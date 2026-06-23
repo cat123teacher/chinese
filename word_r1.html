@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基礎漢字500 生字學習 App (圖文版)</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f8ff; /* 換成柔和的淺藍色背景 */
+    margin: 0;
+  }
+  .card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    width: 300px;
+  }
+  #image-display {
+    font-size: 120px; /* 卡通圖案的大小 */
+    margin-bottom: 20px;
+    line-height: 1;
+  }
+  #word-display {
+    font-size: 120px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1;
+  }
+  .btn {
+    padding: 15px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: #ff9800; /* 活潑的橘色發音按鈕 */
+    color: white;
+    border: none;
+    border-radius: 50px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.1s;
+  }
+  .btn:active {
+    transform: scale(0.95);
+  }
+  .nav-controls {
+    display: flex;
+    gap: 20px;
+  }
+  .nav-btn {
+    padding: 15px 30px;
+    font-size: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .nav-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- 圖片顯示區域 (在生字上方) -->
+  <div id="image-display">⛰️</div>
+  <!-- 生字顯示區域 -->
+  <div id="word-display">山</div>
+</div>
+
+<button class="btn" onclick="speakWord()">🔊 讀出聲音</button>
+
+<div class="nav-controls">
+  <button class="nav-btn" id="prev-btn" onclick="prevWord()" disabled>⬅️ 上一字</button>
+  <button class="nav-btn" id="next-btn" onclick="nextWord()">下一字 ➡️</button>
+</div>
+
+<script>
+  // 包含 20 個生字及其對應卡通圖示的資料庫
+  const wordData = [
+    { word: '山', icon: '⛰️' },
+    { word: '高', icon: '🏔️' },
+    { word: '的', icon: '🎯' },
+    { word: '人', icon: '🧒' }, // 呼應書中的小嬰兒
+    { word: '個', icon: '🧑‍🏫' },
+    { word: '大', icon: '🧍‍♂️' },
+    { word: '上', icon: '🧗' }, // 呼應書中爬上山的動作
+    { word: '下', icon: '🪂' }, // 呼應書中降落傘的動作
+    { word: '在', icon: '📍' },
+    { word: '有', icon: '🙌' },
+    { word: '手', icon: '🖐️' },
+    { word: '很', icon: '✨' },
+    { word: '隻', icon: '🤚' },
+    { word: '小', icon: '🤏' },
+    { word: '孩', icon: '👶' },
+    { word: '家', icon: '🏠' }, // 呼應書中的房子
+    { word: '也', icon: '👯' },
+    { word: '我', icon: '🙋' },
+    { word: '指', icon: '👆' },
+    { word: '五', icon: '🖐️' }
+  ];
+
+  let currentIndex = 0;
+
+  const wordDisplay = document.getElementById('word-display');
+  const imageDisplay = document.getElementById('image-display');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  function updateDisplay() {
+    // 同時更新字與上面的圖案
+    wordDisplay.innerText = wordData[currentIndex].word;
+    imageDisplay.innerText = wordData[currentIndex].icon;
+    
+    // 如果您未來自己截圖了 PDF 裡的圖片（例如 shan.jpg），可以把上面那行註解掉，改成下面這樣：
+    // imageDisplay.innerHTML = `<img src="${wordData[currentIndex].word}.jpg" style="width:150px;">`;
+    
+    // 更新按鈕狀態
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === wordData.length - 1;
+  }
+
+  function speakWord() {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(wordData[currentIndex].word);
+      utterance.lang = 'zh-HK'; 
+      utterance.rate = 0.8; 
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("抱歉，您的瀏覽器不支援語音發聲功能。");
+    }
+  }
+
+  function nextWord() {
+    if (currentIndex < wordData.length - 1) {
+      currentIndex++;
+      updateDisplay();
+    }
+  }
+
+  function prevWord() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateDisplay();
+    }
+  }
+</script>
+
+</body>
+</html>
