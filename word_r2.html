@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幼兒生字學習卡</title>
+<style>
+  body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f8ff; margin: 0; }
+  .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; width: 320px; }
+  #image-display img { height: 180px; object-fit: contain; margin-bottom: 20px; }
+  #word-display { font-size: 80px; font-weight: bold; color: #333; margin-bottom: 20px; }
+  .btn { padding: 15px 30px; font-size: 20px; cursor: pointer; background-color: #ff9800; color: white; border: none; border-radius: 50px; margin-bottom: 20px; }
+  .nav-btn { padding: 10px 20px; font-size: 18px; background-color: #4CAF50; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 0 10px; }
+  .nav-btn:disabled { background-color: #ccc; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="image-display"></div>
+  <div id="word-display">媽媽</div>
+</div>
+<button class="btn" onclick="speakWord()">🔊 按我發音</button>
+<div>
+  <button class="nav-btn" id="prev-btn" onclick="prevWord()" disabled>⬅️ 上一個</button>
+  <button class="nav-btn" id="next-btn" onclick="nextWord()">下一個 ➡️</button>
+</div>
+<script>
+  const wordData = [
+    {word:'媽媽'}, {word:'爸爸'}, {word:'家'}, {word:'狗'}, {word:'貓'},
+    {word:'一'}, {word:'二'}, {word:'三'}, {word:'紅'}, {word:'藍'},
+    {word:'太陽'}, {word:'花'}, {word:'樹'}, {word:'球'}, {word:'書'},
+    {word:'蘋果'}, {word:'香蕉'}, {word:'水'}, {word:'車'}, {word:'月亮'}
+  ];
+  let currentIndex = 0;
+  const wordDiv = document.getElementById('word-display');
+  const imgDiv = document.getElementById('image-display');
+
+  function updateDisplay() {
+    const item = wordData[currentIndex];
+    wordDiv.innerText = item.word;
+    imgDiv.innerHTML = `<img src="${item.word}.jpg" alt="請放入 ${item.word}.jpg">`;
+    document.getElementById('prev-btn').disabled = currentIndex === 0;
+    document.getElementById('next-btn').disabled = currentIndex === wordData.length - 1;
+  }
+  function speakWord() {
+    const utter = new SpeechSynthesisUtterance(wordData[currentIndex].word);
+    utter.lang = 'zh-HK';
+    window.speechSynthesis.speak(utter);
+  }
+  function nextWord() { if(currentIndex < wordData.length-1) { currentIndex++; updateDisplay(); } }
+  function prevWord() { if(currentIndex > 0) { currentIndex--; updateDisplay(); } }
+  updateDisplay();
+</script>
+</body>
+</html>
