@@ -3,111 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teacher Cat 幼兒學習卡</title>
+<title>幼兒中英文學習卡遊戲(發聲版)</title>
 <style>
-  :root { --primary: #FFB7B2; --secondary: #B2E2F2; }
-  body { font-family: sans-serif; background: #FFF9E1; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-  .logo { position: absolute; top: 10px; left: 10px; width: 50px; border-radius: 50%; }
+  :root { --primary: #FFB7B2; --secondary: #B2E2F2; --text: #555; }
+  body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #FFF9E1; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text); }
+  .logo { position: absolute; top: 10px; left: 10px; width: 50px; height: 50px; border-radius: 50%; z-index: 10; border: 2px solid white; }
   .page { display: none; flex-direction: column; align-items: center; width: 100%; flex-grow: 1; padding: 20px; box-sizing: border-box; }
   .active { display: flex; }
-  .mode-btn { width: 80%; max-width: 300px; padding: 20px; margin: 10px; border-radius: 20px; border: none; background: white; font-size: 22px; font-weight: bold; box-shadow: 0 4px #FFDAC1; cursor: pointer; }
-  .level-btn { padding: 12px; background: white; border: 2px solid var(--primary); border-radius: 12px; cursor: pointer; font-size: 14px; }
-  .card { background: white; padding: 20px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 300px; }
+  h1 { color: #FF9AA2; text-align: center; font-size: 26px; }
+  .mode-btn { width: 90%; max-width: 360px; padding: 16px; margin: 6px; border-radius: 20px; border: none; background: white; font-size: 18px; font-weight: bold; box-shadow: 0 4px #FFDAC1; cursor: pointer; }
+  .level-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; width: 100%; max-width: 350px; }
+  .level-btn { padding: 15px; background: white; border: 2px solid var(--primary); border-radius: 15px; cursor: pointer; font-weight: bold; }
+  .card { background: white; padding: 20px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 320px; }
   .card img { width: 100%; height: 180px; object-fit: contain; }
-  .word { font-size: 70px; margin: 15px 0; }
-  footer { background: white; width: 100%; padding: 15px 0; text-align: center; border-top: 4px solid var(--secondary); font-size: 12px; position: relative; bottom: 0; }
+  .word { font-size: 65px; margin: 10px 0; color: #333; }
+  footer { background: white; width: 100%; padding: 15px 0; text-align: center; border-top: 4px solid var(--secondary); font-size: 11px; }
+  footer a { margin: 0 4px; text-decoration: none; color: #777; background: #f9f9f9; padding: 2px 6px; border-radius: 4px; }
 </style>
 </head>
 <body>
 <img src="cat.jpeg" class="logo">
-
-<!-- 第一層：模式選擇 -->
 <div id="mode-page" class="page active">
-  <h1 style="color:#FF9AA2">🌟 幼兒學習卡遊戲 🌟</h1>
-  <button class="mode-btn" onclick="selectMode(true)" style="background:#FFDAC1">初級版 (有圖片)</button>
-  <button class="mode-btn" onclick="selectMode(false)" style="background:#E2F0CB">初級版 (沒有圖片)</button>
+  <h1>🌟 幼兒中英文學習卡遊戲<br>(發聲版) 🌟</h1>
+  <button class="mode-btn" onclick="setMode('zh', true)" style="background:#FFDAC1">初級版中文(K1-K2有圖片)</button>
+  <button class="mode-btn" onclick="setMode('zh', false)" style="background:#FFEDD5">初級版中文(K1-K2沒有圖片)</button>
+  <button class="mode-btn" onclick="setMode('en', true)" style="background:#B2E2F2">初級版英文(K1-K2有圖片)</button>
+  <button class="mode-btn" onclick="setMode('en', false)" style="background:#E0F2FE">初級版英文(K1-K2沒有圖片)</button>
 </div>
-
-<!-- 第二層：關卡選擇 -->
 <div id="level-page" class="page">
-  <h2 id="mode-title"></h2>
-  <div style="display:grid; grid-template-columns:1fr; gap:10px;" id="level-menu"></div>
+  <h2 id="mode-title" style="color:#FF9AA2"></h2>
+  <div class="level-grid" id="level-menu"></div>
   <button onclick="location.reload()" style="margin-top:20px;">⬅️ 返回主頁</button>
 </div>
-
-<!-- 第三層：遊戲畫面 -->
 <div id="game-page" class="page">
-  <div id="game-info" style="margin-bottom:10px; background:var(--secondary); padding:5px 15px; border-radius:15px;"></div>
+  <div id="info-bar" style="background:var(--secondary); padding:5px 20px; border-radius:20px; margin-bottom:10px; font-weight:bold;"></div>
   <div class="card">
     <div id="img-area"></div>
     <div class="word" id="word-text"></div>
   </div>
-  <button style="font-size:30px; margin:20px; border-radius:50%; width:70px; height:70px; background:var(--secondary); border:none;" onclick="speak()">🔊</button>
+  <button style="font-size:35px; margin:20px; border-radius:50%; width:70px; height:70px; background:var(--secondary); border:none; cursor:pointer;" onclick="speak()">🔊</button>
   <div style="display:flex; gap:10px;">
     <button onclick="prev()">⬅️ 上一個</button>
-    <button onclick="selectMode(showImage)">🔢 關卡選單</button>
+    <button onclick="goBackToLevels()">🏠 選單</button>
     <button onclick="next()">下一個 ➡️</button>
   </div>
 </div>
-
 <footer>
   <strong>Teacher Cat 的快樂AI教室</strong><br>
-  <a href="https://www.youtube.com/@TeacherCat123">YouTube</a> | <a href="https://www.instagram.com/teachercat123">IG</a> | <a href="https://www.facebook.com/share/1Gp2hwWUFP/">FB</a> | <a href="https://xhslink.com/m/5UQtqPpcsWK">小紅書</a> | 抖音: 74254902683
+  <div style="margin-top:5px;">
+    <a href="https://www.youtube.com/@TeacherCat123">YouTube</a> | <a href="https://www.instagram.com/teachercat123">IG</a> | <a href="https://www.facebook.com/share/1Gp2hwWUFP/">FB</a> | <a href="https://xhslink.com/m/5UQtqPpcsWK">小紅書</a>
+  </div>
 </footer>
-
 <script>
-  const levels = {
+  const levelsZh = {
     "第一關：家人與家居": ["媽媽","爸爸","哥哥","姐姐","弟弟","妹妹","爺爺","奶奶","家","門","窗","椅子","桌子","燈","床","玩具","娃娃","積木","書","球"],
-    "第二關：數字與顏色": ["一","二","三","四","五","六","七","八","九","十","紅","藍","黃","綠","白","黑","橘","粉","灰","彩虹"],
+    "第二關：數字與顏色": ["一","二","三","四","五","六","七","八","九","十","紅","藍","黃","綠","白","黑","橙","粉紅","灰","彩虹"],
     "第三關：動物與自然": ["狗","貓","鳥","魚","兔子","熊","猴子","太陽","月亮","星星","雲","雨","風","樹","花","草","山","河","葉子","蝴蝶"],
     "第四關：身體與動作": ["頭","眼睛","鼻子","嘴巴","耳朵","手","腳","牙齒","跑","跳","走","唱","畫","吃","喝","笑","哭","抱","洗手","睡覺"],
-    "第五關：食物與日常用品": ["蘋果","香蕉","橘子","西瓜","葡萄","餅乾","麵包","牛奶","飯","蛋","糖果","水","茶","碗","筷子","衣服","鞋子","帽子","公車","幼稚園"]
+    "第五關：食物與日常用品": ["蘋果","香蕉","橙子","西瓜","葡萄","餅乾","麵包","牛奶","飯","蛋","糖果","水","茶","碗","筷子","衣服","鞋子","帽子","公車","幼稚園"]
   };
-  let showImage = true;
-  let currentWords = [];
-  let currentIndex = 0;
-  let currentLevelName = "";
-
-  function selectMode(imgMode) {
-    showImage = imgMode;
+  const levelsEn = {
+    "第一關：家人與家居": ["Mother","Father","Brother","Sister","Brother","Sister","Grandpa","Grandma","Home","Door","Window","Chair","Table","Lamp","Bed","Toy","Doll","Blocks","Book","Ball"],
+    "第二關：數字與顏色": ["One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Red","Blue","Yellow","Green","White","Black","Orange","Pink","Grey","Rainbow"],
+    "第三關：動物與自然": ["Dog","Cat","Bird","Fish","Rabbit","Bear","Monkey","Sun","Moon","Star","Cloud","Rain","Wind","Tree","Flower","Grass","Mountain","River","Leaf","Butterfly"],
+    "第四關：身體與動作": ["Head","Eyes","Nose","Mouth","Ears","Hand","Foot","Teeth","Run","Jump","Walk","Sing","Draw","Eat","Drink","Smile","Cry","Hug","Wash Hands","Sleep"],
+    "第五關：食物與日常用品": ["Apple","Banana","Orange","Watermelon","Grapes","Biscuit","Bread","Milk","Rice","Egg","Candy","Water","Tea","Bowl","Chopsticks","Clothes","Shoes","Hat","Bus","Kindergarten"]
+  };
+  let currentLang = 'zh', showImage = true, currentWords = [], currentImgNames = [], currentIndex = 0, currentLevelName = "";
+  function setMode(lang, img) {
+    currentLang = lang; showImage = img;
     document.getElementById('mode-page').classList.remove('active');
-    document.getElementById('game-page').classList.remove('active');
     document.getElementById('level-page').classList.add('active');
-    document.getElementById('mode-title').innerText = imgMode ? "初級版 (有圖片)" : "初級版 (沒有圖片)";
-    const menu = document.getElementById('level-menu');
-    menu.innerHTML = "";
-    Object.keys(levels).forEach(lvl => {
-      let btn = document.createElement('button');
-      btn.className = 'level-btn';
-      btn.innerText = lvl;
-      btn.onclick = () => startLevel(lvl);
-      menu.appendChild(btn);
+    document.getElementById('mode-title').innerText = `初級版${lang==='zh'?'中文':'英文'}(K1-K2${img?'有圖片':'沒有圖片'})`;
+    const menu = document.getElementById('level-menu'); menu.innerHTML = "";
+    Object.keys(levelsZh).forEach(lvl => {
+      let btn = document.createElement('button'); btn.className = 'level-btn'; btn.innerText = lvl; btn.onclick = () => startLevel(lvl); menu.appendChild(btn);
     });
   }
-
   function startLevel(lvl) {
     currentLevelName = lvl;
-    currentWords = [...levels[lvl]].sort(() => Math.random() - 0.5);
+    let indices = Array.from({length: 20}, (_, i) => i).sort(() => Math.random() - 0.5);
+    currentWords = indices.map(i => currentLang === 'zh' ? levelsZh[lvl][i] : levelsEn[lvl][i]);
+    currentImgNames = indices.map(i => levelsZh[lvl][i]);
     currentIndex = 0;
     document.getElementById('level-page').classList.remove('active');
     document.getElementById('game-page').classList.add('active');
     update();
   }
-
   function update() {
-    const w = currentWords[currentIndex];
-    document.getElementById('game-info').innerText = `${currentLevelName} (${currentIndex+1}/20)`;
-    document.getElementById('word-text').innerText = w;
-    document.getElementById('img-area').innerHTML = showImage ? `<img src="${w}.jpg" alt="${w}">` : "";
+    document.getElementById('info-bar').innerText = `${currentLevelName} (${currentIndex+1}/20)`;
+    document.getElementById('word-text').innerText = currentWords[currentIndex];
+    document.getElementById('img-area').innerHTML = showImage ? `<img src="${currentImgNames[currentIndex]}.jpg" alt="${currentWords[currentIndex]}">` : "";
   }
-
   function speak() {
     const u = new SpeechSynthesisUtterance(currentWords[currentIndex]);
-    u.lang = 'zh-HK'; window.speechSynthesis.speak(u);
+    u.lang = currentLang === 'zh' ? 'zh-HK' : 'en-US'; window.speechSynthesis.speak(u);
   }
-
-  function next() { if(currentIndex < 19) { currentIndex++; update(); } else { alert("挑戰成功！"); selectMode(showImage); } }
+  function next() { if(currentIndex < 19) { currentIndex++; update(); } else { alert("挑戰成功！"); goBackToLevels(); } }
   function prev() { if(currentIndex > 0) { currentIndex--; update(); } }
+  function goBackToLevels() { document.getElementById('game-page').classList.remove('active'); document.getElementById('level-page').classList.add('active'); }
 </script>
 </body>
 </html>
