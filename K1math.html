@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幼兒K1圖解邏輯遊戲(發音版) - Teacher Cat</title>
+    <style>
+        body { font-family: 'Comic Sans MS', '微軟正黑體', sans-serif; text-align: center; background-color: #f0f8ff; padding: 10px; margin: 0; overflow-x: hidden; }
+        
+        .game-container { 
+            background: white; border-radius: 20px; padding: 20px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 450px; 
+            margin: 40px auto 20px auto; border: 5px solid #FFB6C1; 
+            min-height: 550px; position: relative; display: flex; flex-direction: column; 
+        }
+
+        .global-logo {
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #FFD700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            object-fit: cover;
+            background-color: white;
+        }
+
+        h1 { color: #FF69B4; font-size: 22px; margin-bottom: 5px;}
+        .progress { font-size: 16px; color: #888; font-weight: bold; background: #eee; border-radius: 10px; display: inline-block; padding: 5px 15px; margin-bottom: 15px; }
+        
+        #game-area { flex-grow: 1; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .item { font-size: 60px; cursor: pointer; transition: transform 0.2s; display: inline-block; margin: 10px; user-select: none; }
+        .item:active { transform: scale(1.1); }
+        .number-btn { font-size: 24px; padding: 10px 20px; margin: 5px; border-radius: 15px; border: 2px solid #87CEFA; background-color: #E0FFFF; cursor: pointer; font-weight: bold;}
+        
+        /* 迷宮按鈕優化 */
+        .maze-btn { font-size: 24px; width: 60px; height: 60px; margin: 5px; border-radius: 50%; border: 3px solid #ccc; background: #eee; cursor: pointer; font-weight: bold; position: absolute; z-index: 10; transition: transform 0.2s;}
+        .maze-btn:active { transform: scale(1.1); }
+        .maze-btn.correct { background: #a5d6a7; border-color: #4caf50; color: white;}
+        .maze-container { position: relative; width: 300px; height: 250px; background: #e8f5e9; border-radius: 15px; }
+
+        /* 混合選項佈局 */
+        .mixed-option { 
+            background: #f9f9f9; border-radius: 15px; padding: 10px; border: 2px solid #ddd; 
+            cursor: pointer; transition: 0.2s; display: inline-flex; justify-content: center; align-items: center; 
+            width: 90px; height: 90px; margin: 5px; box-sizing: border-box;
+        }
+        .mixed-option:active { transform: scale(1.1); border-color: #FF69B4; }
+        .mixed-option img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .shadow-emoji { font-size: 60px; filter: brightness(0); user-select: none; line-height: 1;}
+
+        .voice-controls { margin-top: 10px; padding-top: 10px; width: 100%;}
+        .voice-btn { font-size: 16px; padding: 12px; margin: 5px; border-radius: 30px; border: none; cursor: pointer; width: 45%; color: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .voice-btn:active { transform: translateY(2px); }
+        .btn-question { background-color: #4CAF50; }
+        .btn-hint { background-color: #FF9800; }
+        .menu-btn { font-size: 18px; padding: 10px 20px; background-color: #9C27B0; color: white; border: none; border-radius: 15px; cursor: pointer; margin: 10px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .menu-btn:hover { background-color: #BA68C8; transform: scale(1.05); }
+        
+        .nav-controls { display: flex; justify-content: space-between; margin-top: 15px; border-top: 2px dashed #eee; padding-top: 15px; width: 100%; }
+        .nav-btn { flex: 1; font-size: 14px; padding: 10px 5px; margin: 0 5px; border-radius: 10px; border: none; cursor: pointer; background-color: #f1f1f1; color: #333; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
+        .nav-btn:active { transform: translateY(2px); }
+        .nav-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .social-footer { margin-top: 20px; padding-top: 15px; border-top: 3px solid #ffeb3b; font-size: 13px; }
+        .social-links a, .social-links span {
+            display: inline-block; padding: 5px 10px; border-radius: 8px; 
+            text-decoration: none; color: white; font-weight: bold; margin: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-size: 12px;
+        }
+        .social-links a:active { transform: scale(0.95); }
+
+        #menu, #play-screen, #level-complete { display: none; }
+        .active-screen { display: flex !important; flex-direction: column; animation: fadeIn 0.5s; flex-grow: 1;}
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #menu.active-screen {
+            background: radial-gradient(circle at center, #ffffff 0%, #ffe0b2 60%, #ffb6c1 100%);
+            border-radius: 15px; border: 4px dashed #FF69B4; padding: 30px 10px;
+        }
+
+        .confetti { position: fixed; width: 15px; height: 15px; z-index: 9999; border-radius: 3px; animation: fall linear forwards; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        .reward-icon { font-size: 70px; display: inline-block; margin: 10px; animation: bounceStar 1s infinite alternate ease-in-out; }
+        @keyframes bounceStar { 0% { transform: scale(0.8) translateY(0); } 100% { transform: scale(1.3) translateY(-20px); filter: drop-shadow(0 0 15px #FFD700); } }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    
+    <img src="cat.jpeg" alt="Teacher Cat" class="global-logo">
+
+    <div id="menu" class="active-screen" style="justify-content: center; align-items: center;">
+        <h1 style="font-size: 26px; color: #FF4500; text-shadow: 2px 2px #FFD700; margin-bottom: 20px;">🌟 幼兒K1圖解邏輯遊戲<br>(發音版) 🌟</h1>
+        <p style="font-weight: bold; color: #555;">請選擇挑戰關卡 (每關10題)</p>
+        <button class="menu-btn" onclick="startLevel(1)">關卡 1：影子大挑戰</button>
+        <button class="menu-btn" onclick="startLevel(2)">關卡 2：數數小能手</button>
+        <button class="menu-btn" onclick="startLevel(3)">關卡 3：動物分類學</button>
+        <button class="menu-btn" onclick="startLevel(4)">關卡 4：順序跳跳過河</button>
+    </div>
+
+    <div id="play-screen">
+        <h1 id="level-title">關卡標題</h1>
+        <div><div class="progress" id="progress-text">第 1 / 10 題</div></div>
+        
+        <div id="game-area"></div>
+
+        <div class="voice-controls">
+            <button class="voice-btn btn-question" onclick="playQuestionVoice()">🔊 聽問題</button>
+            <button class="voice-btn btn-hint" onclick="playHintVoice()">💡 聽提示</button>
+        </div>
+
+        <div class="nav-controls">
+            <button id="prev-btn" class="nav-btn" onclick="goPrevPage()">⬅️ 上一頁</button>
+            <button class="nav-btn" style="background-color: #FFD700;" onclick="showMenu()">🏠 回主頁</button>
+            <button id="next-btn" class="nav-btn" onclick="goNextPage()">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <div id="level-complete" style="justify-content: center; align-items: center;">
+        <h1 style="font-size: 35px; color: #FFD700; text-shadow: 2px 2px #FF8C00; margin-top: 20px;">🏆 過關啦！ 🏆</h1>
+        <p style="font-size: 22px; color: #FF69B4; font-weight: bold;">嘩！你好叻呀，完成咗 10 條題目！</p>
+        
+        <div>
+            <div class="reward-icon" style="animation-delay: 0s;">⭐</div>
+            <div class="reward-icon" style="animation-delay: 0.3s;">🌟</div>
+            <div class="reward-icon" style="animation-delay: 0.6s;">⭐</div>
+        </div>
+        
+        <br>
+        <button class="menu-btn" style="padding: 15px 30px; font-size: 20px;" onclick="showMenu()">🏠 返回主選單</button>
+    </div>
+
+    <div class="social-footer">
+        <div style="font-weight: bold; color: #9C27B0; font-size: 16px; margin-bottom: 8px;">🎓 Teacher Cat 的快樂AI教室 🐱</div>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" style="background: #FF0000;">▶️ YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" style="background: #E1306C;">📸 IG</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" style="background: #1877F2;">📘 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" style="background: #000000;">🧵 Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" style="background: #FF2442;">📕 小紅書</a>
+            <span style="background: #333;">🎵 抖音: 74254902683</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const level1MixedData = [
+        { type: 'img', n: '熊仔', e: '🐻', qImg: 'bear.png', rightImg: 'bear_right.png' },
+        { type: 'img', n: '蝴蝶', e: '🦋', qImg: 'butterfly.png', rightImg: 'butterfly_right.png' },
+        { type: 'img', n: '鴨仔', e: '🦆', qImg: 'duck.png', rightImg: 'duck_right.png' },
+        { type: 'img', n: '老鼠仔', e: '🐭', qImg: 'mouse.png', rightImg: 'mouse_right.png' },
+        { type: 'emoji', n: '兔仔', e: '🐰' }, { type: 'emoji', n: '青蛙仔', e: '🐸' },
+        { type: 'emoji', n: '蘋果', e: '🍎' }, { type: 'emoji', n: '魚仔', e: '🐟' },
+        { type: 'emoji', n: '雨傘', e: '☂️' }, { type: 'emoji', n: '剪刀', e: '✂️' },
+        { type: 'emoji', n: '甲蟲', e: '🐞' }, { type: 'emoji', n: '鯨魚', e: '🐳' }
+    ];
+    
+    const level1Wrongs = [ 'wrong_1.png', 'wrong_2.png' ];
+
+    const categories = [
+        { name: '昆蟲', items: ['🦋', '🐛', '🐞', '🪰', '🐜'] },
+        { name: '水中動物', items: ['🐟', '🐳', '🐬', '🐙', '🦀'] },
+        { name: '雀鳥', items: ['🦆', '🦅', '🦉', '🐧', '🐥'] }
+    ];
+
+    let currentLevel = 0;
+    let currentQNum = 1;
+    const MAX_Q = 10;
+    let currentQuestionData = {};
+    let level1QuestionPool = []; 
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'zh-HK';
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+    }
+
+    function playQuestionVoice() { speak(currentQuestionData.qText); }
+    function playHintVoice() { speak(currentQuestionData.hText); }
+
+    function showMenu() {
+        document.getElementById('menu').className = 'active-screen';
+        document.getElementById('play-screen').className = '';
+        document.getElementById('level-complete').className = '';
+        window.speechSynthesis.cancel(); 
+    }
+
+    function startLevel(level) {
+        currentLevel = level;
+        currentQNum = 1;
+        document.getElementById('menu').className = '';
+        document.getElementById('level-complete').className = '';
+        document.getElementById('play-screen').className = 'active-screen';
+        
+        const titles = ["第一關：影子大挑戰 🐻", "第二關：數數小能手 🍎", "第三關：動物分類學 🐳", "第四關：順序跳跳過河 🔢"];
+        document.getElementById('level-title').innerText = titles[level-1];
+        
+        if(level === 1) { level1QuestionPool = shuffle([...level1MixedData]); }
+        
+        speak(`開始${titles[level-1].split(' ')}`);
+        loadQuestion();
+    }
+
+    function updateNavButtons() {
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        if (currentQNum === 1) { prevBtn.classList.add('disabled'); } else { prevBtn.classList.remove('disabled'); }
+        if (currentQNum === MAX_Q) { nextBtn.classList.add('disabled'); } else { nextBtn.classList.remove('disabled'); }
+    }
+
+    function goPrevPage() { 
+        if (currentQNum > 1) { currentQNum--; window.speechSynthesis.cancel(); loadQuestion(); } 
+        else { speak("已經係第一頁啦"); } 
+    }
+
+    function goNextPage() { 
+        if (currentQNum < MAX_Q) { currentQNum++; window.speechSynthesis.cancel(); loadQuestion(); } 
+        else { speak("已經係最後一頁啦，快啲答埋佢啦"); } 
+    }
+
+    function shootConfetti() {
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500'];
+        for (let i = 0; i < 60; i++) {
+            let conf = document.createElement('div');
+            conf.classList.add('confetti');
+            conf.style.left = Math.random() * 100 + 'vw';
+            conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            conf.style.top = '-20px';
+            document.body.appendChild(conf);
+            setTimeout(() => conf.remove(), 4000);
+        }
+    }
+
+    function nextQuestion() {
+        speak('答啱啦！叻叻！');
+        currentQNum++;
+        if (currentQNum > MAX_Q) {
+            setTimeout(() => {
+                document.getElementById('play-screen').className = '';
+                document.getElementById('level-complete').className = 'active-screen';
+                shootConfetti(); 
+                speak('嘩！太厲害啦！恭喜你，完成咗十條題目啦！');
+            }, 1000);
+        } else { setTimeout(loadQuestion, 1000); }
+    }
+
+    function wrongAnswer() { speak('哎呀，唔啱喎，試下再諗下啦。'); }
+
+    function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+    function getRand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function loadQuestion() {
+        document.getElementById('progress-text').innerText = `第 ${currentQNum} / 10 題`;
+        let area = document.getElementById('game-area');
+        area.innerHTML = ''; 
+        updateNavButtons();
+
+        if (currentLevel === 1) generateLevel1(area);
+        else if (currentLevel === 2) generateLevel2(area);
+        else if (currentLevel === 3) generateLevel3(area);
+        else if (currentLevel === 4) generateLevel4(area);
+    }
+
+    function generateLevel1(area) {
+        let target = level1QuestionPool[currentQNum - 1];
+
+        currentQuestionData.qText = `小朋友，搵下下面邊個係 ${target.n} 嘅影子呀？`;
+        currentQuestionData.hText = `提示：留意下 ${target.n} 嘅外型特徵啦！`;
+
+        let emojiDisplay = target.e ? ` ${target.e}` : '';
+
+        let html = `
+            <p style="font-size: 20px; color: #333; font-weight: bold; margin-bottom: 5px;">
+                🔍 第 ${currentQNum} 題：找出「${target.n}${emojiDisplay}」的影子
+            </p>
+            <p style="font-size: 16px; color: #666; margin-top: 0;">
+                看清楚上面的圖案，在下方找出它的影子吧！
+            </p>
+        `;
+
+        if (target.type === 'img') {
+            html += `<div style="margin-bottom: 15px; cursor: default;">
+                        <img src="${target.qImg}" alt="${target.n}" style="width: 120px; height: 120px; object-fit: contain;">
+                     </div>`;
+        } else {
+            html += `<div class="item" style="font-size: 80px; cursor: default; margin-bottom: 15px;">${target.e}</div>`;
+        }
+
+        let options = [];
+
+        if (target.type === 'img') {
+            options.push({ type: 'img', val: target.rightImg, isCorrect: true });
+        } else {
+            options.push({ type: 'emoji', val: target.e, isCorrect: true });
+        }
+
+        let wrongImg = getRand(['wrong_1.png', 'wrong_2.png']);
+        options.push({ type: 'img', val: wrongImg, isCorrect: false });
+
+        let emojiPool = level1MixedData.filter(item => item.type === 'emoji' && item.e !== target.e);
+        let wrongEmoji = getRand(emojiPool).e;
+        options.push({ type: 'emoji', val: wrongEmoji, isCorrect: false });
+
+        options = shuffle(options);
+
+        html += `<div style="display: flex; justify-content: center; gap: 5px;">`;
+        options.forEach(opt => {
+            let action = opt.isCorrect ? 'nextQuestion()' : 'wrongAnswer()';
+            if (opt.type === 'img') {
+                html += `<div class="mixed-option" onclick="${action}"><img src="${opt.val}" alt="影子選項"></div>`;
+            } else {
+                html += `<div class="mixed-option" onclick="${action}"><span class="shadow-emoji">${opt.val}</span></div>`;
+            }
+        });
+        html += `</div>`;
+
+        area.innerHTML = html;
+        if(currentQNum===1) playQuestionVoice();
+    }
+
+    function generateLevel2(area) {
+        let pool = [
+            {e:'🍎',n:'蘋果'}, {e:'🍊',n:'橙'}, {e:'🍉',n:'西瓜'}, {e:'🍑',n:'水蜜桃'}, 
+            {e:'🍒',n:'車厘子'}, {e:'🍌',n:'香蕉'}, {e:'🍓',n:'士多啤梨'}, {e:'🍐',n:'梨'}, 
+            {e:'☂️',n:'雨傘'}, {e:'✂️',n:'剪刀'}, {e:'⌚',n:'手錶'}, {e:'📱',n:'電話'}, 
+            {e:'✏️',n:'鉛筆'}, {e:'🥄',n:'匙羹'}, {e:'🧢',n:'帽'}, {e:'🛏️',n:'床'}, 
+            {e:'💡',n:'燈泡'}, {e:'🍼',n:'奶樽'}, {e:'🪑',n:'凳'}, {e:'🧁',n:'紙杯蛋糕'}
+        ];
+        let target = getRand(pool);
+        let count = Math.floor(Math.random() * 9) + 1; 
+        let wrong1 = (count % 9) + 1;
+        let wrong2 = ((count + 1) % 9) + 1;
+        let answers = shuffle([count, wrong1, wrong2]);
+
+        currentQuestionData.qText = `畫面上總共有幾多個 ${target.n} 呀？`;
+        currentQuestionData.hText = `提示：用手指一隻一隻慢慢篤住嚟數啦！`;
+
+        let html = `
+            <p style="font-size: 20px; color: #333; font-weight: bold; margin-bottom: 5px;">
+                🔢 第 ${currentQNum} 題：數一數有多少 ${target.n}？
+            </p>
+            <div style="background: #e0f7fa; border-radius: 20px; padding: 20px; width: 85%; margin: 0 auto 15px auto; display: flex; flex-wrap: wrap; justify-content: center;">
+        `;
+        for(let i=0; i<count; i++) { html += `<div class="item" style="margin: 5px;" onclick="speak('${i+1}')">${target.e}</div>`; }
+        html += `</div><div>`;
+        answers.forEach(ans => {
+            let isCorrect = (ans === count) ? 'nextQuestion()' : 'wrongAnswer()';
+            html += `<button class="number-btn" onclick="${isCorrect}">${ans}</button>`;
+        });
+        html += `</div>`;
+        area.innerHTML = html;
+        if(currentQNum===1) playQuestionVoice();
+    }
+
+    function generateLevel3(area) {
+        let targetCat = getRand(categories);
+        let wrongCat1 = categories.find(c => c.name !== targetCat.name);
+        let wrongCat2 = categories.find(c => c.name !== targetCat.name && c.name !== wrongCat1.name);
+        let targetItem = getRand(targetCat.items);
+        let options = shuffle([targetItem, getRand(wrongCat1.items), getRand(wrongCat2.items)]);
+
+        currentQuestionData.qText = `請喺下面三個動物入面，搵出邊個係 ${targetCat.name}！`;
+        currentQuestionData.hText = `提示：諗下 ${targetCat.name} 係喺邊度生活或者有咩特徵？`;
+
+        let html = `
+            <p style="font-size: 20px; color: #333; font-weight: bold; margin-bottom: 5px;">
+                🐾 第 ${currentQNum} 題：找出「${targetCat.name}」
+            </p>
+            <div style="margin-top: 20px;">
+        `;
+        options.forEach(opt => {
+            let isCorrect = (opt === targetItem) ? 'nextQuestion()' : 'wrongAnswer()';
+            html += `<div class="item" style="font-size: 70px; background:#f0f8ff; border-radius:50%; padding:10px;" onclick="${isCorrect}">${opt}</div>`;
+        });
+        html += `</div>`;
+        area.innerHTML = html;
+        if(currentQNum===1) playQuestionVoice();
+    }
+
+    // ⭐ 第4關：按題目進度動態調整難度 (1-4, 1-7, 1-10)
+    let mazeExpected = 1;
+    let mazeMax = 4;
+    function generateLevel4(area) {
+        mazeExpected = 1;
+        
+        // 根據目前題號決定最大數字，落實「鷹架理論」
+        if (currentQNum <= 3) {
+            mazeMax = 4; // 第 1-3 題
+        } else if (currentQNum <= 8) {
+            mazeMax = 7; // 第 4-8 題
+        } else {
+            mazeMax = 10; // 第 9-10 題
+        }
+        
+        currentQuestionData.qText = `請順序由 1 開始，一直㩒到 ${mazeMax}！`;
+        currentQuestionData.hText = `提示：而家要搵數字 ${mazeExpected} 呀！`;
+
+        let html = `
+            <p style="font-size: 20px; color: #333; font-weight: bold; margin-bottom: 5px;">
+                🔢 第 ${currentQNum} 題：依順序找出數字
+            </p>
+            <div class="maze-container">
+        `;
+        let numbers = [];
+        for(let i=1; i<=mazeMax; i++) numbers.push(i);
+        numbers = shuffle(numbers);
+
+        // 擴大安全防重疊座標系統 (3排 x 4列 = 共 12 格，保證 10 個數字絕不重疊)
+        const safePositionsFixed = [
+            { top: 5, left: 5 },  { top: 5, left: 30 },  { top: 5, left: 55 },  { top: 5, left: 80 },
+            { top: 40, left: 5 }, { top: 40, left: 30 }, { top: 40, left: 55 }, { top: 40, left: 80 },
+            { top: 75, left: 5 }, { top: 75, left: 30 }, { top: 75, left: 55 }, { top: 75, left: 80 }
+        ];
+        
+        let currentPositions = shuffle([...safePositionsFixed]);
+
+        numbers.forEach((num, index) => {
+            let pos = currentPositions[index];
+            html += `<button class="maze-btn" style="top:${pos.top}%; left:${pos.left}%;" onclick="checkMaze(this, ${num}, ${mazeMax})">${num}</button>`;
+        });
+        html += `</div>`;
+        area.innerHTML = html;
+        if(currentQNum===1) playQuestionVoice();
+    }
+
+    window.checkMaze = function(btn, num, max) {
+        if(num === mazeExpected) {
+            btn.classList.add('correct');
+            speak(num.toString());
+            mazeExpected++;
+            currentQuestionData.hText = `提示：而家要搵數字 ${mazeExpected} 呀！`; 
+            if(mazeExpected > max) { setTimeout(nextQuestion, 500); }
+        } else if (num > mazeExpected) {
+            speak(`哎呀跳咗 Step 喎，而家應該要㩒 ${mazeExpected}！`);
+        }
+    }
+</script>
+
+</body>
+</html>
