@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小一英文文法大冒險Grammar</title>
+<style>
+    :root {
+        --primary: #FF9A9E;
+        --secondary: #FECFEF;
+        --accent1: #A18CD1;
+        --accent2: #FBC2EB;
+        --bg: #FDFBFB;
+        --text: #333;
+        --correct: #84E896;
+        --wrong: #FF6B6B;
+    }
+    body {
+        margin: 0;
+        font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', '微軟正黑體', sans-serif;
+        background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    /* 左上角圖標 */
+    .top-logo {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        object-fit: cover;
+        z-index: 1000;
+        background-color: #fff;
+    }
+
+    header {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255,255,255,0.8);
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    h1 {
+        margin: 0;
+        color: #5f2c82;
+        font-size: 2.2rem;
+        text-shadow: 2px 2px 0px #fff;
+        padding-left: 60px;
+    }
+    .container {
+        width: 90%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        text-align: center;
+        transition: background-color 0.3s;
+        margin-bottom: 30px;
+    }
+    
+    /* 首頁選單 */
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 15px;
+    }
+    .level-btn {
+        background: linear-gradient(135deg, var(--accent2), var(--accent1));
+        color: white;
+        border: none;
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 0 #7b62a3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.4;
+    }
+    .level-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #7b62a3; }
+    .level-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #7b62a3; }
+    
+    /* 遊戲畫面 */
+    #game-screen, #end-screen { display: none; }
+    .status-bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #555;
+    }
+    .difficulty-badge {
+        background-color: #ffeaa7;
+        padding: 5px 15px;
+        border-radius: 20px;
+        color: #d63031;
+    }
+    
+    .question-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        min-height: 80px;
+    }
+    .question-box {
+        font-size: 1.8rem;
+        color: #2d3436;
+        flex-grow: 1;
+    }
+    .tts-btn {
+        background: #ffeaa7;
+        border: none;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        width: 55px;
+        height: 55px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #fdcb6e;
+        transition: transform 0.1s;
+        margin-left: 15px;
+        flex-shrink: 0;
+    }
+    .tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #fdcb6e; }
+
+    .options-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .option-btn {
+        background: #74b9ff;
+        color: white;
+        border: none;
+        padding: 15px;
+        font-size: 1.3rem;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #0984e3;
+        transition: all 0.2s;
+    }
+    .option-btn:hover:not(:disabled) { background: #0984e3; }
+    .option-btn:disabled { cursor: default; opacity: 0.9; }
+    .correct { background: var(--correct) !important; box-shadow: 0 4px 0 #20bf6b !important; }
+    .wrong { background: var(--wrong) !important; box-shadow: 0 4px 0 #eb3b5a !important; }
+    
+    .nav-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        border-top: 2px dashed #dfe6e9;
+        padding-top: 20px;
+    }
+    .nav-btn {
+        background: #a29bfe;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #6c5ce7;
+        flex: 1;
+        margin: 0 5px;
+    }
+    .nav-btn:hover:not(:disabled) { background: #6c5ce7; }
+    .nav-btn:disabled { background: #b2bec3; box-shadow: 0 4px 0 #636e72; cursor: not-allowed; opacity: 0.7; }
+    .nav-btn.home-btn { background: #ff7675; box-shadow: 0 4px 0 #d63031; }
+    .nav-btn.home-btn:hover { background: #d63031; }
+
+    @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    .correct-anim { animation: correctPop 0.4s ease; }
+    @keyframes flashSuccess { 0% { background-color: rgba(255, 255, 255, 0.95); } 50% { background-color: #d1fae5; } 100% { background-color: rgba(255, 255, 255, 0.95); } }
+    .screen-success { animation: flashSuccess 0.6s ease; }
+    .star-display { font-size: 4rem; margin: 20px 0; }
+
+    .falling-star {
+        position: fixed;
+        top: -50px;
+        z-index: 9999;
+        pointer-events: none;
+        animation: fall linear forwards;
+    }
+    @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+    /* 答題總結面板 CSS */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+        background: #f1f2f6;
+        padding: 15px;
+        border-radius: 15px;
+    }
+    .summary-item {
+        padding: 10px 5px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        font-size: 1rem;
+    }
+    .summary-correct {
+        background-color: #20bf6b;
+        cursor: default;
+        box-shadow: 0 4px 0 #1b9e58;
+    }
+    .summary-wrong {
+        background-color: #eb3b5a;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #b71540;
+        transition: transform 0.1s;
+    }
+    .summary-wrong:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 #b71540;
+    }
+    @media (max-width: 600px) {
+        .summary-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* 底部連結區域 */
+    footer {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        padding: 15px 10px;
+        margin-top: auto;
+        box-shadow: 0 -4px 6px rgba(0,0,0,0.05);
+        font-family: '微軟正黑體', sans-serif;
+    }
+    footer p {
+        margin: 0 0 10px 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #5f2c82;
+    }
+    .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .social-links a, .social-links span {
+        text-decoration: none;
+        color: white;
+        background-color: #a29bfe;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+        display: inline-block;
+    }
+    .social-links a:hover { background-color: #6c5ce7; }
+    .social-links span { background-color: #ff7675; cursor: default; } /* 抖音專屬顏色區隔 */
+</style>
+</head>
+<body>
+
+<img src="cat.jpeg" alt="Teacher Cat" class="top-logo">
+
+<header>
+    <h1>🌟 小一英文文法大冒險Grammar 🌟</h1>
+</header>
+
+<div class="container" id="home-screen">
+    <h2>請選擇挑戰關卡：</h2>
+    <div class="menu-grid" id="menu-grid">
+        <!-- JS 動態生成 -->
+    </div>
+</div>
+
+<div class="container" id="game-screen">
+    <div class="status-bar">
+        <span id="progress-text">題 1/20</span>
+        <span id="difficulty-text" class="difficulty-badge">淺程度</span>
+        <span id="score-text">分數: 0</span>
+    </div>
+    
+    <div class="question-container">
+        <div class="question-box" id="question-text">Question loading...</div>
+        <button class="tts-btn" onclick="speakText()" title="讀出題目">🔊</button>
+    </div>
+
+    <div class="options-grid" id="options-grid">
+        <!-- 選項按鈕 -->
+    </div>
+    
+    <div class="nav-bar" id="nav-bar">
+        <button class="nav-btn" id="prev-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
+        <button class="nav-btn home-btn" onclick="showHome()">🏠 回到主頁</button>
+        <button class="nav-btn" id="next-btn" onclick="nextQuestion()">下一頁 ➡️</button>
+    </div>
+</div>
+
+<div class="container" id="end-screen">
+    <h2>🎉 關卡結算 🎉</h2>
+    <div class="star-display" id="star-display">⭐⭐⭐</div>
+    <h3 id="final-score">你的分數是：20 / 20</h3>
+    
+    <!-- 答題總結面板 -->
+    <div id="summary-container" style="margin-top: 25px;">
+        <h4 style="color: #e15f41; margin: 0;">👇 答題總結：點擊紅色的 ❌ 題目，可以重新挑戰哦！</h4>
+        <div class="summary-grid" id="summary-grid">
+            <!-- 動態生成 20 題的對錯方塊 -->
+        </div>
+    </div>
+
+    <button class="level-btn" onclick="showHome()" style="margin-top: 30px; background: #6c5ce7; box-shadow: 0 4px 0 #a29bfe; padding: 15px 30px;">🏠 選擇其他關卡</button>
+</div>
+
+<footer>
+    <p>Teacher Cat 的快樂AI教室</p>
+    <div class="social-links">
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">▶️ YouTube</a>
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
+        <!-- 抖音已改為純文字標籤 -->
+        <span>🎵 抖音:74254902683</span>
+    </div>
+</footer>
+
+<script>
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = new AudioContext();
+
+    function playCorrectSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+        osc.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    function playWrongSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.4);
+        osc.stop(audioCtx.currentTime + 0.4);
+    }
+
+    function speakText() {
+        window.speechSynthesis.cancel();
+        const text = levelQuestions[currentQuestionIndex].q;
+        const cleanText = text.replace(/__/g, "blank");
+        const msg = new SpeechSynthesisUtterance(cleanText);
+        msg.lang = 'en-US';
+        msg.rate = 0.9; 
+        window.speechSynthesis.speak(msg);
+    }
+
+    function createFallingStars() {
+        const numStars = 40;
+        for (let i = 0; i < numStars; i++) {
+            let star = document.createElement("div");
+            star.innerHTML = "⭐";
+            star.className = "falling-star";
+            star.style.left = Math.random() * 100 + "vw";
+            star.style.fontSize = (Math.random() * 2 + 1) + "rem";
+            star.style.animationDuration = (Math.random() * 2 + 1.5) + "s";
+            document.body.appendChild(star);
+            setTimeout(() => { star.remove(); }, 4000);
+        }
+    }
+
+    const gameData = {
+        1: { title: "1. 基礎知識與標點<br><small>Basics & Punctuation</small>", questions: [{q: "What is the uppercase letter of 'a'?", o: ["A", "B", "C"], a: 0}, {q: "What is the lowercase letter of 'G'?", o: ["p", "g", "h"], a: 1}, {q: "Find the missing letter: F __ H I", o: ["E", "G", "J"], a: 1}, {q: "Find the missing letter: v w __ y", o: ["x", "u", "z"], a: 0}, {q: "Rearrange the letters: r g i t e", o: ["tiger", "greet", "right"], a: 0}, {q: "Rearrange the letters: m j a", o: ["jam", "maj", "amj"], a: 0}, {q: "Write the missing letter: a p p l __", o: ["a", "e", "o"], a: 1}, {q: "Capital letter at the start: __y name is Alex.", o: ["m", "M", "N"], a: 1}, {q: "Choose the correct full stop: I am in Class 1A__", o: ["?", "!", "."], a: 2}, {q: "Choose the correct mark: How are you__", o: ["?", "!", "."], a: 0}, {q: "Punctuation: Hello__ What is your name?", o: [".", ",", "?"], a: 1}, {q: "Punctuation: My name is Sally__", o: [".", ",", "?"], a: 0}, {q: "Find the mistake: Good Morning.", o: ["Good", "Morning", "."], a: 1}, {q: "Find the mistake: what is your name?", o: ["what", "is", "name"], a: 0}, {q: "Find the mistake: I am in class 1B.", o: ["I", "am", "class"], a: 2}, {q: "Correct the sentence: my name is ben", o: ["My name is Ben.", "my name is Ben.", "My name is ben."], a: 0}, {q: "Correct the sentence: how are you", o: ["how are You?", "How are you.", "How are you?"], a: 2}, {q: "Punctuation: Wow__ your school bag is beautiful!", o: ["?", "!", ","], a: 1}, {q: "Days of the week must start with a:", o: ["small letter", "capital letter", "number"], a: 1}, {q: "Which sentence is correct?", o: ["I like to go to Ocean Park.", "i like to go to ocean park.", "I like to go to ocean Park."], a: 0}] },
+        2: { title: "2. 名詞與冠詞<br><small>Nouns & Articles</small>", questions: [{q: "Is 'John' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 0}, {q: "Is 'cat' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 1}, {q: "Choose: __ cow", o: ["A", "An"], a: 0}, {q: "Choose: __ apple", o: ["A", "An"], a: 1}, {q: "Choose: __ umbrella", o: ["A", "An"], a: 1}, {q: "What is the plural of 'pencil'?", o: ["pencils", "pencil", "penciles"], a: 0}, {q: "What is the plural of 'zoo'?", o: ["zoos", "zooes", "zoose"], a: 0}, {q: "Is 'water' countable or uncountable?", o: ["Countable", "Uncountable"], a: 1}, {q: "Is 'lemon' countable or uncountable?", o: ["Countable", "Uncountable"], a: 0}, {q: "Choose: __ octopus", o: ["A", "An"], a: 1}, {q: "What is the plural of 'bus'?", o: ["buss", "buses", "bus"], a: 1}, {q: "What is the plural of 'tomato'?", o: ["tomatos", "tomatoes", "tomato"], a: 1}, {q: "What is the plural of 'baby'?", o: ["babys", "babies", "babeis"], a: 1}, {q: "What is the plural of 'leaf'?", o: ["leafs", "leaves", "leavs"], a: 1}, {q: "What is the plural of 'child'?", o: ["childs", "children", "childes"], a: 1}, {q: "What is the plural of 'mouse'?", o: ["mouses", "mice", "meese"], a: 1}, {q: "What is the plural of 'sheep'?", o: ["sheeps", "sheep", "shipe"], a: 1}, {q: "Choose: __ uniform", o: ["A", "An"], a: 0}, {q: "Choose: __ hour", o: ["A", "An"], a: 1}, {q: "Find the mistake: I have a pens.", o: ["I", "have", "pens"], a: 2}] },
+        3: { title: "3. 代名詞與所有格<br><small>Pronouns & Possessives</small>", questions: [{q: "We use '__' when we talk about ourselves.", o: ["you", "I", "he"], a: 1}, {q: "We use '__' when we talk to someone.", o: ["I", "you", "they"], a: 1}, {q: "Introduce a boy: __ is my brother.", o: ["He", "She", "It"], a: 0}, {q: "Introduce a girl: __ is my sister.", o: ["He", "She", "It"], a: 1}, {q: "Talk about an animal: __ is my pet.", o: ["He", "She", "It"], a: 2}, {q: "Maggie and I = __", o: ["We", "They", "You"], a: 0}, {q: "Roy and Ben = __", o: ["We", "They", "I"], a: 1}, {q: "Possessive for 'I': __ doll.", o: ["my", "our", "your"], a: 0}, {q: "Possessive for 'We': __ books.", o: ["my", "our", "his"], a: 1}, {q: "Possessive for 'He': __ car.", o: ["his", "her", "its"], a: 0}, {q: "Possessive for 'She': __ bag.", o: ["his", "her", "our"], a: 1}, {q: "Possessive for 'They': __ eyes.", o: ["their", "our", "its"], a: 0}, {q: "Possessive for 'It': __ tail.", o: ["his", "their", "its"], a: 2}, {q: "Add apostrophe: The __ hat (one girl)", o: ["girl's", "girls'", "girls"], a: 0}, {q: "Plural apostrophe: The __ hats (many girls)", o: ["girl's", "girls'", "girls"], a: 1}, {q: "Name ending in 's': __ cap", o: ["Bess", "Bess's", "Besss"], a: 1}, {q: "Find the mistake: Sally is my friend. She are good friends.", o: ["Sally", "She", "friends"], a: 1}, {q: "Find the mistake: Joe and John are twins. We are six years old.", o: ["twins", "We", "old"], a: 1}, {q: "Rewrite: This robot belongs to the boy. -> This is the __ robot.", o: ["boys'", "boy's", "boys"], a: 1}, {q: "Rewrite: These jeans belong to Kate. -> These are __ jeans.", o: ["Kate's", "Kates", "Kates'"], a: 0}] },
+        4: { title: "4. 動詞與時態<br><small>Verbs & Tenses</small>", questions: [{q: "He __ a boy.", o: ["am", "is", "are"], a: 1}, {q: "I __ tall.", o: ["am", "is", "are"], a: 0}, {q: "They __ friends.", o: ["am", "is", "are"], a: 2}, {q: "I __ a toy boat.", o: ["has", "have"], a: 1}, {q: "She __ a cupcake.", o: ["has", "have"], a: 0}, {q: "We __ two cupcakes.", o: ["has", "have"], a: 1}, {q: "Imperative: __ the blackboard.", o: ["Clean", "Cleans", "Cleaning"], a: 0}, {q: "Imperative: __ attention.", o: ["Pay", "Pays", "Paying"], a: 0}, {q: "Negative imperative: __ turn off the fan.", o: ["Not", "Don't", "Doesn't"], a: 1}, {q: "Simple present: The dog __ a long tail.", o: ["have", "has", "having"], a: 1}, {q: "Present continuous: I __ (eat) now.", o: ["am eating", "is eating", "are eating"], a: 0}, {q: "Present continuous: The children __ (swing).", o: ["am swinging", "is swinging", "are swinging"], a: 2}, {q: "Present continuous: He is __ (run).", o: ["runing", "running", "runs"], a: 1}, {q: "Present continuous: She is __ (swim).", o: ["swiming", "swimming", "swims"], a: 1}, {q: "Present continuous: They are __ (hike).", o: ["hikeing", "hiking", "hikes"], a: 1}, {q: "Are you eating? Yes, I __.", o: ["do", "am", "are"], a: 1}, {q: "Simple present: My brother __ in the park every day.", o: ["run", "runs", "running"], a: 1}, {q: "Simple present: My sister __ her homework every day.", o: ["do", "does", "doing"], a: 1}, {q: "Simple present: The children __ off for school at seven.", o: ["set", "sets", "setting"], a: 0}, {q: "Simple present: The fisherman __ fish every day.", o: ["catch", "catches", "catching"], a: 1}] },
+        5: { title: "5. 形容詞<br><small>Adjectives</small>", questions: [{q: "A dog is fat. A person is __.", o: ["fat", "chubby", "tall"], a: 1}, {q: "The giraffe has a __ neck.", o: ["long", "short", "fat"], a: 0}, {q: "The hippo has a __ mouth.", o: ["small", "big", "thin"], a: 1}, {q: "Cherries are __.", o: ["sour", "sweet", "spicy"], a: 1}, {q: "Lemons are __.", o: ["sour", "sweet", "salty"], a: 0}, {q: "What is the colour of a strawberry?", o: ["blue", "green", "red"], a: 2}, {q: "What is the colour of the sky?", o: ["red", "blue", "yellow"], a: 1}, {q: "I am smiling. I am __.", o: ["sad", "happy", "angry"], a: 1}, {q: "I am crying. I am __.", o: ["happy", "bored", "sad"], a: 2}, {q: "I want water. I am __.", o: ["hungry", "thirsty", "tired"], a: 1}, {q: "What is the opposite of 'clean'?", o: ["dirty", "new", "beautiful"], a: 0}, {q: "What is the opposite of 'beautiful'?", o: ["handsome", "ugly", "clean"], a: 1}, {q: "The blue whale is __.", o: ["tiny", "large", "thin"], a: 1}, {q: "The green vegetable juice tastes __. Yuck!", o: ["sweet", "bitter", "delicious"], a: 1}, {q: "The curry is hot and __.", o: ["spicy", "sweet", "cold"], a: 0}, {q: "The __ flesh of durians.", o: ["smelly", "smooth", "crispy"], a: 0}, {q: "Synonym (same meaning) for 'happy'?", o: ["frightened", "delighted", "upset"], a: 1}, {q: "Synonym for 'hungry'?", o: ["famished", "exhausted", "boiling"], a: 0}, {q: "Synonym for 'scared'?", o: ["freezing", "frightened", "delighted"], a: 1}, {q: "Synonym for 'tired'?", o: ["exhausted", "upset", "famished"], a: 0}] },
+        6: { title: "6. 疑問句<br><small>Question Words</small>", questions: [{q: "__ is your name?", o: ["What", "How", "Who"], a: 0}, {q: "__ are you? I am fine.", o: ["What", "How", "Where"], a: 1}, {q: "__ old are you?", o: ["What", "How", "Who"], a: 1}, {q: "__ is she? She is my mother.", o: ["What", "How", "Who"], a: 2}, {q: "Are they pencils? Yes, __.", o: ["they are", "it is", "they aren't"], a: 0}, {q: "Is it a dog? No, __.", o: ["it is", "it is not", "they are not"], a: 1}, {q: "Do you like apples? Yes, __.", o: ["I do", "I don't", "he does"], a: 0}, {q: "Does he like apples? No, __.", o: ["he does", "he doesn't", "I don't"], a: 1}, {q: "Can you swim? Yes, __.", o: ["I can", "I cannot", "he can"], a: 0}, {q: "Can ducks fly? No, __.", o: ["they can", "they cannot", "it cannot"], a: 1}, {q: "__ many tigers are there?", o: ["What", "How", "Who"], a: 1}, {q: "Fourteen, fifteen, __.", o: ["seventeen", "sixteen", "eighteen"], a: 1}, {q: "Is the dog hungry? Yes, __.", o: ["it is", "he is", "they are"], a: 0}, {q: "Are the boys thirsty? Yes, __.", o: ["they are", "he is", "we are"], a: 0}, {q: "__ do you live? I live in Kowloon.", o: ["What", "Where", "How"], a: 1}, {q: "__ colour is it? It is blue.", o: ["What", "Where", "How"], a: 0}, {q: "What are the birds doing? They are __.", o: ["singing", "birds", "blue"], a: 0}, {q: "Find the mistake: Do Tim like oranges?", o: ["Do", "like", "oranges"], a: 0}, {q: "Find the mistake: Does you eat fish?", o: ["Does", "eat", "fish"], a: 0}, {q: "Are you bored? No, __.", o: ["I am", "I am not", "you are not"], a: 1}] },
+        7: { title: "7. 指示詞與存在句<br><small>Demonstratives & 'There is/are'</small>", questions: [{q: "Near & Singular: __ is a crayon.", o: ["This", "These", "Those"], a: 0}, {q: "Near & Plural: __ are crayons.", o: ["This", "These", "That"], a: 1}, {q: "Far & Singular: __ is a horse.", o: ["This", "These", "That"], a: 2}, {q: "Far & Plural: __ are horses.", o: ["That", "These", "Those"], a: 2}, {q: "__ is some water.", o: ["There", "Here", "Where"], a: 0}, {q: "There __ four lemons.", o: ["is", "are", "am"], a: 1}, {q: "This is __ teddy bear.", o: ["my", "me", "I"], a: 0}, {q: "Those __ horses.", o: ["is", "are", "am"], a: 1}, {q: "There __ an apple.", o: ["is", "are", "am"], a: 0}, {q: "There are __ ducks.", o: ["one", "two", "three"], a: 2}, {q: "Rewrite to plural: This is a banana.", o: ["These are bananas.", "Those are bananas.", "This are bananas."], a: 0}, {q: "Rewrite to singular: These are mosquitoes.", o: ["This is a mosquito.", "That is a mosquito.", "These is a mosquito."], a: 0}, {q: "Look at that kite! Is it near or far?", o: ["Near", "Far"], a: 1}, {q: "Find mistake: Those horse are running fast.", o: ["Those", "horse", "fast"], a: 1}, {q: "Find mistake: These ducks has big foot.", o: ["ducks", "has", "Both 'has' and 'foot' are wrong"], a: 2}, {q: "Uncountable: There is __ juice.", o: ["many", "some", "a"], a: 1}, {q: "Countable plural: There are __ apples.", o: ["much", "many", "a"], a: 1}, {q: "What is the plural of 'watch'?", o: ["watchs", "watches", "watch"], a: 1}, {q: "What is the short form of 'There is'?", o: ["There's", "Theres", "There're"], a: 0}, {q: "Can we use the short form 'There're'?", o: ["Yes", "No"], a: 1}] },
+        8: { title: "8. 介詞<br><small>Prepositions</small>", questions: [{q: "The fish is __ the tank.", o: ["in", "on", "under"], a: 0}, {q: "The tank is __ the table.", o: ["in", "on", "under"], a: 1}, {q: "The ball is __ the table.", o: ["in", "on", "under"], a: 2}, {q: "The cat is __ the table.", o: ["in", "near", "under"], a: 1}, {q: "The apples are __ the tree.", o: ["in", "on", "under"], a: 1}, {q: "The birds are __ the sky.", o: ["in", "on", "near"], a: 0}, {q: "Fill in: __ Sunday.", o: ["in", "on", "at"], a: 1}, {q: "Fill in: __ the morning.", o: ["in", "on", "at"], a: 0}, {q: "Fill in: __ night.", o: ["in", "on", "at"], a: 2}, {q: "Fill in: __ one o'clock.", o: ["in", "on", "at"], a: 2}, {q: "I see two girls __ the swings.", o: ["in", "on", "at"], a: 1}, {q: "The dog is __ front of the boy.", o: ["in", "on", "at"], a: 0}, {q: "The boy is __ the dog.", o: ["in front of", "behind", "on"], a: 1}, {q: "Where is the vase? It is in the __ room.", o: ["living", "bathroom", "kitchen"], a: 0}, {q: "Where is the towel? It is in the __.", o: ["living room", "bathroom", "bedroom"], a: 1}, {q: "The train leaves __ four o'clock.", o: ["in", "on", "at"], a: 2}, {q: "Leon's music lesson is __ Thursdays.", o: ["in", "on", "at"], a: 1}, {q: "Many flowers bloom __ spring.", o: ["in", "on", "at"], a: 0}, {q: "My birthday is __ 3rd October.", o: ["in", "on", "at"], a: 1}, {q: "I stay with my grandmother __ weekdays.", o: ["in", "on", "at"], a: 1}] },
+        9: { title: "9. 特定詞彙主題<br><small>Specific Vocabulary</small>", questions: [{q: "The sound a sheep makes:", o: ["baa", "moo", "oink"], a: 0}, {q: "The sound a cow makes:", o: ["moo", "neigh", "cluck"], a: 0}, {q: "The sound a horse makes:", o: ["cluck", "neigh", "chirp"], a: 1}, {q: "The sound a hen makes:", o: ["chirp", "quack", "cluck"], a: 2}, {q: "The sound a bird makes:", o: ["chirp", "roar", "croak"], a: 0}, {q: "The sound a pig makes:", o: ["miaow", "oink", "woof"], a: 1}, {q: "The sound a duck makes:", o: ["quack", "croak", "moo"], a: 0}, {q: "The sound a frog makes:", o: ["croak", "roar", "cluck"], a: 0}, {q: "The sound a lion makes:", o: ["miaow", "woof", "roar"], a: 2}, {q: "The sound a cat makes:", o: ["miaow", "woof", "baa"], a: 0}, {q: "What do we call a baby sheep?", o: ["calf", "lamb", "foal"], a: 1}, {q: "What do we call a baby cow?", o: ["calf", "chick", "piglet"], a: 0}, {q: "What do we call a baby horse?", o: ["foal", "duckling", "tadpole"], a: 0}, {q: "What do we call a baby hen?", o: ["cub", "kitten", "chick"], a: 2}, {q: "What do we call a baby pig?", o: ["puppy", "piglet", "calf"], a: 1}, {q: "What do we call a baby duck?", o: ["duckling", "lamb", "foal"], a: 0}, {q: "What do we call a baby frog?", o: ["tadpole", "chick", "cub"], a: 0}, {q: "What do we call a baby lion?", o: ["cub", "kitten", "puppy"], a: 0}, {q: "What do we call a baby cat?", o: ["kitten", "puppy", "piglet"], a: 0}, {q: "What do we call a baby dog?", o: ["kitten", "puppy", "lamb"], a: 1}] }
+    };
+
+    let currentLevelId = 1;
+    let currentQuestionIndex = 0;
+    let levelQuestions = [];
+    let userAnswers = {}; 
+    let isRetryMode = false; // 判斷是否處於重新挑戰模式
+
+    const menuGrid = document.getElementById('menu-grid');
+    for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn';
+        btn.innerHTML = gameData[i].title;
+        btn.onclick = () => startLevel(i);
+        menuGrid.appendChild(btn);
+    }
+
+    function showHome() {
+        document.getElementById('home-screen').style.display = 'block';
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'none';
+        window.speechSynthesis.cancel();
+        isRetryMode = false;
+    }
+
+    function startLevel(id) {
+        currentLevelId = id;
+        levelQuestions = gameData[id].questions;
+        currentQuestionIndex = 0;
+        userAnswers = {}; 
+        isRetryMode = false;
+        
+        document.getElementById('home-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        
+        loadQuestion();
+    }
+
+    function getScore() {
+        let sc = 0;
+        for (let i = 0; i < levelQuestions.length; i++) {
+            if (userAnswers[i] !== undefined && userAnswers[i] === levelQuestions[i].a) {
+                sc++;
+            }
+        }
+        return sc;
+    }
+
+    function loadQuestion() {
+        window.speechSynthesis.cancel(); 
+        
+        // 重新挑戰模式下隱藏上下頁按鈕，只允許作答或回主頁
+        if (isRetryMode) {
+            document.getElementById('prev-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        } else {
+            document.getElementById('prev-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        const qData = levelQuestions[currentQuestionIndex];
+        
+        document.getElementById('progress-text').innerText = `題 ${currentQuestionIndex + 1} / 20`;
+        document.getElementById('score-text').innerText = `分數: ${getScore()}`;
+        
+        const diffBadge = document.getElementById('difficulty-text');
+        if (currentQuestionIndex < 10) {
+            diffBadge.innerText = "⭐ 淺程度 (1-10)";
+            diffBadge.style.color = "#0984e3";
+        } else {
+            diffBadge.innerText = "🔥 深程度 (11-20)";
+            diffBadge.style.color = "#d63031";
+        }
+
+        document.getElementById('question-text').innerText = qData.q;
+        const optionsGrid = document.getElementById('options-grid');
+        optionsGrid.innerHTML = ''; 
+
+        const answeredIndex = userAnswers[currentQuestionIndex];
+        const isAnswered = answeredIndex !== undefined;
+        const correctIndex = qData.a;
+
+        qData.o.forEach((optText, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = optText;
+            
+            if(isAnswered) {
+                btn.disabled = true;
+                if(index === correctIndex) {
+                    btn.classList.add('correct');
+                } else if (index === answeredIndex && answeredIndex !== correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            } else {
+                btn.onclick = () => checkAnswer(index, btn);
+            }
+            
+            optionsGrid.appendChild(btn);
+        });
+
+        document.getElementById('prev-btn').disabled = (currentQuestionIndex === 0);
+        document.getElementById('next-btn').innerText = (currentQuestionIndex === levelQuestions.length - 1) ? "完成關卡 🏁" : "下一頁 ➡️";
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        if (userAnswers[currentQuestionIndex] !== undefined) return; 
+        
+        userAnswers[currentQuestionIndex] = selectedIndex;
+        const correctIndex = levelQuestions[currentQuestionIndex].a;
+
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selectedIndex === correctIndex) {
+            btnElement.classList.add('correct', 'correct-anim');
+            
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('screen-success');
+            void gameScreen.offsetWidth; 
+            gameScreen.classList.add('screen-success');
+            
+            playCorrectSound();
+            createFallingStars(); 
+        } else {
+            btnElement.classList.add('wrong');
+            allBtns[correctIndex].classList.add('correct');
+            playWrongSound();
+        }
+        
+        document.getElementById('score-text').innerText = `分數: ${getScore()}`;
+
+        // 無論答對或答錯，1.8秒後自動執行下一步
+        setTimeout(() => {
+            if (isRetryMode) {
+                // 如果是重新挑戰模式，答完直接回到結算畫面看結果
+                isRetryMode = false;
+                showEndScreen();
+            } else {
+                nextQuestion();
+            }
+        }, 1800);
+    }
+
+    function prevQuestion() {
+        if(currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if(currentQuestionIndex < levelQuestions.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            showEndScreen();
+        }
+    }
+
+    function showEndScreen() {
+        window.speechSynthesis.cancel();
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        const finalScore = getScore();
+        document.getElementById('final-score').innerText = `你的分數是：${finalScore} / 20`;
+        
+        let stars = "⭐";
+        if (finalScore >= 10) stars = "⭐⭐";
+        if (finalScore >= 18) stars = "⭐⭐⭐";
+        document.getElementById('star-display').innerText = stars;
+
+        // 生成答題總結面板
+        const summaryGrid = document.getElementById('summary-grid');
+        summaryGrid.innerHTML = '';
+        
+        for (let i = 0; i < levelQuestions.length; i++) {
+            // 如果 userAnswers[i] 是 undefined (被跳過未答)，也會被視為錯 (isCorrect = false)
+            const isCorrect = userAnswers[i] === levelQuestions[i].a;
+            
+            const box = document.createElement('div');
+            box.className = 'summary-item ' + (isCorrect ? 'summary-correct' : 'summary-wrong');
+            box.innerHTML = `題 ${i + 1} <br> ${isCorrect ? '✅' : '❌'}`;
+            
+            // 答錯的題目點擊可以重新挑戰
+            if (!isCorrect) {
+                box.onclick = () => retryQuestion(i);
+                box.title = "點擊重新挑戰此題！";
+            }
+            
+            summaryGrid.appendChild(box);
+        }
+    }
+
+    // 重新挑戰特定題目
+    function retryQuestion(index) {
+        isRetryMode = true;
+        currentQuestionIndex = index;
+        
+        // 刪除舊的錯誤答案紀錄，讓按鈕重新變成可點擊狀態
+        delete userAnswers[index];
+        
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        
+        loadQuestion();
+    }
+</script>
+
+</body>
+</html>
