@@ -69,6 +69,38 @@
         margin-bottom: 30px;
     }
 
+    /* 養成打壞人元素：飛龍面板 */
+    .dragon-panel {
+        background: linear-gradient(135deg, #fff9e6, #fff0c2);
+        border: 4px solid #ffb142;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 15px rgba(204, 142, 53, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .dragon-img {
+        width: 160px;
+        height: 160px;
+        object-fit: contain;
+        animation: floatAnim 2.5s ease-in-out infinite;
+        filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
+    }
+    .dragon-text {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #d35400;
+        margin: 15px 0 0 0;
+        text-align: center;
+        text-shadow: 1px 1px 0px #fff;
+    }
+    @keyframes floatAnim {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+
     /* 進度紀錄面板 */
     .progress-panel {
         background: rgba(241, 242, 246, 0.9);
@@ -92,7 +124,7 @@
     .clear-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #d63031; }
 
     .progress-stars { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px; }
-    .star-record { display: flex; flex-direction: column; align-items: center; width: 65px; height: 90px; justify-content: flex-end; }
+    .star-record { display: flex; flex-direction: column; align-items: center; width: 75px; height: 110px; justify-content: flex-end; }
     
     /* 星星大小狀態 */
     .star-icon { font-size: 2.5rem; filter: grayscale(100%); opacity: 0.4; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: auto; }
@@ -101,6 +133,7 @@
     
     .star-label { font-size: 0.9rem; font-weight: bold; color: #555; margin-top: 5px; }
     .star-date { font-size: 0.75rem; color: #e17055; margin-top: 2px; font-weight: bold; min-height: 14px; }
+    .star-score { font-size: 0.85rem; color: #0984e3; font-weight: bold; margin-top: 2px; }
     
     /* 首頁選單 */
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
@@ -130,7 +163,7 @@
     /* 文法提示框 CSS */
     .hint-box {
         display: none; background-color: #fff3cd; border-left: 6px solid #ffc107; color: #856404;
-        padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 1.2rem; text-align: left;
+        padding: 15px; margin-bottom: 15px; border-radius: 8px; font-size: 1.2rem; text-align: left;
         animation: fadeIn 0.4s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
     .hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed #e4c664; padding-bottom: 8px; }
@@ -165,6 +198,15 @@
     .nav-btn:disabled { background: #b2bec3; box-shadow: 0 4px 0 #636e72; cursor: not-allowed; opacity: 0.7; }
     .nav-btn.home-btn { background: #ff7675; box-shadow: 0 4px 0 #d63031; }
     .nav-btn.home-btn:hover { background: #d63031; }
+
+    /* 跳轉按鈕專用 CSS */
+    .jump-btn {
+        background: #ff9f43; color: white; border: none; padding: 12px 20px; border-radius: 10px;
+        font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #e67e22; width: 100%;
+        margin-bottom: 20px; transition: all 0.2s; animation: fadeIn 0.4s ease;
+    }
+    .jump-btn:hover { background: #e67e22; }
+    .jump-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #e67e22; }
 
     /* 動畫區 */
     @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -206,6 +248,12 @@
 
 <div class="container" id="home-screen">
     
+    <!-- 全新：養成與打壞人飛龍面板 -->
+    <div class="dragon-panel" id="dragon-panel">
+        <img id="dragon-img" class="dragon-img" src="rainbow_egg.png" alt="Rainbow Egg">
+        <p id="dragon-text" class="dragon-text">快完成關卡,消滅壞人</p>
+    </div>
+
     <!-- 進度紀錄面板 -->
     <div class="progress-panel">
         <div class="progress-header">
@@ -214,7 +262,7 @@
         </div>
         <p style="font-size: 0.9rem; color: #555; margin:0; text-align:left;">合格(10分以上)點亮小星星⭐，挑戰全對(20分)獲得閃耀大星星🌟！</p>
         <div class="progress-stars" id="progress-stars">
-            <!-- JS 動態生成星星 -->
+            <!-- JS 動態生成星星與最高分數 -->
         </div>
     </div>
 
@@ -245,6 +293,11 @@
         <span id="hint-text">這裡會顯示提示。</span>
     </div>
 
+    <!-- 答錯時專用的 Move to next question 按鈕 -->
+    <div id="jump-btn-container" style="display: none; text-align: center;">
+        <button class="jump-btn" onclick="nextQuestion()">⏭️ Move to next question</button>
+    </div>
+
     <div class="options-grid" id="options-grid">
         <!-- 選項與對應發音按鈕 -->
     </div>
@@ -268,7 +321,10 @@
         </div>
     </div>
 
-    <button class="level-btn" onclick="showHome()" style="margin-top: 30px; background: #6c5ce7; box-shadow: 0 4px 0 #a29bfe; padding: 15px 30px;">🏠 選擇其他關卡</button>
+    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+        <button class="level-btn" onclick="startLevel(currentLevelId)" style="background: #00b894; box-shadow: 0 4px 0 #00947a; padding: 15px 30px;">🔄 重新挑戰這一關</button>
+        <button class="level-btn" onclick="showHome()" style="background: #6c5ce7; box-shadow: 0 4px 0 #5f2c82; padding: 15px 30px;">🏠 選擇其他關卡</button>
+    </div>
 </div>
 
 <footer>
@@ -367,8 +423,36 @@
         return array;
     }
 
-    // 取得瀏覽器儲存的進度紀錄
     let savedProgress = JSON.parse(localStorage.getItem('grammarGameProgress')) || {};
+
+    // 飛龍孵化階段定義
+    const dragonStages = [
+        { img: "rainbow_egg.png", text: "快完成關卡,消滅壞人" },
+        { img: "rainbow_egg1.png", text: "蛋殼裂開了,快點過關" },
+        { img: "rainbow_egg2.png", text: "蛋殼再裂開了" },
+        { img: "rainbow_egg3.png", text: "蛋殼再裂開更多了" },
+        { img: "rainbow_egg4.png", text: "蛋殼爆開了,快點過關" },
+        { img: "rainbow_egg5.png", text: "恭喜了,小飛龍出來了" },
+        { img: "rainbow_egg6.png", text: "小飛龍長大了,快點過關" },
+        { img: "rainbow_egg7.png", text: "小飛龍變成小年飛龍,快點過關" },
+        { img: "rainbow_egg8.png", text: "小年飛龍長大了,可以打壞人了" },
+        { img: "rainbow_egg9.png", text: "大飛龍消滅了壞人,恭喜你成功過關" }
+    ];
+
+    // 根據通關數量更新飛龍狀態 (完全依照您指定的 1~9 關卡對應設計)
+    function updateDragonStatus() {
+        let completedCount = 0;
+        for (let i = 1; i <= 9; i++) {
+            if (savedProgress[i] !== undefined) {
+                completedCount++;
+            }
+        }
+        // 防止防呆，確保只計算到第 9 階段
+        completedCount = Math.min(completedCount, 9);
+        
+        document.getElementById('dragon-img').src = dragonStages[completedCount].img;
+        document.getElementById('dragon-text').innerText = dragonStages[completedCount].text;
+    }
 
     function renderProgressStars() {
         const progressStarsContainer = document.getElementById('progress-stars');
@@ -378,16 +462,19 @@
             let isEarned = false;
             let isBigStar = false;
             let recordDate = '-';
+            let recordScoreText = '';
             
-            // 相容舊資料(字串)與新資料(物件包含分數)
             if (record !== undefined) {
                 isEarned = true;
                 if (typeof record === 'string') {
+                    // 兼容舊資料格式
                     recordDate = record;
-                    isBigStar = false; // 舊紀錄預設小星星
+                    isBigStar = false;
+                    recordScoreText = '10+ 分';
                 } else {
                     recordDate = record.date;
-                    isBigStar = (record.score === 20); // 滿分20分變大星星
+                    isBigStar = (record.score === 20);
+                    recordScoreText = `最高: ${record.score}分`;
                 }
             }
 
@@ -403,17 +490,20 @@
                 <div class="star-icon ${starClass}">⭐</div>
                 <div class="star-label">Unit ${i}</div>
                 <div class="star-date">${isEarned ? recordDate : '-'}</div>
+                <div class="star-score">${isEarned ? recordScoreText : ''}</div>
             `;
             progressStarsContainer.appendChild(starDiv);
         }
+        
+        // 每次渲染星星時，同步更新飛龍狀態
+        updateDragonStatus();
     }
 
-    // 清除記錄功能
     function clearProgress() {
-        if (confirm("⚠️ 確定要清除所有的學習記錄和星星嗎？\n清除後將無法復原喔！")) {
+        if (confirm("⚠️ 確定要清除所有的學習記錄和星星嗎？\n小飛龍將會變回原來的蛋喔！")) {
             localStorage.removeItem('grammarGameProgress');
             savedProgress = {};
-            renderProgressStars();
+            renderProgressStars(); // 這裡會連動呼叫 updateDragonStatus() 讓蛋變回等級0
         }
     }
 
@@ -487,6 +577,9 @@
 
     function loadQuestion() {
         window.speechSynthesis.cancel(); 
+        
+        // 每次載入新題目時，將 Jump 按鈕隱藏
+        document.getElementById('jump-btn-container').style.display = 'none';
         
         // 進入重做模式時，自動彈出文法提示
         if (isRetryMode) {
@@ -580,6 +673,9 @@
             playCorrectSound();
             createFallingStars(); 
             document.getElementById('score-text').innerText = `分數: ${getScore()}`;
+            
+            // 答對時隱藏 Move to next question 按鈕
+            document.getElementById('jump-btn-container').style.display = 'none';
 
             setTimeout(() => {
                 if (isRetryMode) {
@@ -595,6 +691,9 @@
             const hintMsg = levelQuestions[currentQuestionIndex].hint || levelHints[currentLevelId];
             document.getElementById('hint-text').innerText = hintMsg;
             document.getElementById('hint-box').style.display = 'block';
+            
+            // 答錯時，自動顯示 Move to next question 按鈕
+            document.getElementById('jump-btn-container').style.display = 'block';
 
             if (isRetryMode) {
                 btnElement.classList.add('wrong');
@@ -633,14 +732,13 @@
         
         const finalScore = getScore();
         
-        // --- 更新星星進度紀錄 (包含分數判斷) ---
+        // --- 更新星星進度紀錄與最高分數 ---
         if (finalScore >= 10) { 
             const today = new Date();
             const dateString = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
             
             let existingRecord = savedProgress[currentLevelId];
             
-            // 如果原本沒有紀錄，或是原本紀錄的舊格式(字串)，或是新分數大於等於舊分數，就更新！
             if (!existingRecord || typeof existingRecord === 'string' || finalScore >= existingRecord.score) {
                 savedProgress[currentLevelId] = {
                     date: dateString,
