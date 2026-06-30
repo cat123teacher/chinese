@@ -293,12 +293,12 @@
         window.speechSynthesis.speak(msg);
     }
 
-    // 新增：文法提示中文發音
+    // 文法提示中文發音
     function speakHint() {
         window.speechSynthesis.cancel();
         const text = document.getElementById('hint-text').innerText;
         const msg = new SpeechSynthesisUtterance(text); 
-        msg.lang = 'zh-HK'; // 設定為中文(香港)發音，確保小朋友聽得懂提示
+        msg.lang = 'zh-HK'; 
         msg.rate = 0.9; 
         window.speechSynthesis.speak(msg);
     }
@@ -331,7 +331,7 @@
         return array;
     }
 
-    // 各關卡的專屬文法提示 (如果題目沒有個別設定，就會顯示這個)
+    // 各關卡的專屬文法提示 
     const levelHints = {
         1: "英文句子開頭必須是大寫 (Capital letter)，結尾要加上適當的標點符號 (如句號或問號) 喔！",
         2: "遇到 a, e, i, o, u 發音開頭的字，前面要用 'an'；兩件以上的物品記得加 '-s' 或 '-es'！",
@@ -399,12 +399,9 @@
 
     function loadQuestion() {
         window.speechSynthesis.cancel(); 
-        
-        // 隱藏文法提示框
         document.getElementById('hint-box').style.display = 'none';
         
         if (isRetryMode) {
-            // 如果是重新挑戰模式，隱藏上一頁按鈕，並將下一頁改為回到總結面板
             document.getElementById('prev-btn').style.display = 'none';
             document.getElementById('next-btn').style.display = 'inline-block';
             document.getElementById('next-btn').innerText = "🔙 回到總結";
@@ -452,15 +449,17 @@
     }
 
     function checkAnswer(selectedIndex, btnElement) {
-        if (userAnswers[currentQuestionIndex] !== undefined) return; 
+        // 第一輪模式下，如果已經答過就不能再點；重試模式下我們允許點多次，直到點中正確為止
+        if (userAnswers[currentQuestionIndex] !== undefined && !isRetryMode) return; 
         
-        userAnswers[currentQuestionIndex] = selectedIndex;
         const correctIndex = levelQuestions[currentQuestionIndex].a;
-
         const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.disabled = true);
 
         if (selectedIndex === correctIndex) {
+            // 無論哪種模式，點中正確答案
+            userAnswers[currentQuestionIndex] = selectedIndex; // 記錄正確答案
+            allBtns.forEach(b => b.disabled = true); // 鎖定所有按鈕
+
             btnElement.classList.add('correct', 'correct-anim');
             
             const gameScreen = document.getElementById('game-screen');
@@ -482,18 +481,26 @@
             }, 1800);
 
         } else {
-            // 答錯時：顯示正確與錯誤按鈕顏色，播放錯誤音效
-            btnElement.classList.add('wrong');
-            allBtns[correctIndex].classList.add('correct');
+            // 答錯時
             playWrongSound();
-            document.getElementById('score-text').innerText = `分數: ${getScore()}`;
-
-            // 顯示文法提示框 (取消自動跳頁，強迫小朋友閱讀)
+            
+            // 顯示文法提示框
             const hintMsg = levelQuestions[currentQuestionIndex].hint || levelHints[currentLevelId];
             document.getElementById('hint-text').innerText = hintMsg;
             document.getElementById('hint-box').style.display = 'block';
-            
-            // 玩家必須自己按「下一頁」或「回到總結」按鈕
+
+            if (isRetryMode) {
+                // 【重試模式】：只鎖定按錯的按鈕，不顯示正確答案，讓小朋友繼續猜其他按鈕
+                btnElement.classList.add('wrong');
+                btnElement.disabled = true;
+            } else {
+                // 【第一輪模式】：鎖定所有按鈕，直接顯示正確與錯誤按鈕顏色
+                userAnswers[currentQuestionIndex] = selectedIndex; // 記錄錯誤答案
+                allBtns.forEach(b => b.disabled = true);
+                btnElement.classList.add('wrong');
+                allBtns[correctIndex].classList.add('correct');
+                document.getElementById('score-text').innerText = `分數: ${getScore()}`;
+            }
         }
     }
 
@@ -521,7 +528,6 @@
         
         const finalScore = getScore();
         
-        // 滿分 20/20 的專屬獎勵
         if (finalScore === 20) {
             document.getElementById('final-score').innerHTML = `🏆 你的分數是：${finalScore} / 20 <br><span style="color:#d63031; font-size:1.5rem; display:block; margin-top:10px;">太棒了！全對滿分！</span>`;
             document.getElementById('star-display').innerText = "🌟🌟🌟🌟🌟";
@@ -534,7 +540,6 @@
             document.getElementById('star-display').innerText = stars;
         }
 
-        // 總結面板
         const summaryGrid = document.getElementById('summary-grid');
         summaryGrid.innerHTML = '';
         
