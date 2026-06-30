@@ -68,13 +68,42 @@
         transition: background-color 0.3s;
         margin-bottom: 30px;
     }
+
+    /* 進度紀錄面板 */
+    .progress-panel {
+        background: rgba(241, 242, 246, 0.9);
+        border: 3px dashed #a29bfe;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .progress-header h3 { margin: 0; color: #6c5ce7; }
+    .clear-btn {
+        background: #ff7675; color: white; border: none; padding: 6px 12px;
+        border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold;
+        box-shadow: 0 3px 0 #d63031; transition: transform 0.1s;
+    }
+    .clear-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #d63031; }
+
+    .progress-stars { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px; }
+    .star-record { display: flex; flex-direction: column; align-items: center; width: 65px; height: 90px; justify-content: flex-end; }
+    
+    /* 星星大小狀態 */
+    .star-icon { font-size: 2.5rem; filter: grayscale(100%); opacity: 0.4; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: auto; }
+    .star-icon.earned-small { filter: grayscale(0%); opacity: 1; transform: scale(1.0); text-shadow: 0 0 8px rgba(241, 196, 15, 0.6); }
+    .star-icon.earned-big { filter: grayscale(0%); opacity: 1; transform: scale(1.4); text-shadow: 0 0 15px rgba(241, 196, 15, 1); }
+    
+    .star-label { font-size: 0.9rem; font-weight: bold; color: #555; margin-top: 5px; }
+    .star-date { font-size: 0.75rem; color: #e17055; margin-top: 2px; font-weight: bold; min-height: 14px; }
     
     /* 首頁選單 */
-    .menu-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 15px;
-    }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
     .level-btn {
         background: linear-gradient(135deg, var(--accent2), var(--accent1));
         color: white; border: none; padding: 15px; font-size: 1.1rem; font-weight: bold;
@@ -100,36 +129,30 @@
 
     /* 文法提示框 CSS */
     .hint-box {
-        display: none;
-        background-color: #fff3cd;
-        border-left: 6px solid #ffc107;
-        color: #856404;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        font-size: 1.2rem;
-        text-align: left;
-        animation: fadeIn 0.4s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        display: none; background-color: #fff3cd; border-left: 6px solid #ffc107; color: #856404;
+        padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 1.2rem; text-align: left;
+        animation: fadeIn 0.4s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    .hint-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-        border-bottom: 1px dashed #e4c664;
-        padding-bottom: 8px;
-    }
+    .hint-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px dashed #e4c664; padding-bottom: 8px; }
     .hint-header b { color: #d35400; font-size: 1.3rem; }
     .hint-tts-btn { width: 45px; height: 45px; font-size: 1.2rem; margin-left: 0; }
 
+    /* 選項與選項發音按鈕 CSS */
     .options-grid { display: flex; flex-direction: column; gap: 15px; }
+    .option-row { display: flex; gap: 10px; align-items: stretch; }
     .option-btn {
         background: #74b9ff; color: white; border: none; padding: 15px; font-size: 1.3rem;
         border-radius: 10px; cursor: pointer; box-shadow: 0 4px 0 #0984e3; transition: all 0.2s;
+        flex: 1; text-align: center;
     }
     .option-btn:hover:not(:disabled) { background: #0984e3; }
     .option-btn:disabled { cursor: default; opacity: 0.9; }
+    .option-tts-btn {
+        background: #ffeaa7; border: none; border-radius: 10px; font-size: 1.5rem; width: 60px;
+        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; flex-shrink: 0;
+    }
+    .option-tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #fdcb6e; }
+    
     .correct { background: var(--correct) !important; box-shadow: 0 4px 0 #20bf6b !important; }
     .wrong { background: var(--wrong) !important; box-shadow: 0 4px 0 #eb3b5a !important; }
     
@@ -182,9 +205,22 @@
 </header>
 
 <div class="container" id="home-screen">
+    
+    <!-- 進度紀錄面板 -->
+    <div class="progress-panel">
+        <div class="progress-header">
+            <h3>🚀 學習進度 Progress Record</h3>
+            <button class="clear-btn" onclick="clearProgress()">🗑️ 清除記錄</button>
+        </div>
+        <p style="font-size: 0.9rem; color: #555; margin:0; text-align:left;">合格(10分以上)點亮小星星⭐，挑戰全對(20分)獲得閃耀大星星🌟！</p>
+        <div class="progress-stars" id="progress-stars">
+            <!-- JS 動態生成星星 -->
+        </div>
+    </div>
+
     <h2>請選擇挑戰關卡：</h2>
     <div class="menu-grid" id="menu-grid">
-        <!-- JS 動態生成 -->
+        <!-- JS 動態生成選單 -->
     </div>
 </div>
 
@@ -210,7 +246,7 @@
     </div>
 
     <div class="options-grid" id="options-grid">
-        <!-- 選項按鈕 -->
+        <!-- 選項與對應發音按鈕 -->
     </div>
     
     <div class="nav-bar" id="nav-bar">
@@ -283,24 +319,24 @@
         osc1.stop(now + 1.5); osc2.stop(now + 1.5);
     }
 
-    // 題目英文發音
     function speakText() {
         window.speechSynthesis.cancel();
         const cleanText = levelQuestions[currentQuestionIndex].q.replace(/__/g, "blank");
         const msg = new SpeechSynthesisUtterance(cleanText); 
-        msg.lang = 'en-US'; 
-        msg.rate = 0.9; 
-        window.speechSynthesis.speak(msg);
+        msg.lang = 'en-US'; msg.rate = 0.9; window.speechSynthesis.speak(msg);
     }
 
-    // 文法提示中文發音
+    function speakOption(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text); 
+        msg.lang = 'en-US'; msg.rate = 0.9; window.speechSynthesis.speak(msg);
+    }
+
     function speakHint() {
         window.speechSynthesis.cancel();
         const text = document.getElementById('hint-text').innerText;
         const msg = new SpeechSynthesisUtterance(text); 
-        msg.lang = 'zh-HK'; 
-        msg.rate = 0.9; 
-        window.speechSynthesis.speak(msg);
+        msg.lang = 'zh-HK'; msg.rate = 0.9; window.speechSynthesis.speak(msg);
     }
 
     function createFallingStars() {
@@ -331,17 +367,66 @@
         return array;
     }
 
-    // 各關卡的專屬文法提示 
+    // 取得瀏覽器儲存的進度紀錄
+    let savedProgress = JSON.parse(localStorage.getItem('grammarGameProgress')) || {};
+
+    function renderProgressStars() {
+        const progressStarsContainer = document.getElementById('progress-stars');
+        progressStarsContainer.innerHTML = '';
+        for (let i = 1; i <= 9; i++) {
+            const record = savedProgress[i];
+            let isEarned = false;
+            let isBigStar = false;
+            let recordDate = '-';
+            
+            // 相容舊資料(字串)與新資料(物件包含分數)
+            if (record !== undefined) {
+                isEarned = true;
+                if (typeof record === 'string') {
+                    recordDate = record;
+                    isBigStar = false; // 舊紀錄預設小星星
+                } else {
+                    recordDate = record.date;
+                    isBigStar = (record.score === 20); // 滿分20分變大星星
+                }
+            }
+
+            let starClass = '';
+            if (isEarned) {
+                starClass = isBigStar ? 'earned-big' : 'earned-small';
+            }
+            
+            const starDiv = document.createElement('div');
+            starDiv.className = 'star-record';
+            
+            starDiv.innerHTML = `
+                <div class="star-icon ${starClass}">⭐</div>
+                <div class="star-label">Unit ${i}</div>
+                <div class="star-date">${isEarned ? recordDate : '-'}</div>
+            `;
+            progressStarsContainer.appendChild(starDiv);
+        }
+    }
+
+    // 清除記錄功能
+    function clearProgress() {
+        if (confirm("⚠️ 確定要清除所有的學習記錄和星星嗎？\n清除後將無法復原喔！")) {
+            localStorage.removeItem('grammarGameProgress');
+            savedProgress = {};
+            renderProgressStars();
+        }
+    }
+
     const levelHints = {
-        1: "英文句子開頭必須是大寫 (Capital letter)，結尾要加上適當的標點符號 (如句號或問號) 喔！",
+        1: "英文句子開頭必須是大寫 (Capital letter)，結尾要加上適當的標點符號喔！",
         2: "遇到 a, e, i, o, u 發音開頭的字，前面要用 'an'；兩件以上的物品記得加 '-s' 或 '-es'！",
-        3: "男生用 he或his，女生用 she或her，動物或死物用 it或its，而我們自己要用 I 喔！",
-        4: "I/You/We/They 要配 have/do/are；如果是 He/She/It 單數，就要配 has/does/is 喔！",
-        5: "形容詞是用來描述人、動物或物品的，例如：大小 (big/small)、顏色 (red/blue) 和感覺 (happy/sad)。",
+        3: "男生用 he/his，女生用 she/her，動物/死物用 it/its，我們自己要用 I 喔！",
+        4: "I/You/We/They 要配 have/do/are；He/She/It 單數要配 has/does/is 喔！",
+        5: "形容詞是用來描述人、動物或物品的，例如：大小 (big/small)、顏色和感覺。",
         6: "What 問「什麼」，How 問「如何或幾歲」，Where 問「哪裡」，Who 問「誰」喔！",
-        7: "近的東西用 this或these，遠的東西用 that或those。單數用 is，眾數用 are 喔！",
+        7: "近的東西用 this/these，遠的東西用 that/those。單數用 is，眾數用 are 喔！",
         8: "in (在裡面)、on (在上面)、under (在下面)。記得看清楚物品的位置！",
-        9: "動物有特定的英文叫聲，寶寶也有特別的名字 (例如羊寶寶是 lamb，狗寶寶是 puppy) 喔！"
+        9: "動物有特定的英文叫聲，寶寶也有特別的名字 (例如羊寶寶是 lamb) 喔！"
     };
 
     const gameData = {
@@ -359,17 +444,20 @@
     let currentLevelId = 1; let currentQuestionIndex = 0; let levelQuestions = [];
     let userAnswers = {}; let isRetryMode = false;
 
+    // 初始渲染選單與星星
     const menuGrid = document.getElementById('menu-grid');
     for (let i = 1; i <= 9; i++) {
         const btn = document.createElement('button'); btn.className = 'level-btn';
         btn.innerHTML = gameData[i].title; btn.onclick = () => startLevel(i); menuGrid.appendChild(btn);
     }
+    renderProgressStars();
 
     function showHome() {
         document.getElementById('home-screen').style.display = 'block';
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('end-screen').style.display = 'none';
         window.speechSynthesis.cancel(); isRetryMode = false;
+        renderProgressStars(); 
     }
 
     function startLevel(id) {
@@ -399,13 +487,19 @@
 
     function loadQuestion() {
         window.speechSynthesis.cancel(); 
-        document.getElementById('hint-box').style.display = 'none';
         
+        // 進入重做模式時，自動彈出文法提示
         if (isRetryMode) {
+            const hintMsg = levelQuestions[currentQuestionIndex].hint || levelHints[currentLevelId];
+            document.getElementById('hint-text').innerText = hintMsg;
+            document.getElementById('hint-box').style.display = 'block';
+            
             document.getElementById('prev-btn').style.display = 'none';
             document.getElementById('next-btn').style.display = 'inline-block';
             document.getElementById('next-btn').innerText = "🔙 回到總結";
         } else {
+            document.getElementById('hint-box').style.display = 'none'; // 第一輪隱藏提示框
+            
             document.getElementById('prev-btn').style.display = 'inline-block';
             document.getElementById('next-btn').style.display = 'inline-block';
             document.getElementById('next-btn').innerText = (currentQuestionIndex === levelQuestions.length - 1) ? "完成關卡 🏁" : "下一頁 ➡️";
@@ -432,8 +526,14 @@
         const correctIndex = qData.a;
 
         qData.o.forEach((optText, index) => {
+            // 創建選項容器
+            const row = document.createElement('div');
+            row.className = 'option-row';
+
+            // 1. 答案按鈕
             const btn = document.createElement('button');
-            btn.className = 'option-btn'; btn.innerText = optText;
+            btn.className = 'option-btn'; 
+            btn.innerText = optText;
             
             if(isAnswered) {
                 btn.disabled = true;
@@ -442,26 +542,36 @@
             } else {
                 btn.onclick = () => checkAnswer(index, btn);
             }
-            optionsGrid.appendChild(btn);
+
+            // 2. 發音按鈕
+            const ttsBtn = document.createElement('button');
+            ttsBtn.className = 'option-tts-btn';
+            ttsBtn.innerText = '🔊';
+            ttsBtn.title = '讀出選項(英文)';
+            ttsBtn.onclick = (e) => {
+                e.stopPropagation();
+                speakOption(optText);
+            };
+
+            row.appendChild(btn);
+            row.appendChild(ttsBtn);
+            optionsGrid.appendChild(row);
         });
 
         document.getElementById('prev-btn').disabled = (currentQuestionIndex === 0);
     }
 
     function checkAnswer(selectedIndex, btnElement) {
-        // 第一輪模式下，如果已經答過就不能再點；重試模式下我們允許點多次，直到點中正確為止
         if (userAnswers[currentQuestionIndex] !== undefined && !isRetryMode) return; 
         
         const correctIndex = levelQuestions[currentQuestionIndex].a;
         const allBtns = document.querySelectorAll('.option-btn');
 
         if (selectedIndex === correctIndex) {
-            // 無論哪種模式，點中正確答案
-            userAnswers[currentQuestionIndex] = selectedIndex; // 記錄正確答案
-            allBtns.forEach(b => b.disabled = true); // 鎖定所有按鈕
+            userAnswers[currentQuestionIndex] = selectedIndex; 
+            allBtns.forEach(b => b.disabled = true); 
 
             btnElement.classList.add('correct', 'correct-anim');
-            
             const gameScreen = document.getElementById('game-screen');
             gameScreen.classList.remove('screen-success');
             void gameScreen.offsetWidth; 
@@ -471,7 +581,6 @@
             createFallingStars(); 
             document.getElementById('score-text').innerText = `分數: ${getScore()}`;
 
-            // 答對時，1.8秒後自動跳往下一題或結算
             setTimeout(() => {
                 if (isRetryMode) {
                     isRetryMode = false; showEndScreen();
@@ -481,21 +590,17 @@
             }, 1800);
 
         } else {
-            // 答錯時
             playWrongSound();
             
-            // 顯示文法提示框
             const hintMsg = levelQuestions[currentQuestionIndex].hint || levelHints[currentLevelId];
             document.getElementById('hint-text').innerText = hintMsg;
             document.getElementById('hint-box').style.display = 'block';
 
             if (isRetryMode) {
-                // 【重試模式】：只鎖定按錯的按鈕，不顯示正確答案，讓小朋友繼續猜其他按鈕
                 btnElement.classList.add('wrong');
                 btnElement.disabled = true;
             } else {
-                // 【第一輪模式】：鎖定所有按鈕，直接顯示正確與錯誤按鈕顏色
-                userAnswers[currentQuestionIndex] = selectedIndex; // 記錄錯誤答案
+                userAnswers[currentQuestionIndex] = selectedIndex;
                 allBtns.forEach(b => b.disabled = true);
                 btnElement.classList.add('wrong');
                 allBtns[correctIndex].classList.add('correct');
@@ -528,6 +633,23 @@
         
         const finalScore = getScore();
         
+        // --- 更新星星進度紀錄 (包含分數判斷) ---
+        if (finalScore >= 10) { 
+            const today = new Date();
+            const dateString = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+            
+            let existingRecord = savedProgress[currentLevelId];
+            
+            // 如果原本沒有紀錄，或是原本紀錄的舊格式(字串)，或是新分數大於等於舊分數，就更新！
+            if (!existingRecord || typeof existingRecord === 'string' || finalScore >= existingRecord.score) {
+                savedProgress[currentLevelId] = {
+                    date: dateString,
+                    score: finalScore
+                };
+                localStorage.setItem('grammarGameProgress', JSON.stringify(savedProgress));
+            }
+        }
+
         if (finalScore === 20) {
             document.getElementById('final-score').innerHTML = `🏆 你的分數是：${finalScore} / 20 <br><span style="color:#d63031; font-size:1.5rem; display:block; margin-top:10px;">太棒了！全對滿分！</span>`;
             document.getElementById('star-display').innerText = "🌟🌟🌟🌟🌟";
