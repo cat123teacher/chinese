@@ -157,6 +157,25 @@
         box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
     }
     
+    /* 返回主連結按鈕 */
+    .return-main-btn {
+        display: inline-block;
+        margin-top: 40px;
+        padding: 15px 40px;
+        background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
+        color: white;
+        text-decoration: none;
+        font-size: 1.4em;
+        font-weight: bold;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .return-main-btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(161, 140, 209, 0.6);
+    }
+
     /* 遊戲畫面 */
     #game-screen { display: none; }
     
@@ -169,7 +188,7 @@
         margin-bottom: 25px;
     }
     
-    /* 更新：圖片加入點擊提示特效 */
+    /* 點擊提示特效 */
     #story-image {
         max-width: 100%;
         max-height: 400px;
@@ -185,7 +204,7 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
     
-    /* 新增：圖片放大的模態框 (Modal) 樣式 */
+    /* 圖片放大的模態框 (Modal) 樣式 */
     #image-modal {
         display: none; 
         position: fixed; 
@@ -411,6 +430,11 @@
 
         <p style="font-size: 1.3em;">請點擊下面的關卡，先看故事再挑戰！</p>
         <div id="level-grid"></div>
+
+        <!-- 新增：返回小朋友學習大冒險按鈕 -->
+        <div>
+            <a href="https://cat123teacher.github.io/chinese/main.html" class="return-main-btn">🚀 返回小朋友學習大冒險</a>
+        </div>
     </div>
 
     <!-- 遊戲畫面 -->
@@ -453,7 +477,7 @@
     </div>
 </div>
 
-<!-- 新增：點擊放大用的隱藏模態框 (Modal) -->
+<!-- 點擊放大用的隱藏模態框 (Modal) -->
 <div id="image-modal" onclick="closeModal()">
     <span class="close-modal">&times;</span>
     <img class="modal-content" id="expanded-image">
@@ -511,7 +535,7 @@ const gameData = [
           { q: "天竺鼠發出什麼聲音？", o: ["天竺鼠一路上開心地發出吱吱聲。", "天竺鼠一路上開心地發出汪汪聲。", "天竺鼠一路上開心地發出喵喵聲。"], a: 0 }
       ]
     },
-    { id: 7, lang: 'zh', image: 'IMG_3104.PNG', title: "7. 企 অবলম্ব的友誼薄餅", 
+    { id: 7, lang: 'zh', image: 'IMG_3104.PNG', title: "7. 企鵝的友誼薄餅", 
       story: ["快樂 AI 教室 —— 每日奇趣新聞（幼稚園版）", "南極洲發生了一件好有趣的事情！", "這裡的企鵝寶寶們決定做一個大大的「友誼薄餅」。", "雖然天氣很冷，牠們不怕！", "大家一起搬來冰塊，再用五顏六色的凍凍果子當配料。", "牠們一邊做一邊開心地唱著歌。", "其他小動物也跑來看，大家都說這是有史以來最漂亮的冰雪薄餅！"],
       q: [
           { q: "故事裡的主角是哪一種可愛的動物？", o: ["故事裡的主角是可愛的企鵝寶寶。", "故事裡的主角是北極熊。", "故事裡的主角是海豹。"], a: 0 }, 
@@ -722,13 +746,13 @@ function playAudio(text, event, isFeedback = false) {
     }
 }
 
-// 新增：開啟/關閉圖片放大模態框的功能
+// 開啟/關閉圖片放大模態框的功能
 function openModal() {
     const modal = document.getElementById("image-modal");
     const modalImg = document.getElementById("expanded-image");
     const storyImg = document.getElementById("story-image");
     modal.style.display = "block";
-    modalImg.src = storyImg.src; // 將放大的圖片來源設定為目前關卡的圖片
+    modalImg.src = storyImg.src; 
 }
 
 function closeModal() {
