@@ -147,6 +147,43 @@
     .level-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 0 #7b62a3; }
     .level-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #7b62a3; }
     
+    /* 課前預習畫面 CSS */
+    #intro-screen { display: none; }
+    .intro-box {
+        background: #fff9e6; border: 4px solid #fdcb6e; border-radius: 15px;
+        padding: 25px; text-align: left; margin-bottom: 25px;
+        box-shadow: 0 6px 12px rgba(253, 203, 110, 0.2);
+    }
+    .intro-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 2px dashed #ffeaa7; padding-bottom: 10px; margin-bottom: 15px;
+    }
+    .intro-title { color: #d35400; font-size: 1.8rem; margin: 0; }
+    .intro-tts-btn {
+        background: #ffeaa7; border: none; border-radius: 50%; font-size: 1.5rem; width: 50px; height: 50px;
+        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+    }
+    .intro-tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #fdcb6e; }
+
+    .intro-concept { font-size: 1.2rem; line-height: 1.6; color: #2d3436; margin-bottom: 20px; }
+    .intro-examples {
+        background: #e3f2fd; border-left: 6px solid #74b9ff; padding: 15px;
+        border-radius: 8px; font-size: 1.2rem; color: #0984e3;
+    }
+    .intro-examples ul { margin: 0; padding-left: 0; list-style: none; }
+    .example-li {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255,255,255,0.7); padding: 8px 12px; border-radius: 10px; margin-bottom: 10px;
+    }
+    
+    .start-game-btn {
+        background: #00b894; color: white; border: none; padding: 18px 30px; border-radius: 15px;
+        font-size: 1.5rem; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #00947a; width: 100%;
+        transition: all 0.2s; animation: correctPop 1s infinite alternate;
+    }
+    .start-game-btn:hover { background: #00cec9; }
+    .start-game-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #00947a; }
+
     /* 遊戲畫面 */
     #game-screen, #end-screen { display: none; }
     .status-bar { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: #555; }
@@ -156,7 +193,7 @@
     .question-box { font-size: 1.8rem; color: #2d3436; flex-grow: 1; }
     .tts-btn {
         background: #ffeaa7; border: none; border-radius: 50%; font-size: 1.5rem; width: 55px; height: 55px;
-        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; margin-left: 15px; flex-shrink: 0;
+        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; margin-left: 15px; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
     }
     .tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #fdcb6e; }
 
@@ -182,7 +219,7 @@
     .option-btn:disabled { cursor: default; opacity: 0.9; }
     .option-tts-btn {
         background: #ffeaa7; border: none; border-radius: 10px; font-size: 1.5rem; width: 60px;
-        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; flex-shrink: 0;
+        cursor: pointer; box-shadow: 0 4px 0 #fdcb6e; transition: transform 0.1s; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
     }
     .option-tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #fdcb6e; }
     
@@ -248,7 +285,7 @@
 
 <div class="container" id="home-screen">
     
-    <!-- 全新：養成與打壞人飛龍面板 -->
+    <!-- 養成與打壞人飛龍面板 -->
     <div class="dragon-panel" id="dragon-panel">
         <img id="dragon-img" class="dragon-img" src="rainbow_egg.png" alt="Rainbow Egg">
         <p id="dragon-text" class="dragon-text">快完成關卡,消滅壞人</p>
@@ -270,6 +307,27 @@
     <div class="menu-grid" id="menu-grid">
         <!-- JS 動態生成選單 -->
     </div>
+</div>
+
+<!-- 課前預習教學畫面 -->
+<div class="container" id="intro-screen">
+    <div class="intro-box">
+        <div class="intro-header">
+            <h2 class="intro-title" id="intro-title">關卡名稱</h2>
+            <button class="intro-tts-btn" onclick="speakIntroConcept()" title="讀出文法重點">🔊</button>
+        </div>
+        <div class="intro-concept" id="intro-concept">
+            這裡會顯示文法重點。
+        </div>
+        <div class="intro-examples">
+            <b>💡 常見例子 (Examples)：</b>
+            <ul id="intro-examples-list">
+                <!-- 動態生成例子與發音按鈕 -->
+            </ul>
+        </div>
+    </div>
+    <button class="start-game-btn" onclick="startQuestionLoop()">🚀 Start the game</button>
+    <button class="nav-btn home-btn" style="width: 100%; margin-top: 15px; padding: 15px;" onclick="showHome()">🏠 先回主頁</button>
 </div>
 
 <div class="container" id="game-screen">
@@ -375,9 +433,20 @@
         osc1.stop(now + 1.5); osc2.stop(now + 1.5);
     }
 
+    // 朗讀課前預習的中文文法重點
+    function speakIntroConcept() {
+        window.speechSynthesis.cancel();
+        const title = document.getElementById('intro-title').innerText;
+        const concept = document.getElementById('intro-concept').innerText;
+        const msg = new SpeechSynthesisUtterance(title + "。" + concept); 
+        msg.lang = 'zh-HK'; msg.rate = 0.9; window.speechSynthesis.speak(msg);
+    }
+
     function speakText() {
         window.speechSynthesis.cancel();
-        const cleanText = levelQuestions[currentQuestionIndex].q.replace(/__/g, "blank");
+        const rawText = levelQuestions[currentQuestionIndex].q;
+        let cleanText = rawText.replace(/\(.*?\)/g, ''); 
+        cleanText = cleanText.replace(/__/g, "blank");
         const msg = new SpeechSynthesisUtterance(cleanText); 
         msg.lang = 'en-US'; msg.rate = 0.9; window.speechSynthesis.speak(msg);
     }
@@ -425,7 +494,6 @@
 
     let savedProgress = JSON.parse(localStorage.getItem('grammarGameProgress')) || {};
 
-    // 飛龍孵化階段定義
     const dragonStages = [
         { img: "rainbow_egg.png", text: "快完成關卡,消滅壞人" },
         { img: "rainbow_egg1.png", text: "蛋殼裂開了,快點過關" },
@@ -439,15 +507,15 @@
         { img: "rainbow_egg9.png", text: "大飛龍消滅了壞人,恭喜你成功過關" }
     ];
 
-    // 根據通關數量更新飛龍狀態 (完全依照您指定的 1~9 關卡對應設計)
     function updateDragonStatus() {
         let completedCount = 0;
         for (let i = 1; i <= 9; i++) {
-            if (savedProgress[i] !== undefined) {
+            if (savedProgress[i] !== undefined && savedProgress[i].score >= 10) {
+                completedCount++;
+            } else if (savedProgress[i] !== undefined && typeof savedProgress[i] === 'string') {
                 completedCount++;
             }
         }
-        // 防止防呆，確保只計算到第 9 階段
         completedCount = Math.min(completedCount, 9);
         
         document.getElementById('dragon-img').src = dragonStages[completedCount].img;
@@ -467,7 +535,6 @@
             if (record !== undefined) {
                 isEarned = true;
                 if (typeof record === 'string') {
-                    // 兼容舊資料格式
                     recordDate = record;
                     isBigStar = false;
                     recordScoreText = '10+ 分';
@@ -495,7 +562,6 @@
             progressStarsContainer.appendChild(starDiv);
         }
         
-        // 每次渲染星星時，同步更新飛龍狀態
         updateDragonStatus();
     }
 
@@ -503,7 +569,7 @@
         if (confirm("⚠️ 確定要清除所有的學習記錄和星星嗎？\n小飛龍將會變回原來的蛋喔！")) {
             localStorage.removeItem('grammarGameProgress');
             savedProgress = {};
-            renderProgressStars(); // 這裡會連動呼叫 updateDragonStatus() 讓蛋變回等級0
+            renderProgressStars(); 
         }
     }
 
@@ -519,22 +585,456 @@
         9: "動物有特定的英文叫聲，寶寶也有特別的名字 (例如羊寶寶是 lamb) 喔！"
     };
 
+    const levelIntros = {
+        1: {
+            title: "1. 基礎知識與標點 (Basics & Punctuation)",
+            concept: "📝 <b>重點整理：</b><br>1. 英文句子開頭必須是<b>大寫字母 (Capital letter)</b>。<br>2. 人名、稱呼 (Miss/Mr) 也必須大寫喔！<br>3. 句子結尾要加上適當的標點符號：句號 (<b>.</b>)、問號 (<b>?</b>) 或感嘆號 (<b>!</b>)。",
+            examples: ["<b>M</b>y name is <b>A</b>lex<b>.</b>", "<b>H</b>ow are you<b>?</b>", "<b>W</b>ow<b>!</b> I am Ben<b>.</b>"]
+        },
+        2: {
+            title: "2. 名詞與冠詞 (Nouns & Articles)",
+            concept: "📝 <b>重點整理：</b><br>1. <b>名詞 (Nouns)</b> 是用來稱呼人、動物、地方或物品的詞。<br>2. 在母音 (a, e, i, o, u) 發音開頭的字前面，要用 <b>an</b>；其他的用 <b>a</b>。<br>3. 數量超過一個時，字尾通常要加 <b>-s</b> 或 <b>-es</b>。",
+            examples: ["<b>a</b> mango / <b>an</b> apple", "one cat ➔ two cat<b>s</b>", "one box ➔ two box<b>es</b>"]
+        },
+        3: {
+            title: "3. 代名詞與所有格 (Pronouns & Possessives)",
+            concept: "📝 <b>重點整理：</b><br>1. <b>I</b> (我)、<b>you</b> (你/你們)、<b>he</b> (他/男生)、<b>she</b> (她/女生)、<b>it</b> (牠/動物或物品)、<b>we</b> (我們)、<b>they</b> (他們)。<br>2. <b>所有格 (Possessives)</b> 表示「是誰的」：my (我的)、your (你的)、his (他的)、her (她的)。",
+            examples: ["<b>He</b> is my brother. <b>His</b> kite is yellow.", "<b>She</b> is my sister. <b>Her</b> kite is orange.", "This is Bess<b>'s</b> cap. (這是 Bess 的帽子)"]
+        },
+        4: {
+            title: "4. 動詞與時態 (Verbs & Tenses)",
+            concept: "📝 <b>重點整理：</b><br>1. <b>To be：</b> I 配 <b>am</b>，You/We/They 配 <b>are</b>，He/She/It 配 <b>is</b>。<br>2. <b>To have：</b> I/You/We/They 用 <b>have</b>，He/She/It 用 <b>has</b>。<br>3. <b>現在進行式：</b> 正在發生的動作，動詞要加 <b>-ing</b>。",
+            examples: ["I <b>am</b> tall.", "He <b>has</b> a toy boat.", "I <b>am eating</b> now. (我現在正在吃東西)"]
+        },
+        5: {
+            title: "5. 形容詞 (Adjectives)",
+            concept: "📝 <b>重點整理：</b><br>1. <b>形容詞</b>是用來描述人、動物或物品的長相、顏色、感覺和味道。<br>2. 經常放在 verb 'to be' 的後面，或名詞的前面。",
+            examples: ["The boy is <b>chubby</b>. (微胖的)", "The cherry tomatoes are <b>sweet</b> and <b>juicy</b>. (甜又多汁)", "I am <b>happy</b>. / I am <b>angry</b>."]
+        },
+        6: {
+            title: "6. 疑問句 (Question Words)",
+            concept: "📝 <b>重點整理：</b><br>我們用疑問詞來問問題：<br>• <b>What</b> 用來問「什麼事物」。<br>• <b>How</b> 用來問「狀況如何」或「幾歲(How old)」。<br>• <b>Where</b> 用來問「哪裡(地點)」。<br>• <b>Who</b> 用來問「是誰(人物)」。",
+            examples: ["<b>What</b> is your name?", "<b>How old</b> are you?", "<b>Where</b> do you live? I live in Kowloon.", "<b>Who</b> is she? She is my mother."]
+        },
+        7: {
+            title: "7. 指示詞與存在句 (Demonstratives & There is/are)",
+            concept: "📝 <b>重點整理：</b><br>1. 指示詞：距離近用 <b>This</b>(單數) / <b>These</b>(眾數)；距離遠用 <b>That</b>(單數) / <b>Those</b>(眾數)。<br>2. 存在句：表示「有...」，單數或不可數用 <b>There is</b>，眾數用 <b>There are</b>。",
+            examples: ["<b>This is</b> a crayon. (近)", "<b>Those are</b> horses. (遠)", "<b>There is</b> some water. (不可數)", "<b>There are</b> four lemons. (眾數)"]
+        },
+        8: {
+            title: "8. 介詞 (Prepositions)",
+            concept: "📝 <b>重點整理：</b><br>1. <b>位置介詞：</b> 告訴我們人或物品在「哪裡」。常考的有 in(裡面), on(上面), under(下面), near(附近), in front of(前面), behind(後面)。<br>2. <b>時間介詞：</b> in the morning/afternoon, on Sunday, at night / at one o'clock。",
+            examples: ["The fish is <b>in</b> the tank. (在魚缸裡)", "The ball is <b>under</b> the table. (在桌下)", "I do homework <b>in</b> the afternoon, and sleep <b>at</b> night."]
+        },
+        9: {
+            title: "9. 特定詞彙主題 (Specific Vocabulary)",
+            concept: "📝 <b>重點整理：</b><br>本單元我們要學習大自然裡的兩個有趣主題：<br>1. <b>動物叫聲 (Animal sounds)：</b> 不同動物在英文裡有不同的叫聲寫法。<br>2. <b>動物寶寶 (Animal young)：</b> 動物小時候有特別的名字喔！",
+            examples: ["A sheep bleats '<b>baa</b>'. (綿羊咩咩叫)", "A cat goes '<b>miaow</b>'. (貓咪喵喵叫)", "A baby sheep is a <b>lamb</b>.", "A baby dog is a <b>puppy</b>."]
+        }
+    };
+
     const gameData = {
-        1: { title: "1. 基礎知識與標點<br><small>Basics & Punctuation</small>", questions: [{q: "What is the uppercase letter of 'a'?", o: ["A", "B", "C"], a: 0}, {q: "What is the lowercase letter of 'G'?", o: ["p", "g", "h"], a: 1}, {q: "Find the missing letter: F __ H I", o: ["E", "G", "J"], a: 1}, {q: "Find the missing letter: v w __ y", o: ["x", "u", "z"], a: 0}, {q: "Rearrange the letters: r g i t e", o: ["tiger", "greet", "right"], a: 0}, {q: "Rearrange the letters: m j a", o: ["jam", "maj", "amj"], a: 0}, {q: "Write the missing letter: a p p l __", o: ["a", "e", "o"], a: 1}, {q: "Capital letter at the start: __y name is Alex.", o: ["m", "M", "N"], a: 1}, {q: "Choose the correct full stop: I am in Class 1A__", o: ["?", "!", "."], a: 2}, {q: "Choose the correct mark: How are you__", o: ["?", "!", "."], a: 0}, {q: "Punctuation: Hello__ What is your name?", o: [".", ",", "?"], a: 1}, {q: "Punctuation: My name is Sally__", o: [".", ",", "?"], a: 0}, {q: "Find the mistake: Good Morning.", o: ["Good", "Morning", "."], a: 1}, {q: "Find the mistake: what is your name?", o: ["what", "is", "name"], a: 0}, {q: "Find the mistake: I am in class 1B.", o: ["I", "am", "class"], a: 2}, {q: "Correct the sentence: my name is ben", o: ["My name is Ben.", "my name is Ben.", "My name is ben."], a: 0}, {q: "Correct the sentence: how are you", o: ["how are You?", "How are you.", "How are you?"], a: 2}, {q: "Punctuation: Wow__ your school bag is beautiful!", o: ["?", "!", ","], a: 1}, {q: "Days of the week must start with a:", o: ["small letter", "capital letter", "number"], a: 1}, {q: "Which sentence is correct?", o: ["I like to go to Ocean Park.", "i like to go to ocean park.", "I like to go to ocean Park."], a: 0}] },
-        2: { title: "2. 名詞與冠詞<br><small>Nouns & Articles</small>", questions: [{q: "Is 'John' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 0}, {q: "Is 'cat' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 1}, {q: "Choose: __ cow", o: ["A", "An"], a: 0}, {q: "Choose: __ apple", o: ["A", "An"], a: 1}, {q: "Choose: __ umbrella", o: ["A", "An"], a: 1}, {q: "What is the plural of 'pencil'?", o: ["pencils", "pencil", "penciles"], a: 0}, {q: "What is the plural of 'zoo'?", o: ["zoos", "zooes", "zoose"], a: 0}, {q: "Is 'water' countable or uncountable?", o: ["Countable", "Uncountable"], a: 1}, {q: "Is 'lemon' countable or uncountable?", o: ["Countable", "Uncountable"], a: 0}, {q: "Choose: __ octopus", o: ["A", "An"], a: 1}, {q: "What is the plural of 'bus'?", o: ["buss", "buses", "bus"], a: 1}, {q: "What is the plural of 'tomato'?", o: ["tomatos", "tomatoes", "tomato"], a: 1}, {q: "What is the plural of 'baby'?", o: ["babys", "babies", "babeis"], a: 1}, {q: "What is the plural of 'leaf'?", o: ["leafs", "leaves", "leavs"], a: 1}, {q: "What is the plural of 'child'?", o: ["childs", "children", "childes"], a: 1}, {q: "What is the plural of 'mouse'?", o: ["mouses", "mice", "meese"], a: 1}, {q: "What is the plural of 'sheep'?", o: ["sheeps", "sheep", "shipe"], a: 1}, {q: "Choose: __ uniform", o: ["A", "An"], a: 0}, {q: "Choose: __ hour", o: ["A", "An"], a: 1}, {q: "Find the mistake: I have a pens.", o: ["I", "have", "pens"], a: 2}] },
-        3: { title: "3. 代名詞與所有格<br><small>Pronouns & Possessives</small>", questions: [{q: "We use '__' when we talk about ourselves.", o: ["you", "I", "he"], a: 1}, {q: "We use '__' when we talk to someone.", o: ["I", "you", "they"], a: 1}, {q: "Introduce a boy: __ is my brother.", o: ["He", "She", "It"], a: 0}, {q: "Introduce a girl: __ is my sister.", o: ["He", "She", "It"], a: 1}, {q: "Talk about an animal: __ is my pet.", o: ["He", "She", "It"], a: 2}, {q: "Maggie and I = __", o: ["We", "They", "You"], a: 0}, {q: "Roy and Ben = __", o: ["We", "They", "I"], a: 1}, {q: "Possessive for 'I': __ doll.", o: ["my", "our", "your"], a: 0}, {q: "Possessive for 'We': __ books.", o: ["my", "our", "his"], a: 1}, {q: "Possessive for 'He': __ car.", o: ["his", "her", "its"], a: 0}, {q: "Possessive for 'She': __ bag.", o: ["his", "her", "our"], a: 1}, {q: "Possessive for 'They': __ eyes.", o: ["their", "our", "its"], a: 0}, {q: "Possessive for 'It': __ tail.", o: ["his", "their", "its"], a: 2}, {q: "Add apostrophe: The __ hat (one girl)", o: ["girl's", "girls'", "girls"], a: 0}, {q: "Plural apostrophe: The __ hats (many girls)", o: ["girl's", "girls'", "girls"], a: 1}, {q: "Name ending in 's': __ cap", o: ["Bess", "Bess's", "Besss"], a: 1}, {q: "Find the mistake: Sally is my friend. She are good friends.", o: ["Sally", "She", "friends"], a: 1}, {q: "Find the mistake: Joe and John are twins. We are six years old.", o: ["twins", "We", "old"], a: 1}, {q: "Rewrite: This robot belongs to the boy. -> This is the __ robot.", o: ["boys'", "boy's", "boys"], a: 1}, {q: "Rewrite: These jeans belong to Kate. -> These are __ jeans.", o: ["Kate's", "Kates", "Kates'"], a: 0}] },
-        4: { title: "4. 動詞與時態<br><small>Verbs & Tenses</small>", questions: [{q: "He __ a boy.", o: ["am", "is", "are"], a: 1}, {q: "I __ tall.", o: ["am", "is", "are"], a: 0}, {q: "They __ friends.", o: ["am", "is", "are"], a: 2}, {q: "I __ a toy boat.", o: ["has", "have"], a: 1}, {q: "She __ a cupcake.", o: ["has", "have"], a: 0}, {q: "We __ two cupcakes.", o: ["has", "have"], a: 1}, {q: "Imperative: __ the blackboard.", o: ["Clean", "Cleans", "Cleaning"], a: 0}, {q: "Imperative: __ attention.", o: ["Pay", "Pays", "Paying"], a: 0}, {q: "Negative imperative: __ turn off the fan.", o: ["Not", "Don't", "Doesn't"], a: 1}, {q: "Simple present: The dog __ a long tail.", o: ["have", "has", "having"], a: 1}, {q: "Present continuous: I __ (eat) now.", o: ["am eating", "is eating", "are eating"], a: 0}, {q: "Present continuous: The children __ (swing).", o: ["am swinging", "is swinging", "are swinging"], a: 2}, {q: "Present continuous: He is __ (run).", o: ["runing", "running", "runs"], a: 1}, {q: "Present continuous: She is __ (swim).", o: ["swiming", "swimming", "swims"], a: 1}, {q: "Present continuous: They are __ (hike).", o: ["hikeing", "hiking", "hikes"], a: 1}, {q: "Are you eating? Yes, I __.", o: ["do", "am", "are"], a: 1}, {q: "Simple present: My brother __ in the park every day.", o: ["run", "runs", "running"], a: 1}, {q: "Simple present: My sister __ her homework every day.", o: ["do", "does", "doing"], a: 1}, {q: "Simple present: The children __ off for school at seven.", o: ["set", "sets", "setting"], a: 0}, {q: "Simple present: The fisherman __ fish every day.", o: ["catch", "catches", "catching"], a: 1}] },
-        5: { title: "5. 形容詞<br><small>Adjectives</small>", questions: [{q: "A dog is fat. A person is __.", o: ["fat", "chubby", "tall"], a: 1}, {q: "The giraffe has a __ neck.", o: ["long", "short", "fat"], a: 0}, {q: "The hippo has a __ mouth.", o: ["small", "big", "thin"], a: 1}, {q: "Cherries are __.", o: ["sour", "sweet", "spicy"], a: 1}, {q: "Lemons are __.", o: ["sour", "sweet", "salty"], a: 0}, {q: "What is the colour of a strawberry?", o: ["blue", "green", "red"], a: 2}, {q: "What is the colour of the sky?", o: ["red", "blue", "yellow"], a: 1}, {q: "I am smiling. I am __.", o: ["sad", "happy", "angry"], a: 1}, {q: "I am crying. I am __.", o: ["happy", "bored", "sad"], a: 2}, {q: "I want water. I am __.", o: ["hungry", "thirsty", "tired"], a: 1}, {q: "What is the opposite of 'clean'?", o: ["dirty", "new", "beautiful"], a: 0}, {q: "What is the opposite of 'beautiful'?", o: ["handsome", "ugly", "clean"], a: 1}, {q: "The blue whale is __.", o: ["tiny", "large", "thin"], a: 1}, {q: "The green vegetable juice tastes __. Yuck!", o: ["sweet", "bitter", "delicious"], a: 1}, {q: "The curry is hot and __.", o: ["spicy", "sweet", "cold"], a: 0}, {q: "The __ flesh of durians.", o: ["smelly", "smooth", "crispy"], a: 0}, {q: "Synonym (same meaning) for 'happy'?", o: ["frightened", "delighted", "upset"], a: 1}, {q: "Synonym for 'hungry'?", o: ["famished", "exhausted", "boiling"], a: 0}, {q: "Synonym for 'scared'?", o: ["freezing", "frightened", "delighted"], a: 1}, {q: "Synonym for 'tired'?", o: ["exhausted", "upset", "famished"], a: 0}] },
-        6: { title: "6. 疑問句<br><small>Question Words</small>", questions: [{q: "__ is your name?", o: ["What", "How", "Who"], a: 0}, {q: "__ are you? I am fine.", o: ["What", "How", "Where"], a: 1}, {q: "__ old are you?", o: ["What", "How", "Who"], a: 1}, {q: "__ is she? She is my mother.", o: ["What", "How", "Who"], a: 2}, {q: "Are they pencils? Yes, __.", o: ["they are", "it is", "they aren't"], a: 0}, {q: "Is it a dog? No, __.", o: ["it is", "it is not", "they are not"], a: 1}, {q: "Do you like apples? Yes, __.", o: ["I do", "I don't", "he does"], a: 0}, {q: "Does he like apples? No, __.", o: ["he does", "he doesn't", "I don't"], a: 1}, {q: "Can you swim? Yes, __.", o: ["I can", "I cannot", "he can"], a: 0}, {q: "Can ducks fly? No, __.", o: ["they can", "they cannot", "it cannot"], a: 1}, {q: "__ many tigers are there?", o: ["What", "How", "Who"], a: 1}, {q: "Fourteen, fifteen, __.", o: ["seventeen", "sixteen", "eighteen"], a: 1}, {q: "Is the dog hungry? Yes, __.", o: ["it is", "he is", "they are"], a: 0}, {q: "Are the boys thirsty? Yes, __.", o: ["they are", "he is", "we are"], a: 0}, {q: "__ do you live? I live in Kowloon.", o: ["What", "Where", "How"], a: 1}, {q: "__ colour is it? It is blue.", o: ["What", "Where", "How"], a: 0}, {q: "What are the birds doing? They are __.", o: ["singing", "birds", "blue"], a: 0}, {q: "Find the mistake: Do Tim like oranges?", o: ["Do", "like", "oranges"], a: 0}, {q: "Find the mistake: Does you eat fish?", o: ["Does", "eat", "fish"], a: 0}, {q: "Are you bored? No, __.", o: ["I am", "I am not", "you are not"], a: 1}] },
-        7: { title: "7. 指示詞與存在句<br><small>Demonstratives & 'There is/are'</small>", questions: [{q: "Near & Singular: __ is a crayon.", o: ["This", "These", "Those"], a: 0}, {q: "Near & Plural: __ are crayons.", o: ["This", "These", "That"], a: 1}, {q: "Far & Singular: __ is a horse.", o: ["This", "These", "That"], a: 2}, {q: "Far & Plural: __ are horses.", o: ["That", "These", "Those"], a: 2}, {q: "__ is some water.", o: ["There", "Here", "Where"], a: 0}, {q: "There __ four lemons.", o: ["is", "are", "am"], a: 1}, {q: "This is __ teddy bear.", o: ["my", "me", "I"], a: 0}, {q: "Those __ horses.", o: ["is", "are", "am"], a: 1}, {q: "There __ an apple.", o: ["is", "are", "am"], a: 0}, {q: "There are __ ducks.", o: ["one", "two", "three"], a: 2}, {q: "Rewrite to plural: This is a banana.", o: ["These are bananas.", "Those are bananas.", "This are bananas."], a: 0}, {q: "Rewrite to singular: These are mosquitoes.", o: ["This is a mosquito.", "That is a mosquito.", "These is a mosquito."], a: 0}, {q: "Look at that kite! Is it near or far?", o: ["Near", "Far"], a: 1}, {q: "Find mistake: Those horse are running fast.", o: ["Those", "horse", "fast"], a: 1}, {q: "Find mistake: These ducks has big foot.", o: ["ducks", "has", "Both 'has' and 'foot' are wrong"], a: 2}, {q: "Uncountable: There is __ juice.", o: ["many", "some", "a"], a: 1}, {q: "Countable plural: There are __ apples.", o: ["much", "many", "a"], a: 1}, {q: "What is the plural of 'watch'?", o: ["watchs", "watches", "watch"], a: 1}, {q: "What is the short form of 'There is'?", o: ["There's", "Theres", "There're"], a: 0}, {q: "Can we use the short form 'There're'?", o: ["Yes", "No"], a: 1}] },
-        8: { title: "8. 介詞<br><small>Prepositions</small>", questions: [{q: "The fish is __ the tank.", o: ["in", "on", "under"], a: 0}, {q: "The tank is __ the table.", o: ["in", "on", "under"], a: 1}, {q: "The ball is __ the table.", o: ["in", "on", "under"], a: 2}, {q: "The cat is __ the table.", o: ["in", "near", "under"], a: 1}, {q: "The apples are __ the tree.", o: ["in", "on", "under"], a: 1}, {q: "The birds are __ the sky.", o: ["in", "on", "near"], a: 0}, {q: "Fill in: __ Sunday.", o: ["in", "on", "at"], a: 1}, {q: "Fill in: __ the morning.", o: ["in", "on", "at"], a: 0}, {q: "Fill in: __ night.", o: ["in", "on", "at"], a: 2}, {q: "Fill in: __ one o'clock.", o: ["in", "on", "at"], a: 2}, {q: "I see two girls __ the swings.", o: ["in", "on", "at"], a: 1}, {q: "The dog is __ front of the boy.", o: ["in", "on", "at"], a: 0}, {q: "The boy is __ the dog.", o: ["in front of", "behind", "on"], a: 1}, {q: "Where is the vase? It is in the __ room.", o: ["living", "bathroom", "kitchen"], a: 0}, {q: "Where is the towel? It is in the __.", o: ["living room", "bathroom", "bedroom"], a: 1}, {q: "The train leaves __ four o'clock.", o: ["in", "on", "at"], a: 2}, {q: "Leon's music lesson is __ Thursdays.", o: ["in", "on", "at"], a: 1}, {q: "Many flowers bloom __ spring.", o: ["in", "on", "at"], a: 0}, {q: "My birthday is __ 3rd October.", o: ["in", "on", "at"], a: 1}, {q: "I stay with my grandmother __ weekdays.", o: ["in", "on", "at"], a: 1}] },
-        9: { title: "9. 特定詞彙主題<br><small>Specific Vocabulary</small>", questions: [{q: "The sound a sheep makes:", o: ["baa", "moo", "oink"], a: 0}, {q: "The sound a cow makes:", o: ["moo", "neigh", "cluck"], a: 0}, {q: "The sound a horse makes:", o: ["cluck", "neigh", "chirp"], a: 1}, {q: "The sound a hen makes:", o: ["chirp", "quack", "cluck"], a: 2}, {q: "The sound a bird makes:", o: ["chirp", "roar", "croak"], a: 0}, {q: "The sound a pig makes:", o: ["miaow", "oink", "woof"], a: 1}, {q: "The sound a duck makes:", o: ["quack", "croak", "moo"], a: 0}, {q: "The sound a frog makes:", o: ["croak", "roar", "cluck"], a: 0}, {q: "The sound a lion makes:", o: ["miaow", "woof", "roar"], a: 2}, {q: "The sound a cat makes:", o: ["miaow", "woof", "baa"], a: 0}, {q: "What do we call a baby sheep?", o: ["calf", "lamb", "foal"], a: 1}, {q: "What do we call a baby cow?", o: ["calf", "chick", "piglet"], a: 0}, {q: "What do we call a baby horse?", o: ["foal", "duckling", "tadpole"], a: 0}, {q: "What do we call a baby hen?", o: ["cub", "kitten", "chick"], a: 2}, {q: "What do we call a baby pig?", o: ["puppy", "piglet", "calf"], a: 1}, {q: "What do we call a baby duck?", o: ["duckling", "lamb", "foal"], a: 0}, {q: "What do we call a baby frog?", o: ["tadpole", "chick", "cub"], a: 0}, {q: "What do we call a baby lion?", o: ["cub", "kitten", "puppy"], a: 0}, {q: "What do we call a baby cat?", o: ["kitten", "puppy", "piglet"], a: 0}, {q: "What do we call a baby dog?", o: ["kitten", "puppy", "lamb"], a: 1}] }
+        1: { title: "1. 基礎知識與標點<br><small>Basics & Punctuation</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "What is the uppercase letter of 'a'?", o: ["A", "B", "C"], a: 0}, 
+            {q: "What is the lowercase letter of 'G'?", o: ["p", "g", "h"], a: 1}, 
+            {q: "Find the missing letter: F __ H I", o: ["E", "G", "J"], a: 1}, 
+            {q: "Find the missing letter: v w __ y", o: ["x", "u", "z"], a: 0}, 
+            {q: "Rearrange the letters: r g i t e", o: ["tiger", "greet", "right"], a: 0}, 
+            {q: "Rearrange the letters: m j a", o: ["jam", "maj", "amj"], a: 0}, 
+            {q: "Write the missing letter: a p p l __", o: ["a", "e", "o"], a: 1}, 
+            {q: "Capital letter at the start: __y name is Alex.", o: ["m", "M", "N"], a: 1}, 
+            {q: "Choose the correct full stop: I am in Class 1A__", o: ["?", "!", "."], a: 2}, 
+            {q: "Choose the correct mark: How are you__", o: ["?", "!", "."], a: 0},
+            {q: "What is the uppercase letter of 'e'?", o: ["E", "F", "G"], a: 0},
+            {q: "What is the lowercase letter of 'M'?", o: ["n", "m", "w"], a: 1},
+            {q: "Find the missing letter: A B __ D", o: ["C", "E", "F"], a: 0},
+            {q: "Find the missing letter: p q __ s", o: ["r", "t", "u"], a: 0},
+            {q: "Rearrange the letters: e e u q n", o: ["queen", "uncle", "equen"], a: 0},
+            {q: "Rearrange the letters: E F I G R N", o: ["FINGER", "FRINGE", "FIGURE"], a: 0},
+            {q: "Write the missing letter: B O O __", o: ["K", "C", "T"], a: 0},
+            {q: "Write the missing letter: __ I S H", o: ["F", "D", "W"], a: 0},
+            {q: "Write the missing letter: __ K I T E", o: ["N", "K", "C"], a: 1},
+            {q: "Capital letter at the start: __i! I am Terry.", o: ["H", "h", "N"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "Punctuation: Hello__ What is your name?", o: [".", ",", "?"], a: 1}, 
+            {q: "Punctuation: My name is Sally__", o: [".", ",", "?"], a: 0}, 
+            {q: "Find the mistake: Good Morning.", o: ["Good", "Morning", "."], a: 1}, 
+            {q: "Find the mistake: what is your name?", o: ["what", "is", "name"], a: 0}, 
+            {q: "Find the mistake: I am in class 1B.", o: ["I", "am", "class"], a: 2}, 
+            {q: "Correct the sentence: my name is ben", o: ["My name is Ben.", "my name is Ben.", "My name is ben."], a: 0}, 
+            {q: "Correct the sentence: how are you", o: ["how are You?", "How are you.", "How are you?"], a: 2}, 
+            {q: "Punctuation: Wow__ your school bag is beautiful!", o: ["?", "!", ","], a: 1}, 
+            {q: "Days of the week must start with a:", o: ["small letter", "capital letter", "number"], a: 1}, 
+            {q: "Which sentence is correct?", o: ["I like to go to Ocean Park.", "i like to go to ocean park.", "I like to go to ocean Park."], a: 0},
+            {q: "Punctuation: good morning mrs chan", o: ["Good morning Mrs Chan.", "Good morning, Mrs Chan.", "good morning, mrs chan."], a: 1},
+            {q: "Correct the sentence: i am in class 1B.", o: ["I am in class 1b.", "I am in Class 1B.", "i am in Class 1B."], a: 1},
+            {q: "Punctuation: sam write down your name please", o: ["Sam, write down your name, please.", "Sam, write down your name please.", "sam write down your name please"], a: 0},
+            {q: "Which sentence is correct?", o: ["I like to go to Hong Kong Disneyland.", "i like to go to hong kong disneyland.", "I like to go to Hong kong disneyland."], a: 0},
+            {q: "Find the mistake: Your name is Jenny.", o: ["your", "What", "Is"], a: 1},
+            {q: "Find the mistake: What class are you in!", o: ["in?", "in.", "in"], a: 0},
+            {q: "Complete: __ is your name?", o: ["What", "How", "Who"], a: 0},
+            {q: "Complete: __ old are you?", o: ["What", "How", "Where"], a: 1},
+            {q: "Find the mistake: mr ng gives me a present at christmas.", o: ["Mr Ng / Christmas", "Mr ng / christmas", "mr Ng / Christmas"], a: 0},
+            {q: "Find the mistake: what do you do on saturdays ann", o: ["What / Saturdays / Ann / ?", "what / Saturdays / Ann / ?", "What / Saturdays / ann / ?"], a: 0}
+        ] },
+        2: { title: "2. 名詞與冠詞<br><small>Nouns & Articles</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "Is 'John' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 0}, 
+            {q: "Is 'cat' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 1}, 
+            {q: "Choose: __ cow", o: ["A", "An"], a: 0}, 
+            {q: "Choose: __ apple", o: ["A", "An"], a: 1}, 
+            {q: "Choose: __ umbrella", o: ["A", "An"], a: 1}, 
+            {q: "What is the plural of 'pencil'?", o: ["pencils", "pencil", "penciles"], a: 0}, 
+            {q: "What is the plural of 'zoo'?", o: ["zoos", "zooes", "zoose"], a: 0}, 
+            {q: "Is 'water' countable or uncountable?", o: ["Countable", "Uncountable"], a: 1}, 
+            {q: "Is 'lemon' countable or uncountable?", o: ["Countable", "Uncountable"], a: 0}, 
+            {q: "Choose: __ octopus", o: ["A", "An"], a: 1},
+            {q: "Choose: __ orange", o: ["A", "An"], a: 1},
+            {q: "Choose: __ egg", o: ["A", "An"], a: 1},
+            {q: "Choose: __ bear", o: ["A", "An"], a: 0},
+            {q: "Choose: __ ostrich", o: ["A", "An"], a: 1},
+            {q: "Plural form: one cat, two __", o: ["cats", "cates", "cat"], a: 0},
+            {q: "Plural form: one box, two __", o: ["boxs", "boxes", "box"], a: 1},
+            {q: "Plural form: one toy, two __", o: ["toys", "toies", "toy"], a: 0},
+            {q: "Is 'teacher' a person, animal, or thing?", o: ["Person", "Animal", "Thing"], a: 0},
+            {q: "Plural form: one mango, two __", o: ["mangos", "mangoes", "mango"], a: 1},
+            {q: "Choose: __ ant", o: ["A", "An"], a: 1},
+            // --- 深程度 (20題) ---
+            {q: "What is the plural of 'bus'?", o: ["buss", "buses", "bus"], a: 1}, 
+            {q: "What is the plural of 'tomato'?", o: ["tomatos", "tomatoes", "tomato"], a: 1}, 
+            {q: "What is the plural of 'baby'?", o: ["babys", "babies", "babeis"], a: 1}, 
+            {q: "What is the plural of 'leaf'?", o: ["leafs", "leaves", "leavs"], a: 1}, 
+            {q: "What is the plural of 'child'?", o: ["childs", "children", "childes"], a: 1}, 
+            {q: "What is the plural of 'mouse'?", o: ["mouses", "mice", "meese"], a: 1}, 
+            {q: "What is the plural of 'sheep'?", o: ["sheeps", "sheep", "shipe"], a: 1}, 
+            {q: "Choose: __ uniform", o: ["A", "An"], a: 0}, 
+            {q: "Choose: __ hour", o: ["A", "An"], a: 1}, 
+            {q: "Find the mistake: I have a pens.", o: ["I", "have", "pens"], a: 2},
+            {q: "What is the plural of 'man'?", o: ["mans", "men", "mens"], a: 1},
+            {q: "What is the plural of 'woman'?", o: ["womans", "women", "womens"], a: 1},
+            {q: "What is the plural of 'foot'?", o: ["foots", "feet", "feets"], a: 1},
+            {q: "What is the plural of 'tooth'?", o: ["tooths", "teeth", "teeths"], a: 1},
+            {q: "What is the plural of 'goose'?", o: ["gooses", "geese", "geeses"], a: 1},
+            {q: "Choose: __ honest boy", o: ["A", "An"], a: 1},
+            {q: "Choose: __ university", o: ["A", "An"], a: 0},
+            {q: "Find the mistake: I see many flower.", o: ["I", "see", "flower -> flowers"], a: 2},
+            {q: "Find the mistake: Two babys are crying.", o: ["Two", "babys -> babies", "crying"], a: 1},
+            {q: "Find the mistake: I have two tooths.", o: ["I", "have", "tooths -> teeth"], a: 2}
+        ] },
+        3: { title: "3. 代名詞與所有格<br><small>Pronouns & Possessives</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "We use '__' when we talk about ourselves.", o: ["you", "I", "he"], a: 1}, 
+            {q: "We use '__' when we talk to someone.", o: ["I", "you", "they"], a: 1}, 
+            {q: "Introduce a boy: __ is my brother.", o: ["He", "She", "It"], a: 0}, 
+            {q: "Introduce a girl: __ is my sister.", o: ["He", "She", "It"], a: 1}, 
+            {q: "Talk about an animal: __ is my pet.", o: ["He", "She", "It"], a: 2}, 
+            {q: "Maggie and I = __", o: ["We", "They", "You"], a: 0}, 
+            {q: "Roy and Ben = __", o: ["We", "They", "I"], a: 1}, 
+            {q: "Possessive for 'I': __ doll.", o: ["my", "our", "your"], a: 0}, 
+            {q: "Possessive for 'We': __ books.", o: ["my", "our", "his"], a: 1}, 
+            {q: "Possessive for 'He': __ car.", o: ["his", "her", "its"], a: 0},
+            {q: "Look at my hot dog! __ is huge!", o: ["It", "He", "She"], a: 0},
+            {q: "You are Joe. __ kite is green.", o: ["Your", "My", "His"], a: 0},
+            {q: "He is Fred. __ nose is big.", o: ["His", "Her", "My"], a: 0},
+            {q: "She is Mary. __ kite is orange.", o: ["Her", "His", "Your"], a: 0},
+            {q: "We are Sally and Joe. __ eyes are not big.", o: ["Our", "Their", "My"], a: 0},
+            {q: "They are Fred and Mary. __ eyes are big.", o: ["Their", "Our", "His"], a: 0},
+            {q: "__ am Kelly.", o: ["I", "You", "He"], a: 0},
+            {q: "__ are a boy.", o: ["I", "You", "She"], a: 1},
+            {q: "This is Mr Wong. __ is our neighbour.", o: ["He", "She", "It"], a: 0},
+            {q: "This is Mrs Wong. __ is slim.", o: ["He", "She", "It"], a: 1},
+            // --- 深程度 (20題) ---
+            {q: "Possessive for 'She': __ bag.", o: ["his", "her", "our"], a: 1}, 
+            {q: "Possessive for 'They': __ eyes.", o: ["their", "our", "its"], a: 0}, 
+            {q: "Possessive for 'It': __ tail.", o: ["his", "their", "its"], a: 2}, 
+            {q: "Add apostrophe: The __ hat (one girl)", o: ["girl's", "girls'", "girls"], a: 0}, 
+            {q: "Plural apostrophe: The __ hats (many girls)", o: ["girl's", "girls'", "girls"], a: 1}, 
+            {q: "Name ending in 's': __ cap", o: ["Bess", "Bess's", "Besss"], a: 1}, 
+            {q: "Find the mistake: Sally is my friend. She are good friends.", o: ["Sally", "She -> We", "friends"], a: 1}, 
+            {q: "Find the mistake: Joe and John are twins. We are six years old.", o: ["twins", "We -> They", "old"], a: 1}, 
+            {q: "Rewrite: This robot belongs to the boy. -> This is the __ robot.", o: ["boys'", "boy's", "boys"], a: 1}, 
+            {q: "Rewrite: These jeans belong to Kate. -> These are __ jeans.", o: ["Kate's", "Kates", "Kates'"], a: 0},
+            {q: "Add apostrophe: David__ robot", o: ["David's", "Davids'", "Davids"], a: 0},
+            {q: "Add apostrophe: Mrs Lee__ cat", o: ["Mrs Lee's", "Mrs Lees'", "Mrs Lees"], a: 0},
+            {q: "Add apostrophe: The __ shoes (two boys)", o: ["boys'", "boy's", "boys"], a: 0},
+            {q: "Find the mistake: My sister skirt is pink.", o: ["My", "sister -> sister's", "is"], a: 1},
+            {q: "Find the mistake: Eric's jackat is blue and red.", o: ["Eric's", "jackat -> jacket", "is"], a: 1},
+            {q: "King Harry is old. __ beard is long.", o: ["His", "Her", "Their"], a: 0},
+            {q: "Queen Mary is old too. __ hair is white.", o: ["Her", "His", "Your"], a: 0},
+            {q: "The king and queen have a son. __ is handsome.", o: ["He", "She", "They"], a: 0},
+            {q: "The princess is beautiful. __ skin is fair.", o: ["His", "Her", "Your"], a: 1},
+            {q: "Find the mistake: This is my brothers yo-yo. (one brother)", o: ["This", "brothers -> brother's", "is"], a: 1}
+        ] },
+        4: { title: "4. 動詞與時態<br><small>Verbs & Tenses</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "He __ a boy.", o: ["am", "is", "are"], a: 1}, 
+            {q: "I __ tall.", o: ["am", "is", "are"], a: 0}, 
+            {q: "They __ friends.", o: ["am", "is", "are"], a: 2}, 
+            {q: "I __ a toy boat.", o: ["has", "have"], a: 1}, 
+            {q: "She __ a cupcake.", o: ["has", "have"], a: 0}, 
+            {q: "We __ two cupcakes.", o: ["has", "have"], a: 1}, 
+            {q: "Imperative: __ the blackboard.", o: ["Clean", "Cleans", "Cleaning"], a: 0}, 
+            {q: "Imperative: __ attention.", o: ["Pay", "Pays", "Paying"], a: 0}, 
+            {q: "Negative imperative: __ turn off the fan.", o: ["Not", "Don't", "Doesn't"], a: 1}, 
+            {q: "Simple present: The dog __ a long tail.", o: ["have", "has", "having"], a: 1},
+            {q: "The baby __ lovely.", o: ["is", "am", "are"], a: 0},
+            {q: "You __ tall.", o: ["are", "is", "am"], a: 0},
+            {q: "I __ a robot.", o: ["have", "has", "having"], a: 0},
+            {q: "My sister, Nancy, __ a doll.", o: ["has", "have", "is"], a: 0},
+            {q: "Negative imperative: __ look at the window.", o: ["Don't", "Doesn't", "Not"], a: 0},
+            {q: "Imperative: __ down, please.", o: ["Sit", "Sits", "Sitting"], a: 0},
+            {q: "Present continuous: I am __ (eat) an apple.", o: ["eating", "eatting", "eats"], a: 0},
+            {q: "Present continuous: He is __ (drink) water.", o: ["drinking", "drinkking", "drinks"], a: 0},
+            {q: "Present continuous: She is __ (play) the piano.", o: ["playing", "plaing", "plays"], a: 0},
+            {q: "Simple present: I __ (like) apples.", o: ["like", "likes", "liking"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "Present continuous: I __ (eat) now.", o: ["am eating", "is eating", "are eating"], a: 0}, 
+            {q: "Present continuous: The children __ (swing).", o: ["am swinging", "is swinging", "are swinging"], a: 2}, 
+            {q: "Present continuous: He is __ (run).", o: ["runing", "running", "runs"], a: 1}, 
+            {q: "Present continuous: She is __ (swim).", o: ["swiming", "swimming", "swims"], a: 1}, 
+            {q: "Present continuous: They are __ (hike).", o: ["hikeing", "hiking", "hikes"], a: 1}, 
+            {q: "Are you eating? Yes, I __.", o: ["do", "am", "are"], a: 1}, 
+            {q: "Simple present: My brother __ in the park every day.", o: ["run", "runs", "running"], a: 1}, 
+            {q: "Simple present: My sister __ her homework every day.", o: ["do", "does", "doing"], a: 1}, 
+            {q: "Simple present: The children __ off for school at seven.", o: ["set", "sets", "setting"], a: 0}, 
+            {q: "Simple present: The fisherman __ fish every day.", o: ["catch", "catches", "catching"], a: 1},
+            {q: "Present continuous: They are __ (swim) in the pool.", o: ["swimming", "swiming", "swims"], a: 0},
+            {q: "Present continuous: She is __ (write) a letter.", o: ["writing", "writeing", "writes"], a: 0},
+            {q: "Simple present: My brother __ (cry) every night.", o: ["cries", "crys", "crying"], a: 0},
+            {q: "Simple present: She __ (wash) her hair every day.", o: ["washes", "washs", "washing"], a: 0},
+            {q: "Simple present: The dog __ (catch) the ball.", o: ["catches", "catchs", "catching"], a: 0},
+            {q: "Simple present: They __ (go) to the library on Sundays.", o: ["go", "goes", "going"], a: 0},
+            {q: "Find mistake: Look! The monkey climb the tree.", o: ["climb -> is climbing", "climb -> climbs", "Look -> Looking"], a: 0},
+            {q: "Complete: __ you eating? No, I __ not.", o: ["Are / am", "Is / am", "Do / do"], a: 0},
+            {q: "Complete: __ he like apples? Yes, he __.", o: ["Does / does", "Do / do", "Is / is"], a: 0},
+            {q: "Present continuous: I am __ (bake) a cake.", o: ["baking", "bakeing", "bakes"], a: 0}
+        ] },
+        5: { title: "5. 形容詞<br><small>Adjectives</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "A dog is fat. A person is __.", o: ["fat", "chubby", "tall"], a: 1}, 
+            {q: "The giraffe has a __ neck.", o: ["long", "short", "fat"], a: 0}, 
+            {q: "The hippo has a __ mouth.", o: ["small", "big", "thin"], a: 1}, 
+            {q: "Cherries are __.", o: ["sour", "sweet", "spicy"], a: 1}, 
+            {q: "Lemons are __.", o: ["sour", "sweet", "salty"], a: 0}, 
+            {q: "What is the colour of a strawberry?", o: ["blue", "green", "red"], a: 2}, 
+            {q: "What is the colour of the sky?", o: ["red", "blue", "yellow"], a: 1}, 
+            {q: "I am smiling. I am __.", o: ["sad", "happy", "angry"], a: 1}, 
+            {q: "I am crying. I am __.", o: ["happy", "bored", "sad"], a: 2}, 
+            {q: "I want water. I am __.", o: ["hungry", "thirsty", "tired"], a: 1},
+            {q: "The elephant is __.", o: ["big", "small", "thin"], a: 0},
+            {q: "The mouse is __.", o: ["small", "big", "tall"], a: 0},
+            {q: "The ruler is __.", o: ["long", "short", "fat"], a: 0},
+            {q: "The girl's hair is __.", o: ["short", "tall", "chubby"], a: 0},
+            {q: "The potato chips are __.", o: ["crispy", "runny", "bitter"], a: 0},
+            {q: "The fire is __.", o: ["hot", "cold", "sweet"], a: 0},
+            {q: "Ice is __.", o: ["cold", "hot", "spicy"], a: 0},
+            {q: "A pig is __.", o: ["fat", "thin", "tall"], a: 0},
+            {q: "The sun is __.", o: ["yellow", "blue", "green"], a: 0},
+            {q: "I am scared. I am __.", o: ["frightened", "happy", "delighted"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "What is the opposite of 'clean'?", o: ["dirty", "new", "beautiful"], a: 0}, 
+            {q: "What is the opposite of 'beautiful'?", o: ["handsome", "ugly", "clean"], a: 1}, 
+            {q: "The blue whale is __.", o: ["tiny", "large", "thin"], a: 1}, 
+            {q: "The green vegetable juice tastes __. Yuck!", o: ["sweet", "bitter", "delicious"], a: 1}, 
+            {q: "The curry is hot and __.", o: ["spicy", "sweet", "cold"], a: 0}, 
+            {q: "The __ flesh of durians.", o: ["smelly", "smooth", "crispy"], a: 0}, 
+            {q: "Synonym (same meaning) for 'happy'?", o: ["frightened", "delighted", "upset"], a: 1}, 
+            {q: "Synonym for 'hungry'?", o: ["famished", "exhausted", "boiling"], a: 0}, 
+            {q: "Synonym for 'scared'?", o: ["freezing", "frightened", "delighted"], a: 1}, 
+            {q: "Synonym for 'tired'?", o: ["exhausted", "upset", "famished"], a: 0},
+            {q: "Synonym for 'sad'?", o: ["upset", "delighted", "famished"], a: 0},
+            {q: "Synonym for 'angry'?", o: ["furious", "exhausted", "freezing"], a: 0},
+            {q: "Synonym for 'cold'?", o: ["freezing", "boiling", "delighted"], a: 0},
+            {q: "Synonym for 'hot'?", o: ["boiling", "freezing", "exhausted"], a: 0},
+            {q: "Opposite of 'old'?", o: ["new", "dirty", "ugly"], a: 0},
+            {q: "The giraffe has a long neck. It is __.", o: ["tall", "short", "fat"], a: 0},
+            {q: "I have a __ tummy!", o: ["big", "long", "tall"], a: 0},
+            {q: "We use 'and' to join two ideas: small __ sweet.", o: ["and", "or", "but"], a: 0},
+            {q: "Find the mistake: I have a long hairs.", o: ["I have", "long hairs -> long hair", "a long"], a: 1},
+            {q: "Find the mistake: The boys is chubby.", o: ["The boys", "is -> are", "chubby"], a: 1}
+        ] },
+        6: { title: "6. 疑問句<br><small>Question Words</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "__ is your name?", o: ["What", "How", "Who"], a: 0}, 
+            {q: "__ are you? I am fine.", o: ["What", "How", "Where"], a: 1}, 
+            {q: "__ old are you?", o: ["What", "How", "Who"], a: 1}, 
+            {q: "__ is she? She is my mother.", o: ["What", "How", "Who"], a: 2}, 
+            {q: "Are they pencils? Yes, __.", o: ["they are", "it is", "they aren't"], a: 0}, 
+            {q: "Is it a dog? No, __.", o: ["it is", "it is not", "they are not"], a: 1}, 
+            {q: "Do you like apples? Yes, __.", o: ["I do", "I don't", "he does"], a: 0}, 
+            {q: "Does he like apples? No, __.", o: ["he does", "he doesn't", "I don't"], a: 1}, 
+            {q: "Can you swim? Yes, __.", o: ["I can", "I cannot", "he can"], a: 0}, 
+            {q: "Can ducks fly? No, __.", o: ["they can", "they cannot", "it cannot"], a: 1},
+            {q: "__ is your English teacher? Mr Chan.", o: ["Who", "What", "Where"], a: 0},
+            {q: "__ colour is it? It is red.", o: ["What", "Who", "How"], a: 0},
+            {q: "__ are you doing? Studying.", o: ["What", "Who", "Where"], a: 0},
+            {q: "__ is your cap? Blue.", o: ["What colour", "Who", "How"], a: 0},
+            {q: "__ are you going? The cinema.", o: ["Where", "What", "Who"], a: 0},
+            {q: "__ many birds are there?", o: ["How", "What", "Who"], a: 0},
+            {q: "__ is the man? My teacher.", o: ["Who", "What", "Where"], a: 0},
+            {q: "__ do you go to school? By bus.", o: ["How", "What", "Where"], a: 0},
+            {q: "Do you like dogs? Yes, I __.", o: ["do", "don't", "does"], a: 0},
+            {q: "Does your mother swim? No, she __.", o: ["doesn't", "don't", "isn't"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "__ many tigers are there?", o: ["What", "How", "Who"], a: 1}, 
+            {q: "Fourteen, fifteen, __.", o: ["seventeen", "sixteen", "eighteen"], a: 1}, 
+            {q: "Is the dog hungry? Yes, __.", o: ["it is", "he is", "they are"], a: 0}, 
+            {q: "Are the boys thirsty? Yes, __.", o: ["they are", "he is", "we are"], a: 0}, 
+            {q: "__ do you live? I live in Kowloon.", o: ["What", "Where", "How"], a: 1}, 
+            {q: "__ colour is it? It is blue.", o: ["What", "Where", "How"], a: 0}, 
+            {q: "What are the birds doing? They are __.", o: ["singing", "birds", "blue"], a: 0}, 
+            {q: "Find the mistake: Do Tim like oranges?", o: ["Do -> Does", "like", "oranges"], a: 0}, 
+            {q: "Find the mistake: Does you eat fish?", o: ["Does -> Do", "eat", "fish"], a: 0}, 
+            {q: "Are you bored? No, __.", o: ["I am", "I am not", "you are not"], a: 1},
+            {q: "__ does Uncle Dave live? Lamma Island.", o: ["Where", "What", "How"], a: 0},
+            {q: "__ do you go to school? By ferry.", o: ["How", "What", "Where"], a: 0},
+            {q: "Find the mistake: Do your father and mother has a car?", o: ["Do", "father", "has -> have"], a: 2},
+            {q: "__ are the rabbits doing? They are hopping.", o: ["What", "Where", "How"], a: 0},
+            {q: "Is the boy happy? Yes, __.", o: ["he is", "he does", "it is"], a: 0},
+            {q: "Are the girls jumping? Yes, __.", o: ["they are", "she is", "we are"], a: 0},
+            {q: "Are you thirsty? No, __.", o: ["I am not", "I don't", "I aren't"], a: 0},
+            {q: "__ many apples are there? There are ten.", o: ["How", "What", "Who"], a: 0},
+            {q: "Can penguins fly? No, they __.", o: ["cannot", "can", "don't"], a: 0},
+            {q: "Do you like this toy? Yes, I __.", o: ["do", "am", "does"], a: 0}
+        ] },
+        7: { title: "7. 指示詞與存在句<br><small>Demonstratives & 'There is/are'</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "Near & Singular: __ is a crayon.", o: ["This", "These", "Those"], a: 0}, 
+            {q: "Near & Plural: __ are crayons.", o: ["This", "These", "That"], a: 1}, 
+            {q: "Far & Singular: __ is a horse.", o: ["This", "These", "That"], a: 2}, 
+            {q: "Far & Plural: __ are horses.", o: ["That", "These", "Those"], a: 2}, 
+            {q: "__ is some water.", o: ["There", "Here", "Where"], a: 0}, 
+            {q: "There __ four lemons.", o: ["is", "are", "am"], a: 1}, 
+            {q: "This is __ teddy bear.", o: ["my", "me", "I"], a: 0}, 
+            {q: "Those __ horses.", o: ["is", "are", "am"], a: 1}, 
+            {q: "There __ an apple.", o: ["is", "are", "am"], a: 0}, 
+            {q: "There are __ ducks.", o: ["one", "two", "three"], a: 2},
+            {q: "Near & Singular: __ is a pen.", o: ["This", "These", "That"], a: 0},
+            {q: "Near & Plural: __ are pens.", o: ["These", "This", "Those"], a: 0},
+            {q: "Far & Singular: __ is a bird.", o: ["That", "Those", "This"], a: 0},
+            {q: "Far & Plural: __ are birds.", o: ["Those", "That", "These"], a: 0},
+            {q: "__ is a big duck.", o: ["There", "Here", "This"], a: 0},
+            {q: "There __ some water.", o: ["is", "are", "am"], a: 0},
+            {q: "There __ four lemons.", o: ["are", "is", "am"], a: 0},
+            {q: "This __ my doll.", o: ["is", "are", "am"], a: 0},
+            {q: "These __ my books.", o: ["are", "is", "am"], a: 0},
+            {q: "That __ a horse.", o: ["is", "are", "am"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "Rewrite to plural: This is a banana.", o: ["These are bananas.", "Those are bananas.", "This are bananas."], a: 0}, 
+            {q: "Rewrite to singular: These are mosquitoes.", o: ["This is a mosquito.", "That is a mosquito.", "These is a mosquito."], a: 0}, 
+            {q: "Look at that kite! Is it near or far?", o: ["Near", "Far"], a: 1}, 
+            {q: "Find mistake: Those horse are running fast.", o: ["Those", "horse -> horses", "fast"], a: 1}, 
+            {q: "Find mistake: These ducks has big foot.", o: ["ducks", "has -> have", "Both 'has' and 'foot' are wrong"], a: 2}, 
+            {q: "Uncountable: There is __ juice.", o: ["many", "some", "a"], a: 1}, 
+            {q: "Countable plural: There are __ apples.", o: ["much", "many", "a"], a: 1}, 
+            {q: "What is the plural of 'watch'?", o: ["watchs", "watches", "watch"], a: 1}, 
+            {q: "What is the short form of 'There is'?", o: ["There's", "Theres", "There're"], a: 0}, 
+            {q: "Can we use the short form 'There're'?", o: ["Yes", "No"], a: 1},
+            {q: "Rewrite to plural: This is a dragonfly.", o: ["These are dragonflies.", "Those are dragonflies.", "These are dragonflys."], a: 0},
+            {q: "Rewrite to plural: This is an octopus.", o: ["These are octopuses.", "Those are octopuses.", "These are octopi."], a: 0},
+            {q: "Rewrite to singular: These are puppies.", o: ["This is a puppy.", "That is a puppy.", "This is a puppies."], a: 0},
+            {q: "Rewrite to singular: These are erasers.", o: ["This is an eraser.", "That is an eraser.", "This is a eraser."], a: 0},
+            {q: "There __ a lot of juice.", o: ["is", "are", "am"], a: 0},
+            {q: "There __ a lot of grapes.", o: ["are", "is", "am"], a: 0},
+            {q: "Uncountable: There is __ milk.", o: ["some", "many", "a"], a: 0},
+            {q: "Countable: There are __ strawberries.", o: ["many", "much", "a"], a: 0},
+            {q: "Find mistake: This box is too high. I cannot touch it.", o: ["This -> That", "box", "touch"], a: 0},
+            {q: "Question: There are many __ at the party.", o: ["children", "child", "childs"], a: 0}
+        ] },
+        8: { title: "8. 介詞<br><small>Prepositions</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "The fish is __ the tank. (魚在魚缸裡面 🐟💧)", o: ["in", "on", "under"], a: 0}, 
+            {q: "The tank is __ the table. (魚缸在桌子上面 ⬆️🪟)", o: ["in", "on", "under"], a: 1}, 
+            {q: "The ball is __ the table. (球在桌子下方 👇🎾)", o: ["in", "on", "under"], a: 2}, 
+            {q: "The cat is __ the table. (貓咪在桌子旁邊 🐈🪑)", o: ["in", "near", "under"], a: 1}, 
+            {q: "The apples are __ the tree. (蘋果長在樹上 🍎🌳)", o: ["in", "on", "under"], a: 1}, 
+            {q: "The birds are __ the sky. (鳥兒在天空中 🐦☁️)", o: ["in", "on", "near"], a: 0}, 
+            {q: "Fill in: __ Sunday.", o: ["in", "on", "at"], a: 1}, 
+            {q: "Fill in: __ the morning.", o: ["in", "on", "at"], a: 0}, 
+            {q: "Fill in: __ night.", o: ["in", "on", "at"], a: 2}, 
+            {q: "Fill in: __ one o'clock.", o: ["in", "on", "at"], a: 2},
+            {q: "The fish is __ the pond. (魚在池塘裡 🐟💧)", o: ["in", "on", "at"], a: 0},
+            {q: "The duck is __ the pond. (鴨子在池塘旁邊 🦆🏞️)", o: ["near", "in", "on"], a: 0},
+            {q: "I sleep __ night.", o: ["at", "in", "on"], a: 0},
+            {q: "I do homework __ the afternoon.", o: ["in", "on", "at"], a: 0},
+            {q: "My birthday is __ October.", o: ["in", "on", "at"], a: 0},
+            {q: "I go to school __ Mondays.", o: ["on", "in", "at"], a: 0},
+            {q: "The cat is __ the table. (躲在桌子底下 🐈👇)", o: ["under", "on", "in"], a: 0},
+            {q: "The vase is __ the table. (放在桌子上面 🏺⬆️)", o: ["on", "in", "under"], a: 0},
+            {q: "The birds are __ the branch. (停在樹枝上 🐦🌳)", o: ["on", "in", "under"], a: 0},
+            {q: "Fill in: __ the evening.", o: ["in", "on", "at"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "I see two girls __ the swings. (女孩坐在鞦韆上 👧)", o: ["in", "on", "at"], a: 1}, 
+            {q: "The dog is __ front of the boy. (狗狗在前面 🐕)", o: ["in", "on", "at"], a: 0}, 
+            {q: "The boy is __ the dog. (男孩躲在狗狗後面 👦🐕)", o: ["in front of", "behind", "on"], a: 1}, 
+            {q: "Where is the vase? It is in the __ room. (客廳 📺)", o: ["living", "bathroom", "kitchen"], a: 0}, 
+            {q: "Where is the towel? It is in the __. (浴室 🛁)", o: ["living room", "bathroom", "bedroom"], a: 1}, 
+            {q: "The train leaves __ four o'clock.", o: ["in", "on", "at"], a: 2}, 
+            {q: "Leon's music lesson is __ Thursdays.", o: ["in", "on", "at"], a: 1}, 
+            {q: "Many flowers bloom __ spring.", o: ["in", "on", "at"], a: 0}, 
+            {q: "My birthday is __ 3rd October.", o: ["in", "on", "at"], a: 1}, 
+            {q: "I stay with my grandmother __ weekdays.", o: ["in", "on", "at"], a: 1},
+            {q: "The clinic opens __ ten o'clock in the morning.", o: ["at", "in", "on"], a: 0},
+            {q: "Hana's birthday is __ summer.", o: ["in", "on", "at"], a: 0},
+            {q: "It is __ 10th July.", o: ["on", "in", "at"], a: 0},
+            {q: "Her grandparents have breakfast with her __ 8 o'clock.", o: ["at", "in", "on"], a: 0},
+            {q: "Hana sleeps late __ night.", o: ["at", "in", "on"], a: 0},
+            {q: "Where are the toy ducks? They are __ the bathtub. (在浴缸裡面 🦆)", o: ["in", "on", "at"], a: 0},
+            {q: "The potted plants are __ the balcony. (放在露台上 🪴)", o: ["on", "in", "under"], a: 0},
+            {q: "The TV is __ the cabinet. (放在櫃子上 📺)", o: ["on", "in", "under"], a: 0},
+            {q: "The boy is hiding __ the sofa. (躲在沙發後面 👦🛋️)", o: ["behind", "in front of", "on"], a: 0},
+            {q: "The dog is __ the boy (facing him). (狗狗在男孩前面 🐕👦)", o: ["in front of", "behind", "on"], a: 0}
+        ] },
+        9: { title: "9. 特定詞彙主題<br><small>Specific Vocabulary</small>", questions: [
+            // --- 淺程度 (20題) ---
+            {q: "The sound a sheep makes:", o: ["baa", "moo", "oink"], a: 0}, 
+            {q: "The sound a cow makes:", o: ["moo", "neigh", "cluck"], a: 0}, 
+            {q: "The sound a horse makes:", o: ["cluck", "neigh", "chirp"], a: 1}, 
+            {q: "The sound a hen makes:", o: ["chirp", "quack", "cluck"], a: 2}, 
+            {q: "The sound a bird makes:", o: ["chirp", "roar", "croak"], a: 0}, 
+            {q: "The sound a pig makes:", o: ["miaow", "oink", "woof"], a: 1}, 
+            {q: "The sound a duck makes:", o: ["quack", "croak", "moo"], a: 0}, 
+            {q: "The sound a frog makes:", o: ["croak", "roar", "cluck"], a: 0}, 
+            {q: "The sound a lion makes:", o: ["miaow", "woof", "roar"], a: 2}, 
+            {q: "The sound a cat makes:", o: ["miaow", "woof", "baa"], a: 0},
+            {q: "The sound a dog makes:", o: ["woof", "miaow", "oink"], a: 0},
+            {q: "A baby dog is a __.", o: ["puppy", "kitten", "calf"], a: 0},
+            {q: "A baby cat is a __.", o: ["kitten", "cub", "foal"], a: 0},
+            {q: "A baby bird is a __.", o: ["chick", "duckling", "lamb"], a: 0},
+            {q: "A baby duck is a __.", o: ["duckling", "tadpole", "piglet"], a: 0},
+            {q: "A baby pig is a __.", o: ["piglet", "calf", "foal"], a: 0},
+            {q: "What is a young cow called?", o: ["calf", "puppy", "chick"], a: 0},
+            {q: "What is a young horse called?", o: ["foal", "kitten", "lamb"], a: 0},
+            {q: "The ducks __ while waddling around.", o: ["quack", "moo", "baa"], a: 0},
+            {q: "The frogs __ loudly.", o: ["croak", "chirp", "cluck"], a: 0},
+            // --- 深程度 (20題) ---
+            {q: "What do we call a baby sheep?", o: ["calf", "lamb", "foal"], a: 1}, 
+            {q: "What do we call a baby cow?", o: ["calf", "chick", "piglet"], a: 0}, 
+            {q: "What do we call a baby horse?", o: ["foal", "duckling", "tadpole"], a: 0}, 
+            {q: "What do we call a baby hen?", o: ["cub", "kitten", "chick"], a: 2}, 
+            {q: "What do we call a baby pig?", o: ["puppy", "piglet", "calf"], a: 1}, 
+            {q: "What do we call a baby duck?", o: ["duckling", "lamb", "foal"], a: 0}, 
+            {q: "What do we call a baby frog?", o: ["tadpole", "chick", "cub"], a: 0}, 
+            {q: "What do we call a baby lion?", o: ["cub", "kitten", "puppy"], a: 0}, 
+            {q: "What do we call a baby cat?", o: ["kitten", "puppy", "piglet"], a: 0}, 
+            {q: "What do we call a baby dog?", o: ["kitten", "puppy", "lamb"], a: 1},
+            {q: "A baby lion is a __.", o: ["cub", "lamb", "foal"], a: 0},
+            {q: "A baby sheep is a __.", o: ["lamb", "calf", "cub"], a: 0},
+            {q: "'Quack, quack!' cries the __.", o: ["duck", "hen", "bird"], a: 0},
+            {q: "'Cluck, cluck!' cries the __.", o: ["hen", "bird", "horse"], a: 0},
+            {q: "'Moo, moo!' cries the __.", o: ["cow", "sheep", "pig"], a: 0},
+            {q: "'Baa, baa!' bleats the __.", o: ["sheep", "cow", "lion"], a: 0},
+            {q: "The kittens __ when they are hungry.", o: ["miaow", "woof", "roar"], a: 0},
+            {q: "'Woof, woof!' barks the __.", o: ["dog", "cat", "frog"], a: 0},
+            {q: "The lion __ loudly.", o: ["roars", "neighs", "croaks"], a: 0},
+            {q: "Can you hear the __ roaring?", o: ["lions", "sheep", "ducks"], a: 0}
+        ] }
     };
 
     let currentLevelId = 1; let currentQuestionIndex = 0; let levelQuestions = [];
     let userAnswers = {}; let isRetryMode = false;
 
-    // 初始渲染選單與星星
     const menuGrid = document.getElementById('menu-grid');
     for (let i = 1; i <= 9; i++) {
         const btn = document.createElement('button'); btn.className = 'level-btn';
@@ -544,6 +1044,7 @@
 
     function showHome() {
         document.getElementById('home-screen').style.display = 'block';
+        document.getElementById('intro-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'none';
         document.getElementById('end-screen').style.display = 'none';
         window.speechSynthesis.cancel(); isRetryMode = false;
@@ -552,18 +1053,73 @@
 
     function startLevel(id) {
         currentLevelId = id;
-        let originalQuestions = JSON.parse(JSON.stringify(gameData[id].questions));
         
-        let easyQs = originalQuestions.slice(0, 10);
-        let hardQs = originalQuestions.slice(10, 20);
-        shuffleArray(easyQs); shuffleArray(hardQs);
+        // 1. 準備題庫
+        let originalQuestions = JSON.parse(JSON.stringify(gameData[id].questions));
+        let easyPool = originalQuestions.slice(0, 20);
+        let hardPool = originalQuestions.slice(20, 40);
+        shuffleArray(easyPool); shuffleArray(hardPool);
+        
+        let easyQs = easyPool.slice(0, 10);
+        let hardQs = hardPool.slice(0, 10);
         levelQuestions = easyQs.concat(hardQs);
 
         currentQuestionIndex = 0; userAnswers = {}; isRetryMode = false;
         
+        // 2. 設置並顯示「課前預習」頁面
         document.getElementById('home-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('intro-screen').style.display = 'block';
+        document.getElementById('game-screen').style.display = 'none';
         document.getElementById('end-screen').style.display = 'none';
+
+        // 填入該關卡的專屬文法重點與例子
+        document.getElementById('intro-title').innerHTML = levelIntros[id].title;
+        document.getElementById('intro-concept').innerHTML = levelIntros[id].concept;
+        
+        const examplesList = document.getElementById('intro-examples-list');
+        examplesList.innerHTML = '';
+        
+        // 動態生成例子與其專屬發音按鈕
+        levelIntros[id].examples.forEach(ex => {
+            let li = document.createElement('li');
+            li.className = 'example-li';
+            
+            let textSpan = document.createElement('span');
+            textSpan.innerHTML = ex;
+            textSpan.style.flexGrow = "1";
+            textSpan.style.marginRight = "10px";
+
+            let exBtn = document.createElement('button');
+            exBtn.className = "intro-tts-btn";
+            exBtn.style.width = "40px";
+            exBtn.style.height = "40px";
+            exBtn.style.fontSize = "1.2rem";
+            exBtn.innerText = "🔊";
+            exBtn.title = "讀出這句英文";
+            
+            // 例子的專屬英文發音
+            exBtn.onclick = () => {
+                window.speechSynthesis.cancel();
+                let tempDiv = document.createElement('div');
+                tempDiv.innerHTML = ex;
+                // 過濾括號內的中文解釋
+                let cleanEx = tempDiv.innerText.replace(/\(.*?\)/g, ''); 
+                let msg = new SpeechSynthesisUtterance(cleanEx);
+                msg.lang = 'en-US';
+                msg.rate = 0.9;
+                window.speechSynthesis.speak(msg);
+            };
+
+            li.appendChild(textSpan);
+            li.appendChild(exBtn);
+            examplesList.appendChild(li);
+        });
+    }
+
+    function startQuestionLoop() {
+        window.speechSynthesis.cancel();
+        document.getElementById('intro-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
         loadQuestion();
     }
 
@@ -578,10 +1134,8 @@
     function loadQuestion() {
         window.speechSynthesis.cancel(); 
         
-        // 每次載入新題目時，將 Jump 按鈕隱藏
         document.getElementById('jump-btn-container').style.display = 'none';
         
-        // 進入重做模式時，自動彈出文法提示
         if (isRetryMode) {
             const hintMsg = levelQuestions[currentQuestionIndex].hint || levelHints[currentLevelId];
             document.getElementById('hint-text').innerText = hintMsg;
@@ -591,7 +1145,7 @@
             document.getElementById('next-btn').style.display = 'inline-block';
             document.getElementById('next-btn').innerText = "🔙 回到總結";
         } else {
-            document.getElementById('hint-box').style.display = 'none'; // 第一輪隱藏提示框
+            document.getElementById('hint-box').style.display = 'none'; 
             
             document.getElementById('prev-btn').style.display = 'inline-block';
             document.getElementById('next-btn').style.display = 'inline-block';
@@ -619,11 +1173,9 @@
         const correctIndex = qData.a;
 
         qData.o.forEach((optText, index) => {
-            // 創建選項容器
             const row = document.createElement('div');
             row.className = 'option-row';
 
-            // 1. 答案按鈕
             const btn = document.createElement('button');
             btn.className = 'option-btn'; 
             btn.innerText = optText;
@@ -636,7 +1188,6 @@
                 btn.onclick = () => checkAnswer(index, btn);
             }
 
-            // 2. 發音按鈕
             const ttsBtn = document.createElement('button');
             ttsBtn.className = 'option-tts-btn';
             ttsBtn.innerText = '🔊';
@@ -674,7 +1225,6 @@
             createFallingStars(); 
             document.getElementById('score-text').innerText = `分數: ${getScore()}`;
             
-            // 答對時隱藏 Move to next question 按鈕
             document.getElementById('jump-btn-container').style.display = 'none';
 
             setTimeout(() => {
@@ -692,7 +1242,6 @@
             document.getElementById('hint-text').innerText = hintMsg;
             document.getElementById('hint-box').style.display = 'block';
             
-            // 答錯時，自動顯示 Move to next question 按鈕
             document.getElementById('jump-btn-container').style.display = 'block';
 
             if (isRetryMode) {
@@ -732,7 +1281,6 @@
         
         const finalScore = getScore();
         
-        // --- 更新星星進度紀錄與最高分數 ---
         if (finalScore >= 10) { 
             const today = new Date();
             const dateString = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
