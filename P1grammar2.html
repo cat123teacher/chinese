@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小一英文文法大冒險下</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', '微軟正黑體', sans-serif;
+            background-color: #E0F7FA;
+            background-image: radial-gradient(#B2EBF2 20%, transparent 20%), radial-gradient(#B2EBF2 20%, transparent 20%);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+            padding-bottom: 150px; 
+        }
+        /* 左上角圖標 */
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #FF4081;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            object-fit: cover;
+            z-index: 1000;
+        }
+        /* 右上角紀錄區 */
+        .top-right-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .record-btn {
+            background: #FFF9C4; border: 4px solid #FBC02D; padding: 10px 15px; border-radius: 15px; font-size: 1.1em; font-weight: bold; color: #E65100; cursor: pointer; box-shadow: 0 4px 0 #F57F17;
+        }
+        .record-btn:active { transform: translateY(4px); box-shadow: 0 0 0; }
+        .clear-btn {
+            background: #FFCDD2; border: 4px solid #F44336; padding: 10px 15px; border-radius: 15px; font-size: 1.1em; font-weight: bold; color: #B71C1C; cursor: pointer; box-shadow: 0 4px 0 #D32F2F;
+        }
+        .clear-btn:active { transform: translateY(4px); box-shadow: 0 0 0; }
+
+        h1 {
+            color: #FF4081; font-size: 2.8em; text-shadow: 3px 3px 0px #FFF, 5px 5px 0px rgba(0,0,0,0.1); margin-top: 60px;
+        }
+        .container {
+            max-width: 900px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 30px; padding: 30px; box-shadow: 0 15px 25px rgba(0,0,0,0.15); border: 8px solid #FFCDD2; position: relative;
+        }
+        
+        /* 首頁關卡選單 */
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 30px; }
+        .level-btn { background-color: #FFF9C4; border: 5px solid #FBC02D; border-radius: 20px; padding: 15px; font-size: 1.2em; font-weight: bold; color: #E65100; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 #FBC02D; }
+        .level-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #FBC02D; }
+        .theme-label { display: block; font-size: 0.85em; color: #00838F; margin-bottom: 8px; background: #B2EBF2; border-radius: 10px; padding: 5px; }
+        
+        /* 關卡教學 */
+        .intro-box { background-color: #E8F5E9; border: 5px dashed #4CAF50; border-radius: 20px; padding: 25px; margin: 20px 0; font-size: 1.3em; text-align: left; line-height: 1.8; color: #2E7D32; }
+        .start-btn { background-color: #4CAF50; color: white; border: none; border-bottom: 6px solid #2E7D32; border-radius: 50px; padding: 15px 50px; font-size: 1.6em; font-weight: bold; cursor: pointer; text-decoration: none;}
+        .start-btn:active { transform: translateY(6px); border-bottom: 0px; }
+        
+        /* 遊戲介面 */
+        .progress { color: #FF5722; font-size: 1.5em; font-weight: bold; margin-bottom: 10px; background: #FFF3E0; display: inline-block; padding: 10px 30px; border-radius: 30px; border: 3px solid #FFCC80;}
+        .difficulty-badge { font-size: 0.8em; background: #FF4081; color: white; padding: 5px 15px; border-radius: 20px; margin-left: 10px;}
+        .question-box { font-size: 2.2em; margin: 20px 0; padding: 30px; background-color: #E3F2FD; border: 5px solid #64B5F6; border-radius: 20px; display: flex; justify-content: center; align-items: center; gap: 20px; font-weight: bold; color: #1565C0; }
+        
+        .audio-btn { background-color: #FF9800; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 1.2em; cursor: pointer; box-shadow: 0 4px 0 #E65100;}
+        .audio-btn:active { transform: translateY(4px); box-shadow: 0 0 0; }
+        .opt-audio-btn { background-color: #03A9F4; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1em; cursor: pointer; margin-left: 10px; box-shadow: 0 3px 0 #0288D1; }
+        .opt-audio-btn:active { transform: translateY(3px); box-shadow: 0 0 0; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .option-btn { display: flex; justify-content: center; align-items: center; background-color: #F3E5F5; border: 4px solid #AB47BC; border-bottom: 8px solid #8E24AA; border-radius: 15px; padding: 15px; font-size: 1.6em; font-weight: bold; color: #4A148C; cursor: pointer; transition: all 0.2s; }
+        .option-btn:active { transform: translateY(8px); border-bottom: 0px solid #8E24AA; }
+        
+        .next-q-btn { background-color: #FF9800; color: white; padding: 15px 40px; font-size: 1.5em; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; border-bottom: 6px solid #E65100; margin-top: 20px; animation: pulse 1.5s infinite;}
+        .next-q-btn:active { transform: translateY(6px); border-bottom: 0; }
+        
+        .nav-bar { display: flex; justify-content: space-between; margin-top: 30px; border-top: 3px dashed #FFCDD2; padding-top: 20px; }
+        .nav-btn { background-color: #9E9E9E; color: white; padding: 10px 25px; font-size: 1.2em; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; border-bottom: 4px solid #616161; }
+        .nav-btn.blue { background-color: #2196F3; border-bottom-color: #1976D2; }
+        .nav-btn:active { transform: translateY(4px); border-bottom: 0; }
+        
+        .correct { background-color: #81C784 !important; border-color: #388E3C !important; color: white !important;}
+        .wrong { background-color: #E57373 !important; border-color: #D32F2F !important; color: white !important;}
+        .hidden { display: none !important; }
+
+        /* 錯題總結區 */
+        .summary-list { text-align: left; max-height: 400px; overflow-y: auto; background: #FFF; padding: 15px; border-radius: 15px; border: 3px solid #ECEFF1; margin-top: 20px;}
+        .summary-item { padding: 15px; border-bottom: 2px dashed #CFD8DC; display: flex; justify-content: space-between; align-items: center; font-size: 1.2em;}
+        .summary-item.s-wrong { background-color: #FFEBEE; }
+        .summary-item.s-correct { background-color: #E8F5E9; }
+        .retry-btn { background-color: #FF5252; color: white; border: none; padding: 10px 20px; border-radius: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #D32F2F;}
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 40px; border-radius: 30px; width: 90%; max-width: 600px; text-align: center; border: 8px solid #FF9800; max-height: 80vh; overflow-y: auto;}
+        
+        /* Progress Record List */
+        .record-list { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; }
+        .record-item { background: #E3F2FD; border: 3px solid #90CAF9; padding: 15px; border-radius: 15px; font-size: 1.3em; display: flex; justify-content: space-between; font-weight: bold; color: #0D47A1;}
+        .score-star { font-size: 1.5em; }
+
+        /* 動畫 */
+        @keyframes popUp { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .visual-effect { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 150px; z-index: 3000; pointer-events: none; animation: popUp 1s ease-out forwards; }
+
+        /* Footer */
+        .footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #FFF9C4; border-top: 4px solid #FBC02D; padding: 15px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items: center; z-index: 100;}
+        .footer-title { font-weight: bold; color: #E65100; font-size: 1.2em; margin-right: 10px; }
+        .footer a { text-decoration: none; color: white; font-weight: bold; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: transform 0.2s;}
+        .footer a:hover { transform: scale(1.1); }
+        .yt { background: #FF0000; } .ig { background: #E1306C; } .fb { background: #1877F2; } .th { background: #000000; } .xhs { background: #FF2442; } .dy { background: #010101; }
+    </style>
+</head>
+<body>
+
+<img src="cat.jpeg" alt="Teacher Cat" class="logo" onerror="this.style.display='none'">
+
+<div class="top-right-controls">
+    <button class="record-btn" onclick="openProgressModal()">📊 Progress Record</button>
+    <button class="clear-btn" onclick="clearRecord()">🗑️ 清除記錄</button>
+</div>
+
+<div class="container">
+    <!-- 首頁：關卡選擇 -->
+    <div id="home-screen">
+        <h1>🌟 小一英文文法大冒險下 🌟</h1>
+        <p style="font-size: 1.4em; color: #555; font-weight: bold;">請選擇關卡開始挑戰（隨機20題）！</p>
+        <div class="level-grid" id="level-grid"></div>
+        <br><br>
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="start-btn" style="display:inline-block; margin-top:20px; background-color:#2196F3; border-color:#1976D2;">返回小朋友學習大冒險 🚀</a>
+    </div>
+
+    <!-- 教學頁面 -->
+    <div id="intro-screen" class="hidden">
+        <h1 id="intro-title" style="color: #4CAF50; display: inline-block; margin-right: 15px;"></h1>
+        <button class="audio-btn" onclick="playIntroAudio()" title="聽教學">🔊</button>
+        <div class="intro-box" id="intro-content"></div>
+        <button class="start-btn" onclick="startGame()">開始遊戲 🚀</button>
+        <br>
+        <button class="nav-btn" style="margin-top: 20px;" onclick="showHome()">返回主頁 🏠</button>
+    </div>
+
+    <!-- 遊戲頁面 -->
+    <div id="game-screen" class="hidden">
+        <div class="progress">
+            <span id="progress-text">第 1 題 / 共 20 題</span>
+            <span id="difficulty-text" class="difficulty-badge">淺</span>
+        </div>
+        <div class="question-box">
+            <span id="question-text"></span>
+            <button class="audio-btn" onclick="playQuestionAudio()" title="聽題目">🔊</button>
+        </div>
+        <div class="options-grid" id="options-container"></div>
+        
+        <button id="next-q-btn" class="next-q-btn hidden" onclick="nextQuestion()">Move to next question ➡️</button>
+
+        <div class="nav-bar">
+            <button class="nav-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
+            <button class="nav-btn" onclick="showHomeConfirm()">🏠 回到主頁</button>
+            <button class="nav-btn blue" onclick="nextQuestionSafe()">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <!-- 結算與錯題總結頁面 -->
+    <div id="result-screen" class="hidden">
+        <h1 style="font-size: 3.2em;">🎉 關卡完成！ 🎉</h1>
+        <h2 id="score-text" style="color: #FF4081; font-size: 2.2em; margin: 15px 0;"></h2>
+        <div id="star-reward-text" style="font-size: 1.8em; color: #FF9800; font-weight: bold;"></div>
+        
+        <h3 style="text-align: left; margin-top: 30px; color: #1565C0;">📝 你的答題總結 (點擊錯題重新挑戰)：</h3>
+        <div id="summary-container"></div>
+        
+        <br>
+        <button class="start-btn" style="background-color: #FF9800; border-color: #F57F17;" onclick="startGame()">🔄 重新挑戰這一關</button>
+        <button class="start-btn" style="margin-left: 10px;" onclick="showHome()">選擇其他關卡 🎮</button>
+    </div>
+</div>
+
+<!-- 重新挑戰 Modal -->
+<div id="retry-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h2 style="color: #D32F2F;">🔥 錯題重新挑戰 🔥</h2>
+        <div id="retry-hint-box" style="background: #E1F5FE; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed #03A9F4; display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <span id="retry-hint" style="color: #0277BD; font-size: 1.2em; font-weight: bold; flex-grow: 1;"></span>
+            <button class="audio-btn" style="width: 40px; height: 40px; font-size: 1em;" onclick="playHintAudio()" title="聽提示">🔊</button>
+        </div>
+        
+        <div class="question-box" style="background: #FFF3E0; border-color: #FF9800; margin-top:0;">
+            <span id="retry-q-text"></span>
+            <button class="audio-btn" onclick="playRetryAudio()">🔊</button>
+        </div>
+        <div class="options-grid" id="retry-options"></div>
+        <button class="nav-btn" style="margin-top: 20px;" onclick="closeRetryModal()">取消</button>
+    </div>
+</div>
+
+<!-- Progress Record Modal -->
+<div id="progress-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-height: 85vh;">
+        <h2 style="color: #1976D2; font-size: 2.2em; margin-top: 0;">🏆 Progress Record 🏆</h2>
+        <p style="color: #555; font-weight:bold;">滿分20分 = 🌟大星星 | 合格10分 = ⭐小星星</p>
+        <div class="record-list" id="progress-list-container"></div>
+        <button class="start-btn" onclick="closeProgressModal()">關閉</button>
+    </div>
+</div>
+
+<!-- 頁尾社交連結 -->
+<div class="footer">
+    <span class="footer-title">Teacher Cat 的快樂AI教室</span>
+    <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="yt">YouTube</a>
+    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="ig">Instagram</a>
+    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="fb">Facebook</a>
+    <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="th">Threads</a>
+    <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="xhs">小紅書</a>
+    <a href="https://v.douyin.com/idKdLH/" target="_blank" class="dy">抖音 (74254902683)</a>
+</div>
+
+<script>
+    // 讀取最高分紀錄
+    let levelScores = JSON.parse(localStorage.getItem('grammarLevelScores')) || {};
+
+    // 終極完整題庫 1-10關
+    const levels = [
+        {
+            id: 1, theme: "第一關：動詞", title: "Verb to be (is/am/are)",
+            hint: "提示：I 用 am，He/She/It 用 is，You/We/They 用 are！",
+            intro: "<b>教學重點：</b><br>⭐ <b>I</b> 配合 <b>am</b>。<br>⭐ <b>He/She/It</b> 配合 <b>is</b>。<br>⭐ <b>You/We/They</b> 配合 <b>are</b>。<br>⭐ 否定句：加上 not (如 isn't / aren't / am not)。<br><br><b>💡 例子：</b><br>1. I <b>am</b> six years old.<br>2. He <b>is</b> not angry.<br>3. We <b>are</b> good friends.<br>4. It <b>is</b> a duck.<br>5. They <b>are</b> wet.",
+            easy: [{q:"He ___ my brother.",options:["am","is","are"],ans:"is"},{q:"My classmates ___ playing.",options:["am","is","are"],ans:"are"},{q:"Eric ___ happy.",options:["am","is","are"],ans:"is"},{q:"You and I ___ friends.",options:["am","is","are"],ans:"are"},{q:"Judy ___ a girl.",options:["am","is","are"],ans:"is"},{q:"Miss Fung ___ our teacher.",options:["am","is","are"],ans:"is"},{q:"The car ___ fast.",options:["am","is","are"],ans:"is"},{q:"I ___ six years old.",options:["am","is","are"],ans:"am"},{q:"Mary and Peter ___ singing.",options:["am","is","are"],ans:"are"},{q:"The lions ___ big.",options:["am","is","are"],ans:"are"},{q:"My mum and dad ___ here.",options:["am","is","are"],ans:"are"},{q:"My uncle ___ a doctor.",options:["am","is","are"],ans:"is"},{q:"Your mum and dad ___ nice.",options:["am","is","are"],ans:"are"},{q:"Roy ___ eating.",options:["am","is","are"],ans:"is"},{q:"My dog ___ cute.",options:["am","is","are"],ans:"is"},{q:"She ___ pretty.",options:["am","is","are"],ans:"is"},{q:"It ___ a lamp.",options:["am","is","are"],ans:"is"},{q:"I ___ a hero.",options:["am","is","are"],ans:"am"},{q:"Amanda ___ a nurse.",options:["am","is","are"],ans:"is"},{q:"Your cats ___ friendly.",options:["am","is","are"],ans:"are"}],
+            hard: [{q:"I ___ very kind.",options:["am","is","are"],ans:"am"},{q:"We ___ good children.",options:["am","is","are"],ans:"are"},{q:"Bibi ___ our dog.",options:["am","is","are"],ans:"is"},{q:"The rainbow ___ colourful.",options:["am","is","are"],ans:"is"},{q:"I ___ fat.",options:["am not","m'not"],ans:"am not"},{q:"She ___ Mandy. She is Sandy.",options:["isn't","aren't"],ans:"isn't"},{q:"It ___ a duck. It is a goose.",options:["aren't","isn't"],ans:"isn't"},{q:"My cousin ___ very tall.",options:["is","are"],ans:"is"},{q:"Winter ___ hot.",options:["is not","are not"],ans:"is not"},{q:"Miss Au ___ a clever woman.",options:["am","is"],ans:"is"},{q:"The sky ___ blue.",options:["am","is","are"],ans:"is"},{q:"I ___ naughty.",options:["am not","isn't","aren't"],ans:"am not"},{q:"It ___ a seesaw. It is a slide.",options:["is not","are not"],ans:"is not"},{q:"Their socks ___ wet.",options:["is","are"],ans:"are"},{q:"The mouse ___ big. It is small.",options:["isn't","aren't"],ans:"isn't"},{q:"Find correct:",options:["I amnt naughty.","I am not naughty."],ans:"I am not naughty."},{q:"The wall ___ green.",options:["is","are"],ans:"is"},{q:"You and I ___ friends.",options:["am","are"],ans:"are"},{q:"Find correct:",options:["The weather is hot.","The weather are hot."],ans:"The weather is hot."},{q:"Jenny ___ stupid.",options:["is not","are not"],ans:"is not"}]
+        },
+        {
+            id: 2, theme: "第二關：擁有", title: "Have & Has",
+            hint: "提示：I/You/We/They 用 have，He/She/It 用 has！",
+            intro: "<b>教學重點：</b><br>⭐ <b>I/You/We/They</b> 用 <b>have</b>。<br>⭐ <b>He/She/It</b> 用 <b>has</b>。<br>⭐ 用來表達「擁有」物品，或形容外貌。<br><br><b>💡 例子：</b><br>1. I <b>have</b> a cat.<br>2. She <b>has</b> long hair.<br>3. The dog <b>has</b> big ears.<br>4. We <b>have</b> apples.<br>5. He <b>has</b> a computer.",
+            easy: [{q:"They ___ pencils.",options:["have","has"],ans:"have"},{q:"We ___ apples.",options:["have","has"],ans:"have"},{q:"She ___ a doll.",options:["have","has"],ans:"has"},{q:"Ian ___ a robot.",options:["have","has"],ans:"has"},{q:"Jessica ___ long hair.",options:["have","has"],ans:"has"},{q:"I ___ a book.",options:["have","has"],ans:"have"},{q:"Judy ___ a bag.",options:["have","has"],ans:"has"},{q:"You ___ a sweet.",options:["have","has"],ans:"have"},{q:"The animals ___ tails.",options:["have","has"],ans:"have"},{q:"My cousins ___ toys.",options:["have","has"],ans:"have"},{q:"Edwin ___ a pen.",options:["have","has"],ans:"has"},{q:"It ___ big ears.",options:["have","has"],ans:"has"},{q:"Jenny & Sam ___ a puzzle.",options:["have","has"],ans:"have"},{q:"My parents ___ a car.",options:["have","has"],ans:"have"},{q:"The students ___ books.",options:["have","has"],ans:"have"},{q:"I ___ a big nose.",options:["have","has"],ans:"have"},{q:"The monkey ___ a long tail.",options:["have","has"],ans:"has"},{q:"You ___ a pencil.",options:["have","has"],ans:"have"},{q:"He ___ a computer.",options:["have","has"],ans:"has"},{q:"We ___ two eyes.",options:["have","has"],ans:"have"}],
+            hard: [{q:"I ___ five blue toy cars.",options:["have","has"],ans:"have"},{q:"Carly ___ big eyes.",options:["have","has"],ans:"has"},{q:"Jason and his sister ___ two dogs.",options:["have","has"],ans:"have"},{q:"The monkeys ___ a lot of bananas.",options:["have","has"],ans:"have"},{q:"Molly ___ long legs.",options:["have","has"],ans:"has"},{q:"A spider ___ eight legs.",options:["have","has"],ans:"has"},{q:"My dog has ___ toy duck.",options:["a","an"],ans:"a"},{q:"Michael has ___ umbrella.",options:["a","an"],ans:"an"},{q:"Edmund ___ a big nose.",options:["is","has"],ans:"has"},{q:"Janet and her friend ___ many books.",options:["has","have"],ans:"have"},{q:"Philip has ___ arms.",options:["long","big"],ans:"long"},{q:"The duck has ___ feathers.",options:["has","white"],ans:"white"},{q:"The children ___ heavy schoolbags.",options:["has","have"],ans:"have"},{q:"Mr Lee has ___ black jacket.",options:["a","has"],ans:"a"},{q:"Correct sentence:",options:["Henry have two robots.","Henry has two robots."],ans:"Henry has two robots."},{q:"Correct sentence:",options:["Jack has short hair.","Jack have short hair."],ans:"Jack has short hair."},{q:"Joy and her cousin ___ a puzzle.",options:["has","have"],ans:"have"},{q:"We ___ long dresses.",options:["has","have"],ans:"have"},{q:"The cat ___ a ball.",options:["has","have"],ans:"has"},{q:"It has ___ mouth.",options:["a","an"],ans:"a"}]
+        },
+        {
+            id: 3, theme: "第三關：能力與許可", title: "Can / Cannot",
+            hint: "提示：Can 或 Cannot 後面的動詞必須保持原形，不用加 s 或 es 喔！",
+            intro: "<b>教學重點：</b><br>⭐ <b>Can</b> 表示「可以」或「有能力」。<br>⭐ <b>Cannot / can't</b> 表示「不可以」。<br>⚠️ <b>注意：</b>Can 後面的動作字 <b>不可以</b>加 s 或 es！<br><br><b>💡 例子：</b><br>1. Robert <b>can</b> swim.<br>2. I <b>cannot</b> fly.<br>3. <b>Can</b> you see the lion?<br>4. The boy <b>can't</b> open the window.<br>5. A fish <b>can</b> swim.",
+            easy: [{q:"Monkeys can ___ trees.",options:["climb","climbs"],ans:"climb"},{q:"You can ___ the potato chips.",options:["eat","eats"],ans:"eat"},{q:"I can ___ a rabbit over there.",options:["see","sees"],ans:"see"},{q:"My sister can ___ beautiful pictures.",options:["draw","draws"],ans:"draw"},{q:"Mrs Lam can ___ the cupboard.",options:["open","opens"],ans:"open"},{q:"Many birds can ___.",options:["fly","flies"],ans:"fly"},{q:"Lily can ___ that drum well.",options:["play","plays"],ans:"play"},{q:"The boy can't ___ the window.",options:["open","opens"],ans:"open"},{q:"Bill cannot ___ Italian.",options:["speak","speaks"],ans:"speak"},{q:"Jack and Helen cannot ___ the guitar.",options:["play","plays"],ans:"play"},{q:"I can't ___ a story.",options:["write","writes"],ans:"write"},{q:"My sister cannot ___ a car.",options:["drive","drives"],ans:"drive"},{q:"I cannot ___ the question.",options:["answer","answers"],ans:"answer"},{q:"You can't ___ to classmates during lesson.",options:["talk","talks"],ans:"talk"},{q:"Jason can't ___ to Tyler's home.",options:["go","goes"],ans:"go"},{q:"She cannot ___ to music.",options:["listen","listens"],ans:"listen"},{q:"You cannot ___ the comic.",options:["read","reads"],ans:"read"},{q:"I can't ___ sweets.",options:["eat","eats"],ans:"eat"},{q:"Emily can't ___ with the doll.",options:["play","plays"],ans:"play"},{q:"A fish ___ swim.",options:["can","cannot"],ans:"can"}],
+            hard: [{q:"Fish ___ fly.",options:["can","cannot"],ans:"cannot"},{q:"I am sick. I ___ play games.",options:["can","cannot"],ans:"cannot"},{q:"You ___ wear the blouse. It is dirty.",options:["can","can't"],ans:"can't"},{q:"My dad ___ sleep. He is working.",options:["cannot","cann't"],ans:"cannot"},{q:"My sister ___ ride a bicycle.",options:["cannot","cann't"],ans:"cannot"},{q:"Janet ___ see the ball. She's blind.",options:["can not","can't"],ans:"can't"},{q:"We ___ shout in the library.",options:["can","can't"],ans:"can't"},{q:"Kangaroos ___ jump.",options:["can","cannot"],ans:"can"},{q:"Can Sarah run fast? Yes, she ___.",options:["can","can't"],ans:"can"},{q:"Can you see the lion? No, I ___.",options:["can","can't"],ans:"can't"},{q:"Can Simon play the guitar? Yes, he ___.",options:["can","can't"],ans:"can"},{q:"Can your brothers build a house? No, they ___.",options:["can","can't"],ans:"can't"},{q:"Can Anna make sandwiches? No, she ___.",options:["can","can't"],ans:"can't"},{q:"Can the parrot talk? Yes, it ___.",options:["can","can't"],ans:"can"},{q:"Can you ___ up?",options:["stand","stands"],ans:"stand"},{q:"Can he ___ a van?",options:["drive","drives"],ans:"drive"},{q:"Can you play the piano? No, I ___.",options:["can","can't"],ans:"can't"},{q:"What can Mr Cho ___?",options:["can","do"],ans:"do"},{q:"What can you do? We ___ football.",options:["can play","can't play"],ans:"can play"},{q:"Correct spelling:",options:["The panda can not swim.","The panda cannot swim."],ans:"The panda cannot swim."}]
+        },
+        {
+            id: 4, theme: "第四關：動詞特例", title: "Verbs I & II",
+            hint: "提示：e 結尾的字要先刪去 e 再加 ing！另外 hate 和 want 不能加 ing 喔！",
+            intro: "<b>教學重點：</b><br>⭐ 字尾有 e 的動詞，加 ing 時要<b>刪除 e</b> (如 make -> making)。<br>⭐ <b>hate</b>(討厭) 和 <b>want</b>(想要) <b>不可以</b>加 ing！<br><br><b>💡 例子：</b><br>1. He is <b>ice-skating</b>.<br>2. Vincent <b>hates</b> milk.<br>3. I <b>want</b> ice cream.<br>4. She is <b>making</b> a model.<br>5. We are <b>listening</b> to music.",
+            easy: [{q:"I ___ skiing.",options:["want","am wanting"],ans:"want"},{q:"I ___ ice cream.",options:["want","am wanting"],ans:"want"},{q:"Vincent ___ milk.",options:["hates","is hating"],ans:"hates"},{q:"She ___ mice.",options:["hates","is hating"],ans:"hates"},{q:"Mary ___ an umbrella.",options:["wants","is wanting"],ans:"wants"},{q:"They don't ___ rude children.",options:["like","put"],ans:"like"},{q:"My brother ___ a robot.",options:["buys","eats"],ans:"buys"},{q:"My dog ___ some noise.",options:["hears","buys"],ans:"hears"},{q:"The plane is far away. I cannot ___ it.",options:["see","listen"],ans:"see"},{q:"I ___ more chocolates.",options:["want","wants"],ans:"want"},{q:"This boy ___ some water.",options:["wants","want"],ans:"wants"},{q:"Helen ___ snakes.",options:["hates","hate"],ans:"hates"},{q:"We ___ spiders.",options:["hate","hates"],ans:"hate"},{q:"Mr Miller ___ in Central.",options:["works","starts"],ans:"works"},{q:"live -> ___",options:["living","liveing"],ans:"living"},{q:"smile -> ___",options:["smiling","smileing"],ans:"smiling"},{q:"make -> ___",options:["making","makeing"],ans:"making"},{q:"run -> ___",options:["running","runing"],ans:"running"},{q:"swim -> ___",options:["swimming","swiming"],ans:"swimming"},{q:"shop -> ___",options:["shopping","shoping"],ans:"shopping"}],
+            hard: [{q:"My dad ___ in a hospital now.",options:["is working","is stopping"],ans:"is working"},{q:"The train ___ at the station.",options:["stops","walks"],ans:"stops"},{q:"Monica ___ a blue dress.",options:["wears","works"],ans:"wears"},{q:"Miss Ng ___ vegetables in the market.",options:["sells","waits"],ans:"sells"},{q:"Dorothy is ___ school uniform.",options:["wearing","hating"],ans:"wearing"},{q:"The film ___ at 4 p.m.",options:["starts","leaves"],ans:"starts"},{q:"Correct word:",options:["She listens to music.","She hears to music."],ans:"She listens to music."},{q:"Correct spelling:",options:["He is ice-skating.","He is ice-skateing."],ans:"He is ice-skating."},{q:"Correct spelling:",options:["climing","climbing"],ans:"climbing"},{q:"I ___ the plant every day.",options:["water","waters"],ans:"water"},{q:"Michael ___ for the bus.",options:["waits","climbs"],ans:"waits"},{q:"My baby sister ___ behind the door.",options:["is hiding","is hideing"],ans:"is hiding"},{q:"He ___ in the park.",options:["is skipping","is skiping"],ans:"is skipping"},{q:"I am ___ a cup on a plate.",options:["putting","waiting"],ans:"putting"},{q:"My father and I ___ to my grandfather.",options:["are listening","am listening"],ans:"are listening"},{q:"Look! The birds ___ to me.",options:["are listening","are hearing"],ans:"are listening"},{q:"We ___ in the hall.",options:["are dancing","is dancing"],ans:"are dancing"},{q:"My sister ___ skipping.",options:["likes","is liking"],ans:"likes"},{q:"He ___ a box.",options:["is carrying","is carry"],ans:"is carrying"},{q:"They are ___ their hands.",options:["clapping","claping"],ans:"clapping"}]
+        },
+        {
+            id: 5, theme: "第五關：時態", title: "Simple Present Tense",
+            hint: "提示：主角是 He/She/It 的時候，動作字尾記得要加 s 或 es！",
+            intro: "<b>教學重點：</b><br>⭐ 講述事實或日常習慣。<br>⭐ 主角是 <b>He/She/It</b> 時，動作字尾加 <b>s/es</b>。<br>⭐ 否定句用 <b>do not / does not</b>。問題用 <b>Do / Does</b>。<br><br><b>💡 例子：</b><br>1. Water <b>boils</b> at 100°C.<br>2. My sister <b>eats</b> breakfast.<br>3. They <b>do not</b> like pigs.<br>4. <b>Does</b> she play?<br>5. He <b>reads</b> newspapers.",
+            easy: [{q:"I ___ rice every day.",options:["eat","eats"],ans:"eat"},{q:"Sally ___ for dinner.",options:["eat","eats"],ans:"eats"},{q:"Paul and I ___ by train.",options:["go","goes"],ans:"go"},{q:"Mr Hui ___ at 7:30 a.m.",options:["go","goes"],ans:"goes"},{q:"She ___ a dress every Sunday.",options:["wear","wears"],ans:"wears"},{q:"I ___ a dress at my grandma's house.",options:["wear","wears"],ans:"wear"},{q:"My mum ___ breakfast.",options:["cook","cooks"],ans:"cooks"},{q:"My dad does not ___ newspapers.",options:["read","reads"],ans:"read"},{q:"Anna ___ with Candy.",options:["chat","chats"],ans:"chats"},{q:"My brother ___ at 10 o'clock.",options:["sleep","sleeps"],ans:"sleeps"},{q:"We ___ uniforms at school.",options:["wear","wears"],ans:"wear"},{q:"Mum ___ the TV show every night.",options:["watch","watches"],ans:"watches"},{q:"The cows ___ grass.",options:["eat","eats"],ans:"eat"},{q:"We ___ our father and mother.",options:["like","likes"],ans:"like"},{q:"He ___ to church on Sundays.",options:["go","goes"],ans:"goes"},{q:"Water ___ at 100°C.",options:["boils","boil"],ans:"boils"},{q:"I ___ coffee.",options:["don't drink","doesn't drink"],ans:"don't drink"},{q:"Larry ___ see the doctor.",options:["doesn't","don't"],ans:"doesn't"},{q:"We ___ fly.",options:["do not","does not"],ans:"do not"},{q:"Katie ___ me.",options:["likes","like"],ans:"likes"}],
+            hard: [{q:"___ they policewomen?",options:["Are","Do"],ans:"Are"},{q:"___ I a good child?",options:["Am","Do"],ans:"Am"},{q:"___ the soup sweet?",options:["Is","Does"],ans:"Is"},{q:"___ his socks? Yes, they are.",options:["Are they","Is it"],ans:"Are they"},{q:"___ a pencil case? No, it isn't.",options:["Is it","Are they"],ans:"Is it"},{q:"___ you have a dog? Yes, I do.",options:["Do","Does"],ans:"Do"},{q:"___ Dennis like swimming? No, he does not.",options:["Does","Do"],ans:"Does"},{q:"___ play football? No, they don't.",options:["Do they","Does he"],ans:"Do they"},{q:"Does Tina ___ apple pies?",options:["like","likes"],ans:"like"},{q:"Are you sad? Yes, ___.",options:["I am","he is"],ans:"I am"},{q:"Do giraffes sleep? Yes, ___.",options:["they do","it does"],ans:"they do"},{q:"Does he read newspapers? No, ___.",options:["he doesn't","he reads"],ans:"he doesn't"},{q:"I ___ to the radio.",options:["listen","listens"],ans:"listen"},{q:"Sam ___ like bread.",options:["does not","do not"],ans:"does not"},{q:"Janet ___ brown hair.",options:["has","have"],ans:"has"},{q:"My dad doesn't ___ a car.",options:["drive","drives"],ans:"drive"},{q:"We ___ talk in the library.",options:["don't","doesn't"],ans:"don't"},{q:"The panda always ___ at the snake.",options:["laughs","laugh"],ans:"laughs"},{q:"The snake ___ not have legs.",options:["does","do"],ans:"does"},{q:"The panda ___ bamboo leaves.",options:["eats","eat"],ans:"eats"}]
+        },
+        {
+            id: 6, theme: "第六關：現在進行式", title: "Present Continuous",
+            hint: "提示：正在發生的事，要用 is/am/are + 動詞加 ing！",
+            intro: "<b>教學重點：</b><br>⭐ 描述「現在正在進行」的事情。<br>⭐ 公式：<b>is / am / are + (Verb)ing</b>。<br>⭐ 否定句：在 is/am/are 後面加 <b>not</b>。<br><br><b>💡 例子：</b><br>1. I <b>am sleeping</b>.<br>2. She <b>is dancing</b>.<br>3. What <b>are</b> you <b>doing</b>?<br>4. They <b>are not running</b>.<br>5. The baby <b>is crying</b>.",
+            easy: [{q:"sleep -> ___",options:["sleeping","sleepes"],ans:"sleeping"},{q:"play -> ___",options:["playing","playes"],ans:"playing"},{q:"make -> ___",options:["making","makeing"],ans:"making"},{q:"swim -> ___",options:["swimming","swiming"],ans:"swimming"},{q:"He ___ (sing).",options:["is singing","are singing"],ans:"is singing"},{q:"We ___ (play) badminton.",options:["are playing","is playing"],ans:"are playing"},{q:"She ___ (draw) a picture.",options:["is drawing","am drawing"],ans:"is drawing"},{q:"The baby ___ (laugh).",options:["is laughing","are laughing"],ans:"is laughing"},{q:"My dad ___ (read).",options:["is reading","are reading"],ans:"is reading"},{q:"I ___ (ice-skate).",options:["am ice-skating","is ice-skating"],ans:"am ice-skating"},{q:"It ___ (fly).",options:["is flying","are flying"],ans:"is flying"},{q:"She ___ (ride) a bicycle.",options:["is riding","are riding"],ans:"is riding"},{q:"My sister ___ her bedroom.",options:["is cleaning","am cleaning"],ans:"is cleaning"},{q:"The baby is ___!",options:["smiling","doing"],ans:"smiling"},{q:"They ___ in Yuen Long.",options:["are living","is living"],ans:"are living"},{q:"We are ___ on the beach.",options:["running","runing"],ans:"running"},{q:"Ann is ___ in the pool.",options:["swimming","swiming"],ans:"swimming"},{q:"I am ___ to friends.",options:["talking","talkking"],ans:"talking"},{q:"She is ___ homework.",options:["doing","doeing"],ans:"doing"},{q:"I am ___ to music.",options:["listening","listening"],ans:"listening"}],
+            hard: [{q:"What ___ you doing?",options:["are","is"],ans:"are"},{q:"I ___ reading in my diary.",options:["am writing","is writing"],ans:"am writing"},{q:"Emily ___ her teeth.",options:["is brushing","are brushing"],ans:"is brushing"},{q:"What ___ your dad doing?",options:["is","are"],ans:"is"},{q:"What are your brothers ___?",options:["doing","do"],ans:"doing"},{q:"He ___ (not sleep).",options:["is not sleeping","are not sleeping"],ans:"is not sleeping"},{q:"I ___ (not dance).",options:["am not dancing","are not dancing"],ans:"am not dancing"},{q:"They ___ (not run) now.",options:["are not running","is not running"],ans:"are not running"},{q:"She isn't ___.",options:["crying","cry"],ans:"crying"},{q:"We are not ___ the book.",options:["reading","read"],ans:"reading"},{q:"Look at my cat. It ___ playing with my sister.",options:["is","are"],ans:"is"},{q:"Those are my brothers. They ___ singing.",options:["are","is"],ans:"are"},{q:"The man is ___ a horse.",options:["riding","rideing"],ans:"riding"},{q:"All students are ___.",options:["sitting","siting"],ans:"sitting"},{q:"The robot ___ moving.",options:["isn't","aren't"],ans:"isn't"},{q:"You ___ listening to me.",options:["aren't","isn't"],ans:"aren't"},{q:"The child is not ___ a letter.",options:["writing","writeing"],ans:"writing"},{q:"Janice and Amy are not ___.",options:["drawing","draw"],ans:"drawing"},{q:"I am ___ in the sea.",options:["not swimming","not swiming"],ans:"not swimming"},{q:"Sam ___ sitting on a bench.",options:["is not","are not"],ans:"is not"}]
+        },
+        {
+            id: 7, theme: "第七關：位置與疑問詞", title: "Where & Prepositions",
+            hint: "提示：Where 問哪裡；in 是裡面，on 是上面，under 是下面！",
+            intro: "<b>教學重點：</b><br>⭐ <b>Where</b> 用來問「哪裡」(地方)。<br>⭐ 位置詞：<b>in</b> (裡面), <b>on</b> (上面), <b>under</b> (下面)。<br><br><b>💡 例子：</b><br>1. <b>Where</b> are you?<br>2. The apples are <b>in</b> the box.<br>3. The bird is <b>on</b> the tree.<br>4. The cat is <b>under</b> the table.<br>5. <b>Where</b> is my mum?",
+            easy: [{q:"___ is the bee?",options:["Where","Who"],ans:"Where"},{q:"___ am I?",options:["Where","What"],ans:"Where"},{q:"___ is she?",options:["Where","What"],ans:"Where"},{q:"The apples are ___ the box (裡面).",options:["in","on"],ans:"in"},{q:"The cat is ___ the table (下面).",options:["under","in"],ans:"under"},{q:"The box is ___ the grass (上面).",options:["on","in"],ans:"on"},{q:"Where ___ the cats?",options:["are","is"],ans:"are"},{q:"Where ___ the books?",options:["are","is"],ans:"are"},{q:"Where ___ Fiona?",options:["is","are"],ans:"is"},{q:"___ is your mum? She is in the kitchen.",options:["Where","Who"],ans:"Where"},{q:"___ are the teachers? They are in the hall.",options:["Where","What"],ans:"Where"},{q:"I put my toys ___ a box.",options:["in","on"],ans:"in"},{q:"Anna puts the shoes ___ the floor.",options:["on","in"],ans:"on"},{q:"The sun is ___ the sky.",options:["in","on"],ans:"in"},{q:"The horse is ___ the grass.",options:["on","in"],ans:"on"},{q:"Look in my bag. The oranges are ___ it.",options:["in","under"],ans:"in"},{q:"A parrot is standing ___ his shoulder.",options:["on","in"],ans:"on"},{q:"Where ___ the trees?",options:["are","is"],ans:"are"},{q:"___ is your father? He is in his office.",options:["Where","Who"],ans:"Where"},{q:"___ is Mr Chan? He is in the bathroom.",options:["Where","What"],ans:"Where"}],
+            hard: [{q:"Where ___ the hamsters?",options:["are","is"],ans:"are"},{q:"Where ___ you? I'm under the desk!",options:["are","is"],ans:"are"},{q:"Are you in your bedroom? ___ are you?",options:["Where","What"],ans:"Where"},{q:"___ are my friends?",options:["Where","Who"],ans:"Where"},{q:"___ is that man? He is my uncle.",options:["Who","Where"],ans:"Who"},{q:"___ is it? It is a monkey.",options:["What","Where"],ans:"What"},{q:"___ can you see? I can see a tree.",options:["What","Where"],ans:"What"},{q:"___ are the trees? They are in the park.",options:["Where","What"],ans:"Where"},{q:"___ is John? John is eight years old.",options:["How old","Where"],ans:"How old"},{q:"I am a cat. ___ are you?",options:["What","Where"],ans:"What"},{q:"You are ___ my house!",options:["in","on"],ans:"in"},{q:"It is a bottle of milk. I put it ___ the table.",options:["on","in"],ans:"on"},{q:"Don't hide ___ the chair.",options:["under","on"],ans:"under"},{q:"Question word? It is a telephone.",options:["What","Where"],ans:"What"},{q:"Question word? She is Debbie.",options:["Who","Where"],ans:"Who"},{q:"Question word? It is in the tree.",options:["Where","What"],ans:"Where"},{q:"Question word? Sam is thirteen.",options:["How old","Who"],ans:"How old"},{q:"Question word? The books are on the table.",options:["Where","What"],ans:"Where"},{q:"___ are lions.",options:["They","There"],ans:"They"},{q:"Question word? He is Louis.",options:["Who","What"],ans:"Who"}]
+        },
+        {
+            id: 8, theme: "第八關：疑問詞", title: "Who, What, What colour",
+            hint: "提示：Who 問人，What 問東西/動物，What colour 問顏色！",
+            intro: "<b>教學重點：</b><br>⭐ <b>Who</b> (是誰)：問人物。<br>⭐ <b>What</b> (是什麼)：問死物或動物。<br>⭐ <b>What colour</b> (甚麼顏色)：問顏色。<br><br><b>💡 例子：</b><br>1. <b>Who</b> is she?<br>2. <b>What</b> is it?<br>3. <b>What</b> can you see?<br>4. <b>What colour</b> is the apple?<br>5. <b>Who</b> are they?",
+            easy: [{q:"___ are you? I'm your teacher.",options:["Who","What"],ans:"Who"},{q:"___ is the rainbow? It is over there.",options:["Where","What"],ans:"Where"},{q:"___ are the chickens? They are in the garden.",options:["Where","Who"],ans:"Where"},{q:"___ can you hear? I can hear some music.",options:["What","Who"],ans:"What"},{q:"___ is the old lady? She is my grandmother.",options:["Who","What colour"],ans:"Who"},{q:"___ is this? This is a violin.",options:["What","Who"],ans:"What"},{q:"___ is Jonathan? He is under the chair!",options:["Where","What"],ans:"Where"},{q:"___ am I? Am I in the police station?",options:["Where","Who"],ans:"Where"},{q:"___ is a fish? A fish is an animal living in the sea.",options:["What","Who"],ans:"What"},{q:"___ is my hat? You are wearing it!",options:["Where","What colour"],ans:"Where"},{q:"___ is the sky? It is blue.",options:["What colour","What"],ans:"What colour"},{q:"___ can you see? I can see a plane.",options:["What","Who"],ans:"What"},{q:"___ is the ball? It is on the sofa.",options:["Where","What colour"],ans:"Where"},{q:"___ are the dogs? They are black.",options:["What colour","Who"],ans:"What colour"},{q:"I can't see my sister. ___ is she?",options:["Where","What"],ans:"Where"},{q:"___ is it? It is a pair of glasses.",options:["What","Who"],ans:"What"},{q:"___ is she? She is Miss Taylor.",options:["Who","What"],ans:"Who"},{q:"___ is he? He is Joe.",options:["Who","What"],ans:"Who"},{q:"___ are they? They are my brothers.",options:["Who","What"],ans:"Who"},{q:"___ is it? It is my cat.",options:["What","Who"],ans:"What"}],
+            hard: [{q:"___ is that? That is a tree.",options:["What","Where"],ans:"What"},{q:"___ is the boat? It is orange.",options:["What colour","What"],ans:"What colour"},{q:"What colour ___ his trousers? They are blue.",options:["are","is"],ans:"are"},{q:"___ are they? They are hippos.",options:["What","Who"],ans:"What"},{q:"I have two rulers. ___ colour are they?",options:["What","Where"],ans:"What"},{q:"My dog is brown. What colour ___ your dog?",options:["is","are"],ans:"is"},{q:"___ is her name? Her name is Sally.",options:["What","Who"],ans:"What"},{q:"___ is he? He is in the bedroom.",options:["Where","Who"],ans:"Where"},{q:"___ are you? I am ten years old.",options:["How old","Who"],ans:"How old"},{q:"___ is it? It is yellow.",options:["What colour","What time"],ans:"What colour"},{q:"___ is the woman? She is my aunt.",options:["Who","What"],ans:"Who"},{q:"They are on the grass. ___ are they?",options:["Where","What"],ans:"Where"},{q:"The birds are ___ the sky.",options:["in","on"],ans:"in"},{q:"___ are they doing? They are reading.",options:["What","Where"],ans:"What"},{q:"___ are you? I live in Kowloon.",options:["Where","Who"],ans:"Where"},{q:"___ do you have? I have four trains.",options:["What","Who"],ans:"What"},{q:"What question word? She is Debbie.",options:["Who","Where"],ans:"Who"},{q:"What question word? The books are on the table.",options:["Where","What"],ans:"Where"},{q:"What question word? Sam is thirteen.",options:["How old","Who"],ans:"How old"},{q:"What question word? He is Louis.",options:["Who","What"],ans:"Who"}]
+        },
+        {
+            id: 9, theme: "第九關：存在句型", title: "There is / are",
+            hint: "提示：單數(一個) 用 There is，眾數(多於一個) 用 There are！",
+            intro: "<b>教學重點：</b><br>⭐ <b>There is</b>：表示有一個（單數）。<br>⭐ <b>There are</b>：表示有多於一個（眾數）。<br>⭐ 可配搭 <b>some</b> (一些) 和 <b>a lot of</b> (很多)。<br><br><b>💡 例子：</b><br>1. <b>There is</b> a tree.<br>2. <b>There are</b> twenty eggs.<br>3. <b>There are</b> some chocolates.<br>4. <b>There are</b> a lot of frogs.<br>5. <b>There is</b> an elephant.",
+            easy: [{q:"There ___ one boy.",options:["is","are"],ans:"is"},{q:"There ___ a toy.",options:["is","are"],ans:"is"},{q:"There ___ an ice cream.",options:["is","are"],ans:"is"},{q:"There ___ twenty eggs.",options:["are","is"],ans:"are"},{q:"There ___ some chocolates.",options:["are","is"],ans:"are"},{q:"There ___ a lot of frogs.",options:["are","is"],ans:"are"},{q:"There ___ a tree.",options:["is","are"],ans:"is"},{q:"There ___ three baskets.",options:["are","is"],ans:"are"},{q:"There ___ some cookies.",options:["are","is"],ans:"are"},{q:"There ___ an elephant.",options:["is","are"],ans:"is"},{q:"There ___ one ship.",options:["is","are"],ans:"is"},{q:"There ___ a lot of stars.",options:["are","is"],ans:"are"},{q:"There ___ a fish.",options:["is","are"],ans:"is"},{q:"There ___ some dresses.",options:["are","is"],ans:"are"},{q:"There ___ a lot of animals.",options:["are","is"],ans:"are"},{q:"There ___ some students.",options:["are","is"],ans:"are"},{q:"There ___ a book on the shelf.",options:["is","are"],ans:"is"},{q:"There ___ an umbrella under the desk.",options:["is","are"],ans:"is"},{q:"There ___ four tigers.",options:["are","is"],ans:"are"},{q:"There ___ a phone.",options:["is","are"],ans:"is"}],
+            hard: [{q:"There ___ two people in the boat.",options:["are","is"],ans:"are"},{q:"There are three ___.",options:["geese","goose"],ans:"geese"},{q:"There ___ five pineapples.",options:["are","is"],ans:"are"},{q:"There is ___ playground.",options:["a","some"],ans:"a"},{q:"There are ten ___.",options:["children","child"],ans:"children"},{q:"There ___ a lot of mice.",options:["are","is"],ans:"are"},{q:"There are ___ presents.",options:["a lot of","a"],ans:"a lot of"},{q:"There is ___ orange.",options:["an","a"],ans:"an"},{q:"There are ___ balls.",options:["twenty","one"],ans:"twenty"},{q:"There ___ a monkey.",options:["is","are"],ans:"is"},{q:"There are ___ beans.",options:["some","a"],ans:"some"},{q:"There ___ no milk now.",options:["is","are"],ans:"is"},{q:"There ___ a bottle of juice.",options:["is","are"],ans:"is"},{q:"There ___ only one box of cereal.",options:["is","are"],ans:"is"},{q:"There ___ two boxes of biscuits too.",options:["are","is"],ans:"are"},{q:"There ___ a pen in the pencil case.",options:["is","are"],ans:"is"},{q:"There ___ a ruler.",options:["is","are"],ans:"is"},{q:"___ are a lot of students.",options:["There","They"],ans:"There"},{q:"There ___ a lot of sweets.",options:["are","is"],ans:"are"},{q:"There are some ___.",options:["books","book"],ans:"books"}]
+        },
+        {
+            id: 10, theme: "第十關：數量與眾數", title: "How many & Plural",
+            hint: "提示：How many 後面一定要配眾數(Plural)名詞(加s)喔！",
+            intro: "<b>教學重點：</b><br>⭐ <b>How many</b> 用來問「多少數量」。<br>⭐ How many 後面的名詞必須轉為<b>眾數 (Plural)</b>。<br>⭐ 注意特別變化字：<b>child -> children, mouse -> mice, tooth -> teeth</b>。<br><br><b>💡 例子：</b><br>1. <b>How many</b> students are there?<br>2. There are <b>two dogs</b>.<br>3. <b>How many</b> children are there?<br>4. There is <b>one mouse</b>.<br>5. <b>How many</b> mice are there?",
+            easy: [{q:"orange -> ___",options:["oranges","orangees"],ans:"oranges"},{q:"lamp -> ___",options:["lamps","lampes"],ans:"lamps"},{q:"dress -> ___",options:["dresses","dresss"],ans:"dresses"},{q:"song -> ___",options:["songs","songes"],ans:"songs"},{q:"car -> ___",options:["cars","cares"],ans:"cars"},{q:"house -> ___",options:["houses","housese"],ans:"houses"},{q:"clock -> ___",options:["clocks","clockes"],ans:"clocks"},{q:"plate -> ___",options:["plates","platess"],ans:"plates"},{q:"book -> ___",options:["books","bookes"],ans:"books"},{q:"cup -> ___",options:["cups","cupes"],ans:"cups"},{q:"How many ___ are there?",options:["students","student"],ans:"students"},{q:"How many ___ are there?",options:["dogs","dog"],ans:"dogs"},{q:"How many ___ are there?",options:["apples","apple"],ans:"apples"},{q:"___ apples are there?",options:["How many","What"],ans:"How many"},{q:"How many biscuits ___ there?",options:["are","is"],ans:"are"},{q:"How many ___ are there?",options:["mangoes","mango"],ans:"mangoes"},{q:"How many sweets ___ there?",options:["are","is"],ans:"are"},{q:"How many books ___ there?",options:["are","is"],ans:"are"},{q:"How many mobile phones are ___?",options:["there","they"],ans:"there"},{q:"How many boys are ___?",options:["there","their"],ans:"there"}],
+            hard: [{q:"fairy -> ___",options:["fairies","fairys"],ans:"fairies"},{q:"wolf -> ___",options:["wolves","wolfs"],ans:"wolves"},{q:"tooth -> ___",options:["teeth","tooths"],ans:"teeth"},{q:"woman -> ___",options:["women","womans"],ans:"women"},{q:"daisy -> ___",options:["daisies","daisys"],ans:"daisies"},{q:"leaf -> ___",options:["leaves","leafs"],ans:"leaves"},{q:"goose -> ___",options:["geese","gooses"],ans:"geese"},{q:"child -> ___",options:["children","childs"],ans:"children"},{q:"monkey -> ___",options:["monkeys","monkies"],ans:"monkeys"},{q:"foot -> ___",options:["feet","foots"],ans:"feet"},{q:"man -> ___",options:["men","mans"],ans:"men"},{q:"mouse -> ___",options:["mice","mouses"],ans:"mice"},{q:"How many ___ are there?",options:["children","childs"],ans:"children"},{q:"How many ___ are there?",options:["boxes","box"],ans:"boxes"},{q:"How many ___ are there?",options:["fairies","fairys"],ans:"fairies"},{q:"How many ___ are there?",options:["animals","animal"],ans:"animals"},{q:"How many ___ are there?",options:["mice","mouses"],ans:"mice"},{q:"How many ___ are there?",options:["geese","gooses"],ans:"geese"},{q:"How many ___ are there? There are thirteen horses.",options:["horses","horse"],ans:"horses"},{q:"How many ___ are there? There are no mice!",options:["mice","mouse"],ans:"mice"}]
+        }
+    ];
+
+    let currentLevelData = null;
+    let gameQuestions = [];
+    let userAnswers = [];
+    let currentQIndex = 0;
+    let isAnswering = false;
+
+    const EASY_Q_COUNT = 10; 
+    const HARD_Q_COUNT = 10; 
+
+    // 初始化首頁
+    const grid = document.getElementById('level-grid');
+    levels.forEach(level => {
+        const btn = document.createElement('button');
+        btn.className = 'level-btn';
+        btn.innerHTML = `<span class="theme-label">${level.theme}</span>${level.title}`;
+        btn.onclick = () => showIntro(level.id);
+        grid.appendChild(btn);
+    });
+
+    function hideAll() {
+        document.getElementById('home-screen').classList.add('hidden');
+        document.getElementById('intro-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.add('hidden');
+        document.getElementById('retry-modal').classList.add('hidden');
+        document.getElementById('progress-modal').classList.add('hidden');
+    }
+
+    function showHome() { hideAll(); document.getElementById('home-screen').classList.remove('hidden'); }
+    function showHomeConfirm() { if(confirm("確定要離開目前關卡回到主頁嗎？進度將不會儲存喔！")) showHome(); }
+
+    function showIntro(levelId) {
+        hideAll();
+        currentLevelData = levels.find(l => l.id === levelId);
+        document.getElementById('intro-title').innerText = currentLevelData.title;
+        document.getElementById('intro-content').innerHTML = currentLevelData.intro;
+        document.getElementById('intro-screen').classList.remove('hidden');
+    }
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // 開始遊戲 - 動態隨機抽取
+    function startGame() {
+        let easyPool = shuffle([...currentLevelData.easy]);
+        let hardPool = shuffle([...currentLevelData.hard]);
+        
+        gameQuestions = easyPool.slice(0, EASY_Q_COUNT).concat(hardPool.slice(0, HARD_Q_COUNT));
+        userAnswers = new Array(gameQuestions.length).fill(null);
+        currentQIndex = 0;
+        
+        hideAll();
+        document.getElementById('game-screen').classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswering = false;
+        document.getElementById('next-q-btn').classList.add('hidden'); // 隱藏下一題按鈕
+        
+        let qData = gameQuestions[currentQIndex];
+        let difficulty = currentQIndex < EASY_Q_COUNT ? "⭐ 淺程度" : "🔥 深程度";
+        
+        document.getElementById('progress-text').innerText = `第 ${currentQIndex + 1} 題 / 共 ${gameQuestions.length} 題`;
+        document.getElementById('difficulty-text').innerText = difficulty;
+        document.getElementById('question-text').innerText = qData.q.replace("___", "______");
+        
+        const optionsBox = document.getElementById('options-container');
+        optionsBox.innerHTML = '';
+        
+        let optsToRender = shuffle([...qData.options]);
+        let savedAns = userAnswers[currentQIndex];
+        
+        optsToRender.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            if(savedAns === opt) btn.classList.add('selected');
+            
+            // 將選項內的撇號 (') 加上轉義字元 (\') 以免破壞 onclick 引號
+            let escapedOpt = opt.replace(/'/g, "\\'");
+            btn.innerHTML = `<span>${opt}</span> <button class="opt-audio-btn" onclick="event.stopPropagation(); playText('${escapedOpt}')" title="聽選項">🔊</button>`;
+            btn.onclick = () => checkAnswer(btn, opt, qData.ans);
+            optionsBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        if (isAnswering) return;
+        isAnswering = true;
+        
+        userAnswers[currentQIndex] = selected;
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.classList.remove('selected'));
+        
+        if (selected === correct) {
+            btn.classList.add('correct');
+            playSound('success');
+            showVisualEffect(true);
+            
+            // 答對則自動跳轉
+            setTimeout(() => {
+                if (currentQIndex < gameQuestions.length - 1) nextQuestion();
+                else showResult();
+            }, 1500); 
+        } else {
+            btn.classList.add('wrong');
+            playSound('error');
+            showVisualEffect(false);
+            
+            // 標示出正確答案
+            allBtns.forEach(b => {
+                if (b.querySelector('span').innerText === correct) b.classList.add('correct');
+            });
+            
+            // 答錯顯示「Move to next question」按鈕
+            document.getElementById('next-q-btn').classList.remove('hidden');
+        }
+    }
+
+    function prevQuestion() { if (currentQIndex > 0) { currentQIndex--; loadQuestion(); } }
+    
+    // 安全跳轉
+    function nextQuestionSafe() {
+        if (currentQIndex < gameQuestions.length - 1) { currentQIndex++; loadQuestion(); }
+        else { showResult(); }
+    }
+    
+    function nextQuestion() {
+        document.getElementById('next-q-btn').classList.add('hidden');
+        nextQuestionSafe();
+    }
+
+    // 結算畫面
+    function showResult() {
+        hideAll();
+        let score = 0;
+        let html = '<div class="summary-list">';
+        
+        gameQuestions.forEach((q, i) => {
+            let uAns = userAnswers[i];
+            let isCor = uAns === q.ans;
+            if(isCor) score++;
+            
+            html += `<div class="summary-item ${isCor ? 's-correct' : 's-wrong'}" id="summary-item-${i}">
+                <div>
+                    <b>Q${i+1}:</b> ${q.q.replace('___', '______')} <br>
+                    <small>你的答案: <b>${uAns || '未作答'}</b> | 正確答案: <b>${q.ans}</b></small>
+                </div>
+                ${!isCor ? `<button class="retry-btn" onclick="openRetryModal(${i})">重新挑戰</button>` : '<span style="font-size:1.5em;">✅</span>'}
+            </div>`;
+        });
+        html += '</div>';
+        
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('score-text').innerText = `總成績： ${score} / ${gameQuestions.length} 題！`;
+        
+        let starStr = score === 20 ? "🌟大星星 (滿分)！" : (score >= 10 ? "⭐小星星 (合格)！" : "再接再厲！");
+        document.getElementById('star-reward-text').innerText = `本次評價: ${starStr}`;
+        document.getElementById('summary-container').innerHTML = html;
+        
+        // 更新並儲存該關卡的最高分
+        let oldScore = levelScores[currentLevelData.id] || 0;
+        if (score > oldScore) {
+            levelScores[currentLevelData.id] = score;
+            localStorage.setItem('grammarLevelScores', JSON.stringify(levelScores));
+        }
+    }
+
+    // 重做錯題系統
+    let currentRetryIdx = -1;
+    function openRetryModal(idx) {
+        currentRetryIdx = idx;
+        let q = gameQuestions[idx];
+        let modal = document.getElementById('retry-modal');
+        
+        // 顯示專屬中文提示
+        document.getElementById('retry-hint').innerText = currentLevelData.hint;
+        document.getElementById('retry-q-text').innerText = q.q.replace("___", "______");
+        
+        let optsBox = document.getElementById('retry-options');
+        optsBox.innerHTML = '';
+        
+        let optsToRender = shuffle([...q.options]);
+        optsToRender.forEach(opt => {
+            let btn = document.createElement('button');
+            btn.className = 'option-btn';
+            
+            let escapedOpt = opt.replace(/'/g, "\\'");
+            btn.innerHTML = `<span>${opt}</span> <button class="opt-audio-btn" onclick="event.stopPropagation(); playText('${escapedOpt}')">🔊</button>`;
+            
+            btn.onclick = () => {
+                if(opt === q.ans) {
+                    btn.classList.add('correct'); playSound('success'); showVisualEffect(true);
+                    setTimeout(() => {
+                        closeRetryModal();
+                        let sumItem = document.getElementById(`summary-item-${idx}`);
+                        sumItem.classList.remove('s-wrong');
+                        sumItem.classList.add('s-correct');
+                        sumItem.innerHTML = `<div><b>Q${idx+1}:</b> ${q.q.replace('___', '______')} <br><small>正確答案: <b>${q.ans}</b> (已訂正 ⭐)</small></div><span style="font-size:1.5em;">✅</span>`;
+                    }, 1000);
+                } else {
+                    btn.classList.add('wrong'); playSound('error'); showVisualEffect(false);
+                }
+            };
+            optsBox.appendChild(btn);
+        });
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeRetryModal() { document.getElementById('retry-modal').classList.add('hidden'); }
+
+    // Progress Record 系統
+    function openProgressModal() {
+        let html = '';
+        levels.forEach(l => {
+            let s = levelScores[l.id];
+            let starIcon = "";
+            let scoreText = "未挑戰";
+            
+            if (s !== undefined) {
+                scoreText = s + " / 20 分";
+                if (s === 20) starIcon = "🌟";
+                else if (s >= 10) starIcon = "⭐";
+            }
+            
+            html += `<div class="record-item">
+                        <span>${l.theme}</span>
+                        <span>${scoreText} <span class="score-star">${starIcon}</span></span>
+                     </div>`;
+        });
+        document.getElementById('progress-list-container').innerHTML = html;
+        document.getElementById('progress-modal').classList.remove('hidden');
+    }
+
+    function closeProgressModal() { document.getElementById('progress-modal').classList.add('hidden'); }
+
+    function clearRecord() {
+        if(confirm("警告：確定要清除所有關卡的星星和最高分記錄嗎？清除後無法復原喔！")) {
+            localStorage.removeItem('grammarLevelScores');
+            levelScores = {};
+            alert("記錄已清除！");
+            closeProgressModal();
+        }
+    }
+
+    // 視覺效果
+    function showVisualEffect(isCorrect) {
+        const effect = document.createElement('div');
+        effect.className = 'visual-effect';
+        effect.innerText = isCorrect ? '🌟' : '❌';
+        document.body.appendChild(effect);
+        setTimeout(() => { if(document.body.contains(effect)) document.body.removeChild(effect); }, 1000);
+    }
+
+    // ========== 發音系統核心 (智慧語言切換) ========== 
+    function playText(text) {
+        // 1. 把填空的底線換成 "blank" 方便朗讀
+        let processedText = text.replace(/___/g, "blank");
+        
+        // 2. 去除 HTML 標籤 (避免把 <b> 讀成 "b")
+        processedText = processedText.replace(/<[^>]+>/g, '');
+
+        let utterance = new SpeechSynthesisUtterance(processedText);
+        
+        // 3. 自動偵測語言：如果包含中文字，就用香港廣東話；否則用英文
+        if (/[\u4e00-\u9fa5]/.test(processedText)) {
+            utterance.lang = 'zh-HK'; // 廣東話
+            utterance.rate = 0.9;
+        } else {
+            utterance.lang = 'en-US'; // 英文
+            utterance.rate = 0.75;
+        }
+        
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    function playQuestionAudio() { playText(gameQuestions[currentQIndex].q); }
+    function playIntroAudio() { playText(document.getElementById('intro-content').innerText); }
+    function playRetryAudio() { playText(gameQuestions[currentRetryIdx].q); }
+    function playHintAudio() { playText(document.getElementById('retry-hint').innerText); }
+
+    function playSound(type) {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if (type === 'success') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        } else {
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.4);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        }
+        oscillator.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.4);
+        oscillator.stop(audioCtx.currentTime + 0.4);
+    }
+</script>
+
+</body>
+</html>
