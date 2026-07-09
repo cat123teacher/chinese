@@ -126,7 +126,7 @@
         </div>
     </div>
 
-    <!-- 教學頁面 (已更新：重點與每句例子都有獨立發音按鈕) -->
+    <!-- 教學頁面 (重點與每句例子都有獨立發音按鈕) -->
     <div id="tutorial-screen" class="hidden">
         <h1 id="tut-title">關卡教學</h1>
         
@@ -326,18 +326,19 @@
         osc.stop(now + 0.3);
     }
 
-    // --- 星星進度系統 ---
+    // --- 星星進度系統 (已修改：直接儲存最新高分) ---
     function loadProgress() {
         let data = localStorage.getItem('teacherCatProgress');
         return data ? JSON.parse(data) : {};
     }
+    
     function saveProgress(level, score) {
         let data = loadProgress();
-        if (!data[level] || score > data[level]) {
-            data[level] = score;
-            localStorage.setItem('teacherCatProgress', JSON.stringify(data));
-        }
+        // 現在改為直接覆蓋最高分（讓小朋友訂正錯題後可以直接更新為 20 分滿分）
+        data[level] = score;
+        localStorage.setItem('teacherCatProgress', JSON.stringify(data));
     }
+    
     function clearProgress() {
         if(confirm("確定要清除所有的星星記錄嗎？這會重新開始喔！")) {
             localStorage.removeItem('teacherCatProgress');
@@ -652,7 +653,7 @@
         if(confirm("確定要回到主頁嗎？目前的進度會消失喔！")) { renderHome(); showScreen('home-screen'); }
     }
 
-    // --- 完整補回的成績與結算系統 ---
+    // --- 完整補回的成績與結算系統 (已修改：取消 isRetryMode 的存檔限制) ---
     function showResultScreen() {
         let currentScore = 0;
         let html = '';
@@ -674,7 +675,8 @@
                      </div>`;
         });
 
-        if (!hasSavedScoreForThisRun && !isRetryMode) {
+        // 已修改：取消 !isRetryMode 的限制，並搭配 retryQuestion() 內的重置
+        if (!hasSavedScoreForThisRun) {
             saveProgress(currentLevel, currentScore);
             hasSavedScoreForThisRun = true;
         }
@@ -700,6 +702,10 @@
     // 重做錯題 (一直答到對為止)
     function retryQuestion(idx) {
         isRetryMode = true;
+        
+        // 新增這行：重置存檔狀態，讓小朋友訂正對了之後可以重新存入新分數！
+        hasSavedScoreForThisRun = false; 
+        
         currentQIndex = idx;
         questionList[idx].userAns = null; 
         
