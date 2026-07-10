@@ -67,12 +67,15 @@
         .retry-btn { background-color: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 4px 0 #ff6b81; }
         .retry-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* 文法提示框 (Modal) */
-        #hint-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: flex; justify-content: center; align-items: center; }
-        .hint-content { background: #fff9c4; border: 6px dashed #ff9f43; border-radius: 25px; padding: 35px; max-width: 85%; width: 550px; text-align: left; box-shadow: 0 15px 35px rgba(0,0,0,0.3); animation: popIn 0.3s ease-out; position: relative;}
+        /* 文法提示框 (Modal) - ✨已優化手機版體驗✨ */
+        #hint-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;}
+        /* 加入 flexbox 佈局與最大高度限制 */
+        .hint-content { background: #fff9c4; border: 6px dashed #ff9f43; border-radius: 25px; padding: 25px; max-width: 95%; width: 550px; text-align: left; box-shadow: 0 15px 35px rgba(0,0,0,0.3); animation: popIn 0.3s ease-out; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
         @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .hint-content h2 { color: #eb3b5a; margin-top: 0; text-align: center; font-size: 32px; text-shadow: 1px 1px #fff; display: flex; justify-content: center; align-items: center; gap: 15px;}
-        .hint-text-box { font-size: 24px; color: #2d3436; line-height: 1.6; margin: 20px 0; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 15px; white-space: pre-line; }
+        /* 標題固定不被壓縮 */
+        .hint-content h2 { color: #eb3b5a; margin-top: 0; text-align: center; font-size: 32px; text-shadow: 1px 1px #fff; display: flex; justify-content: center; align-items: center; gap: 15px; flex-shrink: 0;}
+        /* 內容區塊允許上下滑動 */
+        .hint-text-box { font-size: 24px; color: #2d3436; line-height: 1.6; margin: 15px 0; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 15px; white-space: pre-line; overflow-y: auto; flex: 1; }
 
         /* 底部社群連結 (非 Fixed，自然排在頁面最底部) */
         .footer { width: 100%; background: #2f3542; color: white; padding: 20px 0; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); margin-top: auto; }
@@ -99,7 +102,8 @@
             <p><strong>💡 規則：</strong><span id="hint-text"></span></p>
             <p class="example-text">🎯 例子：<br><span id="hint-example"></span></p>
         </div>
-        <div style="text-align: center;">
+        <!-- 按鈕區塊加上 flex-shrink: 0 確保它永遠不會被擠壓而消失 -->
+        <div style="text-align: center; flex-shrink: 0; padding-bottom: 5px;">
             <button class="btn" style="background-color: #1dd1a1; box-shadow: 0 6px 0 #10ac84; padding: 15px 40px;" onclick="closeHintModal()">知道啦！</button>
         </div>
     </div>
@@ -226,7 +230,7 @@
              desc: "「着」和「了」放在動作後面。\n「着」表示動作正在進行；\n「了」表示動作已經完成。", 
              example: "1. 妹妹笑了。\n2. 妹妹笑着拍手。\n3. 綠豆長出新芽了。\n4. 他拍着皮球。", 
              easy: [ {q:"他拍 ___ 皮球。",o:["着","了"],a:0},{q:"我喝完果汁 ___ 。",o:["着","了"],a:1},{q:"你聽 ___ 音樂。",o:["着","了"],a:0},{q:"他們已經回來 ___ 。",o:["着","了"],a:1},{q:"花兒開 ___ 。",o:["着","了"],a:1}, {q:"弟弟大聲哭 ___ 。",o:["着","了"],a:1},{q:"媽媽正在煮 ___ 飯。",o:["着","了"],a:0},{q:"小鳥唱 ___ 歌。",o:["着","了"],a:0},{q:"大門關上 ___ 。",o:["着","了"],a:1},{q:"我正看 ___ 電視。",o:["着","了"],a:0}, {q:"哥哥吃完蘋果 ___ 。",o:["着","了"],a:1},{q:"大家開心地笑 ___ 。",o:["着","了"],a:0},{q:"雨終於停 ___ 。",o:["着","了"],a:1},{q:"我手裡拿 ___ 鉛筆。",o:["着","了"],a:0},{q:"功課做完 ___ 。",o:["着","了"],a:1}, {q:"大門已經開 ___ 。",o:["着","了"],a:1},{q:"房間的燈亮 ___ 。",o:["着","了"],a:1},{q:"哥哥跑 ___ 步。",o:["着","了"],a:0},{q:"老師帶 ___ 笑容。",o:["着","了"],a:0},{q:"我寫完字 ___ 。",o:["着","了"],a:1} ], 
-             hard: [ {q:"重組：了 / 跑到 / 他 / 終點",o:["他跑到終點了。","他了跑到終點。"],a:0},{q:"重組：忘了 / 爸爸 / 電腦 / 關",o:["爸爸電腦忘了關。","爸爸忘了關電腦。"],a:1},{q:"重組：睡了 / 在樹下 / 妹妹",o:["妹妹在樹下睡了。","睡了妹妹在樹下。"],a:0},{q:"重組：太陽 / 看着 / 升起 / 我",o:["我看着太陽升起。","看我着太陽升起。"],a:0},{q:"重組：媽媽 / 沉重的 / 行李箱 / 拖着",o:["媽媽拖着沉重的行李箱。","媽媽沉重的行李箱拖着。"],a:0}, {q:"重組：數本故事書 / 哥哥 / 拿着",o:["拿着哥哥數本故事書。","哥哥拿着數本故事書。"],a:1},{q:"重組：一箱 / 老師 / 捧着 / 實驗用具",o:["老師捧着一箱實驗用具。","老師一箱實驗用具捧着。"],a:0},{q:"重組：每晚 / 布娃娃 / 陪着我 / 進入夢鄉",o:["布娃娃每晚陪着我進入夢鄉。","每晚陪着我進入夢鄉布娃娃。"],a:0},{q:"重組：掉下來 / 蘋果 / 了",o:["蘋果掉下來了。","掉下來蘋果了。"],a:0},{q:"重組：出門 / 小明 / 帶着 / 雨傘",o:["小明帶着雨傘出門。","小明雨傘帶着出門。"],a:0}, {q:"重組：天空 / 飛着 / 小鳥 / 在",o:["小鳥在天空飛着。","小鳥飛着在天空。"],a:0},{q:"重組：了 / 已經 / 哥哥 / 睡覺",o:["哥哥已經睡覺了。","哥哥了已經睡覺。"],a:0},{q:"重組：吃着 / 妹妹 / 甜甜的 / 糖果",o:["妹妹吃着甜甜的糖果。","吃着妹妹甜甜的糖果。"],a:0},{q:"重組：了 / 功課 / 我 / 做完",o:["我做完功課了。","我功課做完了。"],a:0},{q:"重組：書包 / 揹着 / 上學 / 我",o:["我揹着書包上學。","我上學揹着書包。"],a:0}, {q:"重組：穿上 / 了 / 外套 / 我",o:["我穿上外套了。","我外套穿上了。"],a:0},{q:"重組：寫着 / 名字 / 筆記本上 / 我的",o:["筆記本上寫着我的名字。","我的名字寫着筆記本上。"],a:0},{q:"重組：亮 / 了 / 天",o:["天亮了。","亮天了。"],a:0},{q:"重組：聽着 / 故事 / 弟弟 / 睡着了",o:["弟弟聽着故事睡着了。","弟弟睡着了聽着故事。"],a:0},{q:"重組：買了 / 新玩具 / 爸爸",o:["爸爸買了新玩具。","新玩具買了爸爸。"],a:0} ] },
+             hard: [ {q:"重組：了 / 跑到 / 他 / 終點",o:["他跑到終點了。","他了跑到終點。"],a:0},{q:"重組：忘了 / 爸爸 / 電腦 / 關",o:["爸爸電腦忘了關。","爸爸忘了關電腦。"],a:1},{q:"重組：睡了 / 在樹下 / 妹妹",o:["妹妹在樹下睡了。","睡了妹妹在樹下。"],a:0},{q:"重組：太陽 / 看着 / 升起 / 我",o:["我看着太陽升起。","看我着太陽升起。"],a:0},{q:"重組：媽媽 / 沉重的 / 行李箱 / 拖着",o:["媽媽拖着沉重的行李箱。","媽媽沉重的行李箱拖着。"],a:0}, {q:"重組：數本故事書 / 哥哥 / 拿着",o:["拿着哥哥數本故事書。","哥哥拿着數本故事書。"],a:1},{q:"重組：一箱 / 老師 / 捧着 / 實驗用具",o:["老師捧着一箱實驗用具。","老師一箱實驗用具捧着。"],a:0},{q:"重組：每晚 / 布娃娃 / 陪着我 / 進入夢鄉",o:["布娃娃每晚陪着我進入夢鄉。","每晚陪着我進入夢鄉布娃娃。"],a:0},{q:"重組：掉下來 / 蘋果 / 了",o:["蘋果掉下來了。","掉下來蘋果了。"],a:0},{q:"重組：出門 / 小明 / 帶着 / 雨傘",o:["小明帶着雨傘出門。","小明雨傘帶着出門。"],a:0}, {q:"天空 / 飛着 / 小鳥 / 在",o:["小鳥在天空飛着。","小鳥飛着在天空。"],a:0},{q:"重組：了 / 已經 / 哥哥 / 睡覺",o:["哥哥已經睡覺了。","哥哥了已經睡覺。"],a:0},{q:"重組：吃着 / 妹妹 / 甜甜的 / 糖果",o:["妹妹吃着甜甜的糖果。","吃着妹妹甜甜的糖果。"],a:0},{q:"重組：了 / 功課 / 我 / 做完",o:["我做完功課了。","我功課做完了。"],a:0},{q:"重組：書包 / 揹着 / 上學 / 我",o:["我揹着書包上學。","我上學揹着書包。"],a:0}, {q:"重組：穿上 / 了 / 外套 / 我",o:["我穿上外套了。","我外套穿上了。"],a:0},{q:"重組：寫着 / 名字 / 筆記本上 / 我的",o:["筆記本上寫着我的名字。","我的名字寫着筆記本上。"],a:0},{q:"重組：亮 / 了 / 天",o:["天亮了。","亮天了。"],a:0},{q:"重組：聽着 / 故事 / 弟弟 / 睡着了",o:["弟弟聽着故事睡着了。","弟弟睡着了聽着故事。"],a:0},{q:"重組：買了 / 新玩具 / 爸爸",o:["爸爸買了新玩具。","新玩具買了爸爸。"],a:0} ] },
         
         3: { title: "3. 陳述句：在", 
              desc: "「在」可以表示動作正在進行、動作進行的地方，或動作發生的時間。重組句子時，把「在」放在人或物後。", 
