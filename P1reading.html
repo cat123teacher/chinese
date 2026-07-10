@@ -196,7 +196,7 @@
         object-fit: contain;
         margin-bottom: 20px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        cursor: pointer; /* 鼠標變成點擊手勢 */
+        cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
     }
     #story-image:hover {
@@ -215,9 +215,9 @@
         width: 100%; 
         height: 100%; 
         overflow: auto; 
-        background-color: rgba(0,0,0,0.85); /* 半透明黑色背景 */
+        background-color: rgba(0,0,0,0.85); 
         backdrop-filter: blur(5px);
-        cursor: pointer; /* 點擊任意處可關閉 */
+        cursor: pointer;
     }
     .modal-content {
         margin: auto;
@@ -257,31 +257,68 @@
         to {transform: scale(1); opacity: 1;}
     }
 
+    /* ★ 更新：連貫文章樣式設計 ★ */
     #story-text-container {
         background: #FDFBFB;
         border-radius: 15px;
-        padding: 20px;
+        padding: 25px;
         border: 2px solid #E2E2EC;
-    }
-    .story-line {
-        display: flex;
-        align-items: flex-start;
-        text-align: left;
-        gap: 12px;
-        margin-bottom: 15px;
-        padding: 8px;
-        border-radius: 10px;
-        transition: background 0.2s;
-    }
-    .story-line:hover { background: #F4F4F9; }
-    .story-text {
+        text-align: left; /* 讓文字靠左對齊，像真實文章 */
+        line-height: 2;   /* 增加行高讓閱讀更舒適 */
         font-size: 1.4em;
-        line-height: 1.5;
         color: #444;
-        margin-top: 3px;
+    }
+    
+    .story-paragraph {
+        text-indent: 0;
     }
 
-    /* 發音按鈕 */
+    /* 每個獨立句子的外框，方便滑鼠游標指引 */
+    .sentence-span {
+        border-radius: 8px;
+        transition: background 0.2s;
+        padding: 2px 4px;
+        display: inline; /* 保持與其他句子連在一起 */
+    }
+    .sentence-span:hover { 
+        background: #F4F4F9; 
+    }
+
+    /* ★ 更新：安插在句子旁的小發音按鈕 ★ */
+    .inline-audio-btn {
+        background: #FFE259;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        font-size: 0.9em;
+        cursor: pointer;
+        box-shadow: 0 3px 0 #D4B83C;
+        transition: transform 0.1s;
+        vertical-align: middle;
+        margin: 0 6px 4px 6px; /* 與文字的間距 */
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .inline-audio-btn:active { 
+        transform: translateY(3px); 
+        box-shadow: 0 0 0 #D4B83C; 
+    }
+
+    /* 題目與導航區 */
+    .question-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f1e9ff;
+        padding: 10px 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+    }
+    .progress-text { font-size: 1.3em; font-weight: bold; color: var(--accent); }
+    
+    /* 題目本身的大發音按鈕 */
     .audio-btn {
         background: #FFE259;
         border: none;
@@ -295,19 +332,6 @@
         flex-shrink: 0;
     }
     .audio-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #D4B83C; }
-    .mini-btn { min-width: 40px; height: 40px; font-size: 1em; box-shadow: 0 3px 0 #D4B83C; }
-    
-    /* 題目與導航區 */
-    .question-header-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f1e9ff;
-        padding: 10px 20px;
-        border-radius: 15px;
-        margin-bottom: 15px;
-    }
-    .progress-text { font-size: 1.3em; font-weight: bold; color: var(--accent); }
     
     .question-box {
         background: #fff;
@@ -443,7 +467,7 @@
         <div id="reading-area">
             <h2 id="level-title" style="color: #FF9A9E; margin-top: 0;"></h2>
             <div style="font-size: 1.1em; color: #888; margin-bottom: 10px;">👇 點擊圖片可以放大看清楚喔！ 👇</div>
-            <!-- 原本的圖片，已加入點擊放大功能 -->
+            <!-- 圖片點擊放大功能 -->
             <img id="story-image" src="" alt="故事圖片載入中..." onclick="openModal()">
             <div id="story-text-container"></div>
         </div>
@@ -759,7 +783,7 @@ function closeModal() {
     document.getElementById("image-modal").style.display = "none";
 }
 
-// 3. 遊戲流程控制
+// 3. 遊戲流程控制 - ★ 更改文章生成邏輯 ★
 function startLevel(levelId) {
     currentLevelId = levelId;
     const level = gameData.find(l => l.id === levelId);
@@ -769,16 +793,19 @@ function startLevel(levelId) {
     document.getElementById("level-title").innerText = level.title;
     document.getElementById("story-image").src = level.image;
     
-    let storyHtml = '';
+    // 把每一句連在一起變成一個完整的段落，發音按鈕安插在句子前
+    let storyHtml = '<div class="story-paragraph">';
     level.story.forEach(line => {
         let safeText = line.replace(/'/g, "\\'"); 
         storyHtml += `
-            <div class="story-line">
-                <button class="audio-btn mini-btn" onclick="playAudio('${safeText}', event)">🔊</button>
-                <span class="story-text">${line}</span>
-            </div>
+            <span class="sentence-span">
+                <button class="inline-audio-btn" onclick="playAudio('${safeText}', event)" title="播放此句">🔊</button>
+                ${line}
+            </span>
         `;
     });
+    storyHtml += '</div>';
+    
     document.getElementById("story-text-container").innerHTML = storyHtml;
     document.getElementById("reading-area").style.display = "block";
     document.getElementById("q-nav-bar").style.display = "flex";
