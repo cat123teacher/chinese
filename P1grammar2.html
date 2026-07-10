@@ -37,7 +37,7 @@
             max-width: 900px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 30px; padding: 30px; box-shadow: 0 15px 25px rgba(0,0,0,0.15); border: 8px solid #FFCDD2; position: relative;
         }
         
-        /* 養成故事區 (新加入) */
+        /* 養成故事區 */
         .story-section {
             background: #FFF8E1;
             border: 6px dashed #FFCA28;
@@ -78,15 +78,12 @@
 
         /* 首頁關卡選單 */
         .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 30px; }
-        .level-btn { background-color: #FFF9C4; border: 5px solid #FBC02D; border-radius: 20px; padding: 15px; font-size: 1.2em; font-weight: bold; color: #E65100; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 #FBC02D; }
+        .level-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFF9C4; border: 5px solid #FBC02D; border-radius: 20px; padding: 15px; font-size: 1.2em; font-weight: bold; color: #E65100; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 #FBC02D; }
         .level-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #FBC02D; }
-        .theme-label { display: block; font-size: 0.85em; color: #00838F; margin-bottom: 8px; background: #B2EBF2; border-radius: 10px; padding: 5px; }
+        .theme-label { display: block; width: 100%; font-size: 0.85em; color: #00838F; margin-bottom: 8px; background: #B2EBF2; border-radius: 10px; padding: 5px; box-sizing: border-box;}
         
-        /* 直接顯示在首頁的進度區 */
-        .progress-section { background: #E3F2FD; padding: 25px; border-radius: 25px; border: 4px dashed #90CAF9; margin-top: 50px; max-width: 700px; margin-left: auto; margin-right: auto;}
-        .record-list { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0; text-align: left;}
-        .record-item { background: #FFF; border: 3px solid #64B5F6; padding: 15px; border-radius: 15px; font-size: 1.3em; display: flex; justify-content: space-between; font-weight: bold; color: #0D47A1;}
-        .score-star { font-size: 1.5em; }
+        /* 首頁下方的清除進度與說明區 */
+        .progress-section { background: #E3F2FD; padding: 25px; border-radius: 25px; border: 4px dashed #90CAF9; margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto;}
         
         /* 清除記錄按鈕 */
         .clear-btn {
@@ -170,7 +167,7 @@
     <div id="home-screen">
         <h1>🌟 小一英文文法大冒險下 🌟</h1>
         
-        <!-- 新增的養成故事區塊 -->
+        <!-- 養成故事區塊 -->
         <div class="story-section" id="story-section">
             <img id="story-img" src="blueegg.jpg" alt="Hero Egg" class="story-img">
             <p id="story-text" class="story-text">快完成關卡,孵化英雄/公主去消滅破壞圖書的壞人</p>
@@ -181,11 +178,9 @@
         <!-- 關卡選單 -->
         <div class="level-grid" id="level-grid"></div>
 
-        <!-- 進度區塊 -->
+        <!-- 遊戲設定區塊 (取代原本冗長的列表) -->
         <div class="progress-section">
-            <h2 style="color: #1976D2; font-size: 2em; margin-top: 0;">🏆 Progress Record 🏆</h2>
-            <p style="color: #555; font-weight:bold; margin-bottom: 0;">滿分20分 = 🌟大星星 | 合格10分 = ⭐小星星</p>
-            <div class="record-list" id="home-progress-list"></div>
+            <p style="color: #555; font-weight:bold; font-size: 1.1em; margin-top: 0;">滿分20分 = 🌟大星星 | 合格10分 = ⭐小星星</p>
             <button class="clear-btn" onclick="clearRecord()">🗑️ 清除所有記錄</button>
         </div>
 
@@ -269,7 +264,7 @@
 </div>
 
 <script>
-    // 讀取最高分紀錄
+    // 讀取紀錄
     let levelScores = JSON.parse(localStorage.getItem('grammarLevelScores')) || {};
 
     // 養成系統的故事設定 (共 11 個階段：0 ~ 10)
@@ -366,53 +361,50 @@
     let userAnswers = [];
     let currentQIndex = 0;
     let isAnswering = false;
+    let currentScore = 0;
 
     const EASY_Q_COUNT = 10; 
     const HARD_Q_COUNT = 10; 
 
-    // 渲染首頁的學習進度與養成系統
+    // ====== 修改核心：完全移除獨立的列表邏輯 ======
     function renderProgress() {
-        // 1. 處理分數列表
-        let html = '';
         let completedCount = 0;
+        
+        // 抓取按鈕容器並清空，準備重新產生帶有分數的按鈕
+        const grid = document.getElementById('level-grid');
+        grid.innerHTML = ''; 
         
         levels.forEach(l => {
             let s = levelScores[l.id];
             let starIcon = "";
-            let scoreText = "未挑戰";
+            let btnScoreHtml = ""; // 用於在按鈕內顯示分數
             
             if (s !== undefined) {
-                completedCount++; // 只要有記錄就算完成該關
-                scoreText = s + " / 20 分";
+                completedCount++; 
                 if (s === 20) starIcon = "🌟";
                 else if (s >= 10) starIcon = "⭐";
+                else starIcon = "💡";
+                
+                // 動態產生按鈕下方的紀錄小標籤
+                btnScoreHtml = `<div style="margin-top: 10px; font-size: 0.9em; background: #FFCC80; color: #D84315; padding: 4px 10px; border-radius: 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">紀錄: ${s}分 ${starIcon}</div>`;
             }
             
-            html += `<div class="record-item">
-                        <span>${l.theme}</span>
-                        <span>${scoreText} <span class="score-star">${starIcon}</span></span>
-                     </div>`;
+            // 產生包含分數的關卡按鈕
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.innerHTML = `<span class="theme-label">${l.theme}</span>${l.title}${btnScoreHtml}`;
+            btn.onclick = () => showIntro(l.id);
+            grid.appendChild(btn);
         });
-        document.getElementById('home-progress-list').innerHTML = html;
 
-        // 2. 處理養成系統 (根據 completedCount 更新圖片和文字)
-        if (completedCount > 10) completedCount = 10; // 最高 10 階段
+        // 處理養成系統
+        if (completedCount > 10) completedCount = 10; 
         let currentStep = storySteps[completedCount];
         document.getElementById('story-img').src = currentStep.img;
         document.getElementById('story-text').innerText = currentStep.text;
     }
 
-    // 初始化首頁
-    const grid = document.getElementById('level-grid');
-    levels.forEach(level => {
-        const btn = document.createElement('button');
-        btn.className = 'level-btn';
-        btn.innerHTML = `<span class="theme-label">${level.theme}</span>${level.title}`;
-        btn.onclick = () => showIntro(level.id);
-        grid.appendChild(btn);
-    });
-    
-    // 首次載入時渲染進度和故事
+    // 首次載入時渲染進度、故事和按鈕
     renderProgress();
 
     function hideAll() {
@@ -430,7 +422,7 @@
         document.getElementById('home-screen').classList.remove('hidden'); 
     }
     
-    function showHomeConfirm() { if(confirm("確定要離開目前關卡回到主頁嗎？進度將不會儲存喔！")) showHome(); }
+    function showHomeConfirm() { if(confirm("確定要離開目前關卡回到主頁嗎？")) showHome(); }
 
     function showIntro(levelId) {
         hideAll();
@@ -450,7 +442,7 @@
         return array;
     }
 
-    // 開始遊戲 - 動態隨機抽取
+    // 開始遊戲 
     function startGame() {
         let easyPool = shuffle([...currentLevelData.easy]);
         let hardPool = shuffle([...currentLevelData.hard]);
@@ -466,7 +458,7 @@
 
     function loadQuestion() {
         isAnswering = false;
-        document.getElementById('next-q-btn').classList.add('hidden'); // 隱藏下一題按鈕
+        document.getElementById('next-q-btn').classList.add('hidden'); 
         
         let qData = gameQuestions[currentQIndex];
         let difficulty = currentQIndex < EASY_Q_COUNT ? "⭐ 淺程度" : "🔥 深程度";
@@ -486,7 +478,6 @@
             btn.className = 'option-btn';
             if(savedAns === opt) btn.classList.add('selected');
             
-            // 將選項內的撇號 (') 加上轉義字元 (\') 以免破壞 onclick 引號
             let escapedOpt = opt.replace(/'/g, "\\'");
             btn.innerHTML = `<span>${opt}</span> <button class="opt-audio-btn" onclick="event.stopPropagation(); playText('${escapedOpt}')" title="聽選項">🔊</button>`;
             btn.onclick = () => checkAnswer(btn, opt, qData.ans);
@@ -507,7 +498,6 @@
             playSound('success');
             showVisualEffect(true);
             
-            // 答對則自動跳轉
             setTimeout(() => {
                 if (currentQIndex < gameQuestions.length - 1) nextQuestion();
                 else showResult();
@@ -517,19 +507,16 @@
             playSound('error');
             showVisualEffect(false);
             
-            // 標示出正確答案
             allBtns.forEach(b => {
                 if (b.querySelector('span').innerText === correct) b.classList.add('correct');
             });
             
-            // 答錯顯示「Move to next question」按鈕
             document.getElementById('next-q-btn').classList.remove('hidden');
         }
     }
 
     function prevQuestion() { if (currentQIndex > 0) { currentQIndex--; loadQuestion(); } }
     
-    // 安全跳轉
     function nextQuestionSafe() {
         if (currentQIndex < gameQuestions.length - 1) { currentQIndex++; loadQuestion(); }
         else { showResult(); }
@@ -543,13 +530,13 @@
     // 結算畫面
     function showResult() {
         hideAll();
-        let score = 0;
+        currentScore = 0; 
         let html = '<div class="summary-list">';
         
         gameQuestions.forEach((q, i) => {
             let uAns = userAnswers[i];
             let isCor = uAns === q.ans;
-            if(isCor) score++;
+            if(isCor) currentScore++;
             
             html += `<div class="summary-item ${isCor ? 's-correct' : 's-wrong'}" id="summary-item-${i}">
                 <div>
@@ -562,16 +549,15 @@
         html += '</div>';
         
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('score-text').innerText = `總成績： ${score} / ${gameQuestions.length} 題！`;
+        document.getElementById('score-text').innerText = `總成績： ${currentScore} / ${gameQuestions.length} 題！`;
         
-        let starStr = score === 20 ? "🌟大星星 (滿分)！" : (score >= 10 ? "⭐小星星 (合格)！" : "再接再厲！");
+        let starStr = currentScore === 20 ? "🌟大星星 (滿分)！" : (currentScore >= 10 ? "⭐小星星 (合格)！" : "再接再厲！");
         document.getElementById('star-reward-text').innerText = `本次評價: ${starStr}`;
         document.getElementById('summary-container').innerHTML = html;
         
-        // 更新並儲存該關卡的最高分
-        let oldScore = levelScores[currentLevelData.id] || 0;
-        if (score > oldScore) {
-            levelScores[currentLevelData.id] = score;
+        // 只有當「未曾挑戰過」或「目前分數高於歷史最高分」時才進行覆蓋儲存
+        if (levelScores[currentLevelData.id] === undefined || currentScore > levelScores[currentLevelData.id]) {
+            levelScores[currentLevelData.id] = currentScore;
             localStorage.setItem('grammarLevelScores', JSON.stringify(levelScores));
         }
     }
@@ -583,7 +569,6 @@
         let q = gameQuestions[idx];
         let modal = document.getElementById('retry-modal');
         
-        // 顯示專屬中文提示
         document.getElementById('retry-hint').innerText = currentLevelData.hint;
         document.getElementById('retry-q-text').innerText = q.q.replace("___", "______");
         
@@ -607,6 +592,21 @@
                         sumItem.classList.remove('s-wrong');
                         sumItem.classList.add('s-correct');
                         sumItem.innerHTML = `<div><b>Q${idx+1}:</b> ${q.q.replace('___', '______')} <br><small>正確答案: <b>${q.ans}</b> (已訂正 ⭐)</small></div><span style="font-size:1.5em;">✅</span>`;
+                        
+                        // 更新分數與畫面邏輯
+                        userAnswers[idx] = q.ans;
+                        currentScore++; 
+                        
+                        document.getElementById('score-text').innerText = `總成績： ${currentScore} / ${gameQuestions.length} 題！`;
+                        
+                        let starStr = currentScore === 20 ? "🌟大星星 (滿分)！" : (currentScore >= 10 ? "⭐小星星 (合格)！" : "再接再厲！");
+                        document.getElementById('star-reward-text').innerText = `本次評價: ${starStr}`;
+                        
+                        // 修正答案加分後，同樣只在破紀錄時才儲存
+                        if (levelScores[currentLevelData.id] === undefined || currentScore > levelScores[currentLevelData.id]) {
+                            levelScores[currentLevelData.id] = currentScore;
+                            localStorage.setItem('grammarLevelScores', JSON.stringify(levelScores));
+                        }
                     }, 1000);
                 } else {
                     btn.classList.add('wrong'); playSound('error'); showVisualEffect(false);
@@ -626,11 +626,10 @@
             localStorage.removeItem('grammarLevelScores');
             levelScores = {};
             alert("記錄已清除！");
-            renderProgress(); // 清除後重新渲染，公主會變回原點
+            renderProgress(); 
         }
     }
 
-    // 視覺效果
     function showVisualEffect(isCorrect) {
         const effect = document.createElement('div');
         effect.className = 'visual-effect';
@@ -639,7 +638,7 @@
         setTimeout(() => { if(document.body.contains(effect)) document.body.removeChild(effect); }, 1000);
     }
 
-    // ========== 發音系統核心 (智慧語言切換) ========== 
+    // 發音系統
     function playText(text) {
         let processedText = text.replace(/___/g, "blank");
         processedText = processedText.replace(/<[^>]+>/g, '');
@@ -647,10 +646,10 @@
         let utterance = new SpeechSynthesisUtterance(processedText);
         
         if (/[\u4e00-\u9fa5]/.test(processedText)) {
-            utterance.lang = 'zh-HK'; // 廣東話
+            utterance.lang = 'zh-HK';
             utterance.rate = 0.9;
         } else {
-            utterance.lang = 'en-US'; // 英文
+            utterance.lang = 'en-US';
             utterance.rate = 0.75;
         }
         
