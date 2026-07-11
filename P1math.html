@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小一數學乘數初學大冒險</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --cat-orange: #FF9800; --cat-blue: #03A9F4; --cat-green: #4CAF50; --cat-pink: #FF4081; --bg: #FFF9F0; }
+        body { background: var(--bg); font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; text-align: center; margin: 0; padding-top: 70px; -webkit-tap-highlight-color: transparent; color: #5D4037; }
+        
+        .logo { position: fixed; top: 10px; left: 10px; width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--cat-orange); z-index: 2000; background: white; }
+        
+        /* 頁面切換 */
+        .page { display: none; padding: 20px; animation: fadeIn 0.5s; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 標題與選單 */
+        h1 { color: #E64A19; font-size: 26px; text-shadow: 2px 2px white; }
+        .lvl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 450px; margin: 20px auto; }
+        .lvl-card { background: white; border: 4px solid var(--cat-orange); border-radius: 20px; padding: 15px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 #E65100; }
+        .lvl-card:active { transform: translateY(4px); box-shadow: none; }
+        .star-box { font-size: 24px; min-height: 30px; margin: 5px 0; }
+
+        /* 遊戲區域 */
+        .game-box { background: white; border-radius: 30px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border: 5px solid #FFE0B2; }
+        .formula { font-size: 50px; font-weight: bold; color: var(--cat-orange); margin: 15px 0; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* 互動區域 */
+        .cookie-pool { background: #FFFDE7; padding: 15px; border-radius: 20px; min-height: 80px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; border: 3px dashed #FFD54F; margin: 15px 0; }
+        .plate-area { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .plate { width: 75px; height: 75px; background: #E1F5FE; border: 3px dashed var(--cat-blue); border-radius: 50%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; }
+        .cookie { font-size: 30px; cursor: grab; touch-action: none; }
+
+        /* 按鈕設計 */
+        .opt-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .opt-btn { flex-grow: 1; background: var(--cat-green); color: white; border: none; padding: 18px; border-radius: 20px; font-size: 26px; font-weight: bold; box-shadow: 0 5px 0 #2E7D32; cursor: pointer; }
+        .audio-btn { background: #BBDEFB; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; box-shadow: 0 4px 0 #90CAF9; }
+        
+        /* 導航 */
+        .nav-bar { display: flex; justify-content: space-between; margin: 20px 0; gap: 10px; }
+        .nav-btn { padding: 12px 20px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; background: #f0f0f0; }
+
+        /* 頁尾 */
+        .footer { background: #424242; color: white; padding: 30px 15px; font-size: 14px; line-height: 2; margin-top: 50px; border-radius: 30px 30px 0 0; }
+        .footer a { color: #FFD54F; text-decoration: none; font-weight: bold; margin: 0 8px; border-bottom: 1px solid; }
+        .adventure-btn { background: var(--cat-pink); color: white; border: none; padding: 18px 30px; border-radius: 40px; font-size: 20px; font-weight: bold; margin: 20px 0; cursor: pointer; box-shadow: 0 6px 0 #C2185B; width: 85%; }
+
+        /* 彈窗 */
+        #tableModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width: 85%; max-width: 350px; background:white; border:8px solid var(--cat-orange); border-radius:30px; padding:25px; z-index:3000; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .table-item { background: #FFF9C4; padding: 10px; border-radius: 12px; font-weight: bold; color: #E64A19; }
+    </style>
+</head>
+<body>
+    <img src="cat.jpeg" class="logo" id="mainLogo">
+
+    <!-- 首頁面 -->
+    <div id="homePage" class="page active-page">
+        <h1>🐱 小一數學乘數初學大冒險</h1>
+        <div class="lvl-grid" id="lvlGrid"></div>
+        <button class="nav-btn" onclick="clearData()">⚠️ 清除記錄</button>
+        <br>
+        <button class="adventure-btn" onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'">返回小朋友學習大冒險</button>
+    </div>
+
+    <!-- 遊戲頁面 -->
+    <div id="gamePage" class="page">
+        <div class="game-box">
+            <div class="nav-bar">
+                <button class="nav-btn" onclick="goHome()">🏠 主頁</button>
+                <button class="nav-btn" style="background:var(--cat-pink); color:white;" onclick="openTable()">💡 乘數表</button>
+            </div>
+            <div id="progressTxt" style="font-weight:bold; color:#888;">題目：1 / 20</div>
+            <div id="formula" class="formula"></div>
+            <p><button class="audio-btn" id="qAudio">🔊</button> <span id="qText" style="font-weight:bold;"></span></p>
+            
+            <div id="interArea">
+                <div class="cookie-pool" id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="plate-area" id="plates"></div>
+            </div>
+
+            <div class="options" id="options"></div>
+            <div id="feedback" style="height:40px; margin-top:15px; font-size:24px; font-weight:bold;"></div>
+            
+            <div class="nav-bar">
+                <button class="nav-btn" onclick="prevQ()">⬅️ 上一題</button>
+                <button id="skipBtn" class="nav-btn" style="display:none; background:#FFE082;" onclick="nextQ()">跳過下一題 ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結算頁面 -->
+    <div id="summaryPage" class="page">
+        <h2 id="finalScore"></h2>
+        <div id="starResult" style="font-size:70px; margin:20px;"></div>
+        <button class="opt-btn" style="background:var(--cat-blue); width:280px;" onclick="restartLvl()">🔄 重新挑戰這一關</button>
+        <h3>我的表現 (點擊錯題重做)</h3>
+        <div id="summaryList" style="max-width:450px; margin:auto;"></div>
+        <button class="adventure-btn" onclick="goHome()">🏠 返回主頁選關卡</button>
+    </div>
+
+    <!-- 乘數表彈窗 -->
+    <div id="tableModal">
+        <h2 style="color:var(--cat-orange); margin-bottom:15px;">💡 乘數魔法書</h2>
+        <div id="tableContent" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+        <button onclick="closeModal()" style="margin-top:20px; width:100%; padding:15px; border-radius:15px; background:var(--cat-orange); color:white; border:none; font-weight:bold; font-size:18px;">我知道了！</button>
+    </div>
+
+    <div class="footer">
+        <strong>Teacher Cat 的快樂AI教室</strong><br>
+        <a href="https://www.youtube.com/@TeacherCat123">YouTube</a> | 
+        <a href="https://www.instagram.com/teachercat123">Instagram</a> | 
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/">Facebook</a><br>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni">WhatsApp</a> | 
+        <a href="https://xhslink.com/m/5UQtqPpcsWK">小紅書</a> | 
+        抖音: 74254902683
+    </div>
+
+    <script>
+        let currentLvl=0, curIdx=0, score=0, isRedo=false;
+        let qPool=[], results=[];
+        let fixedC=0, pCount=0;
+
+        function init() {
+            const grid = document.getElementById('lvlGrid');
+            grid.innerHTML = "";
+            for(let i=1; i<=11; i++) {
+                const high = localStorage.getItem('cat_lvl_'+i) || 0;
+                let star = high == 20 ? "🌟" : (high >= 10 ? "⭐" : "");
+                grid.innerHTML += `
+                    <div class="lvl-card" onclick="startLvl(${i})">
+                        <div style="font-weight:bold; color:var(--cat-orange);">${i===11?'終極':i}</div>
+                        <div class="star-box">${star}</div>
+                        <div style="font-size:11px;">最高: ${high}分</div>
+                    </div>`;
+            }
+        }
+
+        function startLvl(lvl) {
+            currentLvl=lvl; curIdx=0; score=0; results=[]; isRedo=false;
+            let easy=[], hard=[];
+            let m = (lvl===1 || lvl===11) ? 0 : lvl-1; 
+
+            for(let i=1; i<=20; i++) {
+                let mult = m || Math.floor(Math.random()*9)+1;
+                easy.push({ m: mult, p: Math.floor(Math.random()*5)+1 });
+                hard.push({ m: mult, p: Math.floor(Math.random()*5)+6 });
+            }
+            
+            // 隨機抽 10+10
+            qPool = [...easy.sort(()=>0.5-Math.random()).slice(0,10), ...hard.sort(()=>0.5-Math.random()).slice(0,10)];
+            showPage('gamePage'); loadQ();
+        }
+
+        function loadQ() {
+            const q = qPool[curIdx];
+            fixedC=q.m; pCount=q.p;
+            document.getElementById('progressTxt').innerText = `題目：${curIdx+1} / 20`;
+            document.getElementById('formula').innerText = `${fixedC} x ${pCount} = ?`;
+            const txt = `每個碟子放 ${fixedC} 塊餅乾，一共放滿 ${pCount} 個碟子。`;
+            document.getElementById('qText').innerText = txt;
+            document.getElementById('qAudio').onclick = () => speak(txt);
+            document.getElementById('feedback').innerHTML = "";
+            document.getElementById('skipBtn').style.display = "none";
+            document.getElementById('formula').style.transform = "scale(1)";
+
+            const inter = document.getElementById('interArea');
+            if(currentLvl === 1 || isRedo) {
+                inter.style.display = 'block';
+                const pool = document.getElementById('pool'); pool.innerHTML = "";
+                for(let i=0; i<fixedC*pCount; i++) pool.innerHTML += `<span class="cookie" draggable="true" ondragstart="drag(event)" id="c${i}">🍪</span>`;
+                const plates = document.getElementById('plates'); plates.innerHTML = "";
+                for(let i=0; i<pCount; i++) plates.innerHTML += `<div class="plate" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`;
+            } else { inter.style.display = 'none'; }
+
+            const opts = document.getElementById('options'); opts.innerHTML = "";
+            let ans = fixedC * pCount;
+            let choices = Array.from(new Set([ans, ans+1, ans-1, ans+5])).sort(()=>0.5-Math.random());
+            choices.forEach(c => {
+                if(c < 0) return;
+                opts.innerHTML += `
+                    <div class="opt-row">
+                        <button class="audio-btn" onclick="speak('${c}')">🔊</button>
+                        <button class="opt-btn" onclick="checkAns(${c})">${c}</button>
+                    </div>`;
+            });
+        }
+
+        function checkAns(val) {
+            const isCorrect = (val === fixedC * pCount);
+            const fb = document.getElementById('feedback');
+            if(isCorrect) {
+                speak("太棒了，你答對了！");
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('formula').style.transform = "scale(1.3)";
+                fb.innerHTML = "<span style='color:var(--cat-green)'>🎉 太棒了！答對了！</span>";
+                if(!isRedo) {
+                    results[curIdx] = { q: `${fixedC}x${pCount}`, ok: true };
+                    score++; setTimeout(nextQ, 1500);
+                } else { setTimeout(showSummary, 1500); }
+            } else {
+                speak("沒關係，再試一次吧！");
+                fb.innerHTML = "<span style='color:red'>❌ 不對喔，再數一數！</span>";
+                if(!isRedo) {
+                    results[curIdx] = { q: `${fixedC}x${pCount}`, ok: false };
+                    document.getElementById('skipBtn').style.display = "block";
+                } else {
+                    alert("💡 提示：每一盤都要有 " + fixedC + " 個餅乾，數數看一共多少個？");
+                }
+            }
+        }
+
+        function nextQ() { curIdx++; if(curIdx < 20) loadQ(); else showSummary(); }
+        function prevQ() { if(curIdx > 0) { curIdx--; loadQ(); } }
+
+        function showSummary() {
+            isRedo = false; showPage('summaryPage');
+            document.getElementById('finalScore').innerText = `得分：${score} / 20`;
+            const sBox = document.getElementById('starResult');
+            sBox.innerText = score === 20 ? "🌟" : (score >= 10 ? "⭐" : "💪");
+            
+            let old = localStorage.getItem('cat_lvl_'+currentLvl) || 0;
+            if(score > old) localStorage.setItem('cat_lvl_'+currentLvl, score);
+
+            const list = document.getElementById('summaryList');
+            list.innerHTML = "";
+            results.forEach((r, i) => {
+                list.innerHTML += `
+                    <div style="background:white; padding:12px; margin:8px 0; border-radius:15px; border:2px solid ${r.ok?'#C8E6C9':'#FFCDD2'}; display:flex; justify-content:space-between;" onclick="${r.ok?'':'redo('+i+')'}">
+                        <span>題目 ${i+1}: ${r.q}</span>
+                        <span>${r.ok?'✅':'❌ (重做)'}</span>
+                    </div>`;
+            });
+            init();
+        }
+
+        function redo(i) { isRedo=true; curIdx=i; showPage('gamePage'); loadQ(); }
+        function restartLvl() { startLvl(currentLvl); }
+        function goHome() { showPage('homePage'); }
+        function openTable() {
+            const content = document.getElementById('tableContent');
+            content.innerHTML = "";
+            for(let i=1; i<=10; i++) content.innerHTML += `<div class="table-item">${fixedC} x ${i} = ${fixedC*i}</div>`;
+            document.getElementById('tableModal').style.display = 'block';
+        }
+        function closeModal() { document.getElementById('tableModal').style.display = 'none'; }
+        function showPage(p) { document.querySelectorAll('.page').forEach(el=>el.classList.remove('active-page')); document.getElementById(p).classList.add('active-page'); window.scrollTo(0,0); }
+        function clearData() { if(confirm("確定要清除星星嗎？")) { localStorage.clear(); init(); } }
+        function speak(t) { const m = new SpeechSynthesisUtterance(t); m.lang = 'zh-HK'; window.speechSynthesis.speak(m); }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+        function drop(e) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text");
+            if(e.target.className === "plate") {
+                e.target.appendChild(document.getElementById(data));
+                const plates = document.querySelectorAll('.plate');
+                if(Array.from(plates).every(p => p.children.length === fixedC)) checkAns(fixedC * pCount);
+            }
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
