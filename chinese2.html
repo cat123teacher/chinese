@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小一中文文法大冒險下</title>
+    <style>
+        :root {
+            --primary: #ff5757;
+            --secondary: #ff914d;
+            --background: #fff8e7;
+            --box-bg: #ffffff;
+            --text-dark: #333333;
+            --btn-easy: #00bf63;
+            --btn-hard: #cb6ce6;
+            --btn-hover: #ffbd59;
+            --correct: #4caf50;
+            --wrong: #f44336;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--background);
+            background-image: radial-gradient(#ffcc00 15%, transparent 15%), radial-gradient(#ffcc00 15%, transparent 15%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--secondary);
+            object-fit: cover;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #a71d2a;
+            margin: 10px auto 25px auto;
+            display: block;
+        }
+        .clear-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        #game-container {
+            background: var(--box-bg);
+            width: 95%;
+            max-width: 900px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            border: 8px solid white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.8em;
+            text-shadow: 3px 3px 0px #ffe6e6;
+            margin-bottom: 10px;
+        }
+
+        .hidden { display: none !important; }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        .level-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #cc6b33;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .level-btn:hover {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #cc6b33;
+            background-color: var(--btn-hover);
+            color: #333;
+        }
+
+        .level-score {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .star-big { font-size: 1.8em; text-shadow: 0 0 10px gold; }
+        .star-small { font-size: 1.2em; }
+        .star-empty { font-size: 1.2em; color: rgba(255,255,255,0.5); }
+
+        .intro-box {
+            background-color: #f0f8ff;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 1.3em;
+            line-height: 1.6;
+            border: 4px dashed #87ceeb;
+        }
+
+        .example-list {
+            background-color: #fff0f5;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border-left: 8px solid #ffb6c1;
+            list-style-type: none;
+        }
+        .example-list li { margin-bottom: 10px; }
+
+        .article-box {
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 1.25em;
+            line-height: 1.7;
+            border: 3px dashed #00acc1;
+            max-height: 280px; 
+            overflow-y: auto;
+            white-space: pre-wrap; 
+            color: #006064;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .inline-audio-btn {
+            background-color: #00d2ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.85em;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #0096c7;
+            margin: 0 3px 0 8px;
+            vertical-align: text-bottom;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+        .inline-audio-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: #eee;
+            padding: 10px 20px;
+            border-radius: 15px;
+        }
+        .difficulty-badge { padding: 5px 15px; border-radius: 20px; color: white; }
+        .diff-easy { background-color: var(--btn-easy); }
+        .diff-hard { background-color: var(--btn-hard); }
+
+        .question-box {
+            background-color: #fffacd;
+            padding: 25px;
+            border-radius: 20px;
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            border: 4px solid #ffd700;
+        }
+
+        .audio-btn {
+            background-color: #00d2ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.3em;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0096c7;
+            transition: transform 0.1s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .audio-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background-color: white;
+            color: var(--text-dark);
+            border: 4px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            gap: 15px;
+        }
+        .option-btn:hover:not(:disabled) { border-color: var(--primary); background-color: #fff5f5; }
+
+        #skip-btn-container { margin-top: 20px; height: 60px; }
+        .skip-btn {
+            background-color: #f4a261;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.4em;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #e76f51;
+            font-weight: bold;
+            animation: pop 1s infinite;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #ccc;
+        }
+        .nav-btn {
+            background-color: #4a4e69;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #22223b;
+        }
+        .nav-btn:active { transform: translateY(5px); box-shadow: none; }
+        .nav-btn:disabled { background-color: #ccc; box-shadow: 0 5px 0 #999; cursor: not-allowed; }
+        
+        .action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            border-radius: 20px;
+            margin: 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #cc0000;
+            font-weight: bold;
+        }
+
+        .retry-hint {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 2px solid #ef5350;
+            animation: pop 0.5s ease;
+        }
+
+        .summary-list {
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 8px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .summary-item.correct { border-color: var(--correct); }
+        .summary-item.wrong { border-color: var(--wrong); }
+        .retry-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #22223b;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: auto;
+            font-size: 1.1em;
+        }
+        .social-links a { color: #ffd56b; text-decoration: none; margin: 0 10px; font-weight: bold; }
+        .social-links a:hover { text-decoration: underline; color: #fff; }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .anim-correct { animation: pop 0.5s ease; box-shadow: 0 0 20px #4caf50; }
+        .anim-wrong { animation: shake 0.5s ease; border-color: var(--wrong) !important; }
+
+        #confetti-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: none;
+            background: rgba(255,255,255,0.8);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+            font-size: 5em;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <img src="cat.jpeg" alt="Cat Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/50?text=Cat'">
+        <span>小一中文文法大冒險下</span>
+    </div>
+</header>
+
+<div id="game-container">
+    <div id="confetti-overlay">🎉 答對了！ 🎉</div>
+
+    <div id="home-screen">
+        <h1>🎈 小一中文文法大冒險下 🎈</h1>
+        <p style="font-size:1.3em; color:#666;">點擊關卡開始！完成關卡收集星星喔！</p>
+        
+        <button class="clear-btn" onclick="clearRecords()">🗑️ 清除所有記錄</button>
+
+        <div class="level-grid" id="level-grid"></div>
+        
+        <br>
+        <a href="https://cat123teacher.github.io/chinese/main.html" style="text-decoration: none;">
+            <button class="action-btn" style="background-color: #2a9d8f; box-shadow: 0 6px 0 #21867a; width: 100%; max-width: 400px;">
+                🚀 返回小朋友學習大冒險
+            </button>
+        </a>
+    </div>
+
+    <div id="intro-screen" class="hidden">
+        <h1 id="intro-title">關卡名稱</h1>
+        <div class="intro-box">
+            <h3 style="color:var(--primary); margin-top:0;">📖 教學重點：</h3>
+            <p id="intro-desc">這裡會顯示重點教學...</p>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <strong style="color:#d63384; font-size:1.2em;">💡 例子示範：</strong>
+                <button class="audio-btn" style="width:40px; height:40px;" onclick="speakExamples()" title="聆聽例子">🔊</button>
+            </div>
+            <ul class="example-list" id="intro-examples"></ul>
+        </div>
+        <button class="action-btn" onclick="startGameplay()">🚀 開始挑戰</button>
+        <button class="action-btn" style="background-color:#9e9e9e; box-shadow:0 6px 0 #757575;" onclick="showHome()">🏠 回到主頁</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div class="status-bar">
+            <span id="progress-text">第 1 題 / 共 20 題</span>
+            <span id="difficulty-badge" class="difficulty-badge diff-easy">🔵 淺程度</span>
+        </div>
+        
+        <div id="article-box" class="article-box hidden"></div>
+
+        <div class="question-box">
+            <button class="audio-btn" onclick="playQuestionAudio()" title="發音提示">🔊</button>
+            <span id="question-text" style="flex-grow: 1; text-align: left;">題目內容...</span>
+        </div>
+        <div class="options-grid" id="options-grid"></div>
+        
+        <div id="skip-btn-container">
+            <button id="skip-btn" class="skip-btn hidden" onclick="navigate(1)">➡️ Move to next question</button>
+        </div>
+        
+        <div class="nav-bar">
+            <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">⬅️ 上一頁</button>
+            <button class="nav-btn" style="background:#ff914d; box-shadow:0 5px 0 #cc6b33;" onclick="showHome()">🏠 回到主頁</button>
+            <button class="nav-btn" id="next-btn" onclick="navigate(1)">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <div id="retry-screen" class="hidden">
+        <h2 style="color:var(--primary);">🎯 重新挑戰，你可以的！</h2>
+        <div id="retry-hint-box" class="retry-hint hidden">💡 提示：這題剛才答錯了，請細心想一想，選出正確答案！</div>
+        
+        <div id="retry-article-box" class="article-box hidden"></div>
+
+        <div class="question-box">
+            <button class="audio-btn" onclick="playRetryAudio()" title="發音提示">🔊</button>
+            <span id="retry-question-text" style="flex-grow: 1; text-align: left;">題目...</span>
+        </div>
+        <div class="options-grid" id="retry-options-grid"></div>
+        <br><br>
+        <button class="action-btn" style="background-color:#9e9e9e; box-shadow:0 6px 0 #757575;" onclick="closeRetryScreen()">🔙 返回成績表</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>🎉 挑戰完成！ 🎉</h1>
+        <p style="font-size: 2em; margin: 10px 0;">得分：<span id="final-score" style="color:var(--primary); font-weight:bold;"></span> / 20</p>
+        <p id="star-reward-msg" style="font-size:1.5em; color:#d39e00; font-weight:bold;"></p>
+        
+        <h3 style="text-align:left; color:#4a4e69;">📋 答題總結 (點擊紅色按鈕可重做錯誤題目)：</h3>
+        <div class="summary-list" id="summary-list"></div>
+        
+        <button class="action-btn" style="background-color: #9b5de5; box-shadow: 0 6px 0 #7a3a99;" onclick="startGameplay()">🔄 重新挑戰這一關</button>
+        <button class="action-btn" onclick="showHome()">🏠 回到主頁</button>
+    </div>
+</div>
+
+<footer>
+    <h3>Teacher Cat 的快樂AI教室</h3>
+    <div class="social-links">
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> |
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> |
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> |
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a> |
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
+        <a href="https://v.douyin.com/idk2195/" target="_blank">抖音 (74254902683)</a>
+    </div>
+</footer>
+
+<script>
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playTone(frequency, type, duration) {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+        oscillator.stop(audioCtx.currentTime + duration);
+    }
+
+    function playCorrectSound() {
+        playTone(523.25, 'sine', 0.1); 
+        setTimeout(() => playTone(659.25, 'sine', 0.1), 100); 
+        setTimeout(() => playTone(783.99, 'sine', 0.2), 200); 
+    }
+
+    function playWrongSound() {
+        playTone(300, 'sawtooth', 0.2);
+        setTimeout(() => playTone(250, 'sawtooth', 0.3), 150);
+    }
+
+    const article1 = `《小雨下》<button class="inline-audio-btn" onclick="speakText('小雨下')">🔊</button>
+
+沙沙沙，
+小雨下。<button class="inline-audio-btn" onclick="speakText('沙沙沙，小雨下。')">🔊</button>
+落在池塘裏；
+塘裏魚兒樂呵呵，
+快樂得搖呀搖尾巴。<button class="inline-audio-btn" onclick="speakText('落在池塘裏；塘裏魚兒樂呵呵，快樂得搖呀搖尾巴。')">🔊</button>
+
+沙沙沙，
+小雨下。<button class="inline-audio-btn" onclick="speakText('沙沙沙，小雨下。')">🔊</button>
+落在田野裏；
+田裏小苗樂悠悠，
+快樂得往上爬呀爬。<button class="inline-audio-btn" onclick="speakText('落在田野裏；田裏小苗樂悠悠，快樂得往上爬呀爬。')">🔊</button>
+
+沙沙沙，
+小雨下。<button class="inline-audio-btn" onclick="speakText('沙沙沙，小雨下。')">🔊</button>
+落在花園裏；
+園裏花兒開滿地，
+花兒開呀開，我們笑哈哈。<button class="inline-audio-btn" onclick="speakText('落在花園裏；園裏花兒開滿地，花兒開呀開，我們笑哈哈。')">🔊</button>`;
+
+    const article2 = `親愛的外公：<button class="inline-audio-btn" onclick="speakText('親愛的外公：')">🔊</button>
+　　您近來好嗎？我十分想念您！<button class="inline-audio-btn" onclick="speakText('您近來好嗎？我十分想念您！')">🔊</button>
+　　外公，我在南元朗官立小學就讀快一年了，學校生活十分快樂呢！<button class="inline-audio-btn" onclick="speakText('外公，我在南元朗官立小學就讀快一年了，學校生活十分快樂呢！')">🔊</button>
+　　為慶祝創立學校一百二十周年，學校將於四月三十日在沙田舉辦校慶大匯演。<button class="inline-audio-btn" onclick="speakText('為慶祝創立學校一百二十周年，學校將於四月三十日在沙田舉辦校慶大匯演。')">🔊</button>近來，我和同學為了校慶這大日子，都努力地練習，希望表演順利。<button class="inline-audio-btn" onclick="speakText('近來，我和同學為了校慶這大日子，都努力地練習，希望表演順利。')">🔊</button>表演節目有很多，包括學生才藝表演、樂器演奏、大合唱、話劇等，節目十分精彩，更邀請了很多嘉賓及家長前來觀賞。<button class="inline-audio-btn" onclick="speakText('表演節目有很多，包括學生才藝表演、樂器演奏、大合唱、話劇等，節目十分精彩，更邀請了很多嘉賓及家長前來觀賞。')">🔊</button>
+　　外公，我下次再寫信給您，告訴您其他學校趣事吧！<button class="inline-audio-btn" onclick="speakText('外公，我下次再寫信給您，告訴您其他學校趣事吧！')">🔊</button>
+
+祝
+身體健康！<button class="inline-audio-btn" onclick="speakText('祝身體健康！')">🔊</button>
+外孫女
+心兒敬上
+四月十八日<button class="inline-audio-btn" onclick="speakText('外孫女，心兒敬上，四月十八日')">🔊</button>`;
+
+    const article3 = `我家小妹妹，只有三歲，可是她的好奇心真不小呢！<button class="inline-audio-btn" onclick="speakText('我家小妹妹，只有三歲，可是她的好奇心真不小呢！')">🔊</button>
+每次看到顏色鮮豔的東西、那些會動的玩具，妹妹都很感興趣，總愛拿來玩，所以我常常跟她分享我的玩具機器人。<button class="inline-audio-btn" onclick="speakText('每次看到顏色鮮豔的東西、那些會動的玩具，妹妹都很感興趣，總愛拿來玩，所以我常常跟她分享我的玩具機器人。')">🔊</button>
+到妹妹懂得說話以後，她總愛問這問那。<button class="inline-audio-btn" onclick="speakText('到妹妹懂得說話以後，她總愛問這問那。')">🔊</button>她會指着鳥兒問爸爸，又會指着花兒問媽媽。<button class="inline-audio-btn" onclick="speakText('她會指着鳥兒問爸爸，又會指着花兒問媽媽。')">🔊</button>所有東西對她來說，都是很有趣的。<button class="inline-audio-btn" onclick="speakText('所有東西對她來說，都是很有趣的。')">🔊</button>
+有一次，妹妹聽到「汪……汪……」的叫聲，她開心得叫起來：「小狗，小狗！」<button class="inline-audio-btn" onclick="speakText('有一次，妹妹聽到汪汪的叫聲，她開心得叫起來：小狗，小狗！')">🔊</button>大家都稱讚她，因為我們都沒想到她竟然記得那些是小狗的叫聲呢！<button class="inline-audio-btn" onclick="speakText('大家都稱讚她，因為我們都沒想到她竟然記得那些是小狗的叫聲呢！')">🔊</button>`;
+
+    const article4 = `這星期，學校舉辦學習周，大家都感到十分興奮。<button class="inline-audio-btn" onclick="speakText('這星期，學校舉辦學習周，大家都感到十分興奮。')">🔊</button>
+其中一天，我們先聽老師介紹公園周圍的環境和各種設施，接着，老師帶領我們參觀元朗公園。<button class="inline-audio-btn" onclick="speakText('其中一天，我們先聽老師介紹公園周圍的環境和各種設施，接着，老師帶領我們參觀元朗公園。')">🔊</button>
+我們經過「蝴蝶閣」、大草坪，沿途鳥語花香，令人心情愉快。<button class="inline-audio-btn" onclick="speakText('我們經過蝴蝶閣、大草坪，沿途鳥語花香，令人心情愉快。')">🔊</button>之後，我們來到「百鳥塔」前，我看見空地上有很多人在做早操呢！<button class="inline-audio-btn" onclick="speakText('之後，我們來到百鳥塔前，我看見空地上有很多人在做早操呢！')">🔊</button>
+走進「百鳥塔」內，我們都安靜地觀鳥，牠們有的站在樹上，有的飛來飛去，有的在吃小蟲，十分自由自在。<button class="inline-audio-btn" onclick="speakText('走進百鳥塔內，我們都安靜地觀鳥，牠們有的站在樹上，有的飛來飛去，有的在吃小蟲，十分自由自在。')">🔊</button>
+這項學習活動，讓我們的學習充滿樂趣，我真的十分開心啊！<button class="inline-audio-btn" onclick="speakText('這項學習活動，讓我們的學習充滿樂趣，我真的十分開心啊！')">🔊</button>`;
+
+    const levelData = {
+        1: { name: "詩歌世界", title: "第 1 關：詩歌世界", desc: "學習閱讀詩歌的節數、地點和事物。請參考上方的詩歌回答問題！",
+             examples: ["1. 詩歌《小雨下》共有三節。", "2. 第一節寫小雨落在池塘裏。", "3. 田裏的小苗快樂得往上爬。"],
+             article: article1,
+             baseEasy: [
+                 { q: "詩歌提及的天氣是怎樣的？", options: ["雨天", "天陰", "大風", "晴朗"], answer: 0 },
+                 { q: "小雨落在田野裏，甚麼樂悠悠？", options: ["魚兒", "小苗", "花兒", "青蛙"], answer: 1 },
+                 { q: "詩歌中沒有提及哪一個地方？", options: ["田野", "花園", "池塘", "山下"], answer: 3 },
+                 { q: "詩歌《小雨下》共有多少節？", options: ["一節", "兩節", "三節", "四節"], answer: 2 },
+                 { q: "小雨落在池塘裏，甚麼樂呵呵？", options: ["魚兒", "小鳥", "小狗", "小苗"], answer: 0 },
+                 { q: "第一節中，魚兒快樂得做甚麼？", options: ["搖尾巴", "往上爬", "笑哈哈", "睡覺了"], answer: 0 },
+                 { q: "小雨落在花園裏，甚麼開滿地？", options: ["魚兒", "小苗", "花兒", "樹葉"], answer: 2 },
+                 { q: "田裏的小苗快樂得怎樣？", options: ["搖尾巴", "往上爬", "笑哈哈", "躲起來"], answer: 1 },
+                 { q: "花兒開呀開，我們會有甚麼反應？", options: ["搖尾巴", "往上爬", "笑哈哈", "哭啦啦"], answer: 2 },
+                 { q: "詩歌中每一節的開頭都重複了哪一個聲音？", options: ["沙沙沙", "汪汪汪", "喵喵喵", "滴滴滴"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "為甚麼魚兒搖呀搖尾巴？", options: ["覺得很快樂", "感到害怕", "在找食物", "天氣很熱"], answer: 0 },
+                 { q: "「沙沙沙」是甚麼聲音？", options: ["下雨的聲音", "魚兒的聲音", "小苗的聲音", "花兒的聲音"], answer: 0 },
+                 { q: "請替詩歌選出一個最合適的題目。", options: ["搖呀搖", "我愛花兒開", "樂在下雨天", "春天的圖畫"], answer: 2 },
+                 { q: "詩歌第一節主要描寫甚麼地方？", options: ["田野", "花園", "池塘", "操場"], answer: 2 },
+                 { q: "詩歌第二節主要描寫甚麼地方？", options: ["田野", "花園", "池塘", "操場"], answer: 0 },
+                 { q: "詩歌第三節主要描寫甚麼地方？", options: ["田野", "花園", "池塘", "操場"], answer: 1 },
+                 { q: "「樂呵呵」在詩歌中是用來形容誰的心情？", options: ["我們", "魚兒", "小苗", "花兒"], answer: 1 },
+                 { q: "「樂悠悠」在詩歌中是用來形容誰的心情？", options: ["我們", "魚兒", "小苗", "花兒"], answer: 2 },
+                 { q: "下列哪一項符合詩歌的內容？", options: ["小雨令大家很快樂", "小雨破壞了花園", "魚兒不喜歡小雨", "我們覺得下雨很沉悶"], answer: 0 },
+                 { q: "詩歌沒有出現以下哪一種事物？", options: ["魚兒", "小苗", "花兒", "青蛙"], answer: 3 }
+             ] },
+        2: { name: "書信天地", title: "第 2 關：書信天地", desc: "學習書信的上下款和日期。請參考上方的書信回答問題！",
+             examples: ["1. 上款是「親愛的外公」。", "2. 下款是「外孫女心兒」。", "3. 信件日期是「四月十八日」。"],
+             article: article2,
+             baseEasy: [
+                 { q: "這封信是寫給誰的？", options: ["外孫女", "同學", "外公", "老師"], answer: 2 },
+                 { q: "學校將於哪一天舉辦匯演？", options: ["4月18日", "4月30日", "3月30日", "5月1日"], answer: 1 },
+                 { q: "寫信人是誰？", options: ["外公", "老師", "心兒", "媽媽"], answer: 2 },
+                 { q: "心兒在哪所小學讀書？", options: ["北元朗", "南元朗", "沙田", "大埔"], answer: 1 },
+                 { q: "學校這次是慶祝創立多少周年？", options: ["100", "110", "120", "130"], answer: 2 },
+                 { q: "這封信是在哪一天寫的？", options: ["4月18日", "4月30日", "3月18日", "5月18日"], answer: 0 },
+                 { q: "匯演在哪個地區舉行？", options: ["元朗", "沙田", "大埔", "屯門"], answer: 1 },
+                 { q: "信件開頭的問候語是甚麼？", options: ["您近來好嗎", "謝謝您", "對不起", "再見"], answer: 0 },
+                 { q: "心兒覺得學校生活怎樣？", options: ["辛苦", "沉悶", "快樂", "奇怪"], answer: 2 },
+                 { q: "心兒是外公的甚麼人？", options: ["外孫女", "女兒", "妹妹", "姐姐"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "寫信的主要目的是甚麼？", options: ["告知生病", "邀請外公", "告知辦匯演", "教寫信"], answer: 2 },
+                 { q: "下列哪項不是匯演節目？", options: ["才藝表演", "樂器", "話劇", "魔術"], answer: 3 },
+                 { q: "近來努力練習的原因？", options: ["應付考試", "表演順利", "老師要求", "賺取零用錢"], answer: 1 },
+                 { q: "邀請了誰來觀賞匯演？", options: ["只有老師", "嘉賓及家長", "只有校長", "只有學生"], answer: 1 },
+                 { q: "匯演節目包括甚麼？", options: ["大合唱", "跑步", "游泳", "畫畫"], answer: 0 },
+                 { q: "信中形容表演節目怎樣？", options: ["沉悶", "精彩", "奇怪", "恐怖"], answer: 1 },
+                 { q: "心兒答應下次寫信會說甚麼？", options: ["學校趣事", "考試成績", "買了甚麼", "去哪裡玩"], answer: 0 },
+                 { q: "信末的祝賀語是甚麼？", options: ["學業進步", "身體健康", "旅途愉快", "生日快樂"], answer: 1 },
+                 { q: "心兒在這所學校就讀了多久？", options: ["剛入學", "快一年", "已經三年", "準備畢業"], answer: 1 },
+                 { q: "為了校慶這「大日子」，大家都在做甚麼？", options: ["努力練習", "努力溫習", "努力放假", "努力玩耍"], answer: 0 }
+             ] },
+        3: { name: "人物故事", title: "第 3 關：人物故事", desc: "留意人物的性格和愛好。請參考上方的故事回答問題！",
+             examples: ["1. 妹妹只有三歲。", "2. 妹妹好奇心很大。", "3. 妹妹愛玩顏色鮮豔的東西。"],
+             article: article3,
+             baseEasy: [
+                 { q: "妹妹今年多少歲？", options: ["一歲", "兩歲", "三歲", "四歲"], answer: 2 },
+                 { q: "妹妹愛玩甚麼顏色的東西？", options: ["暗淡的", "透明的", "鮮豔的", "黑白的"], answer: 2 },
+                 { q: "妹妹聽到甚麼動物的叫聲？", options: ["貓", "狗", "豬", "鳥"], answer: 1 },
+                 { q: "「我」常常跟妹妹分享甚麼玩具？", options: ["機器人", "玩具熊", "玩具車", "洋娃娃"], answer: 0 },
+                 { q: "妹妹看見鳥兒會問誰？", options: ["爸爸", "媽媽", "哥哥", "姐姐"], answer: 0 },
+                 { q: "妹妹看見花兒會問誰？", options: ["爸爸", "媽媽", "哥哥", "姐姐"], answer: 1 },
+                 { q: "小狗發出怎樣的叫聲？", options: ["喵喵", "汪汪", "咕咕", "吱吱"], answer: 1 },
+                 { q: "妹妹對甚麼樣的玩具很感興趣？", options: ["會發光的", "會動的", "會唱歌的", "會飛的"], answer: 1 },
+                 { q: "妹妹看見鳥兒時的心情是怎樣的？", options: ["害怕", "生氣", "感興趣", "傷心"], answer: 2 },
+                 { q: "妹妹聽到狗叫時，有甚麼反應？", options: ["嚇哭", "躲起來", "開心大叫", "逃跑"], answer: 2 }
+             ],
+             baseHard: [
+                 { q: "大家為甚麼要稱讚妹妹？", options: ["跑得快", "唱歌好聽", "記得狗叫聲", "會分享玩具"], answer: 2 },
+                 { q: "文章的第二段主要描述甚麼？", options: ["狗叫反應", "對事物感興趣", "問爸媽問題", "稱讚妹妹"], answer: 1 },
+                 { q: "妹妹懂得說話以後，有甚麼特徵？", options: ["愛哭鬧", "總愛問這問那", "變得安靜", "不理人"], answer: 1 },
+                 { q: "對妹妹來說，甚麼東西是很有趣的？", options: ["只有玩具", "只有動物", "所有東西", "只有食物"], answer: 2 },
+                 { q: "為什麼「我」常跟她分享玩具？", options: ["被媽媽逼", "她不喜歡玩", "她很感興趣", "我不想玩了"], answer: 2 },
+                 { q: "「我」覺得妹妹是一個怎樣的孩子？", options: ["好奇心大", "十分沉悶", "愛生氣", "不聽話"], answer: 0 },
+                 { q: "妹妹叫「小狗，小狗！」時的心情是怎樣的？", options: ["驚慌", "開心", "憤怒", "傷心"], answer: 1 },
+                 { q: "妹妹的好奇心表現在哪裡？", options: ["愛睡覺", "愛發問", "喜歡安靜", "不愛說話"], answer: 1 },
+                 { q: "這篇文章主要寫誰？", options: ["爸爸", "媽媽", "哥哥", "小妹妹"], answer: 3 },
+                 { q: "哪一項「不是」妹妹喜歡的事物？", options: ["鮮豔的東西", "會動的玩具", "黑暗的房間", "鳥兒和花兒"], answer: 2 }
+             ] },
+        4: { name: "遊記體驗", title: "第 4 關：遊記體驗", desc: "記錄去過的地方與心情。請參考上方的遊記回答問題！",
+             examples: ["1. 學校舉辦學習周。", "2. 參觀了元朗公園。", "3. 作者覺得充滿樂趣。"],
+             article: article4,
+             baseEasy: [
+                 { q: "學校舉辦了甚麼活動？", options: ["陸運會", "學習周", "音樂會", "朗誦比賽"], answer: 1 },
+                 { q: "老師帶領大家參觀哪裡？", options: ["九龍公園", "蝴蝶公園", "元朗公園", "屯門公園"], answer: 2 },
+                 { q: "大家經過了甚麼閣？", options: ["植物閣", "百鳥閣", "蝴蝶閣", "金魚閣"], answer: 2 },
+                 { q: "大家在哪裡觀鳥？", options: ["大草坪", "百鳥塔", "蝴蝶閣", "操場"], answer: 1 },
+                 { q: "沿途經過了甚麼草坪？", options: ["大草坪", "小草坪", "綠草坪", "花草坪"], answer: 0 },
+                 { q: "沿途鳥語花香，令人心情怎樣？", options: ["愉快", "傷心", "生氣", "害怕"], answer: 0 },
+                 { q: "在百鳥塔前，看見別人在做甚麼？", options: ["看書", "唱歌", "做早操", "跑步"], answer: 2 },
+                 { q: "學生們在塔內怎樣觀鳥？", options: ["大聲地", "開心地", "安靜地", "奔跑着"], answer: 2 },
+                 { q: "鳥兒在塔內吃甚麼？", options: ["小蟲", "水果", "樹葉", "麵包"], answer: 0 },
+                 { q: "大家對舉辦學習周感到怎樣？", options: ["興奮", "害怕", "奇怪", "沉悶"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "百鳥塔裏的鳥兒「沒有」在做甚麼？", options: ["站在樹上", "飛來飛去", "吃小蟲", "在水裏游"], answer: 3 },
+                 { q: "老師首先帶大家做甚麼？", options: ["介紹公園環境", "參觀蝴蝶閣", "做早操", "吃午餐"], answer: 0 },
+                 { q: "作者對這項學習活動的感覺是甚麼？", options: ["充滿樂趣", "覺得沉悶", "覺得十分辛苦", "覺得很害怕"], answer: 0 },
+                 { q: "鳥兒在百鳥塔內生活得怎樣？", options: ["十分辛苦", "自由自在", "十分害怕", "十分安靜"], answer: 1 },
+                 { q: "文章第一段的重點是甚麼？", options: ["介紹公園", "點出學習周令人興奮", "描寫鳥兒", "總結感受"], answer: 1 },
+                 { q: "參觀路線的先後順序是？", options: ["蝴蝶->草坪->塔", "草坪->塔->蝴蝶", "塔->蝴蝶->草坪", "蝴蝶->塔->草坪"], answer: 0 },
+                 { q: "為什麼大家在塔內要安靜地觀鳥？", options: ["老師的要求", "怕嚇到鳥兒", "大家都累了", "學校的規定"], answer: 1 },
+                 { q: "這篇遊記主要記錄了甚麼？", options: ["在家玩耍", "參觀元朗公園", "學校上課", "去旅行的故事"], answer: 1 },
+                 { q: "下列哪一項景物沒有在文章中出現？", options: ["大草坪", "蝴蝶閣", "百鳥塔", "音樂噴泉"], answer: 3 },
+                 { q: "學習周讓學生的學習變得怎樣？", options: ["更困難", "充滿樂趣", "更無聊", "更沉重"], answer: 1 }
+             ] },
+        5: { name: "字詞特工", title: "第 5 關：字詞特工", desc: "純題目挑戰！找出詞語的意思。",
+             examples: ["1. 「努力」代表十分盡力。", "2. 「懂得」表示知道。", "3. 「自由自在」形容不受拘束。"],
+             baseEasy: [
+                 { q: "形容盡力、用功的詞語：", options: ["精彩", "努力", "順利", "健康"], answer: 1 },
+                 { q: "表示知道、了解的意思：", options: ["懂得", "有趣", "好奇", "分享"], answer: 0 },
+                 { q: "引起人的好奇心，讓人感到有興趣：", options: ["有趣", "鮮豔", "稱讚", "開心"], answer: 0 },
+                 { q: "色彩鮮明美麗：", options: ["鮮豔", "安靜", "自由", "努力"], answer: 0 },
+                 { q: "沒有聲音、不吵鬧：", options: ["安靜", "自由", "愉快", "興奮"], answer: 0 },
+                 { q: "心情非常開心：", options: ["愉快", "安靜", "努力", "生病"], answer: 0 },
+                 { q: "身體狀態良好，沒有生病：", options: ["健康", "順利", "精彩", "努力"], answer: 0 },
+                 { q: "表演十分好看、吸引：", options: ["精彩", "順利", "努力", "懂得"], answer: 0 },
+                 { q: "事情順遂，沒有阻礙：", options: ["順利", "健康", "努力", "精彩"], answer: 0 },
+                 { q: "對事物感到新奇、想知道：", options: ["好奇", "懂得", "稱讚", "有趣"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "形容不受拘束：", options: ["安靜", "愉快", "自由自在", "興奮"], answer: 2 },
+                 { q: "哪一個詞語用來形容鳥兒飛翔最適合？", options: ["自由自在", "努力", "健康", "安靜"], answer: 0 },
+                 { q: "哪一個詞語用來形容考試時的課室最適合？", options: ["安靜", "興奮", "精彩", "順利"], answer: 0 },
+                 { q: "哪一個詞語用來形容五顏六色的花朵最適合？", options: ["鮮豔", "努力", "懂得", "安靜"], answer: 0 },
+                 { q: "哪一個詞語用來形容魔術表演最適合？", options: ["精彩", "順利", "健康", "安靜"], answer: 0 },
+                 { q: "哪一個詞語用來形容每天溫習的態度最適合？", options: ["努力", "自由自在", "安靜", "愉快"], answer: 0 },
+                 { q: "哪一個詞語用來形容期待去旅行的心情最適合？", options: ["興奮", "安靜", "努力", "順利"], answer: 0 },
+                 { q: "哪一個詞語用來形容活動沒有意外發生最適合？", options: ["順利", "健康", "努力", "精彩"], answer: 0 },
+                 { q: "祝願別人的身體狀態：", options: ["健康", "順利", "努力", "精彩"], answer: 0 },
+                 { q: "形容小朋友愛發問的性格：", options: ["好奇", "安靜", "健康", "懂得"], answer: 0 }
+             ] },
+        6: { name: "字詞應用", title: "第 6 關：字詞應用", desc: "純題目挑戰！把詞語應用在新句子裡。",
+             examples: ["1. 考試要「安靜」作答。", "2. 風景優美令人「愉快」。", "3. 表演十分「精彩」。"],
+             baseEasy: [
+                 { q: "小鳥在天空中______地飛翔。", options: ["自由自在", "努力", "順利", "愉快"], answer: 0 },
+                 { q: "這本書很______，我很喜歡。", options: ["有趣", "安靜", "健康", "順利"], answer: 0 },
+                 { q: "考試時，大家都在課室裏______地寫答案。", options: ["安靜", "努力", "自由", "興奮"], answer: 0 },
+                 { q: "小息時，我們在操場上______地玩遊戲。", options: ["快樂", "努力", "安靜", "順利"], answer: 0 },
+                 { q: "哥哥______幫助別人，大家都喜歡他。", options: ["懂得", "鮮豔", "自由自在", "安靜"], answer: 0 },
+                 { q: "沿途風景優美，令人心情______。", options: ["愉快", "傷心", "安靜", "努力"], answer: 0 },
+                 { q: "這朵花的顏色很______，十分美麗。", options: ["鮮豔", "安靜", "努力", "健康"], answer: 0 },
+                 { q: "祝外公身體______！", options: ["健康", "順利", "努力", "精彩"], answer: 0 },
+                 { q: "學校生活十分______呢！", options: ["快樂", "沉悶", "辛苦", "奇怪"], answer: 0 },
+                 { q: "田裏的小苗快樂得往上______。", options: ["爬", "跑", "跳", "飛"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "我們每天都______地練習。", options: ["努力", "自由自在", "安靜", "健康"], answer: 0 },
+                 { q: "魔術表演十分______。", options: ["精彩", "順利", "努力", "懂得"], answer: 0 },
+                 { q: "希望明天的表演一切______。", options: ["順利", "精彩", "健康", "安靜"], answer: 0 },
+                 { q: "明天就是學校旅行了，大家都感到十分______。", options: ["興奮", "安靜", "努力", "順利"], answer: 0 },
+                 { q: "這項活動，讓我們的學習充滿______。", options: ["樂趣", "沉悶", "辛苦", "奇怪"], answer: 0 },
+                 { q: "大家都______妹妹記得小狗的叫聲。", options: ["稱讚", "懂得", "努力", "準備"], answer: 0 },
+                 { q: "妹妹的______真不小，總愛問這問那。", options: ["好奇心", "懂得", "稱讚", "有趣"], answer: 0 },
+                 { q: "我們走進百鳥塔內，______地觀鳥。", options: ["安靜", "大聲", "自由", "快樂"], answer: 0 },
+                 { q: "老師先向我們______公園的環境。", options: ["介紹", "參觀", "準備", "稱讚"], answer: 0 },
+                 { q: "魚兒在池塘裏快樂得搖呀搖______。", options: ["尾巴", "頭部", "身體", "手腳"], answer: 0 }
+             ] },
+        7: { name: "高級字詞特工", title: "第 7 關：高級字詞特工", desc: "挑戰更深的字詞！根據意思找出正確的詞語。",
+             examples: ["1. 「觀賞」代表觀看欣賞。", "2. 「稱讚」表示誇獎別人。", "3. 「舉辦」指籌辦活動。"],
+             baseEasy: [
+                 { q: "表示對別人行為的讚賞：", options: ["稱讚", "介紹", "懂得", "觀賞"], answer: 0 },
+                 { q: "形容鳥叫聲悅耳，花香四溢：", options: ["鳥語花香", "自由自在", "樂呵呵", "精彩"], answer: 0 },
+                 { q: "專為大眾提供便利的設備：", options: ["設施", "趣事", "樂趣", "機器"], answer: 0 },
+                 { q: "為開心的事進行慶賀：", options: ["慶祝", "舉辦", "帶領", "觀賞"], answer: 0 },
+                 { q: "籌辦、辦理活動：", options: ["舉辦", "慶祝", "帶領", "準備"], answer: 0 },
+                 { q: "在前面引導別人：", options: ["帶領", "觀賞", "稱讚", "介紹"], answer: 0 },
+                 { q: "心裡對不在身邊的人有牽掛：", options: ["想念", "愉快", "興奮", "好奇"], answer: 0 },
+                 { q: "有趣的事情：", options: ["趣事", "設施", "樂趣", "節目"], answer: 0 },
+                 { q: "觀看欣賞：", options: ["觀賞", "參觀", "帶領", "介紹"], answer: 0 },
+                 { q: "喜歡並關注某事物：", options: ["感興趣", "好奇心", "想念", "興奮"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "「樂呵呵」的意思是？", options: ["形容非常高興", "形容十分生氣", "形容十分悠閒", "形容大聲笑"], answer: 0 },
+                 { q: "「樂悠悠」的意思是？", options: ["形容悠閒快樂", "形容十分忙碌", "形容十分擔心", "形容大聲哭"], answer: 0 },
+                 { q: "「興奮」的意思是？", options: ["心情激動高興", "感到無聊沉悶", "身體非常健康", "感到害怕驚慌"], answer: 0 },
+                 { q: "「樂趣」的意思是？", options: ["快樂的趣味", "有趣的故事", "感到傷心", "一種遊戲"], answer: 0 },
+                 { q: "「大匯演」的意思是？", options: ["大型的綜合表演", "學校的考試", "一種運動比賽", "在公園散步"], answer: 0 },
+                 { q: "「嘉賓」的意思是？", options: ["受邀請的尊貴客人", "學校的老師", "自己的同學", "表演的學生"], answer: 0 },
+                 { q: "「才藝」的意思是？", options: ["才華和技藝", "學校的功課", "公園的設施", "有趣的事情"], answer: 0 },
+                 { q: "「沿途」的意思是？", options: ["一路上", "公園裡面", "學校裡面", "天空上面"], answer: 0 },
+                 { q: "「機器人」是一種？", options: ["會動的玩具", "顏色鮮豔的花", "小鳥的名字", "學校的設施"], answer: 0 },
+                 { q: "「草坪」的意思是？", options: ["平坦的草地", "種滿花的園子", "水裡的池塘", "很高的高塔"], answer: 0 }
+             ] },
+        8: { name: "詞意大反轉", title: "第 8 關：詞意大反轉", desc: "字詞大反轉！選出詞語的正確解釋，或選出意思相近的詞語。",
+             examples: ["1. 「鮮豔」指色彩明亮美麗。", "2. 「愉快」和快樂意思相近。", "3. 「安靜」和吵鬧意思相反。"],
+             baseEasy: [
+                 { q: "「稱讚」的意思是？", options: ["誇獎和讚美別人", "批評別人", "幫助別人", "帶領別人"], answer: 0 },
+                 { q: "「鮮豔」的意思是？", options: ["色彩明亮美麗", "聲音非常大", "動作十分快", "心情很開心"], answer: 0 },
+                 { q: "「安靜」的意思是？", options: ["沒有聲音不吵鬧", "顏色非常美麗", "身體非常健康", "心情激動高興"], answer: 0 },
+                 { q: "「自由自在」的意思是？", options: ["不受拘束", "十分努力", "感到害怕", "感到生氣"], answer: 0 },
+                 { q: "「懂得」的意思是？", options: ["明白和知道", "感興趣", "感到好奇", "想念別人"], answer: 0 },
+                 { q: "「愉快」的意思是？", options: ["心情好又開心", "感到疲倦", "身體生病", "顏色暗淡"], answer: 0 },
+                 { q: "「健康」的意思是？", options: ["身體狀態良好", "沒有聲音", "表演十分好看", "事情很順利"], answer: 0 },
+                 { q: "「精彩」的意思是？", options: ["表演好看吸引", "顏色明亮", "身體健康", "沒有聲音"], answer: 0 },
+                 { q: "「順利」的意思是？", options: ["事情沒有阻礙", "表演好看", "身體健康", "心情開心"], answer: 0 },
+                 { q: "「努力」的意思是？", options: ["十分盡力用功", "不受拘束", "沒有聲音", "感到害怕"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "下列哪一個詞語和「愉快」的意思最接近？", options: ["快樂", "傷心", "害怕", "努力"], answer: 0 },
+                 { q: "下列哪一個詞語和「稱讚」的意思相反？", options: ["批評", "誇獎", "讚美", "感謝"], answer: 0 },
+                 { q: "下列哪一個詞語和「安靜」的意思相反？", options: ["吵鬧", "平靜", "寧靜", "自由"], answer: 0 },
+                 { q: "下列哪一個詞語和「努力」的意思最接近？", options: ["用功", "懶惰", "放棄", "順利"], answer: 0 },
+                 { q: "用來形容「風景優美」最適合的詞語是？", options: ["鳥語花香", "自由自在", "樂呵呵", "努力"], answer: 0 },
+                 { q: "用來形容「不受任何限制」最適合的詞語是？", options: ["自由自在", "鳥語花香", "順利", "精彩"], answer: 0 },
+                 { q: "下列哪一個詞語和「興奮」的意思最接近？", options: ["激動", "沉悶", "平靜", "傷心"], answer: 0 },
+                 { q: "下列哪一個詞語和「想念」的意思最接近？", options: ["掛念", "忘記", "討厭", "稱讚"], answer: 0 },
+                 { q: "下列哪一個詞語和「順利」的意思相反？", options: ["困難", "容易", "健康", "精彩"], answer: 0 },
+                 { q: "「十分想念」代表想念的程度怎樣？", options: ["非常深", "很輕微", "完全沒有", "不知道"], answer: 0 }
+             ] },
+        9: { name: "高級字詞應用", title: "第 9 關：高級字詞應用", desc: "挑戰更長的句子！把合適的進階詞語填入句子中。",
+             examples: ["1. 老師「帶領」我們參觀。", "2. 學校「舉辦」了校慶大匯演。", "3. 妹妹對玩具很「感興趣」。"],
+             baseEasy: [
+                 { q: "老師帶領我們去參觀公園的各項______。", options: ["設施", "趣事", "嘉賓", "樂趣"], answer: 0 },
+                 { q: "經過大家______地練習，表演終於順利完成。", options: ["努力", "自由", "安靜", "快樂"], answer: 0 },
+                 { q: "學校______了盛大的校慶大匯演。", options: ["舉辦", "稱讚", "觀賞", "帶領"], answer: 0 },
+                 { q: "春天到了，公園裡______，風景真美。", options: ["鳥語花香", "自由自在", "樂呵呵", "努力"], answer: 0 },
+                 { q: "我很______住在外國的外公。", options: ["想念", "稱讚", "舉辦", "懂得"], answer: 0 },
+                 { q: "看到這麼多可愛的小狗，妹妹______地笑了。", options: ["樂呵呵", "氣沖沖", "慢吞吞", "靜悄悄"], answer: 0 },
+                 { q: "大家都______妹妹能夠記得小狗的叫聲。", options: ["稱讚", "舉辦", "帶領", "參觀"], answer: 0 },
+                 { q: "我對會動的玩具非常______。", options: ["感興趣", "好奇心", "想念", "懂得"], answer: 0 },
+                 { q: "為了______學校成立一百二十周年，我們舉辦了活動。", options: ["慶祝", "稱讚", "觀賞", "帶領"], answer: 0 },
+                 { q: "老師______我們走進百鳥塔觀鳥。", options: ["帶領", "舉辦", "慶祝", "稱讚"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "這次的才藝表演十分______，觀眾都熱烈拍手。", options: ["精彩", "順利", "健康", "安靜"], answer: 0 },
+                 { q: "郊遊這項活動，讓我們的學習充滿______。", options: ["樂趣", "趣事", "設施", "嘉賓"], answer: 0 },
+                 { q: "下次寫信，我會告訴你更多學校的______。", options: ["趣事", "樂趣", "設施", "嘉賓"], answer: 0 },
+                 { q: "小鳥在樹林裡______地飛來飛去。", options: ["自由自在", "鳥語花香", "樂呵呵", "努力"], answer: 0 },
+                 { q: "校長邀請了許多家長和______前來觀看表演。", options: ["嘉賓", "設施", "趣事", "樂趣"], answer: 0 },
+                 { q: "田裡的小苗長高了，農夫看了______。", options: ["樂悠悠", "氣沖沖", "慢吞吞", "靜悄悄"], answer: 0 },
+                 { q: "看到魔術師變出白鴿，大家都感到十分______。", options: ["興奮", "安靜", "沉悶", "害怕"], answer: 0 },
+                 { q: "祝您身體______，每天都開開心心！", options: ["健康", "順利", "努力", "精彩"], answer: 0 },
+                 { q: "我終於______自己穿鞋子了，媽媽很高興。", options: ["懂得", "想念", "稱讚", "舉辦"], answer: 0 },
+                 { q: "妹妹的______真大，看到什麼都愛問。", options: ["好奇心", "感興趣", "樂趣", "趣事"], answer: 0 }
+             ] },
+        10:{ name: "終極應用大師", title: "第 10 關：終極應用大師", desc: "終極挑戰！分辨意思相近的詞語，完成高難度句子！",
+             examples: ["1. 在台下「觀賞」表演。", "2. 老師「帶領」我們過馬路。", "3. 顏色「鮮豔」的花朵。"],
+             baseEasy: [
+                 { q: "我們在台下安靜地______精采的魔術表演。", options: ["觀賞", "參觀", "帶領", "舉辦"], answer: 0 },
+                 { q: "老師帶領我們去______元朗公園。", options: ["參觀", "觀賞", "舉辦", "慶祝"], answer: 0 },
+                 { q: "花園裡的花朵顏色十分______。", options: ["鮮豔", "精彩", "努力", "順利"], answer: 0 },
+                 { q: "這本書的內容很______，我很喜歡看。", options: ["有趣", "樂趣", "趣事", "感興趣"], answer: 0 },
+                 { q: "他是一個______發問的好學生。", options: ["懂得", "鮮豔", "順利", "精彩"], answer: 0 },
+                 { q: "今天發生了一件令人開心的______。", options: ["趣事", "樂趣", "設施", "嘉賓"], answer: 0 },
+                 { q: "希望明天的戶外教學能夠一切______。", options: ["順利", "精彩", "健康", "努力"], answer: 0 },
+                 { q: "同學們______地合作，完成了這幅大壁畫。", options: ["努力", "鮮豔", "安靜", "自由"], answer: 0 },
+                 { q: "只要多做運動，身體就會越來越______。", options: ["健康", "順利", "精彩", "愉快"], answer: 0 },
+                 { q: "妹妹對這本會發聲的圖書很______。", options: ["感興趣", "好奇心", "精彩", "順利"], answer: 0 }
+             ],
+             baseHard: [
+                 { q: "這片______綠油油的，很適合我們在上面野餐。", options: ["大草坪", "百鳥塔", "蝴蝶閣", "設施"], answer: 0 },
+                 { q: "學校的遊樂______十分安全，我們可以放心玩。", options: ["設施", "機器人", "玩具", "嘉賓"], answer: 0 },
+                 { q: "在老師的______下，我們安全地過馬路。", options: ["帶領", "舉辦", "稱讚", "觀賞"], answer: 0 },
+                 { q: "大家都在為明天的______做準備。", options: ["大匯演", "設施", "趣事", "好奇心"], answer: 0 },
+                 { q: "她的歌聲很悅耳，大家都______她唱得好。", options: ["稱讚", "想念", "懂得", "舉辦"], answer: 0 },
+                 { q: "看到這張舊照片，我十分______以前的小學同學。", options: ["想念", "稱讚", "懂得", "慶祝"], answer: 0 },
+                 { q: "小雨滴落在______裡，小苗快樂地往上爬。", options: ["田野", "池塘", "花園", "草坪"], answer: 0 },
+                 { q: "為了慶祝生日，媽媽為我______了一個派對。", options: ["舉辦", "帶領", "參觀", "觀賞"], answer: 0 },
+                 { q: "聽到好消息，大家都______得跳了起來。", options: ["興奮", "愉快", "安靜", "樂呵呵"], answer: 0 },
+                 { q: "天上的白雲______地飄來飄去，像棉花糖一樣。", options: ["自由自在", "鳥語花香", "樂悠悠", "靜悄悄"], answer: 0 }
+             ] }
+    };
+
+    function generateFullPool(baseArray, targetCount) {
+        let pool = [];
+        let index = 0;
+        
+        while(pool.length < targetCount) {
+            let src = baseArray[index % baseArray.length];
+            let ops = [...src.options];
+            let ansText = ops[src.answer];
+            
+            for (let i = ops.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [ops[i], ops[j]] = [ops[j], ops[i]];
+            }
+            
+            pool.push({ q: src.q, options: ops, answer: ops.indexOf(ansText) });
+            index++;
+        }
+        
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        return pool.slice(0, targetCount); 
+    }
+
+    let currentQuestions = [];
+    let userAnswers = []; 
+    let currentQuestionIndex = 0;
+    let currentLevel = 1;
+    let retryQuestionData = null; 
+    let currentSessionScore = 0; // 新增：用來追蹤這一次遊玩的即時分數
+
+    let levelScores = JSON.parse(localStorage.getItem('chinese_grammar_scores')) || {};
+
+    function clearRecords() {
+        if(confirm("確定要清除所有關卡記錄和星星嗎？")) {
+            localStorage.removeItem('chinese_grammar_scores');
+            levelScores = {};
+            renderHome();
+        }
+    }
+
+    function hideAll() {
+        ['home-screen', 'intro-screen', 'game-screen', 'result-screen', 'retry-screen'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById('confetti-overlay').style.display = 'none';
+        document.getElementById('game-container').className = '';
+    }
+
+    function showHome() {
+        window.speechSynthesis.cancel();
+        hideAll();
+        renderHome();
+    }
+
+    function renderHome() {
+        document.getElementById('home-screen').classList.remove('hidden');
+        const grid = document.getElementById('level-grid');
+        grid.innerHTML = '';
+        
+        for(let i=1; i<=10; i++) {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
+            
+            let maxScore = levelScores[i] || 0;
+            let starHtml = '';
+            
+            if (maxScore === 20) {
+                starHtml = '<span class="star-big">🌟</span>';
+            } else if (maxScore >= 10) {
+                starHtml = '<span class="star-small">⭐</span>';
+            } else {
+                starHtml = '<span class="star-empty">☆</span>';
+            }
+
+            btn.innerHTML = `
+                ${starHtml}
+                <span>第 ${i} 關</span>
+                <span style="font-size:0.8em; font-weight:normal;">${levelData[i].name}</span>
+                <div class="level-score">最高分: ${maxScore}/20</div>
+            `;
+            btn.onclick = () => loadLevel(i);
+            grid.appendChild(btn);
+        }
+    }
+
+    window.onload = renderHome;
+
+    function loadLevel(level) {
+        currentLevel = level;
+        const data = levelData[level];
+        document.getElementById('intro-title').innerText = data.title;
+        document.getElementById('intro-desc').innerText = data.desc;
+        
+        const exList = document.getElementById('intro-examples');
+        exList.innerHTML = '';
+        data.examples.forEach(ex => {
+            let li = document.createElement('li');
+            li.innerText = ex;
+            exList.appendChild(li);
+        });
+        
+        hideAll();
+        document.getElementById('intro-screen').classList.remove('hidden');
+    }
+
+    function speakExamples() {
+        let text = levelData[currentLevel].examples.join('。 ');
+        speakText(text);
+    }
+
+    function startGameplay() {
+        window.speechSynthesis.cancel();
+        let easy = generateFullPool(levelData[currentLevel].baseEasy, 10).map(q => ({...q, diff: 'easy'}));
+        let hard = generateFullPool(levelData[currentLevel].baseHard, 10).map(q => ({...q, diff: 'hard'}));
+        
+        currentQuestions = [...easy, ...hard];
+        userAnswers = new Array(20).fill(null); 
+        currentQuestionIndex = 0;
+        
+        hideAll();
+        document.getElementById('game-screen').classList.remove('hidden');
+        
+        const articleBox = document.getElementById('article-box');
+        if (levelData[currentLevel].article) {
+            articleBox.innerHTML = levelData[currentLevel].article;
+            articleBox.classList.remove('hidden');
+        } else {
+            articleBox.classList.add('hidden');
+        }
+
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const qData = currentQuestions[currentQuestionIndex];
+        const answered = userAnswers[currentQuestionIndex] !== null;
+        
+        document.getElementById('progress-text').innerText = `第 ${currentQuestionIndex + 1} 題 / 共 20 題`;
+        document.getElementById('question-text').innerText = qData.q;
+        
+        let badge = document.getElementById('difficulty-badge');
+        badge.innerText = currentQuestionIndex < 10 ? "🔵 淺程度" : "🔴 深程度";
+        badge.className = `difficulty-badge ${currentQuestionIndex < 10 ? 'diff-easy' : 'diff-hard'}`;
+
+        const optionsGrid = document.getElementById('options-grid');
+        optionsGrid.innerHTML = '';
+        document.getElementById('skip-btn').classList.add('hidden'); 
+        
+        qData.options.forEach((opt, index) => {
+            let btn = document.createElement('button');
+            btn.className = 'option-btn';
+            
+            btn.innerHTML = `
+                <button class="audio-btn" style="width:40px; height:40px; font-size:1em;" 
+                        onclick="event.stopPropagation(); speakText('${opt}')" title="讀出選項">🔊</button>
+                <span>${opt}</span>
+            `;
+            
+            if(answered) {
+                btn.disabled = true;
+                if(index === userAnswers[currentQuestionIndex]) {
+                    if(index === qData.answer) {
+                        btn.style.borderColor = "var(--correct)";
+                        btn.style.backgroundColor = "#c8e6c9";
+                    } else {
+                        btn.style.borderColor = "var(--wrong)";
+                        btn.style.backgroundColor = "#ffcdd2";
+                        if(currentQuestionIndex === 19) {
+                            let skipBtn = document.getElementById('skip-btn');
+                            skipBtn.innerText = "➡️ 完成提交";
+                            skipBtn.onclick = showResult;
+                            skipBtn.classList.remove('hidden');
+                        } else {
+                            let skipBtn = document.getElementById('skip-btn');
+                            skipBtn.innerText = "➡️ Move to next question";
+                            skipBtn.onclick = () => navigate(1);
+                            skipBtn.classList.remove('hidden');
+                        }
+                    }
+                } else if (index === qData.answer) {
+                    btn.style.borderColor = "var(--correct)";
+                    btn.style.borderWidth = "4px";
+                }
+            } else {
+                btn.onclick = () => submitAnswer(index);
+            }
+            optionsGrid.appendChild(btn);
+        });
+
+        document.getElementById('prev-btn').disabled = (currentQuestionIndex === 0);
+        let nextBtn = document.getElementById('next-btn');
+        if (currentQuestionIndex === 19) {
+            nextBtn.innerText = "完成提交 ✅";
+            nextBtn.disabled = false;
+            nextBtn.onclick = showResult;
+        } else {
+            nextBtn.innerText = "下一頁 ➡️";
+            nextBtn.disabled = false;
+            nextBtn.onclick = () => navigate(1);
+        }
+    }
+
+    function submitAnswer(index) {
+        userAnswers[currentQuestionIndex] = index;
+        const qData = currentQuestions[currentQuestionIndex];
+        const isCorrect = (index === qData.answer);
+        
+        let container = document.getElementById('game-container');
+        if(isCorrect) {
+            playCorrectSound();
+            container.classList.add('anim-correct');
+            showConfetti();
+            setTimeout(() => container.className = '', 500); 
+            renderQuestion(); 
+            if (currentQuestionIndex < 19) {
+                setTimeout(() => navigate(1), 1200); 
+            } else {
+                setTimeout(() => showResult(), 1200);
+            }
+        } else {
+            playWrongSound();
+            container.classList.add('anim-wrong');
+            setTimeout(() => container.className = '', 500); 
+            renderQuestion(); 
+        }
+    }
+
+    function navigate(step) {
+        if (currentQuestionIndex === 19 && step === 1) {
+            showResult();
+            return;
+        }
+        currentQuestionIndex += step;
+        renderQuestion();
+    }
+
+    function showConfetti() {
+        let overlay = document.getElementById('confetti-overlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.style.display = 'none', 1000);
+    }
+
+    function showResult() {
+        hideAll();
+        document.getElementById('result-screen').classList.remove('hidden');
+        
+        currentSessionScore = 0; // 重置當前分數並重新計算
+        let summaryHtml = '';
+        
+        currentQuestions.forEach((q, i) => {
+            let uAns = userAnswers[i];
+            let isCorr = (uAns === q.answer);
+            if(isCorr) currentSessionScore++;
+            
+            summaryHtml += `
+                <div class="summary-item ${isCorr ? 'correct' : 'wrong'}" id="summary-item-${i}">
+                    <div>
+                        <strong>第 ${i+1} 題：</strong> ${q.q}<br>
+                        <span style="font-size:0.9em; color:#666;">你的答案：${uAns !== null ? q.options[uAns] : '未作答'}</span>
+                    </div>
+                    ${!isCorr ? `<button class="retry-btn" onclick="openRetry(${i})">🎯 重做</button>` : `<span style="font-size:1.5em;">✅</span>`}
+                </div>
+            `;
+        });
+        
+        document.getElementById('final-score').innerText = currentSessionScore;
+        document.getElementById('summary-list').innerHTML = summaryHtml;
+        
+        let oldMax = levelScores[currentLevel] || 0;
+        if (currentSessionScore > oldMax) {
+            levelScores[currentLevel] = currentSessionScore;
+            localStorage.setItem('chinese_grammar_scores', JSON.stringify(levelScores));
+        }
+        
+        let maxScore = levelScores[currentLevel];
+        if (maxScore === 20) {
+            document.getElementById('star-reward-msg').innerText = "太厲害了！你獲得了 🌟 大星星滿分！";
+            speakText(`太棒了，你得到 ${currentSessionScore} 分，獲得了大星星！`);
+        } else if (maxScore >= 10) {
+            document.getElementById('star-reward-msg').innerText = "做得好！你獲得了 ⭐ 小星星合格！";
+            speakText(`做得好，你得到 ${currentSessionScore} 分，獲得了小星星！`);
+        } else {
+            document.getElementById('star-reward-msg').innerText = "繼續努力，下次爭取拿星星！";
+            speakText(`完成挑戰，你得到 ${currentSessionScore} 分，繼續努力！`);
+        }
+    }
+
+    function openRetry(index) {
+        retryQuestionData = { ...currentQuestions[index], originalIndex: index };
+        hideAll();
+        document.getElementById('retry-screen').classList.remove('hidden');
+        
+        let hintBox = document.getElementById('retry-hint-box');
+        hintBox.classList.remove('hidden');
+        speakText("這題剛才答錯了，請細心想一想，選出正確答案！");
+
+        const retryArticleBox = document.getElementById('retry-article-box');
+        if (levelData[currentLevel].article) {
+            retryArticleBox.innerHTML = levelData[currentLevel].article;
+            retryArticleBox.classList.remove('hidden');
+        } else {
+            retryArticleBox.classList.add('hidden');
+        }
+        
+        renderRetryQuestion();
+    }
+
+    function renderRetryQuestion() {
+        document.getElementById('retry-question-text').innerText = retryQuestionData.q;
+        const grid = document.getElementById('retry-options-grid');
+        grid.innerHTML = '';
+        
+        retryQuestionData.options.forEach((opt, idx) => {
+            let btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `
+                <button class="audio-btn" style="width:40px; height:40px; font-size:1em;" 
+                        onclick="event.stopPropagation(); speakText('${opt}')">🔊</button>
+                <span>${opt}</span>
+            `;
+            btn.onclick = () => submitRetryAnswer(idx, btn);
+            grid.appendChild(btn);
+        });
+    }
+
+    function submitRetryAnswer(selectedIndex, btnElement) {
+        if (btnElement.disabled) return; // 防止小朋友連按
+        
+        let container = document.getElementById('game-container');
+        document.getElementById('retry-hint-box').classList.add('hidden'); 
+        
+        if(selectedIndex === retryQuestionData.answer) {
+            // 答對後立刻鎖定所有按鈕，防止重複加分
+            let btns = document.querySelectorAll('#retry-options-grid .option-btn');
+            btns.forEach(b => b.disabled = true);
+
+            playCorrectSound();
+            btnElement.style.borderColor = "var(--correct)";
+            btnElement.style.backgroundColor = "#c8e6c9";
+            container.classList.add('anim-correct');
+            showConfetti();
+            speakText("答對了！好聰明！");
+            
+            // --- 即時加分並覆蓋邏輯 ---
+            currentSessionScore++; // 當前分數 +1
+            document.getElementById('final-score').innerText = currentSessionScore; // 更新畫面的大分數
+            
+            let oldMax = levelScores[currentLevel] || 0;
+            if (currentSessionScore > oldMax) {
+                // 如果加上這 1 分超越了歷史最高分，就覆蓋儲存！
+                levelScores[currentLevel] = currentSessionScore;
+                localStorage.setItem('chinese_grammar_scores', JSON.stringify(levelScores));
+                
+                // 動態更新星星獎勵提示
+                let maxScore = levelScores[currentLevel];
+                if (maxScore === 20) {
+                    document.getElementById('star-reward-msg').innerText = "太厲害了！你獲得了 🌟 大星星滿分！";
+                } else if (maxScore >= 10 && oldMax < 10) {
+                    document.getElementById('star-reward-msg').innerText = "做得好！你獲得了 ⭐ 小星星合格！";
+                }
+            }
+            // ---------------------------
+            
+            setTimeout(() => {
+                let listItem = document.getElementById(`summary-item-${retryQuestionData.originalIndex}`);
+                listItem.className = 'summary-item correct';
+                listItem.innerHTML = `
+                    <div><strong>第 ${retryQuestionData.originalIndex + 1} 題：</strong> ${retryQuestionData.q} <br> <span style="color:green;font-size:0.9em;">(已訂正)</span></div>
+                    <span style="font-size:1.5em;">✅</span>
+                `;
+                closeRetryScreen();
+            }, 1500);
+            
+        } else {
+            playWrongSound();
+            btnElement.style.borderColor = "var(--wrong)";
+            btnElement.style.backgroundColor = "#ffcdd2";
+            container.classList.add('anim-wrong');
+            speakText("不對喔，再試一次！");
+            setTimeout(() => container.classList.remove('anim-wrong'), 500);
+        }
+    }
+
+    function closeRetryScreen() {
+        hideAll();
+        document.getElementById('result-screen').classList.remove('hidden');
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); 
+            let cleanText = text.replace(/想一想：|小挑戰：|注意看：|[0-9A-Za-z\.\-\>]/g, ''); 
+            const u = new SpeechSynthesisUtterance(cleanText);
+            u.lang = 'zh-HK'; 
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+        }
+    }
+    function playQuestionAudio() { speakText(document.getElementById('question-text').innerText); }
+    function playRetryAudio() { speakText(document.getElementById('retry-question-text').innerText); }
+</script>
+</body>
+</html>
