@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小朋友學習大冒險 🌟</title>
+    <title>小朋友練習遊戲大冒險 🌟</title>
     <style>
         body {
             font-family: 'Comic Sans MS', 'Microsoft JhengHei', sans-serif;
@@ -28,16 +28,7 @@
             background-color: white;
         }
 
-        /* 為了手機版版面不重疊，螢幕較小時圖標置中 */
-        @media (max-width: 600px) {
-            .top-left-logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 15px;
-            }
-        }
-
+        /* 桌機版：容器與字體設定 */
         h1 {
             color: #ff69b4;
             font-size: 36px;
@@ -53,7 +44,7 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
-        /* 按鈕樣式 */
+        /* 主選單按鈕樣式 */
         .btn-group {
             display: flex;
             flex-direction: column;
@@ -61,33 +52,44 @@
             margin-top: 30px;
         }
         .age-btn {
-            background-color: #ffd700;
-            color: #d2691e;
             font-size: 28px;
             font-weight: bold;
             padding: 20px;
             border: none;
             border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 5px 0 #daa520;
             transition: transform 0.1s, box-shadow 0.1s;
         }
         .age-btn:active {
             transform: translateY(5px);
-            box-shadow: 0 0 0 #daa520;
-        }
-        .age-btn.k3-p1 {
-            background-color: #87ceeb;
-            color: #005f6b;
-            box-shadow: 0 5px 0 #4682b4;
-        }
-        .age-btn.k3-p1:active {
-            box-shadow: 0 0 0 #4682b4;
         }
         
-        /* 遊戲列表樣式 */
-        .game-list {
-            display: none;
+        /* 各年級與科目的專屬顏色 */
+        .btn-nk2 { background-color: #ffd700; color: #d2691e; box-shadow: 0 5px 0 #daa520; }
+        .btn-nk2:active { box-shadow: 0 0 0 #daa520; }
+        
+        .btn-k3 { background-color: #98fb98; color: #006400; box-shadow: 0 5px 0 #3cb371; }
+        .btn-k3:active { box-shadow: 0 0 0 #3cb371; }
+        
+        .btn-p1 { background-color: #87ceeb; color: #005f6b; box-shadow: 0 5px 0 #4682b4; }
+        .btn-p1:active { box-shadow: 0 0 0 #4682b4; }
+
+        .btn-chi { background-color: #ffebcd; color: #8b4513; box-shadow: 0 5px 0 #cd853f; }
+        .btn-chi:active { box-shadow: 0 0 0 #cd853f; }
+
+        .btn-eng { background-color: #e6e6fa; color: #4b0082; box-shadow: 0 5px 0 #9370db; }
+        .btn-eng:active { box-shadow: 0 0 0 #9370db; }
+
+        .btn-math { background-color: #e0ffff; color: #008080; box-shadow: 0 5px 0 #20b2aa; }
+        .btn-math:active { box-shadow: 0 0 0 #20b2aa; }
+        
+        /* 區塊顯示控制與遊戲列表網格 */
+        .section-div {
+            display: none; 
+            margin-top: 20px;
+        }
+        .game-grid {
+            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-top: 20px;
@@ -150,6 +152,7 @@
             font-weight: bold;
             margin: 0 8px;
             display: inline-block;
+            line-height: 2; 
         }
         .footer a:hover {
             color: #005f6b;
@@ -161,6 +164,51 @@
             font-weight: bold;
             color: #333;
         }
+
+        /* 📱 手機版專屬優化 (螢幕寬度小於 600px 時自動觸發) 📱 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* 縮小最外層邊距 */
+            }
+            .top-left-logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 15px;
+                width: 65px; /* 圖標稍微縮小一點 */
+                height: 65px;
+            }
+            .container {
+                padding: 20px 15px; /* 減少兩側留白，讓按鈕空間更大 */
+            }
+            h1 {
+                font-size: 26px; /* 標題縮小，避免折行 */
+            }
+            .age-btn {
+                font-size: 22px; /* 按鈕字體微調 */
+                padding: 15px; /* 按鈕高度稍微縮減 */
+            }
+            .game-grid {
+                grid-template-columns: 1fr; /* 強制遊戲卡片變成上下排列，佔滿寬度 */
+            }
+            .footer {
+                padding: 15px 10px;
+            }
+            .footer p {
+                display: flex;
+                flex-direction: column; /* 讓社群連結變成垂直排列 */
+                gap: 10px; /* 增加上下間距防誤觸 */
+            }
+            .footer a {
+                margin: 0;
+                background-color: #ffe4e1; /* 加一點背景色變成按鈕的感覺 */
+                padding: 8px;
+                border-radius: 8px;
+            }
+            .douyin-text {
+                margin: 10px 0 0 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -169,20 +217,32 @@
 <img src="cat.jpeg" alt="Teacher Cat" class="top-left-logo" onerror="this.style.display='none'">
 
 <div class="container">
-    <h1>🌟 小朋友學習大冒險 🌟</h1>
+    <h1>🌟 小朋友練習遊戲大冒險 🌟</h1>
     <p style="font-size: 20px; color: #666;">小朋友，請選擇你的年級開始挑戰吧！</p>
 
-    <!-- 首頁：年齡選擇 -->
-    <div id="home-menu" class="btn-group">
-        <button class="age-btn" onclick="showGames('k1-k2')">🐣 幼稚園 K1 - K2</button>
-        <button class="age-btn k3-p1" onclick="showGames('k3-p1')">🚀 幼稚園 K3 - P1</button>
+    <!-- 【主目錄】 -->
+    <div id="home-menu" class="btn-group" style="display: flex;">
+        <button class="age-btn btn-nk2" onclick="showSection('nk2-games')">🐣 幼稚園 N - K2</button>
+        <button class="age-btn btn-k3" onclick="showSection('k3-games')">🚀 幼稚園 K3</button>
+        <button class="age-btn btn-p1" onclick="showSection('p1-menu')">🎓 小學一年級</button>
     </div>
 
-    <!-- K1-K2 遊戲區 -->
-    <div id="k1-k2-games" class="game-list">
-        <button class="back-btn" onclick="goHome()">⬅ 返回主目錄</button>
-        <h2>🐣 幼稚園 K1 - K2 遊戲樂園</h2>
-        <div style="display: contents;">
+    <!-- 【小一目錄 (選科)】 -->
+    <div id="p1-menu" class="section-div btn-group">
+        <button class="back-btn" style="align-self: center;" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
+        <h2 style="color: #4682b4;">🎓 小學一年級 科目選擇</h2>
+        <button class="age-btn btn-chi" onclick="showSection('p1-chi-games')">📚 中文</button>
+        <button class="age-btn btn-eng" onclick="showSection('p1-eng-games')">🔤 英文</button>
+        <button class="age-btn btn-math" onclick="showSection('p1-math-games')">🔢 數學</button>
+    </div>
+
+    <!-- ==================== 遊戲列表區 ==================== -->
+
+    <!-- 幼稚園 N-K2 遊戲區 -->
+    <div id="nk2-games" class="section-div">
+        <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
+        <h2>🐣 幼稚園 N - K2 遊戲樂園</h2>
+        <div class="game-grid">
             <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
                 <span class="game-icon">🐻</span>
                 20內加減練習小遊戲
@@ -198,11 +258,66 @@
         </div>
     </div>
 
-    <!-- K3-P1 遊戲區 -->
-    <div id="k3-p1-games" class="game-list">
-        <button class="back-btn" onclick="goHome()">⬅ 返回主目錄</button>
-        <h2>🚀 幼稚園 K3 - P1 遊戲樂園</h2>
-        <div style="display: contents;">
+    <!-- 幼稚園 K3 遊戲區 -->
+    <div id="k3-games" class="section-div">
+        <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
+        <h2>🚀 幼稚園 K3 遊戲樂園</h2>
+        <div class="game-grid">
+            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
+                <span class="game-icon">🐻</span>
+                20內加減練習小遊戲
+            </a>
+            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
+                <span class="game-icon">🔤</span>
+                K1-K3幼稚園認字卡<br>(粵普英發音版)
+            </a>
+        </div>
+    </div>
+
+    <!-- 小一：中文區 -->
+    <div id="p1-chi-games" class="section-div">
+        <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
+        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2>📚 小學一年級 - 中文</h2>
+        <div class="game-grid">
+            <a href="https://cat123teacher.github.io/chinese/chinese.html" class="game-card">
+                <span class="game-icon">📚</span>
+                小一中文文法大冒險
+            </a>
+            <a href="https://cat123teacher.github.io/chinese/chinese2.html" class="game-card">
+                <span class="game-icon">📗</span>
+                小一中文文法大冒險下
+            </a>
+            <a href="https://cat123teacher.github.io/chinese/P1reading.html" class="game-card">
+                <span class="game-icon">📖</span>
+                小一中英文閱讀挑戰
+            </a>
+        </div>
+    </div>
+
+    <!-- 小一：英文區 -->
+    <div id="p1-eng-games" class="section-div">
+        <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
+        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2>🔤 小學一年級 - 英文</h2>
+        <div class="game-grid">
+            <a href="https://cat123teacher.github.io/chinese/P1grammar.html" class="game-card">
+                <span class="game-icon">⚔️</span>
+                小一英文文法大冒險
+            </a>
+            <a href="https://cat123teacher.github.io/chinese/P1grammar2.html" class="game-card">
+                <span class="game-icon">🛡️</span>
+                小一英文文法大冒險下
+            </a>
+        </div>
+    </div>
+
+    <!-- 小一：數學區 -->
+    <div id="p1-math-games" class="section-div">
+        <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
+        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2>🔢 小學一年級 - 數學</h2>
+        <div class="game-grid">
             <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/cat.html" class="game-card">
                 <span class="game-icon">🦁</span>
                 100內加減練習小遊戲
@@ -215,43 +330,21 @@
                 <span class="game-icon">🐰</span>
                 9x9內除數練習小遊戲
             </a>
-            <a href="https://cat123teacher.github.io/chinese/chinese.html" class="game-card">
-                <span class="game-icon">📚</span>
-                小一中文文法大冒險
-            </a>
-            <!-- 新增：小一中文文法大冒險下 -->
-            <a href="https://cat123teacher.github.io/chinese/chinese2.html" class="game-card">
-                <span class="game-icon">📗</span>
-                小一中文文法大冒險下
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1grammar.html" class="game-card">
-                <span class="game-icon">⚔️</span>
-                小一英文文法大冒險<br>Grammar
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1grammar2.html" class="game-card">
-                <span class="game-icon">🛡️</span>
-                小一英文文法大冒險下
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
-                <span class="game-icon">🔤</span>
-                K1-K3幼稚園認字卡<br>(粵普英發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1reading.html" class="game-card">
-                <span class="game-icon">📖</span>
-                小一中英文閱讀挑戰
-            </a>
         </div>
     </div>
+
+    <!-- ======================================================= -->
 
     <!-- 每頁最下方的 Teacher Cat 資訊區 -->
     <div class="footer">
         <h3>🐱 Teacher Cat 的快樂AI教室 🐱</h3>
         <p>
-            <a href="https://www.youtube.com/@TeacherCat123" target="_blank">▶ YouTube</a> | 
-            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a> | 
-            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a> | 
-            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a> | 
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank">▶ YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a>
             <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">💬 WhatsApp 分享 Group</a>
         </p>
         <p>
             <span class="douyin-text">🎵 抖音號：74254902683</span>
@@ -260,24 +353,25 @@
 </div>
 
 <script>
-    // 顯示對應的遊戲選單，隱藏主選單
-    function showGames(ageGroup) {
-        document.getElementById('home-menu').style.display = 'none';
-        document.getElementById('k1-k2-games').style.display = 'none';
-        document.getElementById('k3-p1-games').style.display = 'none';
-
-        if (ageGroup === 'k1-k2') {
-            document.getElementById('k1-k2-games').style.display = 'block';
-        } else if (ageGroup === 'k3-p1') {
-            document.getElementById('k3-p1-games').style.display = 'block';
+    // 透過這個函數來切換不同的顯示區塊
+    function showSection(sectionId) {
+        // 先把所有可能的區塊隱藏起來
+        const sections = [
+            'home-menu', 'p1-menu', 
+            'nk2-games', 'k3-games', 
+            'p1-chi-games', 'p1-eng-games', 'p1-math-games'
+        ];
+        
+        sections.forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
+        
+        // 根據指定的 ID 顯示區塊 (選單用 flex 保持置中，遊戲列表用 block)
+        if (sectionId === 'home-menu' || sectionId === 'p1-menu') {
+            document.getElementById(sectionId).style.display = 'flex';
+        } else {
+            document.getElementById(sectionId).style.display = 'block';
         }
-    }
-
-    // 返回主選單
-    function goHome() {
-        document.getElementById('home-menu').style.display = 'flex';
-        document.getElementById('k1-k2-games').style.display = 'none';
-        document.getElementById('k3-p1-games').style.display = 'none';
     }
 </script>
 
