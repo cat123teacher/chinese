@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小一數學除數初學大冒險</title>
+    
+    <!-- 加入原有的煙火特效 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- 解決手機/平板觸控拖曳不順暢的專用套件 -->
+    <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
+
+    <style>
+        :root { --cat-orange: #FF9800; --cat-blue: #03A9F4; --cat-green: #4CAF50; --cat-pink: #FF4081; --bg: #FFF9F0; }
+        body { background: var(--bg); font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; text-align: center; margin: 0; padding-top: 70px; -webkit-tap-highlight-color: transparent; color: #5D4037; transition: background 1s ease; overscroll-behavior-y: contain; }
+        
+        .logo { position: fixed; top: 10px; left: 10px; width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--cat-orange); z-index: 2000; background: white; }
+        
+        .page { display: none; padding: 15px; animation: fadeIn 0.5s; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1, h2, h3 { color: #E64A19; text-shadow: 1px 1px white; margin: 10px 0; }
+        .subtitle { font-size: 15px; font-weight: bold; color: #555; margin-bottom: 5px; line-height: 1.5; }
+        .story-text { background: rgba(255, 243, 224, 0.9); padding: 15px; border-radius: 15px; border: 2px dashed var(--cat-orange); margin: 10px auto; max-width: 500px; font-size: 14px; text-align: left; }
+
+        .lvl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 500px; margin: 20px auto; }
+        .lvl-card { background: rgba(255, 255, 255, 0.9); border: 3px solid var(--cat-orange); border-radius: 15px; padding: 10px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 0 #E65100; }
+        .lvl-card:active { transform: translateY(4px); box-shadow: none; }
+        .star-box { font-size: 24px; min-height: 30px; margin: 5px 0; }
+
+        .game-box { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border: 4px solid #FFE0B2; }
+        .formula { font-size: 40px; font-weight: bold; color: var(--cat-orange); margin: 10px 0; transition: transform 0.3s; }
+        
+        /* 改善拖拉區域：加大間距、放大碟子與餅乾 */
+        .cookie-pool { background: #FFFDE7; padding: 15px; border-radius: 15px; min-height: 70px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; border: 2px dashed #FFD54F; margin: 10px 0; }
+        .plate-area { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; padding: 10px; min-height: 120px; }
+        .plate { min-width: 110px; min-height: 110px; background: #E1F5FE; border: 3px dashed var(--cat-blue); border-radius: 20px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; padding: 10px; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(3, 169, 244, 0.15); transition: transform 0.2s; }
+        .cookie { font-size: 30px; cursor: grab; touch-action: none; margin: 3px; transition: transform 0.1s; }
+        .cookie:active { transform: scale(1.2); }
+
+        .opt-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .opt-btn { flex-grow: 1; background: var(--cat-green); color: white; border: none; padding: 15px; border-radius: 15px; font-size: 22px; font-weight: bold; box-shadow: 0 4px 0 #2E7D32; cursor: pointer; }
+        .audio-btn { background: #BBDEFB; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 20px; box-shadow: 0 3px 0 #90CAF9; cursor: pointer; }
+        
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; gap: 5px; }
+        .nav-btn { padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: #f0f0f0; flex: 1; font-size: 14px; }
+        .action-btn { background: var(--cat-orange); color: white; border: none; padding: 12px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; margin: 10px 5px; cursor: pointer; box-shadow: 0 4px 0 #E65100; text-decoration: none; display: inline-block; }
+        .cancel-btn { background: #9E9E9E; color: white; box-shadow: 0 4px 0 #616161; }
+
+        .footer { background: #424242; color: white; padding: 25px 15px 35px; font-size: 13px; line-height: 2; margin-top: 40px; border-radius: 20px 20px 0 0; }
+        .footer a { color: #FFD54F; text-decoration: none; font-weight: bold; margin: 0 5px; }
+        .whatsapp-btn { background: #25D366; color: white !important; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 16px; margin-top: 15px; box-shadow: 0 4px 0 #128C7E; transition: transform 0.2s; }
+        
+        /* 彈窗樣式 (除數表與盲盒) */
+        .modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-45%); width: 85%; max-width: 380px; background:#FFFDE7; border:8px solid var(--cat-orange); border-radius:30px; padding:35px 20px 20px; z-index:3000; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .modal-cat-icon { position:absolute; top:-40px; left:50%; transform:translateX(-50%); width:80px; height:80px; border-radius:50%; border:5px solid var(--cat-orange); background:white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .table-item { background: white; padding: 10px; border-radius: 15px; font-weight: bold; color: #E64A19; border: 2px dashed #FFCA28; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        
+        /* 盲盒與戰鬥樣式 */
+        .blind-box-container { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
+        .blind-box-img { width: 80px; height: 80px; border-radius: 15px; border: 3px solid #FFD54F; background: white; object-fit: cover; }
+        
+        .char-img { width: 120px; height: 120px; border-radius: 20px; border: 4px solid var(--cat-pink); margin: 10px auto; display: block; object-fit: cover; }
+        
+        #battleScene { display: none; margin: 20px auto; max-width: 500px; background: rgba(51, 51, 51, 0.95); padding: 20px; border-radius: 20px; border: 5px solid #FF5252; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .boss-img { width: 150px; height: 150px; border-radius: 50%; border: 5px solid #E53935; animation: bossShake 0.5s infinite alternate; margin-bottom: 20px; object-fit: cover; }
+        .heroes-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .hero-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--cat-blue); animation: heroAttack 0.4s infinite alternate; object-fit: cover; }
+        
+        /* 首頁收集到的英雄 */
+        .collected-img { width: 70px; height: 70px; border-radius: 50%; border: 4px solid var(--cat-pink); object-fit: cover; margin: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: transform 0.2s; background: white; }
+        .collected-img:hover { transform: scale(1.1); }
+        
+        @keyframes bossShake { 0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 10px red); } 100% { transform: translateY(10px) scale(1.1); filter: drop-shadow(0 0 20px red); } }
+        @keyframes heroAttack { 0% { transform: translateY(10px); } 100% { transform: translateY(-10px) scale(1.1); filter: drop-shadow(0 0 10px #03A9F4); } }
+        
+        /* 抽盲盒 3 選 1 樣式與誇張動畫 */
+        .pick-box { width: 90px; height: 90px; border-radius: 15px; border: 4px dashed var(--cat-orange); background: white; object-fit: cover; cursor: pointer; transition: transform 0.2s; }
+        .pick-box:hover { transform: scale(1.1); }
+        
+        @keyframes magicExplode {
+            0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+            20% { transform: scale(1.3) rotate(-15deg); filter: brightness(1.2); }
+            40% { transform: scale(1.3) rotate(15deg); }
+            60% { transform: scale(1.5) rotate(-15deg); filter: brightness(1.5); }
+            80% { transform: scale(1.5) rotate(15deg); }
+            100% { transform: scale(0) rotate(0deg); filter: brightness(2); } 
+        }
+        .box-opening { animation: magicExplode 1.2s forwards ease-in-out; pointer-events: none; }
+
+        /* 彩虹動態背景特效 */
+        @keyframes pastelRainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .rainbow-mode {
+            background: linear-gradient(270deg, #ffc3a0, #ffafbd, #a1c4fd, #c2e9fb, #d4fc79, #96e6a1);
+            background-size: 1200% 1200%;
+            animation: pastelRainbow 8s ease infinite !important;
+        }
+    </style>
+</head>
+<body>
+    <img src="cat.jpeg" class="logo" alt="Teacher Cat Logo">
+
+    <!-- 首頁面 -->
+    <div id="homePage" class="page active-page">
+        <h1>🌟 小一數學除數初學大冒險 🌟</h1>
+        
+        <!-- 戰鬥畫面 (通過第11關顯示) -->
+        <div id="battleScene">
+            <h2 style="color:#FFCDD2; margin-top:0;">⚡ 終極大決戰 ⚡</h2>
+            <img src="大魔王.jpg" class="boss-img" alt="大魔王">
+            <div class="heroes-row" id="battleHeroes"></div>
+        </div>
+
+        <!-- 正常首頁故事、收集展示區與盲盒 -->
+        <div id="normalHomeView">
+            <div class="story-text" style="display: flex; align-items: flex-start; gap: 10px;">
+                <button class="audio-btn" onclick="speak('在很久很久以前，時空王國的奇幻寶石被壞人偷走了，整個王國的時間和城堡都被封印在黑白的世界裡。只有勇敢的小朋友能夠通過十個考驗，沿途解救被封印的英雄與公主，最後一起打敗壞人，讓王國恢復色彩！')" style="flex-shrink: 0; margin-top: 2px;">🔊</button>
+                <span>「在很久很久以前，時空王國的『奇幻寶石』被壞人偷走了，整個王國的時間和城堡都被封印在黑白的世界裡。只有勇敢的小朋友（玩家）能夠通過十個考驗，沿途解救被封印的英雄與公主，最後一起打敗壞人，讓王國恢復色彩！」</span>
+            </div>
+            
+            <!-- 已解救的角色展示區 -->
+            <h3 id="heroesTitle" style="color:var(--cat-pink); margin-top:20px; display:none;">💖 已經解救的英雄戰隊 💖</h3>
+            <div id="collectedHeroes" style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-bottom: 5px;"></div>
+            
+            <!-- 抽中的大魔王顯示區 -->
+            <div id="collectedBoss" style="display:flex; justify-content:center; margin-bottom: 25px;"></div>
+
+            <!-- 未收集完的盲盒裝飾 -->
+            <div class="blind-box-container" id="homeBlindBoxes"></div>
+        </div>
+
+        <div class="subtitle" style="margin-top:15px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <button class="audio-btn" style="width: 35px; height: 35px; font-size: 16px; flex-shrink: 0;" onclick="speak('請選擇關卡開始挑戰，隨機20題！通關後可以打開一個寶盒，解放英雄！')">🔊</button>
+            <span>請選擇關卡開始挑戰（隨機20題）！<br>通關後可以打開一個寶盒,解放英雄！</span>
+        </div>
+        <div class="subtitle" style="color:var(--cat-orange); margin-top:10px;">滿分20分= 🌟大星星 | 合格10分= ⭐小星星</div>
+        
+        <div class="lvl-grid" id="lvlGrid"></div>
+        
+        <button class="nav-btn" style="width:200px; margin: 10px auto;" onclick="clearData()">🗑 清除所有記錄</button>
+        <br>
+        <button class="action-btn" onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'">返回小朋友學習大冒險 🚀</button>
+    </div>
+
+    <!-- Teacher Cat 預熱教學頁面 -->
+    <div id="preLearnPage" class="page">
+        <div class="game-box" style="margin-top: 50px; text-align: center;">
+            <img src="cat.jpeg" style="width:100px; height:100px; border-radius:50%; border:5px solid var(--cat-orange); margin-top:-60px; background:white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <h2 style="color:var(--cat-orange); margin-top:10px;">🐱 Teacher Cat 小學堂</h2>
+            
+            <div style="background:#FFFDE7; padding:20px; border-radius:15px; border:2px dashed #FFD54F; margin:20px 0;">
+                <p style="font-size:32px; font-weight:bold; color:var(--cat-pink); margin:10px 0;" id="preLearnFormula"></p>
+                
+                <!-- 圖形視覺化區域 -->
+                <div id="preLearnVisual" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin-bottom: 20px;"></div>
+
+                <div style="display:flex; align-items:flex-start; gap:10px; text-align:left;">
+                    <button class="audio-btn" id="preLearnAudioBtn" style="flex-shrink:0; margin-top:2px; width:45px; height:45px; font-size:20px;">🔊</button>
+                    <p style="font-size:16px; color:#5D4037; font-weight:bold; line-height:1.6; margin:0;" id="preLearnText"></p>
+                </div>
+            </div>
+            
+            <button class="action-btn" style="width:100%; font-size:20px; padding:15px; background:var(--cat-green);" onclick="enterGame()">🚀 我準備好了，開始挑戰！</button>
+            <button class="action-btn cancel-btn" style="width:100%; margin-top:10px;" onclick="goHome()">先回主頁</button>
+        </div>
+    </div>
+
+    <!-- 遊戲頁面 -->
+    <div id="gamePage" class="page">
+        <div class="game-box">
+            <div id="redoHeader" style="display:none; color:#D32F2F; font-size:20px; font-weight:bold; margin-bottom:10px;">
+                <h4>🔥 錯題重新挑戰 🔥</h4>
+                <button class="action-btn cancel-btn" onclick="showSummary()">取消</button>
+            </div>
+            
+            <div class="nav-bar" id="topNavBar">
+                <button class="nav-btn" onclick="prevQ()">⬅ 上一頁</button>
+                <button class="nav-btn" onclick="goHome()">🏠 回到主頁</button>
+                <button class="nav-btn" onclick="nextQ()">下一頁 ➡</button>
+            </div>
+            
+            <button class="nav-btn" style="background:var(--cat-pink); color:white; width:100%; margin-bottom:10px; border:2px solid #C2185B; font-size:16px;" onclick="openTable()">💡 Teacher Cat 的除數魔法書</button>
+
+            <div id="progressTxt" style="font-weight:bold; color:#888; margin: 10px 0;">第 1 題 / 共 20 題 淺</div>
+            
+            <div id="formula" class="formula"></div>
+            <p><button class="audio-btn" id="qAudio">🔊</button> <span id="qText" style="font-weight:bold;"></span></p>
+            
+            <div id="interArea">
+                <div class="cookie-pool" id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                <div class="plate-area" id="plates"></div>
+            </div>
+
+            <div class="options" id="options"></div>
+            <div id="feedback" style="height:40px; margin-top:10px; font-size:20px; font-weight:bold;"></div>
+            <button id="skipBtn" class="action-btn" style="display:none; width:100%; background:#FFB74D;" onclick="nextQ()">Move to next question ➡</button>
+        </div>
+    </div>
+
+    <!-- 結算頁面 -->
+    <div id="summaryPage" class="page">
+        <h2>🎉 關卡完成！ 🎉</h2>
+        <h3 id="finalScore"></h3>
+        <div id="starResult" style="font-size:60px; margin:10px;"></div>
+        
+        <!-- 盲盒抽取區 -->
+        <div id="blindBoxArea" style="display:none; margin: 15px 0; padding: 15px; background: rgba(255, 249, 196, 0.9); border-radius: 15px; border: 3px dashed #FFB300;">
+            <h4 style="color:#E65100; margin-top:0;">獲得了一次抽盲盒的機會！</h4>
+            <button class="action-btn" style="background:#9C27B0; font-size:20px; width:80%;" onclick="openSelectionModal()">🎁 抽取盲盒 🎁</button>
+        </div>
+        
+        <h5 style="font-size:18px; color:#555; text-align:left; max-width:450px; margin:20px auto 10px;">📝 你的答題總結 (點擊錯題重新挑戰)：</h5>
+        <div id="summaryList" style="max-width:450px; margin:auto; text-align:left;"></div>
+        
+        <div style="margin-top:20px;">
+            <button class="action-btn" style="background:var(--cat-blue);" onclick="restartLvl()">🔄 重新挑戰這一關</button>
+            <br>
+            <button class="action-btn" style="background:var(--cat-pink);" onclick="goHome()">返回主頁看公主成長 👑</button>
+        </div>
+    </div>
+
+    <!-- 除數表彈窗 -->
+    <div id="tableModal" class="modal">
+        <img src="cat.jpeg" class="modal-cat-icon" alt="Teacher Cat">
+        <h2 style="color:var(--cat-orange); margin-bottom:5px;">🐱 除數魔法書</h2>
+        <p style="color:#795548; font-weight:bold; font-size:14px; margin-top:0;">喵～ Teacher Cat 偷偷告訴你答案：</p>
+        <div id="tableContent" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;"></div>
+        <button class="action-btn" onclick="closeModal('tableModal')" style="width:100%; margin-top:20px; background:var(--cat-pink);">謝謝 Teacher Cat，我知道了！</button>
+    </div>
+
+    <!-- 盲盒 3 選 1 彈窗 -->
+    <div id="chooseBoxModal" class="modal">
+        <h2 style="color:var(--cat-orange); margin-top:0;">🎁 請選擇一個盲盒！ 🎁</h2>
+        <p style="color:#555; font-size:14px; font-weight:bold;">點擊你最喜歡的圖案來打開它！</p>
+        <div id="boxSelectionArea" style="display:flex; justify-content:center; gap:15px; margin-top:20px;"></div>
+    </div>
+
+    <!-- 盲盒結果彈窗 -->
+    <div id="boxResultModal" class="modal">
+        <h2 style="color:var(--cat-pink); margin-bottom:5px;">✨ 驚喜角色出現！ ✨</h2>
+        <img id="boxCharImg" src="" class="char-img">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0;">
+            <h3 id="boxCharName" style="color:var(--cat-blue); margin:0;"></h3>
+            <button id="charAudioBtn" class="audio-btn" style="width:35px; height:35px; font-size:16px;">🔊</button>
+        </div>
+        <p id="boxCharDesc" style="color:#555; font-size:14px; font-weight:bold; text-align:left; line-height:1.6; margin-top:0;"></p>
+        <button class="action-btn" onclick="closeModal('boxResultModal'); goHome();" style="width:100%; margin-top:15px;">太棒了！收下角色加入戰隊</button>
+    </div>
+
+    <!-- 頁尾連結 -->
+    <div class="footer">
+        <strong>Teacher Cat 的快樂AI教室</strong><br>
+        <a href="https://www.youtube.com/@TeacherCat123">YouTube</a> | 
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr">Instagram</a> | 
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr">Facebook</a><br>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==">Threads</a> | 
+        <a href="https://xhslink.com/m/5UQtqPpcsWK">小紅書</a> | 
+        <a href="https://v.douyin.com/idKdLH/">抖音 (74254902683)</a>
+        <br>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" class="whatsapp-btn">💬 WhatsApp 分享 Group</a>
+    </div>
+
+    <script>
+        const characters = [
+            { name: '公主', img: '公主.jpg', desc: '溫柔勇敢。技能：發出「勇氣光芒」，照亮黑暗。' },
+            { name: '王子', img: '王子.jpg', desc: '聰明機智。技能：使用「智慧之盾」，能反彈一次攻擊。' },
+            { name: '超人', img: '超人.jpg', desc: '充滿正義感。技能：速度極快，能幫忙搬開障礙物。' },
+            { name: '噴火小幼龍', img: '噴火小幼龍.jpg', desc: '雖然是龍但很害羞。技能：噴出溫暖的火，融化冰塊。' },
+            { name: '魔法師', img: '魔法師.jpg', desc: '神秘博學。技能：變出傳送門或解開神奇密碼。' },
+            { name: '橡果小精靈', img: '橡果小精靈.jpg', desc: '熱愛大自然。技能：聽懂動物的話，能請小鳥或昆蟲幫忙。' },
+            { name: '軟糖小丑', img: '軟糖小丑.jpg', desc: '負責逗大家開心。技能：拋接球，能把嚴肅的守衛逗笑。' },
+            { name: '齒輪機器人', img: '齒輪機器人.jpg', desc: '身體是鐵做的。技能：力大無比，還能修理任何壞掉的東西。' },
+            { name: '影子忍者', img: '影子忍者.jpg', desc: '雖然看起來黑漆漆，但其實是守護者。技能：隱身，幫忙打探消息。' }
+        ];
+        const bossInfo = { name: '大魔王', img: '大魔王.jpg', desc: '魔王因為太孤單、沒有人陪他玩，才會偷走寶石。' };
+        const boxImgs = ['box1.jpg', 'box2.jpg', 'box3.jpg', 'box4.jpg', 'box5.jpg', 'box6.jpg'];
+
+        const lvlNames = [
+            "初學認識除數",
+            "除以 1",
+            "除以 2",
+            "除以 3",
+            "除以 4",
+            "除以 5",
+            "除以 6",
+            "除以 7",
+            "除以 8",
+            "除以 9",
+            "終極隨機挑戰"
+        ];
+
+        let currentLvl=0, curIdx=0, score=0, isRedo=false;
+        let qPool=[], results=[], fixedC=0, pCount=0, currentTotal=0;
+
+        function init() {
+            const grid = document.getElementById('lvlGrid');
+            grid.innerHTML = "";
+            for(let i=1; i<=11; i++) {
+                // 使用 div_lvl_ 確保除數進度與乘數分開儲存
+                const high = localStorage.getItem('div_lvl_'+i) || 0;
+                let star = high == 20 ? "🌟" : (high >= 10 ? "⭐" : "");
+                
+                grid.innerHTML += `
+                    <div class="lvl-card" onclick="startLvl(${i})">
+                        <div style="font-weight:bold; color:var(--cat-orange);">第 ${i} 關</div>
+                        <div style="font-size:14px; font-weight:bold; color:var(--cat-blue); margin: 5px 0;">${lvlNames[i-1]}</div>
+                        <div class="star-box">${star}</div>
+                        <div style="font-size:12px; color:#555;">最高分: ${high}</div>
+                    </div>`;
+            }
+
+            const passedLvl11 = (localStorage.getItem('div_lvl_11') || 0) >= 10;
+            const ownedHeroes = JSON.parse(localStorage.getItem('div_heroes')) || [];
+            const bossCollected = localStorage.getItem('div_boss_collected') === 'true'; 
+            
+            if (ownedHeroes.length >= 9) document.body.classList.add('rainbow-mode');
+            else document.body.classList.remove('rainbow-mode');
+
+            if (passedLvl11) {
+                document.getElementById('normalHomeView').style.display = 'none';
+                document.getElementById('battleScene').style.display = 'block';
+                
+                const battleHeroes = document.getElementById('battleHeroes');
+                battleHeroes.innerHTML = "";
+                characters.forEach(c => { 
+                    battleHeroes.innerHTML += `
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                            <img src="${c.img}" class="hero-img">
+                            <div style="font-size:11px; font-weight:bold; color:white; margin-top:-5px; z-index:10; background:#E65100; border-radius:10px; padding:2px 5px;">${c.name}</div>
+                        </div>`;
+                });
+
+                if(!sessionStorage.getItem('div_victoryShown')) {
+                    setTimeout(() => {
+                        alert("🎉 恭喜小朋友大勝利 🎉\n\n你成功了！你不但拿回了奇幻寶石，還用你的勇敢和善良，幫大魔王找到了朋友！現在，這個王國的所有角色都會永遠守護你！");
+                        sessionStorage.setItem('div_victoryShown', 'true');
+                    }, 1500);
+                }
+            } else {
+                document.getElementById('normalHomeView').style.display = 'block';
+                document.getElementById('battleScene').style.display = 'none';
+                
+                const heroesTitle = document.getElementById('heroesTitle');
+                const collectedHeroes = document.getElementById('collectedHeroes');
+                const collectedBoss = document.getElementById('collectedBoss'); 
+                collectedHeroes.innerHTML = ""; collectedBoss.innerHTML = "";
+                
+                if (ownedHeroes.length > 0 || bossCollected) {
+                    heroesTitle.style.display = "block";
+                    ownedHeroes.forEach(hName => {
+                        let charObj = characters.find(c => c.name === hName);
+                        if (charObj) {
+                            collectedHeroes.innerHTML += `
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <img src="${charObj.img}" class="collected-img" title="${charObj.name}">
+                                    <div style="font-size:13px; font-weight:bold; color:var(--cat-blue); background:white; border:2px solid var(--cat-pink); border-radius:12px; padding:2px 8px; margin-top:-8px; z-index:10; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${charObj.name}</div>
+                                </div>`;
+                        }
+                    });
+                    if (bossCollected) {
+                        collectedBoss.innerHTML = `
+                            <div style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
+                                <img src="${bossInfo.img}" class="collected-img" style="border-color:#E53935;" title="${bossInfo.name}">
+                                <div style="font-size:13px; font-weight:bold; color:white; background:#E53935; border:2px solid #B71C1C; border-radius:12px; padding:2px 8px; margin-top:-8px; z-index:10; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${bossInfo.name}</div>
+                            </div>`;
+                    }
+                } else { heroesTitle.style.display = "none"; }
+
+                const bContainer = document.getElementById('homeBlindBoxes');
+                bContainer.innerHTML = "";
+                if (ownedHeroes.length < 9) {
+                    let randomBoxes = [...boxImgs].sort(() => 0.5 - Math.random()).slice(0, 3);
+                    randomBoxes.forEach(img => { bContainer.innerHTML += `<img src="${img}" class="blind-box-img">`; });
+                }
+            }
+        }
+
+        function startLvl(lvl) {
+            currentLvl=lvl; curIdx=0; score=0; results=[]; isRedo=false;
+            let easy=[], hard=[];
+            let isRandom = (lvl===1 || lvl===11);
+            let fixedDivisor = isRandom ? 0 : lvl-1; // 碟子數量(除數)
+
+            for(let i=1; i<=20; i++) {
+                let d = isRandom ? Math.floor(Math.random()*9)+1 : fixedDivisor;
+                easy.push({ d: d, ans: Math.floor(Math.random()*5)+1 }); // ans = 每個碟子幾塊
+                hard.push({ d: d, ans: Math.floor(Math.random()*5)+6 });
+            }
+            
+            qPool = [...easy.sort(()=>0.5-Math.random()).slice(0,10), ...hard.sort(()=>0.5-Math.random()).slice(0,10)];
+            
+            // --- 預熱頁邏輯 (改為除法) ---
+            let teachD = fixedDivisor === 0 ? 3 : fixedDivisor; // 幾個碟子
+            let teachAns = 4; // 每個碟子分到幾塊
+            let teachTotal = teachD * teachAns; // 總共有幾塊
+            
+            let teachText = `喵～ 挑戰開始前，Teacher Cat 教教你：\n${teachTotal} 除以 ${teachD}，就是把 ${teachTotal} 塊餅乾，平均分給 ${teachD} 個碟子，每個碟子會分到 ${teachAns} 塊喔！也就是 ${teachTotal} ÷ ${teachD} = ${teachAns}！`;
+            
+            if (lvl === 1) {
+                teachText = `喵～ 第一關是把餅乾分到碟子裡喔！\n例如 ${teachTotal} 除以 ${teachD}，就是準備 ${teachD} 個碟子，把 ${teachTotal} 塊餅乾平均放進去，每個碟子會分到 ${teachAns} 塊喔！`;
+            }
+
+            document.getElementById('preLearnFormula').innerText = `${teachTotal} ÷ ${teachD} = ?`;
+            document.getElementById('preLearnText').innerText = teachText;
+            document.getElementById('preLearnAudioBtn').onclick = () => speak(teachText.replace(/\n/g, "，").replace(/÷/g, "除以"));
+            
+            // 動態產生除法圖形視覺化
+            let totalBoxHTML = `<div style="background:white; border:2px dashed var(--cat-orange); border-radius:10px; padding:5px 8px; font-size:24px; letter-spacing:2px;">${"🍪".repeat(teachTotal)}</div>`;
+            let divSignHTML = `<span style="font-size:28px; font-weight:bold; color:var(--cat-pink);">÷</span>`;
+            let platesBoxHTML = `<div style="background:white; border:2px dashed var(--cat-blue); border-radius:10px; padding:5px 8px; font-size:20px; font-weight:bold; color:#03A9F4;">${teachD} 個 🍽️</div>`;
+            let equalSignHTML = `<span style="font-size:28px; font-weight:bold; color:var(--cat-blue);">=</span>`;
+            let ansBoxHTML = `<div style="background:white; border:2px dashed var(--cat-green); border-radius:10px; padding:5px 8px; font-size:24px; letter-spacing:2px;">${"🍪".repeat(teachAns)}</div>`;
+            
+            document.getElementById('preLearnVisual').innerHTML = totalBoxHTML + divSignHTML + platesBoxHTML + equalSignHTML + ansBoxHTML;
+            
+            showPage('preLearnPage');
+        }
+
+        function enterGame() { showPage('gamePage'); loadQ(); }
+
+        function loadQ() {
+            const q = qPool[curIdx];
+            pCount = q.d; // 碟子數量(除數)
+            fixedC = q.ans; // 每個碟子分到幾塊(正確答案)
+            currentTotal = pCount * fixedC; // 餅乾總數
+            
+            const diff = curIdx < 10 ? '淺' : '深';
+            document.getElementById('progressTxt').innerText = `第 ${curIdx+1} 題 / 共 20 題 ${diff}`;
+            
+            if(isRedo) {
+                document.getElementById('redoHeader').style.display = 'block';
+                document.getElementById('progressTxt').style.display = 'none';
+                document.getElementById('topNavBar').style.display = 'none';
+            } else {
+                document.getElementById('redoHeader').style.display = 'none';
+                document.getElementById('progressTxt').style.display = 'block';
+                document.getElementById('topNavBar').style.display = 'flex';
+            }
+
+            document.getElementById('formula').innerText = `${currentTotal} ÷ ${pCount} = ?`;
+            const txt = `有 ${currentTotal} 塊餅乾，平均分給 ${pCount} 個碟子，每個碟子可以分到幾塊？`;
+            document.getElementById('qText').innerText = txt;
+            document.getElementById('qAudio').onclick = () => speak(txt);
+            document.getElementById('feedback').innerHTML = "";
+            document.getElementById('skipBtn').style.display = "none";
+            document.getElementById('formula').style.transform = "scale(1)";
+
+            const inter = document.getElementById('interArea');
+            if(currentLvl === 1 || isRedo) {
+                inter.style.display = 'block';
+                const pool = document.getElementById('pool'); pool.innerHTML = "";
+                for(let i=0; i<currentTotal; i++) pool.innerHTML += `<span class="cookie" draggable="true" ondragstart="drag(event)" id="c${i}">🍪</span>`;
+                const plates = document.getElementById('plates'); plates.innerHTML = "";
+                for(let i=0; i<pCount; i++) plates.innerHTML += `<div class="plate" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`;
+            } else { inter.style.display = 'none'; }
+
+            const opts = document.getElementById('options'); opts.innerHTML = "";
+            let ans = fixedC; // 正確答案是每個碟子分到幾塊
+            let choices = Array.from(new Set([ans, ans+1, ans-1, ans+2])).filter(c=>c>0).sort(()=>0.5-Math.random());
+            choices.forEach(c => {
+                opts.innerHTML += `
+                    <div class="opt-row">
+                        <button class="audio-btn" onclick="speak('${c}')">🔊</button>
+                        <button class="opt-btn" onclick="checkAns(${c})">${c}</button>
+                    </div>`;
+            });
+        }
+
+        function checkAns(val) {
+            const isCorrect = (val === fixedC);
+            const fb = document.getElementById('feedback');
+            
+            if(isCorrect) {
+                speak("太棒了，你答對了！");
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('formula').style.transform = "scale(1.3)";
+                fb.innerHTML = "<span style='color:var(--cat-green)'>🎉 太棒了！答對了！</span>";
+                if(!isRedo) {
+                    results[curIdx] = { q: `${currentTotal}÷${pCount}`, ok: true };
+                    score++; setTimeout(nextQ, 1500);
+                } else { 
+                    if (!results[curIdx].ok) {
+                        results[curIdx].ok = true; score++;
+                        let old = localStorage.getItem('div_lvl_'+currentLvl) || 0;
+                        if(score > old) localStorage.setItem('div_lvl_'+currentLvl, score);
+                    }
+                    setTimeout(showSummary, 1500); 
+                }
+            } else {
+                speak("沒關係，再試一次吧！");
+                fb.innerHTML = "<span style='color:red'>❌ 不對喔，再算一算！</span>";
+                if(!isRedo) {
+                    results[curIdx] = { q: `${currentTotal}÷${pCount}`, ok: false };
+                    document.getElementById('skipBtn').style.display = "block";
+                } else {
+                    alert(`💡 提示：喵～把 ${currentTotal} 塊餅乾平均分到 ${pCount} 個碟子，每個碟子應該有幾塊呢？`);
+                }
+            }
+        }
+
+        function nextQ() { 
+            if(isRedo) return;
+            if (!results[curIdx]) results[curIdx] = { q: `${currentTotal}÷${pCount}`, ok: false };
+            curIdx++; 
+            if(curIdx < 20) loadQ(); else showSummary(); 
+        }
+        function prevQ() { 
+            if(isRedo) return;
+            if (!results[curIdx]) results[curIdx] = { q: `${currentTotal}÷${pCount}`, ok: false };
+            if(curIdx > 0) { curIdx--; loadQ(); } 
+        }
+
+        function showSummary() {
+            isRedo = false; showPage('summaryPage');
+            document.getElementById('finalScore').innerText = `得分：${score} / 20`;
+            document.getElementById('starResult').innerText = score === 20 ? "🌟" : (score >= 10 ? "⭐" : "💪");
+            
+            let old = localStorage.getItem('div_lvl_'+currentLvl) || 0;
+            if(score > old) localStorage.setItem('div_lvl_'+currentLvl, score);
+
+            let boxArea = document.getElementById('blindBoxArea');
+            let boxOpened = localStorage.getItem('div_box_lvl_'+currentLvl);
+            if(score >= 10 && !boxOpened && currentLvl <= 10) {
+                boxArea.style.display = "block";
+            } else { boxArea.style.display = "none"; }
+
+            const list = document.getElementById('summaryList');
+            list.innerHTML = "";
+            results.forEach((r, i) => {
+                list.innerHTML += `
+                    <div style="background:rgba(255, 255, 255, 0.9); padding:12px; margin:8px 0; border-radius:15px; border:2px solid ${r.ok?'#C8E6C9':'#FFCDD2'}; display:flex; justify-content:space-between; cursor:pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="${r.ok?'':'redo('+i+')'}">
+                        <span style="font-weight:bold; color:#333;">第 ${i+1} 題: ${r.q}</span>
+                        <span>${r.ok?'✅':'❌ (重新挑戰)'}</span>
+                    </div>`;
+            });
+            init();
+        }
+
+        function openSelectionModal() {
+            localStorage.setItem('div_box_lvl_'+currentLvl, 'true'); // 標記已開
+            document.getElementById('blindBoxArea').style.display = "none";
+            
+            let random3Boxes = [...boxImgs].sort(() => 0.5 - Math.random()).slice(0, 3);
+            const boxArea = document.getElementById('boxSelectionArea');
+            boxArea.innerHTML = "";
+            
+            boxArea.style.pointerEvents = "auto";
+            random3Boxes.forEach((img, idx) => {
+                boxArea.innerHTML += `<img src="${img}" class="pick-box" id="pickBox${idx}" onclick="selectBox(${idx})">`;
+            });
+            document.getElementById('chooseBoxModal').style.display = 'block';
+        }
+
+        function selectBox(idx) {
+            document.getElementById('boxSelectionArea').style.pointerEvents = "none";
+            speak("登登！");
+            
+            const box = document.getElementById('pickBox'+idx);
+            box.classList.add('box-opening');
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+            
+            setTimeout(() => {
+                document.getElementById('chooseBoxModal').style.display = 'none';
+                revealCharacter();
+            }, 1200);
+        }
+
+        function revealCharacter() {
+            let charData;
+            if (currentLvl === 10) {
+                charData = bossInfo;
+                localStorage.setItem('div_boss_collected', 'true');
+            } else {
+                let owned = JSON.parse(localStorage.getItem('div_heroes')) || [];
+                let available = characters.filter(c => !owned.includes(c.name));
+                if (available.length === 0) available = characters; 
+                charData = available[Math.floor(Math.random() * available.length)];
+                owned.push(charData.name);
+                localStorage.setItem('div_heroes', JSON.stringify(owned));
+            }
+
+            document.getElementById('boxCharImg').src = charData.img;
+            document.getElementById('boxCharName').innerText = charData.name;
+            document.getElementById('boxCharDesc').innerText = charData.desc;
+            
+            document.getElementById('charAudioBtn').onclick = () => { speak(charData.name + "。" + charData.desc); };
+            
+            confetti({ particleCount: 300, spread: 120, origin: { y: 0.6 } });
+            document.getElementById('boxResultModal').style.display = 'block';
+        }
+
+        function redo(i) { isRedo=true; curIdx=i; showPage('gamePage'); loadQ(); }
+        function restartLvl() { startLvl(currentLvl); }
+        function goHome() { showPage('homePage'); init(); }
+        
+        function openTable() {
+            const content = document.getElementById('tableContent');
+            content.innerHTML = "";
+            for(let i=1; i<=10; i++) {
+                content.innerHTML += `<div class="table-item"><span>🐾</span> ${pCount*i} ÷ ${pCount} = ${i}</div>`;
+            }
+            document.getElementById('tableModal').style.display = 'block';
+        }
+        
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showPage(p) { document.querySelectorAll('.page').forEach(el=>el.classList.remove('active-page')); document.getElementById(p).classList.add('active-page'); window.scrollTo(0,0); }
+        function clearData() { if(confirm("確定要清除所有除數遊戲的記錄與解救的英雄嗎？")) { localStorage.clear(); sessionStorage.clear(); init(); } }
+        function speak(t) { const m = new SpeechSynthesisUtterance(t); m.lang = 'zh-HK'; window.speechSynthesis.speak(m); }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+        
+        function drop(e) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text");
+            
+            let targetElement = e.target;
+            if (targetElement.classList.contains("cookie")) { targetElement = targetElement.parentElement; }
+            
+            if(targetElement.classList.contains("plate")) {
+                targetElement.appendChild(document.getElementById(data));
+                
+                const plates = document.querySelectorAll('.plate');
+                const fb = document.getElementById('feedback');
+                
+                // 檢查是否全部碟子都放滿了對應的餅乾
+                if(Array.from(plates).every(p => p.children.length === fixedC)) {
+                    if (!fb.innerHTML.includes("餅乾分好了") && !fb.innerHTML.includes("太棒了")) {
+                        fb.innerHTML = "<span style='color:var(--cat-blue)'>✅ 餅乾分好了！現在請點擊下方的正確答案！</span>";
+                        speak("餅乾分好了！現在請選擇正確的答案！");
+                    }
+                }
+            }
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
