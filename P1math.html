@@ -8,7 +8,7 @@
     <!-- 加入原有的煙火特效 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- 🌟 新增：解決手機/平板觸控拖曳不順暢的專用套件 -->
+    <!-- 解決手機/平板觸控拖曳不順暢的專用套件 -->
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
 
     <style>
@@ -33,10 +33,12 @@
         .game-box { background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border: 4px solid #FFE0B2; }
         .formula { font-size: 40px; font-weight: bold; color: var(--cat-orange); margin: 10px 0; transition: transform 0.3s; }
         
-        .cookie-pool { background: #FFFDE7; padding: 10px; border-radius: 15px; min-height: 60px; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; border: 2px dashed #FFD54F; margin: 10px 0; }
-        .plate-area { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .plate { width: 65px; height: 65px; background: #E1F5FE; border: 2px dashed var(--cat-blue); border-radius: 50%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; }
-        .cookie { font-size: 26px; cursor: grab; touch-action: none; } /* touch-action: none 確保手機拖拉時畫面不會跟著捲動 */
+        /* 改善拖拉區域：加大間距、放大碟子與餅乾 */
+        .cookie-pool { background: #FFFDE7; padding: 15px; border-radius: 15px; min-height: 70px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; border: 2px dashed #FFD54F; margin: 10px 0; }
+        .plate-area { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; padding: 10px; min-height: 120px; }
+        .plate { min-width: 110px; min-height: 110px; background: #E1F5FE; border: 3px dashed var(--cat-blue); border-radius: 20px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; padding: 10px; box-sizing: border-box; box-shadow: inset 0 0 10px rgba(3, 169, 244, 0.15); transition: transform 0.2s; }
+        .cookie { font-size: 30px; cursor: grab; touch-action: none; margin: 3px; transition: transform 0.1s; }
+        .cookie:active { transform: scale(1.2); }
 
         .opt-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .opt-btn { flex-grow: 1; background: var(--cat-green); color: white; border: none; padding: 15px; border-radius: 15px; font-size: 22px; font-weight: bold; box-shadow: 0 4px 0 #2E7D32; cursor: pointer; }
@@ -133,7 +135,8 @@
             <div class="blind-box-container" id="homeBlindBoxes"></div>
         </div>
 
-        <div class="subtitle" style="margin-top:15px;">請選擇關卡開始挑戰（隨機20題）！</div>
+        <!-- 🌟 更新：更改了這裡的提示文字 🌟 -->
+        <div class="subtitle" style="margin-top:15px;">請選擇關卡開始挑戰（隨機20題）！通關後可以打開一個寶盒,解放英雄！</div>
         <div class="subtitle" style="color:var(--cat-orange);">滿分20分= 🌟大星星 | 合格10分= ⭐小星星</div>
         
         <div class="lvl-grid" id="lvlGrid"></div>
@@ -141,6 +144,29 @@
         <button class="nav-btn" style="width:200px; margin: 10px auto;" onclick="clearData()">🗑 清除所有記錄</button>
         <br>
         <button class="action-btn" onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'">返回小朋友學習大冒險 🚀</button>
+    </div>
+
+    <!-- Teacher Cat 預熱教學頁面 (含餅乾圖示) -->
+    <div id="preLearnPage" class="page">
+        <div class="game-box" style="margin-top: 50px; text-align: center;">
+            <img src="cat.jpeg" style="width:100px; height:100px; border-radius:50%; border:5px solid var(--cat-orange); margin-top:-60px; background:white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <h2 style="color:var(--cat-orange); margin-top:10px;">🐱 Teacher Cat 小學堂</h2>
+            
+            <div style="background:#FFFDE7; padding:20px; border-radius:15px; border:2px dashed #FFD54F; margin:20px 0;">
+                <p style="font-size:32px; font-weight:bold; color:var(--cat-pink); margin:10px 0;" id="preLearnFormula"></p>
+                
+                <!-- 餅乾圖形視覺化區域 -->
+                <div id="preLearnVisual" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin-bottom: 20px;"></div>
+
+                <div style="display:flex; align-items:flex-start; gap:10px; text-align:left;">
+                    <button class="audio-btn" id="preLearnAudioBtn" style="flex-shrink:0; margin-top:2px; width:45px; height:45px; font-size:20px;">🔊</button>
+                    <p style="font-size:16px; color:#5D4037; font-weight:bold; line-height:1.6; margin:0;" id="preLearnText"></p>
+                </div>
+            </div>
+            
+            <button class="action-btn" style="width:100%; font-size:20px; padding:15px; background:var(--cat-green);" onclick="enterGame()">🚀 我準備好了，開始挑戰！</button>
+            <button class="action-btn cancel-btn" style="width:100%; margin-top:10px;" onclick="goHome()">先回主頁</button>
+        </div>
     </div>
 
     <!-- 遊戲頁面 -->
@@ -257,6 +283,20 @@
         const bossInfo = { name: '大魔王', img: '大魔王.jpg', desc: '魔王因為太孤單、沒有人陪他玩，才會偷走寶石。' };
         const boxImgs = ['box1.jpg', 'box2.jpg', 'box3.jpg', 'box4.jpg', 'box5.jpg', 'box6.jpg'];
 
+        const lvlNames = [
+            "初學認識乘數",
+            "1 的乘數",
+            "2 的乘數",
+            "3 的乘數",
+            "4 的乘數",
+            "5 的乘數",
+            "6 的乘數",
+            "7 的乘數",
+            "8 的乘數",
+            "9 的乘數",
+            "終極隨機挑戰"
+        ];
+
         let currentLvl=0, curIdx=0, score=0, isRedo=false;
         let qPool=[], results=[], fixedC=0, pCount=0;
 
@@ -266,9 +306,11 @@
             for(let i=1; i<=11; i++) {
                 const high = localStorage.getItem('math_lvl_'+i) || 0;
                 let star = high == 20 ? "🌟" : (high >= 10 ? "⭐" : "");
+                
                 grid.innerHTML += `
                     <div class="lvl-card" onclick="startLvl(${i})">
-                        <div style="font-weight:bold; color:var(--cat-orange);">第 ${i===11?'11 (終極)':i} 關</div>
+                        <div style="font-weight:bold; color:var(--cat-orange);">第 ${i} 關</div>
+                        <div style="font-size:14px; font-weight:bold; color:var(--cat-blue); margin: 5px 0;">${lvlNames[i-1]}</div>
                         <div class="star-box">${star}</div>
                         <div style="font-size:12px; color:#555;">最高分: ${high}</div>
                     </div>`;
@@ -360,7 +402,42 @@
             }
             
             qPool = [...easy.sort(()=>0.5-Math.random()).slice(0,10), ...hard.sort(()=>0.5-Math.random()).slice(0,10)];
-            showPage('gamePage'); loadQ();
+            
+            // --- 預熱頁邏輯 (含圖形視覺化) ---
+            let teachM = m === 0 ? 3 : m; // 若是隨機關卡(第1或11關)，預設用 3 做示範
+            let p = 3; 
+            let sumArray = Array(p).fill(teachM);
+            let sumStr = sumArray.join(" + ");
+            
+            let teachText = `喵～ 挑戰開始前，Teacher Cat 教教你：\n${teachM} 乘以 ${p}，就是 ${p} 個 ${teachM} 加起來，也就是 ${sumStr} = ${teachM * p} 喔！`;
+            
+            if (lvl === 1) {
+                teachText = `喵～ 第一關是把餅乾分到碟子裡喔！\n例如 ${teachM} 乘以 ${p}，就是準備 ${p} 個碟子，每個放 ${teachM} 塊餅乾，也就是 ${sumStr} = ${teachM * p} 喔！`;
+            }
+
+            document.getElementById('preLearnFormula').innerText = `${teachM} x ${p} = ?`;
+            document.getElementById('preLearnText').innerText = teachText;
+            document.getElementById('preLearnAudioBtn').onclick = () => speak(teachText.replace(/\n/g, "，"));
+            
+            // 動態產生餅乾圖案
+            let groupCookies = "🍪".repeat(teachM);
+            let totalCookies = "🍪".repeat(teachM * p);
+            
+            let groupBoxHTML = `<div style="background:white; border:2px dashed var(--cat-orange); border-radius:10px; padding:5px 8px; font-size:24px; letter-spacing:2px;">${groupCookies}</div>`;
+            let plusSignHTML = `<span style="font-size:28px; font-weight:bold; color:var(--cat-pink);">+</span>`;
+            let equalSignHTML = `<span style="font-size:28px; font-weight:bold; color:var(--cat-blue);">=</span>`;
+            let totalBoxHTML = `<div style="background:white; border:2px dashed var(--cat-blue); border-radius:10px; padding:5px 8px; font-size:24px; letter-spacing:2px;">${totalCookies}</div>`;
+            
+            let visualHTML = Array(p).fill(groupBoxHTML).join(plusSignHTML) + equalSignHTML + totalBoxHTML;
+            document.getElementById('preLearnVisual').innerHTML = visualHTML;
+            
+            showPage('preLearnPage');
+        }
+
+        // 從預熱頁進入實際遊戲
+        function enterGame() {
+            showPage('gamePage');
+            loadQ();
         }
 
         function loadQ() {
@@ -413,6 +490,7 @@
         function checkAns(val) {
             const isCorrect = (val === fixedC * pCount);
             const fb = document.getElementById('feedback');
+            
             if(isCorrect) {
                 speak("太棒了，你答對了！");
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -561,13 +639,29 @@
 
         function allowDrop(e) { e.preventDefault(); }
         function drag(e) { e.dataTransfer.setData("text", e.target.id); }
+        
         function drop(e) {
             e.preventDefault();
             const data = e.dataTransfer.getData("text");
-            if(e.target.className === "plate") {
-                e.target.appendChild(document.getElementById(data));
+            
+            let targetElement = e.target;
+            if (targetElement.classList.contains("cookie")) {
+                targetElement = targetElement.parentElement;
+            }
+            
+            if(targetElement.classList.contains("plate")) {
+                targetElement.appendChild(document.getElementById(data));
+                
                 const plates = document.querySelectorAll('.plate');
-                if(Array.from(plates).every(p => p.children.length === fixedC)) checkAns(fixedC * pCount);
+                const fb = document.getElementById('feedback');
+                
+                // 檢查是否全部放對，如果放對了，給予友善提示
+                if(Array.from(plates).every(p => p.children.length === fixedC)) {
+                    if (!fb.innerHTML.includes("餅乾分好了") && !fb.innerHTML.includes("太棒了")) {
+                        fb.innerHTML = "<span style='color:var(--cat-blue)'>✅ 餅乾分好了！現在請點擊下方的正確答案！</span>";
+                        speak("餅乾分好了！現在請選擇正確的答案！");
+                    }
+                }
             }
         }
         window.onload = init;
