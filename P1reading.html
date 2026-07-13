@@ -40,11 +40,12 @@
         position: relative;
     }
 
-    /* 左上角圖標設計 */
+    /* 左上角圖標與右上角進度按鈕設計 */
     .top-logo-bar {
         display: flex;
-        justify-content: flex-start;
-        margin-bottom: -20px;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: -15px;
     }
     .brand-logo {
         width: 75px;
@@ -56,6 +57,20 @@
         z-index: 10;
         background-color: #fff;
     }
+    .progress-toggle-btn {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        border: none;
+        border-radius: 15px;
+        padding: 12px 20px;
+        color: #fff;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+        transition: transform 0.2s;
+        margin-top: 10px;
+    }
+    .progress-toggle-btn:hover { transform: scale(1.05); }
 
     h1 {
         color: var(--accent);
@@ -64,244 +79,171 @@
         margin-top: 10px;
     }
     
-    /* 進度記錄區 */
-    .progress-section {
-        background: #FFF5F7;
-        border: 3px dashed #FFB3B3;
-        border-radius: 20px;
-        padding: 20px;
-        margin: 20px 0;
+    /* 進度記錄區 (改為 Modal 彈出視窗) */
+    #progress-modal {
+        display: none; position: fixed; z-index: 10000; left: 0; top: 0;
+        width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); 
+        backdrop-filter: blur(3px); align-items: center; justify-content: center;
     }
-    .progress-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 15px;
+    .progress-modal-content {
+        background: #FFF5F7; border: 4px dashed #FFB3B3; border-radius: 25px; 
+        padding: 30px; width: 90%; max-width: 600px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; position: relative;
+        max-height: 85vh; overflow-y: auto; animation: pop 0.3s ease-out;
     }
-    .progress-header h2 {
-        color: var(--accent);
-        margin: 0;
+    .close-progress {
+        position: absolute; top: 10px; right: 20px; color: #FF9A9E;
+        font-size: 35px; font-weight: bold; cursor: pointer; transition: 0.2s;
     }
+    .close-progress:hover { color: #FF6B6B; }
+
     .clear-btn {
-        background: #FF6B6B;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 15px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: transform 0.1s;
+        background: #FF6B6B; color: white; border: none; padding: 10px 20px;
+        border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 1.1em;
+        transition: transform 0.1s; margin-bottom: 20px; box-shadow: 0 3px 0 #D9534F;
     }
-    .clear-btn:active { transform: scale(0.95); }
+    .clear-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #D9534F; }
     
-    .stars-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
-    .star-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 60px;
-    }
-    .star-label {
-        font-size: 0.9em;
-        color: #777;
-        font-weight: bold;
-    }
-    .star {
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .star.dim {
-        font-size: 1.8em;
-        color: #ccc;
-        filter: grayscale(100%);
-    }
+    .stars-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .star-wrapper { display: flex; flex-direction: column; align-items: center; width: 60px; }
+    .star-label { font-size: 0.9em; color: #777; font-weight: bold; }
+    .star { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .star.dim { font-size: 1.8em; color: #ccc; filter: grayscale(100%); }
     .star.lit {
-        font-size: 3em;
-        color: #FFD700;
-        text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-        transform: scale(1.1);
-        animation: pop 0.5s ease-out;
+        font-size: 3em; color: #FFD700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        transform: scale(1.1); animation: pop 0.5s ease-out;
     }
-    @keyframes pop {
-        0% { transform: scale(0); }
-        80% { transform: scale(1.3); }
-        100% { transform: scale(1.1); }
-    }
+    @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
     /* 分類標題 */
     .category-header {
-        font-size: 1.5em;
-        color: var(--accent);
-        margin: 30px 0 15px 0;
-        font-weight: bold;
-        text-align: left;
-        background: #FFF0F2;
-        padding: 10px 20px;
-        border-radius: 15px;
-        border-left: 8px solid var(--primary);
+        font-size: 1.4em; color: var(--accent); margin: 30px 0 10px 0;
+        font-weight: bold; text-align: left; background: #FFF0F2; padding: 10px 20px;
+        border-radius: 15px; border-left: 8px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
-    /* 首頁關卡網格 */
+    /* ✨ 精緻縮小版「可愛圖書」按鈕設計 ✨ */
     .level-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
-        margin-top: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 20px 15px;
+        margin-top: 20px;
+        padding: 5px;
     }
     .level-btn {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        background: linear-gradient(135deg, #FFB1B5 0%, #FFD1D4 100%);
         border: none;
-        border-radius: 15px;
-        padding: 20px 10px;
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #fff;
+        border-radius: 4px 14px 14px 4px; /* 書本圓角 */
+        border-left: 10px solid #FF8E93; /* 書脊 */
+        padding: 15px 6px 12px 6px;
+        color: #333;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 4px 6px 10px rgba(255, 154, 158, 0.4), inset -2px 0 4px rgba(255,255,255,0.6);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
         position: relative; 
+        min-height: 125px; 
+    }
+    .level-btn::before {
+        content: ''; position: absolute; top: 4px; bottom: 4px; right: 2px;
+        width: 3px; background: rgba(255, 255, 255, 0.7); border-radius: 3px;
     }
     .level-btn:hover {
-        transform: translateY(-5px) scale(1.05);
-        box-shadow: 0 8px 20px rgba(255, 154, 158, 0.6);
+        transform: translateY(-5px) scale(1.05) rotate(-2deg);
+        box-shadow: 8px 12px 20px rgba(255, 154, 158, 0.5);
     }
     .level-btn.completed {
-        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-    }
-
-    /* 首頁關卡上的小發音按鈕 */
-    .home-audio-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #FFE259;
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        font-size: 0.9em;
-        cursor: pointer;
-        box-shadow: 0 3px 0 #D4B83C;
-        transition: transform 0.1s;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2; 
-    }
-    .home-audio-btn:active {
-        transform: translateY(3px);
-        box-shadow: 0 0 0 #D4B83C;
+        background: linear-gradient(135deg, #FFE873 0%, #FFD700 100%);
+        border-left-color: #E5B800;
+        box-shadow: 4px 6px 10px rgba(255, 215, 0, 0.4);
     }
     
-    /* 返回主連結按鈕 */
-    .return-main-btn {
-        display: inline-block;
-        margin-top: 40px;
-        padding: 15px 40px;
+    /* 圖書左上角的精美順序徽章 */
+    .book-number {
+        position: absolute; top: -8px; left: -8px;
         background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%);
-        color: white;
-        text-decoration: none;
-        font-size: 1.4em;
-        font-weight: bold;
-        border-radius: 20px;
-        box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
-        transition: transform 0.2s, box-shadow 0.2s;
+        color: white; width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1em; font-weight: bold; border: 3px solid #fff;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2); z-index: 3;
     }
-    .return-main-btn:hover {
-        transform: translateY(-5px) scale(1.05);
-        box-shadow: 0 8px 25px rgba(161, 140, 209, 0.6);
+    .level-btn.completed .book-number {
+        background: linear-gradient(135deg, #5BC994 0%, #84E7B2 100%);
     }
+
+    .home-audio-btn {
+        position: absolute; top: 6px; right: 8px; background: #FFF; border: none;
+        border-radius: 50%; width: 28px; height: 28px; font-size: 0.8em; cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s; display: flex;
+        justify-content: center; align-items: center; z-index: 3; 
+    }
+    .home-audio-btn:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0.1); }
+    
+    /* 底部按鈕區 */
+    .bottom-buttons { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 35px; }
+    
+    .return-main-btn {
+        display: inline-block; padding: 15px 40px;
+        background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%); color: white;
+        text-decoration: none; font-size: 1.4em; font-weight: bold; border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .return-main-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 8px 25px rgba(161, 140, 209, 0.6); }
+
+    /* WhatsApp 群組按鈕 */
+    .whatsapp-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 15px 40px; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white; text-decoration: none; font-size: 1.3em; font-weight: bold; border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .whatsapp-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6); }
 
     /* 遊戲畫面 */
     #game-screen { display: none; padding: 15px; }
     
-    /* 文章閱讀區 */
     #reading-area {
-        background: #fff;
-        border: 4px dashed var(--secondary);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 25px;
+        background: #fff; border: 4px dashed var(--secondary); border-radius: 20px;
+        padding: 25px; margin-bottom: 25px;
     }
+
+    /* ✨ 列印按鈕設計 ✨ */
+    .print-btn {
+        background: linear-gradient(135deg, #FFE259 0%, #FFA751 100%);
+        color: #333; border: none; padding: 12px 25px;
+        border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 1.2em;
+        transition: transform 0.1s; box-shadow: 0 4px 10px rgba(255, 167, 81, 0.4); 
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .print-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(255, 167, 81, 0.4); }
     
-    /* 點擊提示特效 */
     #story-image {
-        max-width: 100%;
-        max-height: 400px;
-        border-radius: 15px;
-        object-fit: contain;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        cursor: pointer;
+        max-width: 100%; max-height: 400px; border-radius: 15px; object-fit: contain;
+        margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
     }
-    #story-image:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
+    #story-image:hover { transform: scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
     
-    /* 圖片放大的模態框 (Modal) 樣式 */
     #image-modal {
-        display: none; 
-        position: fixed; 
-        z-index: 10000; 
-        padding-top: 40px; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0,0,0,0.85); 
-        backdrop-filter: blur(5px);
-        cursor: pointer;
+        display: none; position: fixed; z-index: 10000; padding-top: 40px; left: 0; top: 0;
+        width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); 
+        backdrop-filter: blur(5px); cursor: pointer;
     }
     .modal-content {
-        margin: auto;
-        display: block;
-        max-width: 95%;
-        max-height: 85vh;
-        border-radius: 15px;
-        box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-        animation: zoomIn 0.3s ease;
-        object-fit: contain;
+        margin: auto; display: block; max-width: 95%; max-height: 85vh; border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease; object-fit: contain;
     }
-    .close-modal {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 50px;
-        font-weight: bold;
-        transition: 0.3s;
-    }
+    .close-modal { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 50px; font-weight: bold; transition: 0.3s; }
     
-    /* 連貫文章樣式設計 */
     #story-text-container {
-        background: #FDFBFB;
-        border-radius: 15px;
-        padding: 25px;
-        border: 2px solid #E2E2EC;
-        text-align: left;
-        line-height: 2;
-        font-size: 1.4em;
-        color: #444;
+        background: #FDFBFB; border-radius: 15px; padding: 25px; border: 2px solid #E2E2EC;
+        text-align: left; line-height: 2; font-size: 1.4em; color: #444;
     }
     
     .story-paragraph { text-indent: 0; }
     .sentence-span { border-radius: 8px; transition: background 0.2s; padding: 2px 4px; display: inline; }
     .sentence-span:hover { background: #F4F4F9; }
 
-    /* 安插在句子旁的小發音按鈕 */
     .inline-audio-btn {
         background: #FFE259; border: none; border-radius: 50%; width: 32px; height: 32px;
         font-size: 0.9em; cursor: pointer; box-shadow: 0 3px 0 #D4B83C; transition: transform 0.1s;
@@ -309,7 +251,6 @@
     }
     .inline-audio-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #D4B83C; }
 
-    /* 題目與導航區 */
     .question-header-bar {
         display: flex; justify-content: space-between; align-items: center;
         background: #f1e9ff; padding: 10px 20px; border-radius: 15px; margin-bottom: 15px;
@@ -345,6 +286,13 @@
     .writing-header {
         font-size: 1.4em; font-weight: bold; color: var(--accent); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
     }
+    
+    /* 畫板上方的題目提示框 */
+    .writing-question-prompt {
+        background: #FFF; border: 2px dashed var(--primary); padding: 15px 20px;
+        border-radius: 15px; margin-bottom: 20px; font-size: 1.3em; font-weight: bold;
+        color: #444; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px;
+    }
 
     .tool-btn {
         padding: 10px 20px; font-size: 1.2em; border: 2px solid #FFC0CB; border-radius: 12px;
@@ -352,10 +300,9 @@
     }
     .tool-btn.active { border-color: var(--accent); background: #f1e9ff; font-weight: bold; color: var(--accent); box-shadow: 0 4px 10px rgba(161, 140, 209, 0.3); }
 
-    /* ✨ 美化後的畫板 (Canvas) 樣式 - 加入 touch-action: none 防止滑動 ✨ */
     .drawing-canvas {
         width: 100%; max-width: 100%; border: 4px solid var(--accent); border-radius: 20px;
-        cursor: crosshair; touch-action: none; /* 防止在畫板上畫畫時螢幕滾動 */
+        cursor: crosshair; touch-action: none; 
         box-shadow: 0 8px 25px rgba(161, 140, 209, 0.2); background-color: #FFFDFD;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100'%3E%3Cline x1='0' y1='95' x2='100%25' y2='95' stroke='%23FFB3B3' stroke-width='4' stroke-dasharray='12, 12'/%3E%3C/svg%3E");
         background-size: 100% 100px; transition: height 0.3s;
@@ -383,9 +330,10 @@
     .q-nav-home { background: #FF9A9E; }
 
     .settlement-btns { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
+    
     .brand-footer { margin-top: 40px; padding-top: 25px; border-top: 3px dashed var(--secondary); text-align: center; }
     .brand-footer h3 { color: var(--accent); font-size: 1.5em; margin-bottom: 15px; }
-    .social-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: 1.1em; }
+    .social-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: 1.1em; margin-bottom: 20px; }
     .social-links a { color: #FF758C; text-decoration: none; font-weight: bold; padding: 5px 10px; background: #FFF0F2; border-radius: 10px; transition: all 0.2s; }
     .social-links a:hover { background: #FF9A9E; color: #fff; }
     .social-links span { color: #FF758C; font-weight: bold; padding: 5px 10px; background: #FFF0F2; border-radius: 10px; }
@@ -400,24 +348,39 @@
 <div class="container">
     <div class="top-logo-bar">
         <img src="cat.jpeg" alt="Teacher Cat Logo" class="brand-logo" onerror="this.style.display='none'">
+        <!-- 右上角進度按鈕 -->
+        <button class="progress-toggle-btn" onclick="toggleProgressModal()">🏆 學習進度</button>
+    </div>
+
+    <!-- 學習進度 Modal 彈出視窗 -->
+    <div id="progress-modal" onclick="if(event.target===this) toggleProgressModal()">
+        <div class="progress-modal-content">
+            <span class="close-progress" onclick="toggleProgressModal()">&times;</span>
+            <h2 style="color: var(--accent); margin-top: 0;">⭐ 學習進度記錄 ⭐</h2>
+            <p style="color: #666; margin-bottom: 20px;">看看你收集了多少顆美麗的星星！</p>
+            <div class="stars-container" id="stars-display"></div>
+            <div style="margin-top: 30px; border-top: 2px dashed #FFB3B3; padding-top: 20px;">
+                <button class="clear-btn" onclick="clearProgress()">🗑️ 清除所有記錄</button>
+            </div>
+        </div>
     </div>
 
     <!-- 首頁 -->
     <div id="home-screen">
         <h1>🌟 小一中文閱讀挑戰 🌟</h1>
-        <div class="progress-section">
-            <div class="progress-header">
-                <h2>⭐ 學習進度 (Progress Record) ⭐</h2>
-                <button class="clear-btn" onclick="clearProgress()">🗑️ 清除記錄</button>
-            </div>
-            <div class="stars-container" id="stars-display"></div>
-        </div>
-        <p style="font-size: 1.3em;">請點擊下面的關卡，先看故事再挑戰！</p>
+        
+        <p style="font-size: 1.3em; margin-top: 30px;">👉 請點擊下面的「故事書」，先看故事再挑戰！</p>
+        
+        <!-- 自動分類：80字以下 -->
         <div class="category-header">🌱 輕鬆小故事 (80字以下)</div>
         <div class="level-grid" id="grid-short"></div>
+        
+        <!-- 自動分類：80字以上 -->
         <div class="category-header">🌳 奇趣大冒險 (80字以上)</div>
         <div class="level-grid" id="grid-long"></div>
-        <div>
+        
+        <!-- 底部按鈕區：返回按鈕 -->
+        <div class="bottom-buttons">
             <a href="https://cat123teacher.github.io/chinese/main.html" class="return-main-btn">🚀 返回小朋友學習大冒險</a>
         </div>
     </div>
@@ -425,7 +388,12 @@
     <!-- 遊戲畫面 -->
     <div id="game-screen">
         <div id="reading-area">
-            <h2 id="level-title" style="color: #FF9A9E; margin-top: 0;"></h2>
+            <!-- ✨ 標題列與列印圖片按鈕 ✨ -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 id="level-title" style="color: #FF9A9E; margin: 0;"></h2>
+                <button class="print-btn" onclick="printImageOnly()">🖨️ 列印此文章圖片</button>
+            </div>
+            
             <div style="font-size: 1.1em; color: #888; margin-bottom: 10px;">👇 點擊圖片可以放大看清楚喔！ 👇</div>
             <img id="story-image" src="" alt="故事圖片載入中..." onclick="openModal()">
             <div id="story-text-container"></div>
@@ -441,7 +409,7 @@
         </div>
     </div>
 
-    <!-- 最下方社群媒體連結 -->
+    <!-- 最下方社群媒體連結與 WhatsApp -->
     <div class="brand-footer">
         <h3>🐾 Teacher Cat 的快樂AI教室 🐾</h3>
         <div class="social-links">
@@ -452,32 +420,94 @@
             <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
             <span>🎵 抖音: 74254902683</span>
         </div>
+        <div style="margin-top: 15px;">
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="whatsapp-btn" style="font-size: 1.1em; padding: 12px 25px;">💬 點擊加入 WhatsApp 互動教學分享群組</a>
+        </div>
     </div>
 </div>
 
 <div id="image-modal" onclick="closeModal()">
     <span class="close-modal">&times;</span>
     <img class="modal-content" id="expanded-image">
-    <div class="modal-tip">💡 點擊畫面任意處關閉</div>
+    <div class="modal-tip" style="color: white; font-size: 1.2em; margin-top: 10px;">💡 點擊畫面任意處關閉</div>
 </div>
 
 <script>
-// 14個中文關卡的資料庫
+// --- 終極大圖庫！完美匯集 70 篇全關卡！ ---
 const gameData = [
-    { id: 1, icon: '🦥', lang: 'zh', image: 'IMG_3100.JPEG', title: "1. 樹懶寶寶", story: ["動物園裡，一隻超級可愛的樹懶寶寶出生囉！", "牠每天都緊緊抱著媽媽的肚子，在大樹上慢吞吞地移動。", "小樹懶最喜歡一邊睡懶覺、一邊吃綠色的樹葉，模樣真的太萌了！"], q: [{ q: "樹懶寶寶緊緊抱著誰？", o: ["樹懶寶寶緊緊抱著媽媽的肚子。", "樹懶寶寶緊緊抱著爸爸的腿。", "樹懶寶寶緊緊抱著樹枝。"], a: 0 }, { q: "樹懶移動得快嗎？", o: ["樹懶在大樹上慢吞吞地移動。", "樹懶在大樹上移動得非常快。", "樹懶在大樹上用飛的移動。"], a: 0 }, { q: "樹懶寶寶喜歡吃什麼？", o: ["樹懶寶寶喜歡吃綠色的樹葉。", "樹懶寶寶喜歡吃紅色的蘋果。", "樹懶寶寶喜歡吃黃色的香蕉。"], a: 0 }] },
-    { id: 2, icon: '🐘', lang: 'zh', image: 'IMG_3101.JPEG', title: "2. 象寶寶玩泥巴", story: ["今天在動物園裡，象寶寶開心極了！", "牠跟媽媽玩起了泥巴大戰。", "象媽媽溫柔地用鼻子把泥巴噴在寶寶身上，", "牠們互相噴灑，玩得全身髒兮兮的，但是非常快樂！"], q: [{ q: "象寶寶在哪裡玩？", o: ["象寶寶在動物園裡玩。", "象寶寶在學校裡玩。", "象寶寶在超級市場裡玩。"], a: 0 }, { q: "象寶寶和媽媽玩什麼？", o: ["象寶寶和媽媽玩泥巴大戰。", "象寶寶和媽媽玩捉迷藏。", "象寶寶和媽媽玩皮球。"], a: 0 }, { q: "媽媽用什麼把泥巴噴在寶寶身上？", o: ["媽媽用鼻子把泥巴噴在寶寶身上。", "媽媽用腳把泥巴噴在寶寶身上。", "媽媽用尾巴把泥巴噴在寶寶身上。"], a: 0 }] },
-    { id: 3, icon: '🐢', lang: 'zh', image: 'IMG_3112.JPEG', title: "3. 巴迪救海龜", story: ["這隻勇敢的小狗叫做「巴迪」，", "牠在海邊游泳時，發現了一隻迷路的小海龜寶寶。", "巴迪沒有吃掉牠，而是輕輕地咬著牠，帶牠回到海裡。", "巴迪真是一隻善良的好狗！"], q: [{ q: "這隻勇敢的小狗叫什麼名字？", o: ["這隻勇敢的小狗叫巴迪。", "這隻勇敢的小狗叫小白。", "這勇敢的小狗叫旺財。"], a: 0 }, { q: "小狗在海邊發現了誰？", o: ["小狗在海邊發現了一隻迷路的小海龜寶寶。", "小狗在海邊發現了一條大魚。", "小狗在海邊發現了一隻螃蟹。"], a: 0 }, { q: "巴迪對小海龜做了什麼？", o: ["巴迪輕輕咬著牠，帶牠回到海裡。", "巴迪把小海龜吃掉了。", "巴迪不理小海龜。"], a: 0 }] },
-    { id: 4, icon: '🐸', lang: 'zh', image: 'IMG_3113.JPEG', title: "4. 生菜裡的小青蛙", story: ["媽媽在廚房打開一袋新鮮的生菜沙拉時，驚訝地發現裡面竟然躲著一隻綠色的小青蛙！", "這隻幸運的小青蛙在菜葉裡睡得飽飽的，還對著大家瞇瞇笑呢！"], q: [{ q: "媽媽在廚房打開了什麼？", o: ["媽媽在廚房打開了一袋新鮮的生菜沙拉。", "媽媽在廚房打開了一盒餅乾。", "媽媽在廚房打開了一瓶牛奶。"], a: 0 }, { q: "媽媽驚訝地發現裡面躲著什麼？", o: ["媽媽驚訝地發現裡面躲著一隻綠色的小青蛙。", "媽媽驚訝地發現裡面躲著一隻小蟲。", "媽媽驚訝地發現裡面躲著一塊石頭。"], a: 0 }, { q: "小青蛙在菜葉裡做什麼？", o: ["小青蛙在菜葉裡睡得飽飽的。", "小青蛙在菜葉裡跳來跳去。", "小青蛙在菜葉裡吃菜葉。"], a: 0 }] },
-    { id: 5, icon: '🦁', lang: 'zh', image: 'IMG_3102.PNG', title: "1. 獅子的冰涼驚喜", story: ["快樂新聞：倫敦動物園的冰涼驚喜", "今天是熱熱的夏天！倫敦動物園的獅子們好熱呀。", "管理員叔叔送給他們大大的冰棒！", "這些冰棒是由獅子喜歡的紅紅果汁和肉汁做成的。", "獅子們用舌頭大口大口地舔，好涼快、好開心呀！", "這真是最有趣的消暑方法！"], q: [{ q: "獅子在哪個動物園？", o: ["獅子在倫敦動物園。", "獅子在紐約動物園。", "獅子在東京動物園。"], a: 0 }, { q: "天氣很熱時，獅子在吃什麼？", o: ["天氣很熱時，獅子在吃大大的冰棒。", "天氣很熱時，獅子在吃熱狗。", "天氣很熱時，獅子在吃麵包。"], a: 0 }, { q: "獅子的冰棒是什麼顏色的？", o: ["獅子的冰棒是紅紅顏色的。", "獅子的冰棒是藍色的。", "獅子的冰棒是綠色的。"], a: 0 }, { q: "冰棒是誰送給獅子們的？", o: ["管理員叔叔送給他們的。", "警察叔叔送給他們的。", "醫生叔叔送給他們的。"], a: 0 }, { q: "冰棒裡面有什麼味道？", o: ["裡面有紅紅果汁和肉汁。", "裡面有蘋果汁和牛奶。", "裡面有葡萄汁和糖果。"], a: 0 }] },
-    { id: 6, icon: '🐹', lang: 'zh', image: 'IMG_3103.PNG', title: "2. 飛機上的天竺鼠", story: ["快樂新聞：飛機上的奇特乘客", "今天是特別的一天！有一家好有趣的航空公司。", "這架飛機的乘客不是人，而是幾十隻可愛的小天竺鼠！", "牠們坐在特製的小座位上，吃著小胡蘿蔔和乾草，", "一路上開心地發出『吱吱』聲。", "大家都說：『這真是最可愛的飛行！』"], q: [{ q: "飛機上的特別乘客是哪種動物？", o: ["飛機上的特別乘客是可愛的小天竺鼠。", "飛機上的特別乘客是小貓。", "飛機上的特別乘客是小狗。"], a: 0 }, { q: "牠們在飛機上吃什麼？", o: ["牠們在飛機上吃著小胡蘿蔔和乾草。", "牠們在飛機上吃冰淇淋。", "牠們在飛機上吃漢堡。"], a: 0 }, { q: "天竺鼠發出什麼聲音？", o: ["天竺鼠一路上開心地發出吱吱聲。", "天竺鼠一路上開心地發出汪汪聲。", "天竺鼠一路上開心地發出喵喵聲。"], a: 0 }, { q: "天竺鼠坐在哪裡？", o: ["牠們坐在特製的小座位上。", "牠們坐在地板上。", "牠們坐在飛機的機翼上。"], a: 0 }, { q: "大家都說這是一趟怎樣的飛行？", o: ["這真是最可愛的飛行。", "這真是最可怕的飛行。", "這真是最無聊的飛行。"], a: 0 }] },
-    { id: 7, icon: '🐧', lang: 'zh', image: 'IMG_3104.PNG', title: "3. 企鵝的友誼薄餅", story: ["快樂 AI 教室 —— 每日奇趣新聞（幼稚園版）", "南極洲發生了一件好有趣的事情！", "這裡的企鵝寶寶們決定做一個大大的「友誼薄餅」。", "雖然天氣很冷，牠們不怕！", "大家一起搬來冰塊，再用五顏六色的凍凍果子當配料。", "牠們一邊做一邊開心地唱著歌。", "其他小動物也跑來看，大家都說這是有史以來最漂亮的冰雪薄餅！"], q: [{ q: "故事裡的主角是哪一種可愛的動物？", o: ["故事裡的主角是可愛的企鵝寶寶。", "故事裡的主角是北極熊。", "故事裡的主角是海豹。"], a: 0 }, { q: "牠們決定做一個大大的什麼？", o: ["牠們決定做一個大大的友誼薄餅。", "牠們決定做一個大大的雪人。", "牠們決定做一個大大的冰雕。"], a: 0 }, { q: "這個特別的薄餅是用什麼做的？", o: ["這個特別的薄餅是用冰塊和凍凍果子做的。", "這個特別的薄餅是用麵粉和雞蛋做的。", "這個特別的薄餅是用泥巴和樹葉做的。"], a: 0 }, { q: "企鵝寶寶們一邊做薄餅一邊做什麼？", o: ["牠們一邊做一邊開心地唱著歌。", "牠們一邊做一邊傷心地哭泣。", "牠們一邊做一邊呼呼大睡。"], a: 0 }, { q: "大家都說這個冰雪薄餅怎麼樣？", o: ["這是有史以來最漂亮的冰雪薄餅。", "這是有史以來最難看的冰雪薄餅。", "這是有史以來最難吃的冰雪薄餅。"], a: 0 }] },
-    { id: 8, icon: '📚', lang: 'zh', image: 'IMG_3105.PNG', title: "4. 熊貓的小書架", story: ["快樂 AI 教室 —— 每日奇趣新聞（另一篇幼稚園版）", "熊貓寶寶們有了全新的 AI 小書架！這是一個由竹子做成的書架。", "管理員叔叔送來了一個會講故事的小機器人（小熊貓造型），它知道世界上所有故事。", "它只要聽到名字，就會講出有趣的冒險故事。", "熊貓寶寶們都好喜歡，天天圍著它聽故事。這真是最棒的熊貓圖書館！"], q: [{ q: "熊貓寶寶的新AI小書架是用什麼做的？", o: ["熊貓寶寶的新AI小書架是用竹子做成的。", "熊貓寶寶的新AI小書架是用木頭做成的。", "熊貓寶寶的新AI小書架是用塑膠做成的。"], a: 0 }, { q: "這個講故事機器人是什麼造型？", o: ["這個講故事機器人是小熊貓造型。", "這個講故事機器人是小狗造型。", "這個講故事機器人是小鳥造型。"], a: 0 }, { q: "這個機器人會做什麼？", o: ["這個機器人會講有趣的冒險故事。", "這個機器人會唱歌跳舞。", "這個機器人會畫畫。"], a: 0 }, { q: "熊貓寶寶們天天圍著小機器人做什麼？", o: ["天天圍著它聽故事。", "天天圍著它玩捉迷藏。", "天天圍著它睡午覺。"], a: 0 }, { q: "大家都說這是最棒的什麼地方？", o: ["這是最棒的熊貓圖書館。", "這是最棒的熊貓遊樂園。", "這是最棒的熊貓餐廳。"], a: 0 }] },
-    { id: 9, icon: '🌈', lang: 'zh', image: 'IMG_3106.PNG', title: "5. 深海的彩虹驚喜", story: ["快樂新聞：深海的彩虹驚喜", "今天，深海裡的探險家們發現了一個大大的驚喜！在好深好深的海底，住著一種很少見的動物。", "探險家們用燈光一照，哇！", "這個海綿動物不是普通的顏色，而是像彩虹一樣，紅橙黃綠藍靛紫，閃閃發光！", "它就像深海裡的一個秘密彩虹蛋糕。", "科學家們都好高興，大家決定叫它「彩虹」，這真是大海裡最可愛的禮物！"], q: [{ q: "探險家在深海裡發現了什麼？", o: ["探險家在深海裡發現了海綿動物。", "探險家在深海裡發現了大鯊魚。", "探險家在深海裡發現了寶藏箱。"], a: 0 }, { q: "這個海綿動物閃閃發光的像什麼？", o: ["這個海綿動物閃閃發光的像彩虹一樣。", "這個海綿動物閃閃發光的像星星一樣。", "這個海綿動物閃閃發光的像太陽一樣。"], a: 0 }, { q: "探險家用什麼照它時，它會發光？", o: ["探險家用燈光照它時，它會發光。", "探險家用火把照它時，它會發光。", "探險家用月光照它時，它會發光。"], a: 0 }, { q: "科學家們決定叫這個海綿動物什麼名字？", o: ["大家決定叫它「彩虹」。", "大家決定叫它「太陽」。", "大家決定叫它「星星」。"], a: 0 }, { q: "這個動物就像深海裡的一個什麼？", o: ["就像深海裡的一個秘密彩虹蛋糕。", "就像深海裡的一個秘密大寶箱。", "就像深海裡的一個秘密潛水艇。"], a: 0 }] },
-    { id: 10, icon: '🛒', lang: 'zh', image: 'IMG_3107.PNG', title: "6. 天竺鼠超級市場", story: ["快樂 AI 教室 —— 每日奇趣新聞 (另一篇幼稚園版)", "哇！天竺鼠當老闆！", "牠們賣好小好小的果子。歡迎光臨！", "天竺鼠超級市場", "牠們在兜！！一塊小胡蘿蔔一毛錢！", "這是世界上最可愛的小市場！！"], q: [{ q: "故事裡的小天竺鼠當了什麼？", o: ["故事裡的小天竺鼠當了老闆。", "故事裡的小天竺鼠當了老師。", "故事裡的小天竺鼠當了醫生。"], a: 0 }, { q: "牠們在小攤位上賣什麼東西？", o: ["牠們在小攤位上賣好小好小的果子和小胡蘿蔔。", "牠們在小攤位上賣好小好小的玩具。", "牠們在小攤位上賣好小好小的衣服。"], a: 0 }, { q: "一塊小胡蘿蔔賣多少錢？", o: ["一塊小胡蘿蔔賣一毛錢。", "一塊小胡蘿蔔賣一百元。", "一塊小胡蘿蔔賣十元。"], a: 0 }, { q: "這個超級市場叫做什麼名字？", o: ["叫做天竺鼠超級市場。", "叫做兔寶寶超級市場。", "叫做小貓咪超級市場。"], a: 0 }, { q: "大家覺得這個小市場怎麼樣？", o: ["這是世界上最可愛的小市場。", "這是世界上最可怕的小市場。", "這是世界上最安靜的小市場。"], a: 0 }] },
-    { id: 11, icon: '♻️', lang: 'zh', image: 'IMG_3108.PNG', title: "7. 熊貓做環保", story: ["快樂 AI 教室 —— 每日奇趣新聞 (另一篇幼稚園版)", "今天是特別的一天！四川熊貓基地的熊貓寶寶們學會了垃圾分類。", "牠們把吃剩的竹子放進綠色的回收桶。", "牠們做得好認真，真是世界上最環保的小熊貓！", "這真是最有趣的分類小遊戲！"], q: [{ q: "故事裡的可愛熊貓學會了做什麼？", o: ["故事裡的可愛熊貓學會了垃圾分類。", "故事裡的可愛熊貓學會了煮飯。", "故事裡的可愛熊貓學會了開車。"], a: 0 }, { q: "熊貓把吃剩的竹子放進什麼顏色的回收桶？", o: ["熊貓把吃剩的竹子放進綠色的回收桶。", "熊貓把吃剩的竹子放進紅色的回收桶。", "熊貓把吃剩的竹子放進藍色的回收桶。"], a: 0 }, { q: "故事發生在哪裡？", o: ["故事發生在四川熊貓基地。", "故事發生在北京動物園。", "故事發生在香港海洋公園。"], a: 0 }, { q: "熊貓寶寶們做垃圾分類做得怎麼樣？", o: ["牠們做得好認真。", "牠們做得好隨便。", "牠們做得好生氣。"], a: 0 }, { q: "大家都稱讚熊貓寶寶是世界上最什麼的小熊貓？", o: ["最環保的小熊貓。", "最貪吃的小熊貓。", "最愛睡的小熊貓。"], a: 0 }] },
-    { id: 12, icon: '🎁', lang: 'zh', image: 'IMG_3109.PNG', title: "8. 深海大禮物包", story: ["快樂 AI 教室 —— 每日奇趣新聞 (另一篇幼稚園版)", "哇！深海大發現！", "一群可愛的海底動物，學會了用小潛水艇的機械手臂，來輕輕拆開一個好神秘的深海大禮物包！", "大家都在想裡面是什麼？", "這真是最有趣的海底尋寶！"], q: [{ q: "海底動物學會了用什麼來拆禮物？", o: ["海底動物學會了用小潛水艇的機械手臂來拆禮物。", "海底動物學會了用嘴巴來拆禮物。", "海底動物學會了用尾巴來拆禮物。"], a: 0 }, { q: "這是一個怎樣的深海大禮物包？", o: ["這是一個好神秘的深海大禮物包。", "這是一個好透明的深海大禮物包。", "這是一個好難看的深海大禮物包。"], a: 0 }, { q: "大家都在想什麼？", o: ["大家都在想裡面是什麼禮物。", "大家都在想什麼時候吃飯。", "大家都在想今天天氣好嗎。"], a: 0 }, { q: "是誰學會了拆開禮物包？", o: ["一群可愛的海底動物。", "一群探險家。", "一群外星人。"], a: 0 }, { q: "大家都覺得這是一場最有趣的什麼活動？", o: ["最有趣的海底尋寶。", "最有趣的海底賽跑。", "最有趣的海底音樂會。"], a: 0 }] },
-    { id: 13, icon: '🍕', lang: 'zh', image: 'IMG_3110.PNG', title: "9. 冰雪披薩店", story: ["快樂 AI 教室 —— 每日奇趣新聞 (全新古怪版)", "南極洲發生了一件超級有趣的事！可愛的企鵝寶寶們開了一家冰雪披薩店。", "牠們用冰塊當桌子，把小魚和鱗蝦鋪在大冰塊披薩上。", "其他海洋動物都跑來看，牠們一邊做一邊唱著快樂的披薩歌！", "這真是最古怪又好玩的廚房！"], q: [{ q: "故事裡的企鵝寶寶開了什麼店？", o: ["故事裡的企鵝寶寶開了一家冰雪披薩店。", "故事裡的企鵝寶寶開了一家玩具店。", "故事裡的企鵝寶寶開了一家書店。"], a: 0 }, { q: "牠們在披薩上鋪了什麼東西？", o: ["牠們在披薩上鋪了小魚和鱗蝦。", "牠們在披薩上鋪了草莓和蘋果。", "牠們在披薩上鋪了巧克力和糖果。"], a: 0 }, { q: "企鵝們用什麼當桌子？", o: ["企鵝們用冰塊當桌子。", "企鵝們用大樹幹當桌子。", "企鵝們用石頭當桌子。"], a: 0 }, { q: "其他海洋動物跑來看時，企鵝寶寶在唱什麼歌？", o: ["牠們一邊做一邊唱著快樂的披薩歌。", "牠們一邊做一邊唱著傷心的搖籃曲。", "牠們一邊做一邊唱著安靜的催眠曲。"], a: 0 }, { q: "大家覺得這是一個怎樣的廚房？", o: ["這是最古怪又好玩的廚房。", "這是最無聊又普通的廚房。", "這是最可怕又黑暗的廚房。"], a: 0 }] },
-    { id: 14, icon: '🐟', lang: 'zh', image: 'IMG_3111.PNG', title: "10. 燈籠魚排積木", story: ["快樂 AI 教室 —— 每日奇趣新聞 (另一篇幼稚園版)", "哇！深海大發現！一群可愛的燈籠魚寶寶，", "在海底學會了用發光的頭燈，把彩色的積木小玩具，分門別類地排好。", "牠們做得好開心，這是深海裡最棒的分類小遊戲！"], q: [{ q: "可愛的燈籠魚寶寶學會了做什麼？", o: ["可愛的燈籠魚寶寶學會了分門別類排積木。", "可愛的燈籠魚寶寶學會了寫字。", "可愛的燈籠魚寶寶學會了畫畫。"], a: 0 }, { q: "牠們用什麼來照亮積木小玩具？", o: ["牠們用頭頂上發光的頭燈來照亮積木小玩具。", "牠們用手電筒來照亮積木小玩具。", "牠們用月亮來照亮積木小玩具。"], a: 0 }, { q: "積木是什麼顏色的？", o: ["積木是彩色的。", "積木是黑白的。", "積木是透明的。"], a: 0 }, { q: "燈籠魚寶寶排積木時覺得怎麼樣？", o: ["牠們做得好開心。", "牠們覺得好難過。", "牠們覺得好生氣。"], a: 0 }, { q: "大家覺得這是深海裡最棒的什麼遊戲？", o: ["最棒的分類小遊戲。", "最棒的捉迷藏遊戲。", "最棒的賽跑遊戲。"], a: 0 }] }
+    // === 輕鬆小故事 & 奇趣大冒險 ===
+    { id: 101, icon: '🐼', lang: 'zh', image: 'IMG_2971.PNG', title: "日本小福星", story: ["日本上野動物園迎來了超級可愛的新明星，", "熊貓寶寶『小福星』第一次跟大家見面。", "牠好奇地看著每一個人。", "小福星笨拙地學習啃竹子，", "園區裡到處都是歡笑聲！"], q: [{ q: "故事裡的熊貓寶寶叫什麼名字？", o: ["小福星", "小黑", "小白"], a: 0 }, { q: "小福星在學習做什麼？", o: ["學習啃竹子", "學習爬樹", "學習睡覺"], a: 0 }, { q: "園區裡到處都是什麼聲音？", o: ["歡笑聲", "哭泣聲", "唱歌聲"], a: 0 }] },
+    { id: 102, icon: '🐙', lang: 'zh', image: 'IMG_3209.JPG', title: "章魚上幼稚園", story: ["最近在法國，一隻超大章魚竟然走進幼稚園！", "這隻章魚非常友善，還帶著紅色便當盒。", "它最喜歡和小朋友一起玩球了。", "大家都說，這是今年最古怪又最開心的新聞！"], q: [{ q: "章魚帶著什麼顏色的便當盒？", o: ["紅色便當盒", "藍色便當盒", "黃色便當盒"], a: 0 }, { q: "章魚最喜歡和小朋友一起玩什麼？", o: ["玩球", "畫畫", "唱歌"], a: 0 }, { q: "大家都說這是今年的什麼新聞？", o: ["最古怪又最開心的新聞", "最無聊的新聞", "最難過的新聞"], a: 0 }] },
+    { id: 103, icon: '🍌', lang: 'zh', image: 'IMG_3210.JPG', title: "會飛的香蕉", story: ["小朋友們，你們有見過會飛的香蕉嗎？", "最近在一個很遠的國家，發生了一件很古怪的事！", "一條超大條的香蕉長出了小翅膀，在天上飛來飛去！"], q: [{ q: "會飛的香蕉長了什麼？", o: ["小翅膀", "小腳丫", "小尾巴"], a: 0 }, { q: "香蕉在哪裡飛來飛去？", o: ["天上", "海裡", "地下"], a: 0 }, { q: "這是一件怎樣的事情？", o: ["很古怪的事", "很平常的事", "很無聊的事"], a: 0 }] },
+    { id: 104, icon: '🍝', lang: 'zh', image: 'IMG_3378.PNG', title: "世界最長意大利麵", story: ["義大利廚師做出世界上最長的一條意大利麵！", "這條彩色的意大利麵長得可以環繞小鎮一圈。", "廚師說：這是為了讓所有小朋友都開心！你想試試嗎？"], q: [{ q: "廚師做出了什麼東西？", o: ["世界上最長的意大利麵", "世界上最大塊的披薩", "世界上最甜的蛋糕"], a: 0 }, { q: "這條意大利麵是什麼顏色的？", o: ["彩色的", "黑色的", "白色的"], a: 0 }, { q: "廚師做這條麵是為了讓誰開心？", o: ["讓所有小朋友都開心", "讓自己開心", "讓小貓開心"], a: 0 }] },
+    { id: 105, icon: '🐕', lang: 'zh', image: 'IMG_3558.JPEG', title: "小狗挑戰積木塔", story: ["最近在美國一所幼稚園發生了怪事！", "一隻叫Max的金毛幼犬用積木和蘋果香蕉堆了比自己還高十倍的塔！", "全校小朋友都驚呆了！"], q: [{ q: "這隻小狗叫什麼名字？", o: ["Max", "波波", "豆豆"], a: 0 }, { q: "牠用什麼東西堆了塔？", o: ["積木和蘋果香蕉", "泥巴和樹葉", "石頭和沙子"], a: 0 }, { q: "這件事發生在哪個國家的幼稚園？", o: ["美國", "英國", "日本"], a: 0 }] },
+    { id: 106, icon: '🐳', lang: 'zh', image: 'IMG_3575.JPG', title: "鯨魚的超大噴嚏", story: ["小朋友們，新聞來了！", "一條超大藍鯨打了一個大噴嚏！", "把海上的海盜船都給吹飛了！"], q: [{ q: "是誰打了一個大噴嚏？", o: ["一條超大藍鯨", "一隻小海豚", "一隻大白鯊"], a: 0 }, { q: "藍鯨把什麼東西吹飛了？", o: ["海盜船", "小帆船", "潛水艇"], a: 0 }, { q: "藍鯨是在哪裡打噴嚏的？", o: ["海上", "陸地", "天空"], a: 0 }] },
+    { id: 107, icon: '🐒', lang: 'zh', image: 'IMG_3837.PNG', title: "猴子吃冰凍腦", story: ["日本有一間動物園，遊客送了太冰淇淋給猴子吃。", "結果好多猴子發生『頭痛』（凍腦），", "牠們全部都在瘋狂地抱著頭大叫，", "動物園管理員趕緊想辦法幫們！"], q: [{ q: "遊客送了什麼給猴子吃？", o: ["冰淇淋", "香蕉", "蘋果"], a: 0 }, { q: "猴子吃太多冰淇淋後發生了什麼事？", o: ["頭痛（凍腦）", "肚子痛", "牙齒痛"], a: 0 }, { q: "誰來幫助這些猴子？", o: ["動物園管理員", "警察叔叔", "醫生"], a: 0 }] },
+    { id: 108, icon: '🐧', lang: 'zh', image: 'IMG_3838.JPEG', title: "小企鵝生日派對", story: ["澳洲發生一件趣事，", "一隻迷路的小企鵝，竟然走進了一個小朋友的生日派對！", "牠在派對上跳舞，還跟小朋友們一起吃蛋糕，大家都開心極了！"], q: [{ q: "哪一種動物迷路走進了派對？", o: ["小企鵝", "小貓咪", "小狗狗"], a: 0 }, { q: "牠走進了什麼活動？", o: ["小朋友的生日派對", "學校的運動會", "音樂會"], a: 0 }, { q: "牠在派對上和小朋友們一起吃了什麼？", o: ["吃蛋糕", "吃餅乾", "吃冰淇淋"], a: 0 }] },
+    { id: 1, icon: '🦥', lang: 'zh', image: 'IMG_3100.JPEG', title: "樹懶寶寶", story: ["動物園裡，一隻超級可愛的樹懶寶寶出生囉！", "牠每天都緊緊抱著媽媽的肚子，在大樹上慢吞吞地移動。", "小樹懶最喜歡一邊睡懶覺、一邊吃綠色的樹葉，模樣真的太萌了！"], q: [{ q: "樹懶寶寶緊緊抱著誰？", o: ["樹懶寶寶緊緊抱著媽媽的肚子。", "樹懶寶寶緊緊抱著爸爸的腿。", "樹懶寶寶緊緊抱著樹枝。"], a: 0 }, { q: "樹懶移動得快嗎？", o: ["樹懶在大樹上慢吞吞地移動。", "樹懶在大樹上移動得非常快。", "樹懶在大樹上用飛的移動。"], a: 0 }, { q: "樹懶寶寶喜歡吃什麼？", o: ["樹懶寶寶喜歡吃綠色的樹葉。", "樹懶寶寶喜歡吃紅色的蘋果。", "樹懶寶寶喜歡吃黃色的香蕉。"], a: 0 }] },
+    { id: 2, icon: '🐘', lang: 'zh', image: 'IMG_3101.JPEG', title: "象寶寶玩泥巴", story: ["今天在動物園裡，象寶寶開心極了！", "牠跟媽媽玩起了泥巴大戰。", "象媽媽溫柔地用鼻子把泥巴噴在寶寶身上，", "牠們互相噴灑，玩得全身髒兮兮的，但是非常快樂！"], q: [{ q: "象寶寶在哪裡玩？", o: ["象寶寶在動物園裡玩。", "象寶寶在學校裡玩。", "象寶寶在超級市場裡玩。"], a: 0 }, { q: "象寶寶和媽媽玩什麼？", o: ["象寶寶和媽媽玩泥巴大戰。", "象寶寶和媽媽玩捉迷藏。", "象寶寶和媽媽玩皮球。"], a: 0 }, { q: "媽媽用什麼把泥巴噴在寶寶身上？", o: ["媽媽用鼻子把泥巴噴在寶寶身上。", "媽媽用腳把泥巴噴在寶寶身上。", "媽媽用尾巴把泥巴噴在寶寶身上。"], a: 0 }] },
+    { id: 3, icon: '🐢', lang: 'zh', image: 'IMG_3112.JPEG', title: "巴迪救海龜", story: ["這隻勇敢的小狗叫做「巴迪」，", "牠在海邊游泳時，發現了一隻迷路的小海龜寶寶。", "巴迪沒有吃掉牠，而是輕輕地咬著牠，帶牠回到海裡。", "巴迪真是一隻善良的好狗！"], q: [{ q: "這隻勇敢的小狗叫什麼名字？", o: ["這隻勇敢的小狗叫巴迪。", "這隻勇敢的小狗叫小白。", "這勇敢的小狗叫旺財。"], a: 0 }, { q: "小狗在海邊發現了誰？", o: ["小狗在海邊發現了一隻迷路的小海龜寶寶。", "小狗在海邊發現了一條大魚。", "小狗在海邊發現了一隻螃蟹。"], a: 0 }, { q: "巴迪對小海龜做了什麼？", o: ["巴迪輕輕咬著牠，帶牠回到海裡。", "巴迪把小海龜吃掉了。", "巴迪不理小海龜。"], a: 0 }] },
+    { id: 4, icon: '🐸', lang: 'zh', image: 'IMG_3113.JPEG', title: "生菜裡的小青蛙", story: ["媽媽在廚房打開一袋新鮮的生菜沙拉時，驚訝地發現裡面竟然躲著一隻綠色的小青蛙！", "這隻幸運的小青蛙在菜葉裡睡得飽飽的，還對著大家瞇瞇笑呢！"], q: [{ q: "媽媽在廚房打開了什麼？", o: ["媽媽在廚房打開了一袋新鮮的生菜沙拉。", "媽媽在廚房打開了一盒餅乾。", "媽媽在廚房打開了一瓶牛奶。"], a: 0 }, { q: "媽媽驚訝地發現裡面躲著什麼？", o: ["媽媽驚訝地發現裡面躲著一隻綠色的小青蛙。", "媽媽驚訝地發現裡面躲著一隻小蟲。", "媽媽驚訝地發現裡面躲著一塊石頭。"], a: 0 }, { q: "小青蛙在菜葉裡做什麼？", o: ["小青蛙在菜葉裡睡得飽飽的。", "小青蛙在菜葉裡跳來跳去。", "小青蛙在菜葉裡吃菜葉。"], a: 0 }] },
+    { id: 10, icon: '🛒', lang: 'zh', image: 'IMG_3107.PNG', title: "天竺鼠超級市場", story: ["哇！天竺鼠當老闆！", "牠們賣好小好小的果子。歡迎光臨！", "天竺鼠超級市場", "牠們在兜！！一塊小胡蘿蔔一毛錢！", "這是世界上最可愛的小市場！！"], q: [{ q: "故事裡的小天竺鼠當了什麼？", o: ["故事裡的小天竺鼠當了老闆。", "故事裡的小天竺鼠當了老師。", "故事裡的小天竺鼠當了醫生。"], a: 0 }, { q: "牠們在小攤位上賣什麼東西？", o: ["牠們在小攤位上賣好小好小的果子和小胡蘿蔔。", "牠們在小攤位上賣好小好小的玩具。", "牠們在小攤位上賣好小好小的衣服。"], a: 0 }, { q: "一塊小胡蘿蔔賣多少錢？", o: ["一塊小胡蘿蔔賣一毛錢。", "一塊小胡蘿蔔賣一百元。", "一塊小胡蘿蔔賣十元。"], a: 0 }] },
+    { id: 12, icon: '🎁', lang: 'zh', image: 'IMG_3109.PNG', title: "深海大禮物包", story: ["哇！深海大發現！", "一群可愛的海底動物，學會了用小潛水艇的機械手臂，來輕輕拆開一個好神秘的深海大禮物包！", "大家都在想裡面是什麼？", "這真是最有趣的海底尋寶！"], q: [{ q: "海底動物學會了用什麼來拆禮物？", o: ["海底動物學會了用小潛水艇的機械手臂來拆禮物。", "海底動物學會了用嘴巴來拆禮物。", "海底動物學會了用尾巴來拆禮物。"], a: 0 }, { q: "這是一個怎樣的深海大禮物包？", o: ["這是一個好神秘的深海大禮物包。", "這是一個好透明的深海大禮物包。", "這是一個好難看的深海大禮物包。"], a: 0 }, { q: "大家都在想什麼？", o: ["大家都在想裡面是什麼禮物。", "大家都在想什麼時候吃飯。", "大家都在想今天天氣好嗎。"], a: 0 }] },
+    { id: 14, icon: '🐟', lang: 'zh', image: 'IMG_3111.PNG', title: "燈籠魚排積木", story: ["哇！深海大發現！一群可愛的燈籠魚寶寶，", "在海底學會了用發光的頭燈，把彩色的積木小玩具，分門別類地排好。", "牠們做得好開心，這是深海裡最棒的分類小遊戲！"], q: [{ q: "可愛的燈籠魚寶寶學會了做什麼？", o: ["可愛的燈籠魚寶寶學會了分門別類排積木。", "可愛的燈籠魚寶寶學會了寫字。", "可愛的燈籠魚寶寶學會了畫畫。"], a: 0 }, { q: "牠們用什麼來照亮積木小玩具？", o: ["牠們用頭頂上發光的頭燈來照亮積木小玩具。", "牠們用手電筒來照亮積木小玩具。", "牠們用月亮來照亮積木小玩具。"], a: 0 }, { q: "積木是什麼顏色的？", o: ["積木是彩色的。", "積木是黑白的。", "積木是透明的。"], a: 0 }] },
+    { id: 5, icon: '🦁', lang: 'zh', image: 'IMG_3102.PNG', title: "獅子的冰涼驚喜", story: ["快樂新聞：倫敦動物園的冰涼驚喜", "今天是熱熱的夏天！倫敦動物園的獅子們好熱呀。", "管理員叔叔送給他們大大的冰棒！", "這些冰棒是由獅子喜歡的紅紅果汁和肉汁做成的。", "獅子們用舌頭大口大口地舔，好涼快、好開心呀！", "這真是最有趣的消暑方法！"], q: [{ q: "獅子在哪個動物園？", o: ["獅子在倫敦動物園。", "獅子在紐約動物園。", "獅子在東京動物園。"], a: 0 }, { q: "天氣很熱時，獅子在吃什麼？", o: ["天氣很熱時，獅子在吃大大的冰棒。", "天氣很熱時，獅子在吃熱狗。", "天氣很熱時，獅子在吃麵包。"], a: 0 }, { q: "冰棒裡面有什麼味道？", o: ["裡面有紅紅果汁和肉汁。", "裡面有蘋果汁和牛奶。", "裡面有葡萄汁和糖果。"], a: 0 }] },
+    { id: 6, icon: '🐹', lang: 'zh', image: 'IMG_3103.PNG', title: "飛機上的天竺鼠", story: ["快樂新聞：飛機上的奇特乘客", "今天是特別的一天！有一家好有趣的航空公司。", "這架飛機的乘客不是人，而是幾十隻可愛的小天竺鼠！", "牠們坐在特製的小座位上，吃著小胡蘿蔔和乾草，", "一路上開心地發出『吱吱』聲。", "大家都說：『這真是最可愛的飛行！』"], q: [{ q: "飛機上的特別乘客是哪種動物？", o: ["飛機上的特別乘客是可愛的小天竺鼠。", "飛機上的特別乘客是小貓。", "飛機上的特別乘客是小狗。"], a: 0 }, { q: "牠們在飛機上吃什麼？", o: ["牠們在飛機上吃著小胡蘿蔔和乾草。", "牠們在飛機上吃冰淇淋。", "牠們在飛機上吃漢堡。"], a: 0 }, { q: "天竺鼠坐在哪裡？", o: ["牠們坐在特製的小座位上。", "牠坐在地板上。", "牠們坐在飛機的機翼上。"], a: 0 }] },
+    { id: 7, icon: '🐧', lang: 'zh', image: 'IMG_3104.PNG', title: "企鵝的友誼薄餅", story: ["快樂 AI 教室 —— 每日奇趣新聞", "南極洲發生了一件好有趣的事情！", "這裡的企鵝寶寶們決定做一個大大的「友誼薄餅」。", "雖然天氣很冷，牠們不怕！", "大家一起搬來冰塊，再用五顏六色的凍凍果子當配料。", "牠們一邊做一邊開心地唱著歌。", "其他小動物也跑來看，大家都說這是有史以來最漂亮的冰雪薄餅！"], q: [{ q: "故事裡的主角是哪一種可愛的動物？", o: ["可愛的企鵝寶寶。", "北極熊。", "海豹。"], a: 0 }, { q: "牠們決定做一個大大的什麼？", o: ["大大的友誼薄餅。", "大大的雪人。", "大大的冰雕。"], a: 0 }, { q: "這個特別的薄餅是用什麼做的？", o: ["冰塊和凍凍果子。", "麵粉和雞蛋。", "泥巴和樹葉。"], a: 0 }] },
+    { id: 8, icon: '📚', lang: 'zh', image: 'IMG_3105.PNG', title: "熊貓的小書架", story: ["快樂 AI 教室 —— 每日奇趣新聞", "熊貓寶寶們有了全新的 AI 小書架！這是一個由竹子做成的書架。", "管理員叔叔送來了一個會講故事的小機器人（小熊貓造型），它知道世界上所有故事。", "它只要聽到名字，就會講出有趣的冒險故事。", "熊貓寶寶們都好喜歡，天天圍著它聽故事。這真是最棒的熊貓圖書館！"], q: [{ q: "熊貓寶寶的新AI小書架是用什麼做的？", o: ["竹子。", "木頭。", "塑膠。"], a: 0 }, { q: "這個講故事機器人是什麼造型？", o: ["小熊貓造型。", "小狗造型。", "小鳥造型。"], a: 0 }, { q: "熊貓寶寶們天天圍著小機器人做什麼？", o: ["聽故事。", "玩捉迷藏。", "睡午覺。"], a: 0 }] },
+    { id: 9, icon: '🌈', lang: 'zh', image: 'IMG_3106.PNG', title: "深海的彩虹驚喜", story: ["快樂新聞：深海的彩虹驚喜", "今天，深海裡的探險家們發現了一個大大的驚喜！在好深好深的海底，住著一種很少見的動物。", "探險家們用燈光一照，哇！", "這個海綿動物不是普通的顏色，而是像彩虹一樣，紅橙黃綠藍靛紫，閃閃發光！", "它就像深海裡的一個秘密彩虹蛋糕。", "科學家們都好高興，大家決定叫它「彩虹」，這真是大海裡最可愛的禮物！"], q: [{ q: "探險家在深海裡發現了什麼？", o: ["海綿動物。", "大鯊魚。", "寶藏箱。"], a: 0 }, { q: "這個海綿動物閃閃發光的像什麼？", o: ["像彩虹一樣。", "像星星一樣。", "像太陽一樣。"], a: 0 }, { q: "科學家們決定叫這個海綿動物什麼名字？", o: ["彩虹。", "太陽。", "星星。"], a: 0 }] },
+    { id: 11, icon: '♻️', lang: 'zh', image: 'IMG_3108.PNG', title: "熊貓做環保", story: ["快樂 AI 教室 —— 每日奇趣新聞", "今天是特別的一天！四川熊貓基地的熊貓寶寶們學會了垃圾分類。", "牠們把吃剩的竹子放進綠色的回收桶。", "牠們做得好認真，真是世界上最環保的小熊貓！", "這真是最有趣的分類小遊戲！"], q: [{ q: "可愛熊貓學會了做什麼？", o: ["學會了垃圾分類。", "學會了煮飯。", "學會了開車。"], a: 0 }, { q: "熊貓把吃剩的竹子放進什麼顏色的回收桶？", o: ["綠色的回收桶。", "紅色的回收桶。", "藍色的回收桶。"], a: 0 }, { q: "故事發生在哪裡？", o: ["四川熊貓基地。", "北京動物園。", "香港海洋公園。"], a: 0 }] },
+    { id: 13, icon: '🍕', lang: 'zh', image: 'IMG_3110.PNG', title: "冰雪披薩店", story: ["快樂 AI 教室 —— 每日奇趣新聞 (全新古怪版)", "南極洲發生了一件超級有趣的事！可愛的企鵝寶寶們開了一家冰雪披薩店。", "牠們用冰塊當桌子，把小魚和鱗蝦鋪在大冰塊披薩上。", "其他海洋動物都跑來看，牠們一邊做一邊唱著快樂的披薩歌！", "這真是最古怪又好玩的廚房！"], q: [{ q: "故事裡的企鵝寶寶開了什麼店？", o: ["冰雪披薩店。", "玩具店。", "書店。"], a: 0 }, { q: "牠們在披薩上鋪了什麼東西？", o: ["小魚和鱗蝦。", "草莓和蘋果。", "巧克力和糖果。"], a: 0 }, { q: "企鵝們用什麼當桌子？", o: ["冰塊。", "大樹幹。", "石頭。"], a: 0 }] },
+    { id: 201, icon: '🦉', lang: 'zh', image: 'IMG_3220.PNG', title: "貓頭鷹圖書館長", story: ["在森林深處，有一位特別的貓頭鷹。牠是森林裡的圖書館長！", "每天，貓頭鷹長老會用牠那大大的眼鏡，溫柔地對著小動物們說：「故事時間到了！」", "牠用神奇的大大肚子，能「變」出各種可愛又有趣的小人書。", "小兔子、小松鼠都喜歡圍著牠，聽關於星星、花朵和飛行的神奇故事。"], q: [{ q: "故事裡的貓頭鷹是做什麼的？", o: ["牠是森林裡的圖書館長。", "牠是森林裡的醫生。", "牠是森林裡的警察。"], a: 0 }, { q: "貓頭鷹用什麼給小動物們變出故事書？", o: ["用神奇的大大肚子。", "用神奇的帽子。", "用神奇的翅膀。"], a: 0 }, { q: "小動物們喜歡聽什麼類型的故事？", o: ["關於星星、花朵和飛行的神奇故事。", "關於游泳和抓魚的故事。", "關於做蛋糕的故事。"], a: 0 }] },
+    { id: 202, icon: '🐊', lang: 'zh', image: 'IMG_3199.PNG', title: "時髦鱷魚閃閃", story: ["巴西濕地有一隻名叫「閃閃」的可愛凱門鱷。", "牠不喜歡髒髒的泥土，反而喜歡戴墨鏡和彩色項鍊！", "其他小動物們覺得很有趣，為牠辦了「時裝秀」。", "閃閃自信地走秀，成為最時尚的鱷魚，讓大家都開懷大笑！"], q: [{ q: "故事中的鱷魚叫什麼名字？", o: ["名叫「閃閃」。", "名叫「波波」。", "名叫「豆豆」。"], a: 0 }, { q: "牠不喜歡泥土，反而喜歡戴什麼？", o: ["喜歡戴墨鏡和彩色項鍊。", "喜歡戴帽子和手套。", "喜歡穿鞋子和襪子。"], a: 0 }, { q: "小動物們為牠辦了什麼活動？", o: ["為牠辦了「時裝秀」。", "為牠辦了「音樂會」。", "為牠辦了「運動會」。"], a: 0 }] },
+    { id: 203, icon: '🐙', lang: 'zh', image: 'IMG_3615.JPEG', title: "章魚爸爸開畫展", story: ["奇妙新聞：章魚爸爸開畫展！最近，一隻叫『保羅』的聰明章魚，在水族館裡舉辦了自己的畫展！", "這隻聰明的章魚，竟然會用觸手拿著畫筆，畫出五顏六色的美麗圖案。", "參觀的小朋友們都覺得牠是世界上最偉大的藝術家。", "大家快來看看牠這些不可思議的超級作品吧！"], q: [{ q: "章魚爸爸的名字叫什麼？", o: ["名叫『保羅』。", "名叫『巴迪』。", "名叫『皮皮』。"], a: 0 }, { q: "牠用什麼來畫畫？", o: ["用觸手拿著畫筆畫畫。", "用嘴巴咬著畫筆畫畫。", "用尾巴沾顏料畫畫。"], a: 0 }, { q: "牠的畫展在哪裡舉辦？", o: ["在水族館裡舉辦。", "在學校裡舉辦。", "在公園裡舉辦。"], a: 0 }] },
+    { id: 301, icon: '🫧', lang: 'zh', image: 'IMG_2911.PNG', title: "超級大泡泡", story: ["今日在香港中環公園，一位泡泡達人叔叔吹出了一個像房子一樣大的巨大泡泡！", "超級大！全場小朋友興奮極了，大家一起追泡泡、拍泡泡，開心地說：", "『哇！這是有史以來最大的泡泡！』", "現場就像仙境一樣，充滿了歡樂和笑聲！"], q: [{ q: "叔叔吹出的泡泡有多大？", o: ["像房子一樣大", "像蘋果一樣大", "像車子一樣大"], a: 0 }, { q: "小朋友在做什麼？", o: ["追泡泡、拍泡泡", "睡覺", "吃飯"], a: 0 }, { q: "現場充滿了什麼？", o: ["歡樂和笑聲", "哭聲", "讀書聲"], a: 0 }] },
+    { id: 302, icon: '🦭', lang: 'zh', image: 'IMG_2937.PNG', title: "海洋公園小海獅", story: ["今天海洋公園好開心！因為有一隻超可愛的小海獅出生啦！", "牠現在和媽媽一起學游泳，還會一起玩！", "小海獅的樣子好圓好可愛，好像一個小毛球。", "牠會「嗷嗷」叫，好聽話喔！小朋友，你想不想去同小海獅見面呀？"], q: [{ q: "海洋公園有哪種動物出生了？", o: ["小海獅", "小企鵝", "小海豚"], a: 0 }, { q: "小海獅和誰一起學游泳？", o: ["媽媽", "爸爸", "哥哥"], a: 0 }, { q: "小海獅的樣子像什麼？", o: ["像一個小毛球", "像一塊石頭", "像一朵雲"], a: 0 }] },
+    { id: 303, icon: '🐒', lang: 'zh', image: 'IMG_2995.PNG', title: "小猴子Punch", story: ["日本動物園裡有一隻超可愛的小猴子，名叫「Punch」。", "今天，牠終於克服害羞，和猴群的新朋友一起玩耍，", "還給了保育員一個大擁抱。", "所有人都笑了，大家都很愛Punch!"], q: [{ q: "小猴子叫什麼名字？", o: ["Punch", "波波", "豆豆"], a: 0 }, { q: "小猴子克服了什麼？", o: ["害羞", "恐懼", "懶惰"], a: 0 }, { q: "牠給了保育員什麼？", o: ["一個大擁抱", "一個蘋果", "一個親吻"], a: 0 }] },
+    { id: 304, icon: '🦔', lang: 'zh', image: 'IMG_3018.PNG', title: "刺蝟花園派對", story: ["在中國的一個大花園裡，發生了一件超級有趣的事情！", "一群超級可愛的小刺蝟，竟然變成了花園派對的主人。", "牠們小心翼翼地把各種彩色的玩具小汽車和小飛機放在花園裡，", "樣子真的太神奇了！所有參觀的小朋友都開心地笑個不停。", "牠們是世界上最認真、最可愛的小刺蝟！"], q: [{ q: "小刺蝟變成了什麼的主人？", o: ["花園派對", "游泳池", "學校"], a: 0 }, { q: "牠們把什麼放在花園裡？", o: ["彩色的玩具", "蘋果和香蕉", "書本和筆"], a: 0 }, { q: "參觀的小朋友反應如何？", o: ["開心地笑個不停", "傷心地哭泣", "生氣地大叫"], a: 0 }] },
+    { id: 305, icon: '🐿️', lang: 'zh', image: 'IMG_3200.JPEG', title: "飛天大松鼠", story: ["在美國一個公園，人們發現了一隻會「飛天」的超大松鼠！", "牠其實不是真的會飛，而是能在樹木之間滑翔很遠。", "這隻可愛的小傢伙，因為吃得飽飽，肚子大大的，", "所以滑翔時像個小氣球，大家都說牠像超級英雄，非常可愛！"], q: [{ q: "這隻大松鼠在哪裡被發現？", o: ["在美國一個公園", "在日本動物園", "在非洲大草原"], a: 0 }, { q: "牠在樹木之間滑翔時像什麼？", o: ["像個小氣球", "像一隻小鳥", "像一架飛機"], a: 0 }, { q: "大家都說牠像什麼？", o: ["像超級英雄", "像警察叔叔", "像小丑"], a: 0 }] },
+    { id: 306, icon: '🦜', lang: 'zh', image: 'IMG_3207.PNG', title: "聰明鸚鵡", story: ["這是一隻聰明的鸚鵡！最近在英國的一個市場，這隻鸚鵡不小心跑出來了。", "牠會模仿人說話，竟然飛到水果攤上，", "對著買東西的人大喊：'老闆！再來一根香蕉！'。", "大家都聽懂了，被這隻愛吃香蕉的鸚鵡逗得好開心！", "最後，鸚鵡的主人聽到了，趕快把牠帶回家。"], q: [{ q: "這隻鸚鵡會做什麼？", o: ["模仿人說話", "游泳", "寫字"], a: 0 }, { q: "牠對著買東西的人喊了什麼？", o: ["老闆！再來一根香蕉！", "老闆！我要吃蘋果！", "老闆！我要喝水！"], a: 0 }, { q: "最後是誰把鸚鵡帶回家？", o: ["鸚鵡的主人", "警察", "消防員"], a: 0 }] },
+    { id: 307, icon: '🐔', lang: 'zh', image: 'IMG_3211.PNG', title: "小雞穿毛衣", story: ["在一個很冷的小鎮，農夫阿姨擔心小雞們會凍僵。", "她想出一個古怪的主意！", "她給每一隻小雞都織了一件五顏六色的毛衣。", "現在，小雞們穿著毛衣在雪地裡快樂地跑來跑去，", "看起來像一個彩虹派對！這真是太神奇了！"], q: [{ q: "農夫阿姨擔心小雞們會怎樣？", o: ["會凍僵", "會餓壞", "會迷路"], a: 0 }, { q: "小雞們穿的是什麼顏色的毛衣？", o: ["五顏六色", "黑色", "白色"], a: 0 }, { q: "小雞穿上毛衣後在做什麼？", o: ["在雪地裡快樂地跑", "在屋裡睡覺", "在唱歌"], a: 0 }] },
+    { id: 308, icon: '🐋', lang: 'zh', image: 'IMG_3222.PNG', title: "抹香鯨寶寶", story: ["最近，科學家在海洋裡拍到了一個超級大驚喜！", "原來，世界上最大的抹香鯨媽媽，生下了一隻小小的抹香鯨寶寶。", "大家都覺得好興奮，因為抹香鯨寶寶看起來就像一隻溫柔的小鯨魚，", "在媽媽身邊游來游去，真的太可愛了！", "我們一起保護海洋，讓更多鯨魚寶寶健康長大吧！"], q: [{ q: "科學家拍到了什麼特別的畫面？", o: ["抹香鯨媽媽生寶寶", "鯊魚在跳舞", "海龜在睡覺"], a: 0 }, { q: "抹香鯨寶寶長得怎麼樣？", o: ["溫柔又可愛", "很可怕", "很生氣"], a: 0 }, { q: "我們可以怎麼做來愛護鯨魚寶寶？", o: ["一起保護海洋", "把垃圾丟進海裡", "不理會牠們"], a: 0 }] },
+    { id: 309, icon: '🏰', lang: 'zh', image: 'IMG_4025.PNG', title: "巨型積木城堡", story: ["新聞：最近，在一個美麗的公園裡，舉行了一場有趣的「巨型積木挑戰賽」。", "一群超級厲害的爸爸媽媽和小朋友，", "用五顏六色的巨型積木蓋出一座比大樹還要高的城堡！", "小朋友們興奮地爬進去探險，大家都笑得合不攏嘴。", "這個巨大的積木城堡，真是太壯觀又好玩了！"], q: [{ q: "巨型積木城堡是用什麼做的？", o: ["五顏六色的巨型積木", "泥土和石頭", "冰塊"], a: 0 }, { q: "城堡蓋得比什麼還要高？", o: ["比大樹還要高", "比小狗還要高", "比桌子還要高"], a: 0 }, { q: "小朋友們在城堡裡做什麼？", o: ["興奮地爬進去探險", "睡午覺", "寫功課"], a: 0 }] },
+    { id: 310, icon: '🦘', lang: 'zh', image: 'IMG_3226.JPEG', title: "小袋鼠搬家", story: ["澳洲的一隻小袋鼠，和媽媽一起搬到了新家。", "工作人員給了牠一個柔軟的紙箱做新「口袋」。", "小袋鼠好開心，在裡面跳來跳去，像個快樂的小精靈。", "媽媽在旁邊看著牠，眼睛笑得像彎彎的月亮！新家真好玩！"], q: [{ q: "小袋鼠搬到了哪裡？", o: ["新家", "學校", "超市"], a: 0 }, { q: "工作人員給了小袋鼠什麼做新口袋？", o: ["柔軟的紙箱", "一個塑膠袋", "一個背包"], a: 0 }, { q: "媽媽的眼睛笑得像什麼？", o: ["彎彎的月亮", "圓圓的太陽", "閃閃的星星"], a: 0 }] },
+    { id: 401, icon: '🐘', lang: 'zh', image: 'IMG_3054.PNG', title: "西班牙小飛象", story: ["哇！在西班牙的一個小鎮裡，發生了一件非常神奇的事情！", "一隻超級可愛的小飛象（牠其實是小老鼠 Merry），名叫 Merry，", "今天第一次學會了張開牠的小翅膀，飛到了一個大氣球上。", "樣子真的太神奇了！所有人都笑了，大家都很愛 Merry！"], q: [{ q: "這隻小飛象其實是什麼動物？", o: ["小老鼠", "小貓", "小鳥"], a: 0 }, { q: "牠學會了張開什麼飛起來？", o: ["小翅膀", "小雨傘", "小葉子"], a: 0 }, { q: "牠飛到了什麼東西上面？", o: ["大氣球", "大樹", "屋頂"], a: 0 }] },
+    { id: 402, icon: '🐼', lang: 'zh', image: 'IMG_3059.PNG', title: "熊貓寶寶學溜冰", story: ["哇！在西班牙的一個小鎮裡，發生了一件非常有趣的事情！", "超可愛的熊貓寶寶「Merry」，今天第一次學會了張開牠的小腳，溜冰在冰上飛翔。", "牠高興地跳來跳去，樣子真的太神奇了！", "所有小朋友都開心得笑個不停。", "牠是世界上最認真、最可愛的小貓！溜冰加油！"], q: [{ q: "熊貓寶寶在學做什麼？", o: ["學溜冰", "學游泳", "學跳舞"], a: 0 }, { q: "熊貓寶寶在冰上感覺像什麼？", o: ["像飛翔", "像睡覺", "像跌倒"], a: 0 }, { q: "小朋友看到牠的反應是什麼？", o: ["開心得笑個不停", "傷心得哭了", "害怕得跑走"], a: 0 }] },
+    { id: 403, icon: '🐙', lang: 'zh', image: 'IMG_3098.PNG', title: "藍色迷你章魚", story: ["科學家在加拉巴哥群島的深海中，發現了一隻全新的超迷你「藍色章魚」！", "牠只有高爾夫球那麼大，皮膚亮晶晶的，非常可愛。", "這隻小章魚住在大海深處，是科學界第一次見到牠喔！"], q: [{ q: "科學家在哪裡發現了這隻章魚？", o: ["深海中", "樹林裡", "沙漠中"], a: 0 }, { q: "這隻章魚的大小像什麼？", o: ["高爾夫球", "籃球", "西瓜"], a: 0 }, { q: "章魚的皮膚看起來怎麼樣？", o: ["亮晶晶的", "黑漆漆的", "毛茸茸的"], a: 0 }] },
+    { id: 404, icon: '🐸', lang: 'zh', image: 'IMG_3201.PNG', title: "生菜裡的驚喜朋友", story: ["哇！就在最近，一家超市發生了超級好笑的事。", "一位叔叔正在整理生菜袋，突然發現袋子裡有東西在跳！", "原來是一隻超級可愛、綠油油的小青蛙，", "牠正躲在裡面探頭探腦，還跟人招手呢！", "牠真是太調皮了，竟然跟著生菜一起旅行！"], q: [{ q: "叔叔在整理什麼東西？", o: ["生菜袋", "蘋果袋", "麵包袋"], a: 0 }, { q: "袋子裡跳出來的是什麼動物？", o: ["小青蛙", "小蟲子", "小老鼠"], a: 0 }, { q: "小青蛙在袋子裡做什麼動作？", o: ["探頭探腦還招手", "呼呼大睡", "一直吃菜"], a: 0 }] },
+    { id: 405, icon: '🐢', lang: 'zh', image: 'IMG_3202.PNG', title: "海龜伯伯小助手", story: ["幾天前，在一個遙遠的海灘上，發生了一件神奇的事！", "一隻超大的海龜伯伯，牠叫「波波」，游到岸邊。", "但牠不是來產卵的，牠是來幫忙的！海灘上到處都是人們丟棄的彩色小鴨子。", "波波用大大的鰭把鴨子推上岸。一個迷路的小女孩「莉莉」看見了，一點也不怕，", "還爬上波波的背，跟著波波一起把小鴨子排整整齊齊。大家都來幫忙！"], q: [{ q: "這位海龜伯伯的名字叫什麼？", o: ["波波", "莉莉", "豆豆"], a: 0 }, { q: "海龜波波來海灘幫忙做什麼？", o: ["把小鴨子推上岸", "產卵", "找食物"], a: 0 }, { q: "莉莉從這件事學會了什麼？", o: ["要愛護大海不亂丟東西", "要每天游泳", "要天天吃小鴨子"], a: 0 }] },
+    { id: 406, icon: '🦀', lang: 'zh', image: 'IMG_3203.PNG', title: "彩色螃蟹賽跑", story: ["科學家在一個島上，發現了一種會「跑步」的彩色小螃蟹！", "牠們不僅漂亮，還跑得非常快！", "村民們為牠們辦了一個跑步大賽，大家都在加油！", "這真是太奇妙了！小朋友們都來觀看。", "大家都覺得這些小螃蟹是神奇的生物。"], q: [{ q: "科學家發現了什麼會跑步的動物？", o: ["彩色小螃蟹", "黑色小烏龜", "白色小兔子"], a: 0 }, { q: "這些小螃蟹跑得怎麼樣？", o: ["非常快", "非常慢", "不會動"], a: 0 }, { q: "村民們為牠們舉辦了什麼活動？", o: ["跑步比賽", "游泳比賽", "畫畫大賽"], a: 0 }] },
+    { id: 407, icon: '🐿️', lang: 'zh', image: 'IMG_3204.PNG', title: "滑水的小松鼠", story: ["在遙遠的森林湖邊，發生了一件神奇的事！", "有一隻小松鼠名叫「閃閃」。牠非常勇敢，竟然學會了滑水！", "牠穿上小小的救生衣，站在小木板上，由一艘玩具船拉著，滑得可快了！", "閃閃說：「滑水真好玩，像飛一樣！」"], q: [{ q: "這隻小松鼠的名字叫什麼？", o: ["閃閃", "波波", "豆豆"], a: 0 }, { q: "牠學會了什麼運動？", o: ["滑水", "游泳", "爬樹"], a: 0 }, { q: "牠說滑水感覺像什麼？", o: ["像飛一樣", "像走路一樣", "像睡覺一樣"], a: 0 }] },
+    { id: 408, icon: '🐝', lang: 'zh', image: 'IMG_3205.PNG', title: "地下的工程蜂", story: ["哇！科學家在一個地下，發現了一個超級大的「工程蜜蜂」城市。", "大約550萬隻小蜜蜂，不是住樹上，而是住在土裡，", "牠們每天忙著挖土、蓋房子、搬運花粉。", "牠們把地下蓋得像一個繁忙的工廠，真是太有趣、太古怪了！", "你們見過這麼勤勞的小工程師嗎？"], q: [{ q: "小蜜蜂住在哪裡？", o: ["住在土裡", "住在樹上", "住在水裡"], a: 0 }, { q: "牠們每天忙著做什麼？", o: ["挖土和蓋房子", "睡覺和唱歌", "游泳和洗澡"], a: 0 }, { q: "地下的蜜蜂城市看起來像什麼？", o: ["繁忙的工廠", "安靜的圖書館", "空蕩蕩的公園"], a: 0 }] },
+    { id: 409, icon: '🐭', lang: 'zh', image: 'IMG_3208.JPEG', title: "小老鼠大醫生", story: ["大象伯伯的象牙腫了，很痛很痛！", "科學家們找來一個超級厲害的醫生：一隻只有手掌大的小老鼠！", "小老鼠爬上象牙，用牠的小鼻子聞一聞，用小腳丫踩一踩，終於把象牙治好了。", "大象伯伯現在開心極了！科學家說，小老鼠是世界上最聰明的象牙醫生！"], q: [{ q: "為什麼大象伯伯要哭？", o: ["因為象牙腫了很痛", "因為肚子餓", "因為迷路了"], a: 0 }, { q: "誰治好了大象伯伯的象牙？", o: ["小老鼠", "小鳥", "小貓"], a: 0 }, { q: "科學家說小老鼠是什麼？", o: ["最聰明的象牙醫生", "最會跑步的動物", "最會唱歌的歌手"], a: 0 }] },
+    { id: 410, icon: '🎃', lang: 'zh', image: 'IMG_3217.PNG', title: "滾南瓜比賽", story: ["在國外的一個小鎮，突然來了幾顆超級大的南瓜！", "它們不是放在車上，而是自己在馬路上「滾」！每顆南瓜都有名字。", "小朋友們都非常興奮，圍著它們跑。", "這是一個特別的滾南瓜比賽，看誰家的南瓜滾得最快最有趣！", "這是一個超級開心的節日！"], q: [{ q: "南瓜是怎麼移動的？", o: ["自己在馬路上滾", "放在車上", "人們抬著"], a: 0 }, { q: "小朋友們看到南瓜的心情是怎樣的？", o: ["非常興奮", "非常害怕", "非常生氣"], a: 0 }, { q: "這個活動是什麼比賽？", o: ["滾南瓜比賽", "吃南瓜比賽", "畫南瓜比賽"], a: 0 }] },
+    { id: 411, icon: '🐕', lang: 'zh', image: 'IMG_3224.JPEG', title: "小狗波波當郵差", story: ["有一隻名叫波波的小狗，在國外的一個小鎮上當上了真正的郵差！", "每天，牠都會背著小書包，載著滿滿的信，在街上快樂地跑來跑去，", "把信給鎮上的好朋友。", "大家都很喜歡波波，每次見到牠都會給一個大大大的擁抱。", "波波送信時還會高興地搖尾巴呢！"], q: [{ q: "小狗郵差的名字叫什麼？", o: ["波波", "閃閃", "豆豆"], a: 0 }, { q: "波波每天送什麼東西？", o: ["滿滿的信", "好吃的蘋果", "漂亮的玩具"], a: 0 }, { q: "見到波波時，大家會做什麼？", o: ["給一個大大的擁抱", "生氣地罵牠", "假裝沒看到"], a: 0 }] },
+    { id: 412, icon: '🐈', lang: 'zh', image: 'IMG_3228.JPEG', title: "日本跳舞貓咪", story: ["【神奇消息】在日本，發生了有趣的事！一隻很聰明的貓咪，", "牠竟然發現了音樂！", "牠每天都聽快樂的音樂，還跟著音樂一起跳舞呢！", "你聽過會跳舞的貓咪嗎？這真是太神奇了！", "你也喜歡音樂嗎？快來和貓咪一起跳舞吧！"], q: [{ q: "日本的貓咪發現了什麼？", o: ["發現了音樂", "發現了魚", "發現了老鼠"], a: 0 }, { q: "貓咪每天聽音樂還會做什麼？", o: ["跟著音樂一起跳舞", "跟著音樂睡覺", "跟著音樂吃飯"], a: 0 }, { q: "大家覺得這件事怎麼樣？", o: ["太神奇了", "太無聊了", "太可怕了"], a: 0 }] },
+    { id: 413, icon: '🐙', lang: 'zh', image: 'IMG_3230.PNG', title: "章魚音樂會", story: ["海洋裡的新聞！在夏威夷的海邊，發生了一件神奇的事。", "科學家發現了一隻非常聰明的章魚。這隻章魚，居然會用它的八隻腳，", "同時彈琴、敲鼓和吹笛子！", "它舉辦了一場美麗的音樂會，讓所有的小魚螃蟹都高興地跳起舞來。", "這真是一場奇妙的海洋音樂會！"], q: [{ q: "是誰舉辦了音樂會？", o: ["聰明的章魚", "快樂的小魚", "巨大的鯨魚"], a: 0 }, { q: "音樂會是在哪裡舉行的？", o: ["夏威夷的海邊", "寒冷的南極", "森林的湖邊"], a: 0 }, { q: "魚兒和螃蟹們聽完音樂後做什麼？", o: ["高興地跳起舞來", "害怕地躲起來", "安靜地睡覺"], a: 0 }] },
+    { id: 414, icon: '🐿️', lang: 'zh', image: 'IMG_3231.JPEG', title: "松鼠的綠帽子", story: ["有趣的新聞。在英國的一個公園裡，一隻小松鼠發現了一個很大、很毛茸茸的綠色帽子。", "小松鼠覺得這是一個很溫暖、很可愛的新家。", "它現在住在裡面，看起來非常好笑！", "小朋友們，你們覺得它的新家漂亮嗎？"], q: [{ q: "小松鼠在哪裡發現帽子的？", o: ["在英國的一個公園裡", "在美國的動物園", "在日本的山上"], a: 0 }, { q: "帽子是什麼顏色的？", o: ["綠色", "紅色", "黃色"], a: 0 }, { q: "小松鼠用帽子做什麼？", o: ["當作溫暖的新家", "當作好吃的食物", "當作好玩的玩具"], a: 0 }] },
+    { id: 415, icon: '🐹', lang: 'zh', image: 'IMG_3233.JPEG', title: "水豚藝術雕塑", story: ["小朋友，你們知道嗎？最近動物園發生了一件趣事！", "為了迎接水豚家族，園區裡擺放了22座超級搶眼的彩色水豚雕塑。", "這些雕塑有鮮艷的粉紅和橘色，看起來就像卡通裡跑出來一樣！", "雖然真的水豚還沒來，但大家已經可以先跟這可愛的藝術雕塑拍照互動了。"], q: [{ q: "動物園裡出現了什麼顏色的水豚雕塑？", o: ["彩色粉紅和橘色", "只有黑色", "只有白色"], a: 0 }, { q: "為什麼動物園要擺放這些水豚雕塑？", o: ["為了迎接水豚家族", "為了慶祝新年", "為了嚇跑小鳥"], a: 0 }, { q: "雖然真的水豚還沒來，大家可以先做什麼？", o: ["跟雕塑拍照和互動", "把雕塑帶回家", "在雕塑上畫畫"], a: 0 }] },
+    { id: 501, icon: '🐻', lang: 'zh', image: 'IMG_3346.PNG', title: "大熊機器人", story: ["世界上出現了一個大熊機器人！它的工作不是打架，而是為小朋友烤麵包和餅乾。", "每天，它都會為全城的人送上熱騰騰的美味，讓大家都開心，肚子也飽飽的。", "這是一個快樂的熊熊廚師！"], q: [{ q: "大熊機器人的工作是什麼？", o: ["為小朋友烤麵包和餅乾", "打架", "掃地"], a: 0 }, { q: "大熊機器人每天會送上什麼？", o: ["熱騰騰的美味", "冷冰冰的水", "苦苦的藥"], a: 0 }, { q: "大家都喜歡大熊機器人嗎？", o: ["喜歡，大家都開心", "不喜歡", "害怕"], a: 0 }] },
+    { id: 502, icon: '🐱', lang: 'zh', image: 'IMG_3379.PNG', title: "時光遊戲機", story: ["近日，在遙遠的小動物國家，發生了一件超級有趣的事！", "一隻名叫「喵喵」的小貓咪發明了一台神奇的「時光遊戲機」。", "這台機器雖然不能真的飛回過去，但只要把舊玩具放進去，它就會自動幫玩具修理好，並加上新功能！", "舊積木會變成會變色的彩虹積木！", "喵喵說：「玩耍是最棒的事情！」"], q: [{ q: "喵喵發明了什麼機器？", o: ["時光遊戲機", "時光飛船", "電視機"], a: 0 }, { q: "這台機器可以把舊玩具變成什麼？", o: ["修理好並加上新功能", "變成食物", "變成石頭"], a: 0 }, { q: "舊積木放進去會變成什麼？", o: ["會變色的彩虹積木", "黑色的積木", "透明的積木"], a: 0 }] },
+    { id: 503, icon: '🧶', lang: 'zh', image: 'IMG_3391.PNG', title: "波波的毛線球", story: ["在遠方的貓咪幼兒園，有一隻特別愛玩毛線的小貓名叫波波。", "波波不小心發現了一顆超級大的七彩毛線球。", "波波花了整整一個星期，天天在裡面鑽來鑽去，把毛線纏得密密麻麻，最後竟然織成了一個溫暖的小窩！", "連老師看了都目瞪口呆，誇牠是天才小編織家。"], q: [{ q: "小貓波波發現了什麼？", o: ["超級大的七彩毛線球", "一個大皮球", "一個蘋果"], a: 0 }, { q: "波波把毛線球變成了什麼？", o: ["溫暖的小窩", "一件毛衣", "一頂帽子"], a: 0 }, { q: "老師誇波波是什麼？", o: ["天才小編織家", "畫畫天才", "跑步冠軍"], a: 0 }] },
+    { id: 504, icon: '🐴', lang: 'zh', image: 'IMG_3398.PNG', title: "小驢子穿襪子", story: ["最近，有一群可愛的救援小驢子因為受傷了，大家都很擔心牠們。", "沒想到，英國的一家足球俱樂部送來了一份特別的禮物——好多好多足球隊的襪子！", "因為很有彈性，被剪裁後剛好變成了小驢子腳上的「保護套」。", "現在，小驢子們穿著帥氣的襪子，腳舒服多了，也能在草地上快樂地跑來跑去了！"], q: [{ q: "小驢子為什麼需要穿襪子？", o: ["因為受傷了需要保護", "因為天氣太冷", "因為要參加比賽"], a: 0 }, { q: "這些襪子原本是給誰穿的？", o: ["足球隊員", "籃球隊員", "警察叔叔"], a: 0 }, { q: "小驢子穿上襪子後感覺怎麼樣？", o: ["腳舒服多了", "覺得很痛", "覺得很熱"], a: 0 }] },
+    { id: 505, icon: '🐶', lang: 'zh', image: 'IMG_3578.PNG', title: "聰明狗狗網購", story: ["在美國，一隻名叫「布迪」的聰明黃金獵犬，趁主人不注意時，", "竟然用平板電腦在購物網站上「點擊」購買了一箱超級巨大的狗餅乾！", "主人發現後哭笑不得，但網店知道後卻決定把這箱餅乾免費送給牠！", "布迪現在是全區最快樂的狗狗啦！"], q: [{ q: "故事裡的狗狗叫什麼名字？", o: ["布迪", "波波", "豆豆"], a: 0 }, { q: "狗狗用什麼東西來網購？", o: ["平板電腦", "手機", "電腦"], a: 0 }, { q: "網店知道後做了什麼決定？", o: ["免費送給牠", "叫主人退貨", "報警處理"], a: 0 }] },
+    { id: 506, icon: '🐻', lang: 'zh', image: 'IMG_3579.JPEG', title: "袋熊與雪怪", story: ["澳洲出現了神奇雪怪！原來是圓圓胖胖的袋熊在雪地裡玩耍。", "牠們短短的腿印在雪上，留下了像大腳怪一樣的痕跡，讓大家嚇一跳！", "科學家說，這些可愛的胖動物能在冷天找到玩樂的方式，真是太聰明了。"], q: [{ q: "雪地裡的「雪怪」其實是什麼動物？", o: ["袋熊", "北極熊", "雪人"], a: 0 }, { q: "大家看到腳印為什麼會嚇一跳？", o: ["像大腳怪一樣的痕跡", "因為腳印很小", "因為沒有腳印"], a: 0 }, { q: "袋熊在雪地裡做什麼？", o: ["玩耍", "睡覺", "找食物"], a: 0 }] },
+    { id: 507, icon: '⚽', lang: 'zh', image: 'IMG_3593.PNG', title: "自律的超能力", story: ["在葡萄牙的一個小島上，有一個叫羅納度的小男孩。", "他小時候長得又瘦又小，別人都笑他踢不了球！", "但他不傷心，他告訴自己：「我要比所有人都更努力！」", "他每天最早起，最晚睡，只吃健康的食物，堅持練習控球和健身。", "經過幾年的堅持，瘦弱的小男孩變成了一位強壯的足球超級巨星！"], q: [{ q: "羅納度小時候，別人批評他什麼？", o: ["太瘦了踢不了球", "跑得太慢", "不會唱歌"], a: 0 }, { q: "羅納度是用什麼方法讓自己變強壯的？", o: ["堅持練習和吃健康食物", "每天睡懶覺", "每天吃糖果"], a: 0 }, { q: "羅納度最後變成了什麼？", o: ["足球超級巨星", "籃球巨星", "電影明星"], a: 0 }] },
+    { id: 508, icon: '🏃', lang: 'zh', image: 'IMG_3597.JPG', title: "永不放棄的足球夢", story: ["傑米·瓦迪在25歲前，只是一名在工廠辛苦工作的普通工人。", "業餘時間他努力地練習踢足球。雖然大家覺得他不可能成功，但瓦迪從不放棄夢想！", "憑藉著熱愛和不屈不撓的毅力，他帶領萊斯特城隊獲得了英超冠軍！", "只要擁有夢想並努力堅持，每個人都有機會創造輝煌！"], q: [{ q: "瓦迪在25歲之前的工作是什麼？", o: ["普通工人", "足球教練", "醫生"], a: 0 }, { q: "當別人都不看好的時候，瓦迪怎麼做？", o: ["從不放棄夢想", "放棄了足球", "每天哭泣"], a: 0 }, { q: "瓦迪最後獲得了什麼冠軍？", o: ["英超冠軍", "世界盃冠軍", "奧運冠軍"], a: 0 }] },
+    { id: 509, icon: '🛹', lang: 'zh', image: 'IMG_3695.PNG', title: "會滑板的狗狗旺旺", story: ["蘇格蘭發生了一件超酷的事情！有一隻叫「旺旺」的小狗，", "牠雖然只有六個月大，但已經是一個超級滑板高手啦！", "旺旺最喜歡在公園裡滑來滑去，牠還會轉圈和滑下小坡呢。", "小朋友都愛來看牠表演，大家都說牠是「最快樂的滑板小明星」！"], q: [{ q: "旺旺是一隻什麼動物？", o: ["小狗", "小貓", "小豬"], a: 0 }, { q: "旺旺最喜歡做什麼？", o: ["玩滑板", "游泳", "睡覺"], a: 0 }, { q: "大家都叫旺旺什麼？", o: ["最快樂的滑板小明星", "最可愛的睡覺明星", "最聰明的畫畫明星"], a: 0 }] },
+    { id: 510, icon: '🐘', lang: 'zh', image: 'IMG_3697.JPEG', title: "超級畫家豆豆", story: ["南非發生了一件超酷的事情！有一隻叫「豆豆」小象，", "雖然只有三歲，但已經是一個超級畫家啦！", "豆豆最喜歡用長長的鼻子捲起畫筆，在畫布上點滿七彩顏色！", "小朋友們都愛來看牠表演，大家都說豆豆是「最快樂的畫家小象」！"], q: [{ q: "豆豆是哪一種動物？", o: ["小象", "小狗", "小猴子"], a: 0 }, { q: "豆豆用什麼來拿畫筆？", o: ["長長的鼻子", "短小的尾巴", "大大的耳朵"], a: 0 }, { q: "大家都叫豆豆什麼？", o: ["最快樂的畫家小象", "最愛吃的胖小象", "最愛睡覺的小象"], a: 0 }] },
+    { id: 511, icon: '🦩', lang: 'zh', image: 'IMG_3698.PNG', title: "超級派對王阿Q", story: ["美國發生了一件超酷的事情！有一隻叫「阿Q」的火烈鳥，", "牠非常喜歡熱鬧！這幾天，阿Q穿上漂亮的派對草裙，在一場夏日派對上跳起了快樂的舞蹈！", "牠用長長的腿踢踢沙子，還用頭蹭蹭小朋友呢！", "大家愛跟牠一起玩，牠是派對上「最受歡迎的大明星」！"], q: [{ q: "阿Q是一隻什麼動物？", o: ["火烈鳥", "小鴨子", "企鵝"], a: 0 }, { q: "阿Q穿上什麼東西跳舞？", o: ["漂亮的派對草裙", "帥氣的西裝", "溫暖的毛衣"], a: 0 }, { q: "大家覺得阿Q是什麼？", o: ["最受歡迎的大明星", "最安靜的旁觀者", "最愛搗蛋的小鳥"], a: 0 }] },
+    { id: 512, icon: '🦋', lang: 'zh', image: 'IMG_3699.PNG', title: "會睡覺的大蝴蝶", story: ["巴西的一個大花園裡，最近發生了一件有趣的事情！", "這裡有一隻很大的蝴蝶雕像，小朋友們聽說蝴蝶晚上會冷，", "所以他們帶了自己的小毯子，幫大蝴蝶蓋上。", "大家還把花園整理得像溫暖的床，大蝴蝶每天都笑得很開心！", "這真是最可愛的花園故事了！"], q: [{ q: "小朋友們幫大蝴蝶做什麼？", o: ["蓋上小毯子", "澆水", "唱歌"], a: 0 }, { q: "為什麼要幫蝴蝶蓋毯子？", o: ["怕蝴蝶晚上會冷", "因為蝴蝶想睡覺", "為了好玩"], a: 0 }, { q: "大家把花園整理得像什麼？", o: ["溫暖的床", "遊樂園", "大泳池"], a: 0 }] },
+    { id: 513, icon: '⛈️', lang: 'zh', image: 'IMG_3882.PNG', title: "每日按時報到的雷雨", story: ["在澳大利亞的提維群島，有個名叫「康維克特·赫克托」的超級雷雨。", "它非常守時，每天下午三點準時出現，就像一個超級準時的小客人！", "它把天上的雲朵吹得又高又大，帶來好多好多的雨水，滋潤了這裡的植物和大地。", "雖然聽起來有點可怕，但其實是一個有趣的大自然奇觀呢！"], q: [{ q: "這個超級雷雨每天幾點出現？", o: ["下午三點", "早上八點", "晚上十點"], a: 0 }, { q: "雷雨帶來的雨水幫助了誰？", o: ["植物和大地", "外星人", "沙漠"], a: 0 }, { q: "這個雷雨叫什麼名字？", o: ["康維克特·赫克托", "波波", "閃閃"], a: 0 }] },
+    { id: 514, icon: '🎈', lang: 'zh', image: 'IMG_3883.PNG', title: "神奇的會飛氣球", story: ["在遙遠的森林裡，小兔子發現了一種神奇的會飛氣球！", "這些氣球不像平常的氣球，它們是由彩虹做的。", "它們可以帶著小動物飛上天，去探索雲朵上面的世界。", "小兔子每天都和氣球一起去冒險，看到了好多好多的美景！"], q: [{ q: "神奇的會飛氣球是什麼做的？", o: ["彩虹", "白雲", "棉花"], a: 0 }, { q: "氣球可以帶小動物去哪裡？", o: ["飛上天探索雲朵", "潛入深海", "鑽進地底"], a: 0 }, { q: "小兔子每天和氣球一起做什麼？", o: ["去冒險", "睡大覺", "吃蘿蔔"], a: 0 }] },
+    { id: 515, icon: '☁️', lang: 'zh', image: 'IMG_3884.PNG', title: "雲朵馬戲團的音樂", story: ["在遙遠的天上，有一家神奇的雲朵馬戲團！", "這些雲朵不只會變換形狀，還會發出美妙的音樂。", "只要我們閉上眼睛，用心聽，就能聽到它們演奏的鋼琴聲和鼓聲。", "每天晚上，馬戲團都會為全世界的小朋友演奏一首特別的安眠曲！"], q: [{ q: "雲朵馬戲團會發出什麼？", o: ["美妙的音樂", "可怕的雷聲", "大雨"], a: 0 }, { q: "閉上眼睛能聽到什麼樂器的聲音？", o: ["鋼琴聲和鼓聲", "吉他聲", "小提琴聲"], a: 0 }, { q: "馬戲團每天晚上為小朋友演奏什麼？", o: ["安眠曲", "進行曲", "搖滾樂"], a: 0 }] },
+    { id: 516, icon: '⛲', lang: 'zh', image: 'IMG_3885.PNG', title: "會跳舞的彩虹噴泉", story: ["在杜拜，有個巨大的噴泉，它不只會噴水，還會跳舞！", "音樂一響，水柱就跟著節奏，像彩虹一樣在空中跳躍。", "它是一個超級準時的藝術家，每天都為全世界表演，太好玩了！"], q: [{ q: "杜拜的巨大噴泉會做什麼？", o: ["跟著音樂跳舞", "唱歌", "煮飯"], a: 0 }, { q: "水柱在空中跳躍時像什麼？", o: ["彩虹", "星星", "月亮"], a: 0 }, { q: "這個噴泉每天都為誰表演？", o: ["全世界", "只有外星人", "只有小狗"], a: 0 }] },
+    { id: 517, icon: '🌞', lang: 'zh', image: 'IMG_3886.PNG', title: "太陽公公也想吃冰淇淋", story: ["在很熱的非洲，太陽公公也覺得熱。這一天，他發現了一個會飛的冰淇淋車，裡面裝滿了彩虹口味的冰淇淋！", "太陽公公用一條光光的手，拿到了一個好好大的冰淇淋。", "他高興得紅紅的臉，像蘋果一樣，太可愛了！"], q: [{ q: "太陽公公在哪裡覺得熱？", o: ["非洲", "南極", "歐洲"], a: 0 }, { q: "冰淇淋車裡面裝了什麼口味的冰淇淋？", o: ["彩虹口味", "巧克力口味", "草莓口味"], a: 0 }, { q: "太陽公公拿到冰淇淋後，臉變得像什麼？", o: ["蘋果", "香蕉", "葡萄"], a: 0 }] },
+    { id: 518, icon: '🍦', lang: 'zh', image: 'IMG_4021.PNG', title: "小企鵝的冰淇淋夢想", story: ["在南極發生了一件趣事！一隻只有幾個月大的小企鵝，因為太想吃冰淇淋了，", "竟然偷偷地溜進了遊客的營地，推著一輛比自己還大的雪糕車，想要去冰淇淋店！", "幸好，保育員叔叔發現了牠，把牠安全地送回了企鵝媽媽的身邊。", "小企鵝雖然沒有吃到冰淇淋，但牠的冒險精神真是太可愛了！"], q: [{ q: "小企鵝為什麼要溜進遊客的營地？", o: ["因為想吃冰淇淋", "因為想找媽媽", "因為想睡覺"], a: 0 }, { q: "小企鵝推著什麼東西？", o: ["一輛雪糕車", "一台電視", "一輛自行車"], a: 0 }, { q: "最後是誰把小企鵝送回媽媽身邊？", o: ["保育員叔叔", "警察叔叔", "遊客"], a: 0 }] },
+    { id: 519, icon: '🍕', lang: 'zh', image: 'IMG_4022.PNG', title: "披薩變身飛盤遊戲", story: ["最近，一個特別的Pizza比賽在義大利舉行。", "一位爸爸在拋Pizza餅皮的時候，不小心讓它飛了出去！", "它飛過花園，正好被一個正在玩耍的小男孩接住了。", "這塊飛行的Pizza變成了最美味的飛盤遊戲！大家都笑得合不攏嘴。"], q: [{ q: "這個趣聞發生在哪裡？", o: ["義大利", "英國", "法國"], a: 0 }, { q: "爸爸在做什麼的時候讓Pizza飛了出去？", o: ["拋Pizza餅皮的時候", "吃Pizza的時候", "買Pizza的時候"], a: 0 }, { q: "Pizza最後被誰接住了？", o: ["一個小男孩", "一隻小狗", "一隻小鳥"], a: 0 }] },
+    { id: 520, icon: '🫧', lang: 'zh', image: 'IMG_4026.PNG', title: "超級泡泡屋", story: ["在一個神奇的公園裡，舉辦了一場有趣的「超級泡泡」派對。", "一位泡泡科學家發明了一種特別的泡泡水，可以吹出比汽車還要大的巨型泡泡！", "兩個幸運的小朋友在裡面玩耍，就像住在彩虹色的城堡裡一樣。", "大家興奮地圍著泡泡屋歡呼，這真是太夢幻了！"], q: [{ q: "這次派對叫什麼名字？", o: ["超級泡泡派對", "生日派對", "音樂派對"], a: 0 }, { q: "科學家發明的泡泡水可以吹出多大的泡泡？", o: ["比汽車還要大", "像蘋果一樣大", "像房子一樣大"], a: 0 }, { q: "小朋友在巨型泡泡裡玩耍，感覺像住在什麼地方？", o: ["彩虹色的城堡", "冰雪宮殿", "樹屋"], a: 0 }] },
+    { id: 521, icon: '🎈', lang: 'zh', image: 'IMG_4030.PNG', title: "天空中的巨型泡泡", story: ["最近，在一個陽光明媚的城市裡，舉行了一場特別的「超級泡泡派對」。", "一位名叫「泡泡伯伯」的發明家帶來了一台巨大的機器，可以吹出比汽車還要大的巨型泡泡！", "這些五顏六色的泡泡飄滿了天空，小朋友們興奮地跳起來想要抓住它們。", "大家在泡泡雨中開心地笑著，這真是一個夢幻又難忘的日子！"], q: [{ q: "這次派對叫什麼名字？", o: ["超級泡泡派對", "生日派對", "音樂派對"], a: 0 }, { q: "誰發明了巨大的泡泡機器？", o: ["泡泡伯伯", "科學家叔叔", "警察叔叔"], a: 0 }, { q: "小朋友們在做什麼？", o: ["想要抓住泡泡", "在睡覺", "在吃東西"], a: 0 }] },
+    { id: 522, icon: '🌈', lang: 'zh', image: 'IMG_4031.PNG', title: "巨型彩虹滑梯", story: ["最近，在一個美麗的城市裡，發生了一件超酷的事情！", "一條超級巨大的彩虹滑梯，從最高的山上一直滑到了市中心！", "這條滑梯有七種顏色，小朋友們可以坐在可愛的氣墊圈裡，從山頂咻地滑下來，就像在雲朵上飛一樣。", "大家都排隊來玩，開心得哈哈大笑。", "這是世界上最長的城市彩虹滑梯，真是太刺激了！"], q: [{ q: "巨型彩虹滑梯有多長？", o: ["從山上滑到市中心", "只有十公尺", "像操場一樣長"], a: 0 }, { q: "小朋友坐在什麼東西上滑下來？", o: ["可愛的氣墊圈", "紙箱", "木板"], a: 0 }, { q: "你覺得滑下來感覺怎麼樣？", o: ["像在雲朵上飛一樣", "很無聊", "很可怕"], a: 0 }] }
 ];
 
 let currentSessionQs = [];
@@ -494,21 +524,40 @@ function initHome() {
     const gridLong = document.getElementById("grid-long");
     gridShort.innerHTML = ""; gridLong.innerHTML = "";
 
+    // 獨立計數器
+    let shortCount = 1;
+    let longCount = 1;
+
     gameData.forEach(level => {
         const btn = document.createElement("button");
         btn.className = `level-btn ${completedLevels.includes(level.id) ? 'completed' : ''}`;
         let safeTitle = level.title.replace(/'/g, "\\'");
+        
+        let wordCount = level.story.join('').length;
+        let isShort = wordCount <= 80;
+        let displayNum = isShort ? shortCount++ : longCount++;
+
         btn.innerHTML = `
+            <div class="book-number">${displayNum}</div>
             <button class="home-audio-btn" onclick="playAudio('${safeTitle}', event)" title="聽聽故事名稱">🔊</button>
-            <div style="font-size: 2.2em; margin-bottom: 8px;">${level.icon}</div>
-            <div style="line-height: 1.4;">${level.title}</div>
+            <div style="font-size: 2.8em; margin-bottom: 10px; z-index: 2; text-shadow: 0 3px 6px rgba(0,0,0,0.15);">${level.icon}</div>
+            <div style="line-height: 1.2; z-index: 2; background: rgba(255,255,255,0.9); color: #333; padding: 4px 6px; border-radius: 6px; width: 85%; font-size: 0.9em; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">${level.title}</div>
         `;
         btn.onclick = () => startLevel(level.id);
         
-        let wordCount = level.story.join('').length;
-        if (wordCount <= 80) gridShort.appendChild(btn);
+        if (isShort) gridShort.appendChild(btn);
         else gridLong.appendChild(btn);
     });
+}
+
+function toggleProgressModal() {
+    const modal = document.getElementById("progress-modal");
+    if (modal.style.display === "flex") {
+        modal.style.display = "none";
+    } else {
+        renderProgress(); 
+        modal.style.display = "flex";
+    }
 }
 
 function renderProgress() {
@@ -530,6 +579,7 @@ function clearProgress() {
         completedLevels = [];
         localStorage.removeItem('teachercat_progress');
         initHome();
+        renderProgress(); 
     }
 }
 
@@ -580,6 +630,42 @@ function openModal() {
     document.getElementById("expanded-image").src = document.getElementById("story-image").src; 
 }
 function closeModal() { document.getElementById("image-modal").style.display = "none"; }
+
+/* ✨ 專屬列印圖片功能：產生一個隱藏 iframe 來列印圖片本身 ✨ */
+function printImageOnly() {
+    let printFrame = document.getElementById("print-frame");
+    if (!printFrame) {
+        printFrame = document.createElement("iframe");
+        printFrame.id = "print-frame";
+        printFrame.style.position = "fixed";
+        printFrame.style.right = "0";
+        printFrame.style.bottom = "0";
+        printFrame.style.width = "0";
+        printFrame.style.height = "0";
+        printFrame.style.border = "0";
+        document.body.appendChild(printFrame);
+    }
+    const imgSrc = document.getElementById("story-image").src;
+    
+    // 將圖片放入 iframe 並設定適合列印的樣式，然後觸發列印
+    const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>列印文章圖片</title>
+            <style>
+                @page { margin: 0; size: auto; }
+                body { margin: 0; display: flex; justify-content: center; align-items: center; background: white; height: 100vh; }
+                img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+            </style>
+        </head>
+        <body>
+            <img src="${imgSrc}" onload="window.focus(); window.print();">
+        </body>
+        </html>
+    `;
+    printFrame.srcdoc = html;
+}
 
 function startLevel(levelId) {
     currentLevelId = levelId;
@@ -639,6 +725,12 @@ function renderQuestion() {
     html += `</div>
         <div class="writing-area">
             <div class="writing-header">✍️ 書寫答案區</div>
+            
+            <div class="writing-question-prompt">
+                <span style="font-size: 1.5em;">❓</span>
+                <span style="flex-grow: 1;">${qData.q}</span>
+            </div>
+
             <div style="color: #666; margin-bottom: 15px; font-size: 1.1em;" data-html2canvas-ignore="true">請用手指或 Apple Pencil 在下方的虛線上寫出答案喔：</div>
             <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;" data-html2canvas-ignore="true">
                 <button class="tool-btn active" id="btn-pen" onclick="setTool('pen')">✏️ 畫筆</button>
@@ -663,7 +755,6 @@ function renderQuestion() {
     setTimeout(initCanvas, 50);
 }
 
-// ================= 畫板 (Canvas) 功能邏輯 =================
 let canvas, ctx, isDrawing = false, currentTool = 'pen'; 
 
 function initCanvas() {
@@ -693,7 +784,6 @@ function setTool(tool) {
     if (tool === 'pen') {
         if(btnPen) btnPen.classList.add('active');
         ctx.globalCompositeOperation = 'source-over'; 
-        // 👇 在這裡修改了畫筆的粗細！原本是 6，現在改成 3 (變得更幼)
         ctx.lineWidth = 3; 
         ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#333';
     } else if (tool === 'eraser') {
@@ -716,13 +806,11 @@ function startDrawing(e) {
     ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
 }
 
-// 📱 真正徹底修復：明確指定 e.touches 抓取第一根手指的座標！
 function startDrawingTouch(e) {
     if(e.touches && e.touches.length > 0) {
-        e.preventDefault(); // 阻止螢幕上下滾動
+        e.preventDefault(); 
         isDrawing = true;
-        // 👇 這裡加上了 [ 0 ] 確保抓取第一點觸控，避開系統過濾！
-        const pos = getPos(e.touches[ 0 ].clientX, e.touches[ 0 ].clientY);
+        const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
     }
@@ -734,13 +822,11 @@ function draw(e) {
     ctx.lineTo(pos.x, pos.y); ctx.stroke();
 }
 
-// 📱 真正徹底修復：明確指定 e.touches 抓取第一根手指的座標！
 function drawTouch(e) {
     if (!isDrawing) return;
     if(e.touches && e.touches.length > 0) {
-        e.preventDefault(); // 阻止螢幕上下滾動
-        // 👇 這裡加上了 [ 0 ] 確保抓取第一點觸控，避開系統過濾！
-        const pos = getPos(e.touches[ 0 ].clientX, e.touches[ 0 ].clientY);
+        e.preventDefault(); 
+        const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
     }
@@ -779,7 +865,6 @@ function saveFullPage() {
         feedbackBox.innerHTML = "❌ 截圖發生了一點小錯誤，請稍後再試。"; feedbackBox.style.color = "#FF8080";
     });
 }
-// ========================================================
 
 function updateNavButtons() {
     document.getElementById("btn-prev").disabled = (currentQIndex === 0);
@@ -841,8 +926,8 @@ function showCompletion() {
             <div style="font-size: 5em; margin-bottom: 10px; animation: pop 0.5s;">⭐</div>
             <h2>${titleText}</h2>
             <div class="settlement-btns">
-                <button class="level-btn" onclick="startLevel(${currentLevelId})">🔄 ${retryText}</button>
-                <button class="level-btn" onclick="goHome()" style="background: var(--accent);">🏠 ${nextText}</button>
+                <button class="level-btn" onclick="startLevel(${currentLevelId})" style="min-height: auto; padding: 15px;">🔄 ${retryText}</button>
+                <button class="level-btn" onclick="goHome()" style="background: var(--accent); min-height: auto; padding: 15px; color: white;">🏠 ${nextText}</button>
             </div>
         </div>
     `;
