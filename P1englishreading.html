@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 P1 English Reading Challenge 🌟</title>
+    <style>
+        :root {
+            --primary-color: #ff9a9e;
+            --secondary-color: #fecfef;
+            --text-color: #333;
+            --bg-color: #fff9ea;
+            --button-hover: #ff7e82;
+        }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            padding-top: 60px;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+        /* 左上角 Logo */
+        .top-left-logo { position: absolute; top: 20px; left: 20px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 1000; }
+        @media (max-width: 600px) { .top-left-logo { width: 50px; height: 50px; top: 10px; left: 10px; border: 2px solid white;} body { padding-top: 70px; } }
+
+        h1, h2, h3 { color: #d63384; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); position: relative; }
+        
+        /* 首頁故事清單 */
+        .story-list { text-align: left; margin: 20px 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .story-list { grid-template-columns: 1fr; } }
+        .story-item { background: var(--secondary-color); padding: 15px; border-radius: 15px; display: flex; align-items: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .story-item:hover { transform: scale(1.03); background: #fde4f2; }
+        .story-icon { font-size: 24px; margin-right: 10px; }
+        .story-title { font-size: 16px; font-weight: bold; margin-left: 10px; line-height: 1.2; }
+        
+        /* 一般按鈕設計 */
+        button { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 25px; cursor: pointer; margin: 10px; font-family: inherit; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;}
+        button:hover { background-color: var(--button-hover); transform: scale(1.02); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .audio-btn { background-color: #4facfe; padding: 5px 10px; font-size: 16px; border-radius: 50%; margin: 0; box-shadow:none;}
+        .audio-btn:hover { background-color: #00f2fe; }
+
+        /* --- 新增：圖片點擊與放大查看設計 --- */
+        .story-img-clickable {
+            max-width: 100%; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer; /* 游標變成點擊圖案 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .story-img-clickable:hover {
+            transform: scale(1.03); /* 微微放大 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* 全螢幕背景 (Lightbox) */
+        #lightbox {
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100vw; height: 100vh; 
+            background: rgba(0, 0, 0, 0.85); /* 背景變暗 */
+            z-index: 10000; 
+            justify-content: center; align-items: center; flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        #lightbox img {
+            max-width: 90%; max-height: 80%; 
+            border-radius: 15px; 
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .close-btn {
+            position: absolute; top: 20px; right: 30px; 
+            color: white; font-size: 50px; 
+            cursor: pointer; font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        .close-btn:hover { color: #ff9a9e; transform: scale(1.2); }
+        .lightbox-hint {
+            color: white; margin-top: 20px; font-size: 22px; font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        /* ---------------------------------- */
+
+        /* 閱讀區 */
+        #story-view, #quiz-view, #result-view { display: none; }
+        .story-text-container { background: #fdfbfb; padding: 25px; border-radius: 15px; border: 2px dashed #ff9a9e; margin-bottom: 20px; text-align: left;}
+        .sentence-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; font-size: 22px; line-height: 1.5; }
+        
+        /* 選擇題設計 */
+        .question-box { background: #e0c3fc; padding: 20px; border-radius: 15px; margin: 15px 0; text-align: left; min-height: 250px; }
+        .question-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px;}
+        .option { display: flex; align-items: center; width: 100%; text-align: left; background: white; color: #333; border: 3px solid #8e2de2; padding: 15px; border-radius: 12px; margin: 8px 0; font-size: 20px; font-weight: bold; transition: all 0.3s;}
+        .option:hover:not(:disabled) { background: #d4fc79; }
+        
+        /* 答對與答錯特效 */
+        @keyframes correctShake { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-5px);} }
+        @keyframes wrongShake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        .correct-choice { background-color: #bbf7d0 !important; border-color: #22c55e !important; color: #166534 !important; animation: correctShake 0.4s; }
+        .wrong-choice { background-color: #fecaca !important; border-color: #ef4444 !important; color: #991b1b !important; animation: wrongShake 0.4s; }
+
+        /* 導航按鈕區 */
+        .quiz-nav { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px;}
+        .quiz-nav button { flex: 1; font-size: 16px; padding: 12px; margin: 0; background-color: #a78bfa; }
+        .quiz-nav button:hover { background-color: #8b5cf6; }
+
+        /* 星星進度區 */
+        #progress-bar { margin: 20px 0; padding: 15px; background: #fff; border-radius: 15px; border: 2px solid #f6d365; text-align: left; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 20px; font-weight: bold;}
+        .stars-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; min-height: 80px;}
+        .star-wrapper { display: flex; flex-direction: column; align-items: center; width: 45px; }
+        .prog-star { font-size: 22px; filter: grayscale(100%); opacity: 0.3; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .prog-star.lit { font-size: 36px; filter: grayscale(0%); opacity: 1; text-shadow: 0 0 15px #ffd700; transform: scale(1.15); }
+        .star-num { font-size: 12px; color: #888; margin-top: 5px; font-weight: bold;}
+        
+        /* 頁尾 Footer */
+        .footer { margin-top: 40px; font-size: 15px; color: #555; border-top: 2px dashed #ff9a9e; padding-top: 20px; background-color: #fffaf0; border-radius: 15px; padding-bottom: 20px; }
+        .footer h4 { margin-bottom: 15px; color: #d63384; font-size: 20px; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items: center;}
+        .footer a, .footer span { text-decoration: none; padding: 8px 12px; background: white; border-radius: 20px; border: 1px solid #ccc; color: #333; font-weight: bold; transition: 0.3s;}
+        .footer a:hover { background: #ff9a9e; color: white; border-color: #ff9a9e; }
+    </style>
+</head>
+<body>
+
+<img src="cat.jpeg" class="top-left-logo" alt="Teacher Cat Logo" onerror="this.style.display='none'">
+
+<!-- 全螢幕圖片查看區 (Lightbox) -->
+<div id="lightbox" onclick="closeLightbox()">
+    <span class="close-btn" title="關閉">✖</span>
+    <img id="lightbox-img" src="" alt="Fullscreen Story Image" onclick="event.stopPropagation();">
+    <div class="lightbox-hint">💡 點擊畫面任意處關閉</div>
+</div>
+
+<div class="container">
+    <div id="home-view">
+        <h1>🌟 P1 English Reading Challenge 🌟</h1>
+        
+        <!-- 學習進度記錄區 -->
+        <div id="progress-bar">
+            <div class="progress-header">
+                <span>🏆 Progress Record 學習進度記錄</span>
+                <button style="font-size:14px; padding:8px 15px; background:#ff4757; margin:0;" onclick="clearStars()">🗑 清除記錄</button>
+            </div>
+            <div class="stars-container" id="progress-record-stars"></div>
+        </div>
+        
+        <p style="font-size: 18px; font-weight: bold;">👉 Click a story below, read carefully, and take the challenge!</p>
+
+        <h2>🌱 Easy Stories (Under 80 words)</h2>
+        <ul class="story-list" id="easy-list"></ul>
+
+        <h2>🌳 Adventure Stories (80 words or more)</h2>
+        <ul class="story-list" id="hard-list"></ul>
+    </div>
+
+    <!-- 閱讀區 -->
+    <div id="story-view">
+        <button onclick="goHome()">⬅ Back</button>
+        <h2 id="sv-title" style="display: flex; align-items: center; justify-content: center; gap: 10px;"></h2>
+        <p style="color: #666; font-size: 16px; margin-top: 0;">(💡 點擊圖片可以放大看清楚喔！)</p>
+        <div id="sv-img-container" style="margin-bottom: 20px;"></div>
+        <div class="story-text-container" id="sv-text"></div>
+        <button onclick="startQuiz()" style="font-size: 22px; padding: 15px 30px; width: 80%; background-color: #fca5a5;">🎮 Start Challenge!</button>
+    </div>
+
+    <!-- 分頁測驗區 -->
+    <div id="quiz-view">
+        <h2 id="qv-title" style="margin-bottom:5px;">Quiz Time!</h2>
+        <p id="qv-progress" style="font-size: 18px; color: #666; margin-top:0; font-weight:bold;"></p>
+        
+        <div id="quiz-container"></div>
+        
+        <div class="quiz-nav">
+            <button id="btn-prev" onclick="changeQuestion(-1)">⬅ 上一頁</button>
+            <button onclick="goHome()" style="background-color: #3b82f6;">🏠 回到主頁</button>
+            <button id="btn-next" onclick="changeQuestion(1)">下一頁 ➡</button>
+        </div>
+    </div>
+
+    <!-- 結算結果區 -->
+    <div id="result-view">
+        <h2 id="rv-title" style="font-size: 32px;"></h2>
+        <p id="rv-score" style="font-size: 24px;"></p>
+        <div id="rv-emoji" style="font-size: 80px; margin: 20px;"></div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <button onclick="startQuiz()" style="font-size: 22px; width: 80%; background-color: #fca5a5;">🔄 重新挑戰這一關 (Retry)</button>
+            <button onclick="goHome()" style="font-size: 22px; width: 80%; background-color: #3b82f6;">🏠 回到主頁 (Home)</button>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    <div class="footer">
+        <h4>🐾 Teacher Cat 的快樂AI教室 🐾</h4>
+        <div class="footer-links">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank">📺 YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
+            <span>🎵 抖音: 74254902683</span>
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">💬 WhatsApp 分享 Group</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 朗讀功能
+    function playAudio(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // 音效系統
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSoundEffect(type) {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if(type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    // 彩紙特效
+    function showConfetti() {
+        const emojis = ['✨', '🎉', '⭐', '🎊', '👍'];
+        for(let i=0; i<15; i++) {
+            let fx = document.createElement('div');
+            fx.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            fx.style.position = 'fixed'; fx.style.left = '50vw'; fx.style.top = '50vh';
+            fx.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            fx.style.pointerEvents = 'none'; fx.style.zIndex = '9999';
+            document.body.appendChild(fx);
+            fx.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${(Math.random()-0.5)*300}px, ${(Math.random()-1)*400}px) scale(1.5)`, opacity: 0 }
+            ], { duration: 800 + Math.random() * 600, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
+            setTimeout(() => fx.remove(), 1500);
+        }
+    }
+
+    // --- 新增：放大圖片 (Lightbox) 相關函數 ---
+    function openLightbox(imgSrc) {
+        document.getElementById('lightbox-img').src = imgSrc;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+    // ---------------------------------------
+
+    // 終極題庫 30 篇 (保留原設定)
+    const storyDB = {
+        // ========== 80字以下 (15篇) ==========
+        e1: { t: "The Runaway Pizza!", e: "🍕", ty: "e", img: "IMG_3704.JPG", tx: "Yesterday in Italy, a giant pizza jumped off a table! It ran down the street. People laughed and chased it. A dog caught the pizza. Everyone ate the happy pizza!", 
+            q: [ {q: "Where did the pizza run?", o: ["Down the street", "Up the tree", "In the sea"], a: 0}, {q: "Who chased the pizza?", o: ["Cats", "People", "Birds"], a: 1}, {q: "What caught the pizza?", o: ["A dog", "A boy", "A car"], a: 0}, {q: "Where did the story happen?", o: ["Japan", "Italy", "China"], a: 1}, {q: "How did people feel?", o: ["They cried", "They slept", "They laughed"], a: 2} ]},
+        e2: { t: "Panda Plays in Japan!", e: "🐼", ty: "e", img: "IMG_2983.PNG", tx: "A super cute panda named 'Pipan' had a fun day at a Japanese zoo! He played with a big yellow ball and then had a tasty snack of sweet potatoes. Pipan even gave a gentle hug to a zoo keeper!", 
+            q: [ {q: "What is the panda's name?", o: ["Pipan", "Po", "Peter"], a: 0}, {q: "Where does Pipan live?", o: ["Japanese zoo", "A forest", "A school"], a: 0}, {q: "What color was the ball?", o: ["Red", "Blue", "Yellow"], a: 2}, {q: "What was Pipan's snack?", o: ["Bamboo", "Sweet potatoes", "Apples"], a: 1}, {q: "Who did Pipan hug?", o: ["A dog", "A zoo keeper", "A bird"], a: 1} ]},
+        e3: { t: "Leo Loves His Little Pool!", e: "🏊", ty: "e", img: "IMG_2984.PNG", tx: "MEOW! A very cool cat named Leo loves his little pool! Every day, he wears goggles and swims with his fish friends. Splish, splash, Leo is the happiest kitty ever!", 
+            q: [ {q: "What is the cat's name?", o: ["Leo", "Tom", "Max"], a: 0}, {q: "What does Leo wear?", o: ["A hat", "Shoes", "Goggles"], a: 2}, {q: "Who does Leo swim with?", o: ["Dogs", "Fish friends", "Birds"], a: 1}, {q: "What is Leo's pool like?", o: ["Little", "Giant", "Dry"], a: 0}, {q: "How does Leo feel?", o: ["Happiest", "Sad", "Angry"], a: 0} ]},
+        e4: { t: "Art Cat Named Leo", e: "🎨", ty: "e", img: "IMG_2994.PNG", tx: "MEOW! A very cool art cat named Leo loves his little classroom! Every day, he makes paintings and plays with kitty friends. Brush, brush, Leo is the happiest kitty ever!", 
+            q: [ {q: "What kind of cat is Leo?", o: ["Art cat", "Space cat", "Magic cat"], a: 0}, {q: "What does Leo love?", o: ["His classroom", "A car", "A boat"], a: 0}, {q: "What does Leo make?", o: ["Toys", "Paintings", "Food"], a: 1}, {q: "Who does Leo play with?", o: ["Dogs", "Kitty friends", "Mice"], a: 1}, {q: "What sound does Leo make?", o: ["Moo", "Oink", "Meow"], a: 2} ]},
+        e5: { t: "Panda Rice Ball!", e: "🍙", ty: "e", img: "IMG_3001.PNG", tx: "Wow! A real-life giant panda at a zoo is super viral in China! People say she looks exactly like a delicious, cute onigiri, which is a yummy Japanese rice ball. Fans wait in long lines!", 
+            q: [ {q: "What animal is super viral?", o: ["Giant panda", "Tiger", "Bear"], a: 0}, {q: "Where is the panda?", o: ["Japan", "China", "USA"], a: 1}, {q: "What does the panda look like?", o: ["A pizza", "A rice ball", "A burger"], a: 1}, {q: "What is an onigiri?", o: ["Japanese rice ball", "A toy", "A fish"], a: 0}, {q: "What do fans do?", o: ["Run away", "Wait in long lines", "Cry"], a: 1} ]},
+        e6: { t: "Tokyo Kitten Library!", e: "📚", ty: "e", img: "IMG_3053.PNG", tx: "Wow! At a beautiful library in Tokyo, some very cute kittens finally learned to love their books! A special 'Kitten Librarian' built tiny shelves. The children clustered around happily watching.", 
+            q: [ {q: "Where is the library?", o: ["London", "Tokyo", "Paris"], a: 1}, {q: "Who loves books?", o: ["Dogs", "Kittens", "Birds"], a: 1}, {q: "Who built tiny shelves?", o: ["Kitten Librarian", "Police", "Doctor"], a: 0}, {q: "Who clustered around?", o: ["Children", "Tigers", "Bears"], a: 0}, {q: "How did they feel?", o: ["Angry", "Happily watching", "Sad"], a: 1} ]},
+        e7: { t: "Ginger's Cage Gym!", e: "🏋️", ty: "e", img: "IMG_3096.PNG", tx: "Wow! In Hong Kong, a very lucky kitty named Ginger got a super new gym! A kind family built a mini gym with tiny tools. Ginger loves the treadmill. Everyone laughs with joy!", 
+            q: [ {q: "Where is Ginger's gym?", o: ["Tokyo", "Hong Kong", "London"], a: 1}, {q: "What is the kitty's name?", o: ["Ginger", "Pepper", "Salt"], a: 0}, {q: "What did the family build?", o: ["A pool", "A mini gym", "A car"], a: 1}, {q: "What tool does Ginger use?", o: ["Treadmill", "Bike", "Ball"], a: 0}, {q: "How does everyone react?", o: ["They cry", "They sleep", "They laugh with joy"], a: 2} ]},
+        e8: { t: "Merry's Polar Adventure!", e: "❄️", ty: "e", img: "IMG_3097.PNG", tx: "Wow! Deep in the Polar Ice Cap, a cute armadillo named Merry had a snowy adventure. She met a tiny sparkling baby penguin and a sweet baby polar bear. Her friends clustered around happily.", 
+            q: [ {q: "What kind of animal is Merry?", o: ["Armadillo", "Cat", "Dog"], a: 0}, {q: "Where was the adventure?", o: ["Jungle", "Polar Ice Cap", "Desert"], a: 1}, {q: "Who did Merry meet first?", o: ["Baby penguin", "Monkey", "Tiger"], a: 0}, {q: "Who was the second friend?", o: ["Polar bear", "Lion", "Elephant"], a: 0}, {q: "How did friends feel?", o: ["Sad", "Angry", "Happily watching"], a: 2} ]},
+        e9: { t: "The Bathtub Racer!", e: "🛁", ty: "e", img: "IMG_3214.JPG", tx: "A giant octopus named Bubbles made a super funny car out of his bathtub! He added big wheels and rolled down the park hill. Everyone laughed as rubber ducks flew in the air!", 
+            q: [ {q: "What is the octopus's name?", o: ["Bubbles", "Bob", "Bill"], a: 0}, {q: "What did he use to make his car?", o: ["A box", "A bathtub", "A bed"], a: 1}, {q: "Where did he roll down?", o: ["Park hill", "Mountain", "Stairs"], a: 0}, {q: "What flew in the air?", o: ["Pigeons", "Rubber ducks", "Apples"], a: 1}, {q: "How did everyone react?", o: ["They cried", "They laughed", "They slept"], a: 1} ]},
+        e10: { t: "Big Bear Plays in Snow!", e: "🐻‍❄️", ty: "e", img: "IMG_3255.JPEG", tx: "A big bear in a cold land wanted to play. It woke up and saw white snow everywhere! The bear smiled and jumped. It rolled, slid, and played. It made three funny snowmen.", 
+            q: [ {q: "What was everywhere?", o: ["Water", "White snow", "Sand"], a: 1}, {q: "How many snowmen did the bear make?", o: ["One", "Two", "Three"], a: 2}, {q: "Was the bear happy?", o: ["Yes, very happy", "No, sad", "Angry"], a: 0}, {q: "What did the bear do?", o: ["Rolled and slid", "Swam", "Flew"], a: 0}, {q: "What kind of day was it?", o: ["Rain day", "Snow day", "Sun day"], a: 1} ]},
+        e11: { t: "Flame Baby Hedgehog", e: "🦔", ty: "e", img: "IMG_3256.JPEG", tx: "A tiny, cute hedgehog in France got a big job! People gave it a small, glowing Olympic torch to carry. It is the special 'Flame Baby'! The hedgehog walked and was very proud.", 
+            q: [ {q: "What animal is the special Flame Baby?", o: ["Hedgehog", "Mouse", "Cat"], a: 0}, {q: "Where did the story happen?", o: ["Japan", "France", "Italy"], a: 1}, {q: "What did the hedgehog carry?", o: ["A stick", "Olympic torch", "A flag"], a: 1}, {q: "How did the hedgehog feel?", o: ["Very proud", "Scared", "Tired"], a: 0}, {q: "What size is the hedgehog?", o: ["Giant", "Tiny", "Tall"], a: 1} ]},
+        e12: { t: "Moon is a Giant Cheese?", e: "🧀", ty: "e", img: "IMG_3259.PNG", tx: "Did you know that some scientists once thought the moon might be made of cheese? Now we know it is rock and dust! But it is fun to imagine a moon made of yummy cheese!", 
+            q: [ {q: "What did scientists once think the moon was?", o: ["Cheese", "Apple", "Bread"], a: 0}, {q: "What is the moon actually made of?", o: ["Water", "Rock and dust", "Gold"], a: 1}, {q: "Is the moon really cheese?", o: ["Yes", "No", "Maybe"], a: 1}, {q: "How does the text describe the idea?", o: ["Smart", "Fun to imagine", "Boring"], a: 1}, {q: "Who thought about the cheese?", o: ["Scientists", "Cats", "Dogs"], a: 0} ]},
+        e13: { t: "Happy Pufferfish", e: "🐡", ty: "e", img: "IMG_3292.PNG", tx: "Look at the giant fish! The 'Happy Pufferfish' can puff itself up to be super large to play with its friends and look cool! It puffs until it's a giant, squishy ball.", 
+            q: [ {q: "What kind of fish is in the news?", o: ["Shark", "Pufferfish", "Whale"], a: 1}, {q: "What can this fish do?", o: ["Fly", "Puff itself up", "Run"], a: 1}, {q: "What shape does it become?", o: ["Squishy ball", "A square", "A star"], a: 0}, {q: "Who does it play with?", o: ["Birds", "Its friends", "Cats"], a: 1}, {q: "How does it look?", o: ["Cool", "Scary", "Sad"], a: 0} ]},
+        e14: { t: "Porcupine Snack!", e: "🍓", ty: "e", img: "IMG_3293.PNG", tx: "A funny porcupine named 'Spiky' went on a secret adventure from the zoo! He found a nice human's backyard. Spiky was so happy to find juicy, sweet strawberries! Zoo keepers were happy he was safe.", 
+            q: [ {q: "Who went on an adventure?", o: ["A monkey", "A porcupine named Spiky", "A cat"], a: 1}, {q: "Where did Spiky find a garden?", o: ["At the park", "Human's backyard", "In the forest"], a: 1}, {q: "What did Spiky find?", o: ["Apples", "Strawberries", "Bananas"], a: 1}, {q: "Where did Spiky come from?", o: ["A house", "The zoo", "The sea"], a: 1}, {q: "How did zoo keepers feel?", o: ["Happy he was safe", "Angry", "Scared"], a: 0} ]},
+        e15: { t: "Super Soccer Duck!", e: "🦆", ty: "e", img: "IMG_3613.PNG", tx: "QUACK QUACK! Merlin the duck is a big soccer star in Mexico City! He wears a tiny jersey and socks. He loves to kick balls in the park. His friend Cristian helps him.", 
+            q: [ {q: "What animal is Merlin?", o: ["A dog", "A cat", "A duck"], a: 2}, {q: "What does Merlin wear?", o: ["A hat", "Tiny jersey and socks", "Glasses"], a: 1}, {q: "Where does Merlin play?", o: ["Mexico City park", "London", "Tokyo"], a: 0}, {q: "Who helps Merlin?", o: ["Cristian", "John", "David"], a: 0}, {q: "What sport does he play?", o: ["Basketball", "Soccer", "Tennis"], a: 1} ]},
+
+        // ========== 80字以上 (15篇) ==========
+        h1: { t: "Elly the Elephant", e: "🐘", ty: "h", img: "IMG_3114.PNG", tx: "One sunny morning, a wise elephant named Elly made a new friend in the big jungle. It had funny hands and a face that was happy! Elly made a trumpet sound and it answered with soft beeps. It was a helper robot! Elly showed the robot to her jungle friends, the bunnies, the squirrels, and the birds. They all laughed. Elly and the robot now play together.", 
+            q: [ {q: "What is the elephant's name?", o: ["Emma", "Elly", "Ella"], a: 1}, {q: "Where did Elly find her new friend?", o: ["In the jungle", "In the zoo", "In the city"], a: 0}, {q: "What was the new friend?", o: ["A monkey", "A helper robot", "A bird"], a: 1}, {q: "What sound did the robot make?", o: ["Soft beeps", "Loud roars", "Meow"], a: 0}, {q: "Which friends did Elly show the robot to?", o: ["Lions", "Bunnies and squirrels", "Fish"], a: 1} ]},
+        h2: { t: "Koala Joey Found!", e: "🐨", ty: "h", img: "IMG_3115.PNG", tx: "Last week, in a beautiful forest in Australia, a tiny, fluffy baby koala was lost. He was very scared! But a nice park ranger found him and gave him milk. He was so happy! A nice vet checked his health. This fluffy little joey got a new name: 'Wattle.' Wattle the Koala is very cute and loves to eat gum leaves. Now, he is safe.", 
+            q: [ {q: "What animal was lost?", o: ["Kangaroo", "Baby koala", "Panda"], a: 1}, {q: "Where did this happen?", o: ["Australia", "Japan", "USA"], a: 0}, {q: "What did the park ranger give the koala?", o: ["Water", "Juice", "Milk"], a: 2}, {q: "What is the koala's new name?", o: ["Wattle", "Wally", "Will"], a: 0}, {q: "What does Wattle love to eat?", o: ["Gum leaves", "Apples", "Pizza"], a: 0} ]},
+        h3: { t: "Pingu in a Little Suit", e: "🐧", ty: "h", img: "IMG_3117.PNG", tx: "Meet our new friend, Pingu! A very nice zookeeper in Japan made a special little red jacket for Pingu because his tummy was cold. He looks so dapper! Pingu loves to waddle around in his new jacket. The other penguins were a little surprised at first, but now they think he is very cool. He waddles very fast!", 
+            q: [ {q: "What did Pingu wear to stay warm?", o: ["Red jacket", "Blue hat", "Green shoes"], a: 0}, {q: "Where does Pingu live?", o: ["China", "Japan", "UK"], a: 1}, {q: "How did the other penguins feel at first?", o: ["Surprised", "Angry", "Happy"], a: 0}, {q: "Why did he need a jacket?", o: ["To look cool", "His tummy was cold", "For a party"], a: 1}, {q: "How does Pingu move?", o: ["He flies", "He swims", "He waddles fast"], a: 2} ]},
+        h4: { t: "Baby Bear Gives a Hug!", e: "🐻", ty: "h", img: "IMG_3120.PNG", tx: "Yesterday, in a far-off Canadian forest, a very cute baby bear got lost. But guess what? A nice, friendly Park Ranger found him! The little bear was so happy to see her. Instead of running away, he gave the ranger a big, warm hug! Other rangers saw it and smiled. They helped the bear find his mummy bear.", 
+            q: [ {q: "What animal was in the story?", o: ["Baby bear", "Baby cat", "Baby dog"], a: 0}, {q: "Who helped the baby bear?", o: ["Park Ranger", "Policeman", "Teacher"], a: 0}, {q: "Did they find the mummy bear?", o: ["Yes", "No", "Maybe"], a: 0}, {q: "Where did this happen?", o: ["Canadian forest", "Japan", "China"], a: 0}, {q: "What did the baby bear do?", o: ["Ran away", "Gave a big warm hug", "Cried"], a: 1} ]},
+        h5: { t: "The Prize-Winning Pup!", e: "🐕", ty: "h", img: "IMG_3213.PNG", tx: "In a beautiful place called Cannes, special movie prizes were given out. But this prize was different! It wasn't for people, it was for dogs! A very talented dog named 'Apocalypse' won the famous 'Palm Dog' award. Why? Because Apocalypse had a great part in a very funny movie! The dog is very good at happy barks and wagging its tail.", 
+            q: [ {q: "Where were the prizes given out?", o: ["Hong Kong", "Cannes", "London"], a: 1}, {q: "What is the talented dog's name?", o: ["Apocalypse", "Buddy", "Max"], a: 0}, {q: "What award did the dog win?", o: ["Golden Dog", "Palm Dog", "Super Dog"], a: 1}, {q: "Who was the prize for?", o: ["Cats", "Birds", "Dogs"], a: 2}, {q: "What is the dog good at?", o: ["Wagging its tail", "Jumping high", "Singing"], a: 0} ]},
+        h6: { t: "Jaguars Soft 'Meow'", e: "🐆", ty: "h", img: "IMG_3242.PNG", tx: "Exciting news from the animal world! Scientists made an amazing discovery about jaguars. Usually, we think jaguars are big, scary cats that roar. But guess what? Scientists recorded wild jaguars making a soft, sweet 'meow' sound! It sounds just like a house cat, but much louder. This helps us understand they have a gentle side.", 
+            q: [ {q: "What sound did the jaguars make?", o: ["Roar", "Meow", "Bark"], a: 1}, {q: "Are jaguars big or small?", o: ["Big", "Small", "Tiny"], a: 0}, {q: "Who recorded the jaguars?", o: ["Doctors", "Scientists", "Teachers"], a: 1}, {q: "Does it sound like a house cat?", o: ["Yes", "No", "Maybe"], a: 0}, {q: "What does this show us?", o: ["They are angry", "They have a gentle side", "They are hungry"], a: 1} ]},
+        h7: { t: "Robot Duck Teaches Swimming!", e: "🦆", ty: "h", img: "IMG_3245.PNG", tx: "A real-life, big robot duck has a very important job. It goes to a pond and swims. It is not real, but the little ducklings do not know! They see the big, friendly robot and think it is their new mommy. The robot duck leads them in a line, showing them how to kick their tiny feet and swim safely.", 
+            q: [ {q: "What did the robot duck teach?", o: ["Flying", "Swimming", "Running"], a: 1}, {q: "Who follows the robot duck?", o: ["Little ducklings", "Cats", "Fish"], a: 0}, {q: "What do ducklings think the robot is?", o: ["Their mommy", "A toy", "A monster"], a: 0}, {q: "Where does the robot duck swim?", o: ["In a pool", "In a pond", "In the sea"], a: 1}, {q: "Is the big duck real?", o: ["Yes", "No", "Maybe"], a: 1} ]},
+        h8: { t: "The Smart Pigeon", e: "🐦", ty: "h", img: "IMG_3246.PNG", tx: "Did you know pigeons are very smart? Scientists recently discovered that pigeons use a special part of their bodies to find their way home. It is actually their liver! Their livers have tiny parts that work just like a compass to help them exactly which way. This helps them find family and friends when they fly long distances.", 
+            q: [ {q: "What part helps it navigate?", o: ["Brain", "Liver", "Heart"], a: 1}, {q: "What tool does the liver work like?", o: ["A map", "A compass", "A phone"], a: 1}, {q: "Are pigeons smart?", o: ["Yes", "No", "Very silly"], a: 0}, {q: "What does it help them find?", o: ["Food", "Family and friends", "Toys"], a: 1}, {q: "Do they fly long distances?", o: ["Yes", "No", "Never"], a: 0} ]},
+        h9: { t: "Deer Loved Escalators!", e: "🦌", ty: "h", img: "IMG_3249.PNG", tx: "A funny thing happened at a shopping mall in Norwich! A young deer, who people now call 'Lucy', went inside a store. Lucy was curious and walked right onto an escalator. The escalator moved, and Lucy got a little stuck! Luckily, friendly store workers and helpers carefully helped Lucy get off. The mall staff were happy to help.", 
+            q: [ {q: "What is the name of the deer?", o: ["Lily", "Lucy", "Lola"], a: 1}, {q: "Where did the deer get stuck?", o: ["In a tree", "On an escalator", "In a box"], a: 1}, {q: "Did the deer get off safely?", o: ["Yes", "No", "We don't know"], a: 0}, {q: "In which city did this happen?", o: ["London", "Norwich", "Paris"], a: 1}, {q: "Who helped Lucy?", o: ["Police", "Store workers", "Doctors"], a: 1} ]},
+        h10: { t: "Magic Collar Lets Pets Talk!", e: "🗣️", ty: "h", img: "IMG_3253.PNG", tx: "AMAZING NEWS! The first 'PetSpeak' translation collar was made this week! This new invention helps cats and dogs say words we understand. When your dog barks, the collar listens. Then, a voice on the collar says simple things like 'play now' or 'more treats.' Doctors say it will help us understand our best friends better.", 
+            q: [ {q: "What did scientists make?", o: ["PetSpeak collar", "Pet toy", "Pet bed"], a: 0}, {q: "What might a dog say?", o: ["Play now", "I am a cat", "Read a book"], a: 0}, {q: "Who will this collar help us understand?", o: ["Birds", "Cats and dogs", "Fish"], a: 1}, {q: "Who says it will help us?", o: ["Doctors", "Teachers", "Policemen"], a: 0}, {q: "Does the collar have a voice?", o: ["Yes", "No", "Only for cats"], a: 0} ]},
+        h11: { t: "A Cat Lawyer in Brazil!", e: "⚖️", ty: "h", img: "IMG_3257.PNG", tx: "A cat has a very important job in a real Brazilian law firm! His name is Leon Advogato, and he is a full-time legal assistant. Leon wears a tiny collar with a tie. He has his own special ID badge and a little desk. Leon's main jobs are greeting clients and being very friendly to keep everyone happy.", 
+            q: [ {q: "What is the cat lawyer's name?", o: ["Leon Advogato", "Tom", "Leo"], a: 0}, {q: "What does Leon wear?", o: ["A hat", "Collar with a tie", "Shoes"], a: 1}, {q: "What are Leon's jobs?", o: ["Greeting clients", "Cooking", "Cleaning"], a: 0}, {q: "Where does Leon work?", o: ["Brazil", "Japan", "USA"], a: 0}, {q: "Does Leon have his own desk?", o: ["Yes", "No", "He sits on the floor"], a: 0} ]},
+        h12: { t: "The Opossum Wants A Nap!", e: "😴", ty: "h", img: "IMG_3258.PNG", tx: "Recently, a funny picture of an opossum became very popular! In the photo, the opossum is looking out of a window with its paws behind its back. It looks very tired, just like some people feel after a long day at work or school. People on the internet think it looks like a funny, sleepy little human.", 
+            q: [ {q: "What animal is in the picture?", o: ["Cat", "Opossum", "Dog"], a: 1}, {q: "Why do people think it is funny?", o: ["Looks like a sleepy human", "It is dancing", "It is eating"], a: 0}, {q: "How does the opossum feel?", o: ["Very tired", "Very angry", "Very happy"], a: 0}, {q: "Where is the opossum looking?", o: ["Out of a window", "At a book", "At a TV"], a: 0}, {q: "What are its paws doing?", o: ["Waving", "Behind its back", "Holding a cup"], a: 1} ]},
+        h13: { t: "The Gym-Goer Cat!", e: "👔", ty: "h", img: "IMG_3260.PNG", tx: "In a small town in New Zealand, something funny happened yesterday! A fluffy orange cat named Biscuit walked into a local school during Tractor Day. While all the big tractors were arriving, Biscuit decided to walk right up to the front door, wearing a tiny little green tie! The children were so surprised and giggled.", 
+            q: [ {q: "What is the name of the cat?", o: ["Biscuit", "Cookie", "Cake"], a: 0}, {q: "Where did the cat walk into?", o: ["A local school", "A hospital", "A police station"], a: 0}, {q: "What was the cat wearing?", o: ["A red hat", "A green tie", "Blue shoes"], a: 1}, {q: "What day was it at school?", o: ["Sports Day", "Tractor Day", "Music Day"], a: 1}, {q: "Where did this happen?", o: ["New Zealand", "Australia", "USA"], a: 0} ]},
+        h14: { t: "Penguin Who Tried To Fly!", e: "🪽", ty: "h", img: "IMG_3291.JPEG", tx: "In a sunny zoo far away, a funny penguin named Pip decided he was tired of swimming. He wanted to touch the clouds! Pip spent all morning flapping his little wings. He hopped onto a giant pile of fluffy hay, took a deep breath, and... jumped! He didn't fly, but he did a perfect belly flop into the soft hay.", 
+            q: [ {q: "What was the penguin's name?", o: ["Pip", "Pop", "Peter"], a: 0}, {q: "What did Pip jump into?", o: ["A pool", "Fluffy hay", "A box"], a: 1}, {q: "Did Pip actually fly?", o: ["Yes", "No", "Almost"], a: 1}, {q: "What did he want to touch?", o: ["The clouds", "The sun", "The trees"], a: 0}, {q: "What did the other penguins do?", o: ["Cried", "Cheered", "Slept"], a: 1} ]},
+        h15: { t: "The Artist Elephant!", e: "🖌️", ty: "h", img: "IMG_3296.PNG", tx: "A new story was found! A smart elephant named Koko has learned to paint with its trunk! Scientists watched Koko pick up brushes and dip them in colorful paints. Koko paints beautiful suns, trees, and flowers on a giant canvas. Many people go the park to watch Koko paint. Koko seems to love making nature and sharing.", 
+            q: [ {q: "Who learned to paint?", o: ["Koko the elephant", "A monkey", "A dog"], a: 0}, {q: "What does Koko paint pictures of?", o: ["Suns, trees, flowers", "Cars", "Buildings"], a: 0}, {q: "Where do people go to see Koko's art?", o: ["The park", "A museum", "A school"], a: 0}, {q: "What does Koko use to paint?", o: ["Paws", "Trunk", "Tail"], a: 1}, {q: "What does Koko dip the brushes in?", o: ["Water", "Colorful paints", "Milk"], a: 1} ]}
+    };
+
+    let currentStoryId = null;
+    let currentQuiz = [];
+    let userAnswers = [];
+    let currentQuestionIndex = 0;
+    
+    let completedLevels = JSON.parse(localStorage.getItem("p1_completed")) || [];
+
+    function updateStarDisplay() {
+        const recordDiv = document.getElementById('progress-record-stars');
+        recordDiv.innerHTML = '';
+        Object.keys(storyDB).forEach((id, index) => {
+            const isCompleted = completedLevels.includes(id);
+            let starWrap = document.createElement('div');
+            starWrap.className = 'star-wrapper';
+            let starObj = document.createElement('div');
+            starObj.className = `prog-star ${isCompleted ? 'lit' : ''}`;
+            starObj.innerText = '⭐';
+            starObj.title = storyDB[id].t; 
+            let numObj = document.createElement('div');
+            numObj.className = 'star-num';
+            numObj.innerText = index + 1;
+            starWrap.appendChild(starObj);
+            starWrap.appendChild(numObj);
+            recordDiv.appendChild(starWrap);
+        });
+    }
+
+    function clearStars() {
+        if(confirm("Are you sure you want to clear all progress? (確定清除所有進度記錄嗎？)")) {
+            completedLevels = [];
+            localStorage.setItem("p1_completed", JSON.stringify(completedLevels));
+            updateStarDisplay();
+        }
+    }
+
+    function init() {
+        const easyList = document.getElementById('easy-list');
+        const hardList = document.getElementById('hard-list');
+        Object.keys(storyDB).forEach((id, index) => {
+            const s = storyDB[id];
+            const li = document.createElement('li');
+            li.className = 'story-item';
+            li.innerHTML = `<span style="color:#aaa; font-size:14px; font-weight:bold; margin-right:5px;">${index+1}.</span>
+                            <span class="story-icon">${s.e}</span> 
+                            <button class="audio-btn" onclick="event.stopPropagation(); playAudio('${s.t.replace(/'/g, "\\'")}')">🔊</button> 
+                            <span class="story-title">${s.t}</span>`;
+            li.onclick = () => openStory(id);
+            if(s.ty === 'e') easyList.appendChild(li);
+            else hardList.appendChild(li);
+        });
+        updateStarDisplay();
+    }
+
+    function goHome() {
+        document.getElementById('home-view').style.display = 'block';
+        document.getElementById('story-view').style.display = 'none';
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'none';
+        window.speechSynthesis.cancel();
+        updateStarDisplay();
+    }
+
+    function openStory(id) {
+        currentStoryId = id;
+        const s = storyDB[id];
+        document.getElementById('sv-title').innerHTML = `${s.e} ${s.t}`;
+        
+        // --- 修改：套用可點擊放大的樣式與函數 ---
+        document.getElementById('sv-img-container').innerHTML = `<img src="${s.img}" class="story-img-clickable" onclick="openLightbox('${s.img}')" alt="Story Image" title="點擊放大圖片">`;
+        // ------------------------------------
+
+        const sentences = s.tx.replace(/([.!?])\s+/g, "$1|").split("|");
+        let textHtml = '';
+        sentences.forEach(sentence => {
+            let cleanText = sentence.trim().replace(/'/g, "\\'");
+            if(cleanText.length > 0) {
+                textHtml += `<div class="sentence-row">
+                                <button class="audio-btn" style="flex-shrink:0; background:#ff4757;" onclick="playAudio('${cleanText}')">🔊</button>
+                                <span>${sentence.trim()}</span>
+                             </div>`;
+            }
+        });
+        document.getElementById('sv-text').innerHTML = textHtml;
+        
+        document.getElementById('home-view').style.display = 'none';
+        document.getElementById('story-view').style.display = 'block';
+    }
+
+    function startQuiz() {
+        const s = storyDB[currentStoryId];
+        window.speechSynthesis.cancel();
+        
+        let shuffled = [...s.q].sort(() => 0.5 - Math.random());
+        currentQuiz = shuffled.slice(0, 3);
+        userAnswers = new Array(3).fill(null);
+        currentQuestionIndex = 0;
+
+        renderQuestion();
+
+        document.getElementById('story-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'none';
+        document.getElementById('quiz-view').style.display = 'block';
+    }
+
+    function renderQuestion() {
+        const qObj = currentQuiz[currentQuestionIndex];
+        const qc = document.getElementById('quiz-container');
+        qc.innerHTML = '';
+        
+        document.getElementById('qv-progress').innerText = `Question ${currentQuestionIndex + 1} / 3`;
+
+        let div = document.createElement('div');
+        div.className = 'question-box';
+        
+        let qTitle = document.createElement('div');
+        qTitle.className = 'question-title';
+        qTitle.innerHTML = `<button class="audio-btn" onclick="playAudio('${qObj.q.replace(/'/g, "\\'")}')">🔊</button> <span>${qObj.q}</span>`;
+        div.appendChild(qTitle);
+
+        qObj.o.forEach((opt, optIndex) => {
+            let btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerHTML = `<button class="audio-btn" style="background:#fbc531; margin-right:15px;" onclick="event.stopPropagation(); playAudio('${opt.replace(/'/g, "\\'")}')">🔊</button> ${opt}`;
+            
+            if (userAnswers[currentQuestionIndex] !== null) {
+                if (optIndex === qObj.a) {
+                    btn.classList.add('correct-choice'); 
+                } else if (optIndex === userAnswers[currentQuestionIndex]) {
+                    btn.classList.add('wrong-choice'); 
+                }
+                btn.disabled = true;
+            } else {
+                btn.onclick = () => selectOption(optIndex, btn);
+            }
+            div.appendChild(btn);
+        });
+        qc.appendChild(div);
+
+        document.getElementById('btn-prev').disabled = (currentQuestionIndex === 0);
+        document.getElementById('btn-next').innerText = (currentQuestionIndex === 2) ? "✅ 結算成績" : "下一頁 ➡";
+    }
+
+    function selectOption(optIndex, btn) {
+        if (userAnswers[currentQuestionIndex] !== null) return; 
+        
+        userAnswers[currentQuestionIndex] = optIndex;
+        const correctAns = currentQuiz[currentQuestionIndex].a;
+        
+        if (optIndex === correctAns) {
+            playSoundEffect('correct');
+            showConfetti();
+            playAudio("Correct!");
+        } else {
+            playSoundEffect('wrong');
+            playAudio("Oops!");
+        }
+        renderQuestion();
+    }
+
+    function changeQuestion(direction) {
+        if (direction === 1 && userAnswers[currentQuestionIndex] === null) {
+            alert("Please select an answer first! (請先選擇一個答案！)");
+            playSoundEffect('wrong');
+            return;
+        }
+        currentQuestionIndex += direction;
+        if (currentQuestionIndex > 2) {
+            submitQuiz();
+        } else {
+            renderQuestion();
+        }
+    }
+
+    function submitQuiz() {
+        let correctCount = 0;
+        currentQuiz.forEach((qObj, index) => {
+            if(userAnswers[index] === qObj.a) correctCount++;
+        });
+
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+
+        const rvTitle = document.getElementById('rv-title');
+        const rvScore = document.getElementById('rv-score');
+        const rvEmoji = document.getElementById('rv-emoji');
+        const s = storyDB[currentStoryId];
+
+        if(correctCount === 3) {
+            rvTitle.innerText = "🎉 Perfect Score! 🎉";
+            rvTitle.style.color = "#ff4757";
+            rvScore.innerText = "You got 3/3! You lit up a STAR ⭐!";
+            rvEmoji.innerText = `🌟`;
+            
+            if(!completedLevels.includes(currentStoryId)) {
+                completedLevels.push(currentStoryId);
+                localStorage.setItem("p1_completed", JSON.stringify(completedLevels));
+            }
+            playSoundEffect('correct');
+            showConfetti();
+            playAudio("Amazing! Perfect Score!");
+        } else {
+            rvTitle.innerText = "💪 Good Try! 💪";
+            rvTitle.style.color = "#1e90ff";
+            rvScore.innerText = `You got ${correctCount}/3. Try again to get a star!`;
+            rvEmoji.innerText = "😸";
+            playAudio("Good try! Practice makes perfect.");
+        }
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
