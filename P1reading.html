@@ -672,7 +672,6 @@ function initCanvas() {
     ctx = canvas.getContext('2d');
     setTool('pen');
 
-    // 加入 passive: false 讓 preventDefault 能夠生效，防止頁面捲動
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mousemove', draw);
     canvas.addEventListener('mouseup', stopDrawing);
@@ -715,11 +714,12 @@ function startDrawing(e) {
     ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
 }
 
-// 📱 真正修復：明確指定 e.touches 抓取第一根手指的座標！
+// 📱 真正徹底修復：明確指定 e.touches 抓取第一根手指的座標！
 function startDrawingTouch(e) {
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); // 阻止螢幕上下滾動
         isDrawing = true;
+        // 這裡補上了 
         const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
@@ -732,11 +732,12 @@ function draw(e) {
     ctx.lineTo(pos.x, pos.y); ctx.stroke();
 }
 
-// 📱 真正修復：明確指定 e.touches 抓取第一根手指的座標！
+// 📱 真正徹底修復：明確指定 e.touches 抓取第一根手指的座標！
 function drawTouch(e) {
     if (!isDrawing) return;
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); // 阻止螢幕上下滾動
+        // 這裡補上了 
         const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
