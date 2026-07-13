@@ -693,7 +693,9 @@ function setTool(tool) {
     if (tool === 'pen') {
         if(btnPen) btnPen.classList.add('active');
         ctx.globalCompositeOperation = 'source-over'; 
-        ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#333';
+        // 👇 在這裡修改了畫筆的粗細！原本是 6，現在改成 3 (變得更幼)
+        ctx.lineWidth = 3; 
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#333';
     } else if (tool === 'eraser') {
         if(btnEraser) btnEraser.classList.add('active');
         ctx.globalCompositeOperation = 'destination-out'; 
@@ -719,8 +721,8 @@ function startDrawingTouch(e) {
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); // 阻止螢幕上下滾動
         isDrawing = true;
-        // 這裡補上了 
-        const pos = getPos(e.touches.clientX, e.touches.clientY);
+        // 👇 這裡加上了 [ 0 ] 確保抓取第一點觸控，避開系統過濾！
+        const pos = getPos(e.touches[ 0 ].clientX, e.touches[ 0 ].clientY);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
     }
@@ -737,8 +739,8 @@ function drawTouch(e) {
     if (!isDrawing) return;
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); // 阻止螢幕上下滾動
-        // 這裡補上了 
-        const pos = getPos(e.touches.clientX, e.touches.clientY);
+        // 👇 這裡加上了 [ 0 ] 確保抓取第一點觸控，避開系統過濾！
+        const pos = getPos(e.touches[ 0 ].clientX, e.touches[ 0 ].clientY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
     }
