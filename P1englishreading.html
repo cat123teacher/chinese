@@ -749,9 +749,17 @@
             div.insertAdjacentHTML('beforeend', encourageMsg);
         }
         
+        // ✨ 新增：在畫板的正上方加入了「題目文字」與「發音按鈕」
         let canvasHtml = `
             <div class="canvas-area">
                 <p style="margin:0 0 10px 0; color:#8e2de2; font-weight:bold;">✍️ 或在這裡手寫答案 (Draw your answer!)</p>
+                
+                <!-- ✨ 畫板專屬：貼心題目提示區 ✨ -->
+                <div style="background: #fff9ea; padding: 10px 15px; border-radius: 10px; border: 2px dashed #fbc531; margin-bottom: 12px; font-size: 18px; font-weight: bold; color: #d63384; text-align: left; display: flex; align-items: flex-start; gap: 8px;">
+                    <button class="audio-btn" title="聽題目發音" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" onclick="playAudio('${qObj.q.replace(/'/g, "\\'")}')">🔊</button>
+                    <span style="line-height: 1.4; padding-top: 4px;">❓ ${qObj.q}</span>
+                </div>
+
                 <div class="canvas-tools">
                     <button onclick="setPen()" style="background:#4facfe;">🖌️ 畫筆</button>
                     <button onclick="setEraser()" style="background:#fbc531; color:#333;">🧽 橡皮擦</button>
