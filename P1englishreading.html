@@ -2,7 +2,6 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <!-- 🌟 已升級：禁止手機自動縮放，確保畫圖順暢 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌟 P1 English Reading Challenge 🌟</title>
     <!-- 引入 html2canvas 實現網頁完整截圖功能 -->
@@ -151,7 +150,6 @@
             border-radius: 10px; 
             background-color: #fafafa;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='49' x2='100' y2='49' stroke='%23cbd5e1' stroke-width='2' stroke-dasharray='6,6'/%3E%3C/svg%3E");
-            /* 🌟 防止預設觸控手勢干擾畫畫 */
             touch-action: none; 
             cursor: crosshair; 
             width: 100%; 
@@ -424,7 +422,6 @@
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         setPen();
 
-        // 使用現代 Pointer Events，統一處理滑鼠、手指觸控與觸控筆(如Apple Pencil)
         canvas.addEventListener('pointerdown', startPos, {passive: false});
         canvas.addEventListener('pointermove', draw, {passive: false});
         canvas.addEventListener('pointerup', stopPos);
@@ -432,7 +429,6 @@
         canvas.addEventListener('pointerout', stopPos);
     }
 
-    // 取得精準的觸控座標
     function getPointerPos(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width; 
@@ -444,10 +440,9 @@
     }
 
     function startPos(e) { 
-        // 💡 如果已經選了答案或按了完成手寫，就鎖定畫板不給畫
-        if(userAnswers[currentQuestionIndex] !== null) {
-            return; 
-        }
+        // 💡 只因為「完成手寫」而鎖定畫板，如果小朋友只點了選擇題，還是可以畫圖！
+        if(writtenAnswers[currentQuestionIndex]) return; 
+        
         e.preventDefault(); 
         drawing = true; 
         const pos = getPointerPos(e);
@@ -461,7 +456,7 @@
     }
 
     function draw(e) {
-        if(!drawing || userAnswers[currentQuestionIndex] !== null) return;
+        if(!drawing || writtenAnswers[currentQuestionIndex]) return;
         e.preventDefault(); 
         const pos = getPointerPos(e);
         ctx.lineTo(pos.x, pos.y); 
@@ -470,10 +465,14 @@
 
     function setPen() { canvasMode = 'pen'; ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 2; ctx.strokeStyle = '#000000'; }
     function setEraser() { canvasMode = 'eraser'; ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 25; }
-    function clearCanvas() { if(userAnswers[currentQuestionIndex] !== null) return; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    
+    function clearCanvas() { 
+        if(writtenAnswers[currentQuestionIndex]) return; 
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    }
 
     function addLines() {
-        if(userAnswers[currentQuestionIndex] !== null) return;
+        if(writtenAnswers[currentQuestionIndex]) return;
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
         tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
@@ -494,8 +493,8 @@
     }
 
     function submitWritten() {
-        if(userAnswers[currentQuestionIndex] !== null) return;
-        userAnswers[currentQuestionIndex] = 'written';
+        if(writtenAnswers[currentQuestionIndex]) return;
+        writtenAnswers[currentQuestionIndex] = true;
         playSoundEffect('correct'); showConfetti(); playAudio("Great job!");
         renderQuestion();
     }
@@ -578,7 +577,11 @@
 
     let currentStoryId = null;
     let currentQuiz = [];
-    let userAnswers = [];
+    
+    // ✨ 將選擇題與手寫區的答案狀態完全獨立分開 ✨
+    let mcAnswers = [];
+    let writtenAnswers = [];
+    
     let currentQuestionIndex = 0;
     
     let completedLevels = JSON.parse(localStorage.getItem("p1_completed")) || [];
@@ -607,7 +610,7 @@
         if(confirm("Are you sure you want to clear all progress? (確定清除所有進度記錄嗎？)")) {
             completedLevels = [];
             localStorage.setItem("p1_completed", JSON.stringify(completedLevels));
-            init(); // 重新載入首頁消除星星
+            init(); 
             document.getElementById('progress-modal').style.display = 'none';
         }
     }
@@ -616,7 +619,6 @@
         const easyList = document.getElementById('easy-list');
         const hardList = document.getElementById('hard-list');
         
-        // 每次載入時清空列表重新渲染，讓星星可以即時更新！
         easyList.innerHTML = '';
         hardList.innerHTML = '';
         
@@ -627,15 +629,13 @@
             const s = storyDB[id];
             const isEasy = (s.ty === 'e');
             const displayIndex = isEasy ? easyCount++ : hardCount++;
-            const isCompleted = completedLevels.includes(id); // 檢查這關是否過關了
+            const isCompleted = completedLevels.includes(id); 
             
             const li = document.createElement('li');
             li.className = 'story-item';
-            // 如果過關了，加上特別的金色邊框特效
             if (isCompleted) li.classList.add('completed-book');
             li.onclick = () => startLevel(id);
             
-            // 如果過關了，加入印章 HTML 元素
             const stampHtml = isCompleted ? `<div class="completed-stamp" title="已過關！You did it!">⭐</div>` : '';
 
             li.innerHTML = `
@@ -660,7 +660,6 @@
         document.getElementById('level-view').style.display = 'none';
         document.getElementById('result-view').style.display = 'none';
         window.speechSynthesis.cancel();
-        // 當返回主頁時，重新執行 init 讓剛拿到的過關星星蓋上去！
         init(); 
     }
 
@@ -689,10 +688,12 @@
         
         window.speechSynthesis.cancel();
         
-        // --- 核心邏輯：5 抽 3 隨機題庫 ---
         let shuffled = [...s.q].sort(() => 0.5 - Math.random());
         currentQuiz = shuffled.slice(0, 3);
-        userAnswers = new Array(3).fill(null);
+        
+        // 初始化兩組答案紀錄
+        mcAnswers = new Array(3).fill(null);
+        writtenAnswers = new Array(3).fill(false);
         currentQuestionIndex = 0;
 
         renderQuestion();
@@ -714,7 +715,6 @@
         let div = document.createElement('div');
         div.className = 'question-box';
         
-        // --- 題目旁的發音按鈕 ---
         let qTitle = document.createElement('div');
         qTitle.className = 'question-title';
         qTitle.innerHTML = `<button class="audio-btn" title="聽題目發音" onclick="playAudio('${qObj.q.replace(/'/g, "\\'")}')">🔊</button> <span>${qObj.q}</span>`;
@@ -724,13 +724,13 @@
             let btn = document.createElement('button');
             btn.className = 'option';
             
-            // --- 選項旁的發音按鈕 ---
             btn.innerHTML = `<button class="audio-btn" title="聽選項發音" style="background:#fbc531; margin-right:15px;" onclick="event.stopPropagation(); playAudio('${opt.replace(/'/g, "\\'")}')">🔊</button> ${opt}`;
             
-            if (userAnswers[currentQuestionIndex] !== null) {
+            // 如果已經選過選擇題，鎖定選項按鈕
+            if (mcAnswers[currentQuestionIndex] !== null) {
                 if (optIndex === qObj.a) {
                     btn.classList.add('correct-choice'); 
-                } else if (userAnswers[currentQuestionIndex] !== 'written' && optIndex === userAnswers[currentQuestionIndex]) {
+                } else if (optIndex === mcAnswers[currentQuestionIndex]) {
                     btn.classList.add('wrong-choice'); 
                 }
                 btn.disabled = true;
@@ -740,21 +740,20 @@
             div.appendChild(btn);
         });
 
-        if (userAnswers[currentQuestionIndex] !== null) {
+        // 只要完成「選擇題」或「手寫」任一種，就會跳出這句鼓勵！
+        if (mcAnswers[currentQuestionIndex] !== null || writtenAnswers[currentQuestionIndex]) {
             let encourageMsg = `
                 <div style="margin: 15px 0; padding: 15px; background: #ebf8ff; border: 2px dashed #4facfe; border-radius: 10px; font-weight: bold; color: #0984e3; text-align: center; font-size: 18px; animation: popIn 0.4s forwards;">
-                    🌟 作答完成！(Well Done!)<br>你可以選擇在下方手寫區多練習，或是點擊「下一頁」繼續挑戰！
+                    🌟 非常棒！(Well Done!)<br>你可以自由完成選擇題與手寫區，準備好再按「下一頁」喔！
                 </div>
             `;
             div.insertAdjacentHTML('beforeend', encourageMsg);
         }
         
-        // ✨ 新增：在畫板的正上方加入了「題目文字」與「發音按鈕」
         let canvasHtml = `
             <div class="canvas-area">
                 <p style="margin:0 0 10px 0; color:#8e2de2; font-weight:bold;">✍️ 或在這裡手寫答案 (Draw your answer!)</p>
                 
-                <!-- ✨ 畫板專屬：貼心題目提示區 ✨ -->
                 <div style="background: #fff9ea; padding: 10px 15px; border-radius: 10px; border: 2px dashed #fbc531; margin-bottom: 12px; font-size: 18px; font-weight: bold; color: #d63384; text-align: left; display: flex; align-items: flex-start; gap: 8px;">
                     <button class="audio-btn" title="聽題目發音" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" onclick="playAudio('${qObj.q.replace(/'/g, "\\'")}')">🔊</button>
                     <span style="line-height: 1.4; padding-top: 4px;">❓ ${qObj.q}</span>
@@ -780,12 +779,11 @@
 
         initCanvas();
         
-        if(userAnswers[currentQuestionIndex] !== null) {
+        // 畫板的完成按鈕，只受畫板自己的狀態控制
+        if(writtenAnswers[currentQuestionIndex]) {
             document.getElementById('btn-submit-written').disabled = true;
             document.getElementById('btn-submit-written').innerText = "已完成 ✅";
-            if(userAnswers[currentQuestionIndex] === 'written') {
-                document.getElementById('btn-submit-written').classList.add('written-pass');
-            }
+            document.getElementById('btn-submit-written').classList.add('written-pass');
         }
 
         document.getElementById('btn-prev').disabled = (currentQuestionIndex === 0);
@@ -793,9 +791,10 @@
     }
 
     function selectOption(optIndex, btn) {
-        if (userAnswers[currentQuestionIndex] !== null) return; 
+        // 只檢查有沒有選過選擇題，不管有沒有畫過圖
+        if (mcAnswers[currentQuestionIndex] !== null) return; 
         
-        userAnswers[currentQuestionIndex] = optIndex;
+        mcAnswers[currentQuestionIndex] = optIndex;
         const correctAns = currentQuiz[currentQuestionIndex].a;
         
         if (optIndex === correctAns) {
@@ -807,8 +806,9 @@
     }
 
     function changeQuestion(direction) {
-        if (direction === 1 && userAnswers[currentQuestionIndex] === null) {
-            alert("Please select an answer or draw it first! (請先選擇答案或手寫完成！)");
+        // 檢查如果「完全沒有作答（兩個都沒選）」才能阻止換題
+        if (direction === 1 && mcAnswers[currentQuestionIndex] === null && !writtenAnswers[currentQuestionIndex]) {
+            alert("Please select an answer or draw it first! (請先選擇答案或完成手寫！)");
             playSoundEffect('wrong');
             return;
         }
@@ -823,7 +823,8 @@
     function submitQuiz() {
         let correctCount = 0;
         currentQuiz.forEach((qObj, index) => {
-            if(userAnswers[index] === qObj.a || userAnswers[index] === 'written') correctCount++;
+            // 只要選擇題答對，或是手寫區有提交，都算是過關
+            if(mcAnswers[index] === qObj.a || writtenAnswers[index]) correctCount++;
         });
 
         document.getElementById('level-view').style.display = 'none';
