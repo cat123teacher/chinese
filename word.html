@@ -8,39 +8,127 @@
   :root { --primary: #FFB7B2; --secondary: #B2E2F2; --text: #555; }
   body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #FFF9E1; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text); }
   .logo { position: absolute; top: 10px; left: 10px; width: 50px; height: 50px; border-radius: 50%; border: 2px solid white; }
+  
   .page { display: none; flex-direction: column; align-items: center; width: 100%; flex-grow: 1; padding: 20px; box-sizing: border-box; }
   .active { display: flex; }
-  h1 { color: #FF9AA2; text-align: center; font-size: 22px; margin-top: 40px; }
-  .mode-btn { width: 95%; max-width: 400px; padding: 14px; margin: 5px; border-radius: 15px; border: none; background: white; font-size: 16px; font-weight: bold; box-shadow: 0 4px #FFDAC1; cursor: pointer; }
-  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; width: 100%; max-width: 400px; }
-  .level-btn { padding: 12px; background: white; border: 2px solid var(--primary); border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  h1 { color: #FF9AA2; text-align: center; font-size: 22px; margin-top: 40px; margin-bottom: 10px; }
+  
+  /* 首頁圖卡樣式 */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 500px; margin-top: 10px; }
+  .mode-card { 
+    padding: 20px 5px; border-radius: 25px; border: 4px solid white; 
+    font-size: 15px; font-weight: bold; cursor: pointer; color: #555; font-family: inherit;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.08); transition: all 0.3s ease; line-height: 1.3;
+  }
+  .mode-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 12px 20px rgba(0,0,0,0.15); }
+  .mode-card .icon { font-size: 40px; margin-bottom: 8px; }
+  .mode-card small { font-size: 12px; color: #777; margin-top: 5px; font-weight: normal; }
+  .return-btn { grid-column: span 2; flex-direction: row; gap: 10px; font-size: 18px; padding: 15px; color: white !important; background:#FF9AA2; }
+  .return-btn .icon { font-size: 28px; margin-bottom: 0; }
+
+  /* 關卡選擇頁面圖卡樣式 */
+  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; width: 100%; max-width: 450px; }
+  .level-btn { 
+    padding: 15px 10px; background: linear-gradient(135deg, #ffffff, #fff3e0); 
+    border: 3px solid #FFDAC1; border-radius: 20px; cursor: pointer; 
+    font-size: 14px; font-weight: bold; color: #555; font-family: inherit;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08); transition: all 0.3s ease; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; line-height: 1.2;
+  }
+  .level-btn:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 10px 18px rgba(0,0,0,0.12); border-color: #FFB7B2; }
+  .level-btn .lvl-icon { font-size: 26px; }
+
   .card { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 350px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; }
   .word { font-size: 28px; line-height: 1.4; color: #333; font-weight: bold; word-break: break-word; }
   .voice-box { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
   .v-btn { padding: 10px 15px; border-radius: 15px; border: none; background: var(--secondary); font-weight: bold; cursor: pointer; font-size: 16px; }
   footer { background: white; width: 100%; padding: 15px 10px; text-align: center; border-top: 4px solid var(--secondary); font-size: 11px; margin-top: auto; line-height: 1.6; }
   footer a { color: #FF9AA2; text-decoration: none; font-weight: bold; margin: 0 5px; }
+
+  /* --- 新增：過關慶祝彈窗動畫與樣式 --- */
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;
+  }
+  .modal-box {
+    background: white; padding: 30px 20px; border-radius: 30px; text-align: center; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 300px; width: 80%; 
+    border: 6px solid #FFDAC1; animation: popIn 0.5s ease;
+  }
+  .modal-icon { font-size: 50px; margin-bottom: 10px; }
+  .modal-title { color: #FF9AA2; margin-top: 0; font-size: 24px; font-weight: bold; }
+  .modal-text { font-size: 16px; font-weight: bold; color: #555; line-height: 1.5; margin-bottom: 20px; }
+  .modal-btn {
+    padding: 12px 25px; font-size: 16px; border-radius: 20px; background: #FF9AA2; color: white;
+    border: none; font-weight: bold; cursor: pointer; box-shadow: 0 6px 12px rgba(255, 154, 162, 0.4);
+    transition: transform 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-3px); }
+  /* --------------------------------------- */
+
 </style>
 </head>
 <body>
 <img src="cat.jpeg" class="logo">
 
+<!-- 慶祝過關的彈出視窗 -->
+<div id="celebrate-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-icon">🎉 🏆 🌟</div>
+    <div class="modal-title" id="modal-title-text">太棒了！</div>
+    <div class="modal-text" id="modal-desc-text">恭喜你完成這個關卡！<br>你真棒！</div>
+    <button class="modal-btn" onclick="closeModal()">繼續大冒險 🚀</button>
+  </div>
+</div>
+
 <div id="mode-page" class="page active">
   <h1>🌟 幼兒中英學習卡(粵普英發聲版) 🌟</h1>
-  <button class="mode-btn" onclick="setMode('zh_jr', true)" style="background:#FFDAC1">初級版中文(K1-K2有圖片)</button>
-  <button class="mode-btn" onclick="setMode('zh_jr', false)" style="background:#FFEDD5">初級版中文(K1-K2沒有圖片)</button>
-  <button class="mode-btn" onclick="setMode('en_jr', true)" style="background:#B2E2F2">初級版英文(K1-K2有圖片)</button>
-  <button class="mode-btn" onclick="setMode('en_jr', false)" style="background:#E0F2FE">初級版英文(K1-K2沒有圖片)</button>
-  <button class="mode-btn" onclick="setMode('zh_mid', false)" style="background:#FEE2E2">中級版中文(K2-K3)</button>
-  <button class="mode-btn" onclick="setMode('en_mid', false)" style="background:#DBEAFE">中級版英文(K2-K3)</button>
-  <button class="mode-btn" onclick="setMode('zh_adv', false)" style="background:#D1FAE5">高級版中文(K2-K3)</button>
-  <button class="mode-btn" onclick="setMode('en_adv', false)" style="background:#CFFAFE">高級版英文(K2-K3)</button>
+  <div class="mode-grid">
+    <button class="mode-card" onclick="setMode('zh_jr', true)" style="background-color:#FFDAC1;">
+      <div class="icon">🍎</div>初級版中文<br><small>(K1-K2 有圖片)</small>
+    </button>
+    <button class="mode-card" onclick="setMode('zh_jr', false)" style="background-color:#FFEDD5;">
+      <div class="icon">✏️</div>初級版中文<br><small>(K1-K2 無圖片)</small>
+    </button>
+    
+    <button class="mode-card" onclick="setMode('en_jr', true)" style="background-color:#B2E2F2;">
+      <div class="icon">🐶</div>初級版英文<br><small>(K1-K2 有圖片)</small>
+    </button>
+    <button class="mode-card" onclick="setMode('en_jr', false)" style="background-color:#E0F2FE;">
+      <div class="icon">📖</div>初級版英文<br><small>(K1-K2 無圖片)</small>
+    </button>
+    
+    <button class="mode-card" onclick="setMode('zh_mid', false)" style="background-color:#FEE2E2;">
+      <div class="icon">🚀</div>中級版中文<br><small>(K2-K3)</small>
+    </button>
+    <button class="mode-card" onclick="setMode('en_mid', false)" style="background-color:#DBEAFE;">
+      <div class="icon">⛵</div>中級版英文<br><small>(K2-K3)</small>
+    </button>
+    
+    <button class="mode-card" onclick="setMode('zh_adv', false)" style="background-color:#D1FAE5;">
+      <div class="icon">👑</div>高級版中文<br><small>(K2-K3)</small>
+    </button>
+    <button class="mode-card" onclick="setMode('en_adv', false)" style="background-color:#CFFAFE;">
+      <div class="icon">🌟</div>高級版英文<br><small>(K2-K3)</small>
+    </button>
+
+    <button class="mode-card return-btn" onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'">
+      <div class="icon">🏠</div> 返回小朋友學習大冒險
+    </button>
+  </div>
 </div>
 
 <div id="level-page" class="page">
-  <h2 id="mode-title" style="color:#FF9AA2"></h2>
+  <h2 id="mode-title" style="color:#FF9AA2; margin-bottom: 5px; font-size: 26px;"></h2>
+  <p style="color: #888; font-size: 14px; margin-top: 0; font-weight: bold;">請選擇你想挑戰的關卡吧！👇</p>
   <div class="level-grid" id="level-menu"></div>
-  <button onclick="location.reload()" style="margin-top:20px;">⬅️ 返回主頁</button>
+  <button onclick="location.reload()" style="margin-top:25px; padding:12px 25px; border-radius:20px; border:none; background:#FF9AA2; color:white; font-weight:bold; cursor:pointer; font-size:16px; box-shadow: 0 6px 12px rgba(255, 154, 162, 0.4); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">⬅️ 返回首頁</button>
 </div>
 
 <div id="game-page" class="page">
@@ -48,9 +136,9 @@
   <div class="card"><div id="img-area"></div><div class="word" id="word-text"></div></div>
   <div class="voice-box" id="voice-btns"></div>
   <div style="display:flex; gap:10px;">
-    <button onclick="prev()" style="padding:10px 20px; border-radius:10px; border:none; background:#FFDAC1;">⬅️</button>
-    <button onclick="goBackToLevels()" style="padding:10px 15px; border-radius:10px; border:none; background:#eee;">🏠</button>
-    <button onclick="next()" style="padding:10px 20px; border-radius:10px; border:none; background:#FFDAC1;">➡️</button>
+    <button onclick="prev()" style="padding:10px 20px; border-radius:10px; border:none; background:#FFDAC1; cursor:pointer;">⬅️</button>
+    <button onclick="goBackToLevels()" style="padding:10px 15px; border-radius:10px; border:none; background:#eee; cursor:pointer;">🏠</button>
+    <button onclick="next()" style="padding:10px 20px; border-radius:10px; border:none; background:#FFDAC1; cursor:pointer;">➡️</button>
   </div>
 </div>
 
@@ -92,7 +180,7 @@
     "第六關：數字與時間": ["現在是早上八點鐘。","一個星期有七天。","我有十根手指頭。","今天是星期五，明天是週末。","時鐘的長針走一圈是一個小時。","我有三本練習簿。","十個小朋友在玩捉迷藏。","我們要準時起床。","下午我們去公園玩。","一年有十二個月。","我的好朋友有五個。","我用了四個顏色筆畫畫。","二加三等於五。","媽媽買了六顆蘋果。","我排在隊伍的第二個。","今天是我們全家出遊的日子。","時間過得好快呀！","九點半我們去睡覺。","我買了八個小積木。","數字真的很好玩。"],
     "第七關：身體與健康": ["我有兩隻眼睛和一個鼻子。","多吃水果身體才會健康。","我長高了，衣服變小了。","運動可以讓力氣變大。","牙齒要每天刷才會白白的。","肚子餓了要吃健康的午餐。","我覺得喉嚨有點痛。","生病了要去看醫生。","我有一雙靈巧的手。","走路要走好，不要跌倒。","我喜歡和大家一起跳舞。","洗手可以把細菌洗掉。","每天都要有精神地去上學。","身體健康最重要。","我會自己綁鞋帶，手很靈活。","多喝水對身體好。","眼睛累了要休息一下。","跳繩可以讓腳更有力。","我跑得比風還要快。","身體強壯就不容易生病。"],
     "第八關：家人與親情": ["爸爸媽媽很愛我。","爺爺奶奶最疼我了。","哥哥會教我寫作業。","妹妹笑起來好可愛。","週末全家人一起去逛超市。","謝謝媽媽每天幫我做早餐。","我會幫爸爸倒一杯水。","我們是一家人，要互相愛護。","我和姊姊一起玩積木。","家裡有一個溫暖的客廳。","媽媽的手很溫柔。","爸爸下班會帶我玩。","我們家有四個人。","爺爺喜歡在公園散步。","奶奶做的菜最好吃了。","我們要聽父母的話。","我喜歡和家人待在一起。","媽媽叫我起床吃早餐。","家是休息最好的地方。","我們全家人的感情很好。"],
-    "第九關：想像與遊戲": ["我想變成一隻快樂的小鳥。","如果我有魔法，我要變出很多糖果。","我在夢裡看到了一座城堡。","玩具士兵正在排隊。","我喜歡玩角色扮演的遊戲。","想像自己正開著一艘大船。","這塊積木看起來像一 হবি恐龍。","我畫了一張奇怪的臉。","我們來玩躲貓貓好不好？","夢想中的房子很大。","我用報紙摺了一頂帽子。","這是我的祕密基地。","我把娃娃當成我的好朋友。","想像力讓我變得很聰明。","我想去外太空看月亮。","我們一起來編故事吧！","我變成了勇敢的騎士。","這是一場神奇的冒險。","玩具變成了神奇的魔法師。","我的想像力沒有邊界。"],
+    "第九關：想像與遊戲": ["我想變成一隻快樂的小鳥。","如果我有魔法，我要變出很多糖果。","我在夢裡看到了一座城堡。","玩具士兵正在排隊。","我喜歡玩角色扮演的遊戲。","想像自己正開著一艘大船。","這塊積木看起來像一隻恐龍。","我畫了一張奇怪的臉。","我們來玩躲貓貓好不好？","夢想中的房子很大。","我用報紙摺了一頂帽子。","這是我的祕密基地。","我把娃娃當成我的好朋友。","想像力讓我變得很聰明。","我想去外太空看月亮。","我們一起來編故事吧！","我變成了勇敢的騎士。","這是一場神奇的冒險。","玩具變成了神奇的魔法師。","我的想像力沒有邊界。"],
     "第十關：食物與飲食": ["這顆蘋果又大又紅。","媽媽煮的麵包很香。","我最喜歡喝新鮮的牛奶。","飯前洗手是好習慣。","吃香蕉可以補充體力。","西瓜切開後有紅紅的汁。","餅乾要慢慢吃，不要噎到。","我會自己用碗筷吃飯。","不要吃太多糖果，牙齒會壞掉。","這裡的水很甜。","這杯熱茶要小心喝。","蛋的味道很好吃。","多吃蔬菜才不會生病。","我們一起分享食物。","這是媽媽親手做的點心。","謝謝農夫辛苦種菜。","吃飽了才有力氣玩。","我最喜歡喝湯了。","食物不能隨便浪費。","大家一起吃飯真熱鬧。"]
   };
 
@@ -110,7 +198,8 @@
   };
 
   let currentSet={}, currentLang='zh', showImage=true, currentWords=[], currentImgNames=[], currentIndex=0, currentLevelName="";
-  
+  const emojis = ['🎈', '🌟', '🐾', '🎨', '🚀', '🍭', '🌈', '⚽', '🧸', '🎒', '🍎', '🧩'];
+
   function setMode(mode, img) {
     showImage = img;
     if(mode === 'zh_jr') { currentSet = jrZh; currentLang = 'zh'; }
@@ -124,22 +213,24 @@
     document.getElementById('mode-page').classList.remove('active');
     document.getElementById('level-page').classList.add('active');
     const menu = document.getElementById('level-menu'); menu.innerHTML = "";
-    Object.keys(currentSet).forEach(lvl => {
-      let btn = document.createElement('button'); btn.className = 'level-btn'; btn.innerText = lvl; btn.onclick = () => startLevel(lvl); menu.appendChild(btn);
+    
+    Object.keys(currentSet).forEach((lvl, index) => {
+      let btn = document.createElement('button'); 
+      btn.className = 'level-btn'; 
+      let icon = emojis[index % emojis.length]; 
+      btn.innerHTML = `<div class="lvl-icon">${icon}</div><div>${lvl}</div>`; 
+      btn.onclick = () => startLevel(lvl); 
+      menu.appendChild(btn);
     });
   }
 
   function startLevel(lvl) {
     currentLevelName = lvl;
-    // 隨機打亂索引
     let indices = Array.from({length: currentSet[lvl].length}, (_, i) => i).sort(() => Math.random() - 0.5);
-    
-    // 確保單字與對應圖片的邏輯正確連接，修正了之前的抓取錯誤
     currentWords = indices.map(i => currentSet[lvl][i]);
     currentImgNames = indices.map(i => (currentSet === jrEn) ? jrZh[lvl][i] : currentSet[lvl][i]);
     currentIndex = 0;
     
-    // 控制字體大小
     if (currentSet === advZh || currentSet === advEn) {
       document.getElementById('word-text').style.fontSize = "28px";
     } else {
@@ -154,7 +245,6 @@
     document.getElementById('info-bar').innerText = `${currentLevelName} (${currentIndex+1}/${currentWords.length})`;
     document.getElementById('word-text').innerText = currentWords[currentIndex];
     
-    // 顯示對應圖片（限初級有圖片版）
     document.getElementById('img-area').innerHTML = (showImage && (currentSet === jrZh || currentSet === jrEn)) ? `<img src="${currentImgNames[currentIndex]}.jpg" style="width:100%;height:180px;object-fit:contain;">` : "";
     
     const vBox = document.getElementById('voice-btns');
@@ -165,10 +255,63 @@
     }
   }
 
-  function speak(langCode) { const u = new SpeechSynthesisUtterance(currentWords[currentIndex]); u.lang = langCode; window.speechSynthesis.speak(u); }
-  function next() { if(currentIndex < currentWords.length - 1) { currentIndex++; update(); } else { alert("太棒了！關卡完成！"); goBackToLevels(); } }
-  function prev() { if(currentIndex > 0) { currentIndex--; update(); } }
-  function goBackToLevels() { document.getElementById('game-page').classList.remove('active'); document.getElementById('level-page').classList.add('active'); }
+  function speak(langCode) { 
+    const u = new SpeechSynthesisUtterance(currentWords[currentIndex]); 
+    u.lang = langCode; 
+    window.speechSynthesis.speak(u); 
+  }
+  
+  function next() { 
+    if(currentIndex < currentWords.length - 1) { 
+      currentIndex++; update(); 
+    } else { 
+      // 改用美化的慶祝彈窗
+      showCelebrateModal();
+    } 
+  }
+  
+  function prev() { 
+    if(currentIndex > 0) { currentIndex--; update(); } 
+  }
+  
+  function goBackToLevels() { 
+    document.getElementById('game-page').classList.remove('active'); 
+    document.getElementById('level-page').classList.add('active'); 
+  }
+
+  // --- 新增：顯示慶祝彈窗與讚美語音 ---
+  function showCelebrateModal() {
+    const modal = document.getElementById('celebrate-modal');
+    const title = document.getElementById('modal-title-text');
+    const desc = document.getElementById('modal-desc-text');
+    
+    // 根據當前模式切換文字與語音語言
+    let praiseText = "";
+    let voiceLang = "";
+    if(currentLang === 'zh') {
+      title.innerText = "太棒了！";
+      desc.innerHTML = "恭喜你完成這個關卡！<br>你真棒！";
+      praiseText = "太棒了！關卡完成！你真棒！";
+      voiceLang = "zh-HK"; // 使用廣東話讚美
+    } else {
+      title.innerText = "Excellent!";
+      desc.innerHTML = "Congratulations!<br>Great job!";
+      praiseText = "Excellent! Level completed! Great job!";
+      voiceLang = "en-US"; // 使用英文讚美
+    }
+    
+    modal.style.display = 'flex';
+    
+    // 播放語音讚美
+    const u = new SpeechSynthesisUtterance(praiseText); 
+    u.lang = voiceLang; 
+    window.speechSynthesis.speak(u); 
+  }
+
+  function closeModal() {
+    document.getElementById('celebrate-modal').style.display = 'none';
+    goBackToLevels(); // 關閉彈窗後自動返回關卡選擇頁面
+  }
 </script>
 </body>
 </html>
