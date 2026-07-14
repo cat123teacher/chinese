@@ -846,12 +846,12 @@ function startDrawing(e) {
     ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
 }
 
-/* ✨✨ 【真正的完全修復】使用 touch = e.touches 抓取第一根手指的觸控位置 ✨✨ */
+/* ✨✨ 【真正的完全修復】抓取第 1 根手指（陣列索引為 0）的觸控位置 ✨✨ */
 function startDrawingTouch(e) {
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); 
         isDrawing = true;
-        // 把第一根手指的資料獨立拿出來，必須加上 
+        // 把第一根手指的資料獨立拿出來，加上  ！！！
         const touch = e.touches; 
         const pos = getPos(touch.clientX, touch.clientY);
         ctx.beginPath();
@@ -865,12 +865,12 @@ function draw(e) {
     ctx.lineTo(pos.x, pos.y); ctx.stroke();
 }
 
-/* ✨✨ 【真正的完全修復】使用 touch = e.touches 抓取第一根手指的觸控位置 ✨✨ */
+/* ✨✨ 【真正的完全修復】抓取第 1 根手指（陣列索引為 0）的觸控位置 ✨✨ */
 function drawTouch(e) {
     if (!isDrawing) return;
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); 
-        // 把第一根手指的資料獨立拿出來，必須加上 
+        // 把第一根手指的資料獨立拿出來，加上  ！！！
         const touch = e.touches;
         const pos = getPos(touch.clientX, touch.clientY);
         ctx.lineTo(pos.x, pos.y);
