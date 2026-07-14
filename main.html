@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小朋友練習遊戲大冒險 🌟</title>
     <style>
+        /* 可愛波點漸層背景 */
         body {
             font-family: 'Comic Sans MS', 'Microsoft JhengHei', sans-serif;
-            background-color: #f0f8ff;
+            background: linear-gradient(135deg, #e0f7fa 25%, #fff0f5 100%);
+            background-image: 
+                radial-gradient(#ffffff 15%, transparent 16%), 
+                radial-gradient(#ffffff 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
             text-align: center;
             margin: 0;
             padding: 20px;
@@ -22,26 +28,39 @@
             width: 80px;
             height: 80px;
             border-radius: 50%; 
-            border: 3px solid #ffb6c1;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 4px solid #ffb6c1;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
             object-fit: cover;
             background-color: white;
+            z-index: 10;
         }
 
-        /* 桌機版：容器與字體設定 */
+        /* 標題彈跳動畫 */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
         h1 {
             color: #ff69b4;
-            font-size: 36px;
-            text-shadow: 2px 2px #ffe4e1;
+            font-size: 40px;
+            text-shadow: 3px 3px 0px #fff, 5px 5px 0px #ffd700;
             margin-top: 10px;
+            letter-spacing: 2px;
         }
+        h1 span {
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        /* 主容器加上卡通虛線邊框 */
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 30px;
+            border: 6px dashed #ffb6c1;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
         }
 
         /* 主選單按鈕樣式 */
@@ -55,32 +74,35 @@
             font-size: 28px;
             font-weight: bold;
             padding: 20px;
-            border: none;
-            border-radius: 15px;
+            border: 4px solid white;
+            border-radius: 20px;
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .age-btn:hover {
+            transform: scale(1.02) translateY(-3px);
         }
         .age-btn:active {
             transform: translateY(5px);
         }
         
-        /* 各年級與科目的專屬顏色 */
-        .btn-nk2 { background-color: #ffd700; color: #d2691e; box-shadow: 0 5px 0 #daa520; }
+        /* 各年級與科目的專屬顏色 (立體效果) */
+        .btn-nk2 { background-color: #ffd700; color: #d2691e; box-shadow: 0 8px 0 #daa520; }
         .btn-nk2:active { box-shadow: 0 0 0 #daa520; }
         
-        .btn-k3 { background-color: #98fb98; color: #006400; box-shadow: 0 5px 0 #3cb371; }
+        .btn-k3 { background-color: #98fb98; color: #006400; box-shadow: 0 8px 0 #3cb371; }
         .btn-k3:active { box-shadow: 0 0 0 #3cb371; }
         
-        .btn-p1 { background-color: #87ceeb; color: #005f6b; box-shadow: 0 5px 0 #4682b4; }
+        .btn-p1 { background-color: #87ceeb; color: #005f6b; box-shadow: 0 8px 0 #4682b4; }
         .btn-p1:active { box-shadow: 0 0 0 #4682b4; }
 
-        .btn-chi { background-color: #ffebcd; color: #8b4513; box-shadow: 0 5px 0 #cd853f; }
+        .btn-chi { background-color: #ffebcd; color: #8b4513; box-shadow: 0 8px 0 #cd853f; }
         .btn-chi:active { box-shadow: 0 0 0 #cd853f; }
 
-        .btn-eng { background-color: #e6e6fa; color: #4b0082; box-shadow: 0 5px 0 #9370db; }
+        .btn-eng { background-color: #e6e6fa; color: #4b0082; box-shadow: 0 8px 0 #9370db; }
         .btn-eng:active { box-shadow: 0 0 0 #9370db; }
 
-        .btn-math { background-color: #e0ffff; color: #008080; box-shadow: 0 5px 0 #20b2aa; }
+        .btn-math { background-color: #e0ffff; color: #008080; box-shadow: 0 8px 0 #20b2aa; }
         .btn-math:active { box-shadow: 0 0 0 #20b2aa; }
         
         /* 區塊顯示控制與遊戲列表網格 */
@@ -88,125 +110,172 @@
             display: none; 
             margin-top: 20px;
         }
+        .section-div h2 {
+            font-size: 32px;
+            text-shadow: 2px 2px #eee;
+            margin-bottom: 30px;
+        }
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
+
+        /* 超可愛 3D 遊戲卡片 */
         .game-card {
-            background-color: #fffacd;
-            border: 3px solid #ffebcd;
-            border-radius: 15px;
-            padding: 20px;
+            background-color: #fff9e6;
+            border: 4px solid #ffcc00;
+            border-radius: 25px;
+            padding: 25px 15px;
             text-decoration: none;
-            color: #333;
-            font-size: 20px;
+            color: #555;
+            font-size: 22px;
             font-weight: bold;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 0.2s;
+            box-shadow: 0 8px 0 #ffb300;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
         .game-card:hover {
-            transform: scale(1.05);
-            background-color: #ffe4b5;
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 16px 0 #ffb300;
+            background-color: #fffdf5;
+            color: #ff6600;
+        }
+        .game-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #ffb300;
+        }
+
+        /* 遊戲圖示放大並加上輕微動畫 */
+        @keyframes gentle-rock {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
         }
         .game-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 55px;
+            margin-bottom: 15px;
+            filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.15));
+        }
+        .game-card:hover .game-icon {
+            animation: gentle-rock 1s infinite;
         }
         
-        /* 返回按鈕 */
+        /* 返回按鈕也變立體 */
         .back-btn {
-            background-color: #ffb6c1;
+            background-color: #ff99cc;
             color: #fff;
             font-size: 20px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: 3px solid white;
+            border-radius: 15px;
             cursor: pointer;
             margin-bottom: 20px;
             display: inline-block;
+            box-shadow: 0 5px 0 #ff66a3;
+            transition: all 0.1s;
+        }
+        .back-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 #ff66a3;
         }
 
         /* 底部聯絡資訊樣式 */
         .footer {
-            margin-top: 40px;
-            padding: 20px;
+            margin-top: 50px;
+            padding: 25px;
             background-color: #fffaf0;
-            border-radius: 15px;
-            border: 2px dashed #ffb6c1;
+            border-radius: 20px;
+            border: 4px dashed #87ceeb;
             font-size: 16px;
             color: #555;
             line-height: 1.8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .footer h3 {
             color: #d2691e;
             margin-top: 0;
             margin-bottom: 15px;
+            font-size: 22px;
         }
         .footer a {
-            color: #ff69b4;
+            color: #005f6b;
+            background-color: #e0ffff;
             text-decoration: none;
             font-weight: bold;
-            margin: 0 8px;
+            margin: 5px 8px;
+            padding: 8px 15px;
+            border-radius: 12px;
             display: inline-block;
-            line-height: 2; 
+            transition: all 0.2s;
+            border: 2px solid #b0e0e6;
         }
         .footer a:hover {
-            color: #005f6b;
-            text-decoration: underline;
+            background-color: #ffb6c1;
+            color: white;
+            border-color: #ff69b4;
+            transform: scale(1.05);
         }
         .douyin-text {
             display: inline-block;
-            margin: 0 8px;
+            margin: 15px 8px 0;
             font-weight: bold;
-            color: #333;
+            color: #ff69b4;
+            background-color: #fff0f5;
+            padding: 8px 15px;
+            border-radius: 12px;
+            border: 2px dashed #ffb6c1;
         }
 
-        /* 📱 手機版專屬優化 (螢幕寬度小於 600px 時自動觸發) 📱 */
+        /* 📱 手機版專屬優化 📱 */
         @media (max-width: 600px) {
-            body {
-                padding: 10px; /* 縮小最外層邊距 */
-            }
+            body { padding: 10px; }
             .top-left-logo {
                 position: relative;
                 top: 0;
                 left: 0;
                 margin-bottom: 15px;
-                width: 65px; /* 圖標稍微縮小一點 */
-                height: 65px;
+                width: 70px; 
+                height: 70px;
+                border-width: 3px;
             }
             .container {
-                padding: 20px 15px; /* 減少兩側留白，讓按鈕空間更大 */
+                padding: 20px 15px; 
+                border-width: 4px;
+                border-radius: 20px;
             }
             h1 {
-                font-size: 26px; /* 標題縮小，避免折行 */
+                font-size: 28px; 
+                text-shadow: 2px 2px 0px #fff, 3px 3px 0px #ffd700;
             }
             .age-btn {
-                font-size: 22px; /* 按鈕字體微調 */
-                padding: 15px; /* 按鈕高度稍微縮減 */
+                font-size: 22px; 
+                padding: 15px; 
+            }
+            .section-div h2 {
+                font-size: 26px;
             }
             .game-grid {
-                grid-template-columns: 1fr; /* 強制遊戲卡片變成上下排列，佔滿寬度 */
+                grid-template-columns: 1fr; 
+                gap: 20px;
+            }
+            .game-card {
+                padding: 20px 15px;
             }
             .footer {
-                padding: 15px 10px;
+                padding: 20px 10px;
             }
             .footer p {
                 display: flex;
-                flex-direction: column; /* 讓社群連結變成垂直排列 */
-                gap: 10px; /* 增加上下間距防誤觸 */
+                flex-direction: column; 
+                gap: 5px; 
             }
             .footer a {
                 margin: 0;
-                background-color: #ffe4e1; /* 加一點背景色變成按鈕的感覺 */
-                padding: 8px;
-                border-radius: 8px;
-            }
-            .douyin-text {
-                margin: 10px 0 0 0;
             }
         }
     </style>
@@ -217,8 +286,8 @@
 <img src="cat.jpeg" alt="Teacher Cat" class="top-left-logo" onerror="this.style.display='none'">
 
 <div class="container">
-    <h1>🌟 小朋友練習遊戲大冒險 🌟</h1>
-    <p style="font-size: 20px; color: #666;">小朋友，請選擇你的年級開始挑戰吧！</p>
+    <h1><span>🌟</span> 小朋友練習遊戲大冒險 <span>🌟</span></h1>
+    <p style="font-size: 22px; color: #888; font-weight: bold;">小朋友，請選擇你的年級開始挑戰吧！</p>
 
     <!-- 【主目錄】 -->
     <div id="home-menu" class="btn-group" style="display: flex;">
@@ -241,7 +310,7 @@
     <!-- 幼稚園 N-K2 遊戲區 -->
     <div id="nk2-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
-        <h2>🐣 幼稚園 N - K2 遊戲樂園</h2>
+        <h2 style="color: #d2691e;">🐣 幼稚園 N - K2 遊戲樂園</h2>
         <div class="game-grid">
             <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
                 <span class="game-icon">🐻</span>
@@ -261,7 +330,7 @@
     <!-- 幼稚園 K3 遊戲區 -->
     <div id="k3-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
-        <h2>🚀 幼稚園 K3 遊戲樂園</h2>
+        <h2 style="color: #006400;">🚀 幼稚園 K3 遊戲樂園</h2>
         <div class="game-grid">
             <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
                 <span class="game-icon">🐻</span>
@@ -277,8 +346,8 @@
     <!-- 小一：中文區 -->
     <div id="p1-chi-games" class="section-div">
         <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
-        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
-        <h2>📚 小學一年級 - 中文</h2>
+        <button class="back-btn" style="background-color: #ddd; color: #333; box-shadow: 0 5px 0 #bbb; border-color: white;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2 style="color: #8b4513;">📚 小學一年級 - 中文</h2>
         <div class="game-grid">
             <a href="https://cat123teacher.github.io/chinese/chinese.html" class="game-card">
                 <span class="game-icon">📚</span>
@@ -298,8 +367,8 @@
     <!-- 小一：英文區 -->
     <div id="p1-eng-games" class="section-div">
         <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
-        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
-        <h2>🔤 小學一年級 - 英文</h2>
+        <button class="back-btn" style="background-color: #ddd; color: #333; box-shadow: 0 5px 0 #bbb; border-color: white;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2 style="color: #4b0082;">🔤 小學一年級 - 英文</h2>
         <div class="game-grid">
             <a href="https://cat123teacher.github.io/chinese/P1grammar.html" class="game-card">
                 <span class="game-icon">⚔️</span>
@@ -309,7 +378,6 @@
                 <span class="game-icon">🛡️</span>
                 小一英文文法大冒險下
             </a>
-            <!-- 新增：小一英文閱讀挑戰 -->
             <a href="https://cat123teacher.github.io/chinese/P1englishreading.html" class="game-card">
                 <span class="game-icon">📕</span>
                 小一英文閱讀挑戰
@@ -320,8 +388,8 @@
     <!-- 小一：數學區 -->
     <div id="p1-math-games" class="section-div">
         <button class="back-btn" onclick="showSection('p1-menu')">⬅ 返回小一目錄</button>
-        <button class="back-btn" style="background-color: #ddd; color: #333;" onclick="showSection('home-menu')">🏠 回主頁</button>
-        <h2>🔢 小學一年級 - 數學</h2>
+        <button class="back-btn" style="background-color: #ddd; color: #333; box-shadow: 0 5px 0 #bbb; border-color: white;" onclick="showSection('home-menu')">🏠 回主頁</button>
+        <h2 style="color: #008080;">🔢 小學一年級 - 數學</h2>
         <div class="game-grid">
             <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/cat.html" class="game-card">
                 <span class="game-icon">🦁</span>
@@ -377,6 +445,9 @@
         } else {
             document.getElementById(sectionId).style.display = 'block';
         }
+        
+        // 切換頁面時，讓視角自動回到網頁最上方
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
 
