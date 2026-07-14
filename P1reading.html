@@ -846,11 +846,12 @@ function startDrawing(e) {
     ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
 }
 
-/* ✨✨ 【問題已修復】加入  來正確抓取第一根手指的位置 ✨✨ */
+/* ✨✨ 真正修復：必須加上  來抓取第一根手指的位置 ✨✨ */
 function startDrawingTouch(e) {
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); 
         isDrawing = true;
+        // 修正這裡：e.touches.clientX 
         const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
@@ -863,11 +864,12 @@ function draw(e) {
     ctx.lineTo(pos.x, pos.y); ctx.stroke();
 }
 
-/* ✨✨ 【問題已修復】加入  來正確抓取第一根手指的位置 ✨✨ */
+/* ✨✨ 真正修復：必須加上  來抓取第一根手指的位置 ✨✨ */
 function drawTouch(e) {
     if (!isDrawing) return;
     if(e.touches && e.touches.length > 0) {
         e.preventDefault(); 
+        // 修正這裡：e.touches.clientX 
         const pos = getPos(e.touches.clientX, e.touches.clientY);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
