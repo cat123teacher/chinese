@@ -2,7 +2,8 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 🌟 已升級：禁止手機自動縮放，確保畫圖順暢 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌟 P1 English Reading Challenge 🌟</title>
     <!-- 引入 html2canvas 實現網頁完整截圖功能 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -150,7 +151,12 @@
             border-radius: 10px; 
             background-color: #fafafa;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='49' x2='100' y2='49' stroke='%23cbd5e1' stroke-width='2' stroke-dasharray='6,6'/%3E%3C/svg%3E");
-            touch-action: none; cursor: crosshair; width: 100%; max-width: 600px; transition: height 0.3s ease;
+            /* 🌟 防止預設觸控手勢干擾畫畫 */
+            touch-action: none; 
+            cursor: crosshair; 
+            width: 100%; 
+            max-width: 600px; 
+            transition: height 0.3s ease;
         }
 
         .answer-display { display: none; margin-top: 15px; padding: 20px; background: #fffae6; border: 4px dashed #f6d365; border-radius: 15px; font-size: 22px; color: #d63384; font-weight: bold; animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -235,6 +241,11 @@
 
         <h2>🌳 Adventure Stories (80 words or more)</h2>
         <ul class="story-list" id="hard-list"></ul>
+
+        <!-- 🚀 返回小朋友學習大冒險按鈕 -->
+        <div style="margin-top: 40px; margin-bottom: 10px;">
+            <button onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'" style="background-color: #3b82f6; color: white; font-size: 22px; font-weight: bold; padding: 15px 30px; border-radius: 30px; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); width: 90%; max-width: 400px; border: 3px solid #60a5fa;">🚀 返回小朋友學習大冒險</button>
+        </div>
     </div>
 
     <!-- 關卡視圖 -->
@@ -395,6 +406,9 @@
         }, 150);
     }
 
+    // ==========================================
+    // 🎨 畫板核心系統 (已升級為 Pointer Events 完美支援手機/平板)
+    // ==========================================
     let canvas, ctx;
     let drawing = false;
     let canvasMode = 'pen';
@@ -410,33 +424,48 @@
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         setPen();
 
-        canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopPos); canvas.addEventListener('mouseout', stopPos);
-        canvas.addEventListener('touchstart', startPos, {passive: false});
-        canvas.addEventListener('touchmove', draw, {passive: false});
-        canvas.addEventListener('touchend', stopPos);
+        // 使用現代 Pointer Events，統一處理滑鼠、手指觸控與觸控筆(如Apple Pencil)
+        canvas.addEventListener('pointerdown', startPos, {passive: false});
+        canvas.addEventListener('pointermove', draw, {passive: false});
+        canvas.addEventListener('pointerup', stopPos);
+        canvas.addEventListener('pointercancel', stopPos);
+        canvas.addEventListener('pointerout', stopPos);
     }
 
-    function getTouchPos(e) {
+    // 取得精準的觸控座標
+    function getPointerPos(e) {
         const rect = canvas.getBoundingClientRect();
-        let clientX, clientY;
-        if (e.touches && e.touches.length > 0) { clientX = e.touches.clientX; clientY = e.touches.clientY; } 
-        else if (e.changedTouches && e.changedTouches.length > 0) { clientX = e.changedTouches.clientX; clientY = e.changedTouches.clientY; } 
-        else { clientX = e.clientX; clientY = e.clientY; }
-        const scaleX = canvas.width / rect.width; const scaleY = canvas.height / rect.height;
-        return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+        const scaleX = canvas.width / rect.width; 
+        const scaleY = canvas.height / rect.height;
+        return { 
+            x: (e.clientX - rect.left) * scaleX, 
+            y: (e.clientY - rect.top) * scaleY 
+        };
     }
 
     function startPos(e) { 
-        if(userAnswers[currentQuestionIndex] !== null) return; 
-        e.preventDefault(); drawing = true; const pos = getTouchPos(e);
-        ctx.beginPath(); ctx.moveTo(pos.x, pos.y); 
+        // 💡 如果已經選了答案或按了完成手寫，就鎖定畫板不給畫
+        if(userAnswers[currentQuestionIndex] !== null) {
+            return; 
+        }
+        e.preventDefault(); 
+        drawing = true; 
+        const pos = getPointerPos(e);
+        ctx.beginPath(); 
+        ctx.moveTo(pos.x, pos.y); 
     }
-    function stopPos() { drawing = false; ctx.beginPath(); }
+
+    function stopPos() { 
+        drawing = false; 
+        ctx.beginPath(); 
+    }
+
     function draw(e) {
         if(!drawing || userAnswers[currentQuestionIndex] !== null) return;
-        e.preventDefault(); const pos = getTouchPos(e);
-        ctx.lineTo(pos.x, pos.y); ctx.stroke(); 
+        e.preventDefault(); 
+        const pos = getPointerPos(e);
+        ctx.lineTo(pos.x, pos.y); 
+        ctx.stroke(); 
     }
 
     function setPen() { canvasMode = 'pen'; ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 2; ctx.strokeStyle = '#000000'; }
@@ -472,7 +501,7 @@
     }
 
     // ==========================================
-    // 📚 終極 65 篇故事題庫 (15篇 Easy + 50篇 Hard) 每個故事5條問題
+    // 📚 終極 65 篇故事題庫 (15篇 Easy + 50篇 Hard)
     // ==========================================
     const storyDB = {
         // --- 80 字以下 Easy Stories (15 篇) ---
@@ -493,7 +522,6 @@
         e15: { t: "Super Soccer Duck!", e: "🦆", ty: "e", img: "IMG_3613.PNG", tx: "QUACK QUACK! Merlin the duck is a big soccer star in Mexico City!\nHe wears a tiny jersey and socks.\nHe loves to kick balls in the park. His friend Cristian helps him.", q: [ {q: "What animal is Merlin?", o: ["A dog", "A cat", "A duck"], a: 2}, {q: "What does Merlin wear?", o: ["A hat", "Tiny jersey and socks", "Glasses"], a: 1}, {q: "Where does Merlin play?", o: ["Mexico City park", "London", "Tokyo"], a: 0}, {q: "Who helps Merlin?", o: ["Cristian", "John", "David"], a: 0}, {q: "What sport does he play?", o: ["Basketball", "Soccer", "Tennis"], a: 1} ]},
 
         // --- 80 字以上 Adventure Stories (50 篇) ---
-        // 原有 35 篇
         h1: { t: "Elly the Elephant", e: "🐘", ty: "h", img: "IMG_3114.PNG", tx: "One sunny morning, a wise elephant named Elly made a new friend in the big jungle. She was walking when she saw a little thing. It had funny hands and a face that was happy!\nElly made a trumpet sound and it answered with soft beeps. Elly was curious! The little friend was a helper robot!\nElly showed the robot to her jungle friends, the bunnies, the squirrels, and the birds. They all laughed.\nElly and the robot now play together. It helps Elly with her tree branch puzzles. Elly is so proud of her smart, little friend. They teach each other new games and are very happy.", q: [ {q: "What is the elephant's name?", o: ["Emma", "Elly", "Ella"], a: 1}, {q: "Where did Elly find her new friend?", o: ["In the jungle", "In the zoo", "In the city"], a: 0}, {q: "What was the new friend?", o: ["A monkey", "A helper robot", "A bird"], a: 1}, {q: "What sound did the robot make?", o: ["Soft beeps", "Loud roars", "Meow"], a: 0}, {q: "Which friends did Elly show the robot to?", o: ["Lions", "Bunnies and squirrels", "Fish"], a: 1} ]},
         h2: { t: "Koala Joey Found!", e: "🐨", ty: "h", img: "IMG_3115.PNG", tx: "Last week, in a beautiful forest in Australia, a tiny, fluffy baby koala was lost. He was very scared!\nBut a nice park ranger found him and gave him milk. He was so happy! A nice vet checked his health and found he was very well.\nThis fluffy little joey got a new name: 'Wattle.'\nWattle the Koala is very cute and loves to eat gum leaves. Now, he is safe and has many new friends in the koala house. Everybody is so happy for him!", q: [ {q: "What animal was lost?", o: ["Kangaroo", "Baby koala", "Panda"], a: 1}, {q: "Where did this happen?", o: ["Australia", "Japan", "USA"], a: 0}, {q: "What did the park ranger give the koala?", o: ["Water", "Juice", "Milk"], a: 2}, {q: "What is the koala's new name?", o: ["Wattle", "Wally", "Will"], a: 0}, {q: "What does Wattle love to eat?", o: ["Gum leaves", "Apples", "Pizza"], a: 0} ]},
         h3: { t: "Pingu in a Little Suit", e: "🐧", ty: "h", img: "IMG_3117.PNG", tx: "Meet our new friend, Pingu!\nA very nice zookeeper in Japan made a special little red jacket for Pingu because his tummy was cold. He looks so dapper!\nPingu loves to waddle around in his new jacket. The other penguins were a little surprised at first, but now they think he is very cool. He waddles very fast!\nThis is the most charming news from the last seven days. Everybody is smiling!", q: [ {q: "What did Pingu wear to stay warm?", o: ["Red jacket", "Blue hat", "Green shoes"], a: 0}, {q: "Where does Pingu live?", o: ["China", "Japan", "UK"], a: 1}, {q: "How did the other penguins feel at first?", o: ["Surprised", "Angry", "Happy"], a: 0}, {q: "Why did he need a jacket?", o: ["To look cool", "His tummy was cold", "For a party"], a: 1}, {q: "How does Pingu move?", o: ["He flies", "He swims", "He waddles fast"], a: 2} ]},
