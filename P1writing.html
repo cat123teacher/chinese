@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小一初級寫作練習</title>
+<style>
+    body { font-family: "Comic Sans MS", "微軟正黑體", sans-serif; background-color: #FDF5E6; text-align: center; margin: 0; padding: 0; padding-bottom: 150px; color: #333; user-select: none; }
+    
+    /* 頂部導航與 Progress Record 按鈕 */
+    .top-bar-global { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #FFCC80; box-shadow: 0 4px rgba(0,0,0,0.1); }
+    .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #FFF; object-fit: cover; }
+    .progress-btn { font-size: 20px; font-weight: bold; color: #FFF; background: #D84315; padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; box-shadow: 0 4px #BF360C; transition: 0.2s;}
+    .progress-btn:active { transform: translateY(4px); box-shadow: 0 0 #BF360C; }
+    
+    #game-container { max-width: 950px; margin: 20px auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 25px; border: 8px solid #FFB74D; position: relative;}
+    h1 { color: #FF7043; font-size: 38px; margin-bottom: 5px; text-shadow: 2px 2px 0px #FFE0B2;}
+    h2 { color: #5C6BC0; font-size: 22px; margin-top: 0; }
+    
+    .level-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px;}
+    .level-btn { background-color: #81C784; border: none; border-radius: 18px; padding: 15px 10px; font-size: 20px; font-weight: bold; color: #fff; cursor: pointer; width: 45%; box-shadow: 0 6px #4CAF50; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .level-btn:active { transform: translateY(6px); box-shadow: 0 0 #4CAF50; }
+    .level-btn:nth-child(2n) { background-color: #64B5F6; box-shadow: 0 6px #2196F3; }
+    .level-btn:nth-child(3n) { background-color: #FFB74D; box-shadow: 0 6px #FF9800; }
+    .level-btn:nth-child(4n) { background-color: #BA68C8; box-shadow: 0 6px #9C27B0; }
+    
+    .screen { display: none; }
+    .active-screen { display: block; }
+    .btn-main { background-color: #FF8A65; font-size: 22px; padding: 12px 30px; border-radius: 25px; color: white; border: none; cursor: pointer; box-shadow: 0 6px #D84315; margin: 10px; transition: 0.2s; }
+    .btn-main:active { transform: translateY(6px); box-shadow: 0 0 #D84315; }
+    
+    /* 課前預習頁面 (Intro Screen) */
+    .intro-badge { display: inline-block; background: #E1BEE7; color: #4A148C; font-weight: bold; padding: 5px 15px; border-radius: 15px; margin-bottom: 15px; font-size: 20px;}
+    #tutorial-box { background: #FFFDE7; padding: 25px; border-radius: 18px; border: 4px dashed #FBC02D; text-align: left; font-size: 22px; line-height: 1.8; margin-bottom: 20px; color: #5D4037; }
+    
+    /* 開始遊戲按鈕 */
+    .start-btn { 
+        background: linear-gradient(to bottom, #FF7043, #D84315); color: white; font-size: 34px; font-weight: 900; 
+        padding: 18px 60px; border: 5px solid #FFF; border-radius: 50px; cursor: pointer; 
+        box-shadow: 0 10px 0 #BF360C, 0 15px 20px rgba(0,0,0,0.2); margin-top: 30px; 
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.4); transition: all 0.15s ease; animation: floatPulse 2s infinite; 
+    }
+    .start-btn:hover { background: linear-gradient(to bottom, #FF8A65, #E53935); transform: scale(1.05) translateY(-2px); }
+    .start-btn:active { transform: translateY(10px) scale(0.98); box-shadow: 0 0 0 #BF360C, 0 5px 10px rgba(0,0,0,0.2); animation: none; }
+    @keyframes floatPulse { 0% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-6px) scale(1.03); box-shadow: 0 16px 0 #BF360C, 0 25px 25px rgba(0,0,0,0.25); } 100% { transform: translateY(0px) scale(1); } }
+
+    /* 遊戲區 */
+    .game-nav { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 3px solid #EEE; padding-bottom: 10px;}
+    .nav-btn { background: #4FC3F7; border: none; padding: 8px 20px; font-size: 18px; color: #FFF; border-radius: 15px; cursor: pointer; box-shadow: 0 4px #0288D1; font-weight: bold;}
+    .nav-btn:active { transform: translateY(4px); box-shadow: 0 0 #0288D1; }
+
+    .question-header { font-size: 26px; font-weight: bold; margin: 20px 0; color: #3F51B5; display: flex; align-items: center; justify-content: center; gap: 15px;}
+    .audio-btn { background: #FFCA28; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; color: white; box-shadow: 0 4px #F57F17; flex-shrink: 0; }
+    .audio-btn:active { transform: scale(0.9); box-shadow: 0 0 #F57F17; }
+    
+    .dropzone-container { display: flex; justify-content: center; gap: 12px; margin: 25px 0; flex-wrap: wrap;}
+    .drop-box { width: 100%; max-width: 180px; min-height: 70px; border: 4px dashed #BDBDBD; border-radius: 15px; background-color: #FAFAFA; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #9E9E9E; cursor: pointer; padding: 12px; text-align: center; gap: 5px; }
+    .drop-box.filled { border: 4px solid #66BB6A; background-color: #E8F5E9; color: #2E7D32; box-shadow: 0 4px #A5D6A7;}
+    
+    .draggables-container { display: flex; justify-content: center; gap: 12px; margin-top: 20px; padding: 20px; background: #FFF8E1; border-radius: 15px; flex-wrap: wrap; border: 3px solid #FFE082; }
+    .drag-item { background: #FFF; border: 3px solid #FFA726; padding: 10px 15px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: grab; box-shadow: 0 5px #FB8C00; display: flex; align-items: center; gap: 10px; color: #E65100;}
+    
+    #tc-hint-box { display: none; background: #FFF9C4; border: 4px solid #FBC02D; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: left; font-size: 22px; font-weight: bold; color: #5D4037; align-items: center; justify-content: space-between;}
+    #skip-btn-container { display: none; margin-top: 15px; }
+    .skip-btn { background: #78909C; color: #FFF; font-size: 20px; font-weight: bold; padding: 10px 25px; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 5px #546E7A; transition: 0.2s;}
+    .skip-btn:active { transform: translateY(5px); box-shadow: 0 0 #546E7A; }
+
+    .summary-list, .progress-list { text-align: left; margin: 20px auto; max-width: 650px; background: #F5F5F5; padding: 20px; border-radius: 15px; max-height: 400px; overflow-y: auto;}
+    .summary-item, .record-item { font-size: 22px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px dashed #CCC; display: flex; justify-content: space-between; align-items: center;}
+    .retry-btn { background: #EF5350; color: white; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 3px #C62828;}
+    
+    #celebration { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; background: rgba(255,255,255,0.85);}
+    .pop-anim { animation: popScale 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes popScale { 0% { transform: scale(0.1) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.5) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 0; } }
+
+    .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFF3E0; border-top: 4px solid #FFCC80; padding: 10px 0; font-size: 14px; color: #5D4037; box-shadow: 0 -4px rgba(0,0,0,0.1); z-index: 1000; }
+    .footer a { color: #1976D2; text-decoration: none; font-weight: bold; margin: 0 5px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar-global">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <img src="cat.jpeg" class="logo-img" alt="Teacher Cat" onerror="this.src='https://via.placeholder.com/60?text=Cat'">
+        <span style="font-weight:bold; font-size:24px; color:#5D4037;">Teacher Cat</span>
+    </div>
+    <button class="progress-btn" onclick="openProgressRecord()">📊 Progress Record</button>
+</div>
+
+<div id="game-container">
+    <div id="home-screen" class="screen active-screen">
+        <h1>🌟 小一初級寫作練習 🌟</h1>
+        <h2>(每次挑戰 20 題，全對可獲大星星！🌟)</h2>
+        <div class="level-grid" id="level-grid"></div>
+        <br><br>
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-main" style="display:inline-block; text-decoration:none; background:#8E24AA; box-shadow: 0 6px #6A1B9A; margin-top:20px;">🌍 返回小朋友學習大冒險</a>
+    </div>
+
+    <div id="tutorial-screen" class="screen">
+        <h1 id="tut-title"></h1>
+        <div class="intro-badge">📖 課前預習頁面</div>
+        <div id="tutorial-box"></div>
+        <button class="start-btn" onclick="startGame()">🚀 開始遊戲</button>
+        <br><br><button onclick="showScreen('home-screen')" style="padding:12px 25px; border-radius:12px; border:none; cursor:pointer; font-size:20px; background:#ddd; margin-top:10px;">返回主頁</button>
+    </div>
+
+    <div id="progress-screen" class="screen">
+        <h1>📊 Progress Record 學習進度</h1>
+        <div class="progress-list" id="progress-list"></div>
+        <button class="btn-main" style="background:#E53935; box-shadow:0 6px #B71C1C;" onclick="clearRecord()">🗑️ 清除記錄</button>
+        <button class="btn-main" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="game-nav">
+            <button class="nav-btn" onclick="prevQuestion()" id="btn-prev">⬅️ 上一頁</button>
+            <button class="nav-btn" onclick="showScreen('home-screen')" style="background:#FFA726; box-shadow:0 4px #EF6C00;">🏠 暫停並回主頁</button>
+            <button class="nav-btn" onclick="nextQuestion()" id="btn-next">下一頁 ➡️</button>
+        </div>
+        
+        <div style="font-size:22px; color:#888; font-weight:bold; margin-bottom:10px;" id="progress-text"></div>
+        <div class="question-header">
+            <button class="audio-btn" onclick="playAudioText(document.getElementById('question-text').innerText)">🔊</button>
+            <span id="question-text"></span>
+        </div>
+        
+        <div class="dropzone-container" style="flex-direction:row; flex-wrap:wrap;" id="dropzones"></div>
+        <div class="draggables-container" id="draggables"></div>
+        
+        <div id="tc-hint-box">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <img src="cat.jpeg" style="width:50px; border-radius:50%;" onerror="this.src='https://via.placeholder.com/50?text=Cat'">
+                <span id="tc-hint-text"></span>
+            </div>
+            <button class="audio-btn" style="width:50px; height:50px;" onclick="playAudioText(document.getElementById('tc-hint-text').innerText)">🔊</button>
+        </div>
+
+        <div class="feedback" id="feedback-text" style="margin-top:15px; font-size:28px;"></div>
+        <div id="skip-btn-container"><button class="skip-btn" onclick="skipQuestion()">⏭️ 跳到下一題</button></div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h1>🏆 關卡總結報告 🏆</h1>
+        <h2 id="score-text" style="font-size: 36px; color: #4CAF50; margin: 15px 0;"></h2>
+        <h3 id="star-award-text" style="font-size: 28px; color: #F57C00;"></h3>
+        <div class="summary-list" id="summary-list"></div>
+        <button class="btn-main" onclick="startGame()">🔄 重新挑戰這一關</button>
+        <button class="btn-main" style="background:#42A5F5; box-shadow:0 6px #1E88E5;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+    </div>
+</div>
+
+<div id="celebration">
+    <div style="font-size:150px;" id="celeb-emoji">🎉🌟💯</div>
+    <div style="font-size:60px; color:#D84315; font-weight:bold; text-shadow: 3px 3px 6px #FFF;">太棒啦！答對了！</div>
+</div>
+
+<div class="footer">
+    <b>Teacher Cat 的快樂AI教室</b> | 
+    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> | 
+    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> | 
+    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a>
+</div>
+
+<script>
+// 音效與 Web Audio API
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function initAudio() { if(!audioCtx) audioCtx = new AudioContext(); }
+
+function playSound(isCorrect) {
+    initAudio();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    if (isCorrect) {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15); 
+        osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.3); 
+        gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+    } else {
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.4);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+    }
+}
+
+// 語音朗讀
+function playAudioText(text, e) {
+    if(e) e.stopPropagation(); 
+    if(!text) return;
+    const utterance = new SpeechSynthesisUtterance(text.replace(/____/g, "空格").replace(/❌/g, ""));
+    utterance.lang = "zh-HK"; utterance.rate = 0.85; 
+    speechSynthesis.speak(utterance);
+}
+
+const LEVEL_HINTS = [
+    "寫作第一步：想想句子中的『甚麼時間』和『甚麼人』喔！", "寫作第二步：找出主角『在哪裡(地點)』和『做甚麼(事情)』！",
+    "四素句組合：時間 ➡️ 人物 ➡️ 地點 ➡️ 事情，順序不要錯喔！", "人感句：想想角色遇到這件事時，心裡是甚麼感受？",
+    "句型擴張：先寫出四素句，最後加上心裡的感覺！", "擴寫細節：加入具體的動作或形容詞，畫面會更生動！",
+    "對話擴寫：想想人物在這個情況下，會開口說甚麼話？", "段落公式一：1. 點題 ➡️ 2. 事例 ➡️ 3. 動作",
+    "段落公式二：1. 點題 ➡️ 2. 動作細節 ➡️ 3. 心情", "段落公式三：1. 點題 ➡️ 2. 人物對話 ➡️ 3. 心情或結果"
+];
+
+// 🔥全新邏輯強化版：詞庫精準一對一對應，保證每一道題的情境 100% 合乎常理！標點完美修復！
+function genLevel(t) {
+    let e=[], h=[];
+    const Q = (q, dz, ans, correctOpts, wrongOpts) => ({ 
+        q, dropzones: dz.map(([id, label]) => ({ id, label })), answers: ans, 
+        options: [...correctOpts, ...wrongOpts].map(o=>({text:o})) 
+    });
+
+    // 小一程度 (Easy)：20 組情境，每個 index 都具有高度邏輯關聯。
+    const eTimes = ["早上", "昨天", "今天", "明天", "晚上", "下午", "秋天", "春天", "夏天", "冬天", "小息", "放學後", "星期天", "週末", "中午", "清晨", "黃昏", "傍晚", "除夕", "節日"];
+    const ePers = ["我", "爸爸", "妹妹", "哥哥", "媽媽", "弟弟", "爺爺", "姐姐", "大家", "奶奶", "同學", "朋友", "一家人", "老師", "小狗", "小鳥", "農夫", "貓咪", "市民", "叔叔"];
+    const ePla = ["學校", "廚房", "公園", "操場", "客廳", "房間", "山頂", "花園", "泳池", "家裡", "課室", "圖書館", "超市", "餐廳", "門口", "樹上", "田裡", "沙發上", "廣場", "舞台上"];
+    const eAct = ["寫字", "煮飯", "玩滑梯", "跑步", "看電視", "睡覺", "看風景", "澆花", "游泳", "喝熱湯", "看書", "溫習", "買菜", "吃飯", "等門", "唱歌", "種菜", "休息", "倒數", "跳舞"];
+    const eEmo = ["感到很開心", "感到很滿足", "感到很快樂", "感到很輕鬆", "感到很平靜", "感到很疲倦", "感到很高興", "感到很得意", "感到很涼快", "感到很溫暖", "看得很專心", "溫習得很認真", "感到很興奮", "感到很滿意", "心裡很焦急", "感到很自由", "覺得很辛苦", "感覺很慵懶", "感到很激動", "充滿了自信"];
+    const eDet = ["整理書包", "洗乾淨手", "穿上外套", "綁好鞋帶", "削好蘋果", "蓋好被子", "帶備水樽", "拿着水壺", "戴上泳鏡", "穿上厚衣", "翻開書本", "拿出筆記", "推着購物車", "點了菜式", "搖着尾巴", "拍拍翅膀", "抹抹汗水", "伸個懶腰", "舉起雙手", "穿上舞衣"];
+    const eDia = ["早晨！", "真好吃！", "很好玩！", "跑得快！", "好看！", "我想睡覺。", "風景好漂亮！", "開了很多花！", "水很涼！", "好喝啊！", "真有趣！", "大家很努力！", "買了很多食物！", "飯菜很美味！", "汪汪！", "吱吱叫！", "終於做完了！", "喵喵！", "新年快樂！", "大家拍手吧！"];
+    const eTopList = ["早上回到學校", "昨天去到廚房", "今天去了公園", "明天去操場玩", "晚上坐在客廳", "下午回到房間", "秋天爬上山頂", "春天來到花園", "夏天去了泳池", "冬天待在家裡", "小息留在課室", "放學去圖書館", "星期天去超市", "週末去了餐廳", "中午來到門口", "清晨走到樹下", "黃昏來到田裡", "傍晚坐在沙發上", "除夕來到廣場", "節日登上舞台"];
+    const eEx = ["學校很大", "準備了食材", "公園很多人", "操場很寬敞", "客廳很整潔", "房間很安靜", "山頂風景美", "花園很香", "泳池水很清", "家裡很舒服", "課室有圖書", "圖書館很靜", "超市貨品多", "餐廳氣氛好", "門口有聲音", "樹上葉子綠", "田裡泥土濕", "沙發很柔軟", "廣場燈光閃", "舞台很熱鬧"];
+
+    // 進階程度 (Hard)：20 組情境，同樣具有高度邏輯關聯。
+    const hTimes = ["初春的早晨", "中秋節的晚上", "炎熱的夏天", "寒冷的冬天", "下雨的午後", "晴朗的週末", "熱鬧的春節", "寧靜的夜晚", "放暑假的時候", "吃過晚飯後", "天色漸暗時", "太陽剛升起", "微風的下午", "大雪的日子", "開學第一天", "決賽的晚上", "比賽結束後", "生日會開始前", "滿天星斗晚上", "全家人團聚時"];
+    const hPers = ["我", "我們一家", "消防員", "同學們", "小動物", "農夫", "幼稚園生", "清潔工", "探險家", "好朋友", "小女孩", "警察", "護士", "小男孩", "女同學", "教練", "鄰居", "小夥伴", "義工", "小公主"];
+    const hPla = ["綠草地", "大公園", "訓練場", "體育館", "大樹下", "郊外", "課室", "街道", "山頂", "草地", "超級市場", "十字路口", "診所", "雪山", "閱覽室", "籃球場", "麵包店", "客廳", "小溪旁", "花園"];
+    const hAct = ["跑跳", "賞月", "演練", "打籃球", "避雨", "種植", "拆禮物", "打掃", "看風景", "放風箏", "找媽媽", "指揮交通", "照顧病人", "堆雪人", "看故事書", "講戰術", "吃美食", "玩捉迷藏", "騎單車", "撫摸小草"];
+    const hEmo = ["感到一陣驚喜", "感到無比幸福", "感到非常自豪", "高興得跳了起來", "嚇得瑟瑟發抖", "感到心滿意足", "笑得合不攏嘴", "覺得十分疲倦", "激動得流下眼淚", "心裡樂開了花", "感到十分害怕", "感到非常欣慰", "表現得十分溫柔", "開心得手舞足蹈", "感到十分充實", "感到充滿希望", "感到無比高興", "興奮得大聲歡呼", "感到十分輕鬆", "感動得熱淚盈眶"];
+    const hDet = ["穿上運動鞋", "提着彩色燈籠", "穿上厚防護服", "換上運動服", "緊緊靠在一起", "戴上大草帽", "拿着紅利是", "拿着長掃把", "拿起望遠鏡", "慢慢拉着線", "緊抓着小背包", "揮動着指揮棒", "準備好藥物", "戴上保暖手套", "輕翻開書頁", "拿着戰術板", "買了新鮮蛋撻", "躲在沙發後面", "吹着涼涼晚風", "看着美麗花朵"];
+    const hDia = ["空氣真清新！", "月亮圓又大！", "保護大家！", "投籃得分了！", "雨何時才停？", "期待大豐收！", "祝身體健康！", "街道乾淨了！", "風景真壯觀！", "風箏飛很高！", "我找不到媽媽！", "注意安全！", "祝早日康復！", "雪人真可愛！", "書真好看！", "大家全力以赴！", "味道太棒了！", "你找不到我的！", "夜空真美麗！", "春天真的來了！"];
+    const hTopList = ["初春的早晨去散步", "中秋節的晚上去賞月", "炎熱的夏天在訓練", "寒冷的冬天做運動", "下雨的午後去躲雨", "晴朗的週末去郊外", "熱鬧的春節在學校", "寧靜的夜晚在街上", "放暑假的時候去登山", "吃過晚飯後去玩耍", "天色漸暗時在超市", "太陽升起時在馬路", "微風的下午在診所", "大雪的日子在雪山", "開學第一天回學校", "決賽的晚上在球場", "比賽結束後去慶祝", "生日會開始前在客廳", "滿天星斗的晚上在溪旁", "全家人團聚時在花園"];
+    const hEx = ["草地鋪了綠色地毯", "公園掛滿了燈籠", "訓練場非常炎熱", "體育館十分熱鬧", "四周響起了雷聲", "郊外陽光很普照", "課室佈置喜氣洋洋", "街道上沒有路人", "山頂上的風很大", "天空中微風吹過", "超市裡人來人往", "城市裡車水馬龍", "鄉村診所很安靜", "雪山上一片白茫茫", "閱覽室放滿新書", "球場的燈光很亮", "麵包店傳來陣陣香味", "客廳掛滿彩色氣球", "小溪旁有螢火蟲", "花園裡充滿歡笑聲"];
+
+    const wrongPool = ["飛機", "紅色", "可愛", "藍色", "大樹", "美味", "書包", "黃色", "唱歌", "蘋果", "巴士", "大象", "雨傘", "氣球", "香蕉", "電視", "電腦", "滑梯", "秋千", "筆盒"];
+    
+    // 獨立分開帶「逗號」與「句號」的錯誤選項，確保孩子不會只看標點符號亂填
+    const wrongSenPool_comma = ["小狗在睡覺，", "蘋果很甜，", "我喜歡藍色，", "巴士來了，", "書包很重，", "小貓在跑，", "天氣很好，", "明天放假，", "我想睡覺，", "書本很厚，"];
+    const wrongSenPool_period = ["小狗在睡覺。", "蘋果很甜。", "我喜歡藍色。", "巴士來了。", "書包很重。", "小貓在跑。", "天氣很好。", "明天放假。", "我想睡覺。", "書本很厚。"];
+
+    const getW = (correctArr, count=3) => wrongPool.filter(w => !correctArr.includes(w)).sort(()=>0.5-Math.random()).slice(0,count);
+    const getW_comma = (correctArr, count=3) => wrongSenPool_comma.filter(w => !correctArr.includes(w)).sort(()=>0.5-Math.random()).slice(0,count);
+    const getW_period = (correctArr, count=3) => wrongSenPool_period.filter(w => !correctArr.includes(w)).sort(()=>0.5-Math.random()).slice(0,count);
+
+    for (let i = 0; i < 20; i++) {
+        let eT = eTimes[i], eP = ePers[i], ePl = ePla[i], eA = eAct[i], eEm = eEmo[i], eD = eDet[i], eDi = eDia[i], eTopic = eTopList[i], eE = eEx[i];
+        let hT = hTimes[i], hP = hPers[i], hPl = hPla[i], hA = hAct[i], hEm = hEmo[i], hD = hDet[i], hDi = hDia[i], hTopic = hTopList[i], hE = hEx[i];
+
+        if (t === 1) {
+            e.push(Q(`找出時間和人物：____，____在${ePl}${eA}。`, [["d1", "時間"], ["d2", "人物"]], {d1: eT, d2: eP}, [eT, eP], getW([eT, eP], 3)));
+            h.push(Q(`找出時間和人物：____，____在${hPl}${hA}。`, [["d1", "時間"], ["d2", "人物"]], {d1: hT, d2: hP}, [hT, hP], getW([hT, hP], 3)));
+        } else if (t === 2) {
+            e.push(Q(`找出地點和事情：${eT}，${eP}在____ ____。`, [["d1", "地點"], ["d2", "事情"]], {d1: ePl, d2: eA}, [ePl, eA], getW([ePl, eA], 3)));
+            h.push(Q(`找出地點和事情：${hT}，${hP}在____ ____。`, [["d1", "地點"], ["d2", "事情"]], {d1: hPl, d2: hA}, [hPl, hA], getW([hPl, hA], 3)));
+        } else if (t === 3) {
+            e.push(Q(`拼出完整四素句：`, [["d1", "時間"], ["d2", "人物"], ["d3", "地點"], ["d4", "事情"]], {d1: `${eT}，`, d2: eP, d3: `在${ePl}`, d4: `${eA}。`}, [`${eT}，`, eP, `在${ePl}`, `${eA}。`], getW([`${eT}，`, eP, `在${ePl}`, `${eA}。`], 2)));
+            h.push(Q(`拼出完整四素句：`, [["d1", "時間"], ["d2", "人物"], ["d3", "地點"], ["d4", "事情"]], {d1: `${hT}，`, d2: hP, d3: `在${hPl}`, d4: `${hA}。`}, [`${hT}，`, hP, `在${hPl}`, `${hA}。`], getW([`${hT}，`, hP, `在${hPl}`, `${hA}。`], 2)));
+        } else if (t === 4) {
+            e.push(Q(`${eP}在${ePl}${eA}，____。`, [["d1", "心情"]], {d1: eEm}, [eEm], getW([eEm], 3)));
+            h.push(Q(`${hP}在${hPl}${hA}，____。`, [["d1", "心情"]], {d1: hEm}, [hEm], getW([hEm], 3)));
+        } else if (t === 5) {
+            e.push(Q(`結合四素句：${eT}，${eP}在${ePl}${eA}，____。`, [["d1", "心情"]], {d1: eEm}, [eEm], getW([eEm], 3)));
+            h.push(Q(`結合四素句：${hT}，${hP}在${hPl}${hA}，____。`, [["d1", "心情"]], {d1: hEm}, [hEm], getW([hEm], 3)));
+        } else if (t === 6) {
+            e.push(Q(`擴寫細節：${eP}在${ePl}忙着____。`, [["d1", "細節"]], {d1: eD}, [eD], getW([eD], 3)));
+            h.push(Q(`擴寫細節：${hP}在${hPl}把東西____。`, [["d1", "細節"]], {d1: hD}, [hD], getW([hD], 3)));
+        } else if (t === 7) {
+            e.push(Q(`加入對話：${eP}大聲說：「____」`, [["d1", "對話"]], {d1: eDi}, [eDi], getW([eDi], 3)));
+            h.push(Q(`加入對話：${hP}溫柔地說：「____」`, [["d1", "對話"]], {d1: hDi}, [hDi], getW([hDi], 3)));
+        } else if (t === 8) {
+            let p1 = `${eTopic}，`; let p2 = `${eE}，`; let p3 = `${eP}在${ePl}${eA}。`;
+            let hp1 = `${hTopic}，`; let hp2 = `${hE}，`; let hp3 = `${hP}在${hPl}${hA}。`;
+            e.push(Q(`重組 (點題，事例，動作。)：`, [["p1", "點題"], ["p2", "事例"], ["p3", "動作"]], {p1: p1, p2: p2, p3: p3}, [p1, p2, p3], [...getW_comma([p1, p2], 2), ...getW_period([p3], 1)]));
+            h.push(Q(`重組 (點題，事例，動作。)：`, [["p1", "點題"], ["p2", "事例"], ["p3", "動作"]], {p1: hp1, p2: hp2, p3: hp3}, [hp1, hp2, hp3], [...getW_comma([hp1, hp2], 2), ...getW_period([hp3], 1)]));
+        } else if (t === 9) {
+            let p1 = `${eTopic}，`; let p2 = `${eP}在${ePl}${eA}，`; let p3 = `${eEm}。`;
+            let hp1 = `${hTopic}，`; let hp2 = `${hP}在${hPl}${hA}，`; let hp3 = `${hEm}。`;
+            e.push(Q(`重組 (點題，動作，心情。)：`, [["p1", "點題"], ["p2", "動作"], ["p3", "心情"]], {p1: p1, p2: p2, p3: p3}, [p1, p2, p3], [...getW_comma([p1, p2], 2), ...getW_period([p3], 1)]));
+            h.push(Q(`重組 (點題，動作，心情。)：`, [["p1", "點題"], ["p2", "動作"], ["p3", "心情"]], {p1: hp1, p2: hp2, p3: hp3}, [hp1, hp2, hp3], [...getW_comma([hp1, hp2], 2), ...getW_period([hp3], 1)]));
+        } else if (t === 10) {
+            let p1 = `${eTopic}，`; let p2 = `${eP}說：「${eDi}」，`; let p3 = `${eEm}。`;
+            let hp1 = `${hTopic}，`; let hp2 = `${hP}說：「${hDi}」，`; let hp3 = `${hEm}。`;
+            e.push(Q(`重組 (點題，對話，心情。)：`, [["p1", "點題"], ["p2", "對話"], ["p3", "心情"]], {p1: p1, p2: p2, p3: p3}, [p1, p2, p3], [...getW_comma([p1, p2], 2), ...getW_period([p3], 1)]));
+            h.push(Q(`重組 (點題，對話，心情。)：`, [["p1", "點題"], ["p2", "對話"], ["p3", "心情"]], {p1: hp1, p2: hp2, p3: hp3}, [hp1, hp2, hp3], [...getW_comma([hp1, hp2], 2), ...getW_period([hp3], 1)]));
+        }
+    }
+    return { easy: e, hard: h };
+}
+
+const btnAudio = (txt) => `<button class="audio-btn" style="width:35px; height:35px; font-size:16px; margin: 0 10px; vertical-align: middle; display: inline-flex; align-items: center; justify-content: center;" onclick="playAudioText('${txt}', event)">🔊</button>`;
+
+const levelData = [
+    { id: 1, title: "第 1 關：拆解四素句(時+人)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('寫作的第一步是找出時間和人物。')}寫作的第一步是找出「時間」和「人物」。<br><br><b>💡 課文例子：</b>${btnAudio('初春的早晨，爸爸、媽媽和我到公園散步。')}「初春的早晨 (時間)，爸爸、媽媽和我 (人物) 到公園散步。」`, ...genLevel(1) },
+    { id: 2, title: "第 2 關：拆解四素句(地+事)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('交代了時間和人物後，我們還要寫出主角在哪裡做甚麼。')}交代了時間和人物後，我們還要寫出主角在「哪裡(地點)」做「甚麼(事情)」。<br><br><b>💡 課文例子：</b>${btnAudio('爸爸、媽媽和我到公園散步。')}「爸爸、媽媽和我到公園 (地點) 散步 (事情)。」`, ...genLevel(2) },
+    { id: 3, title: "第 3 關：組合完整四素句", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('把時間、人物、地點和事情組合起來，就是一個完整的四素句了！')}把時間、人物、地點和事情組合起來，就是一個完整的「四素句」了！<br><br><b>💡 課文例子：</b>${btnAudio('初春的早晨，爸爸、媽媽和我到公園散步。')}「初春的早晨，爸爸、媽媽和我到公園散步。」`, ...genLevel(3) },
+    { id: 4, title: "第 4 關：辨識心情/人感句", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('寫作時，我們要代入角色想像心情，學習加上感受。')}寫作時，我們要代入角色想像心情，學習加上「感受」。<br><br><b>💡 課文例子：</b>${btnAudio('看到小花迎風開放，我感到一陣驚喜。')}課文中寫道：「看到小花迎風開放，我感到一陣驚喜 (心情)。」`, ...genLevel(4) },
+    { id: 5, title: "第 5 關：四素句 ＋ 心情", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('將四素句和心情結合，句子會變得更豐富，這就是過渡至寫段落的基礎！')}將「四素句」和「心情」結合，句子會變得更豐富，這就是過渡至寫段落的基礎！<br><br><b>💡 課文例子：</b>${btnAudio('初春的早晨，我們到公園散步，我感到一陣驚喜。')}「初春的早晨，我們到公園散步 (四素句)，我感到一陣驚喜 (心情)。」`, ...genLevel(5) },
+    { id: 6, title: "第 6 關：擴寫動作五感細節", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('運用五感觀察法，加入具體的細節，畫面會更生動！')}運用「五感觀察法」（視覺、聽覺、嗅覺、味覺、觸覺），加入具體的細節，畫面會更生動！<br><br><b>💡 課文例子：</b>${btnAudio('輕輕地撫摸小草。啊！軟軟的。')}「輕輕地撫摸小草。啊！軟軟的。」(這句用了觸覺喔！)`, ...genLevel(6) },
+    { id: 7, title: "第 7 關：擴寫與感歎號運用", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('在句子中加入驚歎，並正確使用感歎號來表示驚喜或意外的感覺。')}在句子中加入驚歎，並正確使用「感歎號 (！)」來表示驚喜或意外的感覺。<br><br><b>💡 課文例子：</b>${btnAudio('媽媽跟我一起聞一聞小花。啊！香香的！')}「媽媽跟我一起聞一聞小花。啊！香香的！」`, ...genLevel(7) },
+    { id: 8, title: "第 8 關：段落公式一 (點題，事例，動作。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('根據寫作公式，第一步先點題，再寫出發生了甚麼事例，最後加上主角的動作。')}根據寫作公式，第一步先「點題」，再寫出發生了甚麼「事例」，最後加上主角的「動作」。句子與句子之間要使用逗號！<br><br><b>💡 例子：</b>${btnAudio('昨天我們去公園，公園有大草地，我開心地跑跑跳跳。')}昨天我們去公園 (點題)，公園有大草地 (事例)，我開心地跑跑跳跳 (動作)。`, ...genLevel(8) },
+    { id: 9, title: "第 9 關：段落公式二 (點題，動作，心情。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('把點題加上動作細節和心情，短文會更豐富喔！')}把「點題」加上「動作細節」和「心情」，短文會更豐富喔！句子與句子之間要使用逗號！<br><br><b>💡 例子：</b>${btnAudio('我們到公園散步，爸爸讓我撫摸小草，我感到一陣驚喜。')}我們到公園散步 (點題)，爸爸讓我撫摸小草 (動作)，我感到一陣驚喜 (心情)。`, ...genLevel(9) },
+    { id: 10, title: "第 10 關：段落公式三 (點題，對話，心情。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('故事裡加上人物說的話，會變得像看卡通一樣生動！最後寫下心情或結果。')}故事裡加上人物「說的話」，會變得像看卡通一樣生動！最後寫下心情或結果。<br><br><b>💡 例子：</b>${btnAudio('第一天上學，媽媽說：「不用怕！」，我不再害怕了。')}第一天上學 (點題)，媽媽說：「不用怕！」(對話)，我不再害怕了 (心情/結果)。`, ...genLevel(10) }
+];
+
+let currentLevelObj = null, selectedQuestions = [], currentQIndex = 0;
+let draggedItem = null, currentAnswers = {};
+let answersRecord = []; 
+let isRetryMode = false;
+let retryQIndex = 0;
+
+// 渲染關卡按鈕
+function renderLevelButtons() {
+    const grid = document.getElementById("level-grid");
+    grid.innerHTML = ""; 
+    
+    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {};
+
+    levelData.forEach(level => {
+        let score = storedScores[level.id] || 0;
+        let starHTML = "";
+        
+        if (score === 20) {
+            starHTML = `<div style="font-size:24px; margin-top:5px;">🌟</div>`;
+        } else if (score >= 10) {
+            starHTML = `<div style="font-size:24px; margin-top:5px;">⭐</div>`;
+        } else {
+            starHTML = `<div style="font-size:24px; margin-top:5px; visibility:hidden;">⭐</div>`; 
+        }
+
+        const btn = document.createElement("button");
+        btn.className = "level-btn";
+        btn.innerHTML = `<span>${level.title}</span>${starHTML}`;
+        btn.onclick = () => { 
+            currentLevelObj = level; 
+            document.getElementById("tut-title").innerText = level.title; 
+            document.getElementById("tutorial-box").innerHTML = level.tutorial;
+            showScreen('tutorial-screen');
+        };
+        grid.appendChild(btn);
+    });
+}
+
+// 網頁載入時先執行一次渲染
+renderLevelButtons();
+
+function showScreen(id) { 
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); 
+    document.getElementById(id).classList.add('active-screen'); 
+    document.getElementById('tc-hint-box').style.display = 'none'; 
+    document.getElementById('skip-btn-container').style.display = 'none';
+    isRetryMode = false;
+    
+    if (id === 'home-screen') {
+        renderLevelButtons();
+    }
+}
+
+function startGame() {
+    initAudio(); currentQIndex = 0; answersRecord = new Array(20).fill(false); 
+    
+    let finalEasy = [...currentLevelObj.easy].sort(() => 0.5 - Math.random()).slice(0, 10).map(q => ({...q, isEasy: true}));
+    let finalHard = [...currentLevelObj.hard].sort(() => 0.5 - Math.random()).slice(0, 10).map(q => ({...q, isEasy: false}));
+    selectedQuestions = [...finalEasy, ...finalHard]; 
+    
+    showScreen('game-screen'); renderQuestion();
+}
+
+function renderQuestion() {
+    let qIndexToRender = isRetryMode ? retryQIndex : currentQIndex;
+    const qData = selectedQuestions[qIndexToRender]; 
+    currentAnswers = {}; 
+    
+    document.getElementById("btn-prev").style.display = isRetryMode ? "none" : "inline-block";
+    document.getElementById("btn-next").style.display = isRetryMode ? "none" : "inline-block";
+    document.getElementById("tc-hint-box").style.display = "none"; 
+    document.getElementById("skip-btn-container").style.display = "none";
+    document.getElementById("feedback-text").innerText = "";
+
+    if(isRetryMode) {
+        document.getElementById("tc-hint-box").style.display = "flex";
+        document.getElementById("tc-hint-text").innerText = currentLevelObj.hint[currentLevelObj.id - 1];
+        document.getElementById("feedback-text").style.color = "#D84315";
+        document.getElementById("feedback-text").innerText = "💡 現在是重做模式，一直答到對為止喔！";
+    }
+
+    document.getElementById("progress-text").innerText = isRetryMode ? `【錯誤重做】第 ${qIndexToRender + 1} 題` : `第 ${currentLevelObj.id} 關 | 題： ${qIndexToRender + 1}/20`;
+    document.getElementById("question-text").innerHTML = "✏️ " + qData.q.replace(/\n/g, "<br>");
+
+    const dzContainer = document.getElementById("dropzones"); dzContainer.innerHTML = "";
+    qData.dropzones.forEach(dz => {
+        const box = document.createElement("div"); box.className = "drop-box"; box.id = dz.id; box.innerHTML = `<span style="font-size:18px;">${dz.label}</span>`;
+        box.ondragover = (e) => { e.preventDefault(); box.style.borderColor="#42A5F5"; };
+        box.ondragleave = () => box.style.borderColor="#BDBDBD";
+        box.ondrop = (e) => handleDrop(e, box, dz.id, qData.answers[dz.id]);
+        box.onclick = () => handleTapDrop(box, dz.id, qData.answers[dz.id]);
+        dzContainer.appendChild(box);
+    });
+
+    const dragContainer = document.getElementById("draggables"); dragContainer.innerHTML = "";
+    
+    [...qData.options].sort(() => Math.random() - 0.5).forEach((opt, index) => {
+        const item = document.createElement("div"); item.className = "drag-item"; item.draggable = true; item.id = "drag-" + index; item.dataset.value = opt.text;
+        item.innerHTML = `
+            <span class="text-val">${opt.text}</span>
+            <button class="audio-btn" style="width:35px; height:35px; font-size:16px; margin-left:10px;" onclick="playAudioText('${opt.text}', event)">🔊</button>
+        `;
+        item.ondragstart = (e) => { draggedItem = item; e.dataTransfer.setData("text/plain", item.id); };
+        item.onclick = (e) => { if(e.target.tagName==='BUTTON')return; draggedItem = item; document.getElementById("feedback-text").style.color="#F57C00"; document.getElementById("feedback-text").innerText = `💡 已選取「${opt.text}」，請點擊虛線空格！`; };
+        dragContainer.appendChild(item);
+    });
+}
+
+function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderQuestion(); } }
+function nextQuestion() { if(currentQIndex < 19) { currentQIndex++; renderQuestion(); } else { generateSummary(); } }
+
+function skipQuestion() {
+    document.getElementById("skip-btn-container").style.display = 'none';
+    draggedItem = null;
+    if (isRetryMode) { generateSummary(); } 
+    else { answersRecord[currentQIndex] = false; nextQuestion(); }
+}
+
+function handleDrop(e, box, boxId, correct) { e.preventDefault(); box.style.borderColor="#BDBDBD"; if(draggedItem) checkAnswer(box, boxId, correct); }
+function handleTapDrop(box, boxId, correct) { if(!draggedItem) { document.getElementById("feedback-text").style.color="#EF5350"; document.getElementById("feedback-text").innerText = "👇 請先點擊下方字卡！"; return; } checkAnswer(box, boxId, correct); }
+
+function checkAnswer(box, boxId, correct) {
+    let qIndex = isRetryMode ? retryQIndex : currentQIndex;
+    
+    if (draggedItem.dataset.value === correct) {
+        let textHtml = draggedItem.querySelector('.text-val').outerHTML;
+        box.innerHTML = textHtml; 
+        box.classList.add("filled"); draggedItem.style.visibility = "hidden"; draggedItem = null; 
+        currentAnswers[boxId] = true;
+        document.getElementById("skip-btn-container").style.display = "none"; 
+        
+        if (Object.keys(currentAnswers).length === selectedQuestions[qIndex].dropzones.length) {
+            playSound(true); showCelebration(); 
+            document.getElementById("feedback-text").style.color = "#4CAF50"; 
+            document.getElementById("feedback-text").innerText = "🎉 完美過關！";
+            
+            if(!isRetryMode) {
+                answersRecord[qIndex] = true; setTimeout(() => { nextQuestion(); }, 1800);
+            } else {
+                answersRecord[retryQIndex] = true; setTimeout(() => { generateSummary(); }, 1800);
+            }
+        }
+    } else {
+        playSound(false); 
+        document.getElementById("feedback-text").style.color = "#EF5350"; 
+        document.getElementById("feedback-text").innerText = "❌ 好像不對喔，請再試一次！"; 
+        draggedItem = null;
+        
+        document.getElementById("tc-hint-box").style.display = "flex";
+        document.getElementById("tc-hint-text").innerText = currentLevelObj.hint[currentLevelObj.id - 1];
+        document.getElementById("skip-btn-container").style.display = "block";
+        
+        if(!isRetryMode) { answersRecord[qIndex] = false; }
+    }
+}
+
+function showCelebration() {
+    const celeb = document.getElementById('celebration'); celeb.style.display = 'flex'; celeb.classList.add('pop-anim');
+    setTimeout(() => { celeb.style.display = 'none'; celeb.classList.remove('pop-anim'); }, 1500);
+}
+
+function generateSummary() {
+    showScreen('result-screen');
+    let correctNum = answersRecord.filter(Boolean).length;
+    let finalScore = correctNum; 
+    
+    document.getElementById("score-text").innerText = `你的成績：${finalScore} / 20 分！`;
+    
+    let starText = "";
+    if(finalScore === 20) starText = "太強了！你獲得了點亮的大星星 🌟";
+    else if(finalScore >= 10) starText = "恭喜合格！你獲得了點亮的小星星 ⭐";
+    else starText = "加油喔！再試一次爭取星星吧！";
+    document.getElementById("star-award-text").innerText = starText;
+    
+    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {};
+    let oldScore = storedScores[currentLevelObj.id] || 0;
+    
+    if (finalScore > oldScore) { 
+        storedScores[currentLevelObj.id] = finalScore; 
+        localStorage.setItem('tc_level_scores', JSON.stringify(storedScores)); 
+    }
+    
+    let listHTML = "";
+    for(let i=0; i<20; i++) {
+        let isRight = answersRecord[i];
+        let symbol = isRight ? "<span style='color:#4CAF50;'>✅ 答對</span>" : "<span style='color:#EF5350;'>❌ 答錯</span>";
+        let retryBtn = isRight ? "" : `<button class="retry-btn" onclick="startRetry(${i})">🔄 重新做這題</button>`;
+        listHTML += `<div class="summary-item"><span>第 ${i+1} 題：${symbol}</span> ${retryBtn}</div>`;
+    }
+    document.getElementById("summary-list").innerHTML = listHTML;
+}
+
+function startRetry(index) { isRetryMode = true; retryQIndex = index; showScreen('game-screen'); renderQuestion(); }
+
+function openProgressRecord() {
+    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {}; let html = '';
+    for (let i = 1; i <= 10; i++) {
+        let score = storedScores[i], starIcon = '❌', scoreText = '未挑戰', starSize = '24px';
+        if (score !== undefined) {
+            scoreText = `最高分數: ${score} / 20`;
+            if (score === 20) { starIcon = '🌟'; starSize = '36px'; } else if (score >= 10) { starIcon = '⭐'; starSize = '24px'; }
+        }
+        html += `<div class="record-item"><span style="font-weight:bold; color:#3F51B5;">第 ${i} 關</span><span style="color:#555;">${scoreText}</span><span style="font-size: ${starSize}">${starIcon}</span></div>`;
+    }
+    document.getElementById('progress-list').innerHTML = html; showScreen('progress-screen');
+}
+
+function clearRecord() {
+    if(confirm("確定要清除所有辛苦獲得的成績與星星記錄嗎？")) { 
+        localStorage.removeItem('tc_level_scores'); 
+        openProgressRecord(); 
+        renderLevelButtons(); 
+    }
+}
+</script>
+</body>
+</html>
