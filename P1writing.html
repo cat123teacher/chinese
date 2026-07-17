@@ -2,182 +2,179 @@
 <html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 鎖定螢幕縮放，防止小朋友拖拉時不小心放大網頁 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>小一初級寫作練習</title>
 
-<!-- 🔥 加入手機觸控拖拉修復套件 (Mobile Drag Drop Polyfill) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/default.css">
-<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
-<script>
-    // 啟動手機拖拉修復，讓觸控螢幕能模擬電腦滑鼠的拖拉
-    MobileDragDrop.polyfill({
-        holdToDrag: 100 // 按住 100 毫秒後即可拖拉
-    });
-    // 防止在 iOS 設備上拖拉時畫面跟著捲動
-    window.addEventListener('touchmove', function() {}, {passive: false});
-</script>
-
 <style>
-    body { font-family: "Comic Sans MS", "微軟正黑體", sans-serif; background-color: #FDF5E6; text-align: center; margin: 0; padding: 0; padding-bottom: 150px; color: #333; user-select: none; -webkit-user-select: none; }
+    /* ✨ 童趣波點背景 ✨ */
+    body { 
+        font-family: "Comic Sans MS", "微軟正黑體", sans-serif; 
+        background-color: #FFFDE7; 
+        background-image: radial-gradient(#FFE082 3px, transparent 3px), radial-gradient(#FFE082 3px, transparent 3px);
+        background-size: 60px 60px;
+        background-position: 0 0, 30px 30px;
+        text-align: center; margin: 0; padding: 0; padding-bottom: 150px; color: #333; 
+        user-select: none; -webkit-user-select: none; touch-action: manipulation;
+    }
     
-    /* 頂部導航與 Progress Record 按鈕 */
-    .top-bar-global { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #FFCC80; box-shadow: 0 4px rgba(0,0,0,0.1); }
-    .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #FFF; object-fit: cover; }
-    .progress-btn { font-size: 20px; font-weight: bold; color: #FFF; background: #D84315; padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; box-shadow: 0 4px #BF360C; transition: 0.2s;}
-    .progress-btn:active { transform: translateY(4px); box-shadow: 0 0 #BF360C; }
+    /* 頂部導航 */
+    .top-bar-global { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: linear-gradient(90deg, #FF9800, #FF5722); border-bottom: 5px solid #E64A19; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .logo-img { width: 65px; height: 65px; border-radius: 50%; border: 4px solid #FFF; object-fit: cover; box-shadow: 0 3px 6px rgba(0,0,0,0.2);}
+    .progress-btn { font-size: 20px; font-weight: bold; color: #D84315; background: #FFF; padding: 10px 22px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 5px 0 #FFCC80; transition: 0.15s;}
+    .progress-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #FFCC80; }
     
-    #game-container { max-width: 950px; margin: 20px auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 25px; border: 8px solid #FFB74D; position: relative;}
-    h1 { color: #FF7043; font-size: 38px; margin-bottom: 5px; text-shadow: 2px 2px 0px #FFE0B2;}
-    h2 { color: #5C6BC0; font-size: 22px; margin-top: 0; }
+    #game-container { max-width: 950px; margin: 25px auto; background: rgba(255, 255, 255, 0.95); border-radius: 35px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); padding: 30px; border: 8px solid #FFCA28; position: relative;}
+    h1 { color: #E65100; font-size: 42px; margin-bottom: 5px; text-shadow: 2px 3px 0px #FFE0B2; font-weight: 900; letter-spacing: 2px;}
+    h2 { color: #3949AB; font-size: 24px; margin-top: 5px; font-weight: bold; }
     
-    .level-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px;}
-    .level-btn { background-color: #81C784; border: none; border-radius: 18px; padding: 15px 10px; font-size: 20px; font-weight: bold; color: #fff; cursor: pointer; width: 45%; box-shadow: 0 6px #4CAF50; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .level-btn:active { transform: translateY(6px); box-shadow: 0 0 #4CAF50; }
-    .level-btn:nth-child(2n) { background-color: #64B5F6; box-shadow: 0 6px #2196F3; }
-    .level-btn:nth-child(3n) { background-color: #FFB74D; box-shadow: 0 6px #FF9800; }
-    .level-btn:nth-child(4n) { background-color: #BA68C8; box-shadow: 0 6px #9C27B0; }
+    /* 關卡按鈕升級：彩色 3D 漸層 */
+    .level-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;}
+    .level-btn { border: none; border-radius: 25px; padding: 18px 15px; font-size: 22px; font-weight: 900; color: #fff; cursor: pointer; width: 45%; transition: 0.15s; display: flex; flex-direction: column; align-items: center; gap: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+    .level-btn:nth-child(4n+1) { background: linear-gradient(135deg, #66BB6A, #43A047); box-shadow: 0 8px 0 #2E7D32; border: 2px solid #A5D6A7;}
+    .level-btn:nth-child(4n+2) { background: linear-gradient(135deg, #42A5F5, #1E88E5); box-shadow: 0 8px 0 #1565C0; border: 2px solid #90CAF9;}
+    .level-btn:nth-child(4n+3) { background: linear-gradient(135deg, #FFA726, #FB8C00); box-shadow: 0 8px 0 #E65100; border: 2px solid #FFCC80;}
+    .level-btn:nth-child(4n+4) { background: linear-gradient(135deg, #AB47BC, #8E24AA); box-shadow: 0 8px 0 #4A148C; border: 2px solid #CE93D8;}
+    .level-btn:active { transform: translateY(8px); box-shadow: 0 0 0 transparent; }
     
     .screen { display: none; }
     .active-screen { display: block; }
-    .btn-main { background-color: #FF8A65; font-size: 22px; padding: 12px 30px; border-radius: 25px; color: white; border: none; cursor: pointer; box-shadow: 0 6px #D84315; margin: 10px; transition: 0.2s; }
-    .btn-main:active { transform: translateY(6px); box-shadow: 0 0 #D84315; }
     
-    /* 課前預習頁面 (Intro Screen) */
-    .intro-badge { display: inline-block; background: #E1BEE7; color: #4A148C; font-weight: bold; padding: 5px 15px; border-radius: 15px; margin-bottom: 15px; font-size: 20px;}
-    #tutorial-box { background: #FFFDE7; padding: 25px; border-radius: 18px; border: 4px dashed #FBC02D; text-align: left; font-size: 22px; line-height: 1.8; margin-bottom: 20px; color: #5D4037; }
+    .btn-main { background: linear-gradient(to bottom, #FF8A65, #E64A19); font-size: 24px; font-weight:bold; padding: 15px 35px; border-radius: 30px; color: white; border: 3px solid #FFF; cursor: pointer; box-shadow: 0 6px 0 #BF360C; margin: 10px; transition: 0.15s; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}
+    .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #BF360C; }
     
-    /* 開始遊戲按鈕 */
-    .start-btn { 
-        background: linear-gradient(to bottom, #FF7043, #D84315); color: white; font-size: 34px; font-weight: 900; 
-        padding: 18px 60px; border: 5px solid #FFF; border-radius: 50px; cursor: pointer; 
-        box-shadow: 0 10px 0 #BF360C, 0 15px 20px rgba(0,0,0,0.2); margin-top: 30px; 
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.4); transition: all 0.15s ease; animation: floatPulse 2s infinite; 
-    }
-    .start-btn:hover { background: linear-gradient(to bottom, #FF8A65, #E53935); transform: scale(1.05) translateY(-2px); }
+    .intro-badge { display: inline-block; background: #E1BEE7; color: #4A148C; font-weight: 900; padding: 8px 20px; border-radius: 20px; margin-bottom: 20px; font-size: 22px; border: 3px solid #CE93D8;}
+    #tutorial-box { background: #E8F5E9; padding: 30px; border-radius: 25px; border: 5px dashed #81C784; text-align: left; font-size: 24px; line-height: 1.8; margin-bottom: 25px; color: #1B5E20; font-weight: bold; }
+    
+    .start-btn { background: linear-gradient(to bottom, #FF5252, #D84315); color: white; font-size: 38px; font-weight: 900; padding: 20px 70px; border: 6px solid #FFF; border-radius: 60px; cursor: pointer; box-shadow: 0 10px 0 #BF360C, 0 15px 20px rgba(0,0,0,0.2); margin-top: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); transition: all 0.15s ease; animation: floatPulse 2s infinite; }
     .start-btn:active { transform: translateY(10px) scale(0.98); box-shadow: 0 0 0 #BF360C, 0 5px 10px rgba(0,0,0,0.2); animation: none; }
     @keyframes floatPulse { 0% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-6px) scale(1.03); box-shadow: 0 16px 0 #BF360C, 0 25px 25px rgba(0,0,0,0.25); } 100% { transform: translateY(0px) scale(1); } }
 
-    /* 遊戲區 */
-    .game-nav { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 3px solid #EEE; padding-bottom: 10px;}
-    .nav-btn { background: #4FC3F7; border: none; padding: 8px 20px; font-size: 18px; color: #FFF; border-radius: 15px; cursor: pointer; box-shadow: 0 4px #0288D1; font-weight: bold;}
-    .nav-btn:active { transform: translateY(4px); box-shadow: 0 0 #0288D1; }
+    .game-nav { display: flex; justify-content: space-between; margin-bottom: 25px; border-bottom: 4px dashed #FFCC80; padding-bottom: 15px;}
+    .nav-btn { background: #29B6F6; border: 3px solid #FFF; padding: 10px 25px; font-size: 20px; color: #FFF; border-radius: 20px; cursor: pointer; box-shadow: 0 6px 0 #0277BD; font-weight: 900; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);}
+    .nav-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #0277BD; }
 
-    .question-header { font-size: 26px; font-weight: bold; margin: 20px 0; color: #3F51B5; display: flex; align-items: center; justify-content: center; gap: 15px;}
-    .audio-btn { background: #FFCA28; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; color: white; box-shadow: 0 4px #F57F17; flex-shrink: 0; }
-    .audio-btn:active { transform: scale(0.9); box-shadow: 0 0 #F57F17; }
+    .question-header { background: #FFF3E0; border: 4px solid #FFB74D; border-radius: 20px; padding: 20px; font-size: 28px; font-weight: 900; margin: 20px 0; color: #D84315; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 5px 15px rgba(255,152,0,0.2);}
+    .audio-btn { background: linear-gradient(135deg, #42A5F5, #1E88E5); border: 3px solid #FFF; border-radius: 50%; width: 55px; height: 55px; font-size: 24px; cursor: pointer; color: white; box-shadow: 0 5px 0 #0D47A1; flex-shrink: 0; transition: 0.1s;}
+    .audio-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #0D47A1; }
     
-    .dropzone-container { display: flex; justify-content: center; gap: 12px; margin: 25px 0; flex-wrap: wrap;}
-    .drop-box { width: 100%; max-width: 180px; min-height: 70px; border: 4px dashed #BDBDBD; border-radius: 15px; background-color: #FAFAFA; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #9E9E9E; cursor: pointer; padding: 12px; text-align: center; gap: 5px; }
-    .drop-box.filled { border: 4px solid #66BB6A; background-color: #E8F5E9; color: #2E7D32; box-shadow: 0 4px #A5D6A7;}
+    .dropzone-container { display: flex; justify-content: center; gap: 15px; margin: 30px 0; flex-wrap: wrap;}
+    .drop-box { width: 100%; max-width: 190px; min-height: 80px; border: 5px dashed #4FC3F7; border-radius: 25px; background-color: #E1F5FE; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: #0288D1; cursor: pointer; padding: 12px; text-align: center; gap: 5px; transition: 0.2s;}
+    .drop-box.highlight { border-color: #FF9800; background-color: #FFF3E0; animation: pulseBox 1s infinite; transform: scale(1.05); box-shadow: 0 0 15px rgba(255,152,0,0.5);}
+    @keyframes pulseBox { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .drop-box.filled { border: 5px solid #66BB6A; background: linear-gradient(to bottom, #E8F5E9, #C8E6C9); color: #1B5E20; box-shadow: 0 6px 0 #388E3C; animation: none;}
     
-    .draggables-container { display: flex; justify-content: center; gap: 12px; margin-top: 20px; padding: 20px; background: #FFF8E1; border-radius: 15px; flex-wrap: wrap; border: 3px solid #FFE082; }
+    .draggables-container { display: flex; justify-content: center; gap: 15px; margin-top: 25px; padding: 25px; background: #FFF8E1; border-radius: 25px; flex-wrap: wrap; border: 5px solid #FFE082; box-shadow: inset 0 0 20px rgba(255,160,0,0.1); }
     
-    /* 🔥 重要修復：touch-action: none 確保手機拖拉字卡時，網頁不會上下滑動 */
-    .drag-item { background: #FFF; border: 3px solid #FFA726; padding: 10px 15px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: grab; box-shadow: 0 5px #FB8C00; display: flex; align-items: center; gap: 10px; color: #E65100; touch-action: none; -webkit-touch-callout: none; }
+    /* 🔥 touch-action: none 保證在 iPad 上拖拉時畫面不會被滑走 */
+    .drag-item { background: linear-gradient(to bottom, #FFFFFF, #FFF3E0); border: 4px solid #FF9800; padding: 12px 20px; border-radius: 20px; font-size: 24px; font-weight: 900; cursor: grab; box-shadow: 0 8px 0 #F57C00; display: flex; align-items: center; gap: 10px; color: #E65100; touch-action: none; -webkit-touch-callout: none; transition: 0.1s;}
+    .drag-item.selected { background: linear-gradient(to bottom, #FFF9C4, #FFF59D); border-color: #E65100; transform: translateY(-10px) scale(1.1); box-shadow: 0 15px 0 #E65100, 0 0 20px rgba(230,81,0,0.4); z-index: 10;}
+    .drag-item:active:not(.selected) { transform: translateY(8px); box-shadow: 0 0 0 transparent; cursor: grabbing; }
     
-    #tc-hint-box { display: none; background: #FFF9C4; border: 4px solid #FBC02D; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: left; font-size: 22px; font-weight: bold; color: #5D4037; align-items: center; justify-content: space-between;}
-    #skip-btn-container { display: none; margin-top: 15px; }
-    .skip-btn { background: #78909C; color: #FFF; font-size: 20px; font-weight: bold; padding: 10px 25px; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 5px #546E7A; transition: 0.2s;}
-    .skip-btn:active { transform: translateY(5px); box-shadow: 0 0 #546E7A; }
+    #tc-hint-box { display: none; background: #FFF9C4; border: 5px solid #FBC02D; padding: 20px; border-radius: 25px; margin-top: 25px; text-align: left; font-size: 24px; font-weight: 900; color: #5D4037; align-items: center; justify-content: space-between; box-shadow: 0 8px 0 #F57F17;}
+    #skip-btn-container { display: none; margin-top: 20px; }
+    .skip-btn { background: #78909C; color: #FFF; font-size: 22px; font-weight: 900; padding: 12px 30px; border: 3px solid #FFF; border-radius: 25px; cursor: pointer; box-shadow: 0 6px 0 #455A64; transition: 0.2s;}
+    .skip-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #455A64; }
 
-    .summary-list, .progress-list { text-align: left; margin: 20px auto; max-width: 650px; background: #F5F5F5; padding: 20px; border-radius: 15px; max-height: 400px; overflow-y: auto;}
-    .summary-item, .record-item { font-size: 22px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px dashed #CCC; display: flex; justify-content: space-between; align-items: center;}
-    .retry-btn { background: #EF5350; color: white; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 3px #C62828;}
+    .summary-list, .progress-list { text-align: left; margin: 20px auto; max-width: 700px; background: #FAFAFA; padding: 25px; border-radius: 25px; border: 5px solid #EEEEEE; max-height: 450px; overflow-y: auto;}
+    .summary-item, .record-item { font-size: 24px; font-weight:bold; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 3px dashed #E0E0E0; display: flex; justify-content: space-between; align-items: center;}
+    .retry-btn { background: linear-gradient(135deg, #EF5350, #C62828); color: white; border: 3px solid #FFF; padding: 10px 18px; border-radius: 15px; cursor: pointer; font-weight: 900; font-size: 18px; box-shadow: 0 5px 0 #B71C1C; transition: 0.1s;}
+    .retry-btn:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
     
     #celebration { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; background: rgba(255,255,255,0.85);}
     .pop-anim { animation: popScale 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     @keyframes popScale { 0% { transform: scale(0.1) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.5) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 0; } }
 
-    .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFF3E0; border-top: 4px solid #FFCC80; padding: 10px 0; font-size: 14px; color: #5D4037; box-shadow: 0 -4px rgba(0,0,0,0.1); z-index: 1000; }
-    .footer a { color: #1976D2; text-decoration: none; font-weight: bold; margin: 0 5px; }
+    .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFE0B2; border-top: 5px solid #FF9800; padding: 12px 0; font-size: 16px; font-weight:bold; color: #D84315; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); z-index: 1000; }
+    .footer a { color: #1565C0; text-decoration: none; font-weight: 900; margin: 0 8px; padding: 5px 10px; background: #FFF; border-radius: 10px; border: 2px solid #BBDEFB;}
 </style>
 </head>
 <body>
 
 <div class="top-bar-global">
-    <div style="display:flex; align-items:center; gap:10px;">
-        <img src="cat.jpeg" class="logo-img" alt="Teacher Cat" onerror="this.src='https://via.placeholder.com/60?text=Cat'">
-        <span style="font-weight:bold; font-size:24px; color:#5D4037;">Teacher Cat</span>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <img src="cat.jpeg" class="logo-img" alt="Teacher Cat" onerror="this.src='https://via.placeholder.com/65?text=Cat'">
+        <span style="font-weight:900; font-size:28px; color:#FFF; text-shadow: 1px 2px 2px rgba(0,0,0,0.3);">Teacher Cat</span>
     </div>
-    <button class="progress-btn" onclick="openProgressRecord()">📊 Progress Record</button>
+    <button class="progress-btn" onclick="openProgressRecord()">📊 成績大挑戰</button>
 </div>
 
 <div id="game-container">
     <div id="home-screen" class="screen active-screen">
-        <h1>🌟 小一初級寫作練習 🌟</h1>
+        <h1 style="margin-top:20px;">🌟 小一初級寫作練習 🌟</h1>
         <h2>(每次挑戰 20 題，全對可獲大星星！🌟)</h2>
         <div class="level-grid" id="level-grid"></div>
         <br><br>
-        <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-main" style="display:inline-block; text-decoration:none; background:#8E24AA; box-shadow: 0 6px #6A1B9A; margin-top:20px;">🌍 返回小朋友學習大冒險</a>
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-main" style="display:inline-block; text-decoration:none; background:linear-gradient(to bottom, #AB47BC, #6A1B9A); box-shadow: 0 6px 0 #4A148C; margin-top:20px;">🌍 返回學習大冒險</a>
     </div>
 
     <div id="tutorial-screen" class="screen">
         <h1 id="tut-title"></h1>
-        <div class="intro-badge">📖 課前預習頁面</div>
+        <div class="intro-badge">📖 課前預習小教室</div>
         <div id="tutorial-box"></div>
-        <button class="start-btn" onclick="startGame()">🚀 開始遊戲</button>
-        <br><br><button onclick="showScreen('home-screen')" style="padding:12px 25px; border-radius:12px; border:none; cursor:pointer; font-size:20px; background:#ddd; margin-top:10px;">返回主頁</button>
+        <button class="start-btn" onclick="startGame()">🚀 準備出發，開始遊戲！</button>
+        <br><br><button class="btn-main" style="background:#9E9E9E; box-shadow:0 6px 0 #616161;" onclick="showScreen('home-screen')">🔙 返回主頁</button>
     </div>
 
     <div id="progress-screen" class="screen">
-        <h1>📊 Progress Record 學習進度</h1>
+        <h1>📊 學習星星榜 🌟</h1>
         <div class="progress-list" id="progress-list"></div>
-        <button class="btn-main" style="background:#E53935; box-shadow:0 6px #B71C1C;" onclick="clearRecord()">🗑️ 清除記錄</button>
-        <button class="btn-main" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+        <button class="btn-main" style="background:linear-gradient(to bottom, #EF5350, #C62828); box-shadow:0 6px 0 #880E4F;" onclick="clearRecord()">🗑️ 重新挑戰 (清除記錄)</button>
+        <button class="btn-main" style="background:linear-gradient(to bottom, #42A5F5, #1565C0); box-shadow:0 6px 0 #0D47A1;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
     </div>
 
     <div id="game-screen" class="screen">
         <div class="game-nav">
-            <button class="nav-btn" onclick="prevQuestion()" id="btn-prev">⬅️ 上一頁</button>
-            <button class="nav-btn" onclick="showScreen('home-screen')" style="background:#FFA726; box-shadow:0 4px #EF6C00;">🏠 暫停並回主頁</button>
-            <button class="nav-btn" onclick="nextQuestion()" id="btn-next">下一頁 ➡️</button>
+            <button class="nav-btn" onclick="prevQuestion()" id="btn-prev">⬅️ 上一題</button>
+            <button class="nav-btn" onclick="showScreen('home-screen')" style="background:#FFA726; box-shadow:0 6px 0 #E65100; color:#FFF;">🏠 暫停回主頁</button>
+            <button class="nav-btn" onclick="nextQuestion()" id="btn-next">下一題 ➡️</button>
         </div>
         
-        <div style="font-size:22px; color:#888; font-weight:bold; margin-bottom:10px;" id="progress-text"></div>
+        <div style="font-size:24px; color:#1976D2; font-weight:900; margin-bottom:10px; background:#E3F2FD; display:inline-block; padding:8px 20px; border-radius:20px; border:3px solid #90CAF9;" id="progress-text"></div>
+        
         <div class="question-header">
             <button class="audio-btn" onclick="playAudioText(document.getElementById('question-text').innerText)">🔊</button>
             <span id="question-text"></span>
         </div>
         
-        <div class="dropzone-container" style="flex-direction:row; flex-wrap:wrap;" id="dropzones"></div>
+        <div class="dropzone-container" id="dropzones"></div>
         <div class="draggables-container" id="draggables"></div>
         
         <div id="tc-hint-box">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <img src="cat.jpeg" style="width:50px; border-radius:50%;" onerror="this.src='https://via.placeholder.com/50?text=Cat'">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <img src="cat.jpeg" style="width:60px; height:60px; border-radius:50%; border:3px solid #FFF; box-shadow: 0 3px 6px rgba(0,0,0,0.2);" onerror="this.src='https://via.placeholder.com/60?text=Cat'">
                 <span id="tc-hint-text"></span>
             </div>
-            <button class="audio-btn" style="width:50px; height:50px;" onclick="playAudioText(document.getElementById('tc-hint-text').innerText)">🔊</button>
+            <button class="audio-btn" style="width:60px; height:60px; font-size:28px;" onclick="playAudioText(document.getElementById('tc-hint-text').innerText)">🔊</button>
         </div>
 
-        <div class="feedback" id="feedback-text" style="margin-top:15px; font-size:28px;"></div>
-        <div id="skip-btn-container"><button class="skip-btn" onclick="skipQuestion()">⏭️ 跳到下一題</button></div>
+        <div class="feedback" id="feedback-text" style="margin-top:20px; font-size:32px; font-weight:900; text-shadow:1px 1px 2px rgba(0,0,0,0.2);"></div>
+        <div id="skip-btn-container"><button class="skip-btn" onclick="skipQuestion()">⏭️ 不會做，跳到下一題</button></div>
     </div>
 
     <div id="result-screen" class="screen">
-        <h1>🏆 關卡總結報告 🏆</h1>
-        <h2 id="score-text" style="font-size: 36px; color: #4CAF50; margin: 15px 0;"></h2>
-        <h3 id="star-award-text" style="font-size: 28px; color: #F57C00;"></h3>
+        <h1>🏆 關卡挑戰報告 🏆</h1>
+        <h2 id="score-text" style="font-size: 42px; color: #E65100; margin: 15px 0; font-weight:900; text-shadow: 2px 2px 0px #FFE0B2;"></h2>
+        <h3 id="star-award-text" style="font-size: 32px; color: #43A047; font-weight:900;"></h3>
         <div class="summary-list" id="summary-list"></div>
         <button class="btn-main" onclick="startGame()">🔄 重新挑戰這一關</button>
-        <button class="btn-main" style="background:#42A5F5; box-shadow:0 6px #1E88E5;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+        <button class="btn-main" style="background:linear-gradient(to bottom, #42A5F5, #1565C0); box-shadow:0 6px 0 #0D47A1;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
     </div>
 </div>
 
 <div id="celebration">
-    <div style="font-size:150px;" id="celeb-emoji">🎉🌟💯</div>
-    <div style="font-size:60px; color:#D84315; font-weight:bold; text-shadow: 3px 3px 6px #FFF;">太棒啦！答對了！</div>
+    <div style="font-size:160px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));" id="celeb-emoji">🎉🌟💯</div>
+    <div style="font-size:65px; color:#E65100; font-weight:900; text-shadow: 4px 4px 0px #FFF, 0 10px 15px rgba(0,0,0,0.2); margin-top:20px;">太棒啦！答對了！</div>
 </div>
 
 <div class="footer">
-    <b>Teacher Cat 的快樂AI教室</b> | 
-    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> | 
-    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> | 
-    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a>
+    Teacher Cat 的快樂AI教室 | 
+    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">📺 YouTube</a>
+    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
 </div>
 
 <script>
-// 音效與 Web Audio API
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 function initAudio() { if(!audioCtx) audioCtx = new AudioContext(); }
@@ -206,7 +203,6 @@ function playSound(isCorrect) {
     }
 }
 
-// 語音朗讀
 function playAudioText(text, e) {
     if(e) e.stopPropagation(); 
     if(!text) return;
@@ -223,7 +219,6 @@ const LEVEL_HINTS = [
     "段落公式二：1. 點題 ➡️ 2. 動作細節 ➡️ 3. 心情", "段落公式三：1. 點題 ➡️ 2. 人物對話 ➡️ 3. 心情或結果"
 ];
 
-// 動態題目產生器
 function genLevel(t) {
     let e=[], h=[];
     const Q = (q, dz, ans, correctOpts, wrongOpts) => ({ 
@@ -252,7 +247,6 @@ function genLevel(t) {
     const hEx = ["草地鋪了綠色地毯", "公園掛滿了燈籠", "訓練場非常炎熱", "體育館十分熱鬧", "四周響起了雷聲", "郊外陽光很普照", "課室佈置喜氣洋洋", "街道上沒有路人", "山頂上的風很大", "天空中微風吹過", "超市裡人來人往", "城市裡車水馬龍", "鄉村診所很安靜", "雪山上一片白茫茫", "閱覽室放滿新書", "球場的燈光很亮", "麵包店傳來陣陣香味", "客廳掛滿彩色氣球", "小溪旁有螢火蟲", "花園裡充滿歡笑聲"];
 
     const wrongPool = ["飛機", "紅色", "可愛", "藍色", "大樹", "美味", "書包", "黃色", "唱歌", "蘋果", "巴士", "大象", "雨傘", "氣球", "香蕉", "電視", "電腦", "滑梯", "秋千", "筆盒"];
-    
     const wrongSenPool_comma = ["小狗在睡覺，", "蘋果很甜，", "我喜歡藍色，", "巴士來了，", "書包很重，", "小貓在跑，", "天氣很好，", "明天放假，", "我想睡覺，", "書本很厚，"];
     const wrongSenPool_period = ["小狗在睡覺。", "蘋果很甜。", "我喜歡藍色。", "巴士來了。", "書包很重。", "小貓在跑。", "天氣很好。", "明天放假。", "我想睡覺。", "書本很厚。"];
 
@@ -305,7 +299,7 @@ function genLevel(t) {
     return { easy: e, hard: h };
 }
 
-const btnAudio = (txt) => `<button class="audio-btn" style="width:35px; height:35px; font-size:16px; margin: 0 10px; vertical-align: middle; display: inline-flex; align-items: center; justify-content: center;" onclick="playAudioText('${txt}', event)">🔊</button>`;
+const btnAudio = (txt) => `<button class="audio-btn" style="width:40px; height:40px; font-size:18px; margin: 0 10px; vertical-align: middle; display: inline-flex; align-items: center; justify-content: center; box-shadow:0 3px 0 #0D47A1;" onclick="playAudioText('${txt}', event)">🔊</button>`;
 
 const levelData = [
     { id: 1, title: "第 1 關：拆解四素句(時+人)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('寫作的第一步是找出時間和人物。')}寫作的第一步是找出「時間」和「人物」。<br><br><b>💡 課文例子：</b>${btnAudio('初春的早晨，爸爸、媽媽和我到公園散步。')}「初春的早晨 (時間)，爸爸、媽媽和我 (人物) 到公園散步。」`, ...genLevel(1) },
@@ -329,7 +323,6 @@ let retryQIndex = 0;
 function renderLevelButtons() {
     const grid = document.getElementById("level-grid");
     grid.innerHTML = ""; 
-    
     let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {};
 
     levelData.forEach(level => {
@@ -337,16 +330,16 @@ function renderLevelButtons() {
         let starHTML = "";
         
         if (score === 20) {
-            starHTML = `<div style="font-size:24px; margin-top:5px;">🌟</div>`;
+            starHTML = `<div style="font-size:32px; margin-top:5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🌟</div>`;
         } else if (score >= 10) {
-            starHTML = `<div style="font-size:24px; margin-top:5px;">⭐</div>`;
+            starHTML = `<div style="font-size:32px; margin-top:5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">⭐</div>`;
         } else {
-            starHTML = `<div style="font-size:24px; margin-top:5px; visibility:hidden;">⭐</div>`; 
+            starHTML = `<div style="font-size:32px; margin-top:5px; visibility:hidden;">⭐</div>`; 
         }
 
         const btn = document.createElement("button");
         btn.className = "level-btn";
-        btn.innerHTML = `<span>${level.title}</span>${starHTML}`;
+        btn.innerHTML = `<span style="letter-spacing: 1px;">${level.title}</span>${starHTML}`;
         btn.onclick = () => { 
             currentLevelObj = level; 
             document.getElementById("tut-title").innerText = level.title; 
@@ -365,26 +358,21 @@ function showScreen(id) {
     document.getElementById('tc-hint-box').style.display = 'none'; 
     document.getElementById('skip-btn-container').style.display = 'none';
     isRetryMode = false;
-    
-    if (id === 'home-screen') {
-        renderLevelButtons();
-    }
+    if (id === 'home-screen') renderLevelButtons();
 }
 
 function startGame() {
     initAudio(); currentQIndex = 0; answersRecord = new Array(20).fill(false); 
-    
     let finalEasy = [...currentLevelObj.easy].sort(() => 0.5 - Math.random()).slice(0, 10).map(q => ({...q, isEasy: true}));
     let finalHard = [...currentLevelObj.hard].sort(() => 0.5 - Math.random()).slice(0, 10).map(q => ({...q, isEasy: false}));
     selectedQuestions = [...finalEasy, ...finalHard]; 
-    
     showScreen('game-screen'); renderQuestion();
 }
 
 function renderQuestion() {
     let qIndexToRender = isRetryMode ? retryQIndex : currentQIndex;
     const qData = selectedQuestions[qIndexToRender]; 
-    currentAnswers = {}; 
+    currentAnswers = {}; draggedItem = null;
     
     document.getElementById("btn-prev").style.display = isRetryMode ? "none" : "inline-block";
     document.getElementById("btn-next").style.display = isRetryMode ? "none" : "inline-block";
@@ -395,8 +383,8 @@ function renderQuestion() {
     if(isRetryMode) {
         document.getElementById("tc-hint-box").style.display = "flex";
         document.getElementById("tc-hint-text").innerText = currentLevelObj.hint[currentLevelObj.id - 1];
-        document.getElementById("feedback-text").style.color = "#D84315";
-        document.getElementById("feedback-text").innerText = "💡 現在是重做模式，一直答到對為止喔！";
+        document.getElementById("feedback-text").style.color = "#E65100";
+        document.getElementById("feedback-text").innerText = "💡 挑戰重做模式，一直答到對為止喔！";
     }
 
     document.getElementById("progress-text").innerText = isRetryMode ? `【錯誤重做】第 ${qIndexToRender + 1} 題` : `第 ${currentLevelObj.id} 關 | 題： ${qIndexToRender + 1}/20`;
@@ -404,10 +392,14 @@ function renderQuestion() {
 
     const dzContainer = document.getElementById("dropzones"); dzContainer.innerHTML = "";
     qData.dropzones.forEach(dz => {
-        const box = document.createElement("div"); box.className = "drop-box"; box.id = dz.id; box.innerHTML = `<span style="font-size:18px;">${dz.label}</span>`;
-        box.ondragover = (e) => { e.preventDefault(); box.style.borderColor="#42A5F5"; };
-        box.ondragleave = () => box.style.borderColor="#BDBDBD";
-        box.ondrop = (e) => handleDrop(e, box, dz.id, qData.answers[dz.id]);
+        const box = document.createElement("div"); box.className = "drop-box"; box.id = dz.id; box.innerHTML = `<span>${dz.label}</span>`;
+        
+        // 電腦版原生拖放機制
+        box.ondragover = (e) => { e.preventDefault(); box.classList.add("highlight"); };
+        box.ondragleave = () => { box.classList.remove("highlight"); };
+        box.ondrop = (e) => { e.preventDefault(); box.classList.remove("highlight"); checkAnswer(box, dz.id, qData.answers[dz.id]); };
+        
+        // 手機版點擊機制
         box.onclick = () => handleTapDrop(box, dz.id, qData.answers[dz.id]);
         dzContainer.appendChild(box);
     });
@@ -415,15 +407,77 @@ function renderQuestion() {
     const dragContainer = document.getElementById("draggables"); dragContainer.innerHTML = "";
     
     [...qData.options].sort(() => Math.random() - 0.5).forEach((opt, index) => {
-        const item = document.createElement("div"); item.className = "drag-item"; item.draggable = true; item.id = "drag-" + index; item.dataset.value = opt.text;
+        const item = document.createElement("div"); item.className = "drag-item"; item.id = "drag-" + index; item.dataset.value = opt.text; item.draggable = true;
         item.innerHTML = `
             <span class="text-val">${opt.text}</span>
-            <button class="audio-btn" style="width:35px; height:35px; font-size:16px; margin-left:10px;" onclick="playAudioText('${opt.text}', event)">🔊</button>
+            <button class="audio-btn" style="width:40px; height:40px; font-size:18px; margin-left:10px;" onclick="playAudioText('${opt.text}', event)">🔊</button>
         `;
+        
+        // 1. 電腦版滑鼠拖拉
         item.ondragstart = (e) => { draggedItem = item; e.dataTransfer.setData("text/plain", item.id); };
-        item.onclick = (e) => { if(e.target.tagName==='BUTTON')return; draggedItem = item; document.getElementById("feedback-text").style.color="#F57C00"; document.getElementById("feedback-text").innerText = `💡 已選取「${opt.text}」，請點擊虛線空格！`; };
+        
+        // 2. 手機版手指點擊
+        item.onclick = (e) => { 
+            if(e.target.tagName==='BUTTON')return; 
+            document.querySelectorAll('.drag-item').forEach(el => el.classList.remove('selected'));
+            draggedItem = item; item.classList.add('selected');
+            document.querySelectorAll('.drop-box:not(.filled)').forEach(box => box.classList.add('highlight'));
+            document.getElementById("feedback-text").style.color="#F57C00"; 
+            document.getElementById("feedback-text").innerText = `💡 已拿住「${opt.text}」，請直接拖拉，或點擊上方空格！`; 
+        };
+
+        // 3. 🔥 手機版「原生手指觸控拖曳引擎」🔥
+        item.addEventListener('touchstart', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            draggedItem = item;
+            document.querySelectorAll('.drag-item').forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+            document.querySelectorAll('.drop-box:not(.filled)').forEach(box => box.classList.add('highlight'));
+
+            let touch = e.touches;
+            window.touchGhost = item.cloneNode(true);
+            window.touchGhost.id = "";
+            window.touchGhost.style.position = 'fixed';
+            window.touchGhost.style.opacity = '0.85';
+            window.touchGhost.style.pointerEvents = 'none'; // 讓底下的碰撞偵測能穿透
+            window.touchGhost.style.zIndex = '99999';
+            window.touchGhost.style.transform = 'scale(1.1)';
+            window.touchGhost.style.boxShadow = '0 15px 25px rgba(0,0,0,0.3)';
+            document.body.appendChild(window.touchGhost);
+            
+            moveGhost(touch);
+        }, {passive: false});
+
+        item.addEventListener('touchmove', function(e) {
+            if (!window.touchGhost) return;
+            e.preventDefault(); // 絕對禁止 iOS 畫面捲動
+            moveGhost(e.touches);
+        }, {passive: false});
+
+        item.addEventListener('touchend', function(e) {
+            if (!window.touchGhost) return;
+            let touch = e.changedTouches;
+            // 偵測手指放開時，底下是不是空格
+            let dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            window.touchGhost.remove();
+            window.touchGhost = null;
+
+            let box = dropTarget ? dropTarget.closest('.drop-box') : null;
+            if (box && !box.classList.contains('filled')) {
+                checkAnswer(box, box.id, qData.answers[box.id]);
+            }
+        });
+
         dragContainer.appendChild(item);
     });
+}
+
+function moveGhost(touch) {
+    if(window.touchGhost) {
+        window.touchGhost.style.left = (touch.clientX - window.touchGhost.offsetWidth / 2) + 'px';
+        window.touchGhost.style.top = (touch.clientY - window.touchGhost.offsetHeight / 2) + 'px';
+    }
 }
 
 function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderQuestion(); } }
@@ -436,8 +490,15 @@ function skipQuestion() {
     else { answersRecord[currentQIndex] = false; nextQuestion(); }
 }
 
-function handleDrop(e, box, boxId, correct) { e.preventDefault(); box.style.borderColor="#BDBDBD"; if(draggedItem) checkAnswer(box, boxId, correct); }
-function handleTapDrop(box, boxId, correct) { if(!draggedItem) { document.getElementById("feedback-text").style.color="#EF5350"; document.getElementById("feedback-text").innerText = "👇 請先點擊下方字卡！"; return; } checkAnswer(box, boxId, correct); }
+function handleTapDrop(box, boxId, correct) { 
+    if(box.classList.contains("filled")) return;
+    if(!draggedItem) { 
+        document.getElementById("feedback-text").style.color="#D32F2F"; 
+        document.getElementById("feedback-text").innerText = "👇 請先在下方點選或拖曳一張字卡喔！"; 
+        return; 
+    } 
+    checkAnswer(box, boxId, correct);
+}
 
 function checkAnswer(box, boxId, correct) {
     let qIndex = isRetryMode ? retryQIndex : currentQIndex;
@@ -445,8 +506,13 @@ function checkAnswer(box, boxId, correct) {
     if (draggedItem.dataset.value === correct) {
         let textHtml = draggedItem.querySelector('.text-val').outerHTML;
         box.innerHTML = textHtml; 
-        box.classList.add("filled"); draggedItem.style.visibility = "hidden"; draggedItem = null; 
+        box.classList.add("filled"); 
+        box.classList.remove("highlight");
+        
+        draggedItem.style.visibility = "hidden"; draggedItem.classList.remove("selected"); draggedItem = null; 
         currentAnswers[boxId] = true;
+        
+        document.querySelectorAll('.drop-box').forEach(b => b.classList.remove('highlight')); 
         document.getElementById("skip-btn-container").style.display = "none"; 
         
         if (Object.keys(currentAnswers).length === selectedQuestions[qIndex].dropzones.length) {
@@ -459,12 +525,17 @@ function checkAnswer(box, boxId, correct) {
             } else {
                 answersRecord[retryQIndex] = true; setTimeout(() => { generateSummary(); }, 1800);
             }
+        } else {
+            document.getElementById("feedback-text").style.color = "#4CAF50"; 
+            document.getElementById("feedback-text").innerText = "✅ 答對一個了！繼續選下一個！";
         }
     } else {
         playSound(false); 
-        document.getElementById("feedback-text").style.color = "#EF5350"; 
-        document.getElementById("feedback-text").innerText = "❌ 好像不對喔，請再試一次！"; 
-        draggedItem = null;
+        document.getElementById("feedback-text").style.color = "#D32F2F"; 
+        document.getElementById("feedback-text").innerText = "❌ 好像不對喔，請換一張字卡再試試！"; 
+        
+        draggedItem.classList.remove("selected"); draggedItem = null;
+        document.querySelectorAll('.drop-box').forEach(b => b.classList.remove('highlight'));
         
         document.getElementById("tc-hint-box").style.display = "flex";
         document.getElementById("tc-hint-text").innerText = currentLevelObj.hint[currentLevelObj.id - 1];
@@ -503,7 +574,7 @@ function generateSummary() {
     let listHTML = "";
     for(let i=0; i<20; i++) {
         let isRight = answersRecord[i];
-        let symbol = isRight ? "<span style='color:#4CAF50;'>✅ 答對</span>" : "<span style='color:#EF5350;'>❌ 答錯</span>";
+        let symbol = isRight ? "<span style='color:#4CAF50;'>✅ 答對</span>" : "<span style='color:#E53935;'>❌ 答錯</span>";
         let retryBtn = isRight ? "" : `<button class="retry-btn" onclick="startRetry(${i})">🔄 重新做這題</button>`;
         listHTML += `<div class="summary-item"><span>第 ${i+1} 題：${symbol}</span> ${retryBtn}</div>`;
     }
@@ -515,12 +586,12 @@ function startRetry(index) { isRetryMode = true; retryQIndex = index; showScreen
 function openProgressRecord() {
     let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {}; let html = '';
     for (let i = 1; i <= 10; i++) {
-        let score = storedScores[i], starIcon = '❌', scoreText = '未挑戰', starSize = '24px';
+        let score = storedScores[i], starIcon = '❌', scoreText = '未挑戰', starSize = '28px';
         if (score !== undefined) {
             scoreText = `最高分數: ${score} / 20`;
-            if (score === 20) { starIcon = '🌟'; starSize = '36px'; } else if (score >= 10) { starIcon = '⭐'; starSize = '24px'; }
+            if (score === 20) { starIcon = '🌟'; starSize = '42px'; } else if (score >= 10) { starIcon = '⭐'; starSize = '28px'; }
         }
-        html += `<div class="record-item"><span style="font-weight:bold; color:#3F51B5;">第 ${i} 關</span><span style="color:#555;">${scoreText}</span><span style="font-size: ${starSize}">${starIcon}</span></div>`;
+        html += `<div class="record-item"><span style="color:#1976D2;">第 ${i} 關</span><span style="color:#757575;">${scoreText}</span><span style="font-size: ${starSize}; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${starIcon}</span></div>`;
     }
     document.getElementById('progress-list').innerHTML = html; showScreen('progress-screen');
 }
