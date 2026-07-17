@@ -4,8 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小一初級寫作練習</title>
+
+<!-- 🔥 加入手機觸控拖拉修復套件 (Mobile Drag Drop Polyfill) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/default.css">
+<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
+<script>
+    // 啟動手機拖拉修復，讓觸控螢幕能模擬電腦滑鼠的拖拉
+    MobileDragDrop.polyfill({
+        holdToDrag: 100 // 按住 100 毫秒後即可拖拉
+    });
+    // 防止在 iOS 設備上拖拉時畫面跟著捲動
+    window.addEventListener('touchmove', function() {}, {passive: false});
+</script>
+
 <style>
-    body { font-family: "Comic Sans MS", "微軟正黑體", sans-serif; background-color: #FDF5E6; text-align: center; margin: 0; padding: 0; padding-bottom: 150px; color: #333; user-select: none; }
+    body { font-family: "Comic Sans MS", "微軟正黑體", sans-serif; background-color: #FDF5E6; text-align: center; margin: 0; padding: 0; padding-bottom: 150px; color: #333; user-select: none; -webkit-user-select: none; }
     
     /* 頂部導航與 Progress Record 按鈕 */
     .top-bar-global { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #FFCC80; box-shadow: 0 4px rgba(0,0,0,0.1); }
@@ -58,7 +71,9 @@
     .drop-box.filled { border: 4px solid #66BB6A; background-color: #E8F5E9; color: #2E7D32; box-shadow: 0 4px #A5D6A7;}
     
     .draggables-container { display: flex; justify-content: center; gap: 12px; margin-top: 20px; padding: 20px; background: #FFF8E1; border-radius: 15px; flex-wrap: wrap; border: 3px solid #FFE082; }
-    .drag-item { background: #FFF; border: 3px solid #FFA726; padding: 10px 15px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: grab; box-shadow: 0 5px #FB8C00; display: flex; align-items: center; gap: 10px; color: #E65100;}
+    
+    /* 🔥 重要修復：touch-action: none 確保手機拖拉字卡時，網頁不會上下滑動 */
+    .drag-item { background: #FFF; border: 3px solid #FFA726; padding: 10px 15px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: grab; box-shadow: 0 5px #FB8C00; display: flex; align-items: center; gap: 10px; color: #E65100; touch-action: none; -webkit-touch-callout: none; }
     
     #tc-hint-box { display: none; background: #FFF9C4; border: 4px solid #FBC02D; padding: 15px; border-radius: 15px; margin-top: 20px; text-align: left; font-size: 22px; font-weight: bold; color: #5D4037; align-items: center; justify-content: space-between;}
     #skip-btn-container { display: none; margin-top: 15px; }
@@ -208,7 +223,7 @@ const LEVEL_HINTS = [
     "段落公式二：1. 點題 ➡️ 2. 動作細節 ➡️ 3. 心情", "段落公式三：1. 點題 ➡️ 2. 人物對話 ➡️ 3. 心情或結果"
 ];
 
-// 🔥全新邏輯強化版：詞庫精準一對一對應，保證每一道題的情境 100% 合乎常理！標點完美修復！
+// 動態題目產生器
 function genLevel(t) {
     let e=[], h=[];
     const Q = (q, dz, ans, correctOpts, wrongOpts) => ({ 
@@ -216,7 +231,6 @@ function genLevel(t) {
         options: [...correctOpts, ...wrongOpts].map(o=>({text:o})) 
     });
 
-    // 小一程度 (Easy)：20 組情境，每個 index 都具有高度邏輯關聯。
     const eTimes = ["早上", "昨天", "今天", "明天", "晚上", "下午", "秋天", "春天", "夏天", "冬天", "小息", "放學後", "星期天", "週末", "中午", "清晨", "黃昏", "傍晚", "除夕", "節日"];
     const ePers = ["我", "爸爸", "妹妹", "哥哥", "媽媽", "弟弟", "爺爺", "姐姐", "大家", "奶奶", "同學", "朋友", "一家人", "老師", "小狗", "小鳥", "農夫", "貓咪", "市民", "叔叔"];
     const ePla = ["學校", "廚房", "公園", "操場", "客廳", "房間", "山頂", "花園", "泳池", "家裡", "課室", "圖書館", "超市", "餐廳", "門口", "樹上", "田裡", "沙發上", "廣場", "舞台上"];
@@ -227,7 +241,6 @@ function genLevel(t) {
     const eTopList = ["早上回到學校", "昨天去到廚房", "今天去了公園", "明天去操場玩", "晚上坐在客廳", "下午回到房間", "秋天爬上山頂", "春天來到花園", "夏天去了泳池", "冬天待在家裡", "小息留在課室", "放學去圖書館", "星期天去超市", "週末去了餐廳", "中午來到門口", "清晨走到樹下", "黃昏來到田裡", "傍晚坐在沙發上", "除夕來到廣場", "節日登上舞台"];
     const eEx = ["學校很大", "準備了食材", "公園很多人", "操場很寬敞", "客廳很整潔", "房間很安靜", "山頂風景美", "花園很香", "泳池水很清", "家裡很舒服", "課室有圖書", "圖書館很靜", "超市貨品多", "餐廳氣氛好", "門口有聲音", "樹上葉子綠", "田裡泥土濕", "沙發很柔軟", "廣場燈光閃", "舞台很熱鬧"];
 
-    // 進階程度 (Hard)：20 組情境，同樣具有高度邏輯關聯。
     const hTimes = ["初春的早晨", "中秋節的晚上", "炎熱的夏天", "寒冷的冬天", "下雨的午後", "晴朗的週末", "熱鬧的春節", "寧靜的夜晚", "放暑假的時候", "吃過晚飯後", "天色漸暗時", "太陽剛升起", "微風的下午", "大雪的日子", "開學第一天", "決賽的晚上", "比賽結束後", "生日會開始前", "滿天星斗晚上", "全家人團聚時"];
     const hPers = ["我", "我們一家", "消防員", "同學們", "小動物", "農夫", "幼稚園生", "清潔工", "探險家", "好朋友", "小女孩", "警察", "護士", "小男孩", "女同學", "教練", "鄰居", "小夥伴", "義工", "小公主"];
     const hPla = ["綠草地", "大公園", "訓練場", "體育館", "大樹下", "郊外", "課室", "街道", "山頂", "草地", "超級市場", "十字路口", "診所", "雪山", "閱覽室", "籃球場", "麵包店", "客廳", "小溪旁", "花園"];
@@ -240,7 +253,6 @@ function genLevel(t) {
 
     const wrongPool = ["飛機", "紅色", "可愛", "藍色", "大樹", "美味", "書包", "黃色", "唱歌", "蘋果", "巴士", "大象", "雨傘", "氣球", "香蕉", "電視", "電腦", "滑梯", "秋千", "筆盒"];
     
-    // 獨立分開帶「逗號」與「句號」的錯誤選項，確保孩子不會只看標點符號亂填
     const wrongSenPool_comma = ["小狗在睡覺，", "蘋果很甜，", "我喜歡藍色，", "巴士來了，", "書包很重，", "小貓在跑，", "天氣很好，", "明天放假，", "我想睡覺，", "書本很厚，"];
     const wrongSenPool_period = ["小狗在睡覺。", "蘋果很甜。", "我喜歡藍色。", "巴士來了。", "書包很重。", "小貓在跑。", "天氣很好。", "明天放假。", "我想睡覺。", "書本很厚。"];
 
@@ -314,7 +326,6 @@ let answersRecord = [];
 let isRetryMode = false;
 let retryQIndex = 0;
 
-// 渲染關卡按鈕
 function renderLevelButtons() {
     const grid = document.getElementById("level-grid");
     grid.innerHTML = ""; 
@@ -346,7 +357,6 @@ function renderLevelButtons() {
     });
 }
 
-// 網頁載入時先執行一次渲染
 renderLevelButtons();
 
 function showScreen(id) { 
