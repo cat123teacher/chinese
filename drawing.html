@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>兒童填色與畫畫遊戲</title>
+    <!-- 保留輔助工具 -->
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
     <style>
         body { 
@@ -15,14 +16,13 @@
             user-select: none;
         }
 
-        /* ================= 首頁圖庫選單樣式 (油畫風格升級) ================= */
+        /* ================= 首頁圖庫選單樣式 ================= */
         #home-screen { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             height: 100vh; 
             background-color: #e0f7fa;
-            /* 加上一點活潑的背景紋理 */
             background-image: radial-gradient(#b2ebf2 20%, transparent 20%), radial-gradient(#b2ebf2 20%, transparent 20%);
             background-position: 0 0, 25px 25px;
             background-size: 50px 50px;
@@ -40,7 +40,7 @@
             font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             padding: 5px 15px;
             border-radius: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -54,53 +54,52 @@
             max-width: 700px;
             max-height: 75vh;
             overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* 加入這行：確保 iOS 滑動極度流暢 */
             touch-action: pan-y; 
             padding: 15px;
             padding-bottom: 40px;
         }
         @media (min-width: 500px) { #image-grid { grid-template-columns: repeat(3, 1fr); } }
 
-        /* 油畫風格卡片按鈕 */
+        /* 還原乾淨的卡片設計 */
         .card {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
-            /* 模擬厚實的畫框與立體感 */
-            border: 6px solid #ffffff;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2), inset 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            background-color: #ffffff; /* 改回白色底色 */
+            border: 5px solid #80deea; /* 加上粉藍色邊框增加童趣 */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
             padding: 12px;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
         }
         .card:active { 
-            transform: scale(0.92); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: scale(0.95); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
-        /* 圖案本身 */
+        /* 圖案還原原本黑白樣子 */
         .card-img { 
             width: 100%;
             height: 100px;
             object-fit: contain;
-            /* 將白底變透明，黑線與鮮豔背景融合，呈現已上色的錯覺 */
-            mix-blend-mode: multiply; 
-            filter: contrast(1.2); /* 加深線條 */
+            -webkit-user-drag: none; /* 【關鍵優化】：防止瀏覽器原生拖曳，解決滑動卡頓 */
+            user-select: none;
         }
 
-        /* 名牌標題 */
+        /* 中文標題名牌 */
         .card-title {
             margin-top: 10px;
             font-size: 1.2rem;
             font-weight: 900;
-            color: #d84315;
-            background-color: rgba(255, 255, 255, 0.95);
+            color: #00796b;
+            background-color: #e0f7fa;
             padding: 4px 16px;
             border-radius: 20px;
-            border: 2px solid #ffca28;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            border: 2px solid #b2ebf2;
             letter-spacing: 1px;
         }
 
@@ -183,6 +182,7 @@
         #workspaces {
             flex-grow: 1;
             overflow-y: auto;          
+            -webkit-overflow-scrolling: touch; /* 確保畫布區也能平滑捲動 */
             touch-action: pan-y;       
             display: flex;
             flex-direction: column;
@@ -215,6 +215,7 @@
             z-index: 1;
         }
 
+        /* 填色區保留圖案在上層防出界 */
         #image-overlay {
             position: absolute;
             top: 0;
@@ -231,7 +232,7 @@
     <!-- 首頁 -->
     <div id="home-screen">
         <h1>🎨 兒童畫畫樂園 🖌️</h1>
-        <div class="instruction">👇 點擊喜歡的畫布開始 👇</div>
+        <div class="instruction">👇 點擊喜歡的圖案開始 👇</div>
         <div id="image-grid"></div>
     </div>
 
@@ -278,14 +279,14 @@
     </div>
 
     <script>
-        // 帶有標題的圖片清單 (已經過優化命名)
+        // 保留 22 張圖案與中文名稱
         const imageList = [
             { src: "Dcar.jpg", name: "汽車" },
             { src: "Dcat.jpg", name: "小貓" },
             { src: "Ddeer.jpg", name: "小鹿" },
             { src: "Dexcavator.jpg", name: "挖土機" },
             { src: "Dhorse.jpg", name: "小馬" },
-            { src: "Drat.jpg", name: "小兔" }, // 圖片是拿著蘿蔔的兔子
+            { src: "Drat.jpg", name: "小兔" },
             { src: "D倉鼠.jpg", name: "倉鼠" },
             { src: "D消防車.jpg", name: "消防車" },
             { src: "Nfish.jpg", name: "小魚" },
@@ -304,18 +305,6 @@
             { src: "鯊魚.jpg", name: "鯊魚" }
         ];
 
-        // 鮮豔的油畫風格漸層背景庫
-        const vibrantGradients = [
-            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', // 粉彩紅
-            'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', // 暖陽橘
-            'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', // 薄荷藍
-            'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', // 天空藍
-            'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)', // 夢幻紫
-            'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', // 薰衣草
-            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', // 蜜桃色
-            'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)'  // 雲朵白
-        ];
-
         const homeScreen = document.getElementById('home-screen');
         const gameScreen = document.getElementById('game-screen');
         const imageGrid = document.getElementById('image-grid');
@@ -331,20 +320,17 @@
         let activeCtx = null;
         let lastX = 0, lastY = 0;
 
-        // 動態生成帶有名牌與漸層的「油畫畫框」按鈕
-        imageList.forEach((item, index) => {
-            // 建立畫框卡片
+        // 動態生成原圖卡片按鈕
+        imageList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'card';
-            // 隨機套用一個鮮豔的油畫背景
-            card.style.background = vibrantGradients[index % vibrantGradients.length];
             
-            // 建立圖案
             const img = document.createElement('img');
             img.src = item.src;
             img.className = 'card-img';
+            // 【關鍵優化】：將 HTML 標籤屬性加上防拖曳
+            img.draggable = false; 
             
-            // 建立標題名牌
             const title = document.createElement('div');
             title.className = 'card-title';
             title.innerText = item.name;
@@ -352,7 +338,7 @@
             card.appendChild(img);
             card.appendChild(title);
 
-            // 點擊事件
+            // 點擊事件 (如果使用者正在滑動，瀏覽器會自動取消觸發 click，所以這樣寫最穩)
             card.addEventListener('click', () => {
                 overlay.src = item.src; 
                 homeScreen.style.display = 'none';
@@ -411,6 +397,7 @@
             overlay.style.height = newHeight + 'px';
         }
 
+        // 工具列收合開關邏輯
         document.getElementById('toggle-toolbar-btn').addEventListener('click', function() {
             const tb = document.getElementById('toolbar');
             tb.classList.toggle('collapsed');
@@ -463,6 +450,7 @@
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
+        // 觸控繪圖核心邏輯 (使用 .item(0))
         function getPos(e, targetCanvas) {
             const rect = targetCanvas.getBoundingClientRect();
             let clientX, clientY;
