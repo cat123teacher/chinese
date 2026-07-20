@@ -198,14 +198,13 @@
         function initCanvas() {
             const container = document.getElementById('canvas-container');
             
-            // 安全取得圖片比例 (解決手機未完全載入圖片時寬高為 0 的問題)
+            // 安全取得圖片比例
             let imgAspect = overlay.naturalWidth / overlay.naturalHeight;
             if (!imgAspect || isNaN(imgAspect)) {
-                imgAspect = 1; // 如果極端情況下仍無法取得，給予預設比例 1:1
+                imgAspect = 1; 
             }
 
             const containerAspect = container.clientWidth / container.clientHeight;
-
             let newWidth, newHeight;
             
             if (containerAspect > imgAspect) {
@@ -232,7 +231,6 @@
         startBtn.addEventListener('click', () => {
             homeScreen.style.display = 'none';
             gameScreen.style.display = 'flex';
-            // 將延遲稍微調長，確保手機的排版完全展開後再計算大小
             setTimeout(initCanvas, 150); 
         });
 
@@ -282,10 +280,14 @@
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
             
-            // 【關鍵修正】：e.touches 必須加上  才能抓到手指！
+            // 【真正生效的修正】：明確加上  來取得第一隻手指！
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches.clientX;
                 clientY = e.touches.clientY;
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                // 加入 changedTouches 增加相容性
+                clientX = e.changedTouches.clientX;
+                clientY = e.changedTouches.clientY;
             } else {
                 clientX = e.clientX;
                 clientY = e.clientY;
