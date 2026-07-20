@@ -30,6 +30,7 @@
             font-size: 3rem; 
             text-shadow: 3px 3px #fff; 
             margin-bottom: 20px;
+            text-align: center;
         }
         #start-btn { 
             border: none; 
@@ -132,7 +133,6 @@
             mix-blend-mode: multiply; /* 關鍵：保留黑色線條，白色變透明 */
             border-radius: 10px;
         }
-
     </style>
 </head>
 <body>
@@ -180,6 +180,7 @@
         <!-- 畫布與圖層 -->
         <div id="canvas-container">
             <canvas id="coloring-canvas"></canvas>
+            <!-- 填色圖案來源 -->
             <img src="Nfish.jpg" id="fish-overlay" alt="fish outline">
         </div>
     </div>
@@ -294,11 +295,21 @@
 
         // --- 繪圖邏輯 (支援滑鼠與觸控) ---
         
-        // 取得座標 (處理 Touch 與 Mouse 差異)
+        // 取得座標 (修正了觸控事件的第一隻手指索引 )
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches.clientX : e.clientX;
-            const clientY = e.touches ? e.touches.clientY : e.clientY;
+            let clientX, clientY;
+            
+            // 判斷是否為觸控事件，如果是，必須加上  取得第一隻手指的座標
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches.clientX;
+                clientY = e.touches.clientY;
+            } else {
+                // 滑鼠事件
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
             return {
                 x: clientX - rect.left,
                 y: clientY - rect.top
