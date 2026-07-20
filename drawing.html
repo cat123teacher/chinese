@@ -2,7 +2,6 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <!-- 【關鍵修改1】開放最大縮放倍率，允許雙指放大縮小 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>兒童填色與畫畫遊戲</title>
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
@@ -10,13 +9,11 @@
         body { 
             margin: 0; 
             padding: 0; 
-            /* 移除 overflow: hidden 讓頁面在需要時可以滾動 */
             font-family: 'Comic Sans MS', '微軟正黑體', sans-serif; 
             background-color: #e0f7fa; 
             user-select: none;
         }
 
-        /* 偽全螢幕模式 (專為 iOS Safari 設計) */
         body.pseudo-fullscreen #game-screen {
             position: fixed;
             top: 0;
@@ -27,7 +24,6 @@
             background-color: #e0f7fa;
         }
 
-        /* ================= 首頁圖庫選單樣式 ================= */
         #home-screen { 
             display: flex; 
             flex-direction: column; 
@@ -111,7 +107,6 @@
             letter-spacing: 1px;
         }
 
-        /* ================= 遊戲主頁面樣式 ================= */
         #game-screen { 
             display: none; 
             flex-direction: column; 
@@ -191,20 +186,22 @@
         
         #btn-fullscreen { background-color: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         #btn-switch-mode { background-color: #f3e5f5; border-color: #9c27b0; color: #4a148c; }
+        
+        /* 特別為儲存按鈕設定醒目的綠色 */
+        #btn-save { background-color: #c8e6c9; border-color: #4caf50; color: #1b5e20; }
 
         .divider { width: 2px; height: 25px; background: #ddd; margin: 0 2px; border-radius: 2px; }
 
-        /* 【關鍵修改2】工作區支援上下滑動 (overflow: auto) */
         #workspaces {
             flex-grow: 1;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 讓內容可往上推以滾動 */
+            align-items: flex-start;
             background-color: #b2ebf2;
-            overflow: auto; /* 允許打橫時出現捲軸 */
+            overflow: auto; 
             -webkit-overflow-scrolling: touch;
             position: relative;
-            padding: 20px 0 60px 0; /* 底部多留白方便滾動 */
+            padding: 20px 0 60px 0; 
         }
 
         .workspace-section {
@@ -213,7 +210,7 @@
             align-items: center;
             justify-content: flex-start;
             width: 100%;
-            min-height: 100%; /* 確保最小佔滿 */
+            min-height: 100%; 
         }
 
         .section-title {
@@ -230,7 +227,6 @@
             background-color: #ffffff;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 10px;
-            /* 移除 touch-action: none 讓雙指縮放能生效 */
         }
 
         .draw-canvas {
@@ -252,14 +248,12 @@
 </head>
 <body>
 
-    <!-- 首頁 -->
     <div id="home-screen">
         <h1>🎨 兒童畫畫樂園 🖌️</h1>
         <div class="instruction">👇 點擊圖案開始 👇</div>
         <div id="image-grid"></div>
     </div>
 
-    <!-- 遊戲頁面 -->
     <div id="game-screen">
         <div id="toolbar-wrapper">
             <button id="toggle-toolbar-btn">⬆️ 收起工具列 (極致放大畫布)</button>
@@ -290,6 +284,8 @@
                 <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
                 <button class="tool-btn" id="btn-switch-mode">🔄 空白畫板</button>
                 <button class="tool-btn" id="btn-fullscreen">⛶ 全螢幕</button>
+                <!-- 新增：儲存按鈕 -->
+                <button class="tool-btn" id="btn-save">💾 儲存</button>
                 <button class="tool-btn" id="btn-home">🏠 首頁</button>
             </div>
         </div>
@@ -356,7 +352,6 @@
         let rainbowHue = 0;
         let currentMode = 'coloring'; 
 
-        // 生成首頁圖案
         imageList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'card';
@@ -405,7 +400,6 @@
             let maxWidth = workspaces.clientWidth * 0.96;
             let maxHeight = workspaces.clientHeight * 0.92; 
             
-            // 【關鍵修改3】防止打橫時高度縮得太小，設定最低高度
             if (maxHeight < 300) maxHeight = 300; 
             if (maxWidth > 900) maxWidth = 900; 
 
@@ -453,34 +447,30 @@
             setTimeout(() => { initCanvas(true); }, 50);
         });
 
-        // 【關鍵修改4】強化全螢幕支援 (加入偽全螢幕備用方案)
         document.getElementById('btn-fullscreen').addEventListener('click', function() {
             const elem = document.documentElement;
             const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('pseudo-fullscreen');
 
             if (!isFullscreen) {
-                // 嘗試啟用原生全螢幕
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen().catch(() => {
-                        document.body.classList.add('pseudo-fullscreen'); // 如果被阻擋，啟用 CSS 偽全螢幕
+                        document.body.classList.add('pseudo-fullscreen');
                     });
                 } else if (elem.webkitRequestFullscreen) { 
                     elem.webkitRequestFullscreen();
                 } else {
-                    document.body.classList.add('pseudo-fullscreen'); // iOS Safari 備用
+                    document.body.classList.add('pseudo-fullscreen');
                 }
                 this.innerHTML = '📴 退出全螢幕';
             } else {
-                // 退出全螢幕
                 if (document.exitFullscreen && document.fullscreenElement) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
                     document.webkitExitFullscreen();
                 }
-                document.body.classList.remove('pseudo-fullscreen'); // 移除 CSS 偽全螢幕
+                document.body.classList.remove('pseudo-fullscreen');
                 this.innerHTML = '⛶ 全螢幕';
             }
-            
             setTimeout(() => { initCanvas(true); }, 400);
         });
 
@@ -514,6 +504,45 @@
         });
 
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
+
+        // --- 全新：儲存畫作功能 ---
+        document.getElementById('btn-save').addEventListener('click', () => {
+            // 建立一張背景隱藏畫布來進行影像合併
+            const tempCanvas = document.createElement('canvas');
+            const targetCanvas = currentMode === 'coloring' ? document.getElementById('coloring-canvas') : document.getElementById('drawing-canvas');
+            
+            tempCanvas.width = targetCanvas.width;
+            tempCanvas.height = targetCanvas.height;
+            const tCtx = tempCanvas.getContext('2d');
+
+            // 1. 填滿白色背景
+            tCtx.fillStyle = '#ffffff';
+            tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // 2. 畫上小朋友塗的顏色
+            tCtx.drawImage(targetCanvas, 0, 0);
+
+            // 3. 如果是填色模式，把黑線圖案用色彩增值 (multiply) 印上去
+            if (currentMode === 'coloring') {
+                tCtx.globalCompositeOperation = 'multiply';
+                tCtx.drawImage(overlay, 0, 0, tempCanvas.width, tempCanvas.height);
+                tCtx.globalCompositeOperation = 'source-over'; // 重置
+            }
+
+            // 4. 產生圖片並觸發下載
+            const dataURL = tempCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            
+            // 取得現在時間作為檔名的一部分
+            const date = new Date();
+            const timeStr = `${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
+            
+            link.download = currentMode === 'coloring' ? `我的填色畫作_${timeStr}.png` : `我的創意畫作_${timeStr}.png`;
+            link.href = dataURL;
+            document.body.appendChild(link); // 確保在手機瀏覽器上能正確觸發
+            link.click();
+            document.body.removeChild(link);
+        });
 
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -564,9 +593,7 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        // 【關鍵修改5】智慧判別多指觸控，放行畫面拖曳與縮放
         function startDrawing(e) {
-            // 如果偵測到「兩根以上手指」在畫布上，就不阻止預設行為 (交給瀏覽器縮放/滑動)
             if (e.touches && e.touches.length > 1) return;
             
             e.preventDefault(); 
@@ -592,7 +619,6 @@
         }
 
         function draw(e) {
-            // 放行多根手指的操作
             if (e.touches && e.touches.length > 1) return;
             
             e.preventDefault();
@@ -621,7 +647,6 @@
         }
 
         function stopDrawing(e) {
-            // 只有單指操作結束才觸發
             if (e && (!e.touches || e.touches.length === 0)) e.preventDefault();
             isDrawing = false;
             activeCanvas = null;
@@ -634,7 +659,6 @@
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
 
-            // passive: false 是必須的，這樣才能在「單指」時用 e.preventDefault() 停用系統滾動
             canvas.addEventListener('touchstart', startDrawing, {passive: false});
             canvas.addEventListener('touchmove', draw, {passive: false});
             canvas.addEventListener('touchend', stopDrawing, {passive: false});
