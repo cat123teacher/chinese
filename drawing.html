@@ -93,6 +93,8 @@
             object-fit: contain;
             -webkit-user-drag: none; 
             user-select: none;
+            /* 加上過渡效果，讓替換成彩色畫作時更平滑 */
+            transition: all 0.3s ease;
         }
 
         .card-title {
@@ -186,8 +188,6 @@
         
         #btn-fullscreen { background-color: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         #btn-switch-mode { background-color: #f3e5f5; border-color: #9c27b0; color: #4a148c; }
-        
-        /* 特別為儲存按鈕設定醒目的綠色 */
         #btn-save { background-color: #c8e6c9; border-color: #4caf50; color: #1b5e20; }
 
         .divider { width: 2px; height: 25px; background: #ddd; margin: 0 2px; border-radius: 2px; }
@@ -249,8 +249,8 @@
 <body>
 
     <div id="home-screen">
-        <h1>🎨 兒童畫畫樂園 🖌️</h1>
-        <div class="instruction">👇 點擊圖案開始 👇</div>
+        <h1>🎨 兒童畫廊與填色樂園 🖌️</h1>
+        <div class="instruction">👇 點擊圖案開始畫畫 👇</div>
         <div id="image-grid"></div>
     </div>
 
@@ -284,7 +284,6 @@
                 <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
                 <button class="tool-btn" id="btn-switch-mode">🔄 空白畫板</button>
                 <button class="tool-btn" id="btn-fullscreen">⛶ 全螢幕</button>
-                <!-- 新增：儲存按鈕 -->
                 <button class="tool-btn" id="btn-save">💾 儲存</button>
                 <button class="tool-btn" id="btn-home">🏠 首頁</button>
             </div>
@@ -351,6 +350,9 @@
         let isRainbow = false;
         let rainbowHue = 0;
         let currentMode = 'coloring'; 
+        
+        // 【新增變數】記住目前小朋友正在畫的是哪一張首頁卡片
+        let activeCardImgElement = null;
 
         imageList.forEach((item) => {
             const card = document.createElement('div');
@@ -369,6 +371,9 @@
             card.appendChild(title);
 
             card.addEventListener('click', () => {
+                // 進入遊戲時，將這張圖案設為「正在編輯中」
+                activeCardImgElement = img;
+                
                 overlay.src = item.src; 
                 homeScreen.style.display = 'none';
                 gameScreen.style.display = 'flex';
@@ -494,7 +499,34 @@
             });
         }
 
+        // 【新增影像合成函數】統整「首頁更新」與「存檔」所需的影像生成技術
+        function generateArtImage() {
+            const tempCanvas = document.createElement('canvas');
+            const targetCanvas = currentMode === 'coloring' ? document.getElementById('coloring-canvas') : document.getElementById('drawing-canvas');
+            
+            tempCanvas.width = targetCanvas.width;
+            tempCanvas.height = targetCanvas.height;
+            const tCtx = tempCanvas.getContext('2d');
+
+            tCtx.fillStyle = '#ffffff';
+            tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tCtx.drawImage(targetCanvas, 0, 0);
+
+            if (currentMode === 'coloring') {
+                tCtx.globalCompositeOperation = 'multiply';
+                tCtx.drawImage(overlay, 0, 0, tempCanvas.width, tempCanvas.height);
+                tCtx.globalCompositeOperation = 'source-over';
+            }
+            return tempCanvas.toDataURL('image/png');
+        }
+
+        // 修改「回首頁」按鈕邏輯：自動將畫作掛到首頁縮圖上！
         document.getElementById('btn-home').addEventListener('click', () => {
+            // 在退出前，擷取畫布影像並替換首頁對應的縮圖
+            if (activeCardImgElement) {
+                activeCardImgElement.src = generateArtImage();
+            }
+
             gameScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
             if (document.exitFullscreen) document.exitFullscreen();
@@ -505,41 +537,17 @@
 
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
 
-        // --- 全新：儲存畫作功能 ---
+        // 儲存功能改用統整的 generateArtImage
         document.getElementById('btn-save').addEventListener('click', () => {
-            // 建立一張背景隱藏畫布來進行影像合併
-            const tempCanvas = document.createElement('canvas');
-            const targetCanvas = currentMode === 'coloring' ? document.getElementById('coloring-canvas') : document.getElementById('drawing-canvas');
-            
-            tempCanvas.width = targetCanvas.width;
-            tempCanvas.height = targetCanvas.height;
-            const tCtx = tempCanvas.getContext('2d');
-
-            // 1. 填滿白色背景
-            tCtx.fillStyle = '#ffffff';
-            tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-            // 2. 畫上小朋友塗的顏色
-            tCtx.drawImage(targetCanvas, 0, 0);
-
-            // 3. 如果是填色模式，把黑線圖案用色彩增值 (multiply) 印上去
-            if (currentMode === 'coloring') {
-                tCtx.globalCompositeOperation = 'multiply';
-                tCtx.drawImage(overlay, 0, 0, tempCanvas.width, tempCanvas.height);
-                tCtx.globalCompositeOperation = 'source-over'; // 重置
-            }
-
-            // 4. 產生圖片並觸發下載
-            const dataURL = tempCanvas.toDataURL('image/png');
+            const dataURL = generateArtImage();
             const link = document.createElement('a');
             
-            // 取得現在時間作為檔名的一部分
             const date = new Date();
             const timeStr = `${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
             
             link.download = currentMode === 'coloring' ? `我的填色畫作_${timeStr}.png` : `我的創意畫作_${timeStr}.png`;
             link.href = dataURL;
-            document.body.appendChild(link); // 確保在手機瀏覽器上能正確觸發
+            document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         });
