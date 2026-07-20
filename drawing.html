@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小魚填色與畫畫遊戲</title>
+    <title>兒童填色與畫畫遊戲</title>
     <!-- 引入 DragDropTouch Polyfill 輔助工具 -->
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
     <style>
@@ -17,38 +17,60 @@
             user-select: none;
         }
 
-        /* 首頁樣式 */
+        /* --- 首頁圖庫選單樣式 --- */
         #home-screen { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: center; 
             height: 100vh; 
+            background-color: #e0f7fa;
         }
         #home-screen h1 { 
             color: #ff5252; 
-            font-size: 2.5rem; 
-            text-shadow: 3px 3px #fff; 
-            margin-bottom: 20px;
+            font-size: 2.2rem; 
+            text-shadow: 2px 2px #fff; 
+            margin: 20px 0 10px 0;
             text-align: center;
         }
-        #start-btn { 
-            border: none; 
-            background: none; 
-            cursor: pointer; 
-            transition: transform 0.2s; 
-        }
-        #start-btn:active { transform: scale(0.9); }
-        #start-btn img { 
-            max-width: 80vw; 
-            width: 300px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
-            border: 8px solid white; 
-            background-color: white;
+        .instruction {
+            color: #00796b;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
 
-        /* 遊戲主頁面 - 改為直向排版 */
+        /* 圖片網格容器 (允許上下滑動) */
+        #image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 手機上預設顯示兩列 */
+            gap: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 75vh;
+            overflow-y: auto; /* 允許上下滑動 */
+            touch-action: pan-y; /* 確保手機上可以正常滑動 */
+            padding: 10px;
+            padding-bottom: 30px;
+        }
+        
+        @media (min-width: 500px) {
+            #image-grid { grid-template-columns: repeat(3, 1fr); } /* 平板顯示三列 */
+        }
+
+        /* 單個圖片按鈕 */
+        .img-btn { 
+            width: 100%; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+            border: 5px solid white; 
+            background-color: white;
+            cursor: pointer;
+            transition: transform 0.2s; 
+            object-fit: contain;
+        }
+        .img-btn:active { transform: scale(0.9); }
+
+        /* --- 遊戲主頁面樣式 --- */
         #game-screen { 
             display: none; 
             flex-direction: column; 
@@ -105,8 +127,8 @@
         /* 中間滾動區域：包含填色區與自畫區 */
         #workspaces {
             flex-grow: 1;
-            overflow-y: auto;          /* 允許上下滑動 */
-            touch-action: pan-y;       /* 允許手機觸控上下滑動網頁 */
+            overflow-y: auto;          
+            touch-action: pan-y;       
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -130,11 +152,10 @@
             background-color: #ffffff;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 10px;
-            /* 防止在畫畫時不小心滑動了網頁 */
             touch-action: none;
         }
 
-        /* 實際被畫畫的 Canvas (共用樣式) */
+        /* 實際被畫畫的 Canvas */
         .draw-canvas {
             display: block;
             border-radius: 10px;
@@ -142,13 +163,13 @@
         }
 
         /* 填色區專用的黑線覆蓋圖 */
-        #fish-overlay {
+        #image-overlay {
             position: absolute;
             top: 0;
             left: 0;
             z-index: 2;
-            pointer-events: none; /* 點擊穿透到畫布 */
-            mix-blend-mode: multiply; /* 白色透明，黑線保留 */
+            pointer-events: none; 
+            mix-blend-mode: multiply; 
             border-radius: 10px;
         }
 
@@ -156,12 +177,12 @@
 </head>
 <body>
 
-    <!-- 首頁 -->
+    <!-- 首頁圖庫選擇區 -->
     <div id="home-screen">
-        <h1>🎨 小魚填色與畫畫 🖌️</h1>
-        <button id="start-btn">
-            <img src="Nfish.jpg" alt="按我開始填色！">
-        </button>
+        <h1>🎨 兒童畫畫樂園 🖌️</h1>
+        <div class="instruction">👇 請選擇一張喜歡的圖案 👇</div>
+        <!-- 這裡將由 JavaScript 自動生成所有圖片按鈕 -->
+        <div id="image-grid"></div>
     </div>
 
     <!-- 遊戲頁面 -->
@@ -169,7 +190,7 @@
         <!-- 上方工具列 (共同控制兩個區域) -->
         <div id="toolbar">
             <button class="tool-btn active" id="btn-brush">🖌️ 畫筆</button>
-            <button class="tool-btn" id="btn-eraser">🧽 橡皮擦</button>
+            <button class="tool-btn" id="btn-eraser">🧽 橡皮</button>
 
             <div class="divider"></div>
 
@@ -189,7 +210,7 @@
 
             <div class="divider"></div>
             
-            <button class="tool-btn" id="btn-clear">🗑️ 重新開始</button>
+            <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
             <button class="tool-btn" id="btn-home">🏠 首頁</button>
         </div>
         
@@ -197,20 +218,18 @@
         <div id="workspaces">
             <!-- 上半部：填色區 -->
             <div>
-                <div class="section-title">✨ 小魚填色區 ✨</div>
+                <div class="section-title">✨ 開心填色區 ✨</div>
                 <div class="canvas-wrapper">
-                    <!-- 填色畫布 -->
                     <canvas id="coloring-canvas" class="draw-canvas"></canvas>
-                    <!-- 黑色線條底圖 -->
-                    <img src="Nfish.jpg" id="fish-overlay" alt="fish outline">
+                    <!-- 動態載入小朋友選擇的圖片 -->
+                    <img src="" id="image-overlay" alt="coloring outline">
                 </div>
             </div>
 
-            <!-- 下半部：自畫區 (沒有小魚圖片覆蓋) -->
+            <!-- 下半部：自畫區 -->
             <div>
                 <div class="section-title">✨ 創意自畫區 ✨</div>
                 <div class="canvas-wrapper">
-                    <!-- 自由畫布 -->
                     <canvas id="drawing-canvas" class="draw-canvas"></canvas>
                 </div>
             </div>
@@ -218,37 +237,62 @@
     </div>
 
     <script>
-        // 介面與狀態變數
+        // --- 圖片清單設定 ---
+        const imageList = [
+            "Dcar.jpg", "Dcat.jpg", "Ddeer.jpg", "Dexcavator.jpg", "Dhorse.jpg", 
+            "Drat.jpg", "D倉鼠.jpg", "D消防車.jpg", "Nfish.jpg", "公主.jpg", 
+            "城堡.jpg", "巴士.jpg", "恐龍.jpg", "拖車.jpg", "救護車.jpg", 
+            "火車.jpg", "獅子.jpg", "老鷹.jpg", "蜘蛛.jpg", "警車.jpg", 
+            "貨車.jpg", "鯊魚.jpg"
+        ];
+
+        // 介面變數
         const homeScreen = document.getElementById('home-screen');
         const gameScreen = document.getElementById('game-screen');
-        const startBtn = document.getElementById('start-btn');
-        const overlay = document.getElementById('fish-overlay');
+        const imageGrid = document.getElementById('image-grid');
+        const overlay = document.getElementById('image-overlay');
         const workspaces = document.getElementById('workspaces');
-        const canvases = document.querySelectorAll('.draw-canvas'); // 取得兩個畫布
+        const canvases = document.querySelectorAll('.draw-canvas');
 
         let isDrawing = false;
         let currentColor = '#f44336';
         let currentSize = 25;
         let isEraser = false;
-        
         let activeCanvas = null;
         let activeCtx = null;
         let lastX = 0;
         let lastY = 0;
 
-        // 計算並初始化兩個畫布的大小
+        // --- 動態產生首頁圖片按鈕 ---
+        imageList.forEach(src => {
+            const imgBtn = document.createElement('img');
+            imgBtn.src = src;
+            imgBtn.className = 'img-btn';
+            
+            // 點擊圖片進入遊戲
+            imgBtn.addEventListener('click', () => {
+                overlay.src = src; // 將選中的圖案放入填色區
+                homeScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                
+                // 等圖片載入完成後計算大小
+                overlay.onload = () => { initCanvas(); };
+                setTimeout(initCanvas, 150); // 備用方案
+            });
+            
+            imageGrid.appendChild(imgBtn);
+        });
+
+        // --- 畫布初始化與繪圖邏輯 ---
         function initCanvas() {
             let imgAspect = overlay.naturalWidth / overlay.naturalHeight;
-            if (!imgAspect || isNaN(imgAspect)) {
-                imgAspect = 1; 
-            }
+            if (!imgAspect || isNaN(imgAspect)) imgAspect = 1; 
 
             // 設定畫布寬度為螢幕的 90%，最大不超過 500px
             let newWidth = workspaces.clientWidth * 0.9;
             if (newWidth > 500) newWidth = 500;
             let newHeight = newWidth / imgAspect;
 
-            // 一次設定兩個畫布與它們的容器
             canvases.forEach(canvas => {
                 canvas.width = newWidth;
                 canvas.height = newHeight;
@@ -256,14 +300,12 @@
                 canvas.parentElement.style.height = newHeight + 'px';
             });
 
-            // 設定小魚圖片層的大小
             overlay.style.width = newWidth + 'px';
             overlay.style.height = newHeight + 'px';
 
             clearCanvas();
         }
 
-        // 清空兩個畫布
         function clearCanvas() {
             canvases.forEach(canvas => {
                 const ctx = canvas.getContext('2d');
@@ -272,22 +314,13 @@
             });
         }
 
-        // 事件：進入遊戲
-        startBtn.addEventListener('click', () => {
-            homeScreen.style.display = 'none';
-            gameScreen.style.display = 'flex';
-            setTimeout(initCanvas, 150); 
-        });
-
-        // 事件：回首頁
         document.getElementById('btn-home').addEventListener('click', () => {
             gameScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
         });
-
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
 
-        // 工具列事件綁定
+        // 工具列事件
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
@@ -306,28 +339,19 @@
             });
         });
 
-        document.getElementById('btn-brush').addEventListener('click', () => {
-            isEraser = false;
-            updateToolUI();
-        });
-
-        document.getElementById('btn-eraser').addEventListener('click', () => {
-            isEraser = true;
-            updateToolUI();
-        });
+        document.getElementById('btn-brush').addEventListener('click', () => { isEraser = false; updateToolUI(); });
+        document.getElementById('btn-eraser').addEventListener('click', () => { isEraser = true; updateToolUI(); });
 
         function updateToolUI() {
             document.getElementById('btn-brush').classList.toggle('active', !isEraser);
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
-        // --- 核心繪圖邏輯 (完美避開 AI 吞字 Bug 的終極修正版) ---
-        
+        // --- 核心繪圖邏輯 (保留 item(0) 修正) ---
         function getPos(e, targetCanvas) {
             const rect = targetCanvas.getBoundingClientRect();
             let clientX, clientY;
             
-            // 【終極解決方案】：使用 .item(0) 取代中括號，解決程式碼被系統破壞的問題！
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches.item(0).clientX;
                 clientY = e.touches.item(0).clientY;
@@ -339,16 +363,13 @@
                 clientY = e.clientY;
             }
 
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function startDrawing(e) {
-            e.preventDefault(); // 防止滾動網頁
+            e.preventDefault(); 
             isDrawing = true;
-            activeCanvas = e.target; // 偵測目前點擊的是填色區還是自畫區
+            activeCanvas = e.target; 
             activeCtx = activeCanvas.getContext('2d');
             
             const pos = getPos(e, activeCanvas);
@@ -364,7 +385,6 @@
 
         function draw(e) {
             e.preventDefault();
-            // 確認有在畫畫，並且畫筆沒有跨越到另一個畫布
             if (!isDrawing || e.target !== activeCanvas) return; 
             
             const pos = getPos(e, activeCanvas);
@@ -389,26 +409,20 @@
             activeCtx = null;
         }
 
-        // 分別為「填色區」和「自畫區」綁定相同的事件
         canvases.forEach(canvas => {
-            // 滑鼠事件
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
 
-            // 手機觸控事件 (設定 passive: false 防止畫面滑動)
             canvas.addEventListener('touchstart', startDrawing, {passive: false});
             canvas.addEventListener('touchmove', draw, {passive: false});
             canvas.addEventListener('touchend', stopDrawing, {passive: false});
             canvas.addEventListener('touchcancel', stopDrawing, {passive: false});
         });
 
-        // 旋轉螢幕重置畫布
         window.addEventListener('resize', () => {
-            if (gameScreen.style.display === 'flex') {
-                initCanvas();
-            }
+            if (gameScreen.style.display === 'flex') initCanvas();
         });
     </script>
 </body>
