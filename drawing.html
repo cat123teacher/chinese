@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>兒童填色與畫畫遊戲</title>
-    <!-- 保留輔助工具 -->
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
     <style>
         body { 
@@ -54,22 +53,21 @@
             max-width: 700px;
             max-height: 75vh;
             overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; /* 加入這行：確保 iOS 滑動極度流暢 */
+            -webkit-overflow-scrolling: touch; 
             touch-action: pan-y; 
             padding: 15px;
             padding-bottom: 40px;
         }
         @media (min-width: 500px) { #image-grid { grid-template-columns: repeat(3, 1fr); } }
 
-        /* 還原乾淨的卡片設計 */
         .card {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border-radius: 15px;
-            background-color: #ffffff; /* 改回白色底色 */
-            border: 5px solid #80deea; /* 加上粉藍色邊框增加童趣 */
+            background-color: #ffffff; 
+            border: 5px solid #80deea; 
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
             padding: 12px;
             cursor: pointer;
@@ -81,16 +79,14 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
-        /* 圖案還原原本黑白樣子 */
         .card-img { 
             width: 100%;
             height: 100px;
             object-fit: contain;
-            -webkit-user-drag: none; /* 【關鍵優化】：防止瀏覽器原生拖曳，解決滑動卡頓 */
+            -webkit-user-drag: none; 
             user-select: none;
         }
 
-        /* 中文標題名牌 */
         .card-title {
             margin-top: 10px;
             font-size: 1.2rem;
@@ -140,16 +136,16 @@
             flex-wrap: wrap; 
             align-items: center;
             justify-content: center; 
-            gap: 8px; 
-            padding: 10px; 
+            gap: 6px; 
+            padding: 10px 5px; 
         }
         #toolbar.collapsed {
             display: none !important;
         }
         
         .color-btn { 
-            width: 32px; 
-            height: 32px; 
+            width: 28px; 
+            height: 28px; 
             border-radius: 50%; 
             border: 3px solid #eee; 
             cursor: pointer; 
@@ -157,13 +153,17 @@
         }
         .color-btn.active { 
             border-color: #333; 
-            transform: scale(1.15); 
+            transform: scale(1.2); 
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .rainbow-btn {
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
         }
 
         .size-btn, .tool-btn { 
-            padding: 6px 10px; 
-            font-size: 1rem; 
+            padding: 5px 8px; 
+            font-size: 0.9rem; 
             font-weight: bold;
             border-radius: 10px; 
             border: 2px solid #ccc; 
@@ -177,23 +177,34 @@
             color: #d84315;
         }
         
+        /* 特別強調全螢幕與切換按鈕 */
+        #btn-fullscreen { background-color: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        #btn-switch-mode { background-color: #f3e5f5; border-color: #9c27b0; color: #4a148c; }
+
         .divider { width: 2px; height: 25px; background: #ddd; margin: 0 2px; border-radius: 2px; }
 
+        /* 工作區改為100%填滿，取消上下滾動，讓畫布撐到最大 */
         #workspaces {
             flex-grow: 1;
-            overflow-y: auto;          
-            -webkit-overflow-scrolling: touch; /* 確保畫布區也能平滑捲動 */
-            touch-action: pan-y;       
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #b2ebf2;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        .workspace-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px 0 40px 0;
-            gap: 20px;
-            background-color: #b2ebf2;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .section-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: #00796b;
             font-weight: bold;
             text-align: center;
@@ -215,7 +226,6 @@
             z-index: 1;
         }
 
-        /* 填色區保留圖案在上層防出界 */
         #image-overlay {
             position: absolute;
             top: 0;
@@ -232,45 +242,59 @@
     <!-- 首頁 -->
     <div id="home-screen">
         <h1>🎨 兒童畫畫樂園 🖌️</h1>
-        <div class="instruction">👇 點擊喜歡的圖案開始 👇</div>
+        <div class="instruction">👇 點擊圖案開始 👇</div>
         <div id="image-grid"></div>
     </div>
 
     <!-- 遊戲頁面 -->
     <div id="game-screen">
         <div id="toolbar-wrapper">
-            <button id="toggle-toolbar-btn">⬆️ 收起工具列 (放大畫布)</button>
+            <button id="toggle-toolbar-btn">⬆️ 收起工具列 (極致放大畫布)</button>
             <div id="toolbar">
                 <button class="tool-btn active" id="btn-brush">🖌️ 畫筆</button>
                 <button class="tool-btn" id="btn-eraser">🧽 橡皮</button>
                 <div class="divider"></div>
+                
+                <button class="size-btn" data-size="5">極細</button>
                 <button class="size-btn" data-size="10">細</button>
                 <button class="size-btn active" data-size="25">中</button>
                 <button class="size-btn" data-size="45">粗</button>
                 <div class="divider"></div>
+                
                 <div class="color-btn active" style="background-color: #f44336;" data-color="#f44336"></div>
                 <div class="color-btn" style="background-color: #ff9800;" data-color="#ff9800"></div>
                 <div class="color-btn" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
                 <div class="color-btn" style="background-color: #4caf50;" data-color="#4caf50"></div>
+                <div class="color-btn" style="background-color: #00bcd4;" data-color="#00bcd4"></div>
                 <div class="color-btn" style="background-color: #2196f3;" data-color="#2196f3"></div>
                 <div class="color-btn" style="background-color: #9c27b0;" data-color="#9c27b0"></div>
+                <div class="color-btn" style="background-color: #e91e63;" data-color="#e91e63"></div>
+                <div class="color-btn" style="background-color: #795548;" data-color="#795548"></div>
                 <div class="color-btn" style="background-color: #000000;" data-color="#000000"></div>
+                <div class="color-btn rainbow-btn" data-color="rainbow"></div>
                 <div class="divider"></div>
+                
                 <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
+                <!-- 全新加入：切換模式與全螢幕按鈕 -->
+                <button class="tool-btn" id="btn-switch-mode">🔄 空白畫板</button>
+                <button class="tool-btn" id="btn-fullscreen">⛶ 全螢幕</button>
                 <button class="tool-btn" id="btn-home">🏠 首頁</button>
             </div>
         </div>
         
+        <!-- 空間100%利用的工作區 -->
         <div id="workspaces">
-            <div>
+            <!-- 填色區 (預設顯示) -->
+            <div id="coloring-workspace" class="workspace-section">
                 <div class="section-title">✨ 開心填色區 ✨</div>
                 <div class="canvas-wrapper">
                     <canvas id="coloring-canvas" class="draw-canvas"></canvas>
                     <img src="" id="image-overlay" alt="coloring outline">
                 </div>
             </div>
-            <div>
-                <div class="section-title">✨ 創意自畫區 ✨</div>
+            <!-- 自畫區 (預設隱藏) -->
+            <div id="drawing-workspace" class="workspace-section" style="display: none;">
+                <div class="section-title">✨ 創意空白畫板 ✨</div>
                 <div class="canvas-wrapper">
                     <canvas id="drawing-canvas" class="draw-canvas"></canvas>
                 </div>
@@ -279,7 +303,6 @@
     </div>
 
     <script>
-        // 保留 22 張圖案與中文名稱
         const imageList = [
             { src: "Dcar.jpg", name: "汽車" },
             { src: "Dcat.jpg", name: "小貓" },
@@ -319,8 +342,12 @@
         let activeCanvas = null;
         let activeCtx = null;
         let lastX = 0, lastY = 0;
+        
+        let isRainbow = false;
+        let rainbowHue = 0;
+        let currentMode = 'coloring'; // 控制目前顯示哪一塊畫板
 
-        // 動態生成原圖卡片按鈕
+        // 生成首頁圖案
         imageList.forEach((item) => {
             const card = document.createElement('div');
             card.className = 'card';
@@ -328,7 +355,6 @@
             const img = document.createElement('img');
             img.src = item.src;
             img.className = 'card-img';
-            // 【關鍵優化】：將 HTML 標籤屬性加上防拖曳
             img.draggable = false; 
             
             const title = document.createElement('div');
@@ -338,7 +364,6 @@
             card.appendChild(img);
             card.appendChild(title);
 
-            // 點擊事件 (如果使用者正在滑動，瀏覽器會自動取消觸發 click，所以這樣寫最穩)
             card.addEventListener('click', () => {
                 overlay.src = item.src; 
                 homeScreen.style.display = 'none';
@@ -351,14 +376,17 @@
             imageGrid.appendChild(card);
         });
 
+        // 初始化/調整畫布尺寸 (加入防錯誤機制)
         function initCanvas(preserveDrawing = false) {
             const tempCanvases = [];
             if (preserveDrawing) {
                 canvases.forEach((canvas, index) => {
                     const temp = document.createElement('canvas');
-                    temp.width = canvas.width;
-                    temp.height = canvas.height;
-                    temp.getContext('2d').drawImage(canvas, 0, 0);
+                    temp.width = canvas.width || 1; 
+                    temp.height = canvas.height || 1;
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        temp.getContext('2d').drawImage(canvas, 0, 0);
+                    }
                     tempCanvases[index] = temp;
                 });
             }
@@ -366,17 +394,20 @@
             let imgAspect = overlay.naturalWidth / overlay.naturalHeight;
             if (!imgAspect || isNaN(imgAspect)) imgAspect = 1; 
 
-            let maxWidth = workspaces.clientWidth * 0.95;
-            let maxHeight = workspaces.clientHeight * 0.85; 
-            if (maxWidth > 600) maxWidth = 600;
+            // 計算目前剩餘空間的 96%，實現極致放大
+            let maxWidth = workspaces.clientWidth * 0.96;
+            let maxHeight = workspaces.clientHeight * 0.92; 
+            if (maxWidth > 900) maxWidth = 900; // 平板上的合理最大值
 
             let newWidth = maxWidth;
             let newHeight = newWidth / imgAspect;
 
-            if (newHeight > maxHeight && maxHeight > 100) {
+            if (newHeight > maxHeight && maxHeight > 50) {
                 newHeight = maxHeight;
                 newWidth = newHeight * imgAspect;
             }
+
+            if (newWidth === 0 || newHeight === 0) return; // 避免切換時為0的錯誤
 
             canvases.forEach((canvas, index) => {
                 canvas.width = newWidth;
@@ -388,7 +419,8 @@
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                if (preserveDrawing && tempCanvases[index]) {
+                if (preserveDrawing && tempCanvases[index] && tempCanvases[index].width > 1) {
+                    // 將記憶的畫作完美縮放貼回新畫布
                     ctx.drawImage(tempCanvases[index], 0, 0, canvas.width, canvas.height);
                 }
             });
@@ -397,7 +429,48 @@
             overlay.style.height = newHeight + 'px';
         }
 
-        // 工具列收合開關邏輯
+        // --- 全新功能：切換模式 ---
+        document.getElementById('btn-switch-mode').addEventListener('click', function() {
+            if (currentMode === 'coloring') {
+                currentMode = 'drawing';
+                document.getElementById('coloring-workspace').style.display = 'none';
+                document.getElementById('drawing-workspace').style.display = 'flex';
+                this.innerHTML = '🎨 填色區';
+            } else {
+                currentMode = 'coloring';
+                document.getElementById('coloring-workspace').style.display = 'flex';
+                document.getElementById('drawing-workspace').style.display = 'none';
+                this.innerHTML = '🔄 空白畫板';
+            }
+            // 延遲一下讓 DOM 顯示後再計算最大尺寸
+            setTimeout(() => { initCanvas(true); }, 50);
+        });
+
+        // --- 全新功能：系統原生全螢幕 ---
+        document.getElementById('btn-fullscreen').addEventListener('click', function() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                // 進入全螢幕
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* 支援 iOS iPad / Safari */
+                    elem.webkitRequestFullscreen();
+                }
+                this.innerHTML = '📴 退出全螢幕';
+            } else {
+                // 退出全螢幕
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                this.innerHTML = '⛶ 全螢幕';
+            }
+            // 全螢幕動畫完成後重新放大畫布
+            setTimeout(() => { initCanvas(true); }, 400);
+        });
+
+        // 收起工具列邏輯
         document.getElementById('toggle-toolbar-btn').addEventListener('click', function() {
             const tb = document.getElementById('toolbar');
             tb.classList.toggle('collapsed');
@@ -405,7 +478,7 @@
             if (tb.classList.contains('collapsed')) {
                 this.innerHTML = '⬇️ 打開畫筆與顏色 🎨';
             } else {
-                this.innerHTML = '⬆️ 收起工具列 (放大畫布)';
+                this.innerHTML = '⬆️ 收起工具列 (極致放大畫布)';
             }
             setTimeout(() => { initCanvas(true); }, 50);
         });
@@ -421,14 +494,26 @@
         document.getElementById('btn-home').addEventListener('click', () => {
             gameScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
+            // 退出遊戲時自動退出全螢幕
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            document.getElementById('btn-fullscreen').innerHTML = '⛶ 全螢幕';
         });
+
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
 
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                currentColor = e.target.getAttribute('data-color');
+                
+                const selectedColor = e.target.getAttribute('data-color');
+                if (selectedColor === 'rainbow') {
+                    isRainbow = true;
+                } else {
+                    isRainbow = false;
+                    currentColor = selectedColor;
+                }
                 isEraser = false;
                 updateToolUI();
             });
@@ -450,7 +535,6 @@
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
-        // 觸控繪圖核心邏輯 (使用 .item(0))
         function getPos(e, targetCanvas) {
             const rect = targetCanvas.getBoundingClientRect();
             let clientX, clientY;
@@ -479,7 +563,13 @@
 
             activeCtx.beginPath();
             activeCtx.arc(lastX, lastY, currentSize / 2, 0, Math.PI * 2);
-            activeCtx.fillStyle = isEraser ? '#ffffff' : currentColor;
+            if (isEraser) {
+                activeCtx.fillStyle = '#ffffff';
+            } else if (isRainbow) {
+                activeCtx.fillStyle = `hsl(${rainbowHue}, 100%, 50%)`;
+            } else {
+                activeCtx.fillStyle = currentColor;
+            }
             activeCtx.fill();
             activeCtx.closePath();
         }
@@ -488,10 +578,20 @@
             e.preventDefault();
             if (!isDrawing || e.target !== activeCanvas) return; 
             const pos = getPos(e, activeCanvas);
+            
             activeCtx.beginPath();
             activeCtx.moveTo(lastX, lastY);
             activeCtx.lineTo(pos.x, pos.y);
-            activeCtx.strokeStyle = isEraser ? '#ffffff' : currentColor;
+            
+            if (isEraser) {
+                activeCtx.strokeStyle = '#ffffff';
+            } else if (isRainbow) {
+                rainbowHue = (rainbowHue + 4) % 360; 
+                activeCtx.strokeStyle = `hsl(${rainbowHue}, 100%, 50%)`;
+            } else {
+                activeCtx.strokeStyle = currentColor;
+            }
+            
             activeCtx.lineWidth = currentSize;
             activeCtx.lineCap = 'round'; 
             activeCtx.lineJoin = 'round';
@@ -519,8 +619,17 @@
             canvas.addEventListener('touchcancel', stopDrawing, {passive: false});
         });
 
+        // --- 核心防消失記憶技術 (Debounce) ---
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            if (gameScreen.style.display === 'flex') initCanvas(true);
+            if (gameScreen.style.display === 'flex') {
+                // 取消前一次的重整，直到螢幕完全旋轉完畢
+                clearTimeout(resizeTimer);
+                // 延遲 0.3 秒，安全捕捉旋轉後的穩定畫面
+                resizeTimer = setTimeout(() => {
+                    initCanvas(true);
+                }, 300);
+            }
         });
     </script>
 </body>
