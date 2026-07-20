@@ -15,6 +15,7 @@
             font-family: 'Comic Sans MS', '微軟正黑體', sans-serif; 
             background-color: #e0f7fa; 
             user-select: none;
+            touch-action: none; /* 防止整個網頁在手機上被滑動 */
         }
 
         /* 首頁樣式 */
@@ -39,7 +40,7 @@
             transition: transform 0.2s; 
         }
         #start-btn:active { transform: scale(0.9); }
-        /* 首頁的參考來源圖片按鈕 */
+        
         #start-btn img { 
             max-width: 80vw; 
             width: 400px; 
@@ -54,6 +55,7 @@
             display: none; 
             flex-direction: column; 
             height: 100vh; 
+            width: 100vw;
         }
         
         /* 上方畫板工具列 */
@@ -69,7 +71,6 @@
             z-index: 10; 
         }
         
-        /* 顏色選擇按鈕 */
         .color-btn { 
             width: 45px; 
             height: 45px; 
@@ -84,7 +85,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* 筆觸粗幼及工具按鈕 */
         .size-btn, .tool-btn { 
             padding: 10px 20px; 
             font-size: 1.2rem; 
@@ -101,7 +101,6 @@
             color: #d84315;
         }
         
-        /* 分隔線 */
         .divider { width: 3px; height: 40px; background: #ddd; margin: 0 5px; border-radius: 2px; }
 
         /* 畫布區域 */
@@ -113,24 +112,23 @@
             align-items: center; 
             background-color: #b2ebf2; 
             overflow: hidden; 
+            width: 100%;
         }
         
-        /* 利用 z-index 和 mix-blend-mode 讓線條永遠在最上層 */
         #coloring-canvas {
             position: absolute;
             background-color: #ffffff;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            touch-action: none; /* 防止平板在畫畫時滑動螢幕 */
+            touch-action: none;
             z-index: 1;
             border-radius: 10px;
         }
         
-        /* 線條圖層 (覆蓋在畫布上，色彩增值模式) */
         #fish-overlay {
             position: absolute;
             z-index: 2;
-            pointer-events: none; /* 讓點擊穿透到畫布 */
-            mix-blend-mode: multiply; /* 關鍵：保留黑色線條，白色變透明 */
+            pointer-events: none; 
+            mix-blend-mode: multiply; 
             border-radius: 10px;
         }
     </style>
@@ -140,7 +138,6 @@
     <!-- 首頁 -->
     <div id="home-screen">
         <h1>🎨 小魚填色遊戲 🖌️</h1>
-        <!-- 按鈕包含來源圖片 -->
         <button id="start-btn">
             <img src="Nfish.jpg" alt="按我開始填色！">
         </button>
@@ -148,21 +145,19 @@
 
     <!-- 填色遊戲頁面 -->
     <div id="game-screen">
-        <!-- 上方工具列 -->
+        <!-- 工具列 -->
         <div id="toolbar">
             <button class="tool-btn active" id="btn-brush">🖌️ 畫筆</button>
             <button class="tool-btn" id="btn-eraser">🧽 橡皮擦</button>
 
             <div class="divider"></div>
 
-            <!-- 粗幼選擇 -->
             <button class="size-btn" data-size="10">細</button>
             <button class="size-btn active" data-size="25">中</button>
             <button class="size-btn" data-size="45">粗</button>
 
             <div class="divider"></div>
 
-            <!-- 顏色選擇 -->
             <div class="color-btn active" style="background-color: #f44336;" data-color="#f44336"></div>
             <div class="color-btn" style="background-color: #ff9800;" data-color="#ff9800"></div>
             <div class="color-btn" style="background-color: #ffeb3b;" data-color="#ffeb3b"></div>
@@ -180,13 +175,11 @@
         <!-- 畫布與圖層 -->
         <div id="canvas-container">
             <canvas id="coloring-canvas"></canvas>
-            <!-- 填色圖案來源 -->
             <img src="Nfish.jpg" id="fish-overlay" alt="fish outline">
         </div>
     </div>
 
     <script>
-        // 取得介面元素
         const homeScreen = document.getElementById('home-screen');
         const gameScreen = document.getElementById('game-screen');
         const startBtn = document.getElementById('start-btn');
@@ -194,7 +187,6 @@
         const overlay = document.getElementById('fish-overlay');
         const ctx = canvas.getContext('2d');
 
-        // 狀態變數
         let isDrawing = false;
         let currentColor = '#f44336';
         let currentSize = 25;
@@ -202,19 +194,20 @@
         let lastX = 0;
         let lastY = 0;
 
-        // 載入小魚圖片以計算比例
-        let fishImage = new Image();
-        fishImage.src = 'Nfish.jpg';
-
-        // 初始化畫布大小 (維持圖片比例並置中)
+        // 初始化畫布大小
         function initCanvas() {
             const container = document.getElementById('canvas-container');
-            const imgAspect = fishImage.width / fishImage.height;
+            
+            // 安全取得圖片比例 (解決手機未完全載入圖片時寬高為 0 的問題)
+            let imgAspect = overlay.naturalWidth / overlay.naturalHeight;
+            if (!imgAspect || isNaN(imgAspect)) {
+                imgAspect = 1; // 如果極端情況下仍無法取得，給予預設比例 1:1
+            }
+
             const containerAspect = container.clientWidth / container.clientHeight;
 
             let newWidth, newHeight;
             
-            // 讓圖片適應螢幕大小，保留一點邊距 (95%)
             if (containerAspect > imgAspect) {
                 newHeight = container.clientHeight * 0.95;
                 newWidth = newHeight * imgAspect;
@@ -223,7 +216,6 @@
                 newHeight = newWidth / imgAspect;
             }
 
-            // 設定畫布及頂層黑線圖片的大小
             canvas.width = newWidth;
             canvas.height = newHeight;
             overlay.style.width = newWidth + 'px';
@@ -233,31 +225,24 @@
         }
 
         function clearCanvas() {
-            // 畫布塗滿白色
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        // --- 介面事件綁定 ---
-        
-        // 點擊圖片按鈕進入遊戲
         startBtn.addEventListener('click', () => {
             homeScreen.style.display = 'none';
             gameScreen.style.display = 'flex';
-            // 稍微延遲以確保容器已顯示，才能正確計算大小
-            setTimeout(initCanvas, 50);
+            // 將延遲稍微調長，確保手機的排版完全展開後再計算大小
+            setTimeout(initCanvas, 150); 
         });
 
-        // 回首頁按鈕
         document.getElementById('btn-home').addEventListener('click', () => {
             gameScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
         });
 
-        // 重新開始 (清空畫布)
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
 
-        // 顏色選擇邏輯
         document.querySelectorAll('.color-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
@@ -268,7 +253,6 @@
             });
         });
 
-        // 粗幼選擇邏輯
         document.querySelectorAll('.size-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -277,7 +261,6 @@
             });
         });
 
-        // 畫筆與橡皮擦切換
         document.getElementById('btn-brush').addEventListener('click', () => {
             isEraser = false;
             updateToolUI();
@@ -293,19 +276,17 @@
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
-        // --- 繪圖邏輯 (支援滑鼠與觸控) ---
+        // --- 繪圖邏輯 (重要修正區域) ---
         
-        // 取得座標 (修正了觸控事件的第一隻手指索引 )
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
             
-            // 判斷是否為觸控事件，如果是，必須加上  取得第一隻手指的座標
+            // 【關鍵修正】：e.touches 必須加上  才能抓到手指！
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches.clientX;
                 clientY = e.touches.clientY;
             } else {
-                // 滑鼠事件
                 clientX = e.clientX;
                 clientY = e.clientY;
             }
@@ -317,13 +298,12 @@
         }
 
         function startDrawing(e) {
-            e.preventDefault(); // 防止滾動
+            e.preventDefault();
             isDrawing = true;
             const pos = getPos(e);
             lastX = pos.x;
             lastY = pos.y;
 
-            // 支援只點擊一下畫一個圓點
             ctx.beginPath();
             ctx.arc(lastX, lastY, currentSize / 2, 0, Math.PI * 2);
             ctx.fillStyle = isEraser ? '#ffffff' : currentColor;
@@ -341,7 +321,7 @@
             ctx.lineTo(pos.x, pos.y);
             ctx.strokeStyle = isEraser ? '#ffffff' : currentColor;
             ctx.lineWidth = currentSize;
-            ctx.lineCap = 'round'; // 讓線條邊緣圓滑
+            ctx.lineCap = 'round'; 
             ctx.lineJoin = 'round';
             ctx.stroke();
 
@@ -353,30 +333,25 @@
             isDrawing = false;
         }
 
-        // 滑鼠事件
+        // 綁定事件
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
 
-        // 觸控事件 (HTML5 Canvas 原生支援與 DragDropTouch 結合)
         canvas.addEventListener('touchstart', startDrawing, {passive: false});
         canvas.addEventListener('touchmove', draw, {passive: false});
         canvas.addEventListener('touchend', stopDrawing);
         canvas.addEventListener('touchcancel', stopDrawing);
 
-        // 螢幕旋轉或改變大小時，重新計算畫布比例
         window.addEventListener('resize', () => {
             if (gameScreen.style.display === 'flex') {
-                // 暫存目前的畫作
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = canvas.width;
                 tempCanvas.height = canvas.height;
                 tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
                 initCanvas();
-
-                // 將畫作拉伸或縮小回新畫布上
                 ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
             }
         });
