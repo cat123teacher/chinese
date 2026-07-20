@@ -2,17 +2,29 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 【關鍵修改1】開放最大縮放倍率，允許雙指放大縮小 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>兒童填色與畫畫遊戲</title>
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
     <style>
         body { 
             margin: 0; 
             padding: 0; 
-            overflow: hidden; 
+            /* 移除 overflow: hidden 讓頁面在需要時可以滾動 */
             font-family: 'Comic Sans MS', '微軟正黑體', sans-serif; 
             background-color: #e0f7fa; 
             user-select: none;
+        }
+
+        /* 偽全螢幕模式 (專為 iOS Safari 設計) */
+        body.pseudo-fullscreen #game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background-color: #e0f7fa;
         }
 
         /* ================= 首頁圖庫選單樣式 ================= */
@@ -20,7 +32,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             background-color: #e0f7fa;
             background-image: radial-gradient(#b2ebf2 20%, transparent 20%), radial-gradient(#b2ebf2 20%, transparent 20%);
             background-position: 0 0, 25px 25px;
@@ -177,30 +189,31 @@
             color: #d84315;
         }
         
-        /* 特別強調全螢幕與切換按鈕 */
         #btn-fullscreen { background-color: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         #btn-switch-mode { background-color: #f3e5f5; border-color: #9c27b0; color: #4a148c; }
 
         .divider { width: 2px; height: 25px; background: #ddd; margin: 0 2px; border-radius: 2px; }
 
-        /* 工作區改為100%填滿，取消上下滾動，讓畫布撐到最大 */
+        /* 【關鍵修改2】工作區支援上下滑動 (overflow: auto) */
         #workspaces {
             flex-grow: 1;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* 讓內容可往上推以滾動 */
             background-color: #b2ebf2;
-            overflow: hidden; 
+            overflow: auto; /* 允許打橫時出現捲軸 */
+            -webkit-overflow-scrolling: touch;
             position: relative;
+            padding: 20px 0 60px 0; /* 底部多留白方便滾動 */
         }
 
         .workspace-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             width: 100%;
-            height: 100%;
+            min-height: 100%; /* 確保最小佔滿 */
         }
 
         .section-title {
@@ -208,7 +221,7 @@
             color: #00796b;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             text-shadow: 1px 1px #fff;
         }
 
@@ -217,7 +230,7 @@
             background-color: #ffffff;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 10px;
-            touch-action: none;
+            /* 移除 touch-action: none 讓雙指縮放能生效 */
         }
 
         .draw-canvas {
@@ -275,16 +288,13 @@
                 <div class="divider"></div>
                 
                 <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
-                <!-- 全新加入：切換模式與全螢幕按鈕 -->
                 <button class="tool-btn" id="btn-switch-mode">🔄 空白畫板</button>
                 <button class="tool-btn" id="btn-fullscreen">⛶ 全螢幕</button>
                 <button class="tool-btn" id="btn-home">🏠 首頁</button>
             </div>
         </div>
         
-        <!-- 空間100%利用的工作區 -->
         <div id="workspaces">
-            <!-- 填色區 (預設顯示) -->
             <div id="coloring-workspace" class="workspace-section">
                 <div class="section-title">✨ 開心填色區 ✨</div>
                 <div class="canvas-wrapper">
@@ -292,7 +302,6 @@
                     <img src="" id="image-overlay" alt="coloring outline">
                 </div>
             </div>
-            <!-- 自畫區 (預設隱藏) -->
             <div id="drawing-workspace" class="workspace-section" style="display: none;">
                 <div class="section-title">✨ 創意空白畫板 ✨</div>
                 <div class="canvas-wrapper">
@@ -345,7 +354,7 @@
         
         let isRainbow = false;
         let rainbowHue = 0;
-        let currentMode = 'coloring'; // 控制目前顯示哪一塊畫板
+        let currentMode = 'coloring'; 
 
         // 生成首頁圖案
         imageList.forEach((item) => {
@@ -376,7 +385,6 @@
             imageGrid.appendChild(card);
         });
 
-        // 初始化/調整畫布尺寸 (加入防錯誤機制)
         function initCanvas(preserveDrawing = false) {
             const tempCanvases = [];
             if (preserveDrawing) {
@@ -394,20 +402,22 @@
             let imgAspect = overlay.naturalWidth / overlay.naturalHeight;
             if (!imgAspect || isNaN(imgAspect)) imgAspect = 1; 
 
-            // 計算目前剩餘空間的 96%，實現極致放大
             let maxWidth = workspaces.clientWidth * 0.96;
             let maxHeight = workspaces.clientHeight * 0.92; 
-            if (maxWidth > 900) maxWidth = 900; // 平板上的合理最大值
+            
+            // 【關鍵修改3】防止打橫時高度縮得太小，設定最低高度
+            if (maxHeight < 300) maxHeight = 300; 
+            if (maxWidth > 900) maxWidth = 900; 
 
             let newWidth = maxWidth;
             let newHeight = newWidth / imgAspect;
 
-            if (newHeight > maxHeight && maxHeight > 50) {
+            if (newHeight > maxHeight) {
                 newHeight = maxHeight;
                 newWidth = newHeight * imgAspect;
             }
 
-            if (newWidth === 0 || newHeight === 0) return; // 避免切換時為0的錯誤
+            if (newWidth === 0 || newHeight === 0) return; 
 
             canvases.forEach((canvas, index) => {
                 canvas.width = newWidth;
@@ -420,7 +430,6 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 if (preserveDrawing && tempCanvases[index] && tempCanvases[index].width > 1) {
-                    // 將記憶的畫作完美縮放貼回新畫布
                     ctx.drawImage(tempCanvases[index], 0, 0, canvas.width, canvas.height);
                 }
             });
@@ -429,7 +438,6 @@
             overlay.style.height = newHeight + 'px';
         }
 
-        // --- 全新功能：切換模式 ---
         document.getElementById('btn-switch-mode').addEventListener('click', function() {
             if (currentMode === 'coloring') {
                 currentMode = 'drawing';
@@ -442,35 +450,40 @@
                 document.getElementById('drawing-workspace').style.display = 'none';
                 this.innerHTML = '🔄 空白畫板';
             }
-            // 延遲一下讓 DOM 顯示後再計算最大尺寸
             setTimeout(() => { initCanvas(true); }, 50);
         });
 
-        // --- 全新功能：系統原生全螢幕 ---
+        // 【關鍵修改4】強化全螢幕支援 (加入偽全螢幕備用方案)
         document.getElementById('btn-fullscreen').addEventListener('click', function() {
             const elem = document.documentElement;
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                // 進入全螢幕
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('pseudo-fullscreen');
+
+            if (!isFullscreen) {
+                // 嘗試啟用原生全螢幕
                 if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { /* 支援 iOS iPad / Safari */
+                    elem.requestFullscreen().catch(() => {
+                        document.body.classList.add('pseudo-fullscreen'); // 如果被阻擋，啟用 CSS 偽全螢幕
+                    });
+                } else if (elem.webkitRequestFullscreen) { 
                     elem.webkitRequestFullscreen();
+                } else {
+                    document.body.classList.add('pseudo-fullscreen'); // iOS Safari 備用
                 }
                 this.innerHTML = '📴 退出全螢幕';
             } else {
                 // 退出全螢幕
-                if (document.exitFullscreen) {
+                if (document.exitFullscreen && document.fullscreenElement) {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
+                } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
                     document.webkitExitFullscreen();
                 }
+                document.body.classList.remove('pseudo-fullscreen'); // 移除 CSS 偽全螢幕
                 this.innerHTML = '⛶ 全螢幕';
             }
-            // 全螢幕動畫完成後重新放大畫布
+            
             setTimeout(() => { initCanvas(true); }, 400);
         });
 
-        // 收起工具列邏輯
         document.getElementById('toggle-toolbar-btn').addEventListener('click', function() {
             const tb = document.getElementById('toolbar');
             tb.classList.toggle('collapsed');
@@ -494,9 +507,9 @@
         document.getElementById('btn-home').addEventListener('click', () => {
             gameScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
-            // 退出遊戲時自動退出全螢幕
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            document.body.classList.remove('pseudo-fullscreen');
             document.getElementById('btn-fullscreen').innerHTML = '⛶ 全螢幕';
         });
 
@@ -551,7 +564,11 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
+        // 【關鍵修改5】智慧判別多指觸控，放行畫面拖曳與縮放
         function startDrawing(e) {
+            // 如果偵測到「兩根以上手指」在畫布上，就不阻止預設行為 (交給瀏覽器縮放/滑動)
+            if (e.touches && e.touches.length > 1) return;
+            
             e.preventDefault(); 
             isDrawing = true;
             activeCanvas = e.target; 
@@ -575,6 +592,9 @@
         }
 
         function draw(e) {
+            // 放行多根手指的操作
+            if (e.touches && e.touches.length > 1) return;
+            
             e.preventDefault();
             if (!isDrawing || e.target !== activeCanvas) return; 
             const pos = getPos(e, activeCanvas);
@@ -601,7 +621,8 @@
         }
 
         function stopDrawing(e) {
-            if (e) e.preventDefault();
+            // 只有單指操作結束才觸發
+            if (e && (!e.touches || e.touches.length === 0)) e.preventDefault();
             isDrawing = false;
             activeCanvas = null;
             activeCtx = null;
@@ -613,19 +634,17 @@
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
 
+            // passive: false 是必須的，這樣才能在「單指」時用 e.preventDefault() 停用系統滾動
             canvas.addEventListener('touchstart', startDrawing, {passive: false});
             canvas.addEventListener('touchmove', draw, {passive: false});
             canvas.addEventListener('touchend', stopDrawing, {passive: false});
             canvas.addEventListener('touchcancel', stopDrawing, {passive: false});
         });
 
-        // --- 核心防消失記憶技術 (Debounce) ---
         let resizeTimer;
         window.addEventListener('resize', () => {
             if (gameScreen.style.display === 'flex') {
-                // 取消前一次的重整，直到螢幕完全旋轉完畢
                 clearTimeout(resizeTimer);
-                // 延遲 0.3 秒，安全捕捉旋轉後的穩定畫面
                 resizeTimer = setTimeout(() => {
                     initCanvas(true);
                 }, 300);
