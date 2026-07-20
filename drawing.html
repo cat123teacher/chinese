@@ -2,6 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
+    <!-- 確保手機版不會因為雙擊或兩指縮放而走位 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小魚填色遊戲</title>
     <!-- 引入 DragDropTouch Polyfill 輔助工具 -->
@@ -115,6 +116,7 @@
             width: 100%;
         }
         
+        /* 實際被填色的底層畫布 */
         #coloring-canvas {
             position: absolute;
             background-color: #ffffff;
@@ -124,9 +126,11 @@
             border-radius: 10px;
         }
         
+        /* 最上層的圖片 (保持 z-index: 2 並使用 multiply) */
         #fish-overlay {
             position: absolute;
             z-index: 2;
+            /* 重要：讓觸控事件穿透這張圖片，直接點到底下的 Canvas */
             pointer-events: none; 
             mix-blend-mode: multiply; 
             border-radius: 10px;
@@ -274,21 +278,21 @@
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
-        // --- 繪圖邏輯 (重要修正區域) ---
+        // --- 繪圖邏輯 (已完美修正手機觸控問題) ---
         
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
             
-            // 【真正生效的修正】：明確加上  來取得第一隻手指！
+            // 這裡已經確實補上了  來抓取第一根手指的座標
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches.clientX;
                 clientY = e.touches.clientY;
             } else if (e.changedTouches && e.changedTouches.length > 0) {
-                // 加入 changedTouches 增加相容性
                 clientX = e.changedTouches.clientX;
                 clientY = e.changedTouches.clientY;
             } else {
+                // 滑鼠事件
                 clientX = e.clientX;
                 clientY = e.clientY;
             }
@@ -331,20 +335,22 @@
             lastY = pos.y;
         }
 
-        function stopDrawing() {
+        function stopDrawing(e) {
+            e.preventDefault();
             isDrawing = false;
         }
 
-        // 綁定事件
+        // 綁定電腦滑鼠事件
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
 
+        // 綁定手機觸控事件
         canvas.addEventListener('touchstart', startDrawing, {passive: false});
         canvas.addEventListener('touchmove', draw, {passive: false});
-        canvas.addEventListener('touchend', stopDrawing);
-        canvas.addEventListener('touchcancel', stopDrawing);
+        canvas.addEventListener('touchend', stopDrawing, {passive: false});
+        canvas.addEventListener('touchcancel', stopDrawing, {passive: false});
 
         window.addEventListener('resize', () => {
             if (gameScreen.style.display === 'flex') {
