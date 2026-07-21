@@ -145,10 +145,11 @@
         .side-toolbar {
             display: flex; flex-direction: column; align-items: center; background-color: #ffffff;
             box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 10; padding: 15px 5px;
-            overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; 
+            touch-action: pan-y; 
         }
         #left-toolbar { width: 100px; flex-shrink: 0; justify-content: flex-start; }
-        #right-toolbar { width: 95px; flex-shrink: 0; justify-content: flex-start; } /* 稍微加寬以容納縮圖 */
+        #right-toolbar { width: 95px; flex-shrink: 0; justify-content: flex-start; } 
 
         #workspaces {
             flex-grow: 1; display: flex; justify-content: center; align-items: center;
@@ -158,7 +159,7 @@
         .tool-btn { 
             width: 90%; padding: 12px 4px; margin-bottom: 10px; font-size: 0.95rem; font-weight: bold;
             border-radius: 12px; border: 2px solid #ccc; background: #f9f9f9; cursor: pointer; color: #333;
-            text-align: center; transition: transform 0.1s;
+            text-align: center; transition: transform 0.1s; flex-shrink: 0;
         }
         .tool-btn:active { transform: scale(0.95); }
         .tool-btn.active { background: #ffeb3b; border-color: #ff9800; color: #d84315; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
@@ -173,7 +174,7 @@
             width: 85px; height: 85px; border-radius: 20px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;
             cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: 4px solid #fff;
-            transition: transform 0.1s, opacity 0.2s; line-height: 1.3; margin-bottom: 12px;
+            transition: transform 0.1s, opacity 0.2s; line-height: 1.3; margin-bottom: 12px; flex-shrink: 0;
         }
         .big-pop-btn:active { transform: scale(0.95); }
         
@@ -208,7 +209,7 @@
         .draw-canvas { display: block; border-radius: 10px; z-index: 1; }
         #image-overlay { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply; border-radius: 10px; }
         
-        /* 【優化】最近 5 次畫作的容器 (移出畫板，改放於右側工具列) */
+        /* 圖案專屬：最近 3 次畫作的容器 */
         #recent-artworks-container {
             display: flex; flex-direction: column; gap: 8px;
             align-items: center; width: 100%; margin-bottom: 10px;
@@ -245,10 +246,13 @@
         .pen-btn.active, .size-btn.active { background: #ffeb3b; border-color: #ff9800; color: #d84315; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
         .sub-title { font-size: 1.1rem; color: #555; margin-bottom: 8px; font-weight: bold; }
 
-        /* 預防直立手機觀看時自動縮排 */
         @media (orientation: portrait) {
             #game-screen { flex-direction: column; }
-            .side-toolbar { flex-direction: row; width: 100% !important; height: auto; max-height: 15vh; overflow-x: auto; overflow-y: hidden; padding: 10px; gap: 10px; align-items: center; }
+            .side-toolbar { 
+                flex-direction: row; width: 100% !important; height: auto; max-height: 15vh; 
+                overflow-x: auto; overflow-y: hidden; padding: 10px; gap: 10px; align-items: center; 
+                touch-action: pan-x; /* 允許直立手機左右滑動 */
+            }
             #game-logo { width: 50px; height: 50px; margin-bottom: 0; margin-right: 10px; }
             .divider-h { display: none; }
             .big-pop-btn { width: auto; height: auto; padding: 10px 15px; flex-direction: row; gap: 5px; margin-bottom: 0; }
@@ -256,8 +260,7 @@
             #workspaces { height: 70vh; }
             #home-logo { top: 10px; left: 10px; width: 55px; height: 55px; }
             
-            /* 直式排版優化畫廊 */
-            .recent-title { display: none; } /* 節省空間隱藏標題 */
+            .recent-title { display: none; } 
             #recent-artworks-container { flex-direction: row; margin-bottom: 0; margin-right: 10px; width: auto; align-items: center; gap: 10px; }
             .recent-thumb { width: auto; height: 50px; }
         }
@@ -309,7 +312,7 @@
             <button id="btn-open-emoji" class="big-pop-btn"><span>😀 貼紙</span></button>
         </div>
         
-        <!-- 中間畫布區域 (現在沒有最近畫廊了，100% 留給畫畫！) -->
+        <!-- 中間畫布區域 -->
         <div id="workspaces">
             <div id="coloring-workspace" class="workspace-section">
                 <div class="canvas-wrapper">
@@ -324,9 +327,8 @@
             </div>
         </div>
 
-        <!-- 【優化】右側工具列：最上方是最近畫廊，下方才是操作按鈕 -->
+        <!-- 右側工具列 -->
         <div id="right-toolbar" class="side-toolbar">
-            
             <div class="recent-title">🖼️ 畫廊</div>
             <div id="recent-artworks-container"></div>
             
@@ -541,7 +543,7 @@
                 
                 card.addEventListener('click', () => {
                     activeCardImgElement = img; activeItemName = item.name; 
-                    loadRecentArtworks();
+                    loadRecentArtworks(); // 會去讀取該圖案的專屬歷史
                     overlay.src = item.src; 
                     homeScreen.style.display = 'none'; 
                     gameScreen.style.display = 'flex';
@@ -605,12 +607,17 @@
             emojiGrid.appendChild(btn);
         });
 
-        // 加載右上角最近 5 張作品縮圖 (現在渲染於右側工具列)
+        // 【更新】只加載「目前選中圖案」的最近 3 次作品縮圖
         function loadRecentArtworks() {
             const container = document.getElementById('recent-artworks-container');
             container.innerHTML = ''; 
+            if (!activeItemName) return; // 如果還沒選擇圖案就跳出
+            
             let history = [];
-            try { history = JSON.parse(localStorage.getItem('recent_artworks') || '[]'); } catch(e) {}
+            try { 
+                // 從儲存庫讀取「專屬於這張圖案」的歷史紀錄
+                history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]'); 
+            } catch(e) {}
             
             history.forEach(imgData => {
                 let img = document.createElement('img'); img.src = imgData; img.className = 'recent-thumb';
@@ -690,9 +697,11 @@
                         localStorage.setItem('thumb_' + activeItemName, thumbData); 
                         localStorage.setItem('layer_' + activeItemName, layerData); 
                         
-                        let history = JSON.parse(localStorage.getItem('recent_artworks') || '[]');
-                        history.unshift(thumbData); history = history.slice(0, 5); 
-                        localStorage.setItem('recent_artworks', JSON.stringify(history));
+                        // 【更新】針對「當前選中的圖案」儲存專屬的歷史紀錄，且上限改為 3 張
+                        let history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]');
+                        history.unshift(thumbData); 
+                        history = history.slice(0, 3); // 數量上限從 5 縮減為 3
+                        localStorage.setItem('recent_artworks_' + activeItemName, JSON.stringify(history));
                     } catch (e) { console.error("LocalStorage 容量可能已滿", e); }
                 }
             }
