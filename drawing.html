@@ -7,19 +7,14 @@
     <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
     <style>
         body { 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
             font-family: 'Comic Sans MS', '微軟正黑體', sans-serif; 
-            background-color: #e0f7fa; 
-            user-select: none;
-            overflow: hidden; 
-            width: 100vw;
-            height: 100vh;
+            background-color: #e0f7fa; user-select: none;
+            overflow: hidden; width: 100vw; height: 100vh;
         }
 
         body.pseudo-fullscreen #game-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 9999; background-color: #e0f7fa;
         }
 
@@ -41,7 +36,7 @@
         .instruction {
             color: #00796b; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;
             background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0; text-align: center;
         }
         
         /* Logo 圖標樣式 */
@@ -52,9 +47,56 @@
         #home-logo { position: absolute; top: 15px; left: 15px; width: 75px; height: 75px; z-index: 10; }
         #game-logo { width: 65px; height: 65px; margin-bottom: 10px; }
 
+        /* ==========================================
+           【全新】分類拼貼卡片設計
+           ========================================== */
+        #category-selection, #image-selection {
+            width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+        }
+        
+        .category-grid {
+            display: grid; grid-template-columns: repeat(1, 1fr); gap: 25px; 
+            width: 90%; max-width: 800px; padding: 10px 20px 30px 20px;
+        }
+        @media (min-width: 550px) { .category-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .category-card {
+            background-color: #ffffff; border: 6px solid #80deea; border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); padding: 25px 20px 20px 20px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: center;
+            position: relative;
+        }
+        .category-card:active { transform: scale(0.95); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+        
+        /* 像相片疊放的拼貼容器 */
+        .collage-container { position: relative; width: 100%; height: 160px; margin-bottom: 15px; }
+        .collage-img {
+            position: absolute; width: 100px; height: 100px; object-fit: contain;
+            background: white; border: 4px solid #fff; border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        /* 三張圖案的角度與位置 */
+        .collage-img.img-1 { top: 15px; left: 10%; transform: rotate(-18deg); z-index: 1; }
+        .collage-img.img-2 { top: 25px; right: 10%; transform: rotate(22deg); z-index: 2; }
+        .collage-img.img-3 { top: 50px; left: 30%; transform: rotate(-5deg); z-index: 3; width: 110px; height: 110px; }
+        
+        .category-title {
+            font-size: 1.6rem; font-weight: 900; color: #333; margin-top: 10px;
+            background-color: #f1f8e9; padding: 8px 20px; border-radius: 30px;
+            display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #btn-back-category {
+            margin: 0 0 20px 0; padding: 12px 25px; font-size: 1.2rem; font-weight: bold;
+            color: #fff; background-color: #ff9800; border: 3px solid #f57c00; border-radius: 25px;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s;
+        }
+        #btn-back-category:active { transform: scale(0.95); }
+
+        /* 圖案網格 */
         #image-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 92%;
-            max-width: 700px; padding: 15px; flex-shrink: 0;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; 
+            width: 92%; max-width: 700px; padding: 15px; padding-bottom: 30px;
         }
         @media (min-width: 500px) { #image-grid { grid-template-columns: repeat(3, 1fr); } }
 
@@ -170,16 +212,13 @@
         .draw-canvas { display: block; border-radius: 10px; z-index: 1; }
         #image-overlay { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply; border-radius: 10px; }
         
-        /* 【全新】最近 5 次畫作的容器 */
         #recent-artworks-container {
-            position: absolute;
-            top: 10px; right: 10px;
+            position: absolute; top: 10px; right: 10px;
             display: flex; flex-direction: column; gap: 8px;
-            z-index: 5; pointer-events: auto; /* 允許點擊 */
+            z-index: 5; pointer-events: auto;
         }
         .recent-thumb {
-            width: 55px; height: auto;
-            border: 3px solid #ffca28; border-radius: 8px;
+            width: 55px; height: auto; border: 3px solid #ffca28; border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: white;
             cursor: pointer; transition: transform 0.1s;
         }
@@ -223,9 +262,21 @@
     <div id="home-screen">
         <img src="cat.jpeg" id="home-logo" class="app-logo" alt="Teacher Cat Logo">
         <h1>🎨 兒童畫廊與填色樂園 🖌️</h1>
-        <div class="instruction">👇 點擊圖案開始畫畫 👇</div>
-        <div id="image-grid"></div>
-        <button id="btn-reset-all">🗑️ 清除所有畫作紀錄</button>
+        
+        <!-- Phase 1: 分類選擇區塊 -->
+        <div id="category-selection">
+            <div class="instruction">👇 請選擇你想畫的圖案種類 👇</div>
+            <div id="category-grid" class="category-grid"></div>
+            <button id="btn-reset-all">🗑️ 清除所有畫作紀錄</button>
+        </div>
+
+        <!-- Phase 2: 圖案選擇區塊 (預設隱藏) -->
+        <div id="image-selection" style="display: none;">
+            <button id="btn-back-category">⬅️ 返回所有分類</button>
+            <h2 id="current-category-title" style="color: #00796b; font-size: 1.8rem; margin: 0 0 15px 0;"></h2>
+            <div class="instruction">👇 點擊圖案開始畫畫 👇</div>
+            <div id="image-grid"></div>
+        </div>
 
         <div id="social-footer">
             <h3>🎓 Teacher Cat 的快樂AI教室</h3>
@@ -242,7 +293,6 @@
     </div>
 
     <div id="game-screen">
-        
         <!-- 左側工具列 -->
         <div id="left-toolbar" class="side-toolbar">
             <img src="cat.jpeg" id="game-logo" class="app-logo" alt="Teacher Cat Logo">
@@ -259,7 +309,6 @@
                 <div class="canvas-wrapper">
                     <canvas id="coloring-canvas" class="draw-canvas"></canvas>
                     <img src="" id="image-overlay" alt="coloring outline">
-                    <!-- 【更新】不再是一張圖，而是改為容器，裝載最近 5 張畫作 -->
                     <div id="recent-artworks-container"></div>
                 </div>
             </div>
@@ -281,7 +330,7 @@
             <button class="tool-btn" id="btn-home">🏠 首頁</button>
         </div>
 
-        <!-- 【全新】畫作放大欣賞彈窗 -->
+        <!-- 畫作放大欣賞彈窗 -->
         <div id="artwork-view-modal" class="modal-overlay">
             <div class="modal-content" style="background: transparent; border: none; box-shadow: none; align-items: center;">
                 <img id="enlarged-artwork-img" src="" style="max-width: 90vw; max-height: 80vh; border: 5px solid #fff; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: white;">
@@ -289,11 +338,11 @@
             </div>
         </div>
 
-        <!-- 畫筆彈窗 -->
+        <!-- 各式設定彈窗 -->
         <div id="brush-modal" class="modal-overlay">
             <div class="modal-content">
-                <div class="modal-title">🖌️ 設定你的專屬畫筆 📏</div>
-                <div class="sub-title">1️⃣ 選擇畫筆種類</div>
+                <div class="modal-title">🖌️ 設定畫筆 📏</div>
+                <div class="sub-title">1️⃣ 種類</div>
                 <div class="brush-section">
                     <button class="pen-btn active" data-pen="brush" data-icon="🖌️" data-name="畫筆">🖌️ 畫筆</button>
                     <button class="pen-btn" data-pen="watercolor" data-icon="💧" data-name="水彩">💧 水彩</button>
@@ -301,7 +350,7 @@
                     <button class="pen-btn" data-pen="crayon" data-icon="🖍️" data-name="蠟筆">🖍️ 蠟筆</button>
                 </div>
                 <div class="divider-h" style="width: 100%; margin: 5px 0 15px 0;"></div>
-                <div class="sub-title">2️⃣ 選擇筆刷粗細</div>
+                <div class="sub-title">2️⃣ 粗細</div>
                 <div class="brush-section">
                     <button class="size-btn" data-size="5" data-name="極細">極細</button>
                     <button class="size-btn" data-size="10" data-name="細">細</button>
@@ -312,19 +361,17 @@
             </div>
         </div>
 
-        <!-- 顏色彈窗 -->
         <div id="color-modal" class="modal-overlay">
             <div class="modal-content">
-                <div class="modal-title">✨ 挑選一個漂亮的顏色 ✨</div>
+                <div class="modal-title">✨ 挑選顏色 ✨</div>
                 <div id="color-grid"></div>
                 <button class="btn-close-modal" id="btn-close-palette">❌ 關閉</button>
             </div>
         </div>
 
-        <!-- 貼紙彈窗 -->
         <div id="emoji-modal" class="modal-overlay">
             <div class="modal-content">
-                <div class="modal-title">🌟 選擇你喜歡的貼紙 🌟</div>
+                <div class="modal-title">🌟 挑選貼紙 🌟</div>
                 <div id="emoji-grid"></div>
                 <button class="btn-close-modal" id="btn-close-emoji">❌ 關閉</button>
             </div>
@@ -333,19 +380,83 @@
     </div>
 
     <script>
-        const imageList = [
-            { src: "Dcar.jpg", name: "汽車" }, { src: "Dcat.jpg", name: "小貓" }, { src: "Ddeer.jpg", name: "小鹿" },
-            { src: "Dexcavator.jpg", name: "挖土機" }, { src: "Dhorse.jpg", name: "小馬" }, { src: "Drat.jpg", name: "小兔" },
-            { src: "D倉鼠.jpg", name: "倉鼠" }, { src: "D消防車.jpg", name: "消防車" }, { src: "Nfish.jpg", name: "小魚" },
-            { src: "公主.jpg", name: "公主" }, { src: "城堡.jpg", name: "城堡" }, { src: "巴士.jpg", name: "巴士" },
-            { src: "恐龍.jpg", name: "恐龍" }, { src: "拖車.jpg", name: "拖車" }, { src: "救護車.jpg", name: "救護車" },
-            { src: "火車.jpg", name: "火車" }, { src: "獅子.jpg", name: "獅子" }, { src: "老鷹.jpg", name: "老鷹" },
-            { src: "蜘蛛.jpg", name: "蜘蛛" }, { src: "警車.jpg", name: "警車" }, { src: "貨車.jpg", name: "貨車" }, { src: "鯊魚.jpg", name: "鯊魚" }
+        // ==========================================
+        // 【全新】73 張圖案完整分類庫
+        // ==========================================
+        const categories = [
+            {
+                id: "animals",
+                name: "可愛動物",
+                icon: "🐼",
+                borderColor: "#ffb74d",
+                bgColor: "#fff3e0",
+                images: [
+                    { src: "Dcat.jpg", name: "小貓" }, { src: "Ddeer.jpg", name: "小鹿" }, { src: "Dhorse.jpg", name: "小馬" },
+                    { src: "Drat.jpg", name: "小兔" }, { src: "D倉鼠.jpg", name: "倉鼠" }, { src: "Nfish.jpg", name: "小魚" },
+                    { src: "企鵝.jpg", name: "企鵝" }, { src: "天鵝.jpg", name: "天鵝" }, { src: "小刺蝟.jpg", name: "小刺蝟" },
+                    { src: "小松鼠.jpg", name: "小松鼠" }, { src: "小熊貓.jpg", name: "小熊貓" }, { src: "小狗.jpg", name: "小狗" },
+                    { src: "小象.jpg", name: "小象" }, { src: "恐龍.jpg", name: "小恐龍" }, { src: "樹熊.jpg", name: "樹熊" },
+                    { src: "海獺.jpg", name: "海獺" }, { src: "海豚.jpg", name: "海豚" }, { src: "獅子.jpg", name: "獅子" },
+                    { src: "獨角獸.jpg", name: "獨角獸" }, { src: "老鷹.jpg", name: "老鷹" }, { src: "蜘蛛.jpg", name: "蜘蛛" },
+                    { src: "蝴蝶.jpg", name: "蝴蝶" }, { src: "貓頭鷹.jpg", name: "貓頭鷹" }, { src: "鯊魚.jpg", name: "鯊魚" }
+                ]
+            },
+            {
+                id: "vehicles",
+                name: "交通工具",
+                icon: "🚗",
+                borderColor: "#64b5f6",
+                bgColor: "#e3f2fd",
+                images: [
+                    { src: "Dcar.jpg", name: "小汽車" }, { src: "Dexcavator.jpg", name: "挖土機" }, { src: "D消防車.jpg", name: "消防車" },
+                    { src: "垃圾車.jpg", name: "垃圾車" }, { src: "巴士.jpg", name: "巴士" }, { src: "拖車.jpg", name: "拖車" },
+                    { src: "推土機.jpg", name: "推土機" }, { src: "救護車.jpg", name: "救護車" }, { src: "水泥攪拌車.jpg", name: "水泥攪拌車" },
+                    { src: "火車.jpg", name: "火車" }, { src: "直升機.jpg", name: "直升機" }, { src: "裝甲車.jpg", name: "裝甲車" },
+                    { src: "警車.jpg", name: "警車" }, { src: "貨車.jpg", name: "貨車" }, { src: "賽車.jpg", name: "賽車" },
+                    { src: "起重機.jpg", name: "起重機" }, { src: "越野大腳車.jpg", name: "越野大腳車" }, { src: "郵輪.jpg", name: "郵輪" },
+                    { src: "雙層巴士.jpg", name: "雙層巴士" }, { src: "飛機.jpg", name: "飛機" }
+                ]
+            },
+            {
+                id: "characters",
+                name: "角色人物",
+                icon: "👸",
+                borderColor: "#f06292",
+                bgColor: "#fce4ec",
+                images: [
+                    { src: "Brave.jpg", name: "勇敢公主" }, { src: "Jasmine.jpg", name: "茉莉公主" }, { src: "Moana.jpg", name: "莫娜" },
+                    { src: "anna.jpg", name: "安娜" }, { src: "elsa.jpg", name: "艾莎" }, { src: "frog.jpg", name: "青蛙公主" },
+                    { src: "mermaid.jpg", name: "美人魚" }, { src: "木蘭.jpg", name: "花木蘭" }, { src: "長髮.jpg", name: "長髮公主" }, 
+                    { src: "公主.jpg", name: "小公主" }, { src: "duffy.jpg", name: "達菲熊" }, { src: "lion king.jpg", name: "小辛巴" }, 
+                    { src: "micky.jpg", name: "米奇" }, { src: "minnie.jpg", name: "米妮" }, { src: "winnie.jpg", name: "小熊維尼" }, 
+                    { src: "唐老.jpg", name: "唐老鴨" }
+                ]
+            },
+            {
+                id: "scenes",
+                name: "有趣場景",
+                icon: "🏠",
+                borderColor: "#81c784",
+                bgColor: "#e8f5e9",
+                images: [
+                    { src: "動物園.jpg", name: "動物園" }, { src: "城堡.jpg", name: "城堡" }, { src: "太空基地.jpg", name: "太空基地" },
+                    { src: "恐龍世界.jpg", name: "恐龍世界" }, { src: "機場.jpg", name: "機場" }, { src: "海底世界.jpg", name: "海底世界" },
+                    { src: "消防局.jpg", name: "消防局" }, { src: "物流中心.jpg", name: "物流中心" }, { src: "警察局.jpg", name: "警察局" },
+                    { src: "超市.jpg", name: "超市" }, { src: "郵局.jpg", name: "郵局" }, { src: "醫生診所.jpg", name: "醫生診所" },
+                    { src: "餐廳.jpg", name: "餐廳" }
+                ]
+            }
         ];
 
+        // 畫面與容器節點
         const homeScreen = document.getElementById('home-screen');
-        const gameScreen = document.getElementById('game-screen');
+        const categorySelection = document.getElementById('category-selection');
+        const imageSelection = document.getElementById('image-selection');
+        const categoryGrid = document.getElementById('category-grid');
         const imageGrid = document.getElementById('image-grid');
+        const currentCategoryTitle = document.getElementById('current-category-title');
+        const btnBackCategory = document.getElementById('btn-back-category');
+        const gameScreen = document.getElementById('game-screen');
         const overlay = document.getElementById('image-overlay');
         const workspaces = document.getElementById('workspaces');
         const canvases = document.querySelectorAll('.draw-canvas');
@@ -361,15 +472,110 @@
         let isEmojiMode = false;
         let currentEmoji = '🐶';
 
-        let activeCanvas = null;
-        let activeCtx = null;
-        let lastX = 0, lastY = 0;
-        let isRainbow = false;
-        let rainbowHue = 0;
+        let activeCanvas = null; let activeCtx = null; let lastX = 0, lastY = 0;
+        let isRainbow = false; let rainbowHue = 0;
         let currentMode = 'coloring'; 
-        let activeCardImgElement = null;
-        let activeItemName = null; 
+        let activeCardImgElement = null; let activeItemName = null; 
 
+        // ==========================================
+        // 初始化首頁：建立分類拼貼預覽
+        // ==========================================
+        categories.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.style.borderColor = cat.borderColor;
+
+            // 建立拼貼容器
+            const collage = document.createElement('div');
+            collage.className = 'collage-container';
+            
+            // 隨意拿出前三張圖案作為拼貼代表
+            const sampleImages = cat.images.slice(0, 3);
+            sampleImages.forEach((imgObj, idx) => {
+                const img = document.createElement('img');
+                img.src = imgObj.src;
+                img.className = `collage-img img-${idx + 1}`;
+                img.style.borderColor = cat.borderColor; // 圖片邊框跟隨分類顏色
+                collage.appendChild(img);
+            });
+            
+            const title = document.createElement('div');
+            title.className = 'category-title';
+            title.innerText = `${cat.icon} ${cat.name} (${cat.images.length})`;
+            title.style.color = cat.borderColor;
+            title.style.backgroundColor = cat.bgColor;
+            
+            card.appendChild(collage);
+            card.appendChild(title);
+            
+            // 點擊分類卡片
+            card.addEventListener('click', () => { openCategory(cat); });
+            categoryGrid.appendChild(card);
+        });
+
+        // 開啟指定分類
+        function openCategory(category) {
+            categorySelection.style.display = 'none';
+            imageSelection.style.display = 'flex';
+            currentCategoryTitle.innerText = `${category.icon} ${category.name}`;
+            currentCategoryTitle.style.color = category.borderColor;
+            
+            imageGrid.innerHTML = ''; // 清空先前的圖庫
+            
+            // 渲染該分類的所有圖片
+            category.images.forEach((item) => {
+                const card = document.createElement('div'); card.className = 'card';
+                card.style.borderColor = category.borderColor;
+
+                const img = document.createElement('img'); img.className = 'card-img'; img.draggable = false; 
+                
+                // 檢查是否有歷史儲存紀錄
+                const savedThumb = localStorage.getItem('thumb_' + item.name);
+                if (savedThumb) { img.src = savedThumb; } else { img.src = item.src; }
+                
+                const title = document.createElement('div'); title.className = 'card-title'; 
+                title.innerText = item.name;
+                title.style.color = category.borderColor;
+                title.style.backgroundColor = category.bgColor;
+                title.style.borderColor = category.bgColor;
+                
+                card.appendChild(img); card.appendChild(title);
+                
+                card.addEventListener('click', () => {
+                    activeCardImgElement = img; activeItemName = item.name; 
+                    loadRecentArtworks();
+                    overlay.src = item.src; 
+                    
+                    homeScreen.style.display = 'none'; 
+                    gameScreen.style.display = 'flex';
+                    
+                    overlay.onload = () => { 
+                        initCanvas(false); 
+                        const savedLayer = localStorage.getItem('layer_' + activeItemName);
+                        if (savedLayer) {
+                            const restoreImg = new Image();
+                            restoreImg.onload = () => { const ctx = document.getElementById('coloring-canvas').getContext('2d'); ctx.drawImage(restoreImg, 0, 0, ctx.canvas.width, ctx.canvas.height); };
+                            restoreImg.src = savedLayer;
+                        }
+                    };
+                });
+                imageGrid.appendChild(card);
+            });
+        }
+
+        // 返回分類選擇按鈕
+        btnBackCategory.addEventListener('click', () => {
+            imageSelection.style.display = 'none';
+            categorySelection.style.display = 'flex';
+        });
+
+        document.getElementById('btn-reset-all').addEventListener('click', () => {
+            if (confirm("🧹 確定要清除所有畫作紀錄嗎？\n(動作無法復原喔！)🎨")) {
+                localStorage.clear(); alert("✅ 畫作紀錄已全部清除！"); location.reload(); 
+            }
+        });
+
+        // 顏色庫與貼紙庫初始化
         const colorGrid = document.getElementById('color-grid');
         const extraColors = ['#ffffff', '#e0e0e0', '#b3b3b3', '#808080', '#4d4d4d', '#000000', '#3e2723', '#5d4037', '#795548', '#8d6e63', '#d7ccc8', 'rainbow']; 
         let hues = new Array(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330);
@@ -377,7 +583,6 @@
         let allColors = [];
         hues.forEach(h => { lightSats.forEach(ls => { allColors.push(`hsl(${h}, ${ls.s}%, ${ls.l}%)`); }); });
         allColors = extraColors.concat(allColors); 
-
         allColors.forEach((c) => {
             let btn = document.createElement('div'); btn.className = 'color-btn';
             if (c === 'rainbow') { btn.classList.add('rainbow-btn'); btn.setAttribute('data-color', 'rainbow'); } 
@@ -405,19 +610,15 @@
             emojiGrid.appendChild(btn);
         });
 
-        // 【新增】加載右上角最近 5 張作品縮圖的功能
+        // 加載右上角最近 5 張作品縮圖
         function loadRecentArtworks() {
             const container = document.getElementById('recent-artworks-container');
             container.innerHTML = ''; 
             let history = [];
-            try {
-                history = JSON.parse(localStorage.getItem('recent_artworks') || '[]');
-            } catch(e) {}
+            try { history = JSON.parse(localStorage.getItem('recent_artworks') || '[]'); } catch(e) {}
             
             history.forEach(imgData => {
-                let img = document.createElement('img');
-                img.src = imgData;
-                img.className = 'recent-thumb';
+                let img = document.createElement('img'); img.src = imgData; img.className = 'recent-thumb';
                 img.addEventListener('click', () => {
                     document.getElementById('enlarged-artwork-img').src = imgData;
                     document.getElementById('artwork-view-modal').style.display = 'flex';
@@ -425,41 +626,6 @@
                 container.appendChild(img);
             });
         }
-
-        imageList.forEach((item) => {
-            const card = document.createElement('div'); card.className = 'card';
-            const img = document.createElement('img'); img.className = 'card-img'; img.draggable = false; 
-            const savedThumb = localStorage.getItem('thumb_' + item.name);
-            if (savedThumb) { img.src = savedThumb; } else { img.src = item.src; }
-            const title = document.createElement('div'); title.className = 'card-title'; title.innerText = item.name;
-            
-            card.appendChild(img); card.appendChild(title);
-            card.addEventListener('click', () => {
-                activeCardImgElement = img; activeItemName = item.name; 
-                
-                // 在進入畫布前，讀取最新的 5 張作品歷史
-                loadRecentArtworks();
-
-                overlay.src = item.src; homeScreen.style.display = 'none'; gameScreen.style.display = 'flex';
-                
-                overlay.onload = () => { 
-                    initCanvas(false); 
-                    const savedLayer = localStorage.getItem('layer_' + activeItemName);
-                    if (savedLayer) {
-                        const restoreImg = new Image();
-                        restoreImg.onload = () => { const ctx = document.getElementById('coloring-canvas').getContext('2d'); ctx.drawImage(restoreImg, 0, 0, ctx.canvas.width, ctx.canvas.height); };
-                        restoreImg.src = savedLayer;
-                    }
-                };
-            });
-            imageGrid.appendChild(card);
-        });
-
-        document.getElementById('btn-reset-all').addEventListener('click', () => {
-            if (confirm("🧹 確定要清除所有小朋友的畫作紀錄嗎？\n(動作無法復原喔！)🎨")) {
-                localStorage.clear(); alert("✅ 畫作紀錄已全部清除！"); location.reload(); 
-            }
-        });
 
         function initCanvas(preserveDrawing = false) {
             const tempCanvases = [];
@@ -519,6 +685,7 @@
             } catch (error) { return null; }
         }
 
+        // 首頁按鈕：儲存並返回，維持在當前的分類庫
         document.getElementById('btn-home').addEventListener('click', () => {
             if (activeCardImgElement && activeItemName) {
                 const thumbData = generateArtImage(); 
@@ -526,21 +693,19 @@
                     activeCardImgElement.src = thumbData; 
                     try {
                         const colorCanvas = document.getElementById('coloring-canvas'); const layerData = colorCanvas.toDataURL('image/png'); 
-                        
-                        // 儲存針對此圖案的個別資料
                         localStorage.setItem('thumb_' + activeItemName, thumbData); 
                         localStorage.setItem('layer_' + activeItemName, layerData); 
-
-                        // 【新增】將這次的畫作加入到全球最近 5 次歷史紀錄中
+                        
                         let history = JSON.parse(localStorage.getItem('recent_artworks') || '[]');
-                        history.unshift(thumbData); // 放進陣列最前面
-                        history = history.slice(0, 5); // 永遠只保留最新的 5 筆
+                        history.unshift(thumbData); history = history.slice(0, 5); 
                         localStorage.setItem('recent_artworks', JSON.stringify(history));
-
                     } catch (e) { console.error("LocalStorage 容量可能已滿", e); }
                 }
             }
-            gameScreen.style.display = 'none'; homeScreen.style.display = 'flex';
+            gameScreen.style.display = 'none'; 
+            homeScreen.style.display = 'flex'; 
+            // 這裡不需要改動 display，因為原本就是 `#image-selection` 被打開的狀態，可以無縫返回該分類圖庫！
+            
             if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             document.body.classList.remove('pseudo-fullscreen'); document.getElementById('btn-fullscreen').innerHTML = '⛶ 全屏';
         });
@@ -554,13 +719,9 @@
         });
 
         // 彈窗與按鈕控制
-        const colorModal = document.getElementById('color-modal');
-        const brushModal = document.getElementById('brush-modal');
-        const emojiModal = document.getElementById('emoji-modal');
-        const artworkViewModal = document.getElementById('artwork-view-modal');
-
-        const btnOpenPalette = document.getElementById('btn-open-palette');
-        const btnOpenBrush = document.getElementById('btn-open-brush');
+        const colorModal = document.getElementById('color-modal'); const brushModal = document.getElementById('brush-modal');
+        const emojiModal = document.getElementById('emoji-modal'); const artworkViewModal = document.getElementById('artwork-view-modal');
+        const btnOpenPalette = document.getElementById('btn-open-palette'); const btnOpenBrush = document.getElementById('btn-open-brush');
         const btnOpenEmoji = document.getElementById('btn-open-emoji');
 
         btnOpenPalette.addEventListener('click', () => colorModal.style.display = 'flex');
@@ -572,21 +733,17 @@
         document.getElementById('btn-close-emoji').addEventListener('click', () => emojiModal.style.display = 'none');
         document.getElementById('btn-close-artwork-view').addEventListener('click', () => artworkViewModal.style.display = 'none');
 
-        [colorModal, brushModal, emojiModal, artworkViewModal].forEach(modal => {
-            modal.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; });
-        });
+        [colorModal, brushModal, emojiModal, artworkViewModal].forEach(modal => { modal.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; }); });
 
         function updateMainBrushBtn() {
             btnOpenBrush.innerHTML = `<span>${currentPenIcon} ${currentPenName}</span><span style="font-size: 0.9rem; margin-top: 5px;">(${currentSizeName})</span>`;
             btnOpenBrush.style.borderColor = isRainbow ? '#ffeb3b' : currentColor;
         }
-        function updateMainEmojiBtn() {
-            btnOpenEmoji.innerHTML = `<span style="font-size:1.5rem">${currentEmoji}</span><span style="font-size: 0.9rem; margin-top: 5px;">貼紙</span>`;
-        }
+        function updateMainEmojiBtn() { btnOpenEmoji.innerHTML = `<span style="font-size:1.5rem">${currentEmoji}</span><span style="font-size: 0.9rem; margin-top: 5px;">貼紙</span>`; }
         function updateToolUI() {
-            if (isEraser) { btnOpenBrush.style.opacity = '0.4'; btnOpenEmoji.style.opacity = '0.4';
-            } else if (isEmojiMode) { btnOpenBrush.style.opacity = '0.4'; btnOpenEmoji.style.opacity = '1';
-            } else { btnOpenBrush.style.opacity = '1'; btnOpenEmoji.style.opacity = '0.4'; }
+            if (isEraser) { btnOpenBrush.style.opacity = '0.4'; btnOpenEmoji.style.opacity = '0.4'; } 
+            else if (isEmojiMode) { btnOpenBrush.style.opacity = '0.4'; btnOpenEmoji.style.opacity = '1'; } 
+            else { btnOpenBrush.style.opacity = '1'; btnOpenEmoji.style.opacity = '0.4'; }
             document.getElementById('btn-eraser').classList.toggle('active', isEraser);
         }
 
@@ -644,11 +801,9 @@
             const pos = getPos(e, activeCanvas); lastX = pos.x; lastY = pos.y;
             
             if (isEmojiMode && !isEraser) {
-                activeCtx.font = `${currentSize * 1.5 + 10}px Arial`; 
-                activeCtx.textAlign = 'center'; activeCtx.textBaseline = 'middle';
+                activeCtx.font = `${currentSize * 1.5 + 10}px Arial`; activeCtx.textAlign = 'center'; activeCtx.textBaseline = 'middle';
                 activeCtx.fillText(currentEmoji, lastX, lastY); return;
             }
-
             applyPenStyle(activeCtx); activeCtx.beginPath(); activeCtx.arc(lastX, lastY, currentSize / 2, 0, Math.PI * 2); activeCtx.fill(); activeCtx.closePath();
         }
 
@@ -665,9 +820,7 @@
                 }
                 return;
             }
-
-            applyPenStyle(activeCtx);
-            if (isRainbow) { rainbowHue = (rainbowHue + 4) % 360; }
+            applyPenStyle(activeCtx); if (isRainbow) { rainbowHue = (rainbowHue + 4) % 360; }
             activeCtx.lineWidth = currentSize; activeCtx.lineJoin = 'round'; activeCtx.beginPath(); activeCtx.moveTo(lastX, lastY); activeCtx.lineTo(pos.x, pos.y); activeCtx.stroke();
             if (!isEraser && currentPen === 'crayon') {
                 for(let i = 0; i < 4; i++) {
