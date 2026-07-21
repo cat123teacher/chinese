@@ -47,9 +47,7 @@
         #home-logo { position: absolute; top: 15px; left: 15px; width: 75px; height: 75px; z-index: 10; }
         #game-logo { width: 65px; height: 65px; margin-bottom: 10px; }
 
-        /* ==========================================
-           【全新】分類拼貼卡片設計
-           ========================================== */
+        /* 分類拼貼卡片設計 */
         #category-selection, #image-selection {
             width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
         }
@@ -68,14 +66,12 @@
         }
         .category-card:active { transform: scale(0.95); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
         
-        /* 像相片疊放的拼貼容器 */
         .collage-container { position: relative; width: 100%; height: 160px; margin-bottom: 15px; }
         .collage-img {
             position: absolute; width: 100px; height: 100px; object-fit: contain;
             background: white; border: 4px solid #fff; border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        /* 三張圖案的角度與位置 */
         .collage-img.img-1 { top: 15px; left: 10%; transform: rotate(-18deg); z-index: 1; }
         .collage-img.img-2 { top: 25px; right: 10%; transform: rotate(22deg); z-index: 2; }
         .collage-img.img-3 { top: 50px; left: 30%; transform: rotate(-5deg); z-index: 3; width: 110px; height: 110px; }
@@ -152,7 +148,7 @@
             overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y;
         }
         #left-toolbar { width: 100px; flex-shrink: 0; justify-content: flex-start; }
-        #right-toolbar { width: 90px; flex-shrink: 0; justify-content: flex-start; }
+        #right-toolbar { width: 95px; flex-shrink: 0; justify-content: flex-start; } /* 稍微加寬以容納縮圖 */
 
         #workspaces {
             flex-grow: 1; display: flex; justify-content: center; align-items: center;
@@ -185,7 +181,7 @@
         #btn-open-palette { background-color: #f44336; color: #fff; text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000; }
         #btn-open-emoji { background-color: #e1bee7; color: #4a148c; border-color: #ce93d8; }
 
-        .divider-h { width: 80%; height: 3px; background: #ddd; margin: 5px 0 12px 0; border-radius: 2px; }
+        .divider-h { width: 80%; height: 3px; background: #ddd; margin: 5px 0 12px 0; border-radius: 2px; flex-shrink: 0; }
 
         /* 彈出式視窗 (Modal) 共用樣式 */
         .modal-overlay {
@@ -206,23 +202,28 @@
         }
         .btn-close-modal:active { transform: scale(0.95); }
 
-        /* 畫布與最近畫作縮圖容器 */
+        /* 畫布區塊 */
         .workspace-section { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
         .canvas-wrapper { position: relative; background-color: #ffffff; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 10px; }
         .draw-canvas { display: block; border-radius: 10px; z-index: 1; }
         #image-overlay { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply; border-radius: 10px; }
         
+        /* 【優化】最近 5 次畫作的容器 (移出畫板，改放於右側工具列) */
         #recent-artworks-container {
-            position: absolute; top: 10px; right: 10px;
             display: flex; flex-direction: column; gap: 8px;
-            z-index: 5; pointer-events: auto;
+            align-items: center; width: 100%; margin-bottom: 10px;
+            flex-shrink: 0;
         }
         .recent-thumb {
-            width: 55px; height: auto; border: 3px solid #ffca28; border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: white;
-            cursor: pointer; transition: transform 0.1s;
+            width: 65px; height: auto; border: 3px solid #ffca28; border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); background-color: white;
+            cursor: pointer; transition: transform 0.1s; flex-shrink: 0;
         }
         .recent-thumb:active { transform: scale(0.9); }
+        .recent-title {
+            font-size: 0.9rem; font-weight: bold; color: #00796b; 
+            margin-bottom: 8px; text-align: center; flex-shrink: 0;
+        }
 
         #color-grid, #emoji-grid { 
             display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; 
@@ -254,6 +255,11 @@
             .tool-btn { width: auto; margin-bottom: 0; margin-right: 8px; padding: 10px 15px; }
             #workspaces { height: 70vh; }
             #home-logo { top: 10px; left: 10px; width: 55px; height: 55px; }
+            
+            /* 直式排版優化畫廊 */
+            .recent-title { display: none; } /* 節省空間隱藏標題 */
+            #recent-artworks-container { flex-direction: row; margin-bottom: 0; margin-right: 10px; width: auto; align-items: center; gap: 10px; }
+            .recent-thumb { width: auto; height: 50px; }
         }
     </style>
 </head>
@@ -263,14 +269,14 @@
         <img src="cat.jpeg" id="home-logo" class="app-logo" alt="Teacher Cat Logo">
         <h1>🎨 兒童畫廊與填色樂園 🖌️</h1>
         
-        <!-- Phase 1: 分類選擇區塊 -->
+        <!-- 分類選擇區塊 -->
         <div id="category-selection">
             <div class="instruction">👇 請選擇你想畫的圖案種類 👇</div>
             <div id="category-grid" class="category-grid"></div>
             <button id="btn-reset-all">🗑️ 清除所有畫作紀錄</button>
         </div>
 
-        <!-- Phase 2: 圖案選擇區塊 (預設隱藏) -->
+        <!-- 圖案選擇區塊 (預設隱藏) -->
         <div id="image-selection" style="display: none;">
             <button id="btn-back-category">⬅️ 返回所有分類</button>
             <h2 id="current-category-title" style="color: #00796b; font-size: 1.8rem; margin: 0 0 15px 0;"></h2>
@@ -303,13 +309,12 @@
             <button id="btn-open-emoji" class="big-pop-btn"><span>😀 貼紙</span></button>
         </div>
         
-        <!-- 中間畫布區域 -->
+        <!-- 中間畫布區域 (現在沒有最近畫廊了，100% 留給畫畫！) -->
         <div id="workspaces">
             <div id="coloring-workspace" class="workspace-section">
                 <div class="canvas-wrapper">
                     <canvas id="coloring-canvas" class="draw-canvas"></canvas>
                     <img src="" id="image-overlay" alt="coloring outline">
-                    <div id="recent-artworks-container"></div>
                 </div>
             </div>
             <div id="drawing-workspace" class="workspace-section" style="display: none;">
@@ -319,10 +324,15 @@
             </div>
         </div>
 
-        <!-- 右側工具列 -->
+        <!-- 【優化】右側工具列：最上方是最近畫廊，下方才是操作按鈕 -->
         <div id="right-toolbar" class="side-toolbar">
-            <button class="tool-btn" id="btn-eraser">🧽 橡皮</button>
+            
+            <div class="recent-title">🖼️ 畫廊</div>
+            <div id="recent-artworks-container"></div>
+            
             <div class="divider-h"></div>
+
+            <button class="tool-btn" id="btn-eraser">🧽 橡皮</button>
             <button class="tool-btn" id="btn-clear">🗑️ 重畫</button>
             <button class="tool-btn" id="btn-switch-mode">🔄 空板</button>
             <button class="tool-btn" id="btn-fullscreen">⛶ 全屏</button>
@@ -380,9 +390,7 @@
     </div>
 
     <script>
-        // ==========================================
-        // 【全新】73 張圖案完整分類庫
-        // ==========================================
+        // 73 張圖案完整分類庫
         const categories = [
             {
                 id: "animals",
@@ -477,25 +485,21 @@
         let currentMode = 'coloring'; 
         let activeCardImgElement = null; let activeItemName = null; 
 
-        // ==========================================
         // 初始化首頁：建立分類拼貼預覽
-        // ==========================================
         categories.forEach(cat => {
             const card = document.createElement('div');
             card.className = 'category-card';
             card.style.borderColor = cat.borderColor;
 
-            // 建立拼貼容器
             const collage = document.createElement('div');
             collage.className = 'collage-container';
             
-            // 隨意拿出前三張圖案作為拼貼代表
             const sampleImages = cat.images.slice(0, 3);
             sampleImages.forEach((imgObj, idx) => {
                 const img = document.createElement('img');
                 img.src = imgObj.src;
                 img.className = `collage-img img-${idx + 1}`;
-                img.style.borderColor = cat.borderColor; // 圖片邊框跟隨分類顏色
+                img.style.borderColor = cat.borderColor; 
                 collage.appendChild(img);
             });
             
@@ -507,8 +511,6 @@
             
             card.appendChild(collage);
             card.appendChild(title);
-            
-            // 點擊分類卡片
             card.addEventListener('click', () => { openCategory(cat); });
             categoryGrid.appendChild(card);
         });
@@ -519,17 +521,13 @@
             imageSelection.style.display = 'flex';
             currentCategoryTitle.innerText = `${category.icon} ${category.name}`;
             currentCategoryTitle.style.color = category.borderColor;
+            imageGrid.innerHTML = ''; 
             
-            imageGrid.innerHTML = ''; // 清空先前的圖庫
-            
-            // 渲染該分類的所有圖片
             category.images.forEach((item) => {
                 const card = document.createElement('div'); card.className = 'card';
                 card.style.borderColor = category.borderColor;
 
                 const img = document.createElement('img'); img.className = 'card-img'; img.draggable = false; 
-                
-                // 檢查是否有歷史儲存紀錄
                 const savedThumb = localStorage.getItem('thumb_' + item.name);
                 if (savedThumb) { img.src = savedThumb; } else { img.src = item.src; }
                 
@@ -545,7 +543,6 @@
                     activeCardImgElement = img; activeItemName = item.name; 
                     loadRecentArtworks();
                     overlay.src = item.src; 
-                    
                     homeScreen.style.display = 'none'; 
                     gameScreen.style.display = 'flex';
                     
@@ -563,7 +560,6 @@
             });
         }
 
-        // 返回分類選擇按鈕
         btnBackCategory.addEventListener('click', () => {
             imageSelection.style.display = 'none';
             categorySelection.style.display = 'flex';
@@ -575,7 +571,6 @@
             }
         });
 
-        // 顏色庫與貼紙庫初始化
         const colorGrid = document.getElementById('color-grid');
         const extraColors = ['#ffffff', '#e0e0e0', '#b3b3b3', '#808080', '#4d4d4d', '#000000', '#3e2723', '#5d4037', '#795548', '#8d6e63', '#d7ccc8', 'rainbow']; 
         let hues = new Array(0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330);
@@ -610,7 +605,7 @@
             emojiGrid.appendChild(btn);
         });
 
-        // 加載右上角最近 5 張作品縮圖
+        // 加載右上角最近 5 張作品縮圖 (現在渲染於右側工具列)
         function loadRecentArtworks() {
             const container = document.getElementById('recent-artworks-container');
             container.innerHTML = ''; 
@@ -685,7 +680,6 @@
             } catch (error) { return null; }
         }
 
-        // 首頁按鈕：儲存並返回，維持在當前的分類庫
         document.getElementById('btn-home').addEventListener('click', () => {
             if (activeCardImgElement && activeItemName) {
                 const thumbData = generateArtImage(); 
@@ -704,8 +698,6 @@
             }
             gameScreen.style.display = 'none'; 
             homeScreen.style.display = 'flex'; 
-            // 這裡不需要改動 display，因為原本就是 `#image-selection` 被打開的狀態，可以無縫返回該分類圖庫！
-            
             if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             document.body.classList.remove('pseudo-fullscreen'); document.getElementById('btn-fullscreen').innerHTML = '⛶ 全屏';
         });
