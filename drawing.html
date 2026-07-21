@@ -209,7 +209,7 @@
         .draw-canvas { display: block; border-radius: 10px; z-index: 1; }
         #image-overlay { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; mix-blend-mode: multiply; border-radius: 10px; }
         
-        /* 圖案專屬：最近 3 次畫作的容器 */
+        /* 圖案專屬：最近畫作的容器 */
         #recent-artworks-container {
             display: flex; flex-direction: column; gap: 8px;
             align-items: center; width: 100%; margin-bottom: 10px;
@@ -251,7 +251,7 @@
             .side-toolbar { 
                 flex-direction: row; width: 100% !important; height: auto; max-height: 15vh; 
                 overflow-x: auto; overflow-y: hidden; padding: 10px; gap: 10px; align-items: center; 
-                touch-action: pan-x; /* 允許直立手機左右滑動 */
+                touch-action: pan-x; 
             }
             #game-logo { width: 50px; height: 50px; margin-bottom: 0; margin-right: 10px; }
             .divider-h { display: none; }
@@ -502,14 +502,8 @@
             
             sampleImages.forEach((imgObj, idx) => {
                 const img = document.createElement('img');
-                
-                // 【新魔法】檢查這張圖是否有小朋友之前畫過的縮圖
                 const savedThumb = localStorage.getItem('thumb_' + imgObj.name);
-                if (savedThumb) {
-                    img.src = savedThumb; // 有畫過！展示小朋友的最新作品
-                } else {
-                    img.src = imgObj.src; // 沒畫過，展示預設黑白圖案
-                }
+                if (savedThumb) { img.src = savedThumb; } else { img.src = imgObj.src; }
                 
                 img.className = `collage-img img-${idx + 1}`;
                 img.style.borderColor = cat.borderColor; 
@@ -618,16 +612,13 @@
             emojiGrid.appendChild(btn);
         });
 
-        // 只加載「目前選中圖案」的最近 3 次作品縮圖
         function loadRecentArtworks() {
             const container = document.getElementById('recent-artworks-container');
             container.innerHTML = ''; 
             if (!activeItemName) return; 
             
             let history = [];
-            try { 
-                history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]'); 
-            } catch(e) {}
+            try { history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]'); } catch(e) {}
             
             history.forEach(imgData => {
                 let img = document.createElement('img'); img.src = imgData; img.className = 'recent-thumb';
@@ -687,23 +678,50 @@
 
         function clearCanvas() { canvases.forEach(canvas => { const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }); }
 
-        function generateArtImage() {
+        // ==========================================
+        // 【容量魔法優化】大幅降低儲存空間的秘密武器
+        // ==========================================
+        function generateArtImage(isThumbnail = false) {
             try {
-                const tempCanvas = document.createElement('canvas'); const targetCanvas = currentMode === 'coloring' ? document.getElementById('coloring-canvas') : document.getElementById('drawing-canvas');
-                tempCanvas.width = targetCanvas.width; tempCanvas.height = targetCanvas.height; const tCtx = tempCanvas.getContext('2d');
-                tCtx.fillStyle = '#ffffff'; tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height); tCtx.drawImage(targetCanvas, 0, 0);
-                if (currentMode === 'coloring') { tCtx.globalCompositeOperation = 'multiply'; tCtx.drawImage(overlay, 0, 0, tempCanvas.width, tempCanvas.height); tCtx.globalCompositeOperation = 'source-over'; }
-                return tempCanvas.toDataURL('image/png');
+                const targetCanvas = currentMode === 'coloring' ? document.getElementById('coloring-canvas') : document.getElementById('drawing-canvas');
+                const tempCanvas = document.createElement('canvas'); 
+                
+                // 如果是為了存進首頁縮圖或右側歷史紀錄，我們把尺寸縮小到 40%
+                let scale = isThumbnail ? 0.4 : 1; 
+                tempCanvas.width = targetCanvas.width * scale; 
+                tempCanvas.height = targetCanvas.height * scale; 
+                
+                const tCtx = tempCanvas.getContext('2d');
+                tCtx.fillStyle = '#ffffff'; 
+                tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height); 
+                tCtx.drawImage(targetCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                if (currentMode === 'coloring') { 
+                    tCtx.globalCompositeOperation = 'multiply'; 
+                    tCtx.drawImage(overlay, 0, 0, tempCanvas.width, tempCanvas.height); 
+                    tCtx.globalCompositeOperation = 'source-over'; 
+                }
+                
+                // 如果是縮圖，改用 JPEG 格式並壓縮到 60% 畫質 (檔案大小會變成原來的十分之一以下！)
+                if (isThumbnail) {
+                    return tempCanvas.toDataURL('image/jpeg', 0.6);
+                } else {
+                    // 如果是小朋友主動按「下載儲存」，就保留原本的 100% PNG 高畫質原圖
+                    return tempCanvas.toDataURL('image/png');
+                }
             } catch (error) { return null; }
         }
 
         document.getElementById('btn-home').addEventListener('click', () => {
             if (activeCardImgElement && activeItemName) {
-                const thumbData = generateArtImage(); 
+                // 產生低解析度、高壓縮比的「輕量化縮圖」
+                const thumbData = generateArtImage(true); 
                 if (thumbData) {
                     activeCardImgElement.src = thumbData; 
                     try {
-                        const colorCanvas = document.getElementById('coloring-canvas'); const layerData = colorCanvas.toDataURL('image/png'); 
+                        const colorCanvas = document.getElementById('coloring-canvas'); 
+                        const layerData = colorCanvas.toDataURL('image/png'); // 透明圖層還是需要保留 PNG 讓下次能接續畫
+                        
                         localStorage.setItem('thumb_' + activeItemName, thumbData); 
                         localStorage.setItem('layer_' + activeItemName, layerData); 
                         
@@ -717,7 +735,6 @@
             gameScreen.style.display = 'none'; 
             homeScreen.style.display = 'flex'; 
             
-            // 返回首頁時重新整理頁面，這樣隨機預覽和最新畫作就會立刻更新！
             location.reload(); 
             
             if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -726,7 +743,8 @@
 
         document.getElementById('btn-clear').addEventListener('click', clearCanvas);
         document.getElementById('btn-save').addEventListener('click', () => {
-            const dataURL = generateArtImage();
+            // 下載到設備時，產生高畫質原圖
+            const dataURL = generateArtImage(false);
             if (!dataURL) { alert("⚠️ 儲存失敗！\n\n請用手機/iPad的「螢幕截圖」來儲存畫作！"); return; }
             const link = document.createElement('a'); const date = new Date(); const timeStr = `${date.getHours()}${date.getMinutes()}${date.getSeconds()}`;
             link.download = `我的畫作_${timeStr}.png`; link.href = dataURL; document.body.appendChild(link); link.click(); document.body.removeChild(link);
