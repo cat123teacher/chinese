@@ -496,10 +496,21 @@
             const collage = document.createElement('div');
             collage.className = 'collage-container';
             
-            const sampleImages = cat.images.slice(0, 3);
+            // 打亂該分類的圖庫陣列，然後隨機抽出前 3 張！
+            const shuffledImages = [...cat.images].sort(() => 0.5 - Math.random());
+            const sampleImages = shuffledImages.slice(0, 3);
+            
             sampleImages.forEach((imgObj, idx) => {
                 const img = document.createElement('img');
-                img.src = imgObj.src;
+                
+                // 【新魔法】檢查這張圖是否有小朋友之前畫過的縮圖
+                const savedThumb = localStorage.getItem('thumb_' + imgObj.name);
+                if (savedThumb) {
+                    img.src = savedThumb; // 有畫過！展示小朋友的最新作品
+                } else {
+                    img.src = imgObj.src; // 沒畫過，展示預設黑白圖案
+                }
+                
                 img.className = `collage-img img-${idx + 1}`;
                 img.style.borderColor = cat.borderColor; 
                 collage.appendChild(img);
@@ -543,7 +554,7 @@
                 
                 card.addEventListener('click', () => {
                     activeCardImgElement = img; activeItemName = item.name; 
-                    loadRecentArtworks(); // 會去讀取該圖案的專屬歷史
+                    loadRecentArtworks(); 
                     overlay.src = item.src; 
                     homeScreen.style.display = 'none'; 
                     gameScreen.style.display = 'flex';
@@ -607,15 +618,14 @@
             emojiGrid.appendChild(btn);
         });
 
-        // 【更新】只加載「目前選中圖案」的最近 3 次作品縮圖
+        // 只加載「目前選中圖案」的最近 3 次作品縮圖
         function loadRecentArtworks() {
             const container = document.getElementById('recent-artworks-container');
             container.innerHTML = ''; 
-            if (!activeItemName) return; // 如果還沒選擇圖案就跳出
+            if (!activeItemName) return; 
             
             let history = [];
             try { 
-                // 從儲存庫讀取「專屬於這張圖案」的歷史紀錄
                 history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]'); 
             } catch(e) {}
             
@@ -697,16 +707,19 @@
                         localStorage.setItem('thumb_' + activeItemName, thumbData); 
                         localStorage.setItem('layer_' + activeItemName, layerData); 
                         
-                        // 【更新】針對「當前選中的圖案」儲存專屬的歷史紀錄，且上限改為 3 張
                         let history = JSON.parse(localStorage.getItem('recent_artworks_' + activeItemName) || '[]');
                         history.unshift(thumbData); 
-                        history = history.slice(0, 3); // 數量上限從 5 縮減為 3
+                        history = history.slice(0, 3); 
                         localStorage.setItem('recent_artworks_' + activeItemName, JSON.stringify(history));
                     } catch (e) { console.error("LocalStorage 容量可能已滿", e); }
                 }
             }
             gameScreen.style.display = 'none'; 
             homeScreen.style.display = 'flex'; 
+            
+            // 返回首頁時重新整理頁面，這樣隨機預覽和最新畫作就會立刻更新！
+            location.reload(); 
+            
             if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             document.body.classList.remove('pseudo-fullscreen'); document.getElementById('btn-fullscreen').innerHTML = '⛶ 全屏';
         });
