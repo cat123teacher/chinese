@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小二詞語運用大冒險 - Teacher Cat</title>
+    <style>
+        /* 充滿活力的漸變背景 */
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background-color: #8ec5fc;
+            background-image: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            color: #333;
+        }
+        
+        /* 已經移除 position: sticky; top: 0; 讓上方橫列不再固定，釋放做題空間 */
+        .header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background-color: rgba(255, 255, 255, 0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+        .header-bar img { height: 60px; border-radius: 10px; }
+        .record-controls { display: flex; align-items: center; gap: 15px; }
+        
+        .clear-btn {
+            background-color: #f44336; color: white; border: none; padding: 8px 15px;
+            font-size: 1em; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 0 #c62828;
+        }
+        .clear-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #c62828; }
+
+        /* 頁尾改為正常文檔流，取消固定，節省手機螢幕空間 */
+        .footer-bar {
+            background-color: #ffeb3b; padding: 20px 15px; width: 100%; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1); font-size: 0.9em;
+            line-height: 1.8; box-sizing: border-box; margin-top: 40px;
+        }
+        .footer-bar a { text-decoration: none; color: #1976d2; font-weight: bold; margin: 0 5px; display: inline-block; }
+        .footer-bar a:hover { color: #e91e63; text-decoration: underline; }
+
+        h1 { color: #fff; font-size: 2.8em; text-shadow: 3px 3px 0px #ff9800, -1px -1px 0px #ff9800; margin-top: 20px;}
+        
+        .container {
+            max-width: 800px; margin: 20px auto; background: rgba(255, 255, 255, 0.95); 
+            border-radius: 20px; border: 4px solid #fff;
+            padding: 30px; box-shadow: 0 15px 25px rgba(0,0,0,0.15); position: relative;
+        }
+        
+        .btn {
+            background-color: #2196f3; color: white; border: none; padding: 12px 25px;
+            font-size: 1.2em; border-radius: 10px; cursor: pointer; margin: 5px;
+            box-shadow: 0 5px 0 #1565c0; transition: transform 0.1s;
+        }
+        .btn:hover { background-color: #42a5f5; transform: scale(1.05); }
+        .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #1565c0; }
+        
+        #levels-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 20px; margin-top: 20px;
+        }
+        .level-btn {
+            color: white; border: 3px solid #fff; padding: 20px 10px;
+            font-size: 1.15em; border-radius: 20px; cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+            font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); transition: all 0.2s;
+        }
+        .level-btn:nth-child(4n+1) { background: linear-gradient(135deg, #ff9a9e, #fecfef); box-shadow: 0 8px 0 #d81b60; color: #c2185b; text-shadow: 1px 1px 0 #fff;}
+        .level-btn:nth-child(4n+2) { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); box-shadow: 0 8px 0 #1565c0; color: #1565c0; text-shadow: 1px 1px 0 #fff;}
+        .level-btn:nth-child(4n+3) { background: linear-gradient(135deg, #84fab0, #8fd3f4); box-shadow: 0 8px 0 #00695c; color: #00695c; text-shadow: 1px 1px 0 #fff;}
+        .level-btn:nth-child(4n+4) { background: linear-gradient(135deg, #fccb90, #d57eeb); box-shadow: 0 8px 0 #4a148c; color: #4a148c; text-shadow: 1px 1px 0 #fff;}
+        
+        .level-btn:hover { transform: translateY(-5px) scale(1.03); filter: brightness(1.1); }
+        .level-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.5); }
+        
+        .score-badge { font-size: 0.85em; background: rgba(255,255,255,0.8); padding: 3px 12px; border-radius: 15px; color: #333; text-shadow: none; border: 1px solid #ddd;}
+        
+        .star-small { font-size: 1.3em; color: #ffeb3b; text-shadow: 1px 1px 2px #f57f17; }
+        .star-big { font-size: 2.5em; color: #ffeb3b; text-shadow: 2px 2px 5px #f57f17; animation: pulse 1.5s infinite; }
+        .star-none { font-size: 1.3em; color: #ccc; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+        .option-row { display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        .option-btn {
+            flex-grow: 1; max-width: 400px; background-color: #ff9800; color: white;
+            padding: 15px; font-size: 1.3em; border-radius: 10px; border: none;
+            box-shadow: 0 5px 0 #e65100; cursor: pointer; transition: background 0.2s;
+        }
+        .option-btn:hover { background-color: #ffa726; }
+        .speak-btn {
+            background-color: #fff176; border: none; border-radius: 50%; width: 45px; height: 45px;
+            font-size: 1.2em; cursor: pointer; box-shadow: 0 3px 0 #fbc02d; margin-left: 10px; transition: transform 0.1s;
+        }
+        .speak-btn:active { transform: scale(0.9); }
+        
+        #question-text { font-size: 1.8em; margin: 20px 0; font-weight: bold; color: #673ab7; display: block;}
+
+        .nav-bar { display: flex; justify-content: space-between; margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 15px; }
+        .nav-btn { background-color: #9e9e9e; box-shadow: 0 5px 0 #616161; }
+        .nav-btn.home { background-color: #e91e63; box-shadow: 0 5px 0 #ad1457; }
+
+        #success-fx {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+            background: rgba(255,255,255,0.9); z-index: 1000; display: flex;
+            justify-content: center; align-items: center; font-size: 4.5em; opacity: 0;
+            transition: opacity 0.3s; transform: scale(0.5); font-weight: bold; color: #ff5722; text-shadow: 3px 3px #ffe0b2; text-align: center;
+        }
+        #success-fx.show {
+            opacity: 1; transform: scale(1); animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes pop { 0% { transform: scale(0.5); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .hint-box {
+            background-color: #ffebee; border: 3px solid #f44336; padding: 15px; border-radius: 15px;
+            margin: 20px auto; max-width: 600px; color: #b71c1c; font-size: 1.2em; display: none;
+        }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-10px);} 75%{transform:translateX(10px);} }
+
+        .summary-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f5f5f5; margin: 10px 0; padding: 15px; border-radius: 10px; font-size: 1.1em;
+        }
+        .correct-tag { color: #4caf50; font-weight: bold; }
+        .wrong-tag { color: #f44336; font-weight: bold; }
+        .hidden { display: none !important; }
+        
+        .start-btn-giant {
+            background-color: #4caf50; font-size: 2em; padding: 20px 40px; border-radius: 20px;
+            box-shadow: 0 8px 0 #2e7d32; display: block; margin: 30px auto; width: 80%;
+        }
+        
+        .intro-header-row { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin-top: 15px; color:#d84315;}
+    </style>
+</head>
+<body>
+
+<div class="header-bar">
+    <img src="cat.jpeg" alt="Teacher Cat Logo" onerror="this.src='https://via.placeholder.com/60?text=Cat'">
+    <div class="record-controls">
+        <span style="font-weight:bold; color:#e91e63; font-size: 1.2em;">🏆 最高分紀錄表</span>
+        <button class="clear-btn" onclick="clearRecord()">🗑️ 清除記錄</button>
+    </div>
+</div>
+
+<div class="container" id="app">
+    
+    <div id="home-screen">
+        <h1>🌟 小二詞語運用大冒險 🌟</h1>
+        <p style="font-size: 1.2em; font-weight: bold; color: #4a148c;">請選擇關卡開始挑戰吧！</p>
+        <div id="levels-grid"></div>
+        
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="btn" style="display:block; margin: 40px auto 0 auto; background-color:#9c27b0; width: 80%; box-shadow: 0 5px 0 #6a1b9a; text-decoration: none; font-size: 1.5em; padding: 15px;">
+            🏠 返回小朋友學習大冒險
+        </a>
+    </div>
+
+    <div id="intro-screen" class="hidden">
+        <h2 id="intro-title" style="color: #e91e63; font-size: 2.2em;"></h2>
+        <div style="background-color: #fff9c4; border: 3px dashed #ffb300; padding: 25px; border-radius: 15px; text-align: left;">
+            <div class="intro-header-row">
+                <h3 style="margin: 0;">📖 Teacher Cat 學習重點：</h3>
+                <button class="speak-btn" style="width:35px;height:35px;" onclick="speakIntro('intro-teaching')">🔊</button>
+            </div>
+            <p id="intro-teaching" style="font-size: 1.3em; line-height: 1.6;"></p>
+            
+            <div class="intro-header-row" style="margin-top: 25px;">
+                <h3 style="margin: 0;">💡 經典例子：</h3>
+                <button class="speak-btn" style="width:35px;height:35px;" onclick="speakIntro('intro-example')">🔊</button>
+            </div>
+            <p id="intro-example" style="font-size: 1.3em; background:#fff; padding:15px; border-radius:8px; box-shadow: inset 0 0 5px rgba(0,0,0,0.1);"></p>
+        </div>
+        <button class="btn start-btn-giant" onclick="startGame()">🚀 開始遊戲</button>
+        <button class="btn nav-btn" style="width: 50%; font-size: 1.5em; padding: 15px;" onclick="showHome()">返回主頁</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <h2 id="game-level-title" style="color: #e91e63; font-size: 2em;"></h2>
+        <div id="progress-text" style="font-size: 1.4em; color: #009688; font-weight: bold; margin-bottom: 10px;">題數: 1 / 20</div>
+        
+        <div style="background: #f3e5f5; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <span id="question-text"></span>
+            <!-- 保留了喇叭按鈕，讓小朋友有需要時自己按 -->
+            <button class="speak-btn" style="vertical-align: middle;" onclick="speakText(document.getElementById('question-text').innerText)">🔊</button>
+        </div>
+        
+        <div class="hint-box" id="hint-box">
+            <strong>🐱 Teacher Cat 提示：</strong> <span id="hint-text"></span>
+            <button class="speak-btn" style="width:35px; height:35px; font-size:1em;" onclick="speakText(document.getElementById('hint-text').innerText)">🔊</button>
+        </div>
+
+        <div id="options-container"></div>
+        
+        <button id="skip-btn" class="btn hidden" style="background-color:#ff5722; width: 80%; margin: 25px auto; display: block; font-size: 1.3em;" onclick="skipQuestion()">⏭️ 放棄這題，跳到下一題</button>
+        
+        <div class="nav-bar">
+            <button class="btn nav-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
+            <button class="btn nav-btn home" onclick="showHome()">🏠 回到主頁</button>
+            <button class="btn nav-btn" onclick="nextQuestion()">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>🎉 關卡完成！ 🎉</h1>
+        <h2 id="score-text" style="color: #4caf50; font-size: 2.5em; text-shadow: 1px 1px #fff;"></h2>
+        
+        <button class="btn" style="background-color: #ff9800; box-shadow: 0 5px 0 #e65100; margin-bottom: 20px; font-size: 1.6em; padding: 15px 30px;" onclick="startGame()">🔄 重新挑戰這一關</button>
+        
+        <div id="summary-container" style="text-align: left; max-height: 450px; overflow-y: auto; margin-bottom: 20px; padding-right: 10px;"></div>
+        <button class="btn nav-btn home" style="width: 80%; font-size: 1.5em;" onclick="showHome()">🏠 回到主頁更新成績</button>
+    </div>
+</div>
+
+<div id="success-fx"><span id="fx-text">🎊 答對了！太棒了！ 🎊</span></div>
+
+<div class="footer-bar">
+    <strong>Teacher Cat 的快樂AI教室</strong><br>
+    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> | 
+    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> | 
+    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> | 
+    <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a><br>
+    <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> | 
+    <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp 分享 Group</a> | 
+    <span>抖音-74254902683</span>
+</div>
+
+<script>
+    // --- 以下是題庫資料區塊 ---
+    const levelData = {
+        1: {
+            title: "第一關：開學日",
+            teaching: "本課重點學習與學校生活相關的詞語。<br>小提示：「光陰」是名詞，代表時間，我們要愛惜光陰。",
+            example: "【例子】新學年 (開始) 了，校園裏有老師和同學，真 (熱鬧)！",
+            easyPool: [
+                { q: "新學年____了，今天是開學的第一天。", options: ["開始", "暑假", "光陰", "結束"], a: 0 },
+                { q: "我穿上____的校服上學去。", options: ["熱鬧", "整齊", "開心", "破爛"], a: 1 },
+                { q: "同學們見了面，互相點頭打____。", options: ["光陰", "熱鬧", "招呼", "遊戲"], a: 2 },
+                { q: "大家都過了一個開心的____。", options: ["光陰", "禮堂", "暑假", "熱鬧"], a: 2 },
+                { q: "校園裏有老師和同學，真____！", options: ["安靜", "整齊", "熱鬧", "可怕"], a: 2 },
+                { q: "我們在禮堂____開學禮。", options: ["舉行", "招手", "開始", "逃跑"], a: 0 },
+                { q: "校長希望每位同學都愛惜____。", options: ["光陰", "校服", "暑假", "熱鬧"], a: 0 },
+                { q: "我的班主任是陳老師，她對同學很____。", options: ["友善", "生氣", "可怕", "整齊"], a: 0 },
+                { q: "同學們都很____陳老師。", options: ["討厭", "尊敬", "害怕", "友善"], a: 1 },
+                { q: "我們班來了一位新同學，____叫李子君。", options: ["名字", "年齡", "身高", "樣子"], a: 0 },
+                { q: "李子君的樣子十分____。", options: ["可怕", "可笑", "可愛", "可憐"], a: 2 },
+                { q: "李子君對人很有____。", options: ["禮物", "禮貌", "理由", "力氣"], a: 1 },
+                { q: "我們一起鼓掌____李子君。", options: ["歡呼", "歡樂", "歡迎", "歡笑"], a: 2 },
+                { q: "老師站在____前跟我們說話。", options: ["黑板", "廁所", "操場", "天台"], a: 0 },
+                { q: "上課鐘聲響起，大家連忙走進____。", options: ["公園", "課室", "禮堂", "操場"], a: 1 },
+                { q: "班長幫老師派發新的____。", options: ["工作", "通告", "書桌", "校服"], a: 1 },
+                { q: "我跟好朋友分在同一個____。", options: ["班級", "學校", "家裏", "巴士"], a: 0 },
+                { q: "放學後，我跟同學說____。", options: ["早晨", "你好", "再見", "多謝"], a: 2 },
+                { q: "今天是我第一天____。", options: ["放學", "上學", "放假", "睡覺"], a: 1 },
+                { q: "書包裏裝滿了新買的____。", options: ["玩具", "食物", "課本", "衣服"], a: 2 }
+            ],
+            hardPool: [
+                { q: "「光陰」是甚麼詞性？", options: ["動詞", "形容詞", "名詞", "量詞"], a: 2 },
+                { q: "哪一個詞語的意思是「時間」？", options: ["暑假", "光陰", "禮堂", "開始"], a: 1 },
+                { q: "「舉行」通常用來配搭甚麼？", options: ["食物", "衣服", "活動或典禮", "天氣"], a: 2 },
+                { q: "句子改錯：同學們見了面，互相點頭打(招手)。應改為？", options: ["招認", "招呼", "招牌", "招來"], a: 1 },
+                { q: "「熱鬧」的相反詞是甚麼？", options: ["冷清", "開心", "擁擠", "吵鬧"], a: 0 },
+                { q: "「尊敬」通常用來形容對誰的態度？", options: ["同學", "長輩或老師", "寵物", "死物"], a: 1 },
+                { q: "以下哪一個是形容詞？", options: ["舉行", "禮堂", "整齊", "光陰"], a: 2 },
+                { q: "「友善」的意思是甚麼？", options: ["朋友很多", "態度親切和好", "喜歡生氣", "很聰明"], a: 1 },
+                { q: "老師如同父母一樣愛護我們，我們應該怎樣對待老師？", options: ["友善", "尊敬", "歡迎", "可愛"], a: 1 },
+                { q: "「熱鬧」用來形容甚麼情境最好？", options: ["一個人看書", "睡覺的時候", "校園裏很多人", "圖書館裏"], a: 2 },
+                { q: "句子改錯：我穿上(整潔)的校服上學。這裏可以用甚麼詞語替換意思不變？", options: ["破爛", "整齊", "骯髒", "熱鬧"], a: 1 },
+                { q: "「愛惜光陰」的意思是？", options: ["珍惜時間", "喜歡陽光", "討厭上學", "愛護學校"], a: 0 },
+                { q: "「互相」是甚麼意思？", options: ["自己一個人", "彼此、對方", "很多人", "沒有人"], a: 1 },
+                { q: "「新學年」是指甚麼時候？", options: ["新的一年", "學期末", "新學期開始", "放暑假"], a: 2 },
+                { q: "「班主任」的職責是甚麼？", options: ["只教體育", "管理學校", "照顧和教導班上同學", "煮午餐"], a: 2 },
+                { q: "下面哪一個詞語的部首是「見」部？", options: ["覺", "視", "觀", "以上皆是"], a: 3 },
+                { q: "「鼓掌」的動作需要用到身體的哪個部分？", options: ["腳", "頭", "手", "嘴巴"], a: 2 },
+                { q: "「歡迎」這詞語中，「迎」的讀音與哪個字相同？", options: ["型", "營", "盈", "以上皆是"], a: 3 },
+                { q: "如果你是新生，你最希望別人對你怎樣？", options: ["不理睬", "友善", "討厭", "大罵"], a: 1 },
+                { q: "把句子重組：(1)了 (2)新學年 (3)開始", options: ["(1)(2)(3)", "(2)(3)(1)", "(3)(2)(1)", "(2)(1)(3)"], a: 1 }
+            ]
+        },
+        2: {
+        title: "第二關：慶祝生日",
+        teaching: "本課學習與生日派對相關的詞語。<br>小提示：「開心」是形容詞，可以形容人的情緒，也可以疊詞形式出現，例如「開開心心」。",
+        example: "【例子】朋友們來 (參加) 我的生日會，大家都十分 (開心)。",
+        easyPool: [
+            { q: "今天是我的生日，很多朋友來____我的生日會。", options: ["參加", "參觀", "參考", "參與"], a: 0 },
+            { q: "媽媽做了很多____的食物。", options: ["美味", "美麗", "美好", "美妙"], a: 0 },
+            { q: "媽媽做的____十分好吃，大家都喜歡。", options: ["點心", "中心", "開心", "傷心"], a: 0 },
+            { q: "我收到很多生日____，十分高興。", options: ["禮物", "事物", "廢物", "動物"], a: 0 },
+            { q: "朋友們祝我生日____。", options: ["快樂", "樂趣", "樂觀", "可樂"], a: 0 },
+            { q: "大家____地唱起生日歌。", options: ["開心", "愛心", "傷心", "粗心"], a: 0 },
+            { q: "媽媽做了一個生日____給我。", options: ["蛋糕", "蛋卷", "雞蛋", "餅乾"], a: 0 },
+            { q: "爸爸買了一個可愛的____給我。", options: ["洋娃娃", "圖書", "鉛筆", "衣服"], a: 0 },
+            { q: "祖母買了一件美麗的____給我。", options: ["衣服", "鉛筆", "圖書", "蛋糕"], a: 0 },
+            { q: "姐姐送給我一本有趣的____。", options: ["圖書", "衣服", "鉛筆", "蛋糕"], a: 0 },
+            { q: "弟弟送給我一支____，讓我用來做作業。", options: ["鉛筆", "圖書", "衣服", "洋娃娃"], a: 0 },
+            { q: "生日會上，我們玩了很多____的遊戲。", options: ["有趣", "有病", "有害", "無聊"], a: 0 },
+            { q: "我請同學們吃香甜的____。", options: ["糖果", "泥土", "青菜", "苦瓜"], a: 0 },
+            { q: "這份生日禮物包裝得十分____。", options: ["精美", "精靈", "精神", "精明"], a: 0 },
+            { q: "每年的生日，我都過得十分____。", options: ["難忘", "忘記", "難過", "傷心"], a: 0 },
+            { q: "我們在客廳裏佈置了彩色的____。", options: ["氣球", "皮球", "足球", "籃球"], a: 0 },
+            { q: "許願後，我一口氣吹滅了____。", options: ["蠟燭", "燈光", "火災", "太陽"], a: 0 },
+            { q: "大家一起拍手，氣氛十分____。", options: ["熱鬧", "安靜", "可怕", "寒冷"], a: 0 },
+            { q: "我對來參加生日會的朋友說：「____你們！」", options: ["多謝", "對不起", "再見", "早晨"], a: 0 },
+            { q: "收到心愛的玩具，我高興得____起來。", options: ["跳", "哭", "睡", "打"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「開心」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "「開心」的疊詞形式是甚麼？", options: ["開開心心", "開心開心", "心開心開", "開心心"], a: 0 },
+            { q: "句子改錯：親友送了很多生日(禮貌)給祖父。應改為？", options: ["禮物", "禮堂", "禮儀", "禮節"], a: 0 },
+            { q: "句子改錯：美玲(參考)了繪畫比賽。應改為？", options: ["參加", "參觀", "參演", "參拜"], a: 0 },
+            { q: "「參加」的意思是？", options: ["加入某種組織或活動", "去參觀博物館", "考試參考", "放棄"], a: 0 },
+            { q: "「美味」通常用來形容甚麼？", options: ["衣服", "食物", "天氣", "文具"], a: 1 },
+            { q: "以下哪一個是名詞？", options: ["點心", "美味", "參加", "開心"], a: 0 },
+            { q: "「快樂」的近義詞是？", options: ["悲傷", "高興", "生氣", "疲倦"], a: 1 },
+            { q: "「開心」的相反詞是？", options: ["傷心", "歡喜", "高興", "熱鬧"], a: 0 },
+            { q: "以下哪一個量詞配搭正確？", options: ["一塊蛋糕", "一件鉛筆", "一本衣服", "一隻圖書"], a: 0 },
+            { q: "「有趣」的意思是？", options: ["很無聊", "能引起人的好奇心或喜愛", "有味道", "很可怕"], a: 1 },
+            { q: "句子重組：(1)十分 (2)媽媽 (3)做的 (4)好吃 (5)點心", options: ["(2)(3)(5)(1)(4)", "(1)(2)(3)(4)(5)", "(5)(4)(1)(2)(3)", "(3)(5)(1)(2)(4)"], a: 0 },
+            { q: "句子重組：(1)送給 (2)一本 (3)我 (4)姐姐 (5)圖書", options: ["(4)(1)(3)(2)(5)", "(1)(2)(3)(4)(5)", "(4)(3)(1)(2)(5)", "(3)(1)(4)(2)(5)"], a: 0 },
+            { q: "「點心」是指甚麼？", options: ["正餐以外的小食", "時鐘上的時間", "心中的想法", "買東西的商店"], a: 0 },
+            { q: "為甚麼大家要唱生日歌？", options: ["為了叫醒壽星", "為了表達祝賀", "因為要考試", "因為很無聊"], a: 1 },
+            { q: "「精美」的近義詞是？", options: ["粗糙", "美麗/精緻", "難看", "巨大"], a: 1 },
+            { q: "以下哪個詞語可以用來形容「氣氛」？", options: ["美味", "熱鬧", "好吃", "鉛筆"], a: 1 },
+            { q: "「布偶」的同義詞可以是？", options: ["圖書", "洋娃娃", "鉛筆", "蛋糕"], a: 1 },
+            { q: "「禮物」的量詞通常是？", options: ["份 / 件", "條", "隻", "滴"], a: 0 },
+            { q: "收到別人的禮物後，我們最應該做甚麼？", options: ["丟掉", "說多謝", "生氣", "退回去"], a: 1 }
+        ]
+    },
+    3: {
+        title: "第三關：忘記帶課本",
+        teaching: "本課學習與日常作息和忘記事情相關的詞語。<br>小提示：「連忙」、「道歉」和「完成」都是動詞，後面可以加上表示已經做了的助詞「了」。",
+        example: "【例子】我 (發覺) 自己忘記帶課本，(連忙) 向老師 (道歉)。",
+        easyPool: [
+            { q: "早上鬧鐘響了，我還不____起牀。", options: ["願意", "發生", "發覺", "完成"], a: 0 },
+            { q: "媽媽來叫我，我才____起牀。", options: ["連忙", "早晨", "道歉", "完成"], a: 0 },
+            { q: "我匆忙地吃過____，便跟着姐姐上學去。", options: ["早餐", "晚餐", "午餐", "宵夜"], a: 0 },
+            { q: "上課時，我才____沒有帶中文課本。", options: ["發覺", "發明", "發生", "發展"], a: 0 },
+            { q: "我連已經做好了的功課也忘記帶，沒法____交功課。", options: ["完成", "完全", "完美", "完整"], a: 0 },
+            { q: "我不好意思地低着頭向老師____。", options: ["道歉", "道謝", "道理", "道路"], a: 0 },
+            { q: "老師，真對不起，____我昨天很晚睡覺。", options: ["因為", "所以", "認為", "以為"], a: 0 },
+            { q: "我沒有____好書包，所以忘記了帶課本。", options: ["收拾", "收集", "收買", "收入"], a: 0 },
+            { q: "沒有收拾書包，____忘記了帶課本和功課。", options: ["所以", "因為", "可是", "雖然"], a: 0 },
+            { q: "老師說：「你們____從小養成早睡早起的習慣。」", options: ["應該", "應付", "答應", "反應"], a: 0 },
+            { q: "我們從小要____早睡早起的好習慣。", options: ["養成", "生育", "完成", "變成"], a: 0 },
+            { q: "還要____好書包才上學，這才是好孩子啊！", options: ["整理", "整潔", "整齊", "修理"], a: 0 },
+            { q: "昨晚我不小心睡着了，忘記把功課放進____裏。", options: ["書包", "錢包", "沙發", "雪櫃"], a: 0 },
+            { q: "我答應老師，以後會____檢查書包。", options: ["認真", "隨便", "馬虎", "開心"], a: 0 },
+            { q: "上學前，媽媽提醒我____書包，不要漏帶課本。", options: ["檢查", "看見", "發覺", "收拾"], a: 0 },
+            { q: "忘記帶課本，讓我感到十分____。", options: ["後悔", "開心", "驕傲", "生氣"], a: 0 },
+            { q: "下次睡覺前，我一定會把物品____好。", options: ["準備", "忘記", "破壞", "丟掉"], a: 0 },
+            { q: "我____這是一個壞習慣，一定會改過。", options: ["知道", "不知道", "忘記", "猜到"], a: 0 },
+            { q: "做錯事要勇於____，並努力改正。", options: ["認錯", "逃避", "說謊", "打架"], a: 0 },
+            { q: "今天我____了準時交功課的責任。", options: ["忘記", "記住", "完成", "發覺"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「道歉」的意思是甚麼？", options: ["說謝謝", "表示歉意、認錯", "說再見", "講道理"], a: 1 },
+            { q: "「發覺」的近義詞是甚麼？", options: ["發生", "發現", "發明", "發出"], a: 1 },
+            { q: "句子改錯：做錯事的志輝向爸爸(道謝)。應改為？", options: ["道歉", "道別", "道理", "道路"], a: 0 },
+            { q: "句子選詞：老師，真對不起，(認 / 因)為我昨天很晚睡。", options: ["因", "認", "應", "引"], a: 0 },
+            { q: "句子選詞：沒有(集 / 拾)書包，所以忘記了帶課本。", options: ["拾", "集", "十", "合"], a: 0 },
+            { q: "句子選詞：你們(應 / 付)該從小養成好習慣。", options: ["應", "付", "英", "因"], a: 0 },
+            { q: "句子選詞：還要(潔 / 理)好書包才上學。", options: ["理", "潔", "裏", "禮"], a: 0 },
+            { q: "「因為...所以...」是用來表示甚麼關係的關聯詞？", options: ["因果關係", "假設關係", "轉折關係", "並列關係"], a: 0 },
+            { q: "「連忙」的意思是？", options: ["慢慢地", "急忙、趕快", "一直", "從不"], a: 1 },
+            { q: "以下哪個是動詞？", options: ["早餐", "課本", "完成", "習慣"], a: 2 },
+            { q: "「願意」的相反詞是？", options: ["喜歡", "拒絕/不肯", "希望", "高興"], a: 1 },
+            { q: "句子重組：(1)發覺 (2)我才 (3)沒有帶 (4)上課時 (5)中文課本", options: ["(4)(2)(1)(3)(5)", "(1)(2)(3)(4)(5)", "(2)(1)(4)(5)(3)", "(4)(1)(3)(5)(2)"], a: 0 },
+            { q: "「養成」通常搭配甚麼詞語？", options: ["動物", "好習慣/壞習慣", "食物", "衣服"], a: 1 },
+            { q: "「整理」和「收拾」的關係是？", options: ["近義詞", "反義詞", "沒有關係", "同音詞"], a: 0 },
+            { q: "「應該」的詞性是？", options: ["名詞", "能願動詞", "形容詞", "量詞"], a: 1 },
+            { q: "課文中主角為甚麼會忘記帶課本？", options: ["因為課本不見了", "因為他很晚睡，沒有收拾書包", "因為被弟弟拿走了", "因為不想上學"], a: 1 },
+            { q: "「匆忙」的意思是？", options: ["急急忙忙", "慢慢吞吞", "開開心心", "安安靜靜"], a: 0 },
+            { q: "向別人道歉時，最常說的話是甚麼？", options: ["你好", "對不起", "多謝", "再見"], a: 1 },
+            { q: "把物品放置得有條理，我們稱之為？", options: ["破壞", "整理", "弄亂", "丟棄"], a: 1 },
+            { q: "要避免忘記帶東西，最好的方法是？", options: ["出門前才找", "前一晚先收拾好", "叫別人幫忙記", "不帶書包"], a: 1 }
+        ]
+    },
+    4: {
+        title: "第四關：同學們的志願",
+        teaching: "本課學習與不同職業及工作內容相關的詞語。<br>小提示：了解不同職業的動詞搭配，例如「維持治安」、「醫治病人」。",
+        example: "【例子】我的志願是做一名 (醫生)，幫助 (生病) 的人。",
+        easyPool: [
+            { q: "家偉想做一個警察，____社會治安。", options: ["維持", "破壞", "打掃", "駕駛"], a: 0 },
+            { q: "欣兒想做一個____，在醫院照顧病人。", options: ["護士", "學生", "司機", "老師"], a: 0 },
+            { q: "美儀想做一個老師，教____讀書。", options: ["學生", "醫生", "護士", "消防員"], a: 0 },
+            { q: "思思想做一個____，為大家醫治疾病。", options: ["醫生", "護士", "學生", "司機"], a: 0 },
+            { q: "立強想做一個____，去救火又救人。", options: ["消防員", "警察", "郵差", "醫生"], a: 0 },
+            { q: "子輝想做一個郵差，每天為大家派送____。", options: ["信件", "食物", "衣服", "玩具"], a: 0 },
+            { q: "清潔工人每天打掃____，保持環境衞生。", options: ["街道", "天空", "海洋", "太空"], a: 0 },
+            { q: "售貨員的工作十分____，每天要招待很多客人。", options: ["忙碌", "空閒", "無聊", "輕鬆"], a: 0 },
+            { q: "遇到意外時，我們可以向警察____。", options: ["求助", "打架", "逃跑", "投訴"], a: 0 },
+            { q: "司機為我們____不同的交通工具。", options: ["駕駛", "破壞", "修理", "製造"], a: 0 },
+            { q: "社工幫助社會上有____的人。", options: ["需要", "錢", "開心", "食物"], a: 0 },
+            { q: "長大後，我也希望能為社會出一分____。", options: ["力", "錢", "飯", "水"], a: 0 },
+            { q: "我的志願是當一名廚師，煮____的食物。", options: ["美味", "難吃", "有毒", "奇怪"], a: 0 },
+            { q: "農夫在田裏辛苦地種植____。", options: ["蔬菜", "玩具", "汽車", "衣服"], a: 0 },
+            { q: "我們每天都要____，將來才能實現志願。", options: ["學習", "睡覺", "玩耍", "打架"], a: 0 },
+            { q: "建築工人負責建造堅固的____。", options: ["房屋", "白雲", "彩虹", "河流"], a: 0 },
+            { q: "每種職業都值得我們去____。", options: ["尊敬", "討厭", "嘲笑", "欺負"], a: 0 },
+            { q: "只要肯努力，夢想一定能____。", options: ["實現", "消失", "破滅", "忘記"], a: 0 },
+            { q: "老師用心____我們各種知識。", options: ["教導", "責罵", "欺騙", "隱瞞"], a: 0 },
+            { q: "消防員的工作十分____，但他們都很勇敢。", options: ["危險", "安全", "輕鬆", "無聊"], a: 0 }
+        ],
+        hardPool: [
+            { q: "句子改錯：清潔工人每天(打扮)街道。應改為？", options: ["打掃", "打架", "打球", "打人"], a: 0 },
+            { q: "句子改錯：售貨員的工作十分(慌忙)。應改為？", options: ["忙碌 / 繁忙", "空閒", "輕鬆", "害怕"], a: 0 },
+            { q: "句子改錯：遇到意外時，我們可以向警察(幫助)。應改為？", options: ["求助", "助手", "幫忙", "救命"], a: 0 },
+            { q: "句子改錯：公司為我們(駕駛)不同的交通工具。應改為？", options: ["司機", "機師", "船長", "車長"], a: 0 },
+            { q: "句子改錯：社工幫助社會上有(必需)的人。應改為？", options: ["需要", "必須", "須要", "需求"], a: 0 },
+            { q: "「志願」的意思是甚麼？", options: ["志向和願望", "很生氣", "不願意做的事", "義務工作"], a: 0 },
+            { q: "「維持」通常與哪個詞語搭配？", options: ["治安 / 秩序", "衣服", "食物", "天氣"], a: 0 },
+            { q: "「醫治」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 0 },
+            { q: "以下哪個職業的職責是「派送信件」？", options: ["郵差", "警察", "消防員", "醫生"], a: 0 },
+            { q: "「忙碌」的相反詞是？", options: ["空閒 / 清閒", "繁忙", "辛苦", "疲倦"], a: 0 },
+            { q: "「求助」的意思是？", options: ["請求幫助", "幫助別人", "求學", "要求"], a: 0 },
+            { q: "句子重組：(1)警察 (2)一個 (3)家偉 (4)想做", options: ["(3)(4)(2)(1)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(2)(1)(4)(3)"], a: 0 },
+            { q: "句子重組：(1)照顧病人 (2)護士 (3)在醫院裏", options: ["(2)(3)(1)", "(1)(2)(3)", "(3)(2)(1)", "(2)(1)(3)"], a: 0 },
+            { q: "「駕駛」的意思是？", options: ["操縱車、船、飛機等行駛", "修理機器", "買車", "走路"], a: 0 },
+            { q: "「需要」和「必需」的分別？", options: ["需要是動詞(要求得到)，必需是動詞/形容詞(一定要有)", "沒有分別", "需要是名詞", "必需是名詞"], a: 0 },
+            { q: "為甚麼每種職業都值得尊敬？", options: ["因為每種職業都對社會有貢獻", "因為可以賺很多錢", "因為很好玩", "因為很輕鬆"], a: 0 },
+            { q: "「治安」是指甚麼？", options: ["社會的安定秩序", "治病的方法", "天氣預報", "交通情況"], a: 0 },
+            { q: "「教導」的近義詞是？", options: ["教育/指導", "學習", "放棄", "玩耍"], a: 0 },
+            { q: "消防員去救火，體現了甚麼精神？", options: ["勇敢", "懶惰", "自私", "膽小"], a: 0 },
+            { q: "這篇課文主要告訴我們甚麼？", options: ["每個人都可以有自己想做的工作，為社會服務", "醫生最厲害", "不要去工作", "只有警察才偉大"], a: 0 }
+        ]
+    },
+    5: {
+        title: "第五關：啄木鳥",
+        teaching: "本課透過啄木鳥學習描寫動物特徵的詞語。<br>小提示：「尖利」和「光滑」是形容詞，可以在前面加上「十分」、「非常」等表示程度的副詞。",
+        example: "【例子】啄木鳥有 (尖利) 的嘴巴，能為樹木 (消滅) 害蟲。",
+        easyPool: [
+            { q: "啄木鳥是對環境有益的____。", options: ["雀鳥", "魚類", "昆蟲", "植物"], a: 0 },
+            { q: "啄木鳥有一張又長又尖的____。", options: ["嘴巴", "耳朵", "尾巴", "翅膀"], a: 0 },
+            { q: "啄木鳥身上長着灰黑色的____。", options: ["羽毛", "鱗片", "皮毛", "頭髮"], a: 0 },
+            { q: "啄木鳥的爪子十分____，能抓緊樹幹。", options: ["尖利", "柔軟", "光滑", "圓潤"], a: 0 },
+            { q: "啄木鳥的耳朵能夠聽到____的聲音。", options: ["微小", "巨大", "吵鬧", "響亮"], a: 0 },
+            { q: "啄木鳥能夠站在____的樹幹上。", options: ["光滑", "粗糙", "柔軟", "尖利"], a: 0 },
+            { q: "樹木裏有害蟲，便會____。", options: ["生病", "長大", "開花", "結果"], a: 0 },
+            { q: "啄木鳥____啄破壞死了的樹皮。", options: ["能夠", "不能", "不會", "拒絕"], a: 0 },
+            { q: "啄木鳥用帶鈎的舌頭來____害蟲。", options: ["捕食", "睡覺", "唱歌", "飛行"], a: 0 },
+            { q: "啄木鳥替樹木____害蟲。", options: ["消滅", "保護", "餵養", "增加"], a: 0 },
+            { q: "啄木鳥____樹木除蟲，被人們稱為「樹醫生」。", options: ["幫助", "傷害", "欺負", "討厭"], a: 0 },
+            { q: "啄木鳥的尾巴很堅硬，能____身體。", options: ["支撐", "破壞", "隱藏", "折斷"], a: 0 },
+            { q: "牠們在森林裏____地飛來飛去。", options: ["自由", "痛苦", "害怕", "傷心"], a: 0 },
+            { q: "啄木鳥是人類的____。", options: ["好朋友", "敵人", "食物", "玩具"], a: 0 },
+            { q: "聽到「篤篤篤」的聲音，就知道____在工作了。", options: ["啄木鳥", "麻雀", "老鷹", "企鵝"], a: 0 },
+            { q: "我們要好好____大自然裏的雀鳥。", options: ["保護", "捕捉", "傷害", "嚇跑"], a: 0 },
+            { q: "害蟲會把樹木咬得____的。", options: ["破破爛爛", "完好無缺", "漂漂亮亮", "乾乾淨淨"], a: 0 },
+            { q: "啄木鳥的舌頭很____，能伸進樹洞裏。", options: ["長", "短", "粗", "圓"], a: 0 },
+            { q: "大自然真是十分____，每種生物都有自己的本領。", options: ["奇妙", "無聊", "可怕", "可憐"], a: 0 },
+            { q: "樹木恢復了____，長出綠油油的葉子。", options: ["健康", "生病", "死亡", "枯萎"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「尖利」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "「光滑」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "以下哪個副詞可以用在「光滑」前面表示程度？", options: ["十分/非常", "已經", "正在", "從不"], a: 0 },
+            { q: "「微小」的相反詞是甚麼？", options: ["巨大", "細小", "微弱", "精細"], a: 0 },
+            { q: "「消滅」的意思是甚麼？", options: ["除掉、使消失", "發生", "幫助", "保護"], a: 0 },
+            { q: "「捕食」的意思是甚麼？", options: ["捕捉其他生物作食物", "被別人吃掉", "睡覺", "逃跑"], a: 0 },
+            { q: "為甚麼啄木鳥被稱為「樹醫生」？", options: ["因為牠會幫樹木捉出害蟲治病", "因為牠穿着白大褂", "因為牠會開藥", "因為牠會飛"], a: 0 },
+            { q: "句子選詞：樹木裏有害蟲，便會( )。", options: ["生病", "生氣", "生長", "生命"], a: 0 },
+            { q: "句子選詞：啄木鳥( )啄破壞死了的樹皮。", options: ["能夠", "不能", "可能", "大概"], a: 0 },
+            { q: "句子重組：(1)有益的 (2)啄木鳥 (3)雀鳥 (4)是", options: ["(2)(4)(1)(3)", "(1)(2)(3)(4)", "(4)(2)(1)(3)", "(3)(4)(1)(2)"], a: 0 },
+            { q: "句子重組：(1)尖利的 (2)爪子 (3)啄木鳥的 (4)十分", options: ["(3)(2)(4)(1)", "(1)(2)(3)(4)", "(4)(1)(3)(2)", "(2)(3)(4)(1)"], a: 0 },
+            { q: "「光滑」的反義詞是？", options: ["粗糙", "平滑", "明亮", "黑暗"], a: 0 },
+            { q: "「柔軟」通常用來形容甚麼？", options: ["羽毛/布料", "石頭", "玻璃", "鋼鐵"], a: 0 },
+            { q: "「有益」的意思是？", options: ["有好處", "有害處", "沒有用", "有毒"], a: 0 },
+            { q: "啄木鳥用甚麼來聽樹幹裏害蟲的聲音？", options: ["微小的耳朵", "眼睛", "尾巴", "翅膀"], a: 0 },
+            { q: "「樹幹」是指樹的哪個部分？", options: ["樹的主體軀幹", "樹葉", "樹根", "花朵"], a: 0 },
+            { q: "「幫助」的近義詞是？", options: ["幫忙/援助", "打擾", "破壞", "欺負"], a: 0 },
+            { q: "啄木鳥的舌頭有甚麼特徵能幫助牠捕食？", options: ["帶鈎", "會發光", "很短", "很粗"], a: 0 },
+            { q: "這篇課文主要描寫了啄木鳥的甚麼？", options: ["外形特徵和本領", "喜歡吃甚麼水果", "怎樣築巢", "怎樣和別的鳥打架"], a: 0 },
+            { q: "「能夠」可以替換成哪個詞語？", options: ["可以/能", "不能", "不會", "拒絕"], a: 0 }
+        ]
+    },
+    6: {
+        title: "第六關：保護牙齒",
+        teaching: "本課學習與保護牙齒及個人衞生相關的詞語。<br>小提示：「損害」是動詞，指使蒙受損失；「有益」是形容詞，指有好處。",
+        example: "【例子】我們要養成早晚刷牙的 (習慣)，保持牙齒 (健康)。",
+        easyPool: [
+            { q: "我們要保持牙齒____，每天都要刷牙。", options: ["清潔", "骯髒", "破爛", "整齊"], a: 0 },
+            { q: "我們要養成早晚刷牙的____。", options: ["習慣", "練習", "學習", "遊戲"], a: 0 },
+            { q: "我們要用正確的____刷牙，才能刷乾淨。", options: ["方法", "方向", "方面", "方塊"], a: 0 },
+            { q: "牙刷要定期____，不能用太久。", options: ["更換", "更改", "更新", "更加"], a: 0 },
+            { q: "我們要定期到牙醫診所____牙齒。", options: ["檢查", "檢驗", "測驗", "考試"], a: 0 },
+            { q: "喝牛奶可以____牙齒生長，讓牙齒更堅固。", options: ["幫助", "破壞", "阻止", "損害"], a: 0 },
+            { q: "太硬的____可能會傷害牙齒，要小心咀嚼。", options: ["食物", "衣服", "玩具", "書本"], a: 0 },
+            { q: "如果牙齒健康，口氣也會變得____。", options: ["清新", "清涼", "惡臭", "難聞"], a: 0 },
+            { q: "吃太多糖果會____我們的牙齒，容易蛀牙。", options: ["損害", "保護", "幫助", "有益"], a: 0 },
+            { q: "我們要多吃對牙齒____的食物，例如蔬菜。", options: ["有益", "有害", "無用", "損害"], a: 0 },
+            { q: "我們要注意口腔____，避免細菌滋生。", options: ["衞生", "生命", "生活", "生病"], a: 0 },
+            { q: "牙痛起來真的十分____。", options: ["辛苦", "開心", "舒服", "輕鬆"], a: 0 },
+            { q: "飯後我們應該____，保持口腔清潔。", options: ["漱口", "洗澡", "睡覺", "跑步"], a: 0 },
+            { q: "我們要用____刷牙，才能有效預防蛀牙。", options: ["牙膏", "肥皂", "洗頭水", "泥土"], a: 0 },
+            { q: "健康的牙齒看起來十分____。", options: ["潔白", "漆黑", "黃色", "紅色"], a: 0 },
+            { q: "小朋友到了幾歲就會開始____牙？", options: ["換", "掉", "長", "生"], a: 0 },
+            { q: "看牙醫時，不要感到____，牙醫是幫助我們的。", options: ["害怕", "開心", "興奮", "期待"], a: 0 },
+            { q: "牙齒的主要功能是____食物。", options: ["咀嚼", "吞嚥", "消化", "吸收"], a: 0 },
+            { q: "我們每天最少要刷____次牙。", options: ["兩", "一", "零", "十"], a: 0 },
+            { q: "吃完甜食後，要記得____。", options: ["刷牙", "睡覺", "玩耍", "看電視"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「損害」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 0 },
+            { q: "「有益」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "句子改錯：吃太多糖果會(損害)我們的牙齒。(提示：原本可能是錯誤詞，找出正確的)", options: ["損害", "損失", "損傷", "損毀"], a: 0 },
+            { q: "「清新」通常用來形容甚麼？", options: ["空氣 / 口氣", "顏色", "形狀", "聲音"], a: 0 },
+            { q: "「更換」的意思是甚麼？", options: ["替換、換新的", "修理", "買東西", "丟掉"], a: 0 },
+            { q: "「習慣」的意思是？", options: ["長期養成的不易改變的行為", "學習新東西", "偶爾做一次的事", "玩遊戲"], a: 0 },
+            { q: "「有益」的相反詞是？", options: ["有害", "無益", "益處", "利益"], a: 0 },
+            { q: "句子重組：(1)習慣 (2)早晚刷牙的 (3)我們要 (4)養成", options: ["(3)(4)(2)(1)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(2)(1)(3)(4)"], a: 0 },
+            { q: "句子重組：(1)健康 (2)保持 (3)牙齒", options: ["(2)(3)(1)", "(1)(2)(3)", "(3)(2)(1)", "(1)(3)(2)"], a: 0 },
+            { q: "「清潔」的近義詞是？", options: ["乾淨", "骯髒", "混亂", "整齊"], a: 0 },
+            { q: "「損害」和「保護」的關係是？", options: ["反義詞", "近義詞", "同義詞", "沒有關係"], a: 0 },
+            { q: "「檢查」的意思是？", options: ["用心查看以發現問題", "考試", "修理", "清洗"], a: 0 },
+            { q: "「健康」的詞性可以是？", options: ["名詞或形容詞", "只能是動詞", "只能是量詞", "只能是副詞"], a: 0 },
+            { q: "為甚麼太硬的食物會傷害牙齒？", options: ["可能導致牙齒崩裂", "因為太甜", "因為太酸", "因為不好吃"], a: 0 },
+            { q: "「定期」的意思是？", options: ["固定的時間間隔", "從來不", "每天", "隨時"], a: 0 },
+            { q: "「方法」的近義詞是？", options: ["辦法/方式", "方向", "方形", "方面"], a: 0 },
+            { q: "「幫助」可以替換成哪個詞語？", options: ["協助/幫忙", "破壞", "阻止", "反對"], a: 0 },
+            { q: "如果牙齒生病了，會影響我們做甚麼？", options: ["吃東西和說話", "睡覺", "走路", "寫字"], a: 0 },
+            { q: "我們應該多久更換一次牙刷？", options: ["大約三個月", "三年", "每天", "從不"], a: 0 },
+            { q: "這篇課文的主題是甚麼？", options: ["教導我們保護牙齒的重要性及方法", "教我們吃糖果", "教我們看醫生", "教我們買牙刷"], a: 0 }
+        ]
+    },
+    7: {
+        title: "第七關：山雞跳舞",
+        teaching: "本課學習描寫動物外表及動作的詞語。<br>小提示：「漂亮」是形容詞，形容外觀鮮明好看。",
+        example: "【例子】這隻山雞長着 (漂亮) 的羽毛，還會跳優美的 (舞蹈)。",
+        easyPool: [
+            { q: "有人從____帶來一隻美麗的山雞送給曹操。", options: ["外地", "外表", "外面", "外星"], a: 0 },
+            { q: "山雞身上長滿____的羽毛，十分好看。", options: ["漂亮", "響亮", "醜陋", "暗淡"], a: 0 },
+            { q: "山雞的尾巴上有白色的____。", options: ["花紋", "皺紋", "文字", "指紋"], a: 0 },
+            { q: "聽說山雞會跳出美妙的____。", options: ["舞蹈", "飛舞", "跑步", "睡覺"], a: 0 },
+            { q: "曹操十分____能看到山雞跳舞。", options: ["希望", "願望", "失望", "絕望"], a: 0 },
+            { q: "大家用了很多____，可是山雞就是不肯跳舞。", options: ["方法", "方向", "方面", "方便"], a: 0 },
+            { q: "曹操為這件事感到十分____。", options: ["生氣", "脾氣", "開心", "高興"], a: 0 },
+            { q: "曹操的____曹沖想到一個令山雞跳舞的辦法。", options: ["兒子", "女兒", "父親", "母親"], a: 0 },
+            { q: "曹沖想到了一個好____。", options: ["辦法", "辨認", "分辨", "辯論"], a: 0 },
+            { q: "曹沖叫人把一面銅鏡放在山雞的面前，山雞____鏡子裏也有一隻山雞。", options: ["看見", "看不見", "聽見", "不見"], a: 0 },
+            { q: "山雞立刻拍着____跳起舞來。", options: ["翅膀", "尾巴", "爪子", "腦袋"], a: 0 },
+            { q: "眾人看後都哈哈大笑，並____曹沖是一個聰明的孩子。", options: ["稱讚", "責罵", "討厭", "嘲笑"], a: 0 },
+            { q: "曹沖真是一個____的孩子，能想出這麼好的辦法。", options: ["聰明", "愚蠢", "頑皮", "懶惰"], a: 0 },
+            { q: "山雞在鏡子前____地跳舞。", options: ["高興", "傷心", "生氣", "害怕"], a: 0 },
+            { q: "大家對曹沖的聰明才智感到____。", options: ["佩服", "生氣", "討厭", "害怕"], a: 0 },
+            { q: "銅鏡把山雞的倒影照得清清楚楚，就像____一樣。", options: ["真", "假", "畫", "夢"], a: 0 },
+            { q: "山雞以為鏡子裏的是自己的____。", options: ["同伴", "敵人", "食物", "主人"], a: 0 },
+            { q: "這是一個流傳已久的____故事。", options: ["歷史", "科幻", "恐怖", "無聊"], a: 0 },
+            { q: "遇到困難時，我們應該像曹沖一樣多動____。", options: ["腦筋", "手腳", "脾氣", "嘴巴"], a: 0 },
+            { q: "山雞的舞姿十分____。", options: ["優美", "難看", "可怕", "奇怪"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「漂亮」是甚麼詞性？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "「外地」的意思是甚麼？", options: ["本地以外的地方", "外表", "外面", "太空"], a: 0 },
+            { q: "「希望」的詞性可以是？", options: ["動詞或名詞", "只能是動詞", "只能是形容詞", "量詞"], a: 0 },
+            { q: "句子選詞：山雞身上長滿(漂亮 / 響亮)的羽毛。", options: ["漂亮", "響亮", "明亮", "光亮"], a: 0 },
+            { q: "句子選詞：山雞的尾巴上有白色的(花紋 / 皺紋)。", options: ["花紋", "皺紋", "水紋", "指紋"], a: 0 },
+            { q: "句子選詞：大家用了很多(方法 / 方向)。", options: ["方法", "方向", "方面", "方塊"], a: 0 },
+            { q: "句子選詞：曹操為這件事感到十分(生氣 / 脾氣)。", options: ["生氣", "脾氣", "力氣", "和氣"], a: 0 },
+            { q: "「稱讚」的近義詞是？", options: ["讚美/表揚", "責罵", "批評", "討厭"], a: 0 },
+            { q: "「聰明」的相反詞是？", options: ["愚蠢/笨", "機靈", "活潑", "可愛"], a: 0 },
+            { q: "為甚麼山雞看到鏡子會跳舞？", options: ["因為牠以為看到了另一隻山雞，想展示自己", "因為牠喜歡照鏡子", "因為鏡子很亮", "因為牠想打架"], a: 0 },
+            { q: "「辦法」和「方法」的關係是？", options: ["近義詞", "反義詞", "同音詞", "沒有關係"], a: 0 },
+            { q: "句子重組：(1)一隻 (2)有人 (3)美麗的 (4)帶來 (5)山雞", options: ["(2)(4)(1)(3)(5)", "(1)(2)(3)(4)(5)", "(5)(4)(3)(2)(1)", "(2)(1)(4)(3)(5)"], a: 0 },
+            { q: "句子重組：(1)聰明的 (2)曹沖 (3)孩子 (4)是一個", options: ["(2)(4)(1)(3)", "(1)(2)(3)(4)", "(3)(4)(1)(2)", "(4)(3)(2)(1)"], a: 0 },
+            { q: "「立刻」可以替換成哪個詞語？", options: ["馬上/即刻", "慢慢", "從不", "一直"], a: 0 },
+            { q: "「美妙」通常用來形容甚麼？", options: ["聲音或舞蹈等美好的事物", "天氣", "食物", "衣服"], a: 0 },
+            { q: "曹操「生氣」的原因是甚麼？", options: ["因為山雞不肯跳舞", "因為肚子餓", "因為曹沖不聽話", "因為鏡子破了"], a: 0 },
+            { q: "「眾人」的意思是？", options: ["許多人", "一個人", "沒有人", "兩個人"], a: 0 },
+            { q: "這篇課文讚揚了曹沖的甚麼品質？", options: ["善於觀察和動腦筋", "力氣大", "跑得快", "會跳舞"], a: 0 },
+            { q: "「銅鏡」在古代是用來做甚麼的？", options: ["照見容貌(當鏡子用)", "當武器", "煮飯", "當錢幣"], a: 0 },
+            { q: "「花紋」是指甚麼？", options: ["物體表面的紋路和圖案", "花朵的形狀", "花的香味", "文字"], a: 0 }
+        ]
+    },
+    8: {
+        title: "第八關：盲人摸象",
+         গঠন: "本課透過寓言故事學習與認知及溝通相關的詞語。<br>小提示：「從前」是表示過去的時間名詞。",
+        example: "【例子】(從前)，有四個盲人在 (談天)，討論大象的樣子。",
+        easyPool: [
+            { q: "____，村裏有四個盲人。", options: ["從前", "現在", "將來", "明天"], a: 0 },
+            { q: "他們喜歡坐在大樹下____，各人都說自己最有學識。", options: ["談天", "睡覺", "打架", "哭泣"], a: 0 },
+            { q: "有一次，城外的____富有人家從南方帶來了一頭大象。", options: ["一戶", "一個", "一隻", "一間"], a: 0 },
+            { q: "富有人家帶來了____大象。", options: ["一頭", "一隻", "一條", "一個"], a: 0 },
+            { q: "四個盲人____對這種動物毫無認識，但都表示自己知道大象的樣子。", options: ["本來", "後來", "將來", "一直"], a: 0 },
+            { q: "他們都表示自己____大象的樣子。", options: ["知道", "忘記", "不明白", "發覺"], a: 0 },
+            { q: "四個盲人一起走到大象旁邊，第一個盲人抱着象腿，說大象好像一根____。", options: ["柱子", "城牆", "扇子", "繩子"], a: 0 },
+            { q: "第二個盲人摸着大象的肚子，說大象跟____一樣。", options: ["城牆", "柱子", "扇子", "繩子"], a: 0 },
+            { q: "第三個盲人摸着大象的耳朵，說大象有如一把____。", options: ["扇子", "柱子", "城牆", "繩子"], a: 0 },
+            { q: "第四個盲人摸到大象的鼻子，____尖叫有蛇。", options: ["突然", "仍然", "雖然", "固然"], a: 0 },
+            { q: "旁人____他們，他們摸到的只是大象的一部分。", options: ["告訴", "告別", "報告", "宣告"], a: 0 },
+            { q: "旁人說他們摸到的只是大象的一____。", options: ["部分", "全部", "一半", "點點"], a: 0 },
+            { q: "四個盲人再不敢自誇有____的知識了。", options: ["豐富", "貧乏", "缺少", "很多"], a: 0 },
+            { q: "四個盲人再不敢自誇有豐富的____了。", options: ["知識", "認識", "見識", "常識"], a: 0 },
+            { q: "盲人因為看不見，只能用手去____大象。", options: ["觸摸", "觀看", "聆聽", "品嚐"], a: 0 },
+            { q: "大象的身軀十分____。", options: ["巨大", "微小", "瘦弱", "輕巧"], a: 0 },
+            { q: "他們為了大象的樣子爭吵得面紅____。", options: ["耳赤", "心跳", "眼白", "手熱"], a: 0 },
+            { q: "原來他們每個人都只摸到了大象的____。", options: ["一部分", "全部", "頭", "尾巴"], a: 0 },
+            { q: "這個故事告訴我們看事情要____。", options: ["全面", "片面", "隨便", "馬虎"], a: 0 },
+            { q: "不能只憑片面的了解就下____。", options: ["結論", "討論", "爭論", "言論"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「從前」是甚麼詞性？", options: ["時間名詞", "動詞", "形容詞", "量詞"], a: 0 },
+            { q: "「一頭」通常用來作甚麼動物的量詞？", options: ["大象/牛", "魚", "鳥", "螞蟻"], a: 0 },
+            { q: "「一戶」的「戶」在這裏是甚麼意思？", options: ["量詞，用於家庭", "門戶", "窗戶", "戶外"], a: 0 },
+            { q: "句子選詞：四個盲人(本來 / 從此)對大象毫無認識。", options: ["本來", "從此", "後來", "原來"], a: 0 },
+            { q: "句子選詞：第四個盲人(突然 / 仍然)尖叫有蛇。", options: ["突然", "仍然", "雖然", "竟然"], a: 0 },
+            { q: "句子選詞：四個盲人不敢再自誇有(豐富 / 原來)的知識。", options: ["豐富", "原來", "很多", "少許"], a: 0 },
+            { q: "「豐富」的相反詞是？", options: ["貧乏/單調", "很多", "充足", "美麗"], a: 0 },
+            { q: "「突然」的近義詞是？", options: ["忽然", "一直", "慢慢", "從不"], a: 0 },
+            { q: "「盲人摸象」這個成語的比喻義是？", options: ["比喻只憑片面的了解就妄下結論", "比喻眼睛看不見", "比喻大象很大", "比喻喜歡爭吵"], a: 0 },
+            { q: "為甚麼第一個盲人覺得大象像柱子？", options: ["因為他摸到了象腿", "因為他摸到了鼻子", "因為他摸到了肚子", "因為他摸到了耳朵"], a: 0 },
+            { q: "為甚麼第三個盲人覺得大象像扇子？", options: ["因為他摸到了耳朵", "因為他摸到了象腿", "因為他摸到了肚子", "因為他摸到了尾巴"], a: 0 },
+            { q: "「自誇」的意思是？", options: ["自己誇獎自己", "誇獎別人", "自言自語", "自己打自己"], a: 0 },
+            { q: "「毫無認識」的意思是？", options: ["一點也不了解", "完全了解", "認識很久", "認識一點點"], a: 0 },
+            { q: "句子重組：(1)有 (2)從前 (3)盲人 (4)四個", options: ["(2)(1)(4)(3)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(2)(4)(3)(1)"], a: 0 },
+            { q: "句子重組：(1)大象的 (2)只是 (3)他們摸到的 (4)一部分", options: ["(3)(2)(1)(4)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(2)(3)(1)(4)"], a: 0 },
+            { q: "「告訴」的「告」部首是甚麼？", options: ["口", "牛", "言", "人"], a: 0 },
+            { q: "「知識」的「識」讀音與哪個字相同？", options: ["色", "息", "適", "拭"], a: 0 },
+            { q: "第二個盲人摸到的肚子，形狀像甚麼？", options: ["一堵城牆", "一根柱子", "一條蛇", "一把扇子"], a: 0 },
+            { q: "如果他們互相交流，把摸到的部分拼起來，會怎樣？", options: ["能更接近大象真正的樣子", "會打架", "大象會跑掉", "甚麼也不會發生"], a: 0 },
+            { q: "「旁人」是指？", options: ["旁邊的人/其他人", "胖子", "盲人", "大象"], a: 0 }
+        ]
+    },
+    9: {
+        title: "第九關：「鳥王」選舉",
+        teaching: "本課透過童話故事學習與選舉、決定相關的詞語。<br>小提示：「落選」是動詞，指在選舉中失敗；「到處」是表示處所的副詞。",
+        example: "【例子】森林裏 (舉行) 「鳥王」選舉，烏鴉因為欺騙大家而 (落選) 了。",
+        easyPool: [
+            { q: "森林裏一年一度的「鳥王」選舉又要____了。", options: ["舉行", "舉手", "舉起", "舉辦"], a: 0 },
+            { q: "小烏鴉____自己的羽毛這麼烏黑，參加比賽一定會落選。", options: ["覺得", "睡覺", "發覺", "不知"], a: 0 },
+            { q: "他擔心參加比賽一定會____，所以想辦法打扮。", options: ["落選", "當選", "中選", "挑選"], a: 0 },
+            { q: "於是他____去尋找並搜集各種鳥類的羽毛。", options: ["到處", "到底", "到來", "不到"], a: 0 },
+            { q: "他到處去尋找並____各種鳥類的羽毛來為自己裝扮。", options: ["搜集", "收集", "收拾", "垃圾"], a: 0 },
+            { q: "比賽那天，____鳥類都打扮得十分漂亮。", options: ["所有", "沒有", "只有", "所以"], a: 0 },
+            { q: "大會選出了一隻____最鮮豔美麗的鳥兒為「鳥王」。", options: ["色彩", "顏色", "色氣", "彩色"], a: 0 },
+            { q: "____，一根羽毛從「鳥王」身上掉下來。", options: ["忽然", "仍然", "雖然", "固然"], a: 0 },
+            { q: "____，「鳥王」貼在身上的羽毛都掉光了。", options: ["不久", "多久", "好久", "永久"], a: 0 },
+            { q: "____新選出來的「鳥王」就是小烏鴉。", options: ["原來", "原因", "原諒", "原本"], a: 0 },
+            { q: "鳥兒們都不____小烏鴉欺騙別人的做法。", options: ["贊成", "養成", "完成", "變成"], a: 0 },
+            { q: "最後，鳥兒們____重選「鳥王」。", options: ["決定", "解決", "絕對", "決心"], a: 0 },
+            { q: "烏鴉原本的羽毛是____色的。", options: ["黑", "白", "紅", "黃"], a: 0 },
+            { q: "小烏鴉為了贏得比賽，竟然____大家。", options: ["欺騙", "幫助", "保護", "告訴"], a: 0 },
+            { q: "大家發現真相後，感到十分____。", options: ["生氣", "開心", "高興", "害怕"], a: 0 },
+            { q: "真正的美應該是____的，而不是靠欺騙得來的。", options: ["真實", "虛假", "借來", "畫上"], a: 0 },
+            { q: "鳥兒們紛紛____，把自己的羽毛拿回去。", options: ["上前", "退後", "逃跑", "睡覺"], a: 0 },
+            { q: "小烏鴉羞愧地____了頭。", options: ["低", "抬", "搖", "點"], a: 0 },
+            { q: "這件事告訴我們，____是最重要的品德。", options: ["誠實", "說謊", "打扮", "貪心"], a: 0 },
+            { q: "做錯事就要承擔____。", options: ["後果", "水果", "糖果", "蘋果"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「落選」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 0 },
+            { q: "「到處」是甚麼詞性？", options: ["表示處所的副詞", "動詞", "名詞", "連詞"], a: 0 },
+            { q: "句子選詞：(忽然 / 仍然)，一根羽毛掉下來。", options: ["忽然", "仍然", "雖然", "固然"], a: 0 },
+            { q: "句子選詞：(不久 / 多久)，羽毛都掉光了。", options: ["不久", "多久", "好久", "許久"], a: 0 },
+            { q: "句子選詞：鳥兒都不(贊成 / 養成)小烏鴉的做法。", options: ["贊成", "養成", "完成", "造成"], a: 0 },
+            { q: "句子選詞：最後，大家(決定 / 解決)重選。", options: ["決定", "解決", "絕對", "決心"], a: 0 },
+            { q: "「忽然」的近義詞是？", options: ["突然", "一直", "慢慢", "從不"], a: 0 },
+            { q: "「贊成」的相反詞是？", options: ["反對", "同意", "贊同", "允許"], a: 0 },
+            { q: "「搜集」和「收集」的分別是？", options: ["意思相近，都指到處尋找並聚集在一起", "反義詞", "搜集是丟掉", "沒有收集這個詞"], a: 0 },
+            { q: "小烏鴉為甚麼要搜集別人的羽毛？", options: ["因為他覺得自己的羽毛不好看，怕落選", "因為他想做衣服", "因為他想賣錢", "因為他喜歡收集垃圾"], a: 0 },
+            { q: "「原來」在這裏的意思是？", options: ["表示發現了真實情況", "以前的時候", "原本的樣子", "原諒別人"], a: 0 },
+            { q: "「不久」的意思是？", options: ["距離某個時間不遠", "很長時間", "永遠", "從來沒有"], a: 0 },
+            { q: "句子重組：(1)選舉 (2)「鳥王」 (3)舉行 (4)森林裏", options: ["(4)(3)(2)(1)", "(1)(2)(3)(4)", "(3)(4)(1)(2)", "(2)(1)(4)(3)"], a: 0 },
+            { q: "句子重組：(1)重選 (2)決定 (3)鳥兒們", options: ["(3)(2)(1)", "(1)(2)(3)", "(2)(3)(1)", "(2)(1)(3)"], a: 0 },
+            { q: "「欺騙」別人會帶來甚麼結果？", options: ["失去別人的信任", "得到獎品", "變得更漂亮", "交到更多朋友"], a: 0 },
+            { q: "「鮮豔」通常用來形容甚麼？", options: ["顏色鮮明亮麗", "聲音好聽", "味道好吃", "形狀奇怪"], a: 0 },
+            { q: "這個故事改編自著名的甚麼寓言？", options: ["伊索寓言", "格林童話", "安徒生童話", "中國神話"], a: 0 },
+            { q: "「裝扮」的近義詞是？", options: ["打扮", "拆卸", "破壞", "睡覺"], a: 0 },
+            { q: "如果小烏鴉不作弊，他應該怎樣做？", options: ["誠實參賽，展示自己真實的一面", "打其他鳥", "把其他鳥的羽毛拔光", "不去參加"], a: 0 },
+            { q: "「所有」的相反詞是？", options: ["沒有/部分", "全部", "一切", "所以"], a: 0 }
+        ]
+    },
+    10: {
+        title: "第十關：安徒生童話",
+        teaching: "本課學習與閱讀童話故事及形容人物性格相關的詞語。<br>小提示：了解形容詞和名詞的搭配，例如「豐富的題材」、「聰明的小孩」。",
+        example: "【例子】《安徒生童話》內容 (豐富)，故事十分 (有趣)。",
+        easyPool: [
+            { q: "著名作家安徒生寫了很多生動____的童話。", options: ["有趣", "有病", "有害", "無聊"], a: 0 },
+            { q: "安徒生的童話題材十分____。", options: ["豐富", "貧乏", "缺少", "無聊"], a: 0 },
+            { q: "《安徒生童話集》在世界各地廣泛____。", options: ["流傳", "流行", "流動", "流淚"], a: 0 },
+            { q: "很多小朋友都____過《安徒生童話集》。", options: ["閱讀", "朗讀", "說話", "寫字"], a: 0 },
+            { q: "《醜小鴨》的____其實是一隻小天鵝。", options: ["主角", "配角", "作者", "讀者"], a: 0 },
+            { q: "《賣火柴的小女孩》描寫一個____的女孩在街頭賣火柴的故事。", options: ["貧窮", "富有", "開心", "幸運"], a: 0 },
+            { q: "有兩個人向國王說自己做的衣服是世界上最____的。", options: ["漂亮", "嘹亮", "醜陋", "難看"], a: 0 },
+            { q: "他們說只有____的人才會看得見這件衣服。", options: ["聰明", "發明", "愚蠢", "懶惰"], a: 0 },
+            { q: "國王____人們說他愚蠢，所以假裝能看見「衣服」。", options: ["擔心", "負擔", "開心", "放心"], a: 0 },
+            { q: "後來一個____的小孩好奇地問國王為甚麼不穿衣服。", options: ["天真", "天生", "可怕", "奇怪"], a: 0 },
+            { q: "小孩終於說出了____的真相。", options: ["事情", "事業", "東西", "物品"], a: 0 },
+            { q: "安徒生是一位偉大的童話____。", options: ["作家", "畫家", "音樂家", "科學家"], a: 0 },
+            { q: "童話故事裏充滿了奇妙的____。", options: ["想像", "現實", "數學", "科學"], a: 0 },
+            { q: "《國王的新衣》諷刺了那些虛偽和____的人。", options: ["愚蠢", "聰明", "誠實", "善良"], a: 0 },
+            { q: "我們應該像那個小孩一樣保持____和誠實。", options: ["純真", "虛偽", "狡猾", "貪心"], a: 0 },
+            { q: "國王聽到小孩的話後，感到十分____。", options: ["羞愧", "驕傲", "高興", "生氣"], a: 0 },
+            { q: "大家都____國王根本沒有穿衣服。", options: ["知道", "不知道", "忘記", "相信"], a: 0 },
+            { q: "騙子利用了國王的____騙取了錢財。", options: ["虛榮心", "善良", "聰明", "勇敢"], a: 0 },
+            { q: "安徒生的童話陪伴着我們____。", options: ["成長", "生病", "變老", "睡覺"], a: 0 },
+            { q: "你最喜歡哪一個童話____？", options: ["故事", "事故", "做事故", "聽故事"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「豐富」的詞性是甚麼？", options: ["形容詞", "動詞", "名詞", "量詞"], a: 0 },
+            { q: "「流傳」的意思是甚麼？", options: ["傳播開去", "流下來", "流水", "傳染"], a: 0 },
+            { q: "句子選詞：國王說自己做的衣服是世界上最(漂亮 / 嘹亮)的。", options: ["漂亮", "嘹亮", "亮麗", "閃亮"], a: 0 },
+            { q: "句子選詞：只有(聰明 / 發明)的人才會看得見。", options: ["聰明", "發明", "精明", "光明"], a: 0 },
+            { q: "句子選詞：國王(擔心 / 負擔)人們說他愚蠢。", options: ["擔心", "負擔", "擔保", "擔當"], a: 0 },
+            { q: "句子選詞：一個(天真 / 天生)的小孩問國王。", options: ["天真", "天生", "天才", "天然"], a: 0 },
+            { q: "句子選詞：小孩說出了(事情 / 事業)的真相。", options: ["事情", "事業", "事實", "事故"], a: 0 },
+            { q: "「貧窮」的相反詞是？", options: ["富有", "窮苦", "生病", "健康"], a: 0 },
+            { q: "「聰明」的相反詞是？", options: ["愚蠢", "機智", "活潑", "美麗"], a: 0 },
+            { q: "「天真」通常用來形容甚麼人？", options: ["小孩(純真不造作)", "老人", "壞人", "騙子"], a: 0 },
+            { q: "為甚麼大人們都不敢說出國王沒穿衣服的真相？", options: ["因為擔心被別人說自己愚蠢或不稱職", "因為他們都看不見", "因為他們喜歡國王光着身子", "因為他們在睡覺"], a: 0 },
+            { q: "「真相」的意思是？", options: ["事情的真實情況", "相片", "假象", "看相"], a: 0 },
+            { q: "句子重組：(1)安徒生 (2)童話 (3)寫了 (4)很多", options: ["(1)(3)(4)(2)", "(1)(2)(3)(4)", "(3)(4)(1)(2)", "(4)(3)(2)(1)"], a: 0 },
+            { q: "句子重組：(1)看得見 (2)只有 (3)的人 (4)聰明", options: ["(2)(4)(3)(1)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(3)(1)(4)(2)"], a: 0 },
+            { q: "「主角」是指甚麼？", options: ["故事或戲劇中主要的人物", "角落", "主要的作用", "煮東西的角"], a: 0 },
+            { q: "「廣泛」的近義詞是？", options: ["普遍", "狹窄", "很少", "沒有"], a: 0 },
+            { q: "《醜小鴨》告訴我們甚麼道理？", options: ["不要以貌取人，只要有理想並努力，就能發光發熱", "鴨子很醜", "天鵝會飛", "冬天很冷"], a: 0 },
+            { q: "「生動」的意思是？", options: ["具有活力，能使人感動或覺得逼真", "活着", "動物", "生氣"], a: 0 },
+            { q: "安徒生是哪個國家的著名作家？", options: ["丹麥", "英國", "中國", "美國"], a: 0 },
+            { q: "「虛偽」的相反詞是？", options: ["真誠/誠實", "說謊", "狡猾", "虛弱"], a: 0 }
+        ]
+    },
+    11: {
+        title: "第十一關：學校是我家",
+        teaching: "本課學習與校園生活及規則相關的詞語。<br>小提示：「安靜」是形容詞，可以在前面加上表示程度的副詞，如「很安靜」；「學習」和「聽從」都是動詞。",
+        example: "【例子】上課時，大家要保持 (安靜)；向老師 (發問) 前要先舉手。",
+        easyPool: [
+            { q: "老師如同父母一樣愛護我們，感覺____。", options: ["好像", "相處", "好笑", "安靜"], a: 0 },
+            { q: "我們要依照、接受老師的教導，____他們的指示。", options: ["聽從", "發問", "學習", "排隊"], a: 0 },
+            { q: "同學就像兄弟姐妹，大家要和睦地一起____。", options: ["相處", "發問", "安靜", "排隊"], a: 0 },
+            { q: "上課時，大家要保持不發出聲音，十分____。", options: ["安靜", "學習", "相處", "發問"], a: 0 },
+            { q: "我們向老師提出問題前要先舉手____。", options: ["發問", "聽從", "排隊", "學習"], a: 0 },
+            { q: "我們要依次序排列進入教室，不可爭先恐後，要好好____。", options: ["排隊", "相處", "好像", "安靜"], a: 0 },
+            { q: "同學們一起開開心心地求學、____。", options: ["學習", "聽從", "發問", "排隊"], a: 0 },
+            { q: "我們應該要____師長，見到他們要問好。", options: ["尊敬", "討厭", "責罵", "害怕"], a: 0 },
+            { q: "大家合力保持校園環境____。", options: ["清潔", "骯髒", "混亂", "破爛"], a: 0 },
+            { q: "在學校裏，我們要遵守____，不可亂跑。", options: ["秩序", "學習", "安靜", "相處"], a: 0 },
+            { q: "同學們遇到困難時，應該互相____。", options: ["幫助", "欺負", "爭吵", "隱瞞"], a: 0 },
+            { q: "圖書館是一個____的地方，不應該大聲喧嘩。", options: ["安靜", "熱鬧", "可怕", "危險"], a: 0 },
+            { q: "小明上課不專心，沒有____老師的教導。", options: ["聽從", "學習", "發問", "相處"], a: 0 },
+            { q: "我們在小賣部買東西時必須____。", options: ["排隊", "插隊", "發問", "大叫"], a: 0 },
+            { q: "遇到不懂的題目，我會主動向老師____。", options: ["發問", "隱瞞", "逃避", "發脾氣"], a: 0 },
+            { q: "學校就像一個大家庭，我們要好好與同學____。", options: ["相處", "打架", "爭吵", "比較"], a: 0 },
+            { q: "班長是一個樂於____別人的好學生。", options: ["幫助", "命令", "責罵", "討厭"], a: 0 },
+            { q: "保持課室____是每個同學的責任。", options: ["清潔", "吵鬧", "破爛", "黑暗"], a: 0 },
+            { q: "我們每天回校____新知識。", options: ["學習", "放棄", "忘記", "破壞"], a: 0 },
+            { q: "看到老師，我____看到自己的父母一樣親切。", options: ["好像", "不是", "討厭", "忘記"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「安靜」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "「學習」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "副詞"], a: 0 },
+            { q: "「聽從」的近義詞是？", options: ["違抗", "服從", "發問", "學習"], a: 1 },
+            { q: "「安靜」的相反詞是？", options: ["寧靜", "吵鬧", "清潔", "整齊"], a: 1 },
+            { q: "句子改錯：同學們在圖書館裏大聲(發問)，影響了別人。應改為？", options: ["發言", "說話/喧嘩", "排隊", "學習"], a: 1 },
+            { q: "「相處」的意思是甚麼？", options: ["互相打架", "彼此生活在一起", "分開居住", "互相幫助"], a: 1 },
+            { q: "以下哪個詞語前面可以加上副詞「很」或「十分」？", options: ["發問", "排隊", "安靜", "學校"], a: 2 },
+            { q: "句子選字：大家要依照、接受老師的(____)。", options: ["教導", "教訓", "教練", "教師"], a: 0 },
+            { q: "「秩序」通常配搭甚麼動詞？", options: ["破壞或遵守", "吃喝", "睡覺", "學習"], a: 0 },
+            { q: "以下哪個是名詞？", options: ["聽從", "發問", "秩序", "安靜"], a: 2 },
+            { q: "「尊敬」的對象通常是誰？", options: ["寵物", "死物", "長輩或師長", "嬰兒"], a: 2 },
+            { q: "句子改錯：我們每天回校(學問)新知識。應改為？", options: ["學習", "學校", "學生", "學會"], a: 0 },
+            { q: "「發問」的意思是？", options: ["發現問題", "提出問題", "發脾氣", "發明東西"], a: 1 },
+            { q: "「好像」的意思是？", options: ["很好看", "有些像、彷彿", "好人", "喜歡"], a: 1 },
+            { q: "句子重組：(1)要 (2)遵守 (3)我們 (4)在學校裏 (5)秩序", options: ["(4)(3)(1)(2)(5)", "(3)(4)(1)(5)(2)", "(1)(2)(3)(4)(5)", "(4)(1)(2)(3)(5)"], a: 0 },
+            { q: "句子重組：(1)互相幫助 (2)應該 (3)同學們", options: ["(1)(2)(3)", "(3)(2)(1)", "(2)(3)(1)", "(3)(1)(2)"], a: 1 },
+            { q: "「清潔」在這課中是甚麼詞性？（如：保持校園環境清潔）", options: ["名詞", "形容詞", "副詞", "量詞"], a: 1 },
+            { q: "為甚麼在學校要守秩序？", options: ["為了好玩", "為了讓大家能在安全、良好的環境下學習", "因為老師很惡", "為了賺錢"], a: 1 },
+            { q: "「和睦」的意思是？", options: ["相處融洽友愛", "互相生氣", "很安靜", "木頭"], a: 0 },
+            { q: "「愛護」的近義詞是？", options: ["破壞", "保護/愛惜", "討厭", "欺負"], a: 1 }
+        ]
+    },
+    12: {
+        title: "第十二關：準備考試",
+        teaching: "本課學習與考試及準備測驗相關的詞語。<br>小提示：「充足」是形容詞，指數量多；「充滿」是動詞，指佈滿。要注意分辨。",
+        example: "【例子】考試前，我們要 (認真) 溫習，並保持 (充足) 的睡眠。",
+        easyPool: [
+            { q: "老師派發了考試____，提醒我們下週要考試。", options: ["通告", "廣告", "報告", "警告"], a: 0 },
+            { q: "思敏十分____地溫習課本。", options: ["真心", "認真", "開心", "傷心"], a: 1 },
+            { q: "溫習時，思敏沒有去____和看電視。", options: ["玩耍", "玩笑", "睡覺", "吃飯"], a: 0 },
+            { q: "媽媽告訴思敏不用太____，平常心面對就好。", options: ["緊急", "緊張", "生氣", "興奮"], a: 1 },
+            { q: "只要平時專心上課，便會有好____。", options: ["成功", "成績", "成熟", "成立"], a: 1 },
+            { q: "我們要保持____的睡眠，才有精力應付考試。", options: ["充足", "充滿", "充實", "充電"], a: 0 },
+            { q: "我們要在老師____的時間內作答。", options: ["指揮", "指定", "指引", "指出"], a: 1 },
+            { q: "我們要完成考卷上的所有____。", options: ["數目", "題目", "目光", "目的"], a: 1 },
+            { q: "作答時，要把____寫清楚。", options: ["回答", "答案", "答應", "報答"], a: 1 },
+            { q: "偷看同學的____是不對的行為。", options: ["測試", "試卷", "試驗", "嘗試"], a: 1 },
+            { q: "我們要做個____的好孩子，絕對不可以作弊。", options: ["確實", "誠實", "老實", "真實"], a: 1 },
+            { q: "考試前一晚，我把文具準備____。", options: ["充足", "妥當", "充滿", "緊張"], a: 1 },
+            { q: "哥哥這次考試取得了優異的____。", options: ["成績", "成功", "答案", "題目"], a: 0 },
+            { q: "考試時遇到不懂的____，不要慌張。", options: ["題目", "答案", "通告", "玩笑"], a: 0 },
+            { q: "我們____不可在考試時作弊。", options: ["絕對", "決定", "解決", "缺乏"], a: 0 },
+            { q: "老師在黑板上寫下了考試的____時間。", options: ["指定", "指揮", "指責", "指導"], a: 0 },
+            { q: "只要____溫習，一定能考到好成績。", options: ["認真", "隨便", "玩笑", "馬虎"], a: 0 },
+            { q: "偷看別人的答案是不____的行為。", options: ["誠實", "確實", "真實", "老實"], a: 0 },
+            { q: "我把試卷上的所有問題都____了。", options: ["回答", "答案", "發問", "題目"], a: 0 },
+            { q: "睡眠____，第二天才能精神飽滿。", options: ["充足", "充滿", "缺乏", "減少"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「充足」和「充滿」的分別是？", options: ["沒有分別", "充足是形容詞(數量足夠)，充滿是動詞(填滿/佈滿)", "充足是動詞，充滿是形容詞", "都是名詞"], a: 1 },
+            { q: "句子改錯：老師派發了考試(廣告)。應改為？", options: ["報告", "通告", "警告", "宣告"], a: 1 },
+            { q: "句子改錯：思敏(真心)地溫習課本。應改為？", options: ["認真", "天真", "純真", "真實"], a: 0 },
+            { q: "句子改錯：思敏沒有和弟弟開(玩耍)。應改為？", options: ["玩具", "玩笑", "玩樂", "遊戲"], a: 1 },
+            { q: "句子改錯：媽媽叫思敏遇到突發事情不要(緊急)。應改為？", options: ["緊張", "緊要", "緊密", "緊迫"], a: 0 },
+            { q: "句子改錯：只要努力，便會有好(成功)。應改為？", options: ["成績", "成就", "成立", "成熟"], a: 0 },
+            { q: "「成績」的詞性是？", options: ["動詞", "形容詞", "名詞", "副詞"], a: 2 },
+            { q: "「誠實」的相反詞是？", options: ["老實", "虛偽/狡猾", "認真", "緊張"], a: 1 },
+            { q: "「指定」的意思是？", options: ["手指很長", "確定、指出", "指揮交通", "指南針"], a: 1 },
+            { q: "以下哪一個是動詞？", options: ["試卷", "答案", "回答", "題目"], a: 2 },
+            { q: "以下哪一個是名詞？", options: ["認真", "緊張", "答案", "充足"], a: 2 },
+            { q: "「精力」的意思是？", options: ["精神和體力", "精靈", "美麗", "安靜"], a: 0 },
+            { q: "「應付」的意思是？", options: ["付錢", "採取辦法對待或處理", "答應別人", "應用"], a: 1 },
+            { q: "為甚麼考試前要保持充足的睡眠？", options: ["因為可以做夢", "為了有精力應付考試", "為了長高", "為了不被罵"], a: 1 },
+            { q: "「確實」和「誠實」的分別？", options: ["確實指真實無誤，誠實指態度真誠不說謊", "沒有分別", "確實是說謊", "誠實是形容物件"], a: 0 },
+            { q: "句子重組：(1)時間內 (2)我們 (3)指定 (4)要在 (5)作答", options: ["(2)(4)(3)(1)(5)", "(4)(2)(3)(1)(5)", "(3)(1)(4)(2)(5)", "(5)(4)(3)(1)(2)"], a: 0 },
+            { q: "句子重組：(1)好孩子 (2)我們 (3)誠實的 (4)要做", options: ["(2)(4)(3)(1)", "(4)(2)(3)(1)", "(3)(1)(4)(2)", "(1)(2)(3)(4)"], a: 0 },
+            { q: "「作答」的意思是？", options: ["做功課", "回答問題", "打架", "發問"], a: 1 },
+            { q: "「試卷」的量詞是？", options: ["張 / 份", "個", "條", "隻"], a: 0 },
+            { q: "考試時偷看同學的答案，違背了哪種品德？", options: ["勤奮", "勇敢", "誠實", "禮貌"], a: 2 }
+        ]
+    },
+    13: {
+        title: "第十三關：健康的身體",
+        teaching: "本課學習與飲食健康及生活習慣相關的詞語。<br>小提示：要注意分辨字義相近的詞語，例如「有益」和「益處」、「清潔」和「清新」、「充足」和「充滿」。",
+        example: "【例子】欣兒很注意 (飲食) 健康，每天都會喝 (牛奶) 和吃新鮮 (蔬菜)。",
+        easyPool: [
+            { q: "欣兒很注意____健康，不會亂吃東西。", options: ["飲食", "零食", "水分", "偏食"], a: 0 },
+            { q: "每天早上，欣兒都會喝一杯____。", options: ["汽水", "果汁", "牛奶", "咖啡"], a: 2 },
+            { q: "欣兒愛吃____，特別是白菜和菜心。", options: ["零食", "蔬菜", "糖果", "薯片"], a: 1 },
+            { q: "欣兒不會吃太多對身體無益的____。", options: ["蔬菜", "水果", "牛奶", "零食"], a: 3 },
+            { q: "欣兒常喝開水，補充身體的____。", options: ["水分", "糖分", "鹽分", "養分"], a: 0 },
+            { q: "我們要多吃對身體____的食物。", options: ["有益", "益處", "有害", "損害"], a: 0 },
+            { q: "到郊外去，我們可以呼吸____的空氣。", options: ["清潔", "清新", "清楚", "清涼"], a: 1 },
+            { q: "我們要保持____的睡眠，不能熬夜。", options: ["充足", "充滿", "充電", "充實"], a: 0 },
+            { q: "我們每天都要進行____的運動。", options: ["舒適", "適當", "適合", "適應"], a: 1 },
+            { q: "我們要養成早睡早起的____。", options: ["練習", "習慣", "學習", "溫習"], a: 1 },
+            { q: "早睡早起使人____好，上課更專心。", options: ["精彩", "精神", "精靈", "精明"], a: 1 },
+            { q: "保持身體健康，才能有____去學習。", options: ["體形", "體力", "體重", "體溫"], a: 1 },
+            { q: "醫生說____會導致營養不良，甚麼都要吃一點。", options: ["偏食", "飲食", "零食", "進食"], a: 0 },
+            { q: "喝牛奶可以補充鈣質，對骨骼有____。", options: ["有益", "益處", "損害", "壞處"], a: 1 },
+            { q: "運動後流了很多汗，要多喝水補充____。", options: ["水分", "零食", "蔬菜", "牛奶"], a: 0 },
+            { q: "房間要經常打開窗戶，保持空氣____。", options: ["清新", "清潔", "骯髒", "混濁"], a: 0 },
+            { q: "多吃____可以幫助腸胃消化。", options: ["零食", "蔬菜", "糖果", "汽水"], a: 1 },
+            { q: "他昨天沒睡好，今天看起來沒有____。", options: ["精神", "精彩", "體形", "習慣"], a: 0 },
+            { q: "跑步是一種很好的____。", options: ["運動", "睡眠", "飲食", "零食"], a: 0 },
+            { q: "做運動前要先做熱身____。", options: ["習慣", "練習", "精神", "體力"], a: 1 }
+        ],
+        hardPool: [
+            { q: "「有益」和「益處」的分別？", options: ["沒有分別", "有益是形容詞(有好處)，益處是名詞(好處本身)", "有益是名詞", "都是動詞"], a: 1 },
+            { q: "「清潔」和「清新」的分別？", options: ["沒有分別", "清潔指乾淨，清新指空氣或氣味新鮮", "清潔是氣味", "清新是沒有垃圾"], a: 1 },
+            { q: "句子改錯：我們要保持(充滿)的睡眠。應改為？", options: ["充實", "充足", "充電", "充飢"], a: 1 },
+            { q: "句子改錯：我們要進行(舒適)的運動。應改為？", options: ["適合", "適當", "適應", "適量"], a: 1 },
+            { q: "句子改錯：早睡早起使人(精彩)好。應改為？", options: ["精神", "精靈", "精明", "精緻"], a: 0 },
+            { q: "句子改錯：保持健康，才有(體形)學習。應改為？", options: ["體力", "體重", "體質", "體育"], a: 0 },
+            { q: "「偏食」的意思是甚麼？", options: ["吃很多", "只喜歡吃某幾種食物，不吃其他", "一邊走一邊吃", "不吃東西"], a: 1 },
+            { q: "以下哪個是名詞？", options: ["有益", "適當", "益處", "充足"], a: 2 },
+            { q: "「補充」通常配搭甚麼詞語？", options: ["水分/體力", "電視", "睡覺", "衣服"], a: 0 },
+            { q: "「無益」的意思是？", options: ["沒有好處/有害", "免費", "沒有味道", "沒有顏色"], a: 0 },
+            { q: "為甚麼欣兒要喝開水？", options: ["因為開水甜", "為了補充身體的水分", "為了減肥", "因為沒有其他飲料"], a: 1 },
+            { q: "「適當」的意思是？", options: ["很舒服", "切合情況、剛好", "很快", "很慢"], a: 1 },
+            { q: "「習慣」的詞性是？", options: ["動詞", "名詞", "形容詞", "副詞"], a: 1 },
+            { q: "句子重組：(1)有益的 (2)多吃 (3)我們 (4)食物 (5)要", options: ["(3)(5)(2)(1)(4)", "(5)(3)(2)(1)(4)", "(1)(4)(2)(3)(5)", "(2)(1)(4)(5)(3)"], a: 0 },
+            { q: "句子重組：(1)清新 (2)空氣 (3)呼吸 (4)的 (5)多", options: ["(5)(3)(1)(4)(2)", "(1)(4)(2)(3)(5)", "(3)(5)(1)(4)(2)", "(2)(4)(1)(3)(5)"], a: 0 },
+            { q: "「精神」的相反詞是？", options: ["開心", "疲倦/頹廢", "生氣", "健康"], a: 1 },
+            { q: "「體力」的意思是？", options: ["身體的力量", "身體的形狀", "體育課", "體溫"], a: 0 },
+            { q: "「飲食」包含了甚麼？", options: ["飲品和食物", "只有水", "只有飯", "運動"], a: 0 },
+            { q: "以下哪一項是良好的生活習慣？", options: ["經常吃零食", "早睡早起，多做適當運動", "偏食", "不喝水"], a: 1 },
+            { q: "「充足」的相反詞是？", options: ["充滿", "缺乏/不足", "很多", "太少"], a: 1 }
+        ]
+    },
+    14: {
+        title: "第十四關：小蝌蚪",
+        teaching: "本課透過小動物的故事學習代詞「甚麼」和「怎樣」，以及表示能力的動詞「可以」。<br>小提示：「可以」表示可能或能夠；「甚麼」和「怎樣」用來表示發問。",
+        example: "【例子】(不久)，小圓點變成了蝌蚪。牠們在水中游來游去，到底牠們長大後會變成 (甚麼) 呢？",
+        easyPool: [
+            { q: "小鴨子說：我____餓了，要找點東西吃。", options: ["肚子", "腦袋", "眼睛", "翅膀"], a: 0 },
+            { q: "青蛙媽媽說：你不____吃這些小圓點的啊！", options: ["可以", "不久", "沒有", "怎樣"], a: 0 },
+            { q: "小鴨子問：這些是____東西呢？", options: ["甚麼", "怎樣", "可以", "不久"], a: 0 },
+            { q: "青蛙媽媽說：____牠們便會變成蝌蚪了。", options: ["不久", "沒有", "可以", "肚子"], a: 0 },
+            { q: "小鴨子好奇地問：蝌蚪是____的？", options: ["怎樣", "甚麼", "不久", "可以"], a: 0 },
+            { q: "蝌蚪全是黑色，有一條長長的尾巴，可以在水中____。", options: ["跑步", "飛行", "游泳", "睡覺"], a: 2 },
+            { q: "小蝌蚪____時，先長出後肢。", options: ["成績", "成長", "成功", "成為"], a: 1 },
+            { q: "長出後肢，____長出前肢。", options: ["然後", "燃燒", "然而", "不然"], a: 0 },
+            { q: "尾巴會慢慢地____不見了。", options: ["消化", "消滅", "消失", "消息"], a: 2 },
+            { q: "____，小蝌蚪就變成了青蛙。", options: ["最初", "最好", "最壞", "最後"], a: 3 },
+            { q: "青蛙可以在水中____，也可以在陸地上活動。", options: ["生命", "生活", "生長", "生病"], a: 1 },
+            { q: "青蛙會伸出舌頭來捕食____。", options: ["昆蟲", "植物", "魚類", "大象"], a: 0 },
+            { q: "青蛙的幼兒時期叫做____。", options: ["毛蟲", "蝌蚪", "青蛙", "小鴨"], a: 1 },
+            { q: "蝌蚪的身體是____形的。", options: ["正方", "三角", "橢圓", "長方"], a: 2 },
+            { q: "青蛙媽媽在水裏產下許多像小圓點的____。", options: ["卵", "石頭", "葉子", "珍珠"], a: 0 },
+            { q: "小鴨子本來想把青蛙卵當作____吃掉。", options: ["玩具", "食物", "朋友", "垃圾"], a: 1 },
+            { q: "青蛙能在陸地上跳躍，是因為牠有強壯的____。", options: ["尾巴", "翅膀", "後肢", "耳朵"], a: 2 },
+            { q: "「前肢」是指動物前面的____。", options: ["手/腳", "頭", "尾巴", "肚子"], a: 0 },
+            { q: "青蛙是捕捉害蟲的____，我們應該保護牠們。", options: ["好幫手", "壞蛋", "敵人", "植物"], a: 0 },
+            { q: "蝌蚪只能在____中呼吸和生活。", options: ["陸地", "天空", "水", "火"], a: 2 }
+        ],
+        hardPool: [
+            { q: "「可以」的詞性是？", options: ["名詞", "動詞(能願動詞)", "形容詞", "代詞"], a: 1 },
+            { q: "「甚麼」和「怎樣」的詞性是？", options: ["名詞", "動詞", "形容詞", "代詞"], a: 3 },
+            { q: "句子改錯：你不(不久)吃這些小圓點！應改為？", options: ["可以", "沒有", "怎樣", "甚麼"], a: 0 },
+            { q: "「不久」的意思是？", options: ["很久", "距離某個時間不遠的短時間", "永遠", "從前"], a: 1 },
+            { q: "句子改錯：蝌蚪會慢慢地(消滅)。應改為？", options: ["消息", "消失", "消化", "消防"], a: 1 },
+            { q: "「消滅」和「消失」的分別？", options: ["沒有分別", "消滅是除掉(主動)，消失是隱沒不見(自然狀態)", "消滅是出現", "消失是打架"], a: 1 },
+            { q: "句子改錯：青蛙會捕食(蟲子)。(配合課文用詞) 應改為？", options: ["昆蟲", "植物", "動物", "魚類"], a: 0 },
+            { q: "「成長」的意思是？", options: ["變成大人", "向成熟的階段發展生長", "成績很好", "長度很長"], a: 1 },
+            { q: "蝌蚪變成青蛙的順序是甚麼？", options: ["先長前肢，再長後肢", "先長後肢，再長前肢，尾巴消失", "先掉尾巴，再長腳", "不會變"], a: 1 },
+            { q: "「然後」通常用來表示甚麼？", options: ["表示原因", "表示時間或動作的先後順序", "表示轉折", "表示假設"], a: 1 },
+            { q: "「最後」的相反詞是？", options: ["最初/開始", "中間", "然後", "不久"], a: 0 },
+            { q: "「生活」的詞性可以是？", options: ["只能是名詞", "只能是動詞", "動詞或名詞", "代詞"], a: 2 },
+            { q: "以下哪個是代詞？", options: ["肚子", "甚麼", "游泳", "昆蟲"], a: 1 },
+            { q: "「捕食」的「捕」意思是？", options: ["逃跑", "捉拿", "睡覺", "看見"], a: 1 },
+            { q: "句子重組：(1)水中 (2)在 (3)可以 (4)青蛙 (5)生活", options: ["(4)(3)(2)(1)(5)", "(2)(1)(3)(4)(5)", "(1)(2)(3)(4)(5)", "(4)(2)(1)(5)(3)"], a: 0 },
+            { q: "句子重組：(1)怎樣的 (2)是 (3)蝌蚪 (4)小鴨子問", options: ["(4)(3)(2)(1)", "(3)(2)(1)(4)", "(1)(2)(3)(4)", "(4)(1)(2)(3)"], a: 0 },
+            { q: "「橢圓形」是甚麼形狀？", options: ["正方形", "長長的圓形(像雞蛋)", "三角形", "星形"], a: 1 },
+            { q: "「陸地」的相反是甚麼？", options: ["海洋/水裏", "天空", "高山", "森林"], a: 0 },
+            { q: "這篇課文主要介紹了甚麼的生長過程？", options: ["小鴨", "昆蟲", "青蛙", "魚"], a: 2 },
+            { q: "「舌頭」的作用在這裏是？", options: ["說話", "捕食昆蟲", "唱歌", "游泳"], a: 1 }
+        ]
+    },
+    15: {
+        title: "第十五關：不合身的衣服",
+        teaching: "本課學習與衣物、季節及身體成長相關的詞語。<br>小提示：「合適」是形容詞，指恰當、適合；「回收」是動詞，指把物品收回利用。",
+        example: "【例子】(天氣) 冷了，我 (發覺) 舊衣服都不合身了，(所以) 媽媽把它們送到 (回收) 箱。",
+        easyPool: [
+            { q: "秋天到了，____漸漸冷了。", options: ["天氣", "色氣", "生氣", "力氣"], a: 0 },
+            { q: "媽媽把適合____季穿的衣服拿出來。", options: ["春", "夏", "秋", "冬"], a: 3 },
+            { q: "我試穿後____去年的冬衣都不合身了。", options: ["發覺", "發明", "發生", "發出"], a: 0 },
+            { q: "我不但長高了，____變胖了。", options: ["而且", "並且", "然而", "否則"], a: 0 },
+            { q: "我長大了，____衣服不再合身。", options: ["所以", "因為", "雖然", "如果"], a: 0 },
+            { q: "太緊的衣物會____身體發育。", options: ["影相", "影響", "影子", "電影"], a: 1 },
+            { q: "我要穿着合身的衣物，才能____地成長。", options: ["健康", "康樂", "生病", "快樂"], a: 0 },
+            { q: "媽媽把不合身的衣服送到社區中心____。", options: ["回收", "回家", "回答", "回報"], a: 0 },
+            { q: "我把不合身的衣服送給妹妹，她穿上剛好____。", options: ["合作", "合適", "合力", "合理"], a: 1 },
+            { q: "舊衣服如果還很新，我們不應該隨便____。", options: ["丟棄", "保留", "回收", "穿上"], a: 0 },
+            { q: "我們要把衣服洗____才能捐出去。", options: ["骯髒", "乾淨", "破爛", "濕透"], a: 1 },
+            { q: "天氣轉涼，要多穿衣服以免____。", options: ["着涼", "中暑", "流汗", "口渴"], a: 0 },
+            { q: "我的鞋子太小了，穿起來很不____。", options: ["舒服", "合適", "漂亮", "昂貴"], a: 0 },
+            { q: "把物品循環再用，是一種____的行為。", options: ["浪費", "環保", "自私", "破壞"], a: 1 },
+            { q: "小朋友的身體____得很快，衣服很快就不合穿。", options: ["發育", "生病", "縮小", "消失"], a: 0 },
+            { q: "媽媽帶我去服裝店買____的衣服。", options: ["新", "舊", "破", "髒"], a: 0 },
+            { q: "這件衣服的____很好看。", options: ["顏色", "天氣", "聲音", "味道"], a: 0 },
+            { q: "「不但...而且...」是用來表示甚麼關係？", options: ["遞進", "轉折", "因果", "假設"], a: 0 },
+            { q: "「因為...所以...」是用來表示甚麼關係？", options: ["遞進", "轉折", "因果", "假設"], a: 2 },
+            { q: "冬天時，我們會穿上厚厚的____。", options: ["短袖衫", "泳衣", "外套/冬衣", "背心"], a: 2 }
+        ],
+        hardPool: [
+            { q: "「合適」的詞性是？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 2 },
+            { q: "「回收」的詞性是？", options: ["動詞", "名詞", "形容詞", "量詞"], a: 0 },
+            { q: "「發覺」的意思是？", options: ["發明新東西", "開始知道或意識到", "發生事情", "睡覺"], a: 1 },
+            { q: "句子改錯：我(發明)去年的衣服不合身了。應改為？", options: ["發現/發覺", "發出", "發射", "發火"], a: 0 },
+            { q: "「合適」的近義詞是？", options: ["勉強", "恰當/適合", "不合", "漂亮"], a: 1 },
+            { q: "「回收」的意思是？", options: ["回家", "把廢舊物品收回利用", "回答問題", "收錢"], a: 1 },
+            { q: "「影響」通常配搭甚麼？", options: ["飯菜", "發育/成績/心情", "衣服", "天氣"], a: 1 },
+            { q: "以下哪個是連詞？", options: ["而且", "衣服", "回收", "合適"], a: 0 },
+            { q: "「不但...而且...」句子配對：我不但長高了...？", options: ["所以衣服不合身", "而且變胖了", "但是變瘦了", "因為吃飯了"], a: 1 },
+            { q: "以下哪個是形容詞？", options: ["發覺", "影響", "合適", "回收"], a: 2 },
+            { q: "句子改錯：太緊的衣物會(影相)身體發育。應改為？", options: ["影片", "影響", "影印", "影子"], a: 1 },
+            { q: "句子改錯：我要穿合身的衣物，才能(康樂)地成長。應改為？", options: ["健康", "安康", "康莊", "復康"], a: 0 },
+            { q: "「健康」的相反詞是？", options: ["虛弱/生病", "強壯", "開心", "傷心"], a: 0 },
+            { q: "「漸漸」的意思是？", options: ["突然", "慢慢地、逐漸", "立刻", "從來不"], a: 1 },
+            { q: "句子重組：(1)衣服 (2)不合身的 (3)送到 (4)媽媽把 (5)回收箱", options: ["(4)(3)(2)(1)(5)", "(4)(2)(1)(3)(5)", "(2)(1)(4)(3)(5)", "(5)(4)(3)(2)(1)"], a: 1 },
+            { q: "句子重組：(1)長大了 (2)衣服 (3)所以 (4)不再合身 (5)我", options: ["(5)(1)(3)(2)(4)", "(1)(5)(3)(2)(4)", "(3)(5)(1)(2)(4)", "(2)(4)(3)(5)(1)"], a: 0 },
+            { q: "為甚麼太緊的衣物不好？", options: ["因為不好看", "因為會影響身體發育和血液循環", "因為會變冷", "因為太便宜"], a: 1 },
+            { q: "「發育」的意思是？", options: ["生物體成熟的過程", "發明東西", "發脾氣", "體育課"], a: 0 },
+            { q: "把衣服送給妹妹，體現了甚麼美德？", options: ["自私", "節儉和愛護家人", "懶惰", "貪心"], a: 1 },
+            { q: "「社區中心」是一個怎樣的地方？", options: ["買東西的超市", "為社區居民提供服務和活動的場所", "醫院", "警察局"], a: 1 }
+        ]
+    },
+    16: {
+        title: "第十六關：一起做家務",
+        teaching: "本課學習與家務和家庭生活相關的詞語。<br>小提示：「簡單」是形容詞，指容易、不複雜；「合力」是動詞，指共同出力。",
+        example: "【例子】家裏每位 (成員) 都應該出一分力，大家同心 (合力)，把家務做好。",
+        easyPool: [
+            { q: "爸爸媽媽每天上班工作，十分____。", options: ["辛勞", "簡單", "幸福", "居住"], a: 0 },
+            { q: "家裏每位____都應該出一分力。", options: ["成員", "員工", "隊員", "演員"], a: 0 },
+            { q: "我們可以幫忙做一些____的家務。", options: ["複雜", "簡單", "辛苦", "困難"], a: 1 },
+            { q: "大家同心____，把家務做好。", options: ["合力", "分散", "打架", "爭吵"], a: 0 },
+            { q: "大家一起保持____環境清潔衞生。", options: ["居住", "買賣", "遊戲", "學校"], a: 0 },
+            { q: "大家齊來做家務，建立____的家園。", options: ["不幸", "傷心", "幸福", "破壞"], a: 2 },
+            { q: "哥哥____幫媽媽洗碗。", options: ["主動", "懶惰", "忘記", "生氣"], a: 0 },
+            { q: "妹妹把書桌收拾得很____。", options: ["整齊", "骯髒", "混亂", "破爛"], a: 0 },
+            { q: "我們要把它晾乾的衣服____在衣櫃內。", options: ["掛", "丟", "撕", "剪"], a: 0 },
+            { q: "媽媽____說我們都是好孩子。", options: ["笑着", "哭着", "罵着", "氣着"], a: 0 },
+            { q: "週末，我們全家大掃除，____地板。", options: ["打掃", "打架", "弄髒", "打破"], a: 0 },
+            { q: "我們把垃圾____進垃圾桶。", options: ["丟", "吃", "喝", "拿"], a: 0 },
+            { q: "分工____，家務很快就做完了。", options: ["合作", "分開", "吵架", "競爭"], a: 0 },
+            { q: "弟弟幫忙拿____，準備吃飯。", options: ["碗筷", "玩具", "泥土", "書本"], a: 0 },
+            { q: "自己的房間要自己____。", options: ["收拾", "弄亂", "弄髒", "忘記"], a: 0 },
+            { q: "我們不應該把東西____放。", options: ["隨便", "整齊", "小心", "專心"], a: 0 },
+            { q: "媽媽稱讚我是個好____。", options: ["幫手", "壞人", "敵人", "小偷"], a: 0 },
+            { q: "洗完手，要用毛巾擦____。", options: ["乾淨", "骯髒", "濕透", "破爛"], a: 0 },
+            { q: "我們____做家務，減輕父母的負擔。", options: ["一起", "不要", "拒絕", "逃避"], a: 0 },
+            { q: "爸爸正在修理____的椅子。", options: ["損壞", "全新", "漂亮", "乾淨"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「簡單」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 2 },
+            { q: "「簡單」的相反詞是甚麼？", options: ["容易", "複雜", "方便", "輕鬆"], a: 1 },
+            { q: "「辛勞」的意思是甚麼？", options: ["開心", "辛苦勞累", "生氣", "懶惰"], a: 1 },
+            { q: "句子選字：家強把書桌(____)整齊。", options: ["整理", "收拾", "整個", "齊整"], a: 1 },
+            { q: "「合力」的意思是甚麼？", options: ["共同出力", "互相打架", "一個人做", "分開"], a: 0 },
+            { q: "以下哪個是名詞？", options: ["成員", "簡單", "辛勞", "幸福"], a: 0 },
+            { q: "「幸福」的近義詞是甚麼？", options: ["悲慘", "快樂/美滿", "傷心", "辛苦"], a: 1 },
+            { q: "句子改錯：家強和家怡常常(生動)幫媽媽做家務。應改為？", options: ["主動", "活動", "動作", "感動"], a: 0 },
+            { q: "「主動」的相反詞是甚麼？", options: ["被動", "積極", "勤勞", "勇敢"], a: 0 },
+            { q: "句子改錯：我們一起(打架)家居。應改為？", options: ["打掃", "打造", "打開", "打扮"], a: 0 },
+            { q: "句子改錯：爸爸媽媽笑着(稱呼)他們是好孩子。應改為？", options: ["稱讚", "讚美", "讚賞", "稱呼"], a: 0 },
+            { q: "句子改錯：媽媽每天做很多家務，十分(慌忙)。應改為？", options: ["忙碌", "盲目", "幫忙", "急忙"], a: 0 },
+            { q: "「乾淨」的相反詞是甚麼？", options: ["整齊", "骯髒", "清新", "漂亮"], a: 1 },
+            { q: "甚麼是「家務」？", options: ["學校的功課", "家庭的日常事務", "辦公室的工作", "遊戲"], a: 1 },
+            { q: "句子重組：(1)做 (2)大家 (3)家務 (4)齊來 (5)一起", options: ["(2)(4)(5)(1)(3)", "(4)(2)(1)(3)(5)", "(1)(2)(3)(4)(5)", "(3)(4)(5)(1)(2)"], a: 0 },
+            { q: "「居住」通常配搭甚麼詞語？", options: ["環境", "食物", "衣服", "音樂"], a: 0 },
+            { q: "為甚麼我們要幫忙做家務？", options: ["為了賺錢", "因為我們是家庭成員要出一分力", "為了玩耍", "為了不被罵"], a: 1 },
+            { q: "「保持」的意思是甚麼？", options: ["破壞", "維持原狀或使不消失", "丟掉", "改變"], a: 1 },
+            { q: "以下哪個是動詞？", options: ["簡單", "幸福", "打掃", "辛勞"], a: 2 },
+            { q: "句子改錯：家裏每位成員都應該(出一分錢)做家務。應改為？", options: ["出一分力", "逃避", "睡覺", "抱怨"], a: 0 }
+        ]
+    },
+    17: {
+        title: "第十七關：好鄰居",
+        teaching: "本課學習與鄰里相處相關的詞語。<br>小提示：「友善」是形容詞，指對別人說話和態度親切；「欺騙」是動詞，指用假話騙人。",
+        example: "【例子】黃先生是美玲的鄰居，他待人很 (友善)，別人有困難時會 (盡力) 幫助他們。",
+        easyPool: [
+            { q: "黃先生是美玲的鄰居，他待人很____。", options: ["友善", "兇惡", "生氣", "冷淡"], a: 0 },
+            { q: "黃先生會主動____身邊的人。", options: ["欺騙", "關心", "責罵", "討厭"], a: 1 },
+            { q: "別人有困難時，黃先生會____幫助他們。", options: ["盡力", "拒絕", "逃避", "隨便"], a: 0 },
+            { q: "黃先生很守信用，從來不會____別人。", options: ["幫助", "欺騙", "關心", "問候"], a: 1 },
+            { q: "黃先生性格溫和，不會為小事和鄰居____。", options: ["爭吵", "合作", "分享", "談天"], a: 0 },
+            { q: "美玲一家和鄰居關係很好，經常____幫助。", options: ["互相", "拒絕", "單獨", "忘記"], a: 0 },
+            { q: "我們遇見鄰居時，要互相____。", options: ["問候", "打架", "批評", "討厭"], a: 0 },
+            { q: "鄰居之間要互相____，保持居住環境清潔。", options: ["爭吵", "合作", "破壞", "欺騙"], a: 1 },
+            { q: "每天出門見到鄰居，我會說____。", options: ["再見", "早晨", "對不起", "不知道"], a: 1 },
+            { q: "鄰居生病了，我們去____他。", options: ["探望", "責罵", "欺騙", "爭吵"], a: 0 },
+            { q: "大家住在一起，就是好____。", options: ["敵人", "鄰居", "同學", "老師"], a: 1 },
+            { q: "我們不應該在走廊大聲____，以免吵到鄰居。", options: ["閱讀", "說話", "睡覺", "寫字"], a: 1 },
+            { q: "鄰居的小狗走失了，我們幫忙____。", options: ["隱藏", "尋找", "趕走", "欺騙"], a: 1 },
+            { q: "有好吃的食物，可以和鄰居____。", options: ["分享", "爭搶", "丟掉", "隱瞞"], a: 0 },
+            { q: "我們要____別人的生活習慣。", options: ["破壞", "尊重", "嘲笑", "批評"], a: 1 },
+            { q: "鄰居不在家時，我們幫忙留意____。", options: ["門戶", "電視", "食物", "玩具"], a: 0 },
+            { q: "遇到緊急情況，好鄰居會互相____。", options: ["照應", "欺騙", "爭吵", "逃跑"], a: 0 },
+            { q: "中秋節，我們邀請鄰居一起____。", options: ["賞月", "睡覺", "打架", "哭泣"], a: 0 },
+            { q: "鄰居有不懂的問題，我會____教他。", options: ["生氣", "耐心", "隨便", "拒絕"], a: 1 },
+            { q: "俗語說：「遠親不如近____。」", options: ["鄰", "敵", "友", "人"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「友善」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "副詞"], a: 2 },
+            { q: "「欺騙」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "副詞"], a: 0 },
+            { q: "「爭吵」的詞性是甚麼？", options: ["動詞", "名詞", "形容詞", "副詞"], a: 0 },
+            { q: "「友善」的相反詞是甚麼？", options: ["親切", "兇惡", "和藹", "溫柔"], a: 1 },
+            { q: "「盡力」的近義詞是甚麼？", options: ["隨便", "竭力/努力", "放棄", "懶惰"], a: 1 },
+            { q: "「爭吵」的相反詞是甚麼？", options: ["打架", "和睦", "吵鬧", "生氣"], a: 1 },
+            { q: "「欺騙」的意思是甚麼？", options: ["說真話", "用假話或手段騙人", "幫助別人", "合作"], a: 1 },
+            { q: "「互相」的意思是甚麼？", options: ["自己一個人", "彼此、對方", "沒有人", "所有人"], a: 1 },
+            { q: "句子改錯：我們遇見鄰居時，要互相問(猴)。應改為？", options: ["候", "後", "喉", "厚"], a: 0 },
+            { q: "句子改錯：鄰居之間要互相(盒)作。應改為？", options: ["合", "和", "何", "河"], a: 0 },
+            { q: "情境題：鄰居深夜播放大聲的音樂，你應該怎樣做？", options: ["大聲罵他", "有禮貌地勸阻", "打破他的門", "不理會"], a: 1 },
+            { q: "「關心」的詞性可以是？", options: ["只能是名詞", "動詞或名詞", "只能是形容詞", "量詞"], a: 1 },
+            { q: "以下哪一個是動詞？", options: ["欺騙", "友善", "溫和", "好人"], a: 0 },
+            { q: "以下哪一個是形容詞？", options: ["幫助", "友善", "爭吵", "鄰居"], a: 1 },
+            { q: "「信用」的意思是甚麼？", options: ["信用卡", "能夠履行諾言而取得的信任", "不用還錢", "寫信"], a: 1 },
+            { q: "「溫和」通常用來形容甚麼？", options: ["天氣或人的性格", "石頭", "顏色", "汽車"], a: 0 },
+            { q: "「主動」的相反詞是甚麼？", options: ["積極", "被動", "勇敢", "懶惰"], a: 1 },
+            { q: "句子重組：(1)好 (2)大家 (3)就是 (4)住在一起 (5)鄰居", options: ["(2)(4)(3)(1)(5)", "(4)(2)(1)(5)(3)", "(1)(5)(3)(2)(4)", "(2)(1)(5)(3)(4)"], a: 0 },
+            { q: "句子重組：(1)要 (2)互相 (3)鄰居 (4)之間 (5)合作", options: ["(3)(4)(1)(2)(5)", "(1)(2)(3)(4)(5)", "(3)(1)(4)(2)(5)", "(5)(4)(3)(2)(1)"], a: 0 },
+            { q: "選擇正確的詞語搭配：(____)幫助別人。", options: ["盡力", "盡頭", "盡量", "盡情"], a: 0 }
+        ]
+    },
+    18: {
+        title: "第十八關：愚公移山",
+        teaching: "本課透過中國寓言學習表示程度和時間的副詞。<br>小提示：「非常」是副詞，表示程度深；「馬上」是副詞，表示立刻。",
+        example: "【例子】愚公家門前有座大山，出入 (非常) 不便，於是家人 (馬上) 動工移山。",
+        easyPool: [
+            { q: "愚公的____很大，已經有九十歲了。", options: ["年紀", "身高", "財富", "力氣"], a: 0 },
+            { q: "愚公____進出都十分不方便。", options: ["看見", "覺得", "聽見", "忘記"], a: 1 },
+            { q: "於是叫來所有家人，一起____解決辦法。", options: ["爭吵", "討論", "打架", "睡覺"], a: 1 },
+            { q: "大家都____把大山移走。", options: ["反對", "贊成", "討厭", "害怕"], a: 1 },
+            { q: "大家都同意，還____動工。", options: ["馬上", "明年", "遲點", "從不"], a: 0 },
+            { q: "鄰村老人說：你怎麼可能把那座大山移走呢？這____辛苦了。", options: ["十分", "非常", "一點", "完全不"], a: 1 },
+            { q: "愚公____說：我死後還有子孫。", options: ["生氣", "回答", "大哭", "沉默"], a: 1 },
+            { q: "____我年老，但山不會長高。", options: ["因為", "所以", "雖然", "但是"], a: 2 },
+            { q: "子孫們會____做這份工作。", options: ["停止", "繼續", "放棄", "忘記"], a: 1 },
+            { q: "只要我們齊心合力，不怕____。", options: ["困難", "容易", "開心", "食物"], a: 0 },
+            { q: "最終一定能把大山移走。這需要有____。", options: ["恆心", "灰心", "傷心", "粗心"], a: 0 },
+            { q: "愚公家門前有一座____。", options: ["大山", "小河", "森林", "大海"], a: 0 },
+            { q: "這座大山讓他們出入十分____。", options: ["方便", "不便", "開心", "危險"], a: 1 },
+            { q: "愚公把____都叫來商量。", options: ["敵人", "家人", "國王", "動物"], a: 1 },
+            { q: "鄰村的老人____愚公的做法。", options: ["贊成", "質疑", "幫忙", "害怕"], a: 1 },
+            { q: "大山是不會____的，但子孫會不斷繁衍。", options: ["變小", "長高", "消失", "移動"], a: 1 },
+            { q: "愚公的精神感動了____。", options: ["鄰居", "上天", "動物", "敵人"], a: 1 },
+            { q: "愚公的故事是一個著名的中國____。", options: ["寓言", "童話", "神話", "歷史"], a: 0 },
+            { q: "做事情要有始有____。", options: ["終", "初", "末", "前"], a: 0 },
+            { q: "我們不應該半途而____。", options: ["廢", "成", "飛", "跑"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「非常」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 3 },
+            { q: "「馬上」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 3 },
+            { q: "句子改錯：鄰村老人看見愚公這樣(幸)苦。應改為？", options: ["辛", "新", "心", "星"], a: 0 },
+            { q: "句子改錯：愚公(會)答說。應改為？", options: ["回", "迴", "悔", "灰"], a: 0 },
+            { q: "句子改錯：(推)然年老，但山不會長高。應改為？", options: ["雖", "誰", "水", "衰"], a: 0 },
+            { q: "句子改錯：子孫們會(斷)續做這份工作。應改為？", options: ["繼", "計", "記", "寄"], a: 0 },
+            { q: "句子改錯：做這份(公)作。應改為？", options: ["工", "功", "攻", "弓"], a: 0 },
+            { q: "句子改錯：只要齊心，不怕(因)難。應改為？", options: ["困", "綑", "睏", "菌"], a: 0 },
+            { q: "「愚公移山」這個故事告訴我們甚麼道理？", options: ["山很高", "做事要有恆心和毅力，不怕困難", "老人很笨", "不要搬家"], a: 1 },
+            { q: "「贊成」的相反詞是甚麼？", options: ["同意", "反對", "支持", "明白"], a: 1 },
+            { q: "「困難」的相反詞是甚麼？", options: ["容易", "辛苦", "複雜", "危險"], a: 0 },
+            { q: "「雖然」通常與哪一個詞語配搭使用？", options: ["因為", "所以", "但是", "如果"], a: 2 },
+            { q: "「討論」的意思是甚麼？", options: ["打架", "就某一問題交換意見", "考試", "睡覺"], a: 1 },
+            { q: "「馬上」的近義詞是甚麼？", options: ["慢慢", "立刻", "遲早", "從不"], a: 1 },
+            { q: "「非常」的近義詞是甚麼？", options: ["稍微", "十分/特別", "完全不", "也許"], a: 1 },
+            { q: "「子孫」是指甚麼人？", options: ["祖先", "後代", "朋友", "鄰居"], a: 1 },
+            { q: "「齊心合力」的意思是甚麼？", options: ["大家思想一致，共同努力", "大家互相打架", "一個人用力", "大家一起睡覺"], a: 0 },
+            { q: "句子重組：(1)解決 (2)一起 (3)討論 (4)辦法 (5)家人", options: ["(5)(2)(3)(1)(4)", "(2)(3)(5)(1)(4)", "(1)(4)(5)(2)(3)", "(3)(1)(4)(5)(2)"], a: 0 },
+            { q: "句子重組：(1)不怕 (2)只要 (3)困難 (4)我們 (5)齊心", options: ["(2)(4)(5)(1)(3)", "(4)(2)(5)(1)(3)", "(1)(3)(2)(4)(5)", "(5)(4)(2)(1)(3)"], a: 0 },
+            { q: "「覺得」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 1 }
+        ]
+    },
+    19: {
+        title: "第十九關：紅鯉魚的珠子",
+        teaching: "本課透過報恩童話學習與情感及事件發展相關的詞語。<br>小提示：要注意分辨字形或讀音相近的字，例如「康復」和「幸福」、「報答」和「告訴」。",
+        example: "【例子】老婆婆細心 (照料) 紅鯉魚。紅鯉魚為了 (報答) 她的恩情，送了一顆珠子給她。",
+        easyPool: [
+            { q: "老婆婆兒子的健康不太好，常常____。", options: ["生病", "開心", "運動", "睡覺"], a: 0 },
+            { q: "____十分寒冷，老婆婆走到河邊釣魚。", options: ["天氣", "風景", "心情", "房間"], a: 0 },
+            { q: "等了很久，釣到一尾紅鯉魚，她十分____。", options: ["生氣", "傷心", "高興", "害怕"], a: 2 },
+            { q: "老婆婆看見紅鯉魚流下____，便不忍心殺牠。", options: ["汗水", "口水", "眼淚", "血液"], a: 2 },
+            { q: "老婆婆把牠放進水缸，還細心地____牠。", options: ["照料", "責罵", "欺負", "煮食"], a: 0 },
+            { q: "老婆婆和兒子過着____的生活。", options: ["富裕", "貧困", "豪華", "浪費"], a: 1 },
+            { q: "紅鯉魚很____老婆婆不殺之恩。", options: ["討厭", "感激", "害怕", "生氣"], a: 1 },
+            { q: "紅鯉魚決定要____老婆婆。", options: ["報復", "報恩", "欺騙", "傷害"], a: 1 },
+            { q: "紅鯉魚留下一顆紅____給老婆婆。", options: ["蘋果", "石頭", "珠子", "泥土"], a: 2 },
+            { q: "這顆珠子能治百____。", options: ["人", "草", "病", "獸"], a: 2 },
+            { q: "兒子吃了珠子後，身體便恢復____了。", options: ["健康", "生病", "虛弱", "疲勞"], a: 0 },
+            { q: "紅鯉魚最後____了河裏。", options: ["游回", "飛回", "跑回", "跳回"], a: 0 },
+            { q: "老婆婆是一個十分____的人。", options: ["自私", "善良", "貪心", "兇惡"], a: 1 },
+            { q: "老婆婆原本想把魚____給兒子吃。", options: ["賣掉", "煮來", "送給", "扔掉"], a: 1 },
+            { q: "紅鯉魚流淚是因為牠不想____。", options: ["游泳", "死", "吃飯", "睡覺"], a: 1 },
+            { q: "老婆婆把魚放進____裏養着。", options: ["大海", "水缸", "茶杯", "花盆"], a: 1 },
+            { q: "兒子病好後，他們過着____的生活。", options: ["悲慘", "幸福", "痛苦", "貧困"], a: 1 },
+            { q: "這是一個關於____的故事。", options: ["報恩", "復仇", "尋寶", "打仗"], a: 0 },
+            { q: "我們受到別人的幫助，應該心存____。", options: ["怨恨", "感激", "懷疑", "恐懼"], a: 1 },
+            { q: "老婆婆的善良得到了好____。", options: ["報", "壞", "笑", "哭"], a: 0 }
+        ],
+        hardPool: [
+            { q: "句子改錯：紅鯉魚想(回程)了，老婆婆便放牠回河裏。應改為？", options: ["回去/回家", "回報", "回憶", "回答"], a: 0 },
+            { q: "句子改錯：紅鯉魚決定(報道)老婆婆的恩情。應改為？", options: ["報復", "報答", "報告", "報紙"], a: 1 },
+            { q: "句子改錯：紅鯉魚(告別)老婆婆這顆珠子能治百病。應改為？", options: ["告訴", "告狀", "警告", "廣告"], a: 0 },
+            { q: "句子改錯：吃了紅珠子後，便(康樂)了。應改為？", options: ["康復", "健康", "安康", "康莊"], a: 0 },
+            { q: "句子改錯：從此過着(幸好)的生活。應改為？", options: ["幸福", "幸運", "不幸", "幸虧"], a: 0 },
+            { q: "「照料」的意思是甚麼？", options: ["拍照", "照顧料理", "煮食", "照明"], a: 1 },
+            { q: "「眼淚」的量詞通常是甚麼？", options: ["滴", "顆", "把", "件"], a: 0 },
+            { q: "「鯉魚」的量詞通常是甚麼？", options: ["尾/條", "隻", "個", "本"], a: 0 },
+            { q: "「貧困」的相反詞是甚麼？", options: ["窮苦", "富裕", "開心", "傷心"], a: 1 },
+            { q: "「寒冷」的相反詞是甚麼？", options: ["冰凍", "炎熱", "清涼", "溫和"], a: 1 },
+            { q: "「高興」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 2 },
+            { q: "「照料」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 1 },
+            { q: "「報答」的意思是甚麼？", options: ["用實際行動來表示感謝", "寫新聞", "回答問題", "報仇"], a: 0 },
+            { q: "「康復」的意思是甚麼？", options: ["恢復健康", "再次生病", "去醫院", "吃藥"], a: 0 },
+            { q: "「幸福」的近義詞是甚麼？", options: ["悲慘", "美滿", "痛苦", "傷心"], a: 1 },
+            { q: "「生病」通常配搭甚麼詞語？", options: ["看醫生", "看電視", "吃糖果", "跑步"], a: 0 },
+            { q: "句子重組：(1)細心地 (2)老婆婆 (3)紅鯉魚 (4)照料", options: ["(2)(1)(4)(3)", "(1)(2)(3)(4)", "(2)(4)(3)(1)", "(3)(4)(1)(2)"], a: 0 },
+            { q: "句子重組：(1)過着 (2)生活 (3)他們 (4)幸福的", options: ["(3)(1)(4)(2)", "(1)(3)(2)(4)", "(4)(2)(1)(3)", "(3)(4)(2)(1)"], a: 0 },
+            { q: "這個故事帶出甚麼寓意？", options: ["魚很好吃", "善有善報，要懂得感恩", "不要去河邊", "水缸很大"], a: 1 },
+            { q: "以下哪一個是動詞？", options: ["告訴", "幸福", "寒冷", "貧困"], a: 0 }
+        ]
+    },
+    20: {
+        title: "第二十關：小時候的林肯",
+        teaching: "本課學習描寫人物品德與學習態度的詞語。<br>小提示：「勤奮」是形容詞，形容人努力不懈；「專心」也是形容詞，形容人集中精神。",
+        example: "【例子】林肯生於 (貧苦) 家庭，但他十分 (勤奮) 好學，常常向 (鄰居) 借書看。",
+        easyPool: [
+            { q: "林肯生於一個____的家庭。", options: ["富裕", "貧苦", "快樂", "幸福"], a: 1 },
+            { q: "林肯常常向____借書看。", options: ["老師", "鄰居", "國王", "警察"], a: 1 },
+            { q: "林肯每天都要幫助爸爸____。", options: ["睡覺", "工作", "玩耍", "打架"], a: 1 },
+            { q: "林肯從不____時間。", options: ["珍惜", "浪費", "利用", "節省"], a: 1 },
+            { q: "有空時，林肯會坐下來____讀書。", options: ["專心", "隨便", "分心", "馬虎"], a: 0 },
+            { q: "大家都說林肯是一個____的孩子。", options: ["懶惰", "勤奮", "頑皮", "愚笨"], a: 1 },
+            { q: "林肯是美國著名的____。", options: ["總統", "醫生", "歌手", "廚師"], a: 0 },
+            { q: "林肯十分____閱讀。", options: ["討厭", "熱愛", "害怕", "拒絕"], a: 1 },
+            { q: "有一天，一場大雨把林肯借來的圖書____了。", options: ["燒毀", "弄濕", "吹走", "撕破"], a: 1 },
+            { q: "林肯為了賠償，願意替鄰居____。", options: ["打工", "打架", "洗澡", "做功課"], a: 0 },
+            { q: "鄰居看見林肯這麼____，便把圖書送給了他。", options: ["誠實", "狡猾", "懶惰", "生氣"], a: 0 },
+            { q: "林肯不小心害妹妹____了。", options: ["生病", "受傷", "跌倒", "迷路"], a: 1 },
+            { q: "妹妹告訴媽媽是自己一時____弄傷的。", options: ["小心", "大意", "故意", "用力"], a: 1 },
+            { q: "林肯教妹妹不應該____，然後向媽媽說出真相。", options: ["說謊", "誠實", "說話", "睡覺"], a: 0 },
+            { q: "林肯是一個____負責的人。", options: ["推卸", "誠實", "說謊", "自私"], a: 1 },
+            { q: "林肯在火爐邊借着____看書。", options: ["月光", "火光", "陽光", "星光"], a: 1 },
+            { q: "因為家裏窮，林肯沒有錢買____。", options: ["玩具", "書本", "衣服", "食物"], a: 1 },
+            { q: "林肯的行為____了身邊的人。", options: ["激怒", "感動", "驚嚇", "討厭"], a: 1 },
+            { q: "說出事情的____是勇敢的表現。", options: ["假象", "真相", "想像", "現象"], a: 1 },
+            { q: "我們要學習林肯____向上的精神。", options: ["放棄", "發奮", "逃避", "懶散"], a: 1 }
+        ],
+        hardPool: [
+            { q: "句子改錯：一(廠)大雨把圖書弄濕了。應改為？", options: ["場", "長", "腸", "常"], a: 0 },
+            { q: "句子改錯：林肯(顧)意替鄰居打工來買書。應改為？", options: ["願", "原", "圓", "源"], a: 0 },
+            { q: "句子改錯：鄰居被林肯的行為(受)動了。應改為？", options: ["感", "趕", "敢", "幹"], a: 0 },
+            { q: "句子改錯：又有一(件)，林肯不小心害妹妹受傷。應改為？", options: ["次", "刺", "賜", "伺"], a: 0 },
+            { q: "句子改錯：妹妹告訴媽媽是自己一時大(約)。應改為？", options: ["意", "義", "易", "異"], a: 0 },
+            { q: "句子改錯：林肯教妹妹不應該(謊說)，然後說出真相。應改為？", options: ["說謊", "說話", "傳說", "學說"], a: 0 },
+            { q: "「勤奮」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 2 },
+            { q: "「專心」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "副詞"], a: 2 },
+            { q: "「勤奮」的近義詞是甚麼？", options: ["懶惰", "努力", "聰明", "愚笨"], a: 1 },
+            { q: "「浪費」的相反詞是甚麼？", options: ["消耗", "節省/珍惜", "花費", "丟棄"], a: 1 },
+            { q: "「貧苦」的相反詞是甚麼？", options: ["窮困", "富裕", "艱苦", "生病"], a: 1 },
+            { q: "「感動」的意思是甚麼？", options: ["生氣", "思想感情受外界事物影響而激動", "移動", "感覺"], a: 1 },
+            { q: "「大意」的意思是甚麼？", options: ["很大的意思", "疏忽、不小心", "故意", "大聲"], a: 1 },
+            { q: "「真相」的意思是甚麼？", options: ["假的事情", "事情的真實情況", "相片", "樣子"], a: 1 },
+            { q: "為甚麼林肯要替鄰居打工？", options: ["為了賺錢買玩具", "因為他不小心弄濕了借來的書，要打工賠償", "因為他喜歡打工", "為了減肥"], a: 1 },
+            { q: "林肯為甚麼要教妹妹說出真相？", options: ["因為他想妹妹被罵", "因為他認為做人要誠實，不應說謊", "因為他自己不敢說", "因為他討厭妹妹"], a: 1 },
+            { q: "這課書主要讚揚林肯的甚麼品德？", options: ["勤奮好學和誠實負責", "游泳很快", "很有錢", "很會打架"], a: 0 },
+            { q: "句子重組：(1)一個 (2)是 (3)林肯 (4)孩子 (5)勤奮的", options: ["(3)(2)(1)(5)(4)", "(1)(5)(4)(2)(3)", "(3)(1)(5)(4)(2)", "(2)(1)(5)(4)(3)"], a: 0 },
+            { q: "句子重組：(1)圖書 (2)大雨 (3)把 (4)弄濕了 (5)一場", options: ["(5)(2)(3)(1)(4)", "(1)(3)(5)(2)(4)", "(3)(1)(4)(5)(2)", "(5)(3)(1)(2)(4)"], a: 0 },
+            { q: "以下哪一個是形容詞？", options: ["鄰居", "貧苦", "工作", "時間"], a: 1 }
+        ]
+    },
+    21: {
+        title: "第二十一關：老鼠開會",
+        teaching: "本課透過寓言故事學習與討論、提出意見相關的詞語。<br>小提示：「認為」是動詞，指對事物作出判斷；「問題」是名詞。",
+        example: "【例子】幾隻小老鼠 (聚集) 在一起，(商量) 應付貓兒的 (辦法)。",
+        easyPool: [
+            { q: "幾隻小老鼠____在一起開會。", options: ["聚集", "分開", "逃跑", "睡覺"], a: 0 },
+            { q: "希望能夠____出一個「及早發現貓兒到來」的方法。", options: ["打架", "討論", "逃避", "放棄"], a: 1 },
+            { q: "牠們想要想出一個好____。", options: ["辦法", "天氣", "食物", "衣服"], a: 0 },
+            { q: "其中一隻老鼠提出____。", options: ["意見", "意氣", "意外", "意思"], a: 0 },
+            { q: "只要在貓的頸上掛上一個____，就能聽到聲音。", options: ["項鍊", "鈴鐺", "時鐘", "花朵"], a: 1 },
+            { q: "我們聽到聲音後，就能馬上____。", options: ["逃跑", "吃飯", "跳舞", "睡覺"], a: 0 },
+            { q: "老鼠們都表示____這個建議。", options: ["反對", "討厭", "同意", "害怕"], a: 2 },
+            { q: "老鼠們____替貓戴上鈴鐺是好方法。", options: ["忘記", "認為", "承認", "錯認"], a: 1 },
+            { q: "其中一隻老鼠提出____：「誰去替貓掛上鈴鐺呢？」", options: ["答案", "問題", "功課", "禮物"], a: 1 },
+            { q: "大家都覺得這件事一點也不____。", options: ["困難", "容易", "可怕", "辛苦"], a: 1 },
+            { q: "老鼠們都____下來，不敢作聲。", options: ["安靜", "吵鬧", "興奮", "開心"], a: 0 },
+            { q: "掛鈴鐺這個工作誰也不____去做。", options: ["害怕", "拒絕", "願意", "逃避"], a: 2 },
+            { q: "原來，提出意見比真正去做____得多呢！", options: ["容易", "困難", "複雜", "辛苦"], a: 0 },
+            { q: "貓走路時便會發出叮叮噹噹的____。", options: ["歌聲", "鈴聲", "哭聲", "笑聲"], a: 1 },
+            { q: "小老鼠們____貓兒會吃掉牠們。", options: ["喜歡", "害怕", "期待", "歡迎"], a: 1 },
+            { q: "大家____起來討論，氣氛很熱烈。", options: ["聚集", "離開", "分散", "躲藏"], a: 0 },
+            { q: "我們遇到困難時，應該一起____。", options: ["商量", "爭吵", "打架", "哭泣"], a: 0 },
+            { q: "這個____雖然好，但很難實現。", options: ["建議", "錯誤", "玩具", "壞事"], a: 0 },
+            { q: "我____這件事是小明做錯了。", options: ["認為", "認識", "認字", "認出"], a: 0 },
+            { q: "大家都不敢出聲，房間裏十分____。", options: ["安靜", "熱鬧", "吵鬧", "黑暗"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「認為」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "量詞"], a: 1 },
+            { q: "「問題」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "量詞"], a: 0 },
+            { q: "句子改錯：老鼠們(認識)替貓戴鈴鐺是好方法。應改為？", options: ["認為", "確認", "承認", "認真"], a: 0 },
+            { q: "句子改錯：誰也不(同意)去做這件危險的事。應改為？(配合課文意思)", options: ["願意", "意見", "意思", "意願"], a: 0 },
+            { q: "「聚集」的相反詞是甚麼？", options: ["集合", "分散", "開會", "討論"], a: 1 },
+            { q: "「逃跑」的近義詞是甚麼？", options: ["追趕", "躲避/逃走", "站立", "睡覺"], a: 1 },
+            { q: "「安靜」的相反詞是甚麼？", options: ["寧靜", "吵鬧", "清潔", "美麗"], a: 1 },
+            { q: "這則寓言故事的教訓是甚麼？", options: ["貓很可怕", "老鼠很聰明", "提出想法很容易，但實際行動卻很困難", "鈴鐺很好聽"], a: 2 },
+            { q: "「意見」的意思是甚麼？", options: ["對事情的看法或想法", "生氣", "意外", "看見"], a: 0 },
+            { q: "「商量」的意思是甚麼？", options: ["買東西", "交換意見，討論解決辦法", "商人", "打架"], a: 1 },
+            { q: "以下哪個是名詞？", options: ["認為", "容易", "辦法", "安靜"], a: 2 },
+            { q: "以下哪個是形容詞？", options: ["建議", "逃跑", "容易", "問題"], a: 2 },
+            { q: "句子重組：(1)小老鼠 (2)聚集 (3)幾隻 (4)開會 (5)在一起", options: ["(3)(1)(2)(5)(4)", "(1)(3)(2)(5)(4)", "(2)(5)(4)(3)(1)", "(4)(5)(2)(1)(3)"], a: 0 },
+            { q: "句子重組：(1)提出 (2)老鼠 (3)其中一隻 (4)意見", options: ["(3)(2)(1)(4)", "(2)(3)(1)(4)", "(1)(4)(3)(2)", "(4)(1)(2)(3)"], a: 0 },
+            { q: "「建議」和「意見」的分別？", options: ["沒有分別", "建議偏向提出具體做法，意見偏向看法", "建議是名詞，意見是動詞", "建議是生氣"], a: 1 },
+            { q: "「馬上」可以用以下哪個詞語代替？", options: ["慢慢", "立刻", "從來", "一直"], a: 1 },
+            { q: "「作聲」的意思是甚麼？", options: ["做功課", "發出聲音", "唱歌", "畫畫"], a: 1 },
+            { q: "老鼠們為甚麼「不敢作聲」？", options: ["因為很開心", "因為大家都害怕，不願意去掛鈴鐺", "因為在睡覺", "因為貓來了"], a: 1 },
+            { q: "「及早」的意思是？", options: ["很晚", "趁早、及時", "早晨", "早餐"], a: 1 },
+            { q: "「同意」的相反詞是？", options: ["贊成", "反對", "明白", "知道"], a: 1 }
+        ]
+    },
+    22: {
+        title: "第二十二關：我長大了",
+        teaching: "本課學習與日常生活習慣和自我照顧相關的詞語。<br>小提示：「整理」是動詞，指收拾妥當；「操心」也是動詞，指費心神。",
+        example: "【例子】我會努力讀書，不用媽媽 (操心)，自己的事我會 (自己) 做。",
+        easyPool: [
+            { q: "早上起來，我把枕頭和被子____好。", options: ["弄亂", "整理", "丟掉", "隱藏"], a: 1 },
+            { q: "____前，我把餐具放在飯桌上。", options: ["睡覺", "洗澡", "吃飯", "上學"], a: 2 },
+            { q: "我每天放學後，都立刻做功課和____課本。", options: ["溫習", "撕破", "賣掉", "畫花"], a: 0 },
+            { q: "我會努力讀書，不用媽媽____。", options: ["開心", "操心", "放心", "死心"], a: 1 },
+            { q: "我會幫忙____弟弟，陪他玩遊戲。", options: ["欺負", "照顧", "責罵", "討厭"], a: 1 },
+            { q: "爸爸媽媽都說我____長大了。", options: ["已經", "未曾", "不會", "可能"], a: 0 },
+            { q: "從今天____，自己的事我會自己做。", options: ["結束", "開始", "放棄", "忘記"], a: 1 },
+            { q: "放學後，我會把洗乾淨的____掛好。", options: ["書包", "校服", "鞋子", "書本"], a: 1 },
+            { q: "做完功課後，我會收拾好____上的文具。", options: ["沙發", "牀鋪", "書桌", "地板"], a: 2 },
+            { q: "我會幫媽媽____家居，保持清潔。", options: ["破壞", "打掃", "弄髒", "裝飾"], a: 1 },
+            { q: "整理好書包，我才安心去____。", options: ["睡覺", "打架", "哭泣", "生病"], a: 0 },
+            { q: "我學會了自己穿衣服，不再是小____了。", options: ["貓咪", "孩子", "大人", "動物"], a: 1 },
+            { q: "媽媽稱讚我做事很____。", options: ["馬虎", "認真", "隨便", "懶惰"], a: 1 },
+            { q: "這份功課我已經____做完了。", options: ["完整", "殘缺", "破爛", "一半"], a: 0 },
+            { q: "我會幫忙把____放進洗碗機。", options: ["玩具", "碗碟", "泥土", "書本"], a: 1 },
+            { q: "自己的房間要自己____乾淨。", options: ["打掃", "弄亂", "破壞", "弄髒"], a: 0 },
+            { q: "父母每天工作很辛苦，我們不應讓他們____。", options: ["開心", "操心", "放心", "高興"], a: 1 },
+            { q: "我會____好自己的身體，不讓父母擔心。", options: ["照顧", "傷害", "欺騙", "忘記"], a: 0 },
+            { q: "____這本書後，我對這科目更了解了。", options: ["吃掉", "溫習", "丟掉", "撕破"], a: 1 },
+            { q: "我____把明天的時間表看了一遍。", options: ["已經", "未曾", "不會", "從不"], a: 0 }
+        ],
+        hardPool: [
+            { q: "「整理」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "量詞"], a: 1 },
+            { q: "「操心」的詞性是甚麼？", options: ["名詞", "動詞", "形容詞", "量詞"], a: 1 },
+            { q: "「溫習」的近義詞是甚麼？", options: ["學習/複習", "放棄", "睡覺", "玩耍"], a: 0 },
+            { q: "「操心」的意思是甚麼？", options: ["開心", "費心神、擔心", "做體操", "心臟痛"], a: 1 },
+            { q: "「整理」的近義詞是甚麼？", options: ["弄亂", "收拾/整頓", "破壞", "丟棄"], a: 1 },
+            { q: "「已經」通常用來表示甚麼？", options: ["事情還沒發生", "事情已完成或時間已過去", "發生意外", "天氣變化"], a: 1 },
+            { q: "句子改錯：我每天都做功課和(溫柔)課本。應改為？", options: ["溫和", "溫習", "溫度", "溫暖"], a: 1 },
+            { q: "句子改錯：爸爸媽媽說我(以經)長大了。應改為？", options: ["已經", "可經", "曾經", "必經"], a: 0 },
+            { q: "句子改錯：我會努力讀書，不用媽媽(粗心)。應改為？", options: ["小心", "操心", "開心", "傷心"], a: 1 },
+            { q: "句子改錯：做完功課，我會收拾好(書本)上的文具。(提示：指傢俱) 應改為？", options: ["書桌", "書櫃", "書包", "書房"], a: 0 },
+            { q: "這課的主題「我長大了」代表主角學會了甚麼？", options: ["長高了", "能獨立照顧自己和分擔家務", "可以買玩具", "可以不讀書"], a: 1 },
+            { q: "以下哪個是副詞？", options: ["整理", "已經", "操心", "校服"], a: 1 },
+            { q: "以下哪個是名詞？", options: ["溫習", "照顧", "餐具", "開始"], a: 2 },
+            { q: "「打掃」通常配搭甚麼？", options: ["課本", "飯菜", "家居/房間", "電視"], a: 2 },
+            { q: "句子重組：(1)做功課 (2)放學後 (3)立刻 (4)我", options: ["(4)(2)(3)(1)", "(2)(4)(3)(1)", "(1)(2)(4)(3)", "(3)(4)(2)(1)"], a: 0 },
+            { q: "句子重組：(1)自己的 (2)我會 (3)事 (4)自己做", options: ["(1)(3)(2)(4)", "(2)(4)(1)(3)", "(3)(1)(4)(2)", "(4)(2)(1)(3)"], a: 0 },
+            { q: "「完整」的意思是？", options: ["破爛", "齊全、沒有殘缺", "很好看", "很貴"], a: 1 },
+            { q: "「照顧」和「照料」是？", options: ["反義詞", "近義詞", "同音字", "無關"], a: 1 },
+            { q: "「開始」的相反詞是？", options: ["起點", "結束", "然後", "已經"], a: 1 },
+            { q: "我們應該怎樣對待自己的物品（如校服、文具）？", options: ["隨便亂放", "自己整理和收拾好", "叫媽媽幫忙", "丟掉買新的"], a: 1 }
+        ]
+    },
+    23: {
+        title: "第二十三關：郊遊樂",
+        teaching: "本課學習描寫大自然景色和天氣的形容詞。<br>小提示：「綠油油」和「晴朗」都是表示狀態或性質的形容詞，可以在前面加上「十分」或「非常」。",
+        example: "【例子】星期日，天氣 (晴朗)，我們到郊外去欣賞優美的 (風景)。",
+        easyPool: [
+            { q: "星期日，天氣____，我們到郊外去。", options: ["下雨", "晴朗", "寒冷", "颱風"], a: 1 },
+            { q: "郊外的空氣清新，____優美。", options: ["風景", "風氣", "風度", "風格"], a: 0 },
+            { q: "那裏有一大片____的草地。", options: ["紅彤彤", "黃澄澄", "綠油油", "黑沉沉"], a: 2 },
+            { q: "美麗的花兒把蝴蝶和蜜蜂都____過來了。", options: ["趕走", "吸引", "嚇跑", "討厭"], a: 1 },
+            { q: "微風吹過，傳來一陣____的氣味。", options: ["臭惡", "清香", "難聞", "刺鼻"], a: 1 },
+            { q: "小鳥在廣闊的天空中____地飛翔。", options: ["自由", "自私", "害怕", "困難"], a: 0 },
+            { q: "我們喜歡在假日到郊外____。", options: ["睡覺", "遊玩", "工作", "打架"], a: 1 },
+            { q: "哥哥和我在草地上一起放____。", options: ["煙花", "風箏", "火", "毒藥"], a: 1 },
+            { q: "弟弟____小猴子一樣跳來跳去。", options: ["不是", "好像", "討厭", "生氣"], a: 1 },
+            { q: "弟弟十分活潑，到處____。", options: ["睡覺", "哭泣", "亂跑", "生病"], a: 2 },
+            { q: "媽媽坐在大樹下____，欣賞郊外的美景。", options: ["休息", "跑步", "打架", "工作"], a: 0 },
+            { q: "爸爸拿著相機，替我們____留念。", options: ["畫畫", "寫字", "拍照", "唱歌"], a: 2 },
+            { q: "郊外的天空特別____，沒有烏雲。", options: ["蔚藍", "黑暗", "灰色", "綠色"], a: 0 },
+            { q: "我們在草地上野餐，吃了很多美味的____。", options: ["食物", "泥土", "樹葉", "石頭"], a: 0 },
+            { q: "郊外的環境十分____，沒有城市的吵鬧。", options: ["熱鬧", "寧靜", "可怕", "擁擠"], a: 1 },
+            { q: "這朵花散發出淡淡的____。", options: ["清香", "惡臭", "煙味", "汽油味"], a: 0 },
+            { q: "郊遊能讓我們放鬆____。", options: ["心情", "功課", "衣服", "書包"], a: 0 },
+            { q: "大自然有許多____的景色等我們去發現。", options: ["醜陋", "美麗", "可怕", "無聊"], a: 1 },
+            { q: "蝴蝶在花叢中____地飛舞。", options: ["自由", "痛苦", "傷心", "害怕"], a: 0 },
+            { q: "我們今天玩得十分____。", options: ["生氣", "傷心", "開心", "疲倦"], a: 2 }
+        ],
+        hardPool: [
+            { q: "「綠油油」是甚麼詞性？", options: ["動詞", "名詞", "形容詞(狀態)", "量詞"], a: 2 },
+            { q: "「晴朗」是甚麼詞性？", options: ["動詞", "名詞", "形容詞(性質)", "量詞"], a: 2 },
+            { q: "以下哪一個詞語可以用「十分」或「非常」來修飾？", options: ["晴朗", "郊外", "星期日", "蝴蝶"], a: 0 },
+            { q: "「清香」通常用來形容甚麼？", options: ["顏色", "聲音", "氣味", "形狀"], a: 2 },
+            { q: "「吸引」的意思是甚麼？", options: ["把別人的注意力引過來", "趕走別人", "打架", "睡覺"], a: 0 },
+            { q: "「自由」的相反詞是甚麼？", options: ["自在", "束縛/拘束", "開心", "美麗"], a: 1 },
+            { q: "句子改錯：弟弟(好笑)小猴子一樣跳來跳去。應改為？", options: ["好像", "好奇", "好玩", "好人"], a: 0 },
+            { q: "句子改錯：媽媽在大樹下(停止)。(提示：放鬆身心) 應改為？", options: ["休學", "休息", "休假", "休想"], a: 1 },
+            { q: "「風景」的量詞通常是甚麼？", options: ["幅 / 處", "個", "隻", "本"], a: 0 },
+            { q: "「活潑」的意思是？", options: ["生動自然、不呆板", "很生氣", "很安靜", "很傷心"], a: 0 },
+            { q: "「晴朗」的相反詞是？", options: ["炎熱", "陰暗/下雨", "清涼", "溫暖"], a: 1 },
+            { q: "「廣闊」通常配搭甚麼詞語？", options: ["房間", "天空/草原", "書本", "螞蟻"], a: 1 },
+            { q: "以下哪個是動詞？", options: ["晴朗", "吸引", "清香", "綠油油"], a: 1 },
+            { q: "「留念」的意思是？", options: ["留下來作紀念", "忘記", "思考", "讀書"], a: 0 },
+            { q: "句子重組：(1)天氣 (2)星期日 (3)晴朗 (4)十分", options: ["(2)(1)(4)(3)", "(1)(2)(3)(4)", "(3)(4)(1)(2)", "(4)(3)(2)(1)"], a: 0 },
+            { q: "句子重組：(1)蝴蝶 (2)吸引了 (3)花兒把 (4)過來", options: ["(3)(1)(2)(4)", "(1)(3)(2)(4)", "(2)(4)(3)(1)", "(4)(3)(1)(2)"], a: 0 },
+            { q: "「優美」的近義詞是？", options: ["難看", "美麗/美好", "可怕", "奇怪"], a: 1 },
+            { q: "為甚麼蝴蝶和蜜蜂會飛過來？", options: ["因為被花兒吸引", "因為想咬人", "因為迷路了", "因為怕黑"], a: 0 },
+            { q: "「郊外」是指甚麼地方？", options: ["市中心", "城市外圍，自然風景較多的地方", "商場", "學校"], a: 1 },
+            { q: "「微風」是指怎樣的風？", options: ["颱風", "輕微柔和的風", "龍捲風", "暴風"], a: 1 }
+        ]
+    },     
+    24: {
+            title: "第二十四關：端午賽龍舟",
+            teaching: "本課學習與節日活動和比賽相關的詞語。<br>小提示：「到達」是動詞，多與表示地點的名詞一起使用；「出發」也是動詞，多與時間或地點一起使用。",
+            example: "【例子】我們 (到達) 目的地時，龍舟已經準備隨時 (出發)。",
+            easyPool: [
+                { q: "端午節那天，爸爸帶我們到沙田去____龍舟比賽。", options: ["觀察", "觀看", "看見", "視察"], a: 1 },
+                { q: "我們____目的地時，那裏已經站滿了人。", options: ["達到", "到達", "遲到", "早到"], a: 1 },
+                { q: "城門河兩岸，____都插滿了彩旗。", options: ["到底", "到處", "到來", "不到"], a: 1 },
+                { q: "每個健兒看上去都____十足，準備好比賽了。", options: ["信任", "信心", "信用", "信仰"], a: 1 },
+                { q: "龍舟在起點處____，準備隨時出發。", options: ["集會", "集合", "集中", "集郵"], a: 1 },
+                { q: "聽到鼓聲，龍舟便準備隨時____。", options: ["出現", "出發", "出產", "出門"], a: 1 },
+                { q: "咚咚的鑼鼓聲響了，比賽____開始。", options: ["正確", "正式", "正常", "正好"], a: 1 },
+                { q: "健兒們齊心____地向前提。", options: ["吃力", "合力", "大力", "小力"], a: 1 },
+                { q: "健兒們都____在比賽中得到第一名。", options: ["失望", "絕望", "希望", "看望"], a: 2 },
+                { q: "岸上響起一陣____的聲音，為健兒打氣。", options: ["招手", "歡呼", "哭泣", "責罵"], a: 1 },
+                { q: "龍舟比賽在熱鬧的____中結束了。", options: ["天氣", "氣氛", "脾氣", "氧氣"], a: 1 },
+                { q: "各隊全力參賽，賽事十分____。", options: ["精明", "精彩", "精靈", "精神"], a: 1 },
+                { q: "端午節我們會吃____。", options: ["月餅", "湯圓", "粽子", "蛋糕"], a: 2 },
+                { q: "龍舟的船頭雕刻成____的形狀。", options: ["老虎", "龍", "獅子", "老鷹"], a: 1 },
+                { q: "大家在岸邊大聲地____，為隊伍加油。", options: ["睡覺", "吶喊", "唱歌", "畫畫"], a: 1 },
+                { q: "「齊心合力」的意思是大家____合作。", options: ["互相打架", "團結一致", "各自為政", "不理不睬"], a: 1 },
+                { q: "這場比賽真是太____了，讓人目不轉睛！", options: ["無聊", "精彩", "可怕", "傷心"], a: 1 },
+                { q: "比賽結束後，獲勝的隊伍十分____。", options: ["傷心", "高興", "生氣", "害怕"], a: 1 },
+                { q: "健兒們每天辛苦訓練，就是為了今天的____。", options: ["睡覺", "比賽", "考試", "旅行"], a: 1 },
+                { q: "端午節是中國傳統的____。", options: ["節日", "學校", "天氣", "食物"], a: 0 }
+            ],
+            hardPool: [
+                { q: "「觀看」和「觀察」的分別？", options: ["沒有分別", "觀看指特意地看(如比賽)，觀察指仔細察看事物", "觀看是名詞", "觀察是聽聲音"], a: 1 },
+                { q: "「到達」和「達到」的分別？", options: ["到達多用於地點，達到多用於抽象事物", "沒有分別", "到達是名詞", "達到用於地點"], a: 0 },
+                { q: "「集合」和「集會」的分別？", options: ["集合是聚集在一起，集會是聚集開會", "沒有分別", "集合是名詞", "集會是買東西"], a: 0 },
+                { q: "句子改錯：我們(達到)目的地時。應改為？", options: ["到達", "遲到", "早到", "報到"], a: 0 },
+                { q: "句子改錯：城門河兩岸(到底)都插滿彩旗。應改為？", options: ["到處", "到來", "到時", "到期"], a: 0 },
+                { q: "句子改錯：健兒們都(信任)十足。應改為？", options: ["信心", "信用", "信仰", "信件"], a: 0 },
+                { q: "句子改錯：龍舟準備隨時(出現)。應改為？", options: ["出發", "出產", "出門", "出走"], a: 0 },
+                { q: "「氣氛」的詞性是甚麼？", options: ["動詞", "形容詞", "名詞", "副詞"], a: 2 },
+                { q: "「正式」的意思是？", options: ["合乎一般公認標準的、正規的", "不正確", "隨便", "正方形"], a: 0 },
+                { q: "「齊心合力」的近義詞是？", options: ["四分五裂", "團結一致", "互相猜忌", "各自為政"], a: 1 },
+                { q: "「希望」的詞性可以是？", options: ["只能是動詞", "動詞或名詞", "只能是形容詞", "量詞"], a: 1 },
+                { q: "「歡呼」通常在甚麼時候發生？", options: ["傷心時", "生氣時", "高興或慶祝時", "睡覺時"], a: 2 },
+                { q: "「精彩」通常用來形容甚麼？", options: ["表演、比賽或文章十分出色", "天氣", "食物味道", "衣服"], a: 0 },
+                { q: "句子重組：(1)比賽 (2)正式 (3)鑼鼓聲響了 (4)開始", options: ["(3)(1)(2)(4)", "(1)(2)(3)(4)", "(4)(3)(2)(1)", "(2)(1)(4)(3)"], a: 0 },
+                { q: "句子重組：(1)得到 (2)都希望 (3)第一名 (4)健兒們", options: ["(4)(2)(1)(3)", "(2)(4)(1)(3)", "(1)(3)(4)(2)", "(4)(1)(3)(2)"], a: 0 },
+                { q: "「目的地」的意思是？", options: ["出發的地方", "想要到達的地方", "買東西的地方", "迷路的地方"], a: 1 },
+                { q: "「到處」的近義詞是？", options: ["只有一處", "每一處、處處", "從來沒有", "有時候"], a: 1 },
+                { q: "「信心十足」形容健兒們怎樣？", options: ["十分害怕", "對自己充滿自信，相信能做好", "不想比賽", "很累"], a: 1 },
+                { q: "「鑼鼓聲」在賽龍舟中的作用是？", options: ["讓人睡覺", "指揮健兒們划槳的節奏並振奮士氣", "嚇跑魚兒", "沒有作用"], a: 1 },
+                { q: "這篇課文主要描寫了甚麼情景？", options: ["中秋賞月", "端午節賽龍舟的熱鬧氣氛", "新年拜年", "聖誕節派禮物"], a: 1 }
+            ]
+        }
+    };
+    // --- 題庫資料區塊結束 ---
+
+    let currentLevel = 1;
+    let currentQuestions = [];
+    let currentQIndex = 0;
+    let userAnswers = []; 
+    let retryMode = false; 
+
+    let maxScores = JSON.parse(localStorage.getItem('teacherCatScores')) || {};
+
+    window.onload = function() {
+        const grid = document.getElementById("levels-grid");
+        
+        for (let lvl = 1; lvl <= 24; lvl++) {
+            let btn = document.createElement("button");
+            btn.className = "level-btn";
+            
+            if (levelData[lvl]) {
+                let lvlName = levelData[lvl].title;
+                let score = maxScores[lvl] || 0;
+                
+                let starHtml = '<span class="star-none">⭐</span>';
+                if (score === 20) {
+                    starHtml = '<span class="star-big">🌟</span>';
+                } else if (score >= 10) {
+                    starHtml = '<span class="star-small">⭐</span>';
+                }
+
+                btn.innerHTML = `
+                    <span style="font-size: 1.1em; line-height: 1.4;">${lvlName}</span>
+                    <span class="score-badge">最高分: ${score}/20</span>
+                    <div style="margin-top:5px;">${starHtml}</div>
+                `;
+                btn.onclick = () => showIntro(lvl);
+            } else {
+                btn.innerHTML = `
+                    <span style="font-size: 1.1em; line-height: 1.4;">第 ${lvl} 關<br>(待更新)</span>
+                `;
+                btn.style.filter = "grayscale(100%)";
+                btn.style.opacity = "0.7";
+                btn.onclick = () => alert(`Teacher Cat 提示：第 ${lvl} 關的題庫還沒加進去喔！`);
+            }
+            
+            grid.appendChild(btn);
+        }
+    };
+
+    function clearRecord() {
+        if(confirm("確定要清除所有最高分紀錄與星星嗎？這將無法復原喔！")) {
+            localStorage.removeItem('teacherCatScores');
+            location.reload(); 
+        }
+    }
+
+    function hideAll() {
+        document.getElementById("home-screen").classList.add("hidden");
+        document.getElementById("intro-screen").classList.add("hidden");
+        document.getElementById("game-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.add("hidden");
+        document.getElementById("hint-box").style.display = "none";
+        document.getElementById("skip-btn").classList.add("hidden");
+    }
+
+    function showHome() { location.reload(); }
+
+    function showIntro(level) {
+        if (!levelData[level]) { alert("此關卡題目請補上資料！"); return; }
+        currentLevel = level;
+        hideAll();
+        document.getElementById("intro-screen").classList.remove("hidden");
+        document.getElementById("intro-title").innerText = levelData[level].title;
+        document.getElementById("intro-teaching").innerHTML = levelData[level].teaching;
+        document.getElementById("intro-example").innerText = levelData[level].example;
+    }
+
+    function speakIntro(elementId) {
+        let text = document.getElementById(elementId).innerText;
+        speakText(text);
+    }
+
+    function getRandomItems(arr, count) {
+        let shuffled = arr.slice(0), i = arr.length, min = i - count, temp, index;
+        while (i-- > min) {
+            index = Math.floor((i + 1) * Math.random());
+            temp = shuffled[index]; shuffled[index] = shuffled[i]; shuffled[i] = temp;
+        }
+        return shuffled.slice(min);
+    }
+
+    function startGame() {
+        retryMode = false;
+        const data = levelData[currentLevel];
+        let easyCount = data.easyPool ? data.easyPool.length : 0;
+        let hardCount = data.hardPool ? data.hardPool.length : 0;
+        
+        let easyQ = easyCount > 0 ? getRandomItems(data.easyPool, Math.min(10, easyCount)) : [];
+        let hardQ = hardCount > 0 ? getRandomItems(data.hardPool, Math.min(10, hardCount)) : [];
+        
+        currentQuestions = easyQ.concat(hardQ);
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        currentQIndex = 0;
+        
+        hideAll();
+        document.getElementById("game-screen").classList.remove("hidden");
+        document.getElementById("game-level-title").innerText = data.title;
+        loadQuestion();
+    }
+
+    function prevQuestion() { if (currentQIndex > 0) { currentQIndex--; loadQuestion(); } }
+    function nextQuestion() {
+        if (currentQIndex < currentQuestions.length - 1) { currentQIndex++; loadQuestion(); }
+        else { showResult(); }
+    }
+
+    function skipQuestion() {
+        if(!retryMode && userAnswers[currentQIndex] === null) {
+            userAnswers[currentQIndex] = false; 
+        }
+        document.getElementById('skip-btn').classList.add('hidden');
+        document.getElementById("hint-box").style.display = "none";
+        
+        if (retryMode) {
+            showResult(); 
+        } else {
+            nextQuestion(); 
+        }
+    }
+
+    function loadQuestion() {
+        document.getElementById("hint-box").style.display = "none";
+        document.getElementById("skip-btn").classList.add("hidden");
+        
+        let qData = currentQuestions[currentQIndex];
+        
+        if(retryMode) {
+            document.getElementById("progress-text").innerText = `🔄 錯題重答挑戰`;
+            showTeacherCatHint();
+        } else {
+            let difficulty = currentQIndex < 10 ? " (淺)" : " (深)";
+            document.getElementById("progress-text").innerText = `題數: ${currentQIndex + 1} / ${currentQuestions.length} ${difficulty}`;
+        }
+        
+        document.getElementById("question-text").innerText = qData.q;
+        let optContainer = document.getElementById("options-container");
+        optContainer.innerHTML = "";
+        
+        qData.options.forEach((opt, index) => {
+            let row = document.createElement("div");
+            row.className = "option-row";
+            
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, qData.a);
+            
+            let speakBtn = document.createElement("button");
+            speakBtn.className = "speak-btn";
+            speakBtn.innerText = "🔊";
+            speakBtn.onclick = () => speakText(opt);
+            
+            row.appendChild(btn); row.appendChild(speakBtn);
+            optContainer.appendChild(row);
+        });
+        
+        // 已經移除 speakText(qData.q); 現在不會自動讀出題目
+    }
+
+    function showTeacherCatHint() {
+        let hintBox = document.getElementById("hint-box");
+        let hintText = document.getElementById("hint-text");
+        let levelHint = levelData[currentLevel].teaching.replace(/<[^>]*>?/gm, ''); 
+        hintText.innerText = levelHint + " 試著再選一次吧！";
+        hintBox.style.display = "block";
+        
+        hintBox.classList.remove("shake");
+        void hintBox.offsetWidth; 
+        hintBox.classList.add("shake");
+    }
+
+    function checkAnswer(selectedIndex, correctIndex) {
+        if (selectedIndex === correctIndex) {
+            userAnswers[currentQIndex] = true; 
+            
+            document.getElementById('skip-btn').classList.add('hidden');
+            document.getElementById("hint-box").style.display = "none";
+            
+            let currentScore = userAnswers.filter(a => a === true).length;
+            let currentMax = maxScores[currentLevel] || 0;
+            let isNewRecord = false;
+            
+            if (currentScore > currentMax) {
+                maxScores[currentLevel] = currentScore;
+                localStorage.setItem('teacherCatScores', JSON.stringify(maxScores));
+                isNewRecord = true;
+            }
+
+            if (isNewRecord) {
+                showSuccessEffect("🎊 答對了！<br>🏆 破最高分紀錄了！ 🎊");
+                speakText("太棒了！答對了！破紀錄了！");
+            } else {
+                showSuccessEffect("🎊 答對了！太棒了！ 🎊");
+                speakText("太棒了！答對了！");
+            }
+            
+            setTimeout(() => {
+                if (retryMode) {
+                    showResult(); 
+                } else {
+                    nextQuestion();
+                }
+            }, 1800);
+
+        } else {
+            if(!retryMode && userAnswers[currentQIndex] === null) { userAnswers[currentQIndex] = false; }
+            
+            showTeacherCatHint();
+            speakText("哎呀，答錯了。" + document.getElementById('hint-text').innerText);
+            
+            document.getElementById('skip-btn').classList.remove('hidden');
+        }
+    }
+
+    function showSuccessEffect(htmlText) {
+        let fx = document.getElementById("success-fx");
+        document.getElementById("fx-text").innerHTML = htmlText;
+        fx.classList.add("show");
+        setTimeout(() => { fx.classList.remove("show"); }, 1500);
+    }
+
+    function showResult() {
+        hideAll();
+        document.getElementById("result-screen").classList.remove("hidden");
+        
+        let correctCount = userAnswers.filter(a => a === true).length;
+        document.getElementById("score-text").innerText = `你的成績是：${correctCount} / 20 分`;
+        
+        if (!retryMode) {
+            if (correctCount === 20) {
+                speakText(`太厲害了！滿分 20 分！獲得大星星！`);
+            } else if (correctCount >= 10) {
+                speakText(`恭喜合格！獲得小星星！分數是 ${correctCount} 分。`);
+            } else {
+                speakText(`關卡完成，你的分數是 ${correctCount} 分。快來重答錯題吧！`);
+            }
+        }
+
+        let summaryContainer = document.getElementById("summary-container");
+        summaryContainer.innerHTML = "<h3>📝 答題總結：</h3>";
+        
+        currentQuestions.forEach((q, index) => {
+            let item = document.createElement("div");
+            item.className = "summary-item";
+            
+            let qText = document.createElement("span");
+            qText.innerText = `第 ${index + 1} 題：${q.q}`;
+            qText.style.flex = "1";
+            
+            let rightSide = document.createElement("div");
+            rightSide.style.display = "flex";
+            rightSide.style.alignItems = "center";
+            rightSide.style.gap = "10px";
+            
+            let status = document.createElement("span");
+            if (userAnswers[index] === true) {
+                status.className = "correct-tag"; status.innerText = "✅ 答對";
+                rightSide.appendChild(status);
+            } else {
+                status.className = "wrong-tag"; status.innerText = "❌ 答錯";
+                
+                let retryBtn = document.createElement("button");
+                retryBtn.className = "btn";
+                retryBtn.style.backgroundColor = "#ff5722";
+                retryBtn.style.margin = "0";
+                retryBtn.innerText = "🔄 重做";
+                retryBtn.onclick = () => startRetry(index);
+                
+                rightSide.appendChild(status); 
+                rightSide.appendChild(retryBtn);
+            }
+            
+            item.appendChild(qText); 
+            item.appendChild(rightSide);
+            summaryContainer.appendChild(item);
+        });
+    }
+
+    function startRetry(index) {
+        retryMode = true;
+        currentQIndex = index;
+        hideAll();
+        document.getElementById("game-screen").classList.remove("hidden");
+        document.getElementById("game-level-title").innerText = "🔄 錯題重答挑戰";
+        loadQuestion();
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = text; msg.lang = 'zh-HK'; msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+    }
+</script>
+
+</body>
+</html>
