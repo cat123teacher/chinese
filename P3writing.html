@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Cat 的快樂AI教室 - 小三英文寫作大冒險</title>
+    <!-- 引入撒花特效套件 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Nunito:wght@600;800&display=swap');
+        
+        /* 動態漸變背景 - 修改了 padding 和對齊方式以配合非固定 Footer */
+        body { 
+            font-family: 'Nunito', 'Microsoft JhengHei', sans-serif; 
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            margin: 0; 
+            padding: 0; /* 移除原本為了 fixed footer 留的底部空間 */
+            display: flex; 
+            flex-direction: column; /* 讓內容垂直排列 */
+            align-items: center; 
+            min-height: 100vh; 
+            color: #2d3436; 
+            overflow-x: hidden; 
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .top-logo { position: fixed; top: 15px; left: 15px; width: 70px; height: 70px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; border: 3px solid white; background-color: white;}
+        
+        /* Teacher Cat 聯絡欄 (已取消 position: fixed 置底，改為滑動到底部才顯示) */
+        .footer { 
+            width: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1); 
+            padding: 20px 0; 
+            text-align: center; 
+            z-index: 1000; 
+            font-size: 0.9em; 
+            border-top: 4px solid #fff; 
+            margin-top: auto; /* 若畫面不夠長，會自動推到畫面最下方 */
+        }
+        .footer h3 { margin: 0 0 5px 0; color: #ff6b81; font-family: 'Comic Neue', cursive; font-size: 1.2em;}
+        .social-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 0 10px; }
+        .social-links a { color: white; text-decoration: none; font-weight: bold; background: #0984e3; padding: 5px 12px; border-radius: 15px; transition: 0.3s; box-shadow: 0 3px 0 #074ac7;}
+        .social-links a:hover { background: #fdcb6e; color: #2d3436; box-shadow: 0 3px 0 #e1b12c; transform: translateY(-2px);}
+
+        /* 美化主容器 - 加入響應式寬度確保手機顯示正常 */
+        .container { 
+            background-color: rgba(255, 255, 255, 0.95); 
+            border-radius: 35px; 
+            box-shadow: 0 20px 50px rgba(255, 107, 129, 0.2); 
+            width: calc(100% - 40px); /* 保持左右 20px 的距離 */
+            max-width: 850px; 
+            padding: 40px; 
+            text-align: center; 
+            border: 6px solid #fff; 
+            position: relative; 
+            margin-top: 100px; /* 避開左上角的 Logo */
+            margin-bottom: 40px; /* 與 Footer 保持距離 */
+            box-sizing: border-box; /* 確保 padding 不會撐破版面 */
+        }
+        
+        /* 果凍立體標題 */
+        h1 { 
+            color: #fff; 
+            font-size: 3em; 
+            font-family: 'Comic Neue', cursive; 
+            text-shadow: 
+                -2px -2px 0 #ff6b81,  
+                 2px -2px 0 #ff6b81,
+                -2px  2px 0 #ff6b81,
+                 2px  2px 0 #ff6b81,
+                 4px  4px 0 #ff4757,
+                 6px  6px 0 #ffa502,
+                 8px  8px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px; 
+            letter-spacing: 2px;
+        }
+        
+        /* 彩虹立體懸浮按鈕 */
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 18px; margin-bottom: 25px;}
+        .level-btn { 
+            color: white; border: 3px solid rgba(255,255,255,0.6); 
+            padding: 15px 10px; border-radius: 20px; font-size: 1.3em; font-weight: 800; 
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            display: flex; flex-direction: column; align-items: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .level-btn:hover { transform: translateY(-5px) scale(1.05); filter: brightness(1.1); }
+        .level-btn:active { transform: translateY(3px) scale(0.95); }
+        
+        .stars-container { margin-top: 8px; color: #ffeaa7; text-shadow: 1px 1px 0px #d63031; letter-spacing: 2px;}
+        .stars-small { font-size: 1.1em; }
+        .stars-big { font-size: 1.6em; transform: scale(1.1); animation: pop 1s infinite alternate;}
+        @keyframes pop { from { transform: scale(1); } to { transform: scale(1.1); } }
+        
+        .score-badge { background: rgba(0,0,0,0.25); padding: 4px 12px; border-radius: 12px; font-size: 0.85em; margin-top: 8px; border: 1px solid rgba(255,255,255,0.3);}
+
+        .hidden { display: none !important; }
+        
+        /* 預習區塊美化 */
+        .intro-box { background-color: #fff9c4; padding: 25px; border-radius: 25px; border: 5px dashed #fdcb6e; margin: 25px 0; text-align: left; font-size: 1.25em; line-height: 1.6; box-shadow: inset 0 0 20px rgba(253, 203, 110, 0.2);}
+        
+        .action-btn { color: white; border: 2px solid rgba(255,255,255,0.3); padding: 12px 30px; font-size: 1.2em; border-radius: 50px; cursor: pointer; font-weight: bold; margin: 5px; transition: 0.3s; text-decoration: none;}
+        .action-btn:hover { filter: brightness(1.15); transform: translateY(-3px); } 
+        .action-btn:active { transform: translateY(3px); box-shadow: 0 0 0 transparent !important; }
+        
+        .btn-huge { font-size: 1.8em; padding: 15px 50px; background-color: #e17055; box-shadow: 0 8px 0 #d63031; animation: pulse 1.5s infinite; border-radius: 50px;}
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .nav-bar { display: flex; justify-content: space-between; margin-top: 30px; border-top: 3px dashed #dfe6e9; padding-top: 25px; }
+        
+        .question-text { font-size: 1.8em; color: #2d3436; margin-bottom: 25px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; background: #f1f2f6; padding: 20px; border-radius: 20px; border: 3px solid #dfe6e9;}
+        .speak-btn { background-color: #fdcb6e; border: 2px solid white; border-radius: 50%; width: 50px; height: 50px; font-size: 1.3em; cursor: pointer; box-shadow: 0 5px 0 #e1b12c; transition: 0.2s; display: flex; justify-content: center; align-items: center; flex-shrink: 0;}
+        .speak-btn:hover { background-color: #ffeaa7; transform: translateY(-2px);}
+        .speak-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #e1b12c; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;}
+        .option-row { display: flex; gap: 12px; align-items: center; }
+        .option-btn { flex-grow: 1; background-color: #74b9ff; border: 3px solid rgba(255,255,255,0.5); padding: 18px; font-size: 1.4em; font-weight: bold; color: white; border-radius: 20px; cursor: pointer; box-shadow: 0 6px 0 #0984e3; transition: 0.2s; text-shadow: 1px 1px 1px rgba(0,0,0,0.2);}
+        .option-btn:hover { background-color: #00cec9; box-shadow: 0 6px 0 #00b894; transform: translateY(-2px); }
+        
+        .skip-btn-container { text-align: center; margin-top: 20px; animation: fadeIn 0.5s;}
+        
+        .inline-hint-box { background: #fff9c4; padding: 20px; border-radius: 20px; border: 4px solid #ff7675; margin-bottom: 25px; text-align: left; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 20px rgba(214, 48, 49, 0.15);}
+        
+        .summary-list { text-align: left; max-height: 400px; overflow-y: auto; background: #f1f2f6; padding: 25px; border-radius: 20px; margin-bottom: 20px; border: 3px solid #dfe6e9; }
+        .summary-item { padding: 15px; margin-bottom: 15px; border-radius: 15px; background: white; display: flex; justify-content: space-between; align-items: center; border-left: 8px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.05);}
+        .summary-item.correct { border-color: #00b894; }
+        .summary-item.wrong { border-color: #d63031; cursor: pointer; background-color: #ffeaa7; transition: 0.2s; }
+        .summary-item.wrong:hover { background-color: #fdcb6e; transform: scale(1.02); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(5px);}
+        .modal-content { background: white; padding: 35px; border-radius: 30px; max-width: 90%; width: 550px; text-align: center; border: 6px solid #ff7675; position: relative; animation: bounceIn 0.5s; box-shadow: 0 20px 50px rgba(0,0,0,0.3);}
+        .modal-cat-img { width: 110px; height: 110px; border-radius: 50%; position: absolute; top: -55px; left: 50%; transform: translateX(-50%); border: 5px solid #ff7675; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+        @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 80% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+        
+        .progress-bar { width: 100%; height: 25px; background-color: #dfe6e9; border-radius: 25px; overflow: hidden; margin-bottom: 25px; border: 2px solid rgba(0,0,0,0.05);}
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); width: 0%; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    </style>
+</head>
+<body>
+
+<img src="cat.jpeg" class="top-logo" alt="Teacher Cat Logo" onerror="this.src='https://via.placeholder.com/70?text=Cat'">
+
+<div class="container">
+    <div id="home-view">
+        <h1>🌟 小三英文寫作大冒險 🌟</h1>
+        <div style="display:flex; justify-content:center; gap:15px; margin-bottom: 25px; align-items:center;">
+            <p style="margin:0; font-size:1.3em; font-weight:bold; color: #636e72;">快來挑戰拿滿 3 顆大星星吧！</p>
+            <button class="action-btn" onclick="clearRecords()" style="background-color:#d63031; box-shadow:0 5px 0 #b33939; font-size:0.9em; padding: 8px 15px;">🗑️ 清除記錄</button>
+        </div>
+        <div class="level-grid" id="level-container"></div>
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="action-btn" style="display:inline-block; margin-top:25px; background-color:#e84393; box-shadow:0 6px 0 #b33939; padding: 15px 40px; font-size:1.4em;">🌍 返回小朋友學習大冒險</a>
+    </div>
+
+    <!-- 課前預習頁面 -->
+    <div id="intro-view" class="hidden">
+        <h1 id="intro-title" style="text-shadow: 2px 2px 0px #ffeaa7, 4px 4px 0px #fdcb6e;"></h1>
+        <div class="intro-box">
+            <h3 style="color:#e17055; margin-top:0; font-size: 1.3em;">💡 學習重點:</h3>
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
+                <p id="intro-focus" style="margin:0; font-size:1.15em; font-weight:bold;"></p>
+                <button class="speak-btn" onclick="speakText(document.getElementById('intro-focus').innerText)">🔊</button>
+            </div>
+            
+            <h3 style="color:#00b894; font-size: 1.3em;">📖 經典例子:</h3>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <p id="intro-example" style="margin:0; font-weight:bold; font-size:1.15em;"></p>
+                <button class="speak-btn" onclick="speakText(document.getElementById('intro-example').innerText)">🔊</button>
+            </div>
+        </div>
+        <button class="action-btn btn-huge" onclick="startGame()">🚀 開始遊戲</button><br>
+        <button class="action-btn" style="background-color:#b2bec3; box-shadow:0 6px 0 #636e72; margin-top:20px;" onclick="goHome()">回到主頁 🏠</button>
+    </div>
+
+    <!-- 遊戲頁面 -->
+    <div id="game-view" class="hidden">
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; color: #b2bec3; margin-bottom: 15px; font-size:1.2em;">
+            <span id="q-diff-badge" style="padding: 5px 15px; border-radius: 20px; color:white; box-shadow: 0 3px 0 rgba(0,0,0,0.1);"></span>
+            <span>第 <span id="q-current">1</span> / 20 題</span>
+        </div>
+        
+        <div id="inline-hint-container" class="inline-hint-box hidden">
+            <div>
+                <p style="margin:0; font-weight:bold; color:#d35400; font-size: 1.2em;">💡 Teacher Cat 提示：</p>
+                <p id="inline-hint-text" style="margin:5px 0 0 0; font-size:1.1em;"></p>
+            </div>
+            <button class="speak-btn" onclick="speakText(document.getElementById('inline-hint-text').innerText)">🔊</button>
+        </div>
+
+        <div class="question-text">
+            <span id="question-content"></span>
+            <button class="speak-btn" onclick="speakCurrentQuestion()">🔊</button>
+        </div>
+        
+        <div class="options-grid" id="options-container"></div>
+        
+        <div id="skip-btn-wrapper" class="skip-btn-container hidden">
+            <button class="action-btn" onclick="changeQ(1)" style="background-color:#ff9f43; box-shadow:0 6px 0 #e17055; font-size:1.5em; padding: 15px 40px;">⏭️ 跳到下一題</button>
+        </div>
+        
+        <div class="nav-bar">
+            <button class="action-btn" id="btn-prev" onclick="changeQ(-1)" style="background-color:#0984e3; box-shadow:0 6px 0 #074ac7;">⬅️ 上一頁</button>
+            <button class="action-btn" onclick="goHome()" style="background-color:#636e72; box-shadow:0 6px 0 #2d3436;">🏠 回主頁</button>
+            <button class="action-btn" id="btn-next" onclick="changeQ(1)" style="background-color:#0984e3; box-shadow:0 6px 0 #074ac7;">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <!-- 結算頁面 -->
+    <div id="result-view" class="hidden">
+        <h1 id="result-title" style="text-shadow: 2px 2px 0px #ffeaa7, 4px 4px 0px #00cec9;">🎉 挑戰完成！ 🎉</h1>
+        <h2 style="font-size: 3.5em; color: #00cec9; margin: 15px 0; text-shadow: 2px 2px 0px rgba(0,0,0,0.1);">得分: <span id="final-score">0</span> / 20</h2>
+        <p id="result-msg" style="font-weight:bold; color:#ff7675; font-size:1.2em;">👇 點擊黃色框框的錯題，就可以重新挑戰直到答對喔！</p>
+        <div class="summary-list" id="summary-list"></div>
+        
+        <button class="action-btn" onclick="startGame()" style="background-color:#e17055; box-shadow:0 6px 0 #d63031; font-size: 1.3em; padding: 15px 35px;">🔄 重新挑戰這一關</button>
+        <button class="action-btn" onclick="goHome()" style="background-color:#00cec9; box-shadow:0 6px 0 #00b894; font-size: 1.3em; padding: 15px 35px;">選擇其他關卡 🏠</button>
+    </div>
+</div>
+
+<!-- 取消固定的 Footer，改放到最下方 -->
+<div class="footer">
+    <h3>Teacher Cat 的快樂AI教室</h3>
+    <div class="social-links">
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a>
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a>
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp Group</a>
+        <span style="background: #ff7675; color: white; padding: 5px 12px; border-radius: 15px; font-weight:bold; box-shadow: 0 3px 0 #d63031;">抖音: 74254902683</span>
+    </div>
+</div>
+
+<!-- 錯誤提示 Modal -->
+<div id="hint-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <img src="cat.jpeg" class="modal-cat-img" onerror="this.src='https://via.placeholder.com/100?text=Cat'">
+        <h2 style="color: #d63031; margin-top:40px; font-size: 2em;">❌ 哎呀，答錯了！</h2>
+        <div style="background: #fff9c4; padding: 20px; border-radius: 20px; margin: 25px 0; display:flex; align-items:center; gap:15px; text-align:left; border: 3px dashed #fdcb6e;">
+            <div>
+                <p style="margin:0; font-weight:bold; color:#d35400; font-size: 1.2em;">💡 Teacher Cat 提示：</p>
+                <p id="modal-hint-text" style="margin:8px 0 0 0; font-size:1.15em; line-height:1.5;"></p>
+            </div>
+            <button class="speak-btn" onclick="speakText(document.getElementById('modal-hint-text').innerText)">🔊</button>
+        </div>
+        <button class="action-btn" onclick="closeHintModal()" style="background-color:#00cec9; box-shadow:0 6px 0 #00b894; font-size: 1.4em; padding: 12px 40px;">知道了！💡</button>
+    </div>
+</div>
+
+<audio id="sfx-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" preload="auto"></audio>
+<audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/2997/2997-preview.mp3" preload="auto"></audio>
+<audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1997/1997-preview.mp3" preload="auto"></audio>
+
+<script>
+    const teacherCatHints = {
+        1: "日期的介詞要用 on，寫法記得加 th 喔！另外，第三人稱單數動詞（He/She）記得要加 s 或 es。",
+        2: "注意！'can' 後面的動詞必須是原形，不用加 s 或 ing 喔！",
+        3: "描述物品時，記得加上 'a' (例如 a lemon)。問價錢時要用 How much。",
+        4: "shorts, gloves 等由兩個部分組成的衣物通常是眾數。I like 後面通常接動詞 ing 喔！",
+        5: "介詞要注意：在巴士上用 'on the bus'，在巴士站用 'at the bus stop'。",
+        6: "留意日期的正確寫法是 'on 24th July'。形容詞的搭配要注意文法順序！",
+        7: "第三人稱單數（He/She）的動作，記得動詞要加 es (teaches) 或 s (works)。",
+        8: "形容人的外表可以直接說 'She is tall'，千萬不能寫 'She looks like tall' 喔！",
+        9: "這關是過去式！不規則變化要記熟 (go->went, ride->rode)。玩機動遊戲要用 ride on 或 play on。",
+        10: "天氣突變和寫日記都要用過去式！記得打羽毛球是 'play badminton'，前面不需要加 the。",
+        11: "日期拼寫有陷阱，12th 應該拼成 twelfth！過去式 eat 變成 ate, have 變成 had。",
+        12: "不要漏掉動詞！例如 'It was windy'。到達目的地用 reach，後面不用加介詞。",
+        13: "寫信的上款記得加上逗號 (Dear Aunt Helen,)。swim 的過去式是 swam 喔！",
+        14: "節日名稱必須大寫 (Christmas Day)。sing 的過去式是 sang，find 是 found。",
+        15: "在農曆新年期間要用介詞 'at' (at Chinese New Year)。如果特指除夕某一天則用 'on'。"
+    };
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text.replace(/_+/g, "blank")); 
+            utterance.lang = 'en-GB'; utterance.rate = 0.85; window.speechSynthesis.speak(utterance);
+        }
+    }
+    function speakCurrentQuestion() { speakText(document.getElementById('question-content').innerText); }
+
+    // ====================================================================================
+    // Level 1 和 Level 15 的完整 4 選項題庫
+    // ====================================================================================
+    const levelData = {
+        1: { title: "Level 1: 介紹朋友與日期 📅", focus: "月份、日期寫法與表達喜好。", example: "His birthday is on the twentieth of November. He likes making models.", q: [
+            {q:"What comes after March?", o:["April","May","June", "July"], a:0, d:"e"}, {q:"What comes before December?", o:["October","November","September", "August"], a:1, d:"e"}, {q:"The first month of the year is _____.", o:["February","January","March", "December"], a:1, d:"e"}, {q:"School starts in _____.", o:["September","July","August", "June"], a:0, d:"e"}, {q:"He _____ playing the guitar.", o:["like","likes","liking", "liked"], a:1, d:"e"}, {q:"She _____ shopping.", o:["likes","like","liking", "liked"], a:0, d:"e"}, {q:"Ivy does _____ like skipping.", o:["no","not","none", "nothing"], a:1, d:"e"}, {q:"Bobby likes making _____.", o:["models","model","a models", "the model"], a:0, d:"e"}, {q:"His favourite _____ is chicken wings.", o:["colour","drink","food", "subject"], a:2, d:"e"}, {q:"Her favourite food _____ hamburgers.", o:["are","is","am", "be"], a:1, d:"e"}, {q:"My birthday is _____ the first of May.", o:["in","on","at", "for"], a:1, d:"e"}, {q:"He _____ not like listening to music.", o:["do","is","does", "are"], a:2, d:"e"}, {q:"_____ is Ivy.", o:["This","These","Those", "They"], a:0, d:"e"}, {q:"_____ birthday is on 31st December.", o:["She","Her","He", "His"], a:1, d:"e"}, {q:"Which number is '1st'?", o:["first","one","second", "once"], a:0, d:"e"}, {q:"Which number is '2nd'?", o:["two","third","second", "twice"], a:2, d:"e"}, {q:"Which number is '3rd'?", o:["three","third","fourth", "thirty"], a:1, d:"e"}, {q:"Which number is '4th'?", o:["five","four","fourth", "forty"], a:2, d:"e"}, {q:"Which month has 28 or 29 days?", o:["January","February","March", "April"], a:1, d:"e"}, {q:"Summer holiday is in _____ and August.", o:["July","June","May", "April"], a:0, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["His birthday is the twentieth of November.","His birthday is on the twentieth of November.","His birthday is in the twentieth of November.", "His birthday is at the twentieth of November."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["He does not like play.","He does not like playing.","He do not like playing.", "He is not like playing."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["He likes playing.","He like playing.","He likes play.", "He liking playing."], a:0, d:"h"}, {q:"How to spell '12th'?", o:["twelveth","twelfth","twelvth", "twelth"], a:1, d:"h"}, {q:"How to spell '20th'?", o:["twentieth","twentyth","twentith", "twenteth"], a:0, d:"h"}, {q:"How to spell '30th'?", o:["thirtyth","thirtieth","thirtith", "thirteth"], a:1, d:"h"}, {q:"How to spell '9th'?", o:["nineth","ninth","ningth", "ninethe"], a:1, d:"h"}, {q:"How to spell '19th'?", o:["nineteenth","ninteenth","nineteenths", "ninetenth"], a:0, d:"h"}, {q:"He likes playing _____ piano.", o:["the","a","(no word)", "an"], a:0, d:"h"}, {q:"She likes playing _____ guitar.", o:["(no word)","a","the", "an"], a:2, d:"h"}, {q:"Bobby likes _____ models.", o:["make","makes","making", "maked"], a:2, d:"h"}, {q:"He _____ listening to music.", o:["doesn't like","don't like","not like", "isn't like"], a:0, d:"h"}, {q:"Her birthday is on the _____ of October. (31st)", o:["thirty-first","thirtieth-first","thirty-one", "thirty-firsts"], a:0, d:"h"}, {q:"His birthday is on the _____ of June. (5th)", o:["fiveth","fifth","fifeth", "fivth"], a:1, d:"h"}, {q:"I have a friend. _____ name is Bobby.", o:["His","He","Him", "Her"], a:0, d:"h"}, {q:"My sister likes _____ in the park.", o:["skipping","skiping","skips", "skip"], a:0, d:"h"}, {q:"We like _____ chicken wings.", o:["eat","eats","eating", "eaten"], a:2, d:"h"}, {q:"They _____ making models.", o:["like","likes","liking", "liked"], a:0, d:"h"}, {q:"Does he like shopping? No, he _____.", o:["don't","doesn't","isn't", "aren't"], a:1, d:"h"}, {q:"What _____ she like doing?", o:["do","does","is", "are"], a:1, d:"h"}
+        ]},
+        2: { title: "Level 2: 我會做什麼？ ⛸️", focus: "Modal verb 'can/cannot' 與家庭成員。", example: "Danny can ice-skate but he cannot swim.", q: [
+            {q:"Danny is my _____ friend.", o:["pen","pencil","book", "bag"], a:0, d:"e"}, {q:"He is eight _____ old.", o:["year","years","yearly", "year's"], a:1, d:"e"}, {q:"He _____ in England.", o:["lives","live","living", "lived"], a:0, d:"e"}, {q:"He _____ one brother.", o:["has","have","having", "had"], a:0, d:"e"}, {q:"I _____ a sister.", o:["has","have","having", "had"], a:1, d:"e"}, {q:"He _____ read English books.", o:["can","cans","canning", "can to"], a:0, d:"e"}, {q:"A bird _____ fly.", o:["can","cannot","cans", "is can"], a:0, d:"e"}, {q:"A fish _____ walk.", o:["can","cannot","can nots", "do not"], a:1, d:"e"}, {q:"He likes doing _____.", o:["puzzles","puzzle","a puzzles", "the puzzle"], a:0, d:"e"}, {q:"He likes _____.", o:["cycle","cycles","cycling", "cycled"], a:2, d:"e"}, {q:"She likes _____ up hills.", o:["hiking","hike","hikes", "hiked"], a:0, d:"e"}, {q:"I _____ like swimming.", o:["does not","do not","am not", "is not"], a:1, d:"e"}, {q:"My mother's daughter is my _____.", o:["brother","sister","friend", "aunt"], a:1, d:"e"}, {q:"My father's son is my _____.", o:["sister","brother","uncle", "father"], a:1, d:"e"}, {q:"He can _____ a bicycle.", o:["ride","rides","riding", "rode"], a:0, d:"e"}, {q:"She can _____ pictures.", o:["draw","draws","drawing", "drew"], a:0, d:"e"}, {q:"Can you swim? Yes, I _____.", o:["do","am","can", "are"], a:2, d:"e"}, {q:"_____ he ice-skate? No, he can't.", o:["Can","Does","Is", "Do"], a:0, d:"e"}, {q:"I live _____ Hong Kong.", o:["on","in","at", "for"], a:1, d:"e"}, {q:"What are your _____? I like reading.", o:["names","hobbies","ages", "friends"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["He has two sister.","He has two sisters.","He have two sisters.", "He having two sisters."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["He likes cycleing.","He like cycling.","He likes cycling.", "He likes cycle."], a:2, d:"h"}, {q:"He can _____ but he cannot swim.", o:["ice-skate","ice-skates","ice-skating", "ice-skated"], a:0, d:"h"}, {q:"I can _____ very fast.", o:["running","runs","run", "ran"], a:2, d:"h"}, {q:"She _____ sing beautifully.", o:["can","cans","is can", "can to"], a:0, d:"h"}, {q:"He likes hiking but he can't _____.", o:["swims","swim","swimming", "swam"], a:1, d:"h"}, {q:"Danny has _____.", o:["one brothers","one brother","a brothers", "the brothers"], a:1, d:"h"}, {q:"They _____ three sisters.", o:["have","has","are", "is"], a:0, d:"h"}, {q:"What _____ he do? He can jump.", o:["does","is","can", "do"], a:2, d:"h"}, {q:"What _____ he like doing? He likes reading.", o:["does","can","is", "do"], a:0, d:"h"}, {q:"I like reading but I _____ like swimming.", o:["doesn't","don't","can't", "am not"], a:1, d:"h"}, {q:"He can _____ English.", o:["speak","speaks","speaking", "spoke"], a:0, d:"h"}, {q:"She _____ doing puzzles in her free time.", o:["like","likes","can", "liking"], a:1, d:"h"}, {q:"Tony and Danny _____ pen friends.", o:["is","are","am", "be"], a:1, d:"h"}, {q:"Which word is spelled correctly?", o:["swiming","swimming","swimmming", "swim"], a:1, d:"h"}, {q:"Which word is spelled correctly?", o:["hikeing","hikking","hiking", "heking"], a:2, d:"h"}, {q:"He cannot _____ the piano.", o:["play","plays","playing", "played"], a:0, d:"h"}, {q:"I _____ cycle.", o:["can't","don't can","am not can", "no can"], a:0, d:"h"}, {q:"She has two brothers and one _____.", o:["sisters","sister","sister's", "sistars"], a:1, d:"h"}, {q:"My brother likes _____ TV.", o:["watch","watches","watching", "watched"], a:2, d:"h"}
+        ]},
+        3: { title: "Level 3: 猜猜我是誰 🍋", focus: "寫謎語、描述顏色、味道。", example: "It is a fruit. It is sour. It is yellow. It is a lemon.", q: [
+            {q:"Look at the picture 🍋. A lemon is _____.", o:["sweet","sour","salty","spicy"], a:1, d:"e"}, 
+            {q:"Look at the picture 🥤. Cola is _____.", o:["sweet","sour","hot and spicy","salty"], a:0, d:"e"}, 
+            {q:"Look at the picture 🍟. Potato chips are usually _____.", o:["sweet","salty","sour","spicy"], a:1, d:"e"}, 
+            {q:"Look at the picture 🌶️. Chilli is _____.", o:["hot and spicy","sweet","sour","salty"], a:0, d:"e"}, 
+            {q:"What colour is it? 🍋", o:["black","yellow","blue","red"], a:1, d:"e"}, 
+            {q:"What colour is it? 🥤", o:["white","yellow","black","green"], a:2, d:"e"}, 
+            {q:"Look at the picture 🍋. It is a _____.", o:["fruit","meat","vegetable","drink"], a:0, d:"e"}, 
+            {q:"Look at the picture 🥤. Cola is a _____.", o:["food","fruit","drink","toy"], a:2, d:"e"}, 
+            {q:"We can buy apples 🍎 from a _____ shop.", o:["fruit","toy","book","clothes"], a:0, d:"e"}, 
+            {q:"We can buy milk 🥛 from a _____.", o:["park","supermarket","school","hospital"], a:1, d:"e"}, 
+            {q:"Look at the price tag [ $5 ]. It is _____ five dollars.", o:["about","on","in","at"], a:0, d:"e"}, 
+            {q:"What _____ it? 🍋", o:["am","is","are","be"], a:1, d:"e"}, 
+            {q:"It _____ a lemon 🍋.", o:["am","is","are","be"], a:1, d:"e"}, 
+            {q:"They _____ sweet 🍬.", o:["is","are","am","be"], a:1, d:"e"}, 
+            {q:"A strawberry 🍓 is _____.", o:["red","black","blue","white"], a:0, d:"e"}, 
+            {q:"An apple 🍎 is a _____.", o:["drink","fruit","toy","book"], a:1, d:"e"}, 
+            {q:"Ice-cream 🍦 is _____.", o:["hot","sweet","salty","sour"], a:1, d:"e"}, 
+            {q:"Water 💧 has no _____.", o:["colour","size","money","time"], a:0, d:"e"}, 
+            {q:"It is a drink 🥤. We _____ drink it.", o:["can","cannot","does","do"], a:0, d:"e"}, 
+            {q:"We _____ buy it from a shop 🏪.", o:["cans","can","canning","coulds"], a:1, d:"e"},
+
+            {q:"Choose the CORRECT sentence for this picture 🍋:", o:["It is lemon.","It is a lemon.","It is the lemon.", "It is an lemon."], a:1, d:"h"}, 
+            {q:"Choose the CORRECT sentence 🛒:", o:["We can buy it from a supermarket.","We can buy it in a supermarket.","We can buy it on a supermarket.", "We can buy it at supermarket."], a:0, d:"h"}, 
+            {q:"Look at the price tag [ $3 ]. It is _____ three dollars.", o:["about","for","with", "at"], a:0, d:"h"}, 
+            {q:"How does it taste? 🍋 (Which spelling is correct?)", o:["sower","sour","suor", "soar"], a:1, d:"h"}, 
+            {q:"How does it taste? 🌶️ (Which spelling is correct?)", o:["spicey","spicy","spicie", "spice"], a:1, d:"h"}, 
+            {q:"_____ is it? It is a lemon 🍋.", o:["Who","Where","What", "When"], a:2, d:"h"}, 
+            {q:"Look at the picture 🍎. It is a _____.", o:["apple","an apple","fruit", "fruits"], a:2, d:"h"}, 
+            {q:"Look at the picture 🍎. It is _____ apple.", o:["a","an","(no word)", "the"], a:1, d:"h"}, 
+            {q:"We can _____ it from a fruit shop 🍎🏪.", o:["buy","buys","buying", "bought"], a:0, d:"h"}, 
+            {q:"The lemon 🍋 _____ sour.", o:["is","are","taste", "tastes"], a:0, d:"h"}, 
+            {q:"The lemons 🍋🍋 _____ sour.", o:["is","are","tastes", "taste"], a:1, d:"h"}, 
+            {q:"It is a drink 🥤. It _____ sweet.", o:["is","are","am", "be"], a:0, d:"h"}, 
+            {q:"It is about five _____ [ $5 ].", o:["dollar","dollars","dollar's", "dollars'"], a:1, d:"h"}, 
+            {q:"I have ten _____ [ $10 ].", o:["dollars","dollar","dollers", "dollar's"], a:0, d:"h"}, 
+            {q:"It is black 🥤. _____ is a drink.", o:["He","She","It", "They"], a:2, d:"h"}, 
+            {q:"They _____ black and sweet 🍇.", o:["is","are","am", "be"], a:1, d:"h"}, 
+            {q:"Which sentence is a question? ❓", o:["What is it?","It is cola.","It is a drink.", "I like cola."], a:0, d:"h"}, 
+            {q:"You can drink it 🥤. What is it? It is _____.", o:["a apple","cola","a hamburger", "a lemon"], a:1, d:"h"}, 
+            {q:"You can eat it 🍎. What is it? It is _____.", o:["a fruit","milk","water", "cola"], a:0, d:"h"}, 
+            {q:"_____ is it? It is $5 💵.", o:["How many","How much","How old", "How long"], a:1, d:"h"}
+        ]},
+        4: { title: "Level 4: 我最愛的季節 🌸", focus: "季節、天氣與衣物。", example: "My favourite season is summer. It is sunny and hot.", q: [
+            {q:"My favourite season is _____.", o:["summer","hot","sunny","cold"], a:0, d:"e"}, {q:"In summer, the weather is _____ and hot.", o:["snowy","sunny","cold","rainy"], a:1, d:"e"}, {q:"In winter, the weather is _____.", o:["hot","cold","warm","sunny"], a:1, d:"e"}, {q:"I wear a _____ in summer.", o:["jacket","T-shirt","scarf","gloves"], a:1, d:"e"}, {q:"I wear a _____ in winter.", o:["jacket","T-shirt","shorts","swimsuit"], a:0, d:"e"}, {q:"I wear _____ in winter to keep my hands warm.", o:["gloves","boots","caps","shorts"], a:0, d:"e"}, {q:"I wear _____ on my feet when it rains.", o:["gloves","mittens","boots","caps"], a:2, d:"e"}, {q:"I wear a _____ on my head.", o:["scarf","cap","gloves","boots"], a:1, d:"e"}, {q:"I wear a _____ around my neck.", o:["hat","scarf","shorts","shoes"], a:1, d:"e"}, {q:"I like _____ in summer.", o:["swimming","skiing","ice-skating","snowboarding"], a:0, d:"e"}, {q:"I like to ride a _____ in the park.", o:["bicycle","kite","beach","snowman"], a:0, d:"e"}, {q:"I like to fly a _____ in autumn.", o:["park","kite","bicycle","swimming"], a:1, d:"e"}, {q:"I like to go for a _____.", o:["picnic","beach","swimming","bicycle"], a:0, d:"e"}, {q:"In summer, I like to eat _____.", o:["hotpot","ice-cream","hot chocolate","soup"], a:1, d:"e"}, {q:"In winter, I like to eat _____.", o:["ice lollies","hotpot","cola","watermelon"], a:1, d:"e"}, {q:"I like to drink hot _____.", o:["cola","chocolate","ice","juice"], a:1, d:"e"}, {q:"I go to the _____ to build sandcastles.", o:["park","beach","school","home"], a:1, d:"e"}, {q:"What is the weather _____? It is sunny.", o:["like","likes","love","look"], a:0, d:"e"}, {q:"There are _____ seasons in a year.", o:["two","three","four","five"], a:2, d:"e"}, {q:"After spring comes _____.", o:["autumn","summer","winter","spring"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["I wear short.","I wear shorts.","I wear a shorts.","I wear shorts'."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["I like to drink a cola.","I like to drink colas.","I like to drink cola.","I like to drinks cola."], a:2, d:"h"}, {q:"I wear _____ and a T-shirt.", o:["shorts","short","a shorts","the short"], a:0, d:"h"}, {q:"I like _____ in summer.", o:["go swimming","going swimming","go to swimming","goes swimming"], a:1, d:"h"}, {q:"I like to eat _____.", o:["ice lollies","ice lollys","ice lolly","ice lollie"], a:0, d:"h"}, {q:"I wear _____ on my hands.", o:["mitten","mittens","a mittens","the mitten"], a:1, d:"h"}, {q:"I like _____ a kite.", o:["fly","flying","flys","flies"], a:1, d:"h"}, {q:"I like going _____ a picnic.", o:["to","for","on","at"], a:1, d:"h"}, {q:"I like going _____ the beach.", o:["to","for","at","on"], a:0, d:"h"}, {q:"It is sunny _____ hot.", o:["but","and","so","or"], a:1, d:"h"}, {q:"I wear a cap _____ it is sunny.", o:["because","but","so","and"], a:0, d:"h"}, {q:"What _____ you wear in this season?", o:["are","do","does","is"], a:1, d:"h"}, {q:"What _____ he wear in winter?", o:["do","does","is","are"], a:1, d:"h"}, {q:"He _____ a jacket.", o:["wear","wears","wearing","wore"], a:1, d:"h"}, {q:"She likes _____ hotpot.", o:["eat","eating","eats","ate"], a:1, d:"h"}, {q:"I like to _____ a bicycle.", o:["ride","rides","riding","rode"], a:0, d:"h"}, {q:"He likes _____ a bicycle.", o:["ride","rides","riding","rode"], a:2, d:"h"}, {q:"I like to drink _____.", o:["a hot chocolate","hot chocolate","hot chocolates","hot chocolate's"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["autum","autumn","autumm","autunm"], a:1, d:"h"}, {q:"My _____ season is spring.", o:["favourite","like","best","love"], a:0, d:"h"}
+        ]},
+        5: { title: "Level 5: 錯過巴士了！ 🚌", focus: "看圖說故事、表達害怕情緒與動作。", example: "He falls asleep. He misses his bus stop.", q: [
+            {q:"The school day _____.", o:["ends","starts","plays","goes"], a:0, d:"e"}, {q:"Tony goes _____ by bus.", o:["school","home","park","hospital"], a:1, d:"e"}, {q:"Tony is _____ on the bus.", o:["happy","tired","excited","glad"], a:1, d:"e"}, {q:"He falls _____ very soon.", o:["down","asleep","up","in"], a:1, d:"e"}, {q:"He _____ his bus stop.", o:["misses","catches","sees","looks"], a:0, d:"e"}, {q:"When he wakes up, he is _____.", o:["happy","glad","frightened","excited"], a:2, d:"e"}, {q:"He is afraid and he _____.", o:["cries","laughs","smiles","sleeps"], a:0, d:"e"}, {q:"A lady _____ this.", o:["sees","looks","watches","listens"], a:0, d:"e"}, {q:"She gets _____ the bus with Tony.", o:["on","off","up","down"], a:1, d:"e"}, {q:"She takes him _____.", o:["home","school","bus","park"], a:0, d:"e"}, {q:"He goes home _____ bus.", o:["by","on","in","at"], a:0, d:"e"}, {q:"Tony feels _____.", o:["scared","funny","good","happy"], a:0, d:"e"}, {q:"He is _____.", o:["shock","shocked","shocking","shocks"], a:1, d:"e"}, {q:"He _____ aloud because he is afraid.", o:["screams","sleeps","eats","plays"], a:0, d:"e"}, {q:"The lady _____ him.", o:["comforts","hits","scolds","kicks"], a:0, d:"e"}, {q:"He _____ his mum.", o:["calls","speaks","says","talks"], a:0, d:"e"}, {q:"Tony gets on a _____ bus.", o:["double-decker","bicycle","train","taxi"], a:0, d:"e"}, {q:"Tony closes his _____ and sleeps.", o:["eyes","ears","mouth","nose"], a:0, d:"e"}, {q:"The lady is very _____.", o:["bad","kind","angry","sad"], a:1, d:"e"}, {q:"He wakes _____.", o:["down","up","on","off"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["He is tired in the bus.","He is tired on the bus.","He is tired at the bus.","He is tired for the bus."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["He gets off in the bus stop.","He gets off at the bus stop.","He gets off on the bus stop.","He gets off to the bus stop."], a:1, d:"h"}, {q:"Tony _____ home by bus.", o:["go","goes","going","went"], a:1, d:"h"}, {q:"He _____ asleep.", o:["fall","falls","falled","fell"], a:1, d:"h"}, {q:"He _____ his bus stop.", o:["miss","misses","missing","missed"], a:1, d:"h"}, {q:"When he _____ up, he is scared.", o:["wake","wakes","waked","woke"], a:1, d:"h"}, {q:"He is frightened and he _____.", o:["cry","crys","cries","crying"], a:2, d:"h"}, {q:"A lady _____ him.", o:["comfort","comforts","comforting","comforted"], a:1, d:"h"}, {q:"She _____ off the bus.", o:["get","gets","getting","got"], a:1, d:"h"}, {q:"She _____ him home.", o:["take","takes","taking","took"], a:1, d:"h"}, {q:"He gets off _____ the next stop.", o:["in","on","at","to"], a:2, d:"h"}, {q:"He is tired _____ the bus.", o:["on","in","at","for"], a:0, d:"h"}, {q:"He goes home _____ MTR.", o:["in","on","by","with"], a:2, d:"h"}, {q:"He is afraid _____ the dark.", o:["of","for","with","about"], a:0, d:"h"}, {q:"His mum _____ him home.", o:["take","takes","bring","brings"], a:1, d:"h"}, {q:"He feels _____.", o:["frighten","frightened","frightening","frights"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["frightned","frightened","frigtened","frightend"], a:1, d:"h"}, {q:"He does not know _____ to do.", o:["what","how","where","when"], a:0, d:"h"}, {q:"The bus is _____ fast.", o:["move","moves","moving","moved"], a:2, d:"h"}, {q:"Tony is a young _____.", o:["boy","girl","man","woman"], a:0, d:"h"}
+        ]},
+        6: { title: "Level 6: 生日禮物 🎁", focus: "物品的顏色、形狀與質感。", example: "My present is a cushion. It is soft and square.", q: [
+            {q:"It is a birthday _____.", o:["present","boy","day","card"], a:0, d:"e"}, {q:"The shape is like a ball. It is _____.", o:["round","square","long","tall"], a:0, d:"e"}, {q:"A box is usually _____.", o:["square","round","soft","long"], a:0, d:"e"}, {q:"A cushion is usually _____.", o:["soft","hard","rough","long"], a:0, d:"e"}, {q:"A table is usually _____.", o:["hard","soft","delicious","sweet"], a:0, d:"e"}, {q:"The colour is like a pig. It is _____.", o:["pink","black","green","blue"], a:0, d:"e"}, {q:"The colour is like chocolate. It is _____.", o:["brown","white","gold","silver"], a:0, d:"e"}, {q:"The colour is like snow. It is _____.", o:["white","black","purple","red"], a:0, d:"e"}, {q:"It is very pretty. It is _____.", o:["beautiful","ugly","bad","rough"], a:0, d:"e"}, {q:"A puppy is very _____.", o:["cute","rude","square","hard"], a:0, d:"e"}, {q:"A bed is very _____.", o:["comfortable","hard","rough","ugly"], a:0, d:"e"}, {q:"Candy is _____.", o:["delicious","colourful","smart","rough"], a:0, d:"e"}, {q:"A rainbow is _____.", o:["colourful","brown","smooth","rough"], a:0, d:"e"}, {q:"Glass is very _____.", o:["smooth","rough","soft","delicious"], a:0, d:"e"}, {q:"Sandpaper is _____.", o:["rough","smooth","soft","delicious"], a:0, d:"e"}, {q:"It is a _____ teddy bear.", o:["lovely","angry","square","rough"], a:0, d:"e"}, {q:"Who _____ it for you?", o:["bought","buy","buys","buying"], a:0, d:"e"}, {q:"Where do you _____ it?", o:["put","puts","putting","putted"], a:0, d:"e"}, {q:"Why do you _____ it?", o:["like","likes","liked","liking"], a:0, d:"e"}, {q:"I like it _____ it is soft.", o:["because","but","or","so"], a:0, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["My birthday is in 24th July.","My birthday is on 24th July.","My birthday is at 24th July.","My birthday is 24th July."], a:1, d:"h"}, {q:"My mother bought it _____ me.", o:["to","for","with","by"], a:1, d:"h"}, {q:"I _____ it on the sofa.", o:["puts","putting","put","putted"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["colorful","colourful","colourfull","colorfull"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["comfortable","comfortabel","comfertable","confortable"], a:0, d:"h"}, {q:"Which spelling is correct?", o:["beautifull","beautiful","beutiful","beautyful"], a:1, d:"h"}, {q:"It is _____.", o:["a yellow","the yellow","yellow","an yellow"], a:2, d:"h"}, {q:"It is a _____.", o:["cushions","cushion","round","softs"], a:1, d:"h"}, {q:"It is square _____ soft.", o:["but","and","so","or"], a:1, d:"h"}, {q:"My mother bought it for me last _____.", o:["year","years","yearly","year's"], a:0, d:"h"}, {q:"What is the _____ of your present? It is pink.", o:["colour","round","soft","shape"], a:0, d:"h"}, {q:"What is the _____ of your present? It is square.", o:["pink","shape","hard","soft"], a:1, d:"h"}, {q:"What is _____ favourite present?", o:["you","yours","your","you're"], a:2, d:"h"}, {q:"I like _____ presents.", o:["mine","me","my","I"], a:2, d:"h"}, {q:"It is soft and _____.", o:["comfortably","comfortable","comfort","comforts"], a:1, d:"h"}, {q:"My dad _____ me a watch.", o:["give","gave","gived","gives"], a:1, d:"h"}, {q:"The shape _____ round.", o:["are","is","am","be"], a:1, d:"h"}, {q:"The colours _____ pink and purple.", o:["is","are","am","be"], a:1, d:"h"}, {q:"It is brown _____ square.", o:["or","and","but","so"], a:1, d:"h"}, {q:"It is a beautiful _____.", o:["presents","present","presenting","presented"], a:1, d:"h"}
+        ]},
+        7: { title: "Level 7: 我的家人 ✉️", focus: "書信格式、職業與人物性格。", example: "My father is a postman. He is polite.", q: [
+            {q:"My father is a _____.", o:["postoffice","postman","post","police"], a:1, d:"e"}, {q:"A postman delivers _____.", o:["letters","food","cars","books"], a:0, d:"e"}, {q:"He works in a _____.", o:["school","post office","hospital","park"], a:1, d:"e"}, {q:"My mother is a _____.", o:["teacher","school","student","postman"], a:0, d:"e"}, {q:"A teacher teaches _____.", o:["students","doctors","animals","police"], a:0, d:"e"}, {q:"A teacher works in a _____.", o:["post office","park","school","hospital"], a:2, d:"e"}, {q:"He is very _____. He says 'Thank you'.", o:["rude","polite","fat","bad"], a:1, d:"e"}, {q:"He talks to me. He is _____.", o:["rude","bad","friendly","angry"], a:2, d:"e"}, {q:"He does not tell lies. He is _____.", o:["honest","bad","fat","rude"], a:0, d:"e"}, {q:"He knows a lot of things. He is _____.", o:["short","smart","hard","fat"], a:1, d:"e"}, {q:"He fights with others. He is _____.", o:["kind","smart","rude","honest"], a:2, d:"e"}, {q:"She _____ after her students.", o:["looks","look","looking","looked"], a:0, d:"e"}, {q:"He _____ everyone he meets.", o:["greet","greets","greeting","greeted"], a:1, d:"e"}, {q:"_____ Ada,", o:["Date","Dear","Yours","To"], a:1, d:"e"}, {q:"How _____ you?", o:["is","are","am","be"], a:1, d:"e"}, {q:"Please write _____.", o:["to","on","back","at"], a:2, d:"e"}, {q:"_____, Victor.", o:["Your","You","Yours","You're"], a:2, d:"e"}, {q:"What does your father _____?", o:["does","is","do","are"], a:2, d:"e"}, {q:"She is _____.", o:["kindly","kind","kinds","kinder"], a:1, d:"e"}, {q:"He plays _____ me.", o:["to","with","for","at"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["She teachs students.","She teaches students.","She teach students.","She teaching students."], a:1, d:"h"}, {q:"He _____ in a post office.", o:["work","works","working","worked"], a:1, d:"h"}, {q:"He _____ letters.", o:["deliver","delivering","delivers","delivered"], a:2, d:"h"}, {q:"She _____ after her students.", o:["look","looking","looks","looked"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["freindly","friendly","friendy","friendley"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["polight","pollite","polite","polit"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["honest","honnest","onest","honist"], a:0, d:"h"}, {q:"She is a _____.", o:["teachers","teach","teacher","teaching"], a:2, d:"h"}, {q:"My mother _____ a teacher.", o:["are","is","am","be"], a:1, d:"h"}, {q:"He greets everyone he _____.", o:["meet","meeting","meets","met"], a:2, d:"h"}, {q:"16th November, _____ (Year)", o:["Dear","Yours","2XXX","Date"], a:2, d:"h"}, {q:"What does your mother _____?", o:["does","do","doing","did"], a:1, d:"h"}, {q:"My father is _____ postman.", o:["an","the","a","(no word)"], a:2, d:"h"}, {q:"I write a _____ to my friend.", o:["letters","letter","postman","book"], a:1, d:"h"}, {q:"A polite person says _____.", o:["no","please","bad words","hey"], a:1, d:"h"}, {q:"He is an _____ boy.", o:["smart","friendly","honest","rude"], a:2, d:"h"}, {q:"She is a _____ girl.", o:["honest","smart","angry","rude"], a:1, d:"h"}, {q:"He doesn't tell _____.", o:["lie","lies","a lies","the lie"], a:1, d:"h"}, {q:"He _____ a lot of things.", o:["know","knowing","knows","knew"], a:2, d:"h"}, {q:"A rude person fights _____ others.", o:["for","to","with","at"], a:2, d:"h"}
+        ]},
+        8: { title: "Level 8: 最好的朋友 🧑‍🤝‍🧑", focus: "形容外貌與性格 (She is tall)。", example: "Mary is my best friend. She is tall. She has long hair.", q: [
+            {q:"Who is your _____ friend?", o:["most","best","goodest","better"], a:1, d:"e"}, {q:"Mary is eight _____ old.", o:["year","years","age","ages"], a:1, d:"e"}, {q:"She is tall and _____.", o:["long","fat","big","short"], a:1, d:"e"}, {q:"He is short and _____.", o:["tall","thin","long","fat"], a:1, d:"e"}, {q:"She has big _____ to see.", o:["ears","noses","eyes","mouth"], a:2, d:"e"}, {q:"He has a small _____ to smell.", o:["eyes","nose","hair","ears"], a:1, d:"e"}, {q:"She has a big _____ to eat.", o:["hair","mouth","eyes","nose"], a:1, d:"e"}, {q:"He has short _____ on his head.", o:["eyes","hair","ears","mouth"], a:1, d:"e"}, {q:"She has _____ hair.", o:["tall","long","fat","short"], a:1, d:"e"}, {q:"His desk is clean. He is _____.", o:["dirty","tidy","fat","lazy"], a:1, d:"e"}, {q:"She does her homework well. She is _____.", o:["lazy","hard-working","short","rude"], a:1, d:"e"}, {q:"He is very clever. He is _____.", o:["stupid","tall","smart","fat"], a:2, d:"e"}, {q:"Her favourite _____ is red.", o:["food","colour","shape","book"], a:1, d:"e"}, {q:"She _____ dancing.", o:["like","liking","likes","liked"], a:2, d:"e"}, {q:"I think she is _____.", o:["friend","friendly","friendship","friends"], a:1, d:"e"}, {q:"She likes _____ others.", o:["help","helping","helps","helped"], a:1, d:"e"}, {q:"He _____ polite.", o:["are","is","am","be"], a:1, d:"e"}, {q:"They _____ kind.", o:["is","am","are","be"], a:2, d:"e"}, {q:"What does she _____ like?", o:["looks","look","looking","looked"], a:1, d:"e"}, {q:"What do you think _____ him?", o:["for","of","at","in"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["She looks like tall.","She is tall.","She have tall.","She has tall."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["He looks like short.","He is short.","He has short.","He look short."], a:1, d:"h"}, {q:"She _____ long hair.", o:["is","has","have","having"], a:1, d:"h"}, {q:"He _____ big eyes.", o:["is","have","has","having"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["hard-work","hardworking","hard-working","hard working"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["clever","clevar","claver","cleverr"], a:0, d:"h"}, {q:"I think she is friendly _____ she likes helping others.", o:["but","because","so","and"], a:1, d:"h"}, {q:"What does he _____ doing?", o:["likes","liking","like","liked"], a:2, d:"h"}, {q:"She likes _____.", o:["dance","dances","dancing","danced"], a:2, d:"h"}, {q:"Her favourite colour _____ red.", o:["are","is","am","be"], a:1, d:"h"}, {q:"He _____ a small mouth.", o:["is","have","has","having"], a:2, d:"h"}, {q:"He is tall _____ thin.", o:["or","and","but","so"], a:1, d:"h"}, {q:"She has big eyes _____ a small nose.", o:["or","but","and","so"], a:2, d:"h"}, {q:"He has _____ hair.", o:["a short","short","shorts","the short"], a:1, d:"h"}, {q:"She is _____ honest girl.", o:["a","an","the","(no word)"], a:1, d:"h"}, {q:"He is _____ tidy boy.", o:["an","a","the","(no word)"], a:1, d:"h"}, {q:"She has _____ big eyes.", o:["a","the","(no word)","an"], a:2, d:"h"}, {q:"He has _____ big nose.", o:["an","(no word)","a","the"], a:2, d:"h"}, {q:"They _____ my best friends.", o:["is","are","am","be"], a:1, d:"h"}, {q:"Who _____ your best friend?", o:["are","is","am","be"], a:1, d:"h"}
+        ]},
+        9: { title: "Level 9: 遊樂園歷險 🎢", focus: "過去式與動作介詞 (ride on)。", example: "We rode on the roller-coaster. I felt excited!", q: [
+            {q:"Tony went to an _____ park.", o:["amazing","amusement","angry","apple"], a:1, d:"e"}, {q:"A _____ wheel goes round and round slowly.", o:["Roller","Bumper","Ferris","Merry"], a:2, d:"e"}, {q:"A _____ goes very fast up and down.", o:["merry-go-round","roller-coaster","haunted house","bumper car"], a:1, d:"e"}, {q:"We ride on horses on a _____.", o:["bumper cars","merry-go-round","Ferris wheel","roller-coaster"], a:1, d:"e"}, {q:"We drive and bump in _____.", o:["haunted houses","Ferris wheels","bumper cars","merry-go-round"], a:2, d:"e"}, {q:"Ghosts are in the _____.", o:["merry-go-round","haunted house","roller-coaster","bumper cars"], a:1, d:"e"}, {q:"I was _____ in the haunted house.", o:["happy","frightened","glad","excited"], a:1, d:"e"}, {q:"I was _____ on the fast roller-coaster.", o:["sad","asleep","excited","bored"], a:2, d:"e"}, {q:"I felt _____ when going round too fast.", o:["happy","dizzy","hungry","glad"], a:1, d:"e"}, {q:"I was _____ to see the ghost.", o:["bored","surprised","asleep","tired"], a:1, d:"e"}, {q:"It was exciting _____ fun!", o:["but","and","or","so"], a:1, d:"e"}, {q:"_____ Uncle Mark,", o:["Hello","Date","Dear","Yours"], a:2, d:"e"}, {q:"I am _____ an amusement park.", o:["on","in","at","for"], a:1, d:"e"}, {q:"I _____ to come here next time!", o:["wants","want","wanting","wanted"], a:1, d:"e"}, {q:"How _____ you?", o:["is","am","are","be"], a:2, d:"e"}, {q:"We rode _____ the roller-coaster.", o:["in","at","on","to"], a:2, d:"e"}, {q:"It was _____ the bumper cars.", o:["next","opposite","near to","on"], a:1, d:"e"}, {q:"_____, Tony.", o:["You","Your","Yours","You're"], a:2, d:"e"}, {q:"The park is _____.", o:["sad","fun","angry","boring"], a:1, d:"e"}, {q:"I felt _____.", o:["afraid of","a afraid","afraid","frighten"], a:2, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["We play the roller-coaster.","We rode on the roller-coaster.","We play on the roller-coaster.","We ride the roller-coaster."], a:1, d:"h"}, {q:"Choose the CORRECT sentence:", o:["I went in the haunted house.","I play the haunted house.","I play in the haunted house.","I went the haunted house."], a:0, d:"h"}, {q:"I want to come here _____ you next time!", o:["to","for","with","by"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["roller-coster","roller-coaster","roler-coaster","roller-coast"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["mery-go-round","merry-go-run","merry-go-round","merry-goround"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["hounted","haunted","hauted","haunt"], a:1, d:"h"}, {q:"I _____ dizzy.", o:["feel","falled","felt","feeled"], a:2, d:"h"}, {q:"I _____ surprised.", o:["were","was","is","are"], a:1, d:"h"}, {q:"We _____ excited.", o:["was","are","were","is"], a:2, d:"h"}, {q:"Tony _____ to an amusement park.", o:["go","goes","went","going"], a:2, d:"h"}, {q:"It _____ exciting and fun.", o:["is","were","was","are"], a:2, d:"h"}, {q:"I am in an amusement park _____ my friends.", o:["and","with","to","for"], a:1, d:"h"}, {q:"We played on the bumper _____.", o:["car","cars'","cars","car's"], a:2, d:"h"}, {q:"I went to the park _____ my friends.", o:["by","for","with","and"], a:2, d:"h"}, {q:"He was _____.", o:["worry","worried","worrying","worries"], a:1, d:"h"}, {q:"She felt _____.", o:["sickness","bad","ill","sick"], a:2, d:"h"}, {q:"The Ferris wheel _____ big.", o:["were","are","was","is"], a:2, d:"h"}, {q:"We went there _____ Sunday.", o:["in","at","on","for"], a:2, d:"h"}, {q:"_____ an exciting day!", o:["How","Which","What","Why"], a:2, d:"h"}, {q:"I want _____ come here again.", o:["for","with","to","at"], a:2, d:"h"}
+        ]},
+        10: { title: "Level 10: 突然下雨了 ⛈️", focus: "天氣突變與不規則動詞。", example: "Suddenly, the sky turned grey. We ran to the bus stop.", q: [
+            {q:"Eric is writing a _____ entry.", o:["dictionary","diary","date","letter"], a:1, d:"e"}, {q:"Today, it was _____. The sun was shining.", o:["rainy","sunny","stormy","cloudy"], a:1, d:"e"}, {q:"There were many clouds. It was _____.", o:["sunny","cloudy","snowy","hot"], a:1, d:"e"}, {q:"The rain was heavy. It was _____.", o:["sunny","hot","rainy","dry"], a:2, d:"e"}, {q:"There was wind and rain. It was _____.", o:["sunny","stormy","dry","hot"], a:1, d:"e"}, {q:"I played _____.", o:["the badminton","badminton","a badminton","badmintons"], a:1, d:"e"}, {q:"Suddenly, the sky _____ grey.", o:["turns","turned","turning","turn"], a:1, d:"e"}, {q:"We were _____ about the weather.", o:["happy","worried","glad","excited"], a:1, d:"e"}, {q:"After a few minutes, it _____ heavily.", o:["raining","rain","rained","rains"], a:2, d:"e"}, {q:"We did not take our _____.", o:["shoes","umbrellas","bags","books"], a:1, d:"e"}, {q:"We were all _____ in the rain.", o:["dry","wet","hot","cold"], a:1, d:"e"}, {q:"We ran _____ to the bus stop.", o:["slow","happy","quickly","sad"], a:2, d:"e"}, {q:"We went to the bus stop for _____.", o:["bus","shelter","rain","sun"], a:1, d:"e"}, {q:"Luckily, it _____ raining.", o:["stop","stopped","stops","stopping"], a:1, d:"e"}, {q:"We played badminton _____!", o:["before","again","soon","after"], a:1, d:"e"}, {q:"We _____ for the rain to stop.", o:["wait","waiting","waited","waits"], a:2, d:"e"}, {q:"We ran / _____ to the bus stop.", o:["slow","hurried","walked","crawled"], a:1, d:"e"}, {q:"What was the weather _____?", o:["likes","look","like","looking"], a:2, d:"e"}, {q:"Today, I played _____ Ada.", o:["and","with","to","for"], a:1, d:"e"}, {q:"The sky was _____.", o:["green","grey","yellow","red"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["I played the badminton.","I played badminton.","I play badminton yesterday.","I played a badminton."], a:1, d:"h"}, {q:"It _____ heavily.", o:["rains","rainned","rained","raining"], a:2, d:"h"}, {q:"We _____ not take our umbrellas.", o:["do","does","did","doing"], a:2, d:"h"}, {q:"We _____ all wet.", o:["was","are","were","is"], a:2, d:"h"}, {q:"We _____ to the bus stop.", o:["run","runned","ran","running"], a:2, d:"h"}, {q:"We _____ for the rain to stop.", o:["wait","waitted","waited","waiting"], a:2, d:"h"}, {q:"It _____ raining very soon.", o:["stoped","stopped","stops","stopping"], a:1, d:"h"}, {q:"Suddenly, the sky _____ grey.", o:["turn","turns","turned","turning"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["suddenlly","suddenly","sudenly","suddnely"], a:1, d:"h"}, {q:"Which spelling is correct?", o:["hurryed","hurrid","hurried","hurrying"], a:2, d:"h"}, {q:"Which spelling is correct?", o:["umbrellas","umbrelas","umberellas","umbrellar"], a:0, d:"h"}, {q:"I play tennis. I played _____.", o:["the tennis","a tennis","tennis","tennises"], a:2, d:"h"}, {q:"We ran quickly _____ the bus stop.", o:["for","to","at","in"], a:1, d:"h"}, {q:"We waited _____ the rain to stop.", o:["to","at","for","in"], a:2, d:"h"}, {q:"It was _____.", o:["cloud","clouds","cloudy","clouding"], a:2, d:"h"}, {q:"We were _____.", o:["worry","worried","worrying","worries"], a:1, d:"h"}, {q:"What _____ the weather like suddenly?", o:["is","was","were","are"], a:1, d:"h"}, {q:"What _____ happen in the end?", o:["does","do","did","doing"], a:2, d:"h"}, {q:"We went for shelter _____ the bus stop.", o:["in","on","at","to"], a:2, d:"h"}, {q:"The rain stopped. _____, we could play again.", o:["Sadly","Luckily","Unluckily","Happy"], a:1, d:"h"}
+        ]},
+        11: { title: "Level 11: 開心去公園 🌳", focus: "寫故事：表達開心與過去式。", example: "Macy and her friends went to a park. They had a good time.", q: [
+            {q:"Macy went to a _____.", o:["park","school","hospital","home"], a:0, d:"e"}, {q:"She went there with her _____.", o:["dogs","friends","books","cats"], a:1, d:"e"}, {q:"They went there by _____.", o:["walk","bus","bicycle","car"], a:1, d:"e"}, {q:"They _____ on the swings.", o:["played","ate","read","slept"], a:0, d:"e"}, {q:"They _____ a good time.", o:["had","has","have","having"], a:0, d:"e"}, {q:"It _____ fun.", o:["were","is","was","are"], a:2, d:"e"}, {q:"They were very _____.", o:["sad","angry","excited","tired"], a:2, d:"e"}, {q:"They ate _____ and ice-cream.", o:["rice","cakes","soup","fish"], a:1, d:"e"}, {q:"They went _____ at half past four.", o:["home","bus","school","park"], a:0, d:"e"}, {q:"The friends rode on their _____.", o:["cars","bicycles","planes","trains"], a:1, d:"e"}, {q:"We can sit on a _____ and go up and down.", o:["swing","bus","cake","bicycle"], a:0, d:"e"}, {q:"I went to the park to _____ with friends.", o:["eat","sleep","play","study"], a:2, d:"e"}, {q:"It was a _____ day.", o:["happy","sad","bad","angry"], a:0, d:"e"}, {q:"They _____ together.", o:["cried","smiled","hurt","slept"], a:1, d:"e"}, {q:"They shared the _____.", o:["books","food","tests","pens"], a:1, d:"e"}, {q:"Macy _____ happy.", o:["feel","felt","feeling","feels"], a:1, d:"e"}, {q:"They played _____ a long time.", o:["for","at","in","on"], a:0, d:"e"}, {q:"The bus has two floors. It is a _____ bus.", o:["school","double-decker","small","train"], a:1, d:"e"}, {q:"They went to the park _____ September.", o:["in","on","at","to"], a:0, d:"e"}, {q:"Did they have a good time? Yes, they _____.", o:["do","did","were","are"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["They went there on the twelfth of September.","They went there on the twelveth of September.","They went there in the twelfth of September.","They went there at the twelfth of September."], a:0, d:"h"}, {q:"Which spelling is correct?", o:["twelvth","twelfth","twelveth","twelth"], a:1, d:"h"}, {q:"They _____ to a park.", o:["go","goes","went","going"], a:2, d:"h"}, {q:"They went there _____ bus.", o:["by","on","in","at"], a:0, d:"h"}, {q:"They played _____ the swings.", o:["in","on","at","to"], a:1, d:"h"}, {q:"Then, they _____ cakes.", o:["eat","ate","eated","eating"], a:1, d:"h"}, {q:"They _____ home at half past four.", o:["go","going","went","goes"], a:2, d:"h"}, {q:"They _____ a good time.", o:["have","had","having","has"], a:1, d:"h"}, {q:"They _____ on the swings.", o:["play","played","playing","plays"], a:1, d:"h"}, {q:"They _____ excited.", o:["was","were","are","is"], a:1, d:"h"}, {q:"It _____ fun.", o:["was","were","did","do"], a:0, d:"h"}, {q:"They went home at half _____ four.", o:["past","to","pass","in"], a:0, d:"h"}, {q:"What _____ they do there?", o:["do","does","did","doing"], a:2, d:"h"}, {q:"How _____ they go there?", o:["did","do","were","are"], a:0, d:"h"}, {q:"They _____.", o:["cycle","cycled","cycling","cycles"], a:1, d:"h"}, {q:"They had a lot of _____.", o:["fun","funs","funny","funning"], a:0, d:"h"}, {q:"They ate ice-cream _____ the park.", o:["at","on","to","in"], a:0, d:"h"}, {q:"Macy and her friends _____.", o:["is","were","was","are"], a:1, d:"h"}, {q:"We _____ happy yesterday.", o:["was","were","are","is"], a:1, d:"h"}, {q:"They _____ a good time.", o:["did","had","was","were"], a:1, d:"h"}
+        ]},
+        12: { title: "Level 12: 糟糕的旅行 😭", focus: "寫日記：連接詞與表達難過。", example: "Suddenly, Eric kicked me and I fell down. What an unlucky day!", q: [
+            {q:"Tony is writing a _____ entry.", o:["diary","dictionary","letter","book"], a:0, d:"e"}, {q:"Tony went to a school _____.", o:["park","picnic","bus","school"], a:1, d:"e"}, {q:"In the morning, they flew _____.", o:["kites","birds","planes","clouds"], a:0, d:"e"}, {q:"They had sandwiches _____ lunch.", o:["in","for","at","on"], a:1, d:"e"}, {q:"They had _____ and chicken wings.", o:["soup","sushi","fish","rice"], a:1, d:"e"}, {q:"After lunch, they played _____.", o:["piano","football","swimming","books"], a:1, d:"e"}, {q:"Eric _____ me.", o:["hugged","kicked","kissed","smiled"], a:1, d:"e"}, {q:"Tony _____ down.", o:["sat","fell","jumped","ran"], a:1, d:"e"}, {q:"Tony's leg was _____.", o:["happy","hurt","fast","good"], a:1, d:"e"}, {q:"The teacher called his _____.", o:["friend","mum","dog","dad"], a:1, d:"e"}, {q:"His mum took him _____.", o:["school","park","home","bus"], a:2, d:"e"}, {q:"Tony felt _____.", o:["glad","excited","sad","happy"], a:2, d:"e"}, {q:"What an _____ day!", o:["unlucky","lucky","happy","good"], a:0, d:"e"}, {q:"He was very _____.", o:["upset","glad","joyful","happy"], a:0, d:"e"}, {q:"_____ a way to end the picnic day!", o:["How","What","Why","When"], a:1, d:"e"}, {q:"He could not _____ football anymore.", o:["play","plays","played","playing"], a:0, d:"e"}, {q:"His leg felt _____.", o:["good","painful","happy","fun"], a:1, d:"e"}, {q:"Tony cried _____ he was hurt.", o:["so","because","but","or"], a:1, d:"e"}, {q:"A picnic is usually _____.", o:["boring","fun","sad","angry"], a:1, d:"e"}, {q:"He went home _____.", o:["slowly","immediately","happy","gladly"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["It windy this morning.","It was windy this morning.","It were windy this morning.","It is windy this morning."], a:1, d:"h"}, {q:"We reached the park _____ ten o'clock.", o:["in","on","at","to"], a:2, d:"h"}, {q:"It was windy and I _____ kites.", o:["fly","flew","flyed","flying"], a:1, d:"h"}, {q:"Then, we _____ sandwiches.", o:["have","had","having","has"], a:1, d:"h"}, {q:"_____, Eric kicked me. (It happened fast)", o:["Suddenly","After that","Then","And"], a:0, d:"h"}, {q:"I _____ down.", o:["fall","felled","fell","fallen"], a:2, d:"h"}, {q:"My leg was _____.", o:["hurt","hurts","hurting","horted"], a:0, d:"h"}, {q:"My teacher _____ my mum.", o:["call","called","calling","calls"], a:1, d:"h"}, {q:"She told me to go home _____.", o:["immediately","suddenly","luckily","sadly"], a:0, d:"h"}, {q:"What _____ unlucky day!", o:["a","an","the","(no word)"], a:1, d:"h"}, {q:"We had sandwiches _____ sushi.", o:["and","but","or","so"], a:0, d:"h"}, {q:"What did you _____ for lunch?", o:["had","have","having","has"], a:1, d:"h"}, {q:"I got hurt _____ the school picnic.", o:["during","on","at","in"], a:0, d:"h"}, {q:"We _____ football.", o:["play","played","playing","plays"], a:1, d:"h"}, {q:"I felt _____ today.", o:["sad","sads","sadly","sadness"], a:0, d:"h"}, {q:"What happened _____ the end?", o:["at","in","on","to"], a:1, d:"h"}, {q:"Eric kicked _____.", o:["my","mine","me","I"], a:2, d:"h"}, {q:"_____ lunch, we played football.", o:["After","Before","Then","When"], a:0, d:"h"}, {q:"My mum took me _____.", o:["to home","home","at home","in home"], a:1, d:"h"}, {q:"It _____ a bad day.", o:["is","were","was","are"], a:2, d:"h"}
+        ]},
+        13: { title: "Level 13: 沙灘的一天 🏖️", focus: "寫信：沙灘活動與表達愉快。", example: "I had a great day at the beach. We built a sandcastle.", q: [
+            {q:"Ada had a great day at the _____.", o:["park","beach","school","hospital"], a:1, d:"e"}, {q:"She is writing a letter to _____ Helen.", o:["Uncle","Aunt","Brother","Sister"], a:1, d:"e"}, {q:"It was hot and _____.", o:["sunny","rainy","snowy","stormy"], a:0, d:"e"}, {q:"Ada went there last _____.", o:["Monday","Sunday","Friday","Tuesday"], a:1, d:"e"}, {q:"She went with her family and _____.", o:["dogs","friends","cats","birds"], a:1, d:"e"}, {q:"Ada and her sister built a _____.", o:["sandcastle","snowman","house","bus"], a:0, d:"e"}, {q:"Her dad read _____.", o:["books","newspapers","comics","letters"], a:1, d:"e"}, {q:"Her mum had a _____.", o:["sunbath","shower","bath","sleep"], a:0, d:"e"}, {q:"Tony and Eric _____ in the sea.", o:["walked","swam","slept","ran"], a:1, d:"e"}, {q:"They had a lot of _____!", o:["fun","food","water","toys"], a:0, d:"e"}, {q:"They felt very _____.", o:["sad","glad","angry","tired"], a:1, d:"e"}, {q:"They _____ the day.", o:["hated","enjoyed","cried","slept"], a:1, d:"e"}, {q:"Aunt Helen is her _____.", o:["friend","relative","teacher","student"], a:1, d:"e"}, {q:"They looked at _____ on the beach.", o:["shells","fish","cars","dogs"], a:0, d:"e"}, {q:"Her mum sat under a beach _____.", o:["tree","umbrella","table","chair"], a:1, d:"e"}, {q:"They had a _____ time.", o:["good","bad","sad","angry"], a:0, d:"e"}, {q:"Ada wore a _____.", o:["swimsuit","jacket","coat","sweater"], a:0, d:"e"}, {q:"The sand was _____.", o:["hot","cold","wet","hard"], a:0, d:"e"}, {q:"_____ write back.", o:["Please","Do","Don't","Are"], a:0, d:"e"}, {q:"_____, Ada.", o:["Yours","You","Your","You're"], a:0, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["Dear Aunt Helen","Dear Aunt Helen,","Dear Aunt Helen.","Dear, Aunt Helen,"], a:1, d:"h"}, {q:"I had a great day _____ the beach.", o:["in","at","on","to"], a:1, d:"h"}, {q:"I _____ a beautiful sandcastle.", o:["build","builded","built","building"], a:2, d:"h"}, {q:"My dad _____ newspapers.", o:["read","readed","reading","reads"], a:0, d:"h"}, {q:"My mum _____ a sunbath.", o:["has","had","having","have"], a:1, d:"h"}, {q:"Tony and Eric _____ in the sea.", o:["swim","swimed","swam","swimming"], a:2, d:"h"}, {q:"We _____ a lot of fun.", o:["have","had","has","having"], a:1, d:"h"}, {q:"What did you do _____ your sister?", o:["and","with","for","to"], a:1, d:"h"}, {q:"I went there _____ my friends.", o:["and","with","by","in"], a:1, d:"h"}, {q:"They had a sunbath _____ a beach umbrella.", o:["under","on","in","at"], a:0, d:"h"}, {q:"It was _____ and sunny.", o:["hot","hots","hotly","hotting"], a:0, d:"h"}, {q:"We _____ the day.", o:["enjoy","enjoyed","enjoying","enjoys"], a:1, d:"h"}, {q:"We felt _____.", o:["happiness","glad","gladly","glads"], a:1, d:"h"}, {q:"They built _____ sandcastle.", o:["a","an","the","(no word)"], a:0, d:"h"}, {q:"What did your dad _____?", o:["do","did","does","doing"], a:0, d:"h"}, {q:"Where _____ your family go?", o:["do","did","were","are"], a:1, d:"h"}, {q:"They swam _____ the sea.", o:["on","in","at","to"], a:1, d:"h"}, {q:"We looked _____ shells.", o:["at","on","in","for"], a:0, d:"h"}, {q:"They had a _____ time.", o:["greatly","great","greats","greatest"], a:1, d:"h"}, {q:"How _____ you feel?", o:["do","did","was","were"], a:1, d:"h"}
+        ]},
+        14: { title: "Level 14: 快樂聖誕節 🎄", focus: "節日食物與活動 (Christmas)。", example: "Ada sang Christmas carols. She unwrapped her present.", q: [
+            {q:"Ada had a happy Christmas _____.", o:["Eve","Day","Morning","Night"], a:0, d:"e"}, {q:"She sang Christmas _____.", o:["songs","carols","books","poems"], a:1, d:"e"}, {q:"She sang in her _____.", o:["school","church","home","park"], a:1, d:"e"}, {q:"She looked at Christmas _____.", o:["lights","dark","sun","moon"], a:0, d:"e"}, {q:"She found many presents under the Christmas _____.", o:["table","tree","bed","sofa"], a:1, d:"e"}, {q:"She _____ her present.", o:["unwrapped","kicked","threw","ate"], a:0, d:"e"}, {q:"She found a lovely _____ bear.", o:["koala","teddy","panda","cat"], a:1, d:"e"}, {q:"The bear was in the _____.", o:["bag","box","cup","plate"], a:1, d:"e"}, {q:"She _____ her parents.", o:["hit","hugged","pushed","kicked"], a:1, d:"e"}, {q:"They ate _____ for dinner.", o:["turkey","chicken","pork","beef"], a:0, d:"e"}, {q:"They also ate a Christmas _____.", o:["cake","soup","rice","fish"], a:0, d:"e"}, {q:"They ate gingerbread _____.", o:["boys","girls","men","women"], a:2, d:"e"}, {q:"She had an _____ day!", o:["enjoyable","sad","bad","boring"], a:0, d:"e"}, {q:"She was _____ that day.", o:["angry","overjoyed","upset","tired"], a:1, d:"e"}, {q:"What a _____ Christmas Eve!", o:["happy","sad","bad","boring"], a:0, d:"e"}, {q:"Santa gives out _____.", o:["coal","presents","homework","books"], a:1, d:"e"}, {q:"The lights are very _____.", o:["dark","beautiful","ugly","bad"], a:1, d:"e"}, {q:"Ada likes her _____.", o:["present","punishment","test","homework"], a:0, d:"e"}, {q:"It is in the month of _____.", o:["November","December","January","October"], a:1, d:"e"}, {q:"They celebrate _____.", o:["Easter","Christmas","Halloween","Chinese New Year"], a:1, d:"e"},
+            {q:"She _____ Christmas carols.", o:["sing","singed","sang","singing"], a:2, d:"h"}, {q:"She _____ at Christmas lights.", o:["look","looked","looking","looks"], a:1, d:"h"}, {q:"She _____ many presents.", o:["find","finded","found","finding"], a:2, d:"h"}, {q:"She _____ her present.", o:["unwrap","unwrapped","unwraped","unwrapping"], a:1, d:"h"}, {q:"She _____ her parents.", o:["hug","huged","hugged","hugging"], a:2, d:"h"}, {q:"They _____ turkey.", o:["eat","ate","eated","eating"], a:1, d:"h"}, {q:"She found a bear _____ the box.", o:["on","in","at","to"], a:1, d:"h"}, {q:"She was _____.", o:["overjoy","overjoyed","overjoying","overjoys"], a:1, d:"h"}, {q:"She had _____ enjoyable day.", o:["a","an","the","(no word)"], a:1, d:"h"}, {q:"What _____ she do in the end?", o:["did","do","does","doing"], a:0, d:"h"}, {q:"Did Ada _____ her present?", o:["likes","like","liked","liking"], a:1, d:"h"}, {q:"What _____ the present?", o:["is","was","were","are"], a:1, d:"h"}, {q:"She sang _____ her church.", o:["in","on","at","to"], a:0, d:"h"}, {q:"She found presents _____ the tree.", o:["under","on","in","at"], a:0, d:"h"}, {q:"When _____ she go home?", o:["do","did","does","doing"], a:1, d:"h"}, {q:"What _____ happy Christmas Eve!", o:["a","an","the","(no word)"], a:0, d:"h"}, {q:"She found _____ lovely teddy bear.", o:["a","an","the","(no word)"], a:0, d:"h"}, {q:"She was happy _____ that day.", o:["in","on","(no word)","at"], a:2, d:"h"}, {q:"They ate a Christmas cake _____ home.", o:["in","at","on","to"], a:1, d:"h"}, {q:"She unwrapped _____ present.", o:["her","she","hers","she's"], a:0, d:"h"}
+        ]},
+        15: { title: "Level 15: 農曆新年 🧧", focus: "節慶習俗與過去式。", example: "I had a wonderful time at Chinese New Year. I got red packets.", q: [
+            {q:"Tony is writing a letter to tell Ada about Chinese New _____.", o:["Day","Year","Month", "Week"], a:1, d:"e"}, {q:"I had a _____ time.", o:["bad","wonderful","sad", "boring"], a:1, d:"e"}, {q:"I went to a _____ market.", o:["flower","fish","meat", "clothes"], a:0, d:"e"}, {q:"I went there with my _____.", o:["pets","parents","teachers", "monkeys"], a:1, d:"e"}, {q:"I wore _____ clothes.", o:["old","dirty","new", "ugly"], a:2, d:"e"}, {q:"I got _____ packets.", o:["blue","red","green", "yellow"], a:1, d:"e"}, {q:"I got them from my _____.", o:["parents","dogs","cats", "birds"], a:0, d:"e"}, {q:"We visited our _____.", o:["relatives","enemies","strangers", "aliens"], a:0, d:"e"}, {q:"We ate _____ cakes.", o:["turnip","strawberry","chocolate", "lemon"], a:0, d:"e"}, {q:"They were _____!", o:["yummy","yucky","bad", "sour"], a:0, d:"e"}, {q:"We also eat sticky cakes called Nian _____.", o:["Gao","Bao","Mao", "Dao"], a:0, d:"e"}, {q:"We eat _____ seeds.", o:["apple","melon","grape", "orange"], a:1, d:"e"}, {q:"We eat chocolate _____.", o:["coins","bills","cards", "shoes"], a:0, d:"e"}, {q:"Children like getting red _____.", o:["packets","bags","boxes", "cans"], a:0, d:"e"}, {q:"It is an important Chinese _____.", o:["festival","test","school", "class"], a:0, d:"e"}, {q:"People say 'Kung Hei Fat _____'!", o:["Choy","Boy","Toy", "Joy"], a:0, d:"e"}, {q:"We clean our _____ before the New Year.", o:["house","park","school", "bus"], a:0, d:"e"}, {q:"We put up red _____.", o:["papers","fai chun","books", "bags"], a:1, d:"e"}, {q:"Tony was very _____.", o:["happy","sad","angry", "upset"], a:0, d:"e"}, {q:"Please write _____.", o:["front","back","down", "up"], a:1, d:"e"},
+            {q:"Choose the CORRECT sentence:", o:["I was happy on Chinese New Year.","I was happy in Chinese New Year.","I was happy at Chinese New Year.", "I was happy for Chinese New Year."], a:2, d:"h"}, {q:"I _____ a wonderful time.", o:["have","had","has", "having"], a:1, d:"h"}, {q:"I _____ to a flower market.", o:["go","went","goed", "going"], a:1, d:"h"}, {q:"I went there on Chinese New Year's _____.", o:["Eve","Day","Night", "Morning"], a:0, d:"h"}, {q:"I _____ new clothes.", o:["wear","wears","wore", "worn"], a:2, d:"h"}, {q:"I _____ red packets.", o:["get","got","getted", "getting"], a:1, d:"h"}, {q:"We _____ our relatives.", o:["visit","visited","visiting", "visits"], a:1, d:"h"}, {q:"We _____ turnip cakes.", o:["eat","ate","eaten", "eating"], a:1, d:"h"}, {q:"What did you _____ at Chinese New Year?", o:["do","did","done", "doing"], a:0, d:"h"}, {q:"Were you happy _____ Chinese New Year?", o:["at","on","in", "for"], a:0, d:"h"}, {q:"I got red packets _____ my parents.", o:["to","from","for", "at"], a:1, d:"h"}, {q:"We ate turnip cakes _____!", o:["to","two","too", "toe"], a:2, d:"h"}, {q:"They _____ yummy.", o:["was","were","are", "is"], a:1, d:"h"}, {q:"What did you wear _____ Chinese New Year's Day?", o:["in","on","at", "for"], a:1, d:"h"}, {q:"What did you _____?", o:["ate","eat","eats", "eaten"], a:1, d:"h"}, {q:"He _____ letter.", o:["wrote a","write a","writing", "written a"], a:0, d:"h"}, {q:"I _____ red packets from them.", o:["receives","received","receive", "receiving"], a:1, d:"h"}, {q:"We _____ relatives.", o:["visit","visited","visits", "visiting"], a:1, d:"h"}, {q:"What did Tony _____?", o:["did","does","do", "doing"], a:2, d:"h"}, {q:"I went to the market _____ my parents.", o:["with","and","for", "to"], a:0, d:"h"}
+        ]}
+    };
+
+    const rainbowColors = [
+        { bg: '#ff7675', shadow: '#d63031' },
+        { bg: '#fdcb6e', shadow: '#e1b12c' },
+        { bg: '#00cec9', shadow: '#00b894' },
+        { bg: '#0984e3', shadow: '#074ac7' },
+        { bg: '#6c5ce7', shadow: '#4834d4' },
+        { bg: '#e84393', shadow: '#b33939' } 
+    ];
+
+    function clearRecords() {
+        if(confirm("確定要清除所有辛苦獲得的星星與分數紀錄嗎？")) {
+            for(let i=1; i<=15; i++) {
+                localStorage.removeItem('tc_score_L' + i);
+            }
+            renderLevelButtons();
+            alert("記錄已清除！重新挑戰吧！");
+        }
+    }
+
+    function getMaxScore(level) {
+        return parseInt(localStorage.getItem('tc_score_L' + level)) || 0;
+    }
+    
+    function saveMaxScore(level, currentScore) {
+        let oldMax = getMaxScore(level);
+        if(currentScore > oldMax) {
+            localStorage.setItem('tc_score_L' + level, currentScore);
+            return true;
+        }
+        return false;
+    }
+
+    function renderLevelButtons() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= 15; i++) {
+            if(!levelData[i]) continue; 
+            
+            let maxScore = getMaxScore(i);
+            let starsHTML = '';
+            
+            if (maxScore === 20) {
+                starsHTML = '<span class="stars-big">🌟🌟🌟</span>';
+            } else if (maxScore >= 10) {
+                starsHTML = '<span class="stars-small">⭐⭐⭐</span>';
+            } else {
+                starsHTML = '<span class="stars-small" style="color:rgba(255,255,255,0.4);">☆☆☆</span>';
+            }
+
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            
+            const colorTheme = rainbowColors[(i - 1) % rainbowColors.length];
+            btn.style.backgroundColor = colorTheme.bg;
+            btn.style.boxShadow = `0 6px 0 ${colorTheme.shadow}`;
+            
+            btn.innerHTML = `
+                <span style="font-size: 0.95em; line-height: 1.3; margin-bottom: 5px; display: block;">
+                    ${levelData[i].title}
+                </span> 
+                <div class="stars-container">${starsHTML}</div>
+                <div class="score-badge">最高分: ${maxScore}/20</div>
+            `;
+            
+            btn.onclick = () => loadLevel(i);
+            container.appendChild(btn);
+        }
+    }
+
+    window.onload = renderLevelButtons;
+
+    function switchView(viewId) {
+        ['home-view', 'intro-view', 'game-view', 'result-view', 'hint-modal'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+        if(viewId === 'home-view') renderLevelButtons(); 
+        
+        // 切換視圖時自動滾動到最上方
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goHome() { switchView('home-view'); window.speechSynthesis.cancel(); }
+
+    function loadLevel(level) {
+        currentLevel = level;
+        const data = levelData[level];
+        document.getElementById('intro-title').innerText = data.title;
+        document.getElementById('intro-focus').innerText = data.focus;
+        document.getElementById('intro-example').innerText = data.example;
+        switchView('intro-view');
+    }
+
+    function startGame() {
+        document.getElementById('final-score').innerText = '0'; 
+        
+        const allQ = levelData[currentLevel].q;
+        const easyQ = allQ.filter(q => q.d === 'e').sort(() => 0.5 - Math.random()).slice(0, 10);
+        const hardQ = allQ.filter(q => q.d === 'h').sort(() => 0.5 - Math.random()).slice(0, 10);
+        selectedQuestions = [...easyQ, ...hardQ];
+        
+        currentQIndex = 0; score = 0; userAnswers = new Array(20).fill(-1);
+        isRetrying = false;
+        switchView('game-view');
+        renderQuestion();
+    }
+
+    function changeQ(dir) {
+        window.speechSynthesis.cancel();
+        if (dir === -1 && currentQIndex > 0) currentQIndex--;
+        else if (dir === 1 && currentQIndex < 19) currentQIndex++;
+        else if (dir === 1 && currentQIndex === 19) { showResult(); return; }
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        if (currentQIndex >= selectedQuestions.length) { showResult(); return; }
+        const qData = selectedQuestions[currentQIndex];
+        
+        document.getElementById('inline-hint-container').classList.add('hidden');
+        document.getElementById('skip-btn-wrapper').classList.add('hidden');
+
+        document.getElementById('btn-prev').disabled = (currentQIndex === 0);
+        document.getElementById('btn-next').innerText = (currentQIndex === 19) ? "看成績 🏆" : "下一頁 ➡️";
+        document.getElementById('q-current').innerText = currentQIndex + 1;
+        document.getElementById('question-content').innerText = qData.q;
+        
+        const diffBadge = document.getElementById('q-diff-badge');
+        diffBadge.innerText = (qData.d === 'e') ? '⭐ 淺程度' : '🔥 深程度 (常犯錯誤)';
+        diffBadge.style.backgroundColor = (qData.d === 'e') ? '#00b894' : '#d63031';
+        diffBadge.style.boxShadow = (qData.d === 'e') ? '0 4px 0 #009688' : '0 4px 0 #b33939';
+
+        document.getElementById('progress').style.width = `${((currentQIndex + 1) / 20) * 100}%`;
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = ''; 
+        
+        qData.o.forEach((opt, index) => {
+            const row = document.createElement('div');
+            row.className = 'option-row';
+            
+            const speakO = document.createElement('button');
+            speakO.className = 'speak-btn'; speakO.innerText = '🔊';
+            speakO.onclick = (e) => { e.stopPropagation(); speakText(opt); };
+            
+            const btn = document.createElement('button');
+            btn.className = 'option-btn'; btn.innerText = opt;
+            
+            if(userAnswers[currentQIndex] !== -1) {
+                btn.disabled = true;
+                if(index === qData.a) {
+                    btn.style.backgroundColor = '#00b894'; 
+                    btn.style.boxShadow = '0 6px 0 #009688';
+                }
+                else if(index === userAnswers[currentQIndex]) {
+                    btn.style.backgroundColor = '#ff7675';
+                    btn.style.boxShadow = '0 6px 0 #d63031';
+                }
+            } else {
+                btn.onclick = () => { speakText(opt); checkAnswer(index, qData.a, btn); };
+            }
+            
+            row.appendChild(speakO);
+            row.appendChild(btn);
+            optionsContainer.appendChild(row);
+        });
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, btnElement) {
+        const qData = selectedQuestions[isRetrying ? retryIndex : currentQIndex];
+
+        if (selectedIndex === correctIndex) {
+            document.getElementById('sfx-correct').play();
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            btnElement.style.backgroundColor = '#00b894';
+            btnElement.style.boxShadow = '0 6px 0 #009688';
+            
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if(isRetrying) {
+                userAnswers[retryIndex] = selectedIndex; 
+                setTimeout(() => { showResult(); }, 1200); 
+            } else {
+                userAnswers[currentQIndex] = selectedIndex; 
+                setTimeout(() => { changeQ(1); }, 1500); 
+            }
+
+        } else {
+            document.getElementById('sfx-wrong').play();
+            btnElement.style.backgroundColor = '#ff7675'; 
+            btnElement.style.boxShadow = '0 6px 0 #d63031';
+            
+            btnElement.disabled = true; 
+            
+            if(isRetrying) {
+                speakText("Try again.");
+            } else {
+                userAnswers[currentQIndex] = selectedIndex; 
+                
+                setTimeout(() => {
+                    document.getElementById('modal-hint-text').innerText = teacherCatHints[currentLevel] || "請仔細看清楚題目中的關鍵字喔！";
+                    document.getElementById('hint-modal').classList.remove('hidden');
+                    speakText("Oops! Let's check the hint.");
+                }, 600);
+            }
+        }
+    }
+
+    function closeHintModal() {
+        document.getElementById('hint-modal').classList.add('hidden');
+        document.getElementById('skip-btn-wrapper').classList.remove('hidden'); 
+    }
+
+    function showResult() {
+        const wasRetrying = isRetrying; 
+        isRetrying = false; 
+        switchView('result-view');
+        
+        let correctCount = userAnswers.filter((ans, i) => ans === selectedQuestions[i].a).length;
+        const scoreSpan = document.getElementById('final-score');
+        let oldScore = parseInt(scoreSpan.innerText) || 0;
+        
+        scoreSpan.innerText = correctCount;
+        
+        if (wasRetrying && correctCount > oldScore) {
+            scoreSpan.style.animation = 'none';
+            setTimeout(() => { scoreSpan.style.animation = 'pop 0.5s ease'; }, 10);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.7 } });
+        }
+        
+        let isRecord = saveMaxScore(currentLevel, correctCount);
+        const msg = document.getElementById('result-msg');
+        
+        if (correctCount === 20) { 
+            msg.innerText = "太棒了！你是英文小天才！🏆"; 
+            if(!wasRetrying) document.getElementById('sfx-win').play(); 
+            confetti({ particleCount: 400, spread: 150, zIndex: 3000 });
+        } else if (correctCount >= 15) { 
+            msg.innerText = "做得好！繼續努力！🌟" + (isRecord?" (⭐破最高分紀錄了！)":""); 
+        } else { 
+            msg.innerText = "再接再厲，點擊下方黃色錯題重做吧！💪"; 
+        }
+
+        const listDOM = document.getElementById('summary-list');
+        listDOM.innerHTML = '';
+        selectedQuestions.forEach((qData, i) => {
+            const item = document.createElement('div');
+            let isCorrect = (userAnswers[i] === qData.a);
+            
+            item.className = 'summary-item ' + (isCorrect ? 'correct' : 'wrong');
+            item.innerHTML = `
+                <div>
+                    <strong>Q${i+1}:</strong> ${qData.q} <br>
+                    <span style="font-size:1em; color:#636e72;">你的答案: ${userAnswers[i] !== -1 ? qData.o[userAnswers[i]] : "未作答"} 
+                    ${isCorrect ? "✅" : "❌ <strong style='color:#d63031;'>(點擊重答)</strong>"}</span>
+                </div>
+            `;
+            
+            if(!isCorrect) {
+                item.onclick = () => {
+                    isRetrying = true;
+                    retryIndex = i;
+                    switchView('game-view');
+                    renderRetryQuestion(i);
+                };
+            }
+            listDOM.appendChild(item);
+        });
+    }
+
+    function renderRetryQuestion(qIndex) {
+        document.getElementById('btn-prev').disabled = true;
+        document.getElementById('btn-next').innerText = "放棄重答，回總結";
+        document.getElementById('btn-next').onclick = showResult; 
+        
+        document.getElementById('q-current').innerText = qIndex + 1 + " (錯題重做)";
+        const qData = selectedQuestions[qIndex];
+        document.getElementById('question-content').innerText = qData.q;
+        
+        document.getElementById('inline-hint-container').classList.remove('hidden');
+        document.getElementById('inline-hint-text').innerText = teacherCatHints[currentLevel] || "仔細看看！";
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = ''; 
+        qData.o.forEach((opt, index) => {
+            const row = document.createElement('div');
+            row.className = 'option-row';
+            
+            const speakO = document.createElement('button');
+            speakO.className = 'speak-btn'; speakO.innerText = '🔊';
+            speakO.onclick = (e) => { e.stopPropagation(); speakText(opt); };
+            
+            const btn = document.createElement('button');
+            btn.className = 'option-btn'; btn.innerText = opt;
+            btn.onclick = () => { speakText(opt); checkAnswer(index, qData.a, btn); };
+            
+            row.appendChild(speakO);
+            row.appendChild(btn);
+            optionsContainer.appendChild(row);
+        });
+    }
+</script>
+</body>
+</html>
