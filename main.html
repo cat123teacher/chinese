@@ -110,6 +110,9 @@
         .btn-p1 { background-color: #118ab2; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-p1:hover { background-color: #1eb2e0; transform: translateY(-2px); }
 
+        .btn-p2 { background-color: #8338ec; color: #fff; box-shadow: 6px 6px 0px #333; }
+        .btn-p2:hover { background-color: #9d4edd; transform: translateY(-2px); }
+
         .btn-draw { background-color: #ff70a6; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-draw:hover { background-color: #ff99c8; transform: translateY(-2px); }
 
@@ -320,7 +323,8 @@
         <button class="age-btn btn-nk2" onclick="showSection('nk2-games')">🐣 幼稚園 N - K2</button>
         <button class="age-btn btn-k3" onclick="showSection('k3-games')">🚀 幼稚園 K3</button>
         <button class="age-btn btn-p1" onclick="showSection('p1-menu')">🎓 小學一年級</button>
-        <!-- 新增：輕鬆畫畫 -->
+        <!-- 新增：小學二年級 -->
+        <button class="age-btn btn-p2" onclick="showSection('p2-menu')">🎒 小學二年級</button>
         <button class="age-btn btn-draw" onclick="showSection('drawing-games')">🎨 輕鬆畫畫</button>
     </div>
 
@@ -331,6 +335,13 @@
         <button class="age-btn btn-chi" onclick="showSection('p1-chi-games')">📚 中文冒險</button>
         <button class="age-btn btn-eng" onclick="showSection('p1-eng-games')">🔤 英文挑戰</button>
         <button class="age-btn btn-math" onclick="showSection('p1-math-games')">🔢 數學樂園</button>
+    </div>
+
+    <!-- 【小二目錄 (選科)】 -->
+    <div id="p2-menu" class="section-div btn-group">
+        <button class="back-btn" style="align-self: center;" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
+        <h2 style="color: #8338ec;">🎒 小學二年級 科目</h2>
+        <button class="age-btn btn-eng" onclick="showSection('p2-eng-games')">🔤 英文挑戰</button>
     </div>
 
     <!-- ==================== 遊戲列表區 ==================== -->
@@ -448,6 +459,22 @@
         </div>
     </div>
 
+    <!-- 小二：英文區 -->
+    <div id="p2-eng-games" class="section-div">
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="back-btn" onclick="showSection('p2-menu')">⬅ 回小二</button>
+            <button class="back-btn home" onclick="showSection('home-menu')">🏠 回主頁</button>
+        </div>
+        <h2 style="color: #9d4edd;">🔤 小二 - 英文</h2>
+        <div class="game-grid">
+            <!-- 新增：小二英文寫作練習 -->
+            <a href="https://cat123teacher.github.io/chinese/P2writing.html" class="game-card">
+                <span class="game-icon">✍️</span>
+                小二英文寫作練習
+            </a>
+        </div>
+    </div>
+
     <!-- 輕鬆畫畫區 -->
     <div id="drawing-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
@@ -484,10 +511,11 @@
     function showSection(sectionId) {
         // 先把所有可能的區塊隱藏起來
         const sections = [
-            'home-menu', 'p1-menu', 
+            'home-menu', 'p1-menu', 'p2-menu',
             'nk2-games', 'k3-games', 
             'p1-chi-games', 'p1-eng-games', 'p1-math-games',
-            'drawing-games' // 加上新建立的畫畫區塊
+            'p2-eng-games',
+            'drawing-games'
         ];
         
         sections.forEach(id => {
@@ -495,7 +523,7 @@
         });
         
         // 根據指定的 ID 顯示區塊 (選單用 flex 保持置中，遊戲列表用 block)
-        if (sectionId === 'home-menu' || sectionId === 'p1-menu') {
+        if (sectionId === 'home-menu' || sectionId === 'p1-menu' || sectionId === 'p2-menu') {
             document.getElementById(sectionId).style.display = 'flex';
         } else {
             document.getElementById(sectionId).style.display = 'block';
