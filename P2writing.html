@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Cat 的快樂AI教室 - 小二英文寫作大冒險</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        body { 
+            font-family: 'Comic Neue', 'Comic Sans MS', sans-serif; 
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #333; text-align: center; margin: 0; padding: 20px; 
+        }
+        
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        #logo { position: absolute; top: 15px; left: 15px; width: 85px; height: auto; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 3px solid white; }
+        
+        h1 { color: #FFFFFF; font-size: 3em; letter-spacing: 2px; text-shadow: 3px 3px 0 #FF6F00, -2px -2px 0 #FF6F00, 2px -2px 0 #FF6F00, -2px 2px 0 #FF6F00, 4px 4px 10px rgba(0,0,0,0.3); margin-top: 50px; margin-bottom: 10px; }
+        
+        .container { max-width: 900px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 35px; border: 6px solid #FFF59D; box-shadow: 0 15px 30px rgba(0,0,0,0.15); position: relative; }
+
+        .progress-header { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 10px; }
+        .progress-header h2 { color: #512DA8; font-size: 2em; margin: 0; text-shadow: 1px 1px #D1C4E9; }
+        
+        .clear-btn { background-color: #F44336; color: white; border: none; padding: 10px 15px; border-radius: 12px; cursor: pointer; font-size: 1.1em; box-shadow: 0 5px #C62828; font-weight: bold; transition: all 0.2s; }
+        .clear-btn:active { transform: translateY(4px); box-shadow: 0 1px #C62828; }
+
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 20px; margin-top: 30px; }
+        
+        .level-btn { background-color: var(--bg-color); color: white; border: none; padding: 20px 10px; border-radius: 20px; cursor: pointer; box-shadow: 0 8px 0 var(--shadow-color), 0 15px 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.1s, box-shadow 0.1s, filter 0.2s; border: 3px solid rgba(255,255,255,0.4); }
+        .level-btn:hover { transform: translateY(-5px); box-shadow: 0 13px 0 var(--shadow-color), 0 20px 25px rgba(0,0,0,0.2); filter: brightness(1.1); }
+        .level-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--shadow-color), 0 5px 10px rgba(0,0,0,0.2); }
+        
+        .level-number { font-size: 1.2em; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .level-theme { font-size: 1.5em; font-weight: bold; margin: 8px 0; text-shadow: 2px 2px 3px rgba(0,0,0,0.4); letter-spacing: 1px; }
+        .score-text { font-size: 1em; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 12px; font-weight: bold; }
+        
+        .star-small { font-size: 1.8em; color: #FFEA00; text-shadow: 0 0 10px #FF9800; }
+        .star-big { font-size: 3em; color: #FFEA00; text-shadow: 0 0 20px #FF9800, 2px 2px 0 #E65100; animation: pulseStar 1.2s infinite alternate; }
+        .star-none { font-size: 1.8em; color: rgba(255,255,255,0.5); }
+        @keyframes pulseStar { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .intro-box { background-color: #F1F8E9; border: 5px dashed #8BC34A; padding: 30px; border-radius: 25px; font-size: 1.5em; text-align: left; margin: 25px 0; color: #33691E; line-height: 1.8; box-shadow: inset 0 0 15px rgba(0,0,0,0.05); }
+        .intro-tts-btn { background-color: #FFCA28; color: #333; border: 3px solid #FF8F00; padding: 10px 20px; font-size: 1em; border-radius: 20px; cursor: pointer; box-shadow: 0 5px 0 #FF8F00; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.1s; }
+        .intro-tts-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #FF8F00; }
+        
+        .start-btn { background-color: #FF5252; color: white; border: none; padding: 20px 60px; font-size: 2.2em; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 8px 0 #C62828, 0 15px 20px rgba(0,0,0,0.2); animation: bounce 2s infinite; transition: all 0.1s; border: 4px solid #FFCDD2; }
+        .start-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #C62828; animation: none; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .nav-btn { background-color: #29B6F6; color: white; border: none; padding: 12px 25px; font-size: 1.3em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 #0288D1; transition: all 0.1s; }
+        .nav-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #0288D1; }
+
+        .question-header { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 25px; background: #FFF3E0; padding: 20px; border-radius: 20px; border: 3px solid #FFE0B2; }
+        .question-text { font-size: 2.3em; color: #E65100; margin: 0; font-weight: bold; }
+        .tts-btn { background: #FFD54F; border: 2px solid #FFB300; border-radius: 50%; width: 50px; height: 50px; font-size: 1.5em; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 0 #FF8F00; display: flex; align-items: center; justify-content: center; }
+        .tts-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #FF8F00; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
+        .option-wrapper { display: flex; align-items: center; background-color: #4DD0E1; border-radius: 20px; box-shadow: 0 6px 0 #0097A7; padding: 15px; transition: all 0.2s; border: 3px solid white; }
+        .option-wrapper:hover { transform: translateY(-3px); box-shadow: 0 9px 0 #0097A7; background-color: #26C6DA; }
+        .option-btn { flex-grow: 1; background: none; color: white; border: none; font-size: 1.6em; font-weight: bold; cursor: pointer; text-align: left; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+
+        .skip-btn { background-color: #BA68C8; color: white; border: none; padding: 15px 35px; font-size: 1.6em; font-weight: bold; border-radius: 20px; cursor: pointer; margin-top: 30px; box-shadow: 0 6px 0 #7B1FA2; display: none; transition: all 0.1s; border: 3px solid white; }
+        .skip-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #7B1FA2; }
+        
+        .tc-hint-box { background-color: #FFF9C4; border: 4px dashed #FBC02D; padding: 20px; border-radius: 20px; font-size: 1.5em; margin-top: 25px; display: none; color: #D32F2F; font-weight: bold; }
+
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; margin-top: 25px; }
+        .sum-item { padding: 15px; border-radius: 12px; font-size: 1.2em; box-shadow: 0 3px 5px rgba(0,0,0,0.1); }
+        .sum-correct { background-color: #E8F5E9; border-left: 8px solid #4CAF50; color: #2E7D32; }
+        .sum-wrong { background-color: #FFEBEE; border-left: 8px solid #F44336; color: #C628AF; cursor: pointer; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+        .exaggerated-effect { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5em; z-index: 9999; pointer-events: none; animation: popIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; text-shadow: 0 0 20px #FFEB3B, 0 0 40px #FF9800; font-weight: bold; color: white; white-space: nowrap; }
+        @keyframes popIn { 0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0; } }
+
+        .main-adventure-btn { background: linear-gradient(180deg, #FF4081, #C2185B); color: white; text-decoration: none; padding: 20px 40px; border-radius: 25px; font-size: 1.6em; font-weight: bold; display: inline-block; box-shadow: 0 8px 0 #880E4F, 0 15px 20px rgba(0,0,0,0.2); transition: all 0.1s; border: 3px solid #F8BBD0; }
+        .main-adventure-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #880E4F; }
+        .bottom-nav-container { margin-top: 70px; padding-bottom: 20px; }
+
+        .footer { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); color: white; padding: 25px 20px; font-size: 1em; text-align: center; border-radius: 25px; max-width: 900px; margin: 40px auto 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3); line-height: 2; border: 2px solid rgba(255,255,255,0.2); }
+        .footer a { color: #84FFFF; text-decoration: none; margin: 0 12px; font-weight: bold; white-space: nowrap; display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 10px; transition: background 0.2s;}
+        .footer a:hover { color: #FFFFFF; background: rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+
+    <img src="cat.jpeg" id="logo" alt="Teacher Cat Logo">
+
+    <div class="container">
+        <!-- 首頁 -->
+        <div id="home-page">
+            <h1>🌟 小二英文寫作大冒險 🌟</h1>
+            <div class="progress-header">
+                <h2>🏆 Progress Record 🏆</h2>
+                <button class="clear-btn" onclick="clearRecords()">🗑️ 清除記錄</button>
+            </div>
+            <div class="level-grid" id="level-grid"></div>
+            <div class="bottom-nav-container">
+                <a href="https://cat123teacher.github.io/chinese/main.html" class="main-adventure-btn">🚀 返回小朋友學習大冒險</a>
+            </div>
+        </div>
+
+        <!-- 預習頁面 -->
+        <div id="intro-page" style="display: none;">
+            <h1 id="intro-title" style="color: #2E7D32; font-size: 2.5em; text-shadow: 2px 2px #C8E6C9;"></h1>
+            <div class="intro-box">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <strong>📝 課前預習 (學習重點)：</strong>
+                    <button class="intro-tts-btn" onclick="speakIntro()">🔊 聆聽重點</button>
+                </div>
+                <hr style="border: 2px dashed #AED581; margin: 15px 0;">
+                <span id="intro-content"></span>
+            </div>
+            <button class="start-btn" onclick="startQuiz()">🚀 開始遊戲</button>
+            <br><br>
+            <button class="nav-btn" onclick="goHome()">🏠 返回主頁</button>
+        </div>
+
+        <!-- 問答頁面 -->
+        <div id="quiz-page" style="display: none;">
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevQ()">⬅️ 上一頁</button>
+                <button class="nav-btn" style="background-color:#9CCC65; box-shadow: 0 6px 0 #689F38;" onclick="goHome()">🏠 回到主頁</button>
+                <button class="nav-btn" onclick="nextQ()" id="next-btn">下一頁 ➡️</button>
+            </div>
+            
+            <div class="progress" id="progress-text" style="font-size: 1.4em; color: #616161; font-weight: bold;"></div>
+            <div class="question-header">
+                <p class="question-text" id="question-text"></p>
+                <button class="tts-btn" onclick="speakText(currentQ.q)">🔊</button>
+            </div>
+            <div class="options-grid" id="options-grid"></div>
+            <button class="skip-btn" id="skip-btn" onclick="skipToNext()">⏭️ 跳到下一題</button>
+            
+            <div class="tc-hint-box" id="tc-hint">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><strong>🐱 Teacher Cat 提示：</strong> <span id="hint-text"></span></span>
+                    <button class="tts-btn" onclick="speakHint()">🔊</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 結算頁面 -->
+        <div id="summary-page" style="display: none;">
+            <h1 style="color: #4CAF50; text-shadow: 2px 2px #C8E6C9; font-size: 3.5em;">🎉 關卡完成！ 🎉</h1>
+            <h2 id="score-text" style="font-size: 2.2em; color: #FF9800; line-height: 1.3;"></h2>
+            <div id="stars-display" style="margin: 20px 0;"></div>
+            <p style="color: #D32F2F; font-weight: bold; font-size: 1.3em; background: #FFCDD2; display: inline-block; padding: 10px 20px; border-radius: 15px;">(點擊紅色錯誤的題目，可以重新挑戰一直答到對喔！)</p>
+            <div style="display: flex; justify-content: center; gap: 30px; margin-top: 25px;">
+                <button class="nav-btn" style="padding: 15px 30px; font-size: 1.5em; background-color: #2196F3; box-shadow: 0 8px 0 #1565C0;" onclick="openIntro(currentLevel)">🔄 重新挑戰這一關</button>
+                <button class="nav-btn" style="padding: 15px 30px; font-size: 1.5em; background-color: #4CAF50; box-shadow: 0 8px 0 #2E7D32;" onclick="goHome()">🏠 回到主頁</button>
+            </div>
+            <div class="summary-grid" id="summary-grid"></div>
+        </div>
+    </div>
+
+    <!-- 頁腳 -->
+    <div class="footer">
+        <p style="margin: 0 0 15px 0; font-size: 1.5em; color: #FFCA28; font-weight: bold; letter-spacing: 1px;">Teacher Cat 的快樂AI教室</p>
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a>
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a>
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp 分享 Group</a>
+        <span style="display: inline-block; margin: 0 10px; font-weight: bold; color: #B2EBF2; padding: 5px 10px; background: rgba(0,0,0,0.3); border-radius: 10px;">抖音-74254902683</span>
+    </div>
+
+    <script>
+        // ==========================================
+        // 📚 題庫：第 1 關 至 第 5 關完整資料庫 (每關 20 淺 + 20 深)
+        // ==========================================
+        const database = {
+            1: { title: "Level 1: All About Me", teach: "1. 學習介紹自己喜歡的水果和興趣。<br>2. 例子：I like <b>bananas</b>. (很多時我們會加 s)<br>3. 例子：I <b>cannot</b> swim. (不能寫成 cann't 喔!)",
+                 easy: [
+                    {q:"What fruit is yellow and long?", options:["bananas","grapes","pears"], ans:"bananas"},
+                    {q:"What fruit is small, round, and purple or green?", options:["grapes","bananas","apples"], ans:"grapes"},
+                    {q:"What fruit is shaped like a bell and green or yellow?", options:["pears","bananas","grapes"], ans:"pears"},
+                    {q:"What dessert is cold and melts?", options:["ice cream","egg tarts","puddings"], ans:"ice cream"},
+                    {q:"What dessert has a yellow egg center?", options:["egg tarts","ice cream","grapes"], ans:"egg tarts"},
+                    {q:"What dessert is soft, sweet and wobbles?", options:["puddings","ice cream","pears"], ans:"puddings"},
+                    {q:"What action do you do in the water?", options:["swim","read","draw"], ans:"swim"},
+                    {q:"What action do you do with music?", options:["dance","read","swim"], ans:"dance"},
+                    {q:"What action do you do with a book?", options:["read","sing","dance"], ans:"read"},
+                    {q:"What action means moving fast on your feet?", options:["run","swim","draw"], ans:"run"},
+                    {q:"What action makes a musical sound with your mouth?", options:["sing","run","swim"], ans:"sing"},
+                    {q:"What action do you do with a pencil and paper?", options:["draw","run","swim"], ans:"draw"},
+                    {q:"How old is Mary in our story?", options:["seven years old","six years old","eight years old"], ans:"seven years old"},
+                    {q:"What does Mary like to do in her spare time?", options:["watch TV","swim","ride a bicycle"], ans:"watch TV"},
+                    {q:"What fruit does Mary like?", options:["bananas","pears","grapes"], ans:"bananas"},
+                    {q:"What dessert does Mary like?", options:["fruit tarts","puddings","ice cream"], ans:"fruit tarts"},
+                    {q:"What can Mary do?", options:["swim","run","dance"], ans:"swim"},
+                    {q:"What can't Mary do?", options:["ride a bicycle","swim","watch TV"], ans:"ride a bicycle"},
+                    {q:"Which of these is a fruit?", options:["bananas","dog","car"], ans:"bananas"},
+                    {q:"Which of these is a dessert?", options:["puddings","cat","pencil"], ans:"puddings"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I like ___.", options:["bananas","banana","bananas's"], ans:"bananas"},
+                    {q:"Common Error: I ___ swim.", options:["cannot","cann't","canot"], ans:"cannot"},
+                    {q:"Choose the correct word: I like ___.", options:["pears","pear","a pears"], ans:"pears"},
+                    {q:"Choose the correct word: I like ___.", options:["grapes","grape","a grapes"], ans:"grapes"},
+                    {q:"Choose the correct spelling:", options:["ice cream","ice crem","is cream"], ans:"ice cream"},
+                    {q:"Choose the correct spelling:", options:["puddings","pudings","puddinges"], ans:"puddings"},
+                    {q:"Choose the correct question:", options:["What is your name?","What your name is?","What name is your?"], ans:"What is your name?"},
+                    {q:"Choose the correct question:", options:["How old are you?","How old you are?","How you are old?"], ans:"How old are you?"},
+                    {q:"Choose the correct verb form:", options:["I can swim.","I can swimming.","I can swims."], ans:"I can swim."},
+                    {q:"Choose the correct verb form:", options:["I cannot dance.","I cannot dancing.","I cannot dances."], ans:"I cannot dance."},
+                    {q:"Choose the correct preposition:", options:["In my spare time","On my spare time","At my spare time"], ans:"In my spare time"},
+                    {q:"What does 'cannot' mean?", options:["not able to do it","able to do it","like to do it"], ans:"not able to do it"},
+                    {q:"Fill in the blank: What fruit do you ___?", options:["like","likes","liking"], ans:"like"},
+                    {q:"Fill in the blank: What ___ you do?", options:["can","cans","canning"], ans:"can"},
+                    {q:"Choose the correct spelling:", options:["desserts","deserts","dessarts"], ans:"desserts"},
+                    {q:"Choose the correct word: I like fruit tarts ___.", options:["too","to","two"], ans:"too"},
+                    {q:"Choose the correct sentence:", options:["What do you like to do?","What do you likes to do?","What are you like to do?"], ans:"What do you like to do?"},
+                    {q:"Choose the correct sentence:", options:["My name is Mary.","My name are Mary.","My name am Mary."], ans:"My name is Mary."},
+                    {q:"Choose the correct sentence:", options:["I am seven years old.","I is seven years old.","I are seven years old."], ans:"I am seven years old."},
+                    {q:"Choose the correct sentence:", options:["I like to watch TV.","I like to watching TV.","I like watch TV."], ans:"I like to watch TV."}
+                 ]
+            },
+            2: { title: "Level 2: My Pets", teach: "1. 學習描述寵物。<br>2. 例子：I like <b>them</b> very much. (不能寫 they)<br>3. 例子：I can <b>hop</b>. (can 後面加原形動詞)",
+                 easy: [
+                    {q:"What animal has long ears?", options:["rabbit","goldfish","dog"], ans:"rabbit"},
+                    {q:"Where does a rabbit live?", options:["in a cage","in a tank","in a tree"], ans:"in a cage"},
+                    {q:"What color is Macy's rabbit?", options:["grey","red","blue"], ans:"grey"},
+                    {q:"What can a rabbit do?", options:["hop","fly","swim"], ans:"hop"},
+                    {q:"What does a rabbit like to eat?", options:["carrots","worms","cheese"], ans:"carrots"},
+                    {q:"What animal lives in a water tank?", options:["goldfish","rabbit","bird"], ans:"goldfish"},
+                    {q:"How many goldfish does Ian have?", options:["two","three","one"], ans:"two"},
+                    {q:"What color are the goldfish?", options:["red","grey","black"], ans:"red"},
+                    {q:"What do goldfish have?", options:["long tails","long ears","long legs"], ans:"long tails"},
+                    {q:"What can goldfish do?", options:["swim","hop","run"], ans:"swim"},
+                    {q:"What do goldfish like to eat?", options:["worms","carrots","bread"], ans:"worms"},
+                    {q:"A rabbit is...", options:["lovely","angry","scary"], ans:"lovely"},
+                    {q:"Goldfish are...", options:["cute","ugly","bad"], ans:"cute"},
+                    {q:"You keep a rabbit in a...", options:["cage","tank","box"], ans:"cage"},
+                    {q:"You keep a goldfish in a...", options:["tank","cage","bag"], ans:"tank"},
+                    {q:"A rabbit has long...", options:["ears","tails","wings"], ans:"ears"},
+                    {q:"A goldfish has a long...", options:["tail","ear","nose"], ans:"tail"},
+                    {q:"Rabbits like to eat...", options:["carrots","fish","meat"], ans:"carrots"},
+                    {q:"Goldfish like to eat...", options:["worms","apples","cheese"], ans:"worms"},
+                    {q:"'Hop' means to...", options:["jump","sleep","eat"], ans:"jump"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I like ___ very much.", options:["them","they","their"], ans:"them"},
+                    {q:"Common Error: I can ___.", options:["hop","hopping","hops"], ans:"hop"},
+                    {q:"Choose the correct sentence:", options:["They are red.","They is red.","They am red."], ans:"They are red."},
+                    {q:"Choose the correct sentence:", options:["Their tails are long.","Their tails is long.","Their tail are long."], ans:"Their tails are long."},
+                    {q:"Choose the correct sentence:", options:["It likes carrots.","It like carrots.","It liking carrots."], ans:"It likes carrots."},
+                    {q:"Choose the correct sentence:", options:["It lives in a cage.","It live in a cage.","It living in a cage."], ans:"It lives in a cage."},
+                    {q:"Choose the correct sentence:", options:["I like it very much.","I likes it very much.","I like it very many."], ans:"I like it very much."},
+                    {q:"Which modal verb is correct?", options:["can","cans","canning"], ans:"can"},
+                    {q:"They ___ worms.", options:["like","likes","liking"], ans:"like"},
+                    {q:"They ___ cute.", options:["are","is","am"], ans:"are"},
+                    {q:"It ___ lovely.", options:["is","are","am"], ans:"is"},
+                    {q:"It ___ long ears.", options:["has","have","having"], ans:"has"},
+                    {q:"Ian ___ two goldfish.", options:["has","have","having"], ans:"has"},
+                    {q:"Macy ___ a rabbit.", options:["has","have","having"], ans:"has"},
+                    {q:"Choose the correct spelling:", options:["rabbit","rabit","rabbitt"], ans:"rabbit"},
+                    {q:"Choose the correct spelling:", options:["carrots","carots","carrotss"], ans:"carrots"},
+                    {q:"Choose the correct spelling:", options:["goldfish","goldefish","goldfishes"], ans:"goldfish"},
+                    {q:"What is the plural of goldfish?", options:["goldfish","goldfishes","goldfishs"], ans:"goldfish"},
+                    {q:"Choose the correct sentence:", options:["I have a rabbit.","I has a rabbit.","I having a rabbit."], ans:"I have a rabbit."},
+                    {q:"Choose the correct sentence:", options:["They can swim.","They can swimming.","They can swims."], ans:"They can swim."}
+                 ]
+            },
+            3: { title: "Level 3: Animal Riddle", teach: "1. 猜猜動物。<br>2. 形容詞：clever (聰明), beautiful (美麗).<br>3. 例子：It has <b>a long tail</b>. (不要忘記 a) 尾巴是可數的！",
+                 easy: [
+                    {q:"What animal likes cheese and corn?", options:["mouse","dog","elephant"], ans:"mouse"},
+                    {q:"What animal can climb trees and has a bushy tail?", options:["squirrel","fish","snake"], ans:"squirrel"},
+                    {q:"Which word means 'smart'?", options:["clever","lazy","friendly"], ans:"clever"},
+                    {q:"Which word means 'good looking'?", options:["beautiful","ugly","lazy"], ans:"beautiful"},
+                    {q:"Which word means 'nice to others'?", options:["friendly","lazy","clever"], ans:"friendly"},
+                    {q:"Which word means 'does not like to work'?", options:["lazy","helpful","friendly"], ans:"lazy"},
+                    {q:"Which word means 'wants to help'?", options:["helpful","lazy","angry"], ans:"helpful"},
+                    {q:"What color is the mouse in the story?", options:["grey","brown","red"], ans:"grey"},
+                    {q:"What color is the squirrel?", options:["brown","grey","blue"], ans:"brown"},
+                    {q:"What does a mouse have?", options:["big ears","a bushy tail","wings"], ans:"big ears"},
+                    {q:"What does a squirrel have?", options:["a bushy tail","big ears","a trunk"], ans:"a bushy tail"},
+                    {q:"A mouse can...", options:["run","fly","swim"], ans:"run"},
+                    {q:"A squirrel can...", options:["climb trees","fly","read"], ans:"climb trees"},
+                    {q:"A squirrel likes...", options:["apples and tomatoes","cheese and corn","hamburgers"], ans:"apples and tomatoes"},
+                    {q:"A mouse likes...", options:["cheese and corn","apples and tomatoes","pizza"], ans:"cheese and corn"},
+                    {q:"A mouse is...", options:["clever","lazy","bad"], ans:"clever"},
+                    {q:"A squirrel is...", options:["lovely","angry","sad"], ans:"lovely"},
+                    {q:"Is a squirrel a fox?", options:["No","Yes","Maybe"], ans:"No"},
+                    {q:"Is a mouse a dog?", options:["No","Yes","Maybe"], ans:"No"},
+                    {q:"Which animal is NOT an elephant but has big ears?", options:["mouse","squirrel","cat"], ans:"mouse"}
+                 ],
+                 hard: [
+                    {q:"Common Error: It has ___.", options:["a long tail","long tail","a long tails"], ans:"a long tail"},
+                    {q:"Which is an uncountable noun?", options:["cheese","potatoes","tomatoes"], ans:"cheese"},
+                    {q:"Which is a countable noun?", options:["sausages","ham","bread"], ans:"sausages"},
+                    {q:"Which is an uncountable noun?", options:["juice","mushrooms","sandwiches"], ans:"juice"},
+                    {q:"Which is an uncountable noun?", options:["bread","tomatoes","potatoes"], ans:"bread"},
+                    {q:"Which is an uncountable noun?", options:["ham","sandwiches","sausages"], ans:"ham"},
+                    {q:"Which is a countable noun?", options:["potatoes","rice","juice"], ans:"potatoes"},
+                    {q:"Which is an uncountable noun?", options:["rice","mushrooms","tomatoes"], ans:"rice"},
+                    {q:"Choose the correct sentence:", options:["It is an elephant.","It is a elephant.","It are an elephant."], ans:"It is an elephant."},
+                    {q:"Choose the correct sentence:", options:["It likes apples.","It like apples.","It likes apple."], ans:"It likes apples."},
+                    {q:"Choose the correct sentence:", options:["It can climb trees.","It can climbs trees.","It can climbing trees."], ans:"It can climb trees."},
+                    {q:"Choose the correct sentence:", options:["It is not a cat.","It is no a cat.","It not a cat."], ans:"It is not a cat."},
+                    {q:"Choose the correct spelling:", options:["beautiful","beutiful","beautyful"], ans:"beautiful"},
+                    {q:"Choose the correct spelling:", options:["squirrel","squirel","squirrell"], ans:"squirrel"},
+                    {q:"Choose the correct spelling:", options:["cheese","chese","cheeze"], ans:"cheese"},
+                    {q:"Choose the correct spelling:", options:["friendly","frendly","friendley"], ans:"friendly"},
+                    {q:"Choose the correct sentence:", options:["This animal is brown.","This animal are brown.","This animals is brown."], ans:"This animal is brown."},
+                    {q:"Choose the correct sentence:", options:["It likes cheese and corn.","It like cheese and corn.","It liking cheese and corn."], ans:"It likes cheese and corn."},
+                    {q:"Choose the correct question:", options:["What is it?","What it is?","What is its?"], ans:"What is it?"},
+                    {q:"Choose the correct spelling:", options:["tomatoes","tomatos","tomato"], ans:"tomatoes"}
+                 ]
+            },
+            4: { title: "Level 4: Recipe", teach: "1. 學習寫食譜 (Recipe)。<br>2. 步驟：I <b>put</b> some ham <b>on</b> top.<br>3. 例子：I put <b>an</b> egg on top. (egg 前面用 an)",
+                 easy: [
+                    {q:"What bread do we need for a hot dog?", options:["bun","sandwich","biscuit"], ans:"bun"},
+                    {q:"What meat is in a hot dog?", options:["sausage","fish","chicken"], ans:"sausage"},
+                    {q:"What yellow sauce goes on a hot dog?", options:["mustard","tomato sauce","milk"], ans:"mustard"},
+                    {q:"What red sauce goes on a hot dog?", options:["tomato sauce","mustard","water"], ans:"tomato sauce"},
+                    {q:"First step to make a sandwich?", options:["I take a piece of bread.","I eat it.","I sleep."], ans:"I take a piece of bread."},
+                    {q:"What do we do with butter?", options:["spread it","drink it","throw it"], ans:"spread it"},
+                    {q:"What do we need for an egg and ham sandwich?", options:["bread, butter, cheese, ham, egg","bun, sausage","rice, soup"], ans:"bread, butter, cheese, ham, egg"},
+                    {q:"What is the first step for a hot dog?", options:["I take half a bun.","I eat the bun.","I jump."], ans:"I take half a bun."},
+                    {q:"Where do we put the sausage?", options:["on it","under it","in the sky"], ans:"on it"},
+                    {q:"Where do we put the mustard?", options:["on top","inside out","under the table"], ans:"on top"},
+                    {q:"Where do we put the tomato sauce?", options:["on top","on the floor","on my head"], ans:"on top"},
+                    {q:"What is the last step for a hot dog?", options:["I put the other half of the bun on top.","I throw it away.","I cry."], ans:"I put the other half of the bun on top."},
+                    {q:"What do you spread on bread for a sandwich?", options:["some butter","some water","some juice"], ans:"some butter"},
+                    {q:"After butter, what do you put on top?", options:["some cheese","a shoe","a toy"], ans:"some cheese"},
+                    {q:"After cheese, what meat do you put on top?", options:["some ham","a sausage","some fish"], ans:"some ham"},
+                    {q:"What goes on top of the ham?", options:["an egg","an apple","an orange"], ans:"an egg"},
+                    {q:"What do you do with the bread first?", options:["take a piece","cut it","burn it"], ans:"take a piece"},
+                    {q:"The recipe is for a...", options:["hot dog","pizza","salad"], ans:"hot dog"},
+                    {q:"The other recipe is for an...", options:["egg and ham sandwich","ice cream","cake"], ans:"egg and ham sandwich"},
+                    {q:"A bun is a type of...", options:["bread","meat","sauce"], ans:"bread"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I put ___ on top.", options:["an egg","a egg","some egg"], ans:"an egg"},
+                    {q:"Common Error: I put ___ on top.", options:["some ham","a ham","an ham"], ans:"some ham"},
+                    {q:"Which noun is countable?", options:["buns","tomato sauce","bread"], ans:"buns"},
+                    {q:"Which noun is countable?", options:["tomatoes","mustard","butter"], ans:"tomatoes"},
+                    {q:"Which noun is uncountable?", options:["bread","buns","tomatoes"], ans:"bread"},
+                    {q:"Which noun is uncountable?", options:["tomato sauce","sausages","eggs"], ans:"tomato sauce"},
+                    {q:"Choose the correct sentence:", options:["I spread some butter on it.","I spread a butter on it.","I spread an butter on it."], ans:"I spread some butter on it."},
+                    {q:"Choose the correct sentence:", options:["I put some cheese on top.","I put a cheese on top.","I put an cheese on top."], ans:"I put some cheese on top."},
+                    {q:"Choose the correct action:", options:["I take half a bun.","I take half bun.","I takes half a bun."], ans:"I take half a bun."},
+                    {q:"Choose the correct action:", options:["I put a sausage on it.","I put some sausage on it.","I put an sausage on it."], ans:"I put a sausage on it."},
+                    {q:"Choose the correct action:", options:["I put some mustard on top.","I put a mustard on top.","I put an mustard on top."], ans:"I put some mustard on top."},
+                    {q:"Choose the correct action:", options:["I put the other half of the bun on top.","I put the other half bun on top.","I put the other half of a bun on top."], ans:"I put the other half of the bun on top."},
+                    {q:"Choose the correct spelling:", options:["sausage","sausag","sosage"], ans:"sausage"},
+                    {q:"Choose the correct spelling:", options:["mustard","musterd","mustart"], ans:"mustard"},
+                    {q:"Choose the correct spelling:", options:["cheese","chese","cheeze"], ans:"cheese"},
+                    {q:"Choose the correct spelling:", options:["piece","peice","peace"], ans:"piece"},
+                    {q:"Choose the correct sentence:", options:["I take a piece of bread.","I take a piece bread.","I take piece of bread."], ans:"I take a piece of bread."},
+                    {q:"What word shows an uncountable quantity?", options:["some","a","an"], ans:"some"},
+                    {q:"What word shows a single countable item starting with a vowel sound?", options:["an","a","some"], ans:"an"},
+                    {q:"Choose the correct verb:", options:["I spread","I spreads","I spreading"], ans:"I spread"}
+                 ]
+            },
+            5: { title: "Level 5: A Day in the Park", teach: "1. 在公園的一天。<br>2. 感覺：frightened, afraid (害怕)。<br>3. 例子：My dog barks <b>at</b> the snake. (是對著蛇叫，不是 to)",
+                 easy: [
+                    {q:"Where is Ada walking her dog?", options:["in the park","in the school","in the hospital"], ans:"in the park"},
+                    {q:"How does the park look?", options:["beautiful","ugly","scary"], ans:"beautiful"},
+                    {q:"What flying insects are in the park?", options:["butterflies","dogs","snakes"], ans:"butterflies"},
+                    {q:"What color are the flowers?", options:["colourful","black","invisible"], ans:"colourful"},
+                    {q:"What do the butterflies do?", options:["dance over the flowers","swim","read books"], ans:"dance over the flowers"},
+                    {q:"What animal has no legs and slithers?", options:["a snake","a dog","a butterfly"], ans:"a snake"},
+                    {q:"Where is the snake crawling?", options:["on the grass","in the sky","on the tree"], ans:"on the grass"},
+                    {q:"How do you feel when you see a snake?", options:["frightened","happy","hungry"], ans:"frightened"},
+                    {q:"Another word for frightened is...", options:["afraid","happy","angry"], ans:"afraid"},
+                    {q:"Another word for afraid is...", options:["scared","glad","tired"], ans:"scared"},
+                    {q:"What do you do when you are frightened?", options:["yell out in fear","laugh loudly","go to sleep"], ans:"yell out in fear"},
+                    {q:"What does 'scream in fright' mean?", options:["make a loud scary noise","sing a song","whisper"], ans:"make a loud scary noise"},
+                    {q:"What sound does a dog make?", options:["bark","meow","moo"], ans:"bark"},
+                    {q:"Who does the dog bark at?", options:["the snake","the butterfly","the flower"], ans:"the snake"},
+                    {q:"What does the snake do when the dog barks?", options:["slides away","starts dancing","eats the dog"], ans:"slides away"},
+                    {q:"What do you say to the dog?", options:["'Thank you!'","'Goodbye!'","'Hello!'"], ans:"'Thank you!'"},
+                    {q:"How do you say it?", options:["happily","sadly","angrily"], ans:"happily"},
+                    {q:"What do you do to the dog at the end?", options:["hug my dog","kick my dog","scold my dog"], ans:"hug my dog"},
+                    {q:"Who is walking in the park?", options:["I and my dog","a cat and a mouse","a pilot"], ans:"I and my dog"},
+                    {q:"What is on the ground in the park?", options:["grass","snow","sand"], ans:"grass"}
+                 ],
+                 hard: [
+                    {q:"Common Error: My dog barks ___ the snake.", options:["at","to","on"], ans:"at"},
+                    {q:"Which word shows a quick surprise?", options:["Suddenly","Slowly","Tomorrow"], ans:"Suddenly"},
+                    {q:"Which linking word means 'right away'?", options:["Immediately","Yesterday","Next year"], ans:"Immediately"},
+                    {q:"Choose the correct phrase:", options:["I yell out in fear.","I yell out on fear.","I yell out at fear."], ans:"I yell out in fear."},
+                    {q:"Choose the correct spelling:", options:["frightened","frighten","frighteninged"], ans:"frightened"},
+                    {q:"Choose the correct spelling:", options:["beautiful","beutiful","beautyful"], ans:"beautiful"},
+                    {q:"Choose the correct spelling:", options:["colourful","colorfull","colurful"], ans:"colourful"},
+                    {q:"Choose the correct spelling:", options:["butterflies","butterflys","butterfles"], ans:"butterflies"},
+                    {q:"Choose the correct sentence:", options:["I hug my dog thankfully.","I hug my dog thankful.","I hug my dog thank."], ans:"I hug my dog thankfully."},
+                    {q:"Choose the correct verb form:", options:["a snake crawling on the grass","a snake crawl on the grass","a snake crawls on the grass"], ans:"a snake crawling on the grass"},
+                    {q:"Choose the correct preposition:", options:["slides away","slides to","slides on"], ans:"slides away"},
+                    {q:"Choose the correct sentence:", options:["I am frightened.","I am frighten.","I frightened."], ans:"I am frightened."},
+                    {q:"Choose the correct sentence:", options:["I say happily.","I say happy.","I says happily."], ans:"I say happily."},
+                    {q:"Choose the correct sentence:", options:["Today, I walk my dog.","Today, I walks my dog.","Today, I walking my dog."], ans:"Today, I walk my dog."},
+                    {q:"Choose the correct phrase:", options:["dancing over the colourful flowers","dancing under the colourful flowers","dancing in the colourful flowers"], ans:"dancing over the colourful flowers"},
+                    {q:"Which is a linking word?", options:["Suddenly","Beautiful","Dog"], ans:"Suddenly"},
+                    {q:"Which is a linking word?", options:["Immediately","Frightened","Grass"], ans:"Immediately"},
+                    {q:"Choose the correct preposition:", options:["on the grass","in the grass","at the grass"], ans:"on the grass"},
+                    {q:"Choose the correct spelling:", options:["scared","scard","scarred"], ans:"scared"},
+                    {q:"Choose the correct phrase:", options:["scream in fright","scream on fright","scream at fright"], ans:"scream in fright"}
+                 ]
+            },
+            6: { title: "Level 6: Talking About Myself", teach: "1. 介紹自己和愛好。<br>2. 例子：I like <b>swimming</b>. (like 後面的動作經常加 ing)<br>3. 交通工具：<b>by</b> MTR, <b>on</b> foot.",
+                 easy: [
+                    {q:"How old is Jessie Chan?", options:["nine years old","seven years old","eight years old"], ans:"nine years old"},
+                    {q:"Where does Jessie live?", options:["Tsuen Wan","North Point","Central"], ans:"Tsuen Wan"},
+                    {q:"How does Jessie go to school?", options:["by MTR","on foot","by bus"], ans:"by MTR"},
+                    {q:"What class is Jessie in?", options:["Class 4C","Class 2B","Class 1A"], ans:"Class 4C"},
+                    {q:"What instrument does Jessie like playing?", options:["the violin","the piano","the guitar"], ans:"the violin"},
+                    {q:"Does Jessie like swimming?", options:["Yes","No","Maybe"], ans:"Yes"},
+                    {q:"What does Jessie NOT like doing?", options:["riding a bicycle","swimming","playing the violin"], ans:"riding a bicycle"},
+                    {q:"What is Jessie's favourite toy?", options:["teddy bear","doll","robot"], ans:"teddy bear"},
+                    {q:"What is Jessie's favourite animal?", options:["giraffe","monkey","dog"], ans:"giraffe"},
+                    {q:"How does Ada go to school?", options:["on foot","by MTR","by bus"], ans:"on foot"},
+                    {q:"What sport is Ada good at?", options:["cycling","football","swimming"], ans:"cycling"},
+                    {q:"Which of these is a hobby?", options:["reading","sleeping","eating breakfast"], ans:"reading"},
+                    {q:"Which of these is a vehicle (交通工具)?", options:["minibus","teddy bear","violin"], ans:"minibus"},
+                    {q:"I go to school ___ bus.", options:["by","on","in"], ans:"by"},
+                    {q:"I go to school ___ school bus.", options:["by","on","in"], ans:"by"},
+                    {q:"I go to school ___ ferry.", options:["by","on","in"], ans:"by"},
+                    {q:"I go to school ___ tram.", options:["by","on","in"], ans:"by"},
+                    {q:"I play ___.", options:["football","the football","a football"], ans:"football"},
+                    {q:"I play the ___.", options:["violin","football","swimming"], ans:"violin"},
+                    {q:"Which of these is an animal?", options:["monkey","tram","doll"], ans:"monkey"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I like ___.", options:["swimming","swim","swims"], ans:"swimming"},
+                    {q:"Common Error: I like ___.", options:["reading","read","reads"], ans:"reading"},
+                    {q:"Choose the correct phrase:", options:["on foot","by foot","in foot"], ans:"on foot"},
+                    {q:"Choose the correct preposition:", options:["I live in Tsuen Wan.","I live on Tsuen Wan.","I live at Tsuen Wan."], ans:"I live in Tsuen Wan."},
+                    {q:"Choose the correct preposition:", options:["I am in Class 4C.","I am at Class 4C.","I am on Class 4C."], ans:"I am in Class 4C."},
+                    {q:"Choose the correct sentence:", options:["I like playing the violin.","I like play the violin.","I like playing violin."], ans:"I like playing the violin."},
+                    {q:"Choose the correct sentence:", options:["I don't like riding a bicycle.","I don't like ride a bicycle.","I don't like rides a bicycle."], ans:"I don't like riding a bicycle."},
+                    {q:"Choose the correct conjunction:", options:["I like reading and singing.","I like reading but singing.","I like reading or singing."], ans:"I like reading and singing."},
+                    {q:"Choose the correct conjunction for negatives:", options:["I don't like reading or singing.","I don't like reading and singing.","I don't like reading but singing."], ans:"I don't like reading or singing."},
+                    {q:"Choose the correct phrase:", options:["good at cycling","good at cycle","good to cycling"], ans:"good at cycling"},
+                    {q:"Choose the correct sentence:", options:["My favourite toy is my doll.","My favourite toy are my doll.","My favourite toy am my doll."], ans:"My favourite toy is my doll."},
+                    {q:"Choose the correct sentence:", options:["My favourite animal is the monkey.","My favourite animal are the monkey.","My favourite animal am the monkey."], ans:"My favourite animal is the monkey."},
+                    {q:"Choose the correct spelling:", options:["favourite","favurite","faverite"], ans:"favourite"},
+                    {q:"Choose the correct spelling:", options:["bicycle","bicyle","bycycle"], ans:"bicycle"},
+                    {q:"Choose the correct spelling:", options:["swimming","swiming","swimmng"], ans:"swimming"},
+                    {q:"Choose the correct spelling:", options:["giraffe","girafe","jiraffe"], ans:"giraffe"},
+                    {q:"Choose the correct verb:", options:["I am nine years old.","I is nine years old.","I have nine years old."], ans:"I am nine years old."},
+                    {q:"Choose the correct sentence:", options:["I go to school by train.","I go to school by a train.","I go to school on train."], ans:"I go to school by train."},
+                    {q:"Choose the correct word:", options:["hobbies","hobbys","hobbyes"], ans:"hobbies"},
+                    {q:"Choose the correct conjunction:", options:["I like swimming but I don't like football.","I like swimming and I don't like football.","I like swimming or I don't like football."], ans:"I like swimming but I don't like football."}
+                 ]
+            },
+            7: { title: "Level 7: A Letter to Tony", teach: "1. 寫信給朋友描述日常。<br>2. 時間介詞：<b>in</b> the morning, <b>at</b> night。<br>3. 例子：I watch <b>TV</b>. (TV 記得要大寫喔)",
+                 easy: [
+                    {q:"Who is the letter to?", options:["Tony","Aunt June","Ada"], ans:"Tony"},
+                    {q:"Who wrote the letter?", options:["Aunt June","Tony","Ada"], ans:"Aunt June"},
+                    {q:"How do you start a letter to Aunt June?", options:["Dear Aunt June,","Bye Aunt June,","Hello Aunt June"], ans:"Dear Aunt June,"},
+                    {q:"What do you say when you receive a letter?", options:["I am happy to hear from you.","I am sad to hear from you.","I am angry to hear from you."], ans:"I am happy to hear from you."},
+                    {q:"What do you do to your teeth in the morning?", options:["brush my teeth","eat my teeth","wash my teeth"], ans:"brush my teeth"},
+                    {q:"What do you do to your face?", options:["wash my face","draw my face","feed my face"], ans:"wash my face"},
+                    {q:"Where do you go to learn?", options:["go to school","go to market","go to sleep"], ans:"go to school"},
+                    {q:"What do you give your cat?", options:["feed my cat","wash my cat","watch my cat"], ans:"feed my cat"},
+                    {q:"What do you do after school with your books?", options:["do my homework","do some colouring","play chess"], ans:"do my homework"},
+                    {q:"What do you watch in the evening?", options:["television","music","puzzles"], ans:"television"},
+                    {q:"What do you listen to?", options:["music","TV","chess"], ans:"music"},
+                    {q:"What do you do with a dog?", options:["walk my dog","read my dog","watch my dog"], ans:"walk my dog"},
+                    {q:"What do you do with a pencil and colors?", options:["do some colouring","play chess","wash my face"], ans:"do some colouring"},
+                    {q:"What board game can you play?", options:["play chess","play TV","play homework"], ans:"play chess"},
+                    {q:"What do you do with puzzles?", options:["do puzzles","listen to puzzles","feed puzzles"], ans:"do puzzles"},
+                    {q:"What meal comes after morning?", options:["afternoon","night","morning"], ans:"afternoon"},
+                    {q:"What time of day is before you sleep?", options:["night","morning","afternoon"], ans:"night"},
+                    {q:"How do you end a letter?", options:["Yours,","Hello,","Dear,"], ans:"Yours,"},
+                    {q:"Tony feeds his cat fish and...", options:["milk","juice","water"], ans:"milk"},
+                    {q:"Tony says his day is tiring but...", options:["happy","sad","angry"], ans:"happy"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I go to school ___ half past seven.", options:["at","in","on"], ans:"at"},
+                    {q:"Common Error: I watch TV ___ night.", options:["at","in","on"], ans:"at"},
+                    {q:"Common Error: I watch ___.", options:["TV","tv","Tv"], ans:"TV"},
+                    {q:"Choose the correct preposition:", options:["in the morning","at the morning","on the morning"], ans:"in the morning"},
+                    {q:"Choose the correct preposition:", options:["in the afternoon","at the afternoon","on the afternoon"], ans:"in the afternoon"},
+                    {q:"Choose the correct preposition:", options:["in the evening","at the evening","on the evening"], ans:"in the evening"},
+                    {q:"Choose the correct phrase:", options:["Please write back.","Please write backwards.","Please writing back."], ans:"Please write back."},
+                    {q:"Choose the correct spelling:", options:["television","televison","telivision"], ans:"television"},
+                    {q:"Choose the correct spelling:", options:["puzzles","puzles","puzzels"], ans:"puzzles"},
+                    {q:"Choose the correct spelling:", options:["colouring","coluring","colorring"], ans:"colouring"},
+                    {q:"Choose the correct spelling:", options:["homework","homewrok","homeworks"], ans:"homework"},
+                    {q:"Choose the correct sentence:", options:["I have a tiring but happy day.","I have a tiring and happy day.","I have a tiring because happy day."], ans:"I have a tiring but happy day."},
+                    {q:"Choose the correct sentence:", options:["I usually feed it fish.","I usually feeds it fish.","I usually feeding it fish."], ans:"I usually feed it fish."},
+                    {q:"Choose the correct sentence:", options:["I do my homework.","I does my homework.","I doing my homework."], ans:"I do my homework."},
+                    {q:"Choose the correct verb:", options:["brush my teeth","brushes my teeth","brushing my teeth"], ans:"brush my teeth"},
+                    {q:"Choose the correct action:", options:["play chess","do chess","make chess"], ans:"play chess"},
+                    {q:"Choose the correct action:", options:["do some drawing","play some drawing","make some drawing"], ans:"do some drawing"},
+                    {q:"Choose the correct phrase:", options:["listen to music","listen music","listen at music"], ans:"listen to music"},
+                    {q:"Choose the correct punctuation:", options:["Yours,","Yours","Yours."], ans:"Yours,"},
+                    {q:"Choose the correct question:", options:["How are you?","How you are?","How are your?"], ans:"How are you?"}
+                 ]
+            },
+            8: { title: "Level 8: Daily Routine", teach: "1. 日常作息與時間。<br>2. 例子：I go to school <b>by school bus</b>. (前面不用加 a)<br>3. 時間表達：at half past seven (7:30).",
+                 easy: [
+                    {q:"When do you wake up?", options:["in the morning","at night","in the afternoon"], ans:"in the morning"},
+                    {q:"What do you put on before school?", options:["my uniform","my pyjamas","my swimsuit"], ans:"my uniform"},
+                    {q:"What do you pack for school?", options:["my school bag","my bed","my dog"], ans:"my school bag"},
+                    {q:"What meal do you have in the morning?", options:["breakfast","dinner","lunch"], ans:"breakfast"},
+                    {q:"What do you have for breakfast?", options:["eggs and ham","books and pens","toys and games"], ans:"eggs and ham"},
+                    {q:"How do you go to school?", options:["by school bus","by bed","by table"], ans:"by school bus"},
+                    {q:"How do you feel in the morning?", options:["great","tired","sad"], ans:"great"},
+                    {q:"How to say 7:00 in words?", options:["seven o'clock","six oh five","seven ten"], ans:"seven o'clock"},
+                    {q:"How to say 6:05 in words?", options:["six oh five","six five","five past six"], ans:"six oh five"},
+                    {q:"How to say 7:10 in words?", options:["seven ten","seven oh one","ten seven"], ans:"seven ten"},
+                    {q:"How to say 8:15 in words?", options:["eight fifteen","eight fifty","eight five"], ans:"eight fifteen"},
+                    {q:"How to say 9:25 in words?", options:["nine twenty-five","nine two five","nine twenty"], ans:"nine twenty-five"},
+                    {q:"How to say 10:30 in words?", options:["ten thirty / half past ten","ten three zero","ten thirteen"], ans:"ten thirty / half past ten"},
+                    {q:"How to say 11:35 in words?", options:["eleven thirty-five","eleven three five","eleven fifty-three"], ans:"eleven thirty-five"},
+                    {q:"How to say 12:40 in words?", options:["twelve forty","twelve four zero","twelve fourteen"], ans:"twelve forty"},
+                    {q:"How to say 1:45 in words?", options:["one forty-five","one four five","one fifteen"], ans:"one forty-five"},
+                    {q:"How to say 2:50 in words?", options:["two fifty","two five zero","two fifteen"], ans:"two fifty"},
+                    {q:"How to say 3:55 in words?", options:["three fifty-five","three fifty five","three five five"], ans:"three fifty-five"},
+                    {q:"How to say 4:00 in words?", options:["four o'clock","four oh","four zero"], ans:"four o'clock"},
+                    {q:"What do you do 'After breakfast'?", options:["I go to school","I wake up","I go to sleep"], ans:"I go to school"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I go to school ___.", options:["by school bus","by a school bus","in school bus"], ans:"by school bus"},
+                    {q:"Choose the correct spelling:", options:["o'clock","oclock","o clock"], ans:"o'clock"},
+                    {q:"Choose the correct phrase:", options:["half past seven","seven past half","seven thirty past"], ans:"half past seven"},
+                    {q:"Choose the correct sentence:", options:["I wake up at seven o'clock.","I wake up in seven o'clock.","I wake up on seven o'clock."], ans:"I wake up at seven o'clock."},
+                    {q:"Choose the correct linking word:", options:["Then, I put on my uniform.","Because, I put on my uniform.","But, I put on my uniform."], ans:"Then, I put on my uniform."},
+                    {q:"Choose the correct sentence:", options:["I put on my uniform.","I put in my uniform.","I put at my uniform."], ans:"I put on my uniform."},
+                    {q:"Choose the correct phrase:", options:["pack my school bag","pack my school bag's","packing my school bag"], ans:"pack my school bag"},
+                    {q:"Choose the correct sentence:", options:["I have eggs and ham for breakfast.","I have eggs and ham to breakfast.","I have eggs and ham at breakfast."], ans:"I have eggs and ham for breakfast."},
+                    {q:"Choose the correct linking phrase:", options:["After breakfast, I go to school.","After breakfast I go to the school.","After breakfast, I go school."], ans:"After breakfast, I go to school."},
+                    {q:"Choose the correct feeling:", options:["I feel great!","I feels great!","I feeling great!"], ans:"I feel great!"},
+                    {q:"Choose the correct spelling:", options:["breakfast","breakfest","breekfast"], ans:"breakfast"},
+                    {q:"Choose the correct spelling:", options:["uniform","unuform","youniform"], ans:"uniform"},
+                    {q:"Choose the correct spelling:", options:["thirty-five","thirty five","thirt-five"], ans:"thirty-five"},
+                    {q:"Choose the correct spelling:", options:["forty-five","fourty-five","forty five"], ans:"forty-five"},
+                    {q:"Choose the correct verb form:", options:["I wake up","I wakes up","I waking up"], ans:"I wake up"},
+                    {q:"Choose the correct verb form:", options:["I have breakfast","I has breakfast","I having breakfast"], ans:"I have breakfast"},
+                    {q:"Choose the correct verb form:", options:["I go to school","I goes to school","I going to school"], ans:"I go to school"},
+                    {q:"How do you write 12:40 in words?", options:["twelve forty","twelve-forty","twelf forty"], ans:"twelve forty"},
+                    {q:"How do you write 2:50 in words?", options:["two fifty","two-fifty","to fifty"], ans:"two fifty"},
+                    {q:"Which shows the correct order of events?", options:["Wake up -> Put on uniform -> Breakfast -> Go to school","Breakfast -> Wake up -> Put on uniform -> Go to school","Go to school -> Wake up -> Breakfast -> Put on uniform"], ans:"Wake up -> Put on uniform -> Breakfast -> Go to school"}
+                 ]
+            },
+            9: { title: "Level 9: My Best Friend", teach: "1. 描述好朋友。<br>2. 例子：He <b>sweeps</b> the floor. (第三人稱單數，動詞要加 s)<br>3. 形容詞：polite (有禮貌), helpful, tidy.",
+                 easy: [
+                    {q:"A person who works hard is...", options:["hard-working","lazy","bad"], ans:"hard-working"},
+                    {q:"A person who cleans their room is...", options:["tidy","lazy","funny"], ans:"tidy"},
+                    {q:"A person who tells jokes is...", options:["funny","polite","tidy"], ans:"funny"},
+                    {q:"A person who says 'thank you' is...", options:["polite","honest","active"], ans:"polite"},
+                    {q:"A person who helps others is...", options:["helpful","lazy","funny"], ans:"helpful"},
+                    {q:"A person who tells the truth is...", options:["honest","lazy","funny"], ans:"honest"},
+                    {q:"A person who is nice to others is...", options:["kind","angry","mean"], ans:"kind"},
+                    {q:"A person who is easy to be friends with is...", options:["friendly","scary","sad"], ans:"friendly"},
+                    {q:"What does Eric do with a broom?", options:["sweeps the floor","plays basketball","makes his bed"], ans:"sweeps the floor"},
+                    {q:"What does Eric do after school?", options:["does his homework","tells lies","sleeps all day"], ans:"does his homework"},
+                    {q:"What sport can Eric do fast in the water?", options:["swim fast","run fast","fly fast"], ans:"swim fast"},
+                    {q:"What does Amy do in the morning in her bedroom?", options:["makes her bed","sweeps the floor","plays the piano"], ans:"makes her bed"},
+                    {q:"What does Amy do to make people laugh?", options:["tells jokes","tells lies","cries loudly"], ans:"tells jokes"},
+                    {q:"What does Amy do with pencils and colours?", options:["draws well","dances well","swims fast"], ans:"draws well"},
+                    {q:"What sport uses a racket and a shuttlecock?", options:["play badminton","play basketball","run fast"], ans:"play badminton"},
+                    {q:"What sport uses a big orange ball?", options:["play basketball","play table tennis","swim fast"], ans:"play basketball"},
+                    {q:"What instrument has black and white keys?", options:["play the piano","play the violin","play badminton"], ans:"play the piano"},
+                    {q:"To be honest means you do NOT...", options:["tell lies","tell jokes","help others"], ans:"tell lies"},
+                    {q:"If you tidy your home, you are...", options:["tidy","funny","lazy"], ans:"tidy"},
+                    {q:"If you study hard, you are...", options:["hard-working","lazy","funny"], ans:"hard-working"}
+                 ],
+                 hard: [
+                    {q:"Common Error: He ___ the floor.", options:["sweeps","sweep","sweeping"], ans:"sweeps"},
+                    {q:"Common Error: She ___ jokes.", options:["tells","tell","telling"], ans:"tells"},
+                    {q:"Choose the correct verb: He always ___ his homework.", options:["does","do","doing"], ans:"does"},
+                    {q:"Choose the correct verb: She always ___ her bed.", options:["makes","make","making"], ans:"makes"},
+                    {q:"Choose the correct verb: He ___ sports.", options:["likes","like","liking"], ans:"likes"},
+                    {q:"Choose the correct sentence:", options:["She can draw well.","She can draws well.","She can drawing well."], ans:"She can draw well."},
+                    {q:"Choose the correct sentence:", options:["He can swim fast.","He can swims fast.","He can swimming fast."], ans:"He can swim fast."},
+                    {q:"Choose the correct verb:", options:["She likes art.","She like art.","She liking art."], ans:"She likes art."},
+                    {q:"Choose the correct sentence:", options:["I like him very much.","I likes him very much.","I like he very much."], ans:"I like him very much."},
+                    {q:"Choose the correct sentence:", options:["He does not tell lies.","He do not tell lies.","He does not tells lies."], ans:"He does not tell lies."},
+                    {q:"Choose the correct spelling:", options:["helpful","helpfull","helpeful"], ans:"helpful"},
+                    {q:"Choose the correct spelling:", options:["polite","pollite","polit"], ans:"polite"},
+                    {q:"Choose the correct spelling:", options:["hard-working","hard-work","hard-workingg"], ans:"hard-working"},
+                    {q:"Choose the correct spelling:", options:["honest","honnest","onest"], ans:"honest"},
+                    {q:"Choose the correct spelling:", options:["friendly","frendly","friendley"], ans:"friendly"},
+                    {q:"Choose the correct phrase:", options:["play the piano","play piano","play a piano"], ans:"play the piano"},
+                    {q:"Choose the correct phrase:", options:["play badminton","play the badminton","play a badminton"], ans:"play badminton"},
+                    {q:"Choose the correct phrase:", options:["play table tennis","play the table tennis","play a table tennis"], ans:"play table tennis"},
+                    {q:"Choose the correct verb form:", options:["tidy his home","tidys his home","tidying his home"], ans:"tidy his home"},
+                    {q:"Choose the correct verb form:", options:["study hard","studys hard","studing hard"], ans:"study hard"}
+                 ]
+            },
+            10: { title: "Level 10: A Big Surprise", teach: "1. 意外驚喜。<br>2. 例子：I say, <b>'</b>I love you!<b>'</b> (說話內容要加單引號)<br>3. 感覺：surprised, in wonder.",
+                 easy: [
+                    {q:"Who gives you presents at Christmas?", options:["Santa Claus","My dog","A rabbit"], ans:"Santa Claus"},
+                    {q:"How do you feel when you get a surprise?", options:["surprised","sad","angry"], ans:"surprised"},
+                    {q:"What rings at the door?", options:["doorbell","telephone","alarm clock"], ans:"doorbell"},
+                    {q:"What do you do with a door?", options:["open it","eat it","read it"], ans:"open it"},
+                    {q:"What does Santa give you?", options:["a present","a homework","a test"], ans:"a present"},
+                    {q:"Who is Santa Claus in the story?", options:["my father","my dog","my teacher"], ans:"my father"},
+                    {q:"How do you show love to your father?", options:["hug him","kick him","hit him"], ans:"hug him"},
+                    {q:"What do you say to your father?", options:["'I love you!'","'Go away!'","'I hate you!'"], ans:"'I love you!'"},
+                    {q:"What time is 4:00?", options:["four o'clock","five o'clock","three o'clock"], ans:"four o'clock"},
+                    {q:"What are you doing at home?", options:["doing my homework","swimming","flying"], ans:"doing my homework"},
+                    {q:"What does Santa say?", options:["'Merry Christmas!'","'Happy Birthday!'","'Happy New Year!'"], ans:"'Merry Christmas!'"},
+                    {q:"When you look at something amazing, you look in...", options:["wonder","fear","anger"], ans:"wonder"},
+                    {q:"If you didn't expect something, it is a...", options:["surprise","test","homework"], ans:"surprise"},
+                    {q:"Where are you doing your homework?", options:["at home","in the park","at school"], ans:"at home"},
+                    {q:"When the doorbell rings, you...", options:["open the door","hide under the bed","cry"], ans:"open the door"},
+                    {q:"Who do you see at the door first?", options:["Santa Claus","a monster","a dog"], ans:"Santa Claus"},
+                    {q:"Does he give you a present?", options:["Yes","No","Maybe"], ans:"Yes"},
+                    {q:"How does Ada feel when she sees Santa?", options:["surprised","angry","bored"], ans:"surprised"},
+                    {q:"Is Santa real in this story?", options:["No, it's her father","Yes, he flew from the North Pole","Maybe"], ans:"No, it's her father"},
+                    {q:"What holiday is this?", options:["Christmas","Halloween","Easter"], ans:"Christmas"}
+                 ],
+                 hard: [
+                    {q:"Common Error: I say, ___", options:["'I love you!'","'I love you!' (No comma)","I love you!"], ans:"'I love you!'"},
+                    {q:"Common Error: Then, he says, ___", options:["'Merry Christmas, Ada!'","'Merry Christmas, Ada!' (No comma)","Merry Christmas, Ada!"], ans:"'Merry Christmas, Ada!'"},
+                    {q:"Which phrase shows sudden feeling?", options:["To my surprise,","In my surprise,","On my surprise,"], ans:"To my surprise,"},
+                    {q:"Choose the correct phrase:", options:["I look at him in surprise.","I look at him on surprise.","I look at him at surprise."], ans:"I look at him in surprise."},
+                    {q:"Choose the correct phrase:", options:["I stare at him in wonder.","I stare at him on wonder.","I stare at him at wonder."], ans:"I stare at him in wonder."},
+                    {q:"Choose the correct linking word:", options:["Suddenly, the doorbell rings.","Then, the doorbell rings.","Because, the doorbell rings."], ans:"Suddenly, the doorbell rings."},
+                    {q:"Choose the correct linking word:", options:["Then, he says...","Suddenly, he says...","After, he says..."], ans:"Then, he says..."},
+                    {q:"Choose the correct sentence:", options:["It is four o'clock.","It are four o'clock.","It have four o'clock."], ans:"It is four o'clock."},
+                    {q:"Choose the correct sentence:", options:["I am doing my homework.","I doing my homework.","I am do my homework."], ans:"I am doing my homework."},
+                    {q:"Choose the correct verb:", options:["the doorbell rings","the doorbell ring","the doorbell ringing"], ans:"the doorbell rings"},
+                    {q:"Choose the correct verb:", options:["He gives me a present.","He give me a present.","He giving me a present."], ans:"He gives me a present."},
+                    {q:"Choose the correct sentence:", options:["He is my father!","He are my father!","He am my father!"], ans:"He is my father!"},
+                    {q:"Choose the correct spelling:", options:["surprise","suprise","surprize"], ans:"surprise"},
+                    {q:"Choose the correct spelling:", options:["Christmas","Crisymas","Christmass"], ans:"Christmas"},
+                    {q:"Choose the correct spelling:", options:["wonder","wondar","wunder"], ans:"wonder"},
+                    {q:"Choose the correct spelling:", options:["doorbell","dorbell","doorbel"], ans:"doorbell"},
+                    {q:"Choose the correct punctuation:", options:["Oh! He is my father!","Oh He is my father","Oh, He is my father"], ans:"Oh! He is my father!"},
+                    {q:"Choose the correct phrase:", options:["at home","in home","on home"], ans:"at home"},
+                    {q:"Choose the correct phrase:", options:["open the door","open door","open a door"], ans:"open the door"},
+                    {q:"Choose the correct punctuation:", options:["I hug him and say, 'I love you!'","I hug him and say 'I love you!'","I hug him and say, I love you!"], ans:"I hug him and say, 'I love you!'"}
+                 ]
+            },
+            11: { title: "Level 11: A Day at the Beach", teach: "1. 去沙灘玩。<br>2. 例子：a beach <b>umbrella</b> (拼寫注意，是 um 不是 un)<br>3. 連接詞：Once we arrive, Then, After that.",
+                 easy: [
+                    {q:"What is the weather like today?", options:["sunny","snowy","stormy"], ans:"sunny"},
+                    {q:"Where do you and your family go?", options:["to the beach","to the library","to the school"], ans:"to the beach"},
+                    {q:"What do you do once you arrive?", options:["jump into the sea","go to sleep","do homework"], ans:"jump into the sea"},
+                    {q:"How do you swim?", options:["happily","sadly","angrily"], ans:"happily"},
+                    {q:"Where do parents take a rest?", options:["under a beach umbrella","on a tree","in the water"], ans:"under a beach umbrella"},
+                    {q:"What do the sister and I play with?", options:["a beach ball","a piano","a school bag"], ans:"a beach ball"},
+                    {q:"What do you see suddenly?", options:["a boy fall down","a flying dog","Santa Claus"], ans:"a boy fall down"},
+                    {q:"What does the boy do?", options:["cries loudly","laughs loudly","sings a song"], ans:"cries loudly"},
+                    {q:"What do you do immediately?", options:["run over and help him up","run away","laugh at him"], ans:"run over and help him up"},
+                    {q:"How does the boy feel?", options:["thankful","angry","hungry"], ans:"thankful"},
+                    {q:"What do you do in the end?", options:["play together","fight","cry"], ans:"play together"},
+                    {q:"Which word means 'right now' or 'very fast'?", options:["immediately","slowly","tomorrow"], ans:"immediately"},
+                    {q:"Which phrase means 'at last'?", options:["in the end","in the beginning","in the morning"], ans:"in the end"},
+                    {q:"What covers you from the sun at the beach?", options:["beach umbrella","coat","scarf"], ans:"beach umbrella"},
+                    {q:"What do you jump into at the beach?", options:["the sea","the bed","the tree"], ans:"the sea"},
+                    {q:"Who takes a rest?", options:["parents","the boy","the sea"], ans:"parents"},
+                    {q:"Who plays with a beach ball?", options:["my sister and I","my parents","the dog"], ans:"my sister and I"},
+                    {q:"If someone falls down, you should...", options:["help him up","push him","run away"], ans:"help him up"},
+                    {q:"The boy cries...", options:["loudly","happily","quietly"], ans:"loudly"},
+                    {q:"We swim...", options:["happily","loudly","sadly"], ans:"happily"}
+                 ],
+                 hard: [
+                    {q:"Common Error: a beach ___", options:["umbrella","unbrella","umbrela"], ans:"umbrella"},
+                    {q:"Spelling check:", options:["umbrella","umbrela","unbrella"], ans:"umbrella"},
+                    {q:"Choose the correct linking word: ___ we arrive, we jump into the sea.", options:["Once","Because","But"], ans:"Once"},
+                    {q:"Choose the correct linking word: ___, my parents take a rest.", options:["Then","Once","Suddenly"], ans:"Then"},
+                    {q:"Choose the correct linking word: ___, we see a boy fall down.", options:["Suddenly","Then","Once"], ans:"Suddenly"},
+                    {q:"Choose the correct linking word: ___, we run over and help him up.", options:["Immediately","Suddenly","Then"], ans:"Immediately"},
+                    {q:"Grammar: we jump ___ the sea", options:["into","on","at"], ans:"into"},
+                    {q:"Grammar: a rest ___ a beach umbrella", options:["under","on","in"], ans:"under"},
+                    {q:"Grammar: we see a boy ___ down", options:["fall","falls","falling"], ans:"fall"},
+                    {q:"Grammar: The boy ___ loudly.", options:["cries","cry","crying"], ans:"cries"},
+                    {q:"Grammar: we ___ over and help him up.", options:["run","runs","running"], ans:"run"},
+                    {q:"Grammar: play ___ a beach ball", options:["with","by","on"], ans:"with"},
+                    {q:"Grammar: the boy ___ thankful", options:["is","are","am"], ans:"is"},
+                    {q:"Grammar: my parents ___ a rest", options:["take","takes","taking"], ans:"take"},
+                    {q:"Spelling check:", options:["suddenly","sudenly","suddonly"], ans:"suddenly"},
+                    {q:"Spelling check:", options:["immediately","imediately","immediatly"], ans:"immediately"},
+                    {q:"Choose the correct sentence:", options:["We play together!","We plays together!","We playing together!"], ans:"We play together!"},
+                    {q:"Choose the correct phrase:", options:["In the end","On the end","At the end"], ans:"In the end"},
+                    {q:"Choose the correct phrase:", options:["After that","After this","After those"], ans:"After that"},
+                    {q:"Choose the correct phrase:", options:["At last","In last","On last"], ans:"At last"}
+                 ]
+            },
+            12: { title: "Level 12: Pen Friend", teach: "1. 認識不同的職業。<br>2. pilot: fly planes, doctor: save people.<br>3. 信件結語 (Complimentary close)：Yours, Love, Regards,",
+                 easy: [
+                    {q:"What does a teacher do?", options:["teach students","fly planes","fight fires"], ans:"teach students"},
+                    {q:"What does a doctor do?", options:["save people","catch thieves","teach students"], ans:"save people"},
+                    {q:"What does a nurse do?", options:["help doctors","fly planes","fight fires"], ans:"help doctors"},
+                    {q:"What does a pilot do?", options:["fly planes","cure people","catch thieves"], ans:"fly planes"},
+                    {q:"What does a policeman do?", options:["catch thieves","teach students","fly planes"], ans:"catch thieves"},
+                    {q:"What does a firefighter do?", options:["fight fires","save people","fly planes"], ans:"fight fires"},
+                    {q:"Emily's father is a...", options:["pilot","doctor","teacher"], ans:"pilot"},
+                    {q:"Emily's mother is a...", options:["policewoman","nurse","firefighter"], ans:"policewoman"},
+                    {q:"How old is Emily?", options:["eight years old","nine years old","seven years old"], ans:"eight years old"},
+                    {q:"How old is Emily's brother?", options:["twelve","ten","five"], ans:"twelve"},
+                    {q:"How do you say hello in a letter?", options:["Dear Emily,","Bye Emily,","Yours Emily,"], ans:"Dear Emily,"},
+                    {q:"What do you write at the end of a letter?", options:["Yours,","Hello,","Dear,"], ans:"Yours,"},
+                    {q:"What is a female police officer called?", options:["policewoman","policegirl","policelady"], ans:"policewoman"},
+                    {q:"Who looks after patients?", options:["nurse","policeman","teacher"], ans:"nurse"},
+                    {q:"Who cures sick people?", options:["doctor","pilot","firefighter"], ans:"doctor"},
+                    {q:"What do you say when you get a letter?", options:["I am glad to hear from you.","I am sad to hear from you.","I am angry to hear from you."], ans:"I am glad to hear from you."},
+                    {q:"Who works in the sky?", options:["pilot","doctor","teacher"], ans:"pilot"},
+                    {q:"Who works in a hospital?", options:["doctor and nurse","pilot and teacher","policeman"], ans:"doctor and nurse"},
+                    {q:"Who works in a school?", options:["teacher","pilot","firefighter"], ans:"teacher"},
+                    {q:"What is the word for 'sick people'?", options:["patients","thieves","students"], ans:"patients"}
+                 ],
+                 hard: [
+                    {q:"Choose the correct complimentary close:", options:["Yours,","Your,","You,"], ans:"Yours,"},
+                    {q:"Choose the correct complimentary close:", options:["With love,","With love","With loves,"], ans:"With love,"},
+                    {q:"Choose the correct complimentary close:", options:["Regards,","Regard,","Regarding,"], ans:"Regards,"},
+                    {q:"Choose the correct sentence:", options:["He saves people.","He save people.","He saving people."], ans:"He saves people."},
+                    {q:"Choose the correct sentence:", options:["She teaches children.","She teach children.","She teaching children."], ans:"She teaches children."},
+                    {q:"Grammar: I live ___ my sister.", options:["with","by","on"], ans:"with"},
+                    {q:"Grammar: Please tell me ___ your family.", options:["more about","more on","more at"], ans:"more about"},
+                    {q:"Spelling check:", options:["policewoman","policwoman","police woman"], ans:"policewoman"},
+                    {q:"Spelling check:", options:["firefighter","firefigter","firfighter"], ans:"firefighter"},
+                    {q:"Choose the correct sentence:", options:["She is a doctor.","She are a doctor.","She am a doctor."], ans:"She is a doctor."},
+                    {q:"Grammar: My father is ___ pilot.", options:["a","an","some"], ans:"a"},
+                    {q:"Grammar: He ___ planes.", options:["flies","flys","fly"], ans:"flies"},
+                    {q:"Grammar: She ___ thieves.", options:["catches","catch","catching"], ans:"catches"},
+                    {q:"Grammar: I am glad to ___ from you.", options:["hear","listen","see"], ans:"hear"},
+                    {q:"Choose the correct complimentary close:", options:["Lots of love,","Lot of love,","Lots of loves,"], ans:"Lots of love,"},
+                    {q:"Spelling check:", options:["twelve","twelf","twelv"], ans:"twelve"},
+                    {q:"Grammar: My brother ___ twelve.", options:["is","are","am"], ans:"is"},
+                    {q:"Choose the correct question:", options:["How do you do?","How does you do?","How are you do?"], ans:"How do you do?"},
+                    {q:"Choose the correct phrase:", options:["cure people","care people","cut people"], ans:"cure people"},
+                    {q:"Choose the correct phrase:", options:["look after patients","look for patients","look at patients"], ans:"look after patients"}
+                 ]
+            },
+            13: { title: "Level 13: A Happy Day", teach: "1. 星期與天氣。<br>2. 天氣：sunny, cloudy, rainy, foggy。<br>3. 星期：Sunday, Monday, Tuesday... 記得首字母大寫！",
+                 easy: [
+                    {q:"What day is it in Ada's story?", options:["Saturday","Monday","Sunday"], ans:"Saturday"},
+                    {q:"What day comes after Monday?", options:["Tuesday","Wednesday","Friday"], ans:"Tuesday"},
+                    {q:"What day comes before Friday?", options:["Thursday","Wednesday","Saturday"], ans:"Thursday"},
+                    {q:"What is the weather like if there is a lot of rain?", options:["rainy","sunny","snowy"], ans:"rainy"},
+                    {q:"What is the weather like if there is a lot of sun?", options:["sunny","rainy","cloudy"], ans:"sunny"},
+                    {q:"What is the weather like if there is thick fog?", options:["foggy","windy","sunny"], ans:"foggy"},
+                    {q:"What is the weather like if there are many clouds?", options:["cloudy","foggy","stormy"], ans:"cloudy"},
+                    {q:"What is the weather like if there is strong wind?", options:["windy","snowy","sunny"], ans:"windy"},
+                    {q:"Where does Ada go on Saturday?", options:["the library","the beach","the park"], ans:"the library"},
+                    {q:"What does Ada do in the library?", options:["read a book","eat noodles","swim"], ans:"read a book"},
+                    {q:"What does Ada have for lunch?", options:["noodles","pizza","hamburger"], ans:"noodles"},
+                    {q:"Is the food delicious?", options:["Yes","No","Maybe"], ans:"Yes"},
+                    {q:"How does Ada feel today?", options:["happy","sad","angry"], ans:"happy"},
+                    {q:"What day comes after Saturday?", options:["Sunday","Monday","Friday"], ans:"Sunday"},
+                    {q:"What day comes after Wednesday?", options:["Thursday","Tuesday","Friday"], ans:"Thursday"},
+                    {q:"If it is cold and white outside, it is...", options:["snowy","sunny","rainy"], ans:"snowy"},
+                    {q:"If there is a storm, it is...", options:["stormy","sunny","windy"], ans:"stormy"},
+                    {q:"What do you do in a library?", options:["read books","eat food","play basketball"], ans:"read books"},
+                    {q:"What do you eat with chopsticks in a bowl?", options:["noodles","bread","sandwich"], ans:"noodles"},
+                    {q:"What word describes very good food?", options:["delicious","bad","scary"], ans:"delicious"}
+                 ],
+                 hard: [
+                    {q:"Spelling check:", options:["Wednesday","Wenesday","Wendesday"], ans:"Wednesday"},
+                    {q:"Spelling check:", options:["Thursday","Tursday","Thurday"], ans:"Thursday"},
+                    {q:"Spelling check:", options:["Saturday","Saterday","Saturaday"], ans:"Saturday"},
+                    {q:"Spelling check:", options:["foggy","foggie","fogey"], ans:"foggy"},
+                    {q:"Spelling check:", options:["stormy","stormie","stormey"], ans:"stormy"},
+                    {q:"Spelling check:", options:["snowy","snowie","snowey"], ans:"snowy"},
+                    {q:"Spelling check:", options:["delicious","delishous","dilicious"], ans:"delicious"},
+                    {q:"Spelling check:", options:["library","libary","librery"], ans:"library"},
+                    {q:"Choose the correct question:", options:["What is the weather like?","What the weather like?","What weather is like?"], ans:"What is the weather like?"},
+                    {q:"Choose the correct word:", options:["rainy","a rain","the rainy"], ans:"rainy"},
+                    {q:"Grammar: I go ___ the library.", options:["to","at","on"], ans:"to"},
+                    {q:"Grammar: I read ___ book.", options:["a","an","some"], ans:"a"},
+                    {q:"Grammar: Is the food delicious?", options:["Is","Are","Am"], ans:"Is"},
+                    {q:"Choose the correct phrase:", options:["Days of the week","Days of week","Day of the week"], ans:"Days of the week"},
+                    {q:"Grammar: I have noodles ___ lunch.", options:["for","to","at"], ans:"for"},
+                    {q:"Choose the correct sentence:", options:["Today is Saturday.","Today is Saturday","Today are Saturday."], ans:"Today is Saturday."},
+                    {q:"Spelling check:", options:["windy","windie","windey"], ans:"windy"},
+                    {q:"Grammar: Ada ___ to the library.", options:["goes","go","going"], ans:"goes"},
+                    {q:"Grammar: Ada ___ a book.", options:["reads","read","reading"], ans:"reads"},
+                    {q:"Grammar: The food ___ delicious.", options:["is","are","am"], ans:"is"}
+                 ]
+            },
+            14: { title: "Level 14: Seasons", teach: "1. 四季與衣服。<br>2. 介詞：in spring, in summer, in autumn, in winter。<br>3. 夏天：T-shirt, shorts, swim in the sea.",
+                 easy: [
+                    {q:"What season is very hot?", options:["summer","winter","spring"], ans:"summer"},
+                    {q:"What season is very cold?", options:["winter","summer","autumn"], ans:"winter"},
+                    {q:"What season is warm and has flowers?", options:["spring","autumn","winter"], ans:"spring"},
+                    {q:"What season is cool and windy?", options:["autumn","summer","spring"], ans:"autumn"},
+                    {q:"What do you wear in summer?", options:["T-shirt and shorts","coat and scarf","jumper"], ans:"T-shirt and shorts"},
+                    {q:"What do you wear in winter?", options:["coat and scarf","shorts and vest","swimsuit"], ans:"coat and scarf"},
+                    {q:"What do you like eating in summer?", options:["ice cream","hotpot","hot soup"], ans:"ice cream"},
+                    {q:"What do you like eating in winter?", options:["hotpot","ice lollies","ice cream"], ans:"hotpot"},
+                    {q:"Where do you swim in summer?", options:["in the sea or pool","in the library","in the bedroom"], ans:"in the sea or pool"},
+                    {q:"What do you fly in autumn?", options:["a kite","a book","a dog"], ans:"a kite"},
+                    {q:"When do you look at the beautiful flowers?", options:["spring","winter","autumn"], ans:"spring"},
+                    {q:"When do you usually have a barbecue?", options:["autumn","winter","spring"], ans:"autumn"},
+                    {q:"What goes on your head to keep warm in winter?", options:["hat or cap","shoes","socks"], ans:"hat or cap"},
+                    {q:"What goes around your neck in winter?", options:["scarf","trousers","vest"], ans:"scarf"},
+                    {q:"What are long clothes for your legs?", options:["trousers","shorts","T-shirt"], ans:"trousers"},
+                    {q:"What is a T-shirt?", options:["clothing for summer","clothing for winter","food"], ans:"clothing for summer"},
+                    {q:"What do you ride in the park?", options:["a bicycle","a plane","a sea"], ans:"a bicycle"},
+                    {q:"What sweet cold food comes on a stick?", options:["ice lolly","hotpot","barbecue"], ans:"ice lolly"},
+                    {q:"How many seasons are there in a year?", options:["four","twelve","seven"], ans:"four"},
+                    {q:"What is the weather like in spring?", options:["warm","hot","cold"], ans:"warm"}
+                 ],
+                 hard: [
+                    {q:"Choose the correct phrase:", options:["in spring","on spring","at spring"], ans:"in spring"},
+                    {q:"Choose the correct phrase:", options:["in summer","on summer","at summer"], ans:"in summer"},
+                    {q:"Choose the correct phrase:", options:["in autumn","on autumn","at autumn"], ans:"in autumn"},
+                    {q:"Choose the correct phrase:", options:["in winter","on winter","at winter"], ans:"in winter"},
+                    {q:"Spelling check:", options:["autumn","autum","autunm"], ans:"autumn"},
+                    {q:"Spelling check:", options:["summer","sumer","summor"], ans:"summer"},
+                    {q:"Spelling check:", options:["jumper","jumber","jumpur"], ans:"jumper"},
+                    {q:"Spelling check:", options:["trousers","trouzers","trouseres"], ans:"trousers"},
+                    {q:"Spelling check:", options:["scarf","scarff","scaf"], ans:"scarf"},
+                    {q:"Grammar: I swim ___ the sea.", options:["in","on","at"], ans:"in"},
+                    {q:"Grammar: look ___ the flowers", options:["at","on","in"], ans:"at"},
+                    {q:"Grammar: have ___ barbecue", options:["a","an","some"], ans:"a"},
+                    {q:"Grammar: eat ice ___", options:["lollies","lollys","lollie"], ans:"lollies"},
+                    {q:"Grammar: fly ___ kite", options:["a","an","some"], ans:"a"},
+                    {q:"Grammar: ride ___ bicycle", options:["a","an","some"], ans:"a"},
+                    {q:"Grammar: What do you like ___?", options:["doing","do","does"], ans:"doing"},
+                    {q:"Grammar: What do you usually ___?", options:["wear","wears","wearing"], ans:"wear"},
+                    {q:"Choose the correct plural form:", options:["shorts","short","shortes"], ans:"shorts"},
+                    {q:"Choose the correct sentence:", options:["Summer is coming.","Summer coming.","Summer are coming."], ans:"Summer is coming."},
+                    {q:"Grammar: I like ___ ice cream.", options:["eating","eat","eats"], ans:"eating"}
+                 ]
+            },
+            15: { title: "Level 15: Birthday", teach: "1. 生日派對。<br>2. 食物：biscuits, cookies, cakes。<br>3. 感覺：delighted, overjoyed, excited (都是開心的意思喔).",
+                 easy: [
+                    {q:"What date is Ada's birthday?", options:["3rd July","1st May","25th December"], ans:"3rd July"},
+                    {q:"What do you eat at a birthday party?", options:["cakes","rice","homework"], ans:"cakes"},
+                    {q:"What salty snack is made of potatoes?", options:["potato chips","cake","ice cream"], ans:"potato chips"},
+                    {q:"What sweet snacks are small and colourful?", options:["sweets","vegetables","soup"], ans:"sweets"},
+                    {q:"What is made of bread, meat, and cheese?", options:["sandwiches","biscuits","salad"], ans:"sandwiches"},
+                    {q:"What are hard, baked sweet treats?", options:["biscuits","noodles","salad"], ans:"biscuits"},
+                    {q:"Who comes to your birthday party?", options:["friends","thieves","policemen"], ans:"friends"},
+                    {q:"What do friends give you on your birthday?", options:["presents","homework","tests"], ans:"presents"},
+                    {q:"How does Ada feel on her birthday?", options:["happy","sad","frightened"], ans:"happy"},
+                    {q:"Which word means 'very very happy'?", options:["overjoyed","sleepy","angry"], ans:"overjoyed"},
+                    {q:"Which word means 'happy to do something'?", options:["pleased","lazy","tired"], ans:"pleased"},
+                    {q:"Which word means 'happy and looking forward to something'?", options:["excited","bored","sad"], ans:"excited"},
+                    {q:"Where does Ada have her birthday party?", options:["at home","in the hospital","in the library"], ans:"at home"},
+                    {q:"What do you sing at a birthday party?", options:["birthday song","lullaby","school song"], ans:"birthday song"},
+                    {q:"What goes on top of a birthday cake?", options:["candles","shoes","books"], ans:"candles"},
+                    {q:"What do you give someone for their birthday?", options:["a present","a pencil","a problem"], ans:"a present"},
+                    {q:"What month comes after June?", options:["July","May","August"], ans:"July"},
+                    {q:"What healthy food do you mix with vegetables?", options:["salad","sweets","potato chips"], ans:"salad"},
+                    {q:"Another word for biscuits is...", options:["cookies","cakes","sweets"], ans:"cookies"},
+                    {q:"A feeling of happiness is...", options:["glad","angry","scared"], ans:"glad"}
+                 ],
+                 hard: [
+                    {q:"Spelling check:", options:["biscuits","biscuts","biscutes"], ans:"biscuits"},
+                    {q:"Spelling check:", options:["sandwiches","sandwichs","sandwitches"], ans:"sandwiches"},
+                    {q:"Spelling check:", options:["potato chips","potato chip","potatos chips"], ans:"potato chips"},
+                    {q:"Spelling check:", options:["delighted","delited","dlighted"], ans:"delighted"},
+                    {q:"Spelling check:", options:["overjoyed","overjoy","overjoied"], ans:"overjoyed"},
+                    {q:"Spelling check:", options:["excited","exsited","excitted"], ans:"excited"},
+                    {q:"Choose the correct phrase:", options:["Today is the 3rd of July.","Today is a 3rd of July.","Today is an 3rd of July."], ans:"Today is the 3rd of July."},
+                    {q:"Choose the correct phrase:", options:["Today is the 3rd of July.","Today is the 3rd on July.","Today is the 3rd in July."], ans:"Today is the 3rd of July."},
+                    {q:"Grammar: She feels ___.", options:["great","greatly","greats"], ans:"great"},
+                    {q:"Grammar: Friends ___ to her home.", options:["come","comes","coming"], ans:"come"},
+                    {q:"Grammar: What do they ___ at the party?", options:["eat","eats","eating"], ans:"eat"},
+                    {q:"Grammar: What do friends ___ to her?", options:["give","gives","giving"], ans:"give"},
+                    {q:"Grammar: It ___ Ada's birthday.", options:["is","are","am"], ans:"is"},
+                    {q:"Word choice: She is ___.", options:["pleased","please","pleasing"], ans:"pleased"},
+                    {q:"Choose the correct plural form:", options:["presents","presentes","present"], ans:"presents"},
+                    {q:"Choose the correct plural form:", options:["cookies","cookys","cookey"], ans:"cookies"},
+                    {q:"Grammar: She ___ excited.", options:["feels","feel","feeling"], ans:"feels"},
+                    {q:"Spelling check:", options:["sweets","swets","sweetes"], ans:"sweets"},
+                    {q:"Choose the correct sentence:", options:["Today is Ada's birthday.","Today is Ada birthday.","Today are Ada's birthday."], ans:"Today is Ada's birthday."},
+                    {q:"Choose the correct question:", options:["What date is it today?","What date it is today?","What is date today?"], ans:"What date is it today?"}
+                 ]
+            }
+        };
+
+        let currentLevel = 1;
+        let quizQueue = [];
+        let userAnswers = []; 
+        let currentQuestionIndex = 0;
+        let currentQ = null;
+        let retryMode = false; 
+        let currentLevelVocab = []; 
+        
+        let progressScores = JSON.parse(localStorage.getItem('teacherCatScores')) || {};
+
+        window.onload = () => { renderHome(); };
+
+        function clearRecords() {
+            if(confirm("確定要清除所有辛苦獲得的星星與分數記錄嗎？")) {
+                localStorage.removeItem('teacherCatScores');
+                progressScores = {};
+                renderHome();
+            }
+        }
+
+        function renderHome() {
+            const grid = document.getElementById("level-grid");
+            grid.innerHTML = "";
+            const colorPalette = [
+                {bg: "#FF5252", shadow: "#C62828"}, {bg: "#FF9800", shadow: "#E65100"},
+                {bg: "#4CAF50", shadow: "#2E7D32"}, {bg: "#29B6F6", shadow: "#0277BD"},
+                {bg: "#AB47BC", shadow: "#6A1B9A"}, {bg: "#EC407A", shadow: "#AD1457"}
+            ];
+
+            for (let i = 1; i <= 15; i++) {
+                // 如果該關卡目前還沒有資料庫內容，顯示為準備中，不影響網頁運行
+                if (!database[i]) {
+                    database[i] = { title: `Level ${i}: 準備中`, teach: "老師準備中...", easy: [{q:"Test", options:["A"], ans:"A"}], hard: [{q:"Test", options:["A"], ans:"A"}] };
+                }
+                
+                let btn = document.createElement("button");
+                btn.className = "level-btn";
+                
+                let color = colorPalette[(i-1) % colorPalette.length];
+                btn.style.setProperty('--bg-color', color.bg);
+                btn.style.setProperty('--shadow-color', color.shadow);
+                
+                let bestScore = progressScores[i] || 0;
+                let starHTML = "";
+                // 滿分標準：20分
+                if (bestScore === 20) { starHTML = '<div class="star-big">🌟</div>'; }
+                else if (bestScore >= 10) { starHTML = '<div class="star-small">⭐</div>'; }
+                else { starHTML = '<div class="star-none">☆</div>'; }
+                
+                let fullTitle = database[i].title; 
+                let themePart = fullTitle.includes(":") ? fullTitle.split(":").slice(1).join(":").trim() : fullTitle;
+                
+                btn.innerHTML = `
+                    ${starHTML}
+                    <div class="level-number">Level ${i}</div>
+                    <div class="level-theme">${themePart}</div>
+                    <div class="score-text">最高分: ${bestScore}/20</div>
+                `;
+                
+                btn.onclick = () => openIntro(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        function openIntro(level) {
+            currentLevel = level;
+            document.getElementById("home-page").style.display = "none";
+            document.getElementById("summary-page").style.display = "none";
+            document.getElementById("quiz-page").style.display = "none";
+            
+            document.getElementById("intro-title").innerText = database[level].title;
+            document.getElementById("intro-content").innerHTML = database[level].teach;
+            
+            document.getElementById("intro-page").style.display = "block";
+            window.speechSynthesis.cancel(); 
+        }
+
+        function speakIntro() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let plainText = document.getElementById("intro-content").innerHTML.replace(/<[^>]*>?/gm, ''); 
+                let utterance = new SpeechSynthesisUtterance(plainText);
+                utterance.lang = 'zh-HK'; 
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function shuffleArray(array) {
+            let arr = array.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startQuiz() {
+            window.speechSynthesis.cancel(); 
+            retryMode = false;
+            document.getElementById("intro-page").style.display = "none";
+            document.getElementById("quiz-page").style.display = "block";
+            
+            let data = database[currentLevel];
+            let allOpts = [];
+            data.easy.forEach(q => allOpts.push(...q.options));
+            data.hard.forEach(q => allOpts.push(...q.options));
+            currentLevelVocab = [...new Set(allOpts)]; 
+            
+            // 🚨 絕不重複抽題：完全打亂並嚴格抽取 10 題淺 + 10 題深！
+            let easyQs = shuffleArray(data.easy).slice(0, 10);
+            let hardQs = shuffleArray(data.hard).slice(0, 10);
+            
+            quizQueue = easyQs.concat(hardQs);
+            userAnswers = new Array(quizQueue.length).fill(null);
+            currentQuestionIndex = 0;
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            document.getElementById("tc-hint").style.display = "none"; 
+            document.getElementById("skip-btn").style.display = "none"; 
+            currentQ = quizQueue[currentQuestionIndex];
+            
+            if(!retryMode) { document.getElementById("progress-text").innerText = `題號: ${currentQuestionIndex + 1} / ${quizQueue.length}`; }
+            else { document.getElementById("progress-text").innerText = `🔄 重新挑戰錯誤題目！`; }
+            
+            document.getElementById("question-text").innerText = currentQ.q;
+            
+            let optionsGrid = document.getElementById("options-grid");
+            optionsGrid.innerHTML = "";
+            
+            let currentOpts = [...currentQ.options];
+            let loopGuard = 0;
+            while (currentOpts.length < 4 && loopGuard < 50) {
+                let randomOpt = currentLevelVocab[Math.floor(Math.random() * currentLevelVocab.length)];
+                if (!currentOpts.includes(randomOpt)) {
+                    currentOpts.push(randomOpt);
+                }
+                loopGuard++; 
+            }
+            
+            let shuffledOptions = shuffleArray(currentOpts);
+            
+            shuffledOptions.forEach(opt => {
+                let wrap = document.createElement("div");
+                wrap.className = "option-wrapper";
+                
+                let btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, currentQ.ans, wrap);
+                
+                let tts = document.createElement("button");
+                tts.className = "tts-btn";
+                tts.innerText = "🔊";
+                tts.onclick = () => speakText(opt);
+                
+                wrap.appendChild(btn);
+                wrap.appendChild(tts);
+                optionsGrid.appendChild(wrap);
+            });
+            
+            document.getElementById("next-btn").innerText = (currentQuestionIndex === quizQueue.length - 1 && !retryMode) ? "完成關卡 🏁" : "下一頁 ➡️";
+
+            if (retryMode) { showTeacherCatHint("這題之前答錯了，重溫一下知識點吧！"); }
+        }
+
+        let autoNextTimeout;
+
+        function checkAnswer(selected, correct, wrapElement) {
+            clearTimeout(autoNextTimeout); 
+            
+            let btns = document.getElementsByClassName("option-btn");
+            for(let btn of btns) { btn.disabled = true; }
+
+            if (selected === correct) {
+                wrapElement.style.backgroundColor = "#66BB6A"; 
+                wrapElement.style.boxShadow = "0 6px 0 #388E3C";
+                
+                userAnswers[currentQuestionIndex] = { correct: true, selected: selected };
+                document.getElementById("skip-btn").style.display = "none";
+
+                if (!retryMode) {
+                    triggerExaggeratedEffect(); 
+                    autoNextTimeout = setTimeout(nextQ, 2000); 
+                } else {
+                    let correctCount = userAnswers.filter(ans => ans && ans.correct).length;
+                    let currentBest = progressScores[currentLevel] || 0;
+                    
+                    if (correctCount > currentBest) {
+                        progressScores[currentLevel] = correctCount;
+                        localStorage.setItem('teacherCatScores', JSON.stringify(progressScores));
+                        triggerExaggeratedEffect("🏆 分數 +1！破紀錄啦！");
+                    } else {
+                        triggerExaggeratedEffect("✅ 成功訂正！分數 +1！"); 
+                    }
+                    setTimeout(() => { showSummary(); }, 2000); 
+                }
+            } else {
+                wrapElement.style.backgroundColor = "#EF5350"; 
+                wrapElement.style.boxShadow = "0 6px 0 #C62828";
+                let audio = new Audio('https://www.myinstants.com/media/sounds/error_CDpn0.mp3'); 
+                audio.play().catch(e=>{});
+                
+                if (!retryMode) {
+                    userAnswers[currentQuestionIndex] = { correct: false, selected: selected };
+                    
+                    document.getElementById("skip-btn").style.display = "inline-block";
+                    showTeacherCatHint("哎呀，答錯了！試試其他選項！記得：");
+                    
+                    setTimeout(() => {
+                        wrapElement.style.backgroundColor = "#4DD0E1";
+                        wrapElement.style.boxShadow = "0 6px 0 #0097A7";
+                        for(let btn of btns) { btn.disabled = false; }
+                    }, 1000);
+
+                } else {
+                    showTeacherCatHint("再試一次！記得：");
+                    setTimeout(() => {
+                        wrapElement.style.backgroundColor = "#4DD0E1";
+                        wrapElement.style.boxShadow = "0 6px 0 #0097A7";
+                        for(let btn of btns) { btn.disabled = false; }
+                    }, 1000);
+                }
+            }
+        }
+
+        function showTeacherCatHint(prefix) {
+            let hintBox = document.getElementById("tc-hint");
+            let hintText = document.getElementById("hint-text");
+            let plainTeach = database[currentLevel].teach.replace(/<[^>]*>?/gm, ''); 
+            hintText.innerText = prefix + plainTeach;
+            hintBox.style.display = "block";
+        }
+
+        function skipToNext() { document.getElementById("skip-btn").style.display = "none"; nextQ(); }
+
+        function triggerExaggeratedEffect(customMessage) {
+            let effect = document.createElement('div');
+            const cheers = ["🎉 AMAZING! 🎉", "🤩 SUPER! 🤩", "✨ GENIUS! ✨", "🚀 EXCELLENT! 🚀"];
+            effect.innerHTML = customMessage || cheers[Math.floor(Math.random() * cheers.length)];
+            effect.className = 'exaggerated-effect';
+            
+            if(customMessage) { effect.style.fontSize = "3.5em"; }
+            
+            document.body.appendChild(effect);
+            
+            let msg = new SpeechSynthesisUtterance("Excellent! Good Job!");
+            msg.rate = 1.2;
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+
+            setTimeout(() => effect.remove(), 2000);
+        }
+
+        function prevQ() {
+            if(retryMode) { showSummary(); return; }
+            if (currentQuestionIndex > 0) { currentQuestionIndex--; showQuestion(); }
+        }
+
+        function nextQ() {
+            if(retryMode) { showSummary(); return; }
+            if (currentQuestionIndex < quizQueue.length - 1) { currentQuestionIndex++; showQuestion(); } 
+            else { showSummary(); }
+        }
+
+        function showSummary() {
+            retryMode = false;
+            document.getElementById("quiz-page").style.display = "none";
+            document.getElementById("summary-page").style.display = "block";
+            
+            let correctCount = userAnswers.filter(ans => ans && ans.correct).length;
+            let total = quizQueue.length;
+            let currentBest = progressScores[currentLevel] || 0;
+            
+            if (correctCount > currentBest) {
+                progressScores[currentLevel] = correctCount;
+                localStorage.setItem('teacherCatScores', JSON.stringify(progressScores));
+                currentBest = correctCount; 
+            }
+            
+            document.getElementById("score-text").innerHTML = `
+                目前成績：${correctCount} / ${total} <br>
+                <span style="font-size: 0.7em; color: #757575;">(最高分紀錄: ${currentBest} / ${total})</span>
+            `;
+            
+            let starsDisplay = document.getElementById("stars-display");
+            if (correctCount === 20) { starsDisplay.innerHTML = '<span class="star-big">🌟 滿分大星星！</span>'; } 
+            else if (correctCount >= 10) { starsDisplay.innerHTML = '<span class="star-small">⭐ 合格星星！</span>'; } 
+            else { starsDisplay.innerHTML = '<span class="star-none">☆ 繼續努力！</span>'; }
+            
+            let grid = document.getElementById("summary-grid");
+            grid.innerHTML = "";
+            
+            quizQueue.forEach((q, index) => {
+                let ansLog = userAnswers[index];
+                let item = document.createElement("div");
+                
+                if (ansLog && ansLog.correct) {
+                    item.className = "sum-item sum-correct";
+                    item.innerHTML = `✅ 第 ${index+1} 題: ${q.q} <br><small>答對了！</small>`;
+                } else {
+                    item.className = "sum-item sum-wrong";
+                    item.innerHTML = `❌ 第 ${index+1} 題: ${q.q} <br><small>點擊重新挑戰</small>`;
+                    item.onclick = () => {
+                        retryMode = true;
+                        currentQuestionIndex = index;
+                        document.getElementById("summary-page").style.display = "none";
+                        document.getElementById("quiz-page").style.display = "block";
+                        showQuestion();
+                    };
+                }
+                grid.appendChild(item);
+            });
+        }
+
+        function goHome() {
+            document.getElementById("intro-page").style.display = "none";
+            document.getElementById("quiz-page").style.display = "none";
+            document.getElementById("summary-page").style.display = "none";
+            document.getElementById("home-page").style.display = "block";
+            window.speechSynthesis.cancel();
+            renderHome(); 
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; 
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakHint() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let text = document.getElementById("hint-text").innerText;
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-HK'; 
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
