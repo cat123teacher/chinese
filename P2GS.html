@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Cat 的快樂AI教室 - 小二常識大冒險</title>
+    <style>
+        /* 首頁背景美化：動態鮮艷漸變背景 */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        body {
+            font-family: "Comic Sans MS", "微軟正黑體", sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            text-align: center; margin: 0; padding: 70px 20px 40px 20px; 
+            color: #333; overflow-x: hidden;
+        }
+        
+        .logo { position: fixed; top: 10px; left: 10px; width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; background-color: white;}
+        
+        h1 { color: #ff5722; text-shadow: 3px 3px white; font-size: 42px; margin-top: 0; font-weight: 900;}
+        .container { max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 30px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; border: 5px solid white;}
+        
+        /* 首頁關卡按鈕與內嵌進度美化 */
+        .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 30px; }
+        .level-btn { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; border: 4px solid rgba(255,255,255,0.5); border-radius: 25px; padding: 20px 10px; 
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 10px 0 rgba(0,0,0,0.2); 
+        }
+        .level-btn:hover { transform: translateY(-5px) scale(1.05); }
+        .level-btn:active { transform: translateY(10px); box-shadow: none; }
+        .level-title-text { font-size: 26px; font-weight: 900; text-shadow: 2px 2px rgba(0,0,0,0.3); margin-bottom: 8px;}
+        .level-theme-text { font-size: 18px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 15px;}
+        
+        /* 關卡內的進度/星星顯示 */
+        .level-score-text { margin-top: 12px; font-size: 16px; font-weight: bold; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 15px; }
+        .score-perfect { color: #fff59d; text-shadow: 0 0 10px gold; font-size: 20px;}
+        .score-pass { color: #fff59d; }
+        .score-none { color: rgba(255,255,255,0.7); font-size: 14px;}
+
+        .screen { display: none; }
+        .active { display: block; animation: popIn 0.5s ease; }
+
+        /* 題目選項區 */
+        .question-box { font-size: 28px; margin: 20px 0; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 15px; color: #1565c0;}
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+        .option-row { display: flex; align-items: center; gap: 10px; justify-content: center; width: 100%;}
+        .option-btn { flex-grow: 1; background-color: #2196f3; color: white; border: 3px solid white; border-radius: 15px; padding: 15px; font-size: 24px; cursor: pointer; box-shadow: 0 6px 0 #0d47a1; text-align: left; padding-left: 20px; font-weight: bold;}
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #0d47a1; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        
+        .audio-btn { background-color: #ffeb3b; border: 3px solid white; border-radius: 50%; width: 50px; height: 50px; font-size: 22px; cursor: pointer; box-shadow: 0 5px 0 #fbc02d; flex-shrink: 0; display: flex; align-items: center; justify-content: center;}
+        .audio-btn:active { transform: translateY(5px); box-shadow: none; }
+        
+        .nav-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 30px; }
+        .nav-btn { background-color: #ff5722; color: white; border: 3px solid white; border-radius: 15px; padding: 12px 25px; font-size: 18px; cursor: pointer; box-shadow: 0 6px 0 #bf360c; font-weight: bold;}
+        .nav-btn:active { transform: translateY(6px); box-shadow: none; }
+        
+        /* Teacher Cat 提示框 */
+        .hint-box { display: none; background: #fff9c4; border-left: 8px solid #ff9800; padding: 20px; margin-top: 25px; text-align: left; font-size: 20px; border-radius: 10px; animation: popIn 0.5s ease;}
+        
+        /* 總結與錯題重做 */
+        .summary-list { text-align: left; font-size: 20px; max-height: 400px; overflow-y: auto; margin-top: 20px; padding-right: 10px;}
+        .summary-item { padding: 15px; border-bottom: 2px dashed #ccc; display: flex; justify-content: space-between; align-items: center;}
+        .retry-btn { background-color: #e91e63; color: white; border: 2px solid white; padding: 8px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #880e4f;}
+        .retry-btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        /* 頁腳 */
+        .footer { 
+            max-width: 800px; margin: 40px auto 0 auto; background: rgba(255,255,255,0.9); padding: 20px; 
+            border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-size: 15px; border: 3px solid white;
+        }
+        .footer-title { font-weight: bold; color: #ff5722; margin-bottom: 10px; font-size: 18px;}
+        .social-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+        .social-links a { text-decoration: none; color: #1565c0; font-weight: bold; background: #e3f2fd; padding: 8px 15px; border-radius: 15px; transition: 0.2s;}
+        .social-links a:hover { background: #bbdefb; }
+        .social-links span { background: #ffe0b2; padding: 8px 15px; border-radius: 15px; font-weight: bold; color: #e65100;}
+        
+        /* 動畫 */
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-15px) rotate(-5deg); } 75% { transform: translateX(15px) rotate(5deg); } }
+        .exaggerated-correct { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: none; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.7); }
+        .exaggerated-correct span { font-size: 150px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; text-shadow: 0 0 30px gold; }
+        
+        /* 彈出視窗 */
+        .modal { display: none; position: fixed; top: 5%; left: 5%; width: 90%; max-height: 90vh; overflow-y: auto; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 0 40px rgba(0,0,0,0.6); z-index: 2000; box-sizing: border-box; border: 5px solid #ff9800;}
+        
+        /* 學習重點頁面 */
+        .intro-content { background: #e3f2fd; padding: 25px; border-radius: 20px; text-align: left; font-size: 18px; line-height: 1.8; margin-bottom: 20px; border: 3px dashed #64b5f6;}
+        .start-btn { font-size: 32px; padding: 20px 50px; background-color: #4caf50; color: white; border: 4px solid white; border-radius: 25px; box-shadow: 0 8px 0 #2e7d32; cursor: pointer; animation: popIn 0.5s; font-weight: 900;}
+        .start-btn:active { transform: translateY(8px); box-shadow: none; }
+
+        @media (max-width: 600px) {
+            .level-grid { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 32px; }
+            .option-btn { font-size: 20px; }
+            .audio-btn { width: 45px; height: 45px; font-size: 18px; }
+            .question-box { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<img src="cat.jpeg" alt="Teacher Cat Logo" class="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1864/1864514.png'">
+
+<div class="container">
+    <!-- 首頁 -->
+    <div id="home-screen" class="screen active">
+        <h1>🌟 小二常識大冒險 🌟</h1>
+        <p style="font-size: 24px; font-weight: bold; color: #555;">請選擇關卡，開始挑戰吧！</p>
+        
+        <div class="level-grid" id="level-buttons"></div>
+        
+        <br><br>
+        <div class="nav-controls">
+            <a href="https://cat123teacher.github.io/chinese/main.html" class="nav-btn" style="text-decoration:none; display:inline-block; background-color:#3f51b5; box-shadow: 0 6px 0 #283593;">🌍 返回小朋友學習大冒險</a>
+            <button class="nav-btn" style="background-color:#f44336; box-shadow: 0 6px 0 #c62828;" onclick="clearProgress()">🗑️ 清除所有成績</button>
+        </div>
+    </div>
+
+    <!-- 學習重點預習頁面 -->
+    <div id="intro-screen" class="screen">
+        <h1 id="intro-title" style="color: #00bcd4; font-size: 40px;">關卡預習</h1>
+        <div class="intro-content">
+            <h3 style="color: #1976d2; margin-top: 0;">Teacher Cat 課前重點與例子：</h3>
+            <div id="intro-text-container">
+                <!-- 動態生成發音按鈕 -->
+            </div>
+        </div>
+        <button class="start-btn" onclick="startQuiz()">🚀 開始計分遊戲！</button>
+        <br><br>
+        <div class="nav-controls">
+            <button class="nav-btn" style="background:#607d8b; box-shadow: 0 6px 0 #37474f;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+        </div>
+    </div>
+
+    <!-- 答題頁面 -->
+    <div id="quiz-screen" class="screen">
+        <h2 id="quiz-progress" style="color:#e91e63;">題目: 1 / 20</h2>
+        <div class="question-box">
+            <button class="audio-btn" onclick="speakCurrentQuestion()">🔊</button>
+            <span id="question-text">題目內容</span>
+        </div>
+        
+        <div class="options-grid" id="options-container"></div>
+        
+        <div class="hint-box" id="hint-box">
+            <strong style="color: #d84315; font-size: 24px;">💡 Teacher Cat 提示：</strong>
+            <div id="hint-text-container" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- 答題時保留三個導航按鈕 -->
+        <div class="nav-controls" id="quiz-nav-controls">
+            <button class="nav-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
+            <button class="nav-btn" style="background:#607d8b;" onclick="showScreen('home-screen')">🏠 回到主頁</button>
+            <button class="nav-btn" onclick="nextQuestion()">下一頁 ➡️</button>
+        </div>
+    </div>
+
+    <!-- 結算頁面 -->
+    <div id="result-screen" class="screen">
+        <h1>🎉 關卡完成！ 🎉</h1>
+        <h2 id="final-score" style="font-size: 50px; color: #4caf50; background: #e8f5e9; padding: 20px; border-radius: 20px; display: inline-block; border: 3px dashed #4caf50;">得分: 0 / 20</h2>
+        
+        <h3 style="color:#d84315;">📝 錯題本 (點擊重新挑戰，即時加分！)</h3>
+        <div class="summary-list" id="summary-container"></div>
+        
+        <br>
+        <div class="nav-controls">
+            <button class="nav-btn" style="background:#00bcd4; box-shadow: 0 6px 0 #00838f;" onclick="selectLevel(currentLevel)">🔄 重新挑戰這一關</button>
+            <button class="nav-btn" onclick="showScreen('home-screen')">🏠 返回主頁</button>
+        </div>
+    </div>
+</div>
+
+<!-- 重做題目視窗 -->
+<div id="retry-modal" class="modal">
+    <h2 style="color:#e91e63; font-size: 36px;">🔄 重新挑戰</h2>
+    <div class="question-box">
+        <button class="audio-btn" id="retry-q-audio">🔊</button>
+        <span id="retry-question-text">題目</span>
+    </div>
+    <div class="options-grid" id="retry-options-container"></div>
+    
+    <div class="hint-box" id="retry-hint-box" style="display:block; margin-top: 25px;">
+        <strong style="color: #d84315;">💡 Teacher Cat 提示：</strong>
+        <div id="retry-hint-text-container" style="margin-top: 15px;"></div>
+    </div>
+    <br><button class="nav-btn" onclick="closeModal('retry-modal')">返回錯題本</button>
+</div>
+
+<div id="correct-effect" class="exaggerated-correct">
+    <span>🌟太棒了！🌟</span>
+</div>
+
+<!-- 頁腳 -->
+<div class="footer">
+    <div class="footer-title">Teacher Cat 的快樂AI教室</div>
+    <div class="social-links">
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">📺 YouTube</a>
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📷 Instagram</a>
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">💬 WhatsApp</a>
+        <span>🎵 抖音: 74254902683</span>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // ⚠️ 題庫區域：內建完整 1-9 關重點筆記。請在 2-8 關預留位置補入您的題目陣列。
+    // 第 1 關與第 9 關已有完整的 20易 20深 題目。
+    // ==========================================
+    const levelData = {
+        1: {
+            title: "第一關：食物與健康",
+            intro: "【核心重點】<br>1. 飲食金字塔：穀物類(吃最多)、蔬菜水果類(多吃)、肉魚蛋豆/奶品類(適量吃)、油鹽糖類(吃最少)。<br>2. 消化系統：口腔(咬碎) ➔ 食道(送進胃) ➔ 胃(變糊狀並消化) ➔ 小腸(吸收養分) ➔ 大腸(吸收水分) ➔ 肛門(排出糞便)。<br>3. 食物安全：分開處理生、熟食物。放室溫超過兩小時的食物不宜食用。<br>【5個必讀例子】<br>🍱 例子 1：健康午餐比例是「3份飯、2份蔬菜、1份肉」。<br>💧 例子 2：每天應喝六至八杯流質飲料，包括清水、奶和清湯。<br>🔪 例子 3：處理食物時，要使用不同的砧板和器皿分開處理生、熟食物，避免交叉污染。<br>🏃 例子 4：進食時要慢慢咀嚼，進食後不要馬上做劇烈運動，以保護消化系統。<br>🥛 例子 5：鮮奶、沙律等應保存在攝氏4度或以下的雪櫃，停電超過四小時便要把鮮奶棄掉。",
+            easy: [
+                { q: "處理食物前，我們第一步應該做甚麼？", options: ["徹底煮熟", "放入雪櫃", "徹底清潔雙手", "馬上吃掉"], ans: 2 },
+                { q: "我們每天應該喝多少杯流質飲料？", options: ["1至2杯", "3至4杯", "6至8杯", "10杯以上"], ans: 2 },
+                { q: "根據「健康飲食金字塔」，我們應該吃最多的食物是甚麼？", options: ["蔬菜類", "穀物類", "肉類", "油鹽糖"], ans: 1 },
+                { q: "根據「健康飲食金字塔」，我們應該吃最少的食物是甚麼？", options: ["蔬菜類", "穀物類", "肉類", "油鹽糖"], ans: 3 },
+                { q: "以下哪一種食物屬於「穀物類」？", options: ["白菜", "蘋果", "麵包", "牛肉"], ans: 2 },
+                { q: "以下哪一種食物屬於「蔬菜類」？", options: ["番茄", "香蕉", "雞蛋", "米粉"], ans: 0 },
+                { q: "以下哪一種食物屬於「奶品類」？", options: ["糖果", "芝士", "豆腐", "汽水"], ans: 1 },
+                { q: "哪一種烹調方法比較健康？", options: ["多油炸", "多加鹽", "多蒸煮", "多加糖"], ans: 2 },
+                { q: "食物過了食用期限，還可以吃嗎？", options: ["可以", "不可以", "煮熟就可以", "洗乾淨就可以"], ans: 1 },
+                { q: "食物暴露在空氣中容易怎樣？", options: ["變大", "變壞", "變香", "變熟"], ans: 1 },
+                { q: "進食前我們應該養成甚麼習慣？", options: ["做運動", "睡覺", "洗手", "看電視"], ans: 2 },
+                { q: "食物能為我們的身體提供甚麼？", options: ["空氣", "能量", "陽光", "玩具"], ans: 1 },
+                { q: "以下哪一項是健康的飲品？", options: ["清水", "汽水", "濃茶", "咖啡"], ans: 0 },
+                { q: "沒有蓋好的食物，容易受到甚麼污染？", options: ["陽光", "細菌", "空氣", "雨水"], ans: 1 },
+                { q: "買包裝食物時，最重要是留意甚麼？", options: ["包裝顏色", "食用期限", "食品形狀", "廣告"], ans: 1 },
+                { q: "處理生肉和熟肉時，應該怎樣做？", options: ["放在一起", "分開處理", "不用清洗", "用同一個砧板"], ans: 1 },
+                { q: "保持廚房清潔，可以預防甚麼？", options: ["火災", "細菌滋生", "停電", "地震"], ans: 1 },
+                { q: "多吃蔬菜有助我們甚麼？", options: ["消化", "排尿", "長高", "變胖"], ans: 0 },
+                { q: "我們每天吃午餐時，飯、菜、肉的比例應該是多少？", options: ["3:2:1", "1:2:3", "3:3:3", "1:1:1"], ans: 0 },
+                { q: "以下哪一項不是有益食物的功用？", options: ["提供能量", "維持健康", "幫助成長", "令人變老"], ans: 3 }
+            ],
+            hard: [
+                { q: "偏食不愛吃蔬菜，容易導致甚麼後果？", options: ["長得更高", "容易便秘", "吸收過多脂肪", "體重過輕"], ans: 1 },
+                { q: "常吃垃圾食物（如薯片），容易導致甚麼後果？", options: ["肥胖", "營養過剩", "長高", "變瘦"], ans: 0 },
+                { q: "食物放在室溫下超過多久，就不宜再食用？", options: ["半小時", "一小時", "兩小時", "四小時"], ans: 2 },
+                { q: "鮮奶、沙律應該保存在甚麼溫度的環境中？", options: ["攝氏20度", "攝氏10度", "攝氏4度或以下", "攝氏0度以下"], ans: 2 },
+                { q: "進食了不安全的食物，可能會引致甚麼疾病？", options: ["感冒", "腸胃炎", "心臟病", "近視"], ans: 1 },
+                { q: "消化系統中，哪一個器官負責用牙齒把食物咬碎？", options: ["胃", "大腸", "口腔", "小腸"], ans: 2 },
+                { q: "食物被咬碎後，會經哪一個器官進入胃？", options: ["大腸", "食道", "小腸", "肛門"], ans: 1 },
+                { q: "把食物與胃液混和，變成糊狀並消化，是哪個器官的功用？", options: ["胃", "食道", "大腸", "小腸"], ans: 0 },
+                { q: "哪一個器官負責進一步把食物消化，並吸收當中的養分？", options: ["胃", "小腸", "大腸", "肛門"], ans: 1 },
+                { q: "吸收食物殘渣中的水分，形成糞便，是哪個器官的功用？", options: ["胃", "小腸", "大腸", "食道"], ans: 2 },
+                { q: "糞便是經由哪一個器官排出體外？", options: ["胃", "小腸", "大腸", "肛門"], ans: 3 },
+                { q: "吃剩的食物應該用甚麼盛載才放進雪櫃？", options: ["紙巾", "保鮮袋或有蓋食物盒", "報紙", "不用盛載"], ans: 1 },
+                { q: "食物不應該保存在雪櫃超過多少天？", options: ["一天", "兩天", "三天", "七天"], ans: 2 },
+                { q: "食物在甚麼環境下容易變壞？", options: ["乾燥", "低溫", "潮濕", "通風"], ans: 2 },
+                { q: "以下哪一項是保護消化系統的好方法？", options: ["暴飲暴食", "飲食定時和定量", "邊吃邊跑", "偏食"], ans: 1 },
+                { q: "進食時，我們應該怎樣做來幫助消化？", options: ["狼吞虎嚥", "慢慢咀嚼", "喝大量冰水", "馬上睡覺"], ans: 1 },
+                { q: "進食後，以下哪一項行為是錯誤的？", options: ["休息", "散步", "馬上做劇烈運動", "看書"], ans: 2 },
+                { q: "如果停電超過四小時，雪櫃內的鮮奶應該怎樣處理？", options: ["馬上喝掉", "放回雪櫃", "把鮮奶棄掉", "加熱後喝"], ans: 2 },
+                { q: "偏食（不愛吃肉）會導致甚麼後果？", options: ["容易便秘", "營養不足及體重過輕", "肥胖", "生病"], ans: 1 },
+                { q: "為什麼要在低溫的環境下保存食物？", options: ["增加味道", "食物保存得較久", "方便進食", "改變顏色"], ans: 1 }
+            ]
+        },
+        2: {
+            title: "第二關：運動與健康",
+            intro: "【核心重點】<br>1. 運動的種類：可分為個人運動（如跑步）、羣體運動（如打籃球）、室內及室外運動。<br>2. 運動的益處：能強壯肌肉、舒展身心、消耗熱量避免過胖，以及結交新朋友 [1]。<br>3. 運動安全：運動前後需做足熱身和緩和運動，選擇合適場地並穿妥保護裝備 [2]。<br>【5個必讀例子】<br>🚴 例子 1：騎自行車時必須佩戴頭盔和護手腳裝束，以保護頭部及關節 [2]。<br>⏱️ 例子 2：小朋友每天要做 60 分鐘運動，例如飯後可散步 15 分鐘幫助消化 [1]。<br>🤸 例子 3：運動前必須先伸展身體各部分做熱身，能讓身體進入狀態並減低受傷機會 [2]。<br>🫀 例子 4：運動時如果感到呼吸急促或心跳加速，應立刻停止並到陰涼處休息 [2]。<br>🚫 例子 5：剛做完劇烈運動後，切勿馬上飲用冷水或洗澡，應該飲用常溫清水補充水分 [2]。", 
+            easy: [
+                { q: "跳繩屬於哪一種運動？[8]", options: ["群體運動", "個人運動", "水上運動", "冰上運動"], ans: 1 },
+                { q: "踢足球屬於哪一種運動？[8]", options: ["個人運動", "群體運動", "室內運動", "靜態活動"], ans: 1 },
+                { q: "打乒乓球通常屬於哪一種運動？[8]", options: ["室外運動", "水上運動", "室內運動", "極限運動"], ans: 2 },
+                { q: "騎自行車屬於哪一種運動？[8]", options: ["室外運動", "室內運動", "靜態活動", "群體運動"], ans: 0 },
+                { q: "運動可以幫助我們消耗熱量，避免甚麼？[8]", options: ["長高", "過胖", "生病", "流汗"], ans: 1 },
+                { q: "做運動可以結交甚麼？[8]", options: ["新朋友", "新玩具", "新功課", "新衣服"], ans: 0 },
+                { q: "運動前，我們必須做甚麼來減低受傷機會？[9]", options: ["洗澡", "睡覺", "熱身運動", "吃飽"], ans: 2 },
+                { q: "騎自行車時，必須戴上甚麼來保護頭部？[9]", options: ["帽子", "頭盔", "頭巾", "太陽眼鏡"], ans: 1 },
+                { q: "溜冰時，為了保護關節，應該戴上甚麼？[9]", options: ["手套和護膝", "頸巾", "手錶", "戒指"], ans: 0 },
+                { q: "飯後多久才適合進行劇烈運動？[9]", options: ["馬上", "半小時", "兩小時", "一天"], ans: 2 },
+                { q: "以下哪一個是不適合做運動的地方？[9]", options: ["運動場", "籃球場", "馬路", "單車徑"], ans: 2 },
+                { q: "運動時如果感到不適，應該怎樣做？[9]", options: ["繼續堅持", "喝大量汽水", "慢步停下並尋找成人協助", "馬上跑回家"], ans: 2 },
+                { q: "我們每天應該做多少分鐘運動？[8]", options: ["10分鐘", "30分鐘", "60分鐘", "120分鐘"], ans: 2 },
+                { q: "早上起床後，適合做甚麼運動？[8]", options: ["舉重", "伸展運動", "游泳", "打籃球"], ans: 1 },
+                { q: "飯後適合做甚麼活動幫助消化？[8]", options: ["跑步", "散步15分鐘", "跳繩", "打羽毛球"], ans: 1 },
+                { q: "參與群體運動可以培養甚麼精神？[8]", options: ["自私", "合作精神", "懶惰", "驕傲"], ans: 1 },
+                { q: "運動需要有甚麼態度？[8]", options: ["半途而廢", "恆心和持續訓練", "隨便玩玩", "怕辛苦"], ans: 1 },
+                { q: "生病時應該做運動嗎？[9]", options: ["應該", "不應該", "只做劇烈運動", "多做運動出汗"], ans: 1 },
+                { q: "單車徑適合進行甚麼運動？[9]", options: ["跑步", "打籃球", "騎自行車", "踢足球"], ans: 2 },
+                { q: "運動能幫助我們強壯甚麼？[8]", options: ["頭髮", "肌肉", "指甲", "牙齒"], ans: 1 }
+            ],
+            hard: [
+                { q: "做熱身運動的主要目的是甚麼？[9]", options: ["令人流汗", "使身體進入運動狀態，減低受傷機會", "浪費時間", "令人疲倦"], ans: 1 },
+                { q: "運動時，我們的身體會有甚麼變化？[9]", options: ["心跳減慢", "呼吸急速，心跳加速", "體溫下降", "不會流汗"], ans: 1 },
+                { q: "剛做完劇烈運動後，切勿馬上做甚麼？[9]", options: ["坐下休息", "慢步一會兒", "輕拉肌肉", "抹汗"], ans: 0 },
+                { q: "剛做完運動後，切勿馬上喝甚麼？[9]", options: ["溫水", "清水", "冷水洗澡或冷飲", "果汁"], ans: 2 },
+                { q: "運動後應該飲用甚麼來補充流失的水分？[9]", options: ["汽水", "清水", "咖啡", "濃茶"], ans: 1 },
+                { q: "如果運動時不聽從教練指示，容易發生甚麼？[9]", options: ["進步更快", "意外", "比賽勝出", "得到稱讚"], ans: 1 },
+                { q: "我們參與比賽，不應該只為了甚麼而運動？[8]", options: ["健康", "興趣", "獎牌或獎品", "朋友"], ans: 2 },
+                { q: "以下哪一項不是運動的益處？[8]", options: ["改善體能", "舒展身心，消除壓力", "增加壓力", "消耗熱量"], ans: 2 },
+                { q: "如果在家中看電視，我們可以同時做甚麼運動？[8]", options: ["踢足球", "伸展運動", "打羽毛球", "騎自行車"], ans: 1 },
+                { q: "外出時，我們可以用甚麼方法增加運動量？[8]", options: ["多乘電梯", "多乘升降機", "走樓梯代替乘搭電梯", "多坐車"], ans: 2 },
+                { q: "如果在街上踢足球，最可能引致甚麼後果？[10]", options: ["違法及容易撞倒他人", "強身健體", "認識新朋友", "沒有影響"], ans: 0 },
+                { q: "如果天氣悶熱但不戴頭盔騎單車，跌倒時容易怎樣？[10]", options: ["更涼快", "頭部容易受傷", "不會受傷", "騎得更快"], ans: 1 },
+                { q: "游泳時，如果感到呼吸過於急促，應該怎樣？[9]", options: ["游快一點", "立刻停止運動", "潛入水中", "大聲呼叫"], ans: 1 },
+                { q: "做完運動後進行「緩和運動」，有甚麼好處？[9]", options: ["增加心跳", "輕拉肌肉，幫助身體回復平靜", "流更多汗", "浪費時間"], ans: 1 },
+                { q: "運動時流汗，代表身體正在怎樣？[9]", options: ["生病", "流失水分和散熱", "變冷", "吸收水分"], ans: 1 },
+                { q: "踢足球扭傷了腿，應該馬上怎樣做？[11]", options: ["繼續踢球", "多穿衣服", "停止踢球並請成人協助", "喝熱水"], ans: 2 },
+                { q: "運動能幫助我們改善體能，增強甚麼？[7]", options: ["視力", "抵抗力", "聽力", "食慾"], ans: 1 },
+                { q: "以下哪一項屬於田徑運動？[12]", options: ["攀石", "游泳", "跑步", "騎自行車"], ans: 2 },
+                { q: "在雨天進行戶外運動，是正確的行為嗎？[12]", options: ["正確，因為涼快", "正確，可以訓練毅力", "錯誤，容易滑倒受傷", "沒有所謂"], ans: 2 },
+                { q: "如果做運動時不穿著合適的運動鞋，容易導致甚麼？[10]", options: ["容易滑倒", "跑得更快", "跳得更高", "沒有影響"], ans: 0 }
+            ]
+        },
+        3: {
+            title: "第三關：動植物的生長",
+            intro: "【核心重點】<br>1. 動物的種類：分為由母體直接產下的「胎生」動物，以及由卵孵化而出的「卵生」動物 [3]。<br>2. 飼養動物：要考慮居住環境、經濟能力、家人意見，並承諾照顧牠們一生一世 [3]。<br>3. 植物的生長：基本需要水、空氣和陽光 [4]。成長順序為發芽生根，再長莖、葉、花和果實 [4]。<br>【5個必讀例子】<br>🐈 例子 1：貓、狗和牛是「胎生」動物；而雞、鳥和烏龜則是「卵生」動物 [3]。<br>💰 例子 2：決定飼養寵物前，要考慮是否有足夠的經濟能力負擔飼料和看獸醫的費用 [3]。<br>🩺 例子 3：當寵物生病時，主人有絕對責任帶牠看獸醫，不可隨意遺棄 [3]。<br>🌱 例子 4：有花植物的成長順序是：發芽 ➔ 根 ➔ 莖 ➔ 葉子 ➔ 花 ➔ 果實（含有種子） [4]。<br>☀️ 例子 5：栽種植物要有愛心和耐性，定時澆水施肥，並把它放在有陽光照射和通風的地方 [4]。", 
+            easy: [
+                { q: "植物生長的基本條件是甚麼？[13]", options: ["水、空氣、泥土", "水、空氣、陽光", "肥料、陽光、泥土", "只有水"], ans: 1 },
+                { q: "動物分為哪兩大類繁殖方式？[14]", options: ["水生和陸生", "肉食和草食", "胎生和卵生", "日行和夜行"], ans: 2 },
+                { q: "以下哪一種動物是「胎生」的？[14]", options: ["雞", "烏龜", "狗", "雀鳥"], ans: 2 },
+                { q: "以下哪一種動物是「卵生」的？[14]", options: ["貓", "牛", "雞", "兔子"], ans: 2 },
+                { q: "卵生動物是由母體產下甚麼孵化而出的？[14]", options: ["卵（蛋）", "幼兒", "種子", "毛髮"], ans: 0 },
+                { q: "胎生動物的幼兒是直接由哪裏生下來的？[14]", options: ["泥土", "母體", "樹上", "水中"], ans: 1 },
+                { q: "植物主要由根、莖、花、果實、種子和甚麼組成？[13]", options: ["葉子", "羽毛", "鱗片", "觸角"], ans: 0 },
+                { q: "哪一個植物部分負責在泥土中吸收水分？[13]", options: ["花", "葉子", "莖", "根"], ans: 3 },
+                { q: "哪一個植物部分負責支撐植物？[13]", options: ["根", "花", "莖", "果實"], ans: 2 },
+                { q: "有些植物開花後，會結出甚麼？[13]", options: ["葉子", "果實", "根", "樹枝"], ans: 1 },
+                { q: "果實裡面通常藏有甚麼，用來繁殖下一代？[13]", options: ["葉子", "水分", "種子", "花瓣"], ans: 2 },
+                { q: "栽種植物時，我們要有甚麼態度？[13]", options: ["粗心大意", "愛心和耐性", "隨便", "急躁"], ans: 1 },
+                { q: "植物應該放在甚麼地方生長最好？[13]", options: ["黑暗的衣櫃", "有陽光照射和通風的地方", "密封的箱子", "雪櫃裡"], ans: 1 },
+                { q: "我們應該定時為植物做甚麼？[13]", options: ["唱歌", "澆水和施肥", "拔掉葉子", "塗顏色"], ans: 1 },
+                { q: "決定飼養動物前，首要考慮甚麼？[14]", options: ["動物是否可愛", "有沒有責任感照顧牠一生", "動物的價錢", "朋友的意見"], ans: 1 },
+                { q: "動物生病時，我們應該帶牠去看誰？[14]", options: ["警察", "獸醫", "老師", "牙醫"], ans: 1 },
+                { q: "飼養狗隻，家中需要有甚麼？[14]", options: ["足夠的空間", "很多玩具", "漂亮的花園", "其他狗隻"], ans: 0 },
+                { q: "貓的初生幼兒體形較小，長大後體形會怎樣？[14]", options: ["變小", "不變", "變大", "消失"], ans: 2 },
+                { q: "種子發芽後，最先長出來的部分是甚麼？[7]", options: ["花", "根", "葉子", "莖"], ans: 1 },
+                { q: "動物維持生命需要甚麼？[15]", options: ["水", "空氣", "食物", "以上皆是"], ans: 3 }
+            ],
+            hard: [
+                { q: "有花植物的生長順序是怎樣的？[13]", options: ["花➔果➔葉➔根", "發芽➔根➔莖➔葉➔花➔果實", "根➔果實➔花➔莖", "種子➔花➔根➔葉"], ans: 1 },
+                { q: "如果居住的屋苑不准許養狗，我們應該怎樣做？[14]", options: ["偷偷養", "放棄飼養", "搬家", "把狗藏起來"], ans: 1 },
+                { q: "飼養動物需要花費，我們必須考慮自己的甚麼能力？[14]", options: ["經濟能力", "跑步能力", "唱歌能力", "讀書能力"], ans: 0 },
+                { q: "飼養寵物前，為甚麼要詢問家人的意見？[14]", options: ["為了要零用錢", "避免破壞家人感情或家人有敏感", "家人可以代為照顧", "沒有特別原因"], ans: 1 },
+                { q: "當寵物老去時，我們應該保持甚麼態度？[14]", options: ["遺棄牠", "繼續悉心照顧", "賣掉牠", "不理會牠"], ans: 1 },
+                { q: "寵物死亡後，我們可以怎樣表達感受？[14]", options: ["隨便丟棄", "與家人傾訴及製作紀念冊", "馬上買新的", "假裝沒事"], ans: 1 },
+                { q: "如果把植物放在沒有陽光的地方，會發生甚麼事？[16]", options: ["長得更快", "開出大花", "植物不能健康生長", "結出果實"], ans: 2 },
+                { q: "動物沒有足夠活動空間，會帶來甚麼影響？[17]", options: ["動物容易運動不足", "動物會很開心", "動物會長胖", "動物會變聰明"], ans: 0 },
+                { q: "如果家人對貓毛敏感，你還應該養貓嗎？[17]", options: ["應該，因為我喜歡", "不應該，會影響家人健康", "偷偷養在房間", "給貓剃毛"], ans: 1 },
+                { q: "把動物隨便丟棄在街上，會導致動物怎樣？[17]", options: ["找到新主人", "無家可歸", "自由自在", "變得強壯"], ans: 1 },
+                { q: "三天沒有帶小狗外出散步，小狗會覺得怎樣？[17]", options: ["開心", "沉悶及運動不足", "肚餓", "口渴"], ans: 1 },
+                { q: "如果沒有經濟能力負擔動物的醫療費用，你應該養寵物嗎？[17]", options: ["應該", "不應該，因為無法負擔開支", "借錢養", "動物不會生病"], ans: 1 },
+                { q: "植物的莖除了支撐植物，還有甚麼功用？[13]", options: ["吸收陽光", "運送水分和養分", "吸引昆蟲", "抓住泥土"], ans: 1 },
+                { q: "鳥類的幼兒孵化出來時，通常沒有甚麼？[14]", options: ["眼睛", "豐滿的羽毛", "嘴巴", "心跳"], ans: 1 },
+                { q: "胎生動物（如狗）成長時，除了體形變大，甚麼也會增多？[14]", options: ["腳的數量", "毛髮", "尾巴", "耳朵"], ans: 1 },
+                { q: "以下哪一項不是植物的部分？[16]", options: ["莖", "葉子", "果實", "羽毛"], ans: 3 },
+                { q: "決定飼養動物後，要當一個怎樣的主人？[14]", options: ["負責任的主人，照顧牠一生一世", "只在有空時陪伴", "隨便的主人", "嚴厲的主人"], ans: 0 },
+                { q: "兔子、倉鼠、烏龜、狗，一般來說哪一種壽命最長？[18]", options: ["倉鼠", "烏龜", "兔子", "狗"], ans: 1 },
+                { q: "倉鼠、烏龜、兔子、狗，一般來說哪一種壽命最短？[18]", options: ["倉鼠", "烏龜", "兔子", "狗"], ans: 0 },
+                { q: "如果可可的倉鼠生病了，她覺得很傷心，她應該怎樣做？[18]", options: ["把倉鼠丟掉", "告訴大人並帶牠看獸醫", "不理會", "自己餵牠吃人類藥物"], ans: 1 }
+            ]
+        },
+        4: {
+            title: "第四關：日與夜",
+            intro: "【核心重點】<br>1. 日與夜的形成：地球不停轉動，受太陽照射到的地方便是白天，背向太陽漆黑一片的地方便是黑夜 [5]。<br>2. 影子的變化：太陽位置改變會影響影子長短，早上和黃昏的影子較長，中午的影子最短 [5]。<br>3. 月相與星星：月亮的形狀約30天循環一次；星星一直都在天上，但白天陽光太強烈所以看不見 [5]。<br>【5個必讀例子】<br>⏳ 例子 1：中國古代發明了「日晷」，是透過觀察太陽照射在上面的影子變化來讀取時間的儀器 [5]。<br>🦉 例子 2：貓頭鷹和眼鏡猴是主要在「晚上」活動和尋找食物的動物 [5]。<br>🌕 例子 3：農曆十五的月亮形狀是滿月（圓形），而農曆初一是新月（看不見月亮） [5]。<br>👤 例子 4：一天之中，影子在中午的時候最短；在早上和黃昏的時候則會變得比較長 [5]。<br>💡 例子 5：愛迪生發明了電燈泡，讓人們從此在黑夜也能過着跟白天差不多的生活 [5]。", 
+            easy: [
+                { q: "當太陽照射在地球的地面，當地便是甚麼？[19]", options: ["黑夜", "白天", "冬天", "下雨"], ans: 1 },
+                { q: "當地球某個地方漆黑一片，當地便是甚麼？[19]", options: ["白天", "黑夜", "夏天", "颳風"], ans: 1 },
+                { q: "白天時的天色是怎樣的？[19]", options: ["黑暗", "明亮", "紅色", "綠色"], ans: 1 },
+                { q: "黑夜時的天色是怎樣的？[19]", options: ["黑暗", "明亮", "刺眼", "彩色"], ans: 0 },
+                { q: "白天我們能在天空中看見甚麼？[19]", options: ["星星", "太陽", "月亮", "雲朵"], ans: 1 },
+                { q: "黑夜我們通常能在天空中看見甚麼？[19]", options: ["太陽", "月亮和星星", "彩虹", "白雲"], ans: 1 },
+                { q: "白天的氣溫通常比黑夜怎樣？[19]", options: ["低一些", "高一些", "一樣", "非常寒冷"], ans: 1 },
+                { q: "甚麼時候會有較多人進行活動（較熱鬧）？[19]", options: ["白天", "黑夜", "半夜", "凌晨"], ans: 0 },
+                { q: "以下哪項活動適合在白天進行？[19]", options: ["睡覺", "觀星", "晾曬衣服", "看月亮"], ans: 2 },
+                { q: "以下哪項活動較適合在晚上進行？[19]", options: ["上學", "觀星", "耕種", "曬太陽"], ans: 1 },
+                { q: "黑夜時，多數人會留在家中做甚麼？[19]", options: ["上學", "工作", "休息及睡覺", "做運動"], ans: 2 },
+                { q: "太陽在甚麼時候升起？[19]", options: ["中午", "黃昏", "早上", "半夜"], ans: 2 },
+                { q: "太陽在甚麼時候慢慢落下？[19]", options: ["早上", "中午", "半夜", "黃昏"], ans: 3 },
+                { q: "太陽發出的光線怎樣？[20]", options: ["微弱", "十分強烈", "綠色", "冰冷"], ans: 1 },
+                { q: "直接觀看太陽會怎樣？[20]", options: ["眼睛變好", "損害眼睛", "令人長高", "沒有影響"], ans: 1 },
+                { q: "是誰發明了電燈泡，讓人們在黑夜也能活動？[19]", options: ["愛因斯坦", "愛迪生", "牛頓", "蔡倫"], ans: 1 },
+                { q: "晚上開燈過多，會造成甚麼問題？[16]", options: ["浪費電力", "空氣清新", "更易入睡", "節省金錢"], ans: 0 },
+                { q: "星星的光線怎樣？[19]", options: ["強烈", "微弱", "刺眼", "炎熱"], ans: 1 },
+                { q: "月亮和星星其實甚麼時候都在天上？[19]", options: ["只有晚上", "只有白天", "一直都在", "只有冬天"], ans: 2 },
+                { q: "晚上需要上班的人員包括甚麼職業？[19]", options: ["學生", "校長", "消防員和警察", "郵差"], ans: 2 }
+            ],
+            hard: [
+                { q: "為甚麼白天看不見星星？[19]", options: ["星星睡覺了", "太陽的光太強烈，掩蓋了星光", "星星掉下來了", "被雲吃掉了"], ans: 1 },
+                { q: "影子的位置和長短，會隨著甚麼而改變？[19]", options: ["風向", "太陽的位置", "氣溫", "心情"], ans: 1 },
+                { q: "一天裏，甚麼時候的影子最長？[19]", options: ["早上和黃昏", "中午", "下午兩點", "半夜"], ans: 0 },
+                { q: "一天裏，甚麼時候的影子最短？[19]", options: ["早上", "黃昏", "中午", "傍晚"], ans: 2 },
+                { q: "中國古代透過觀察甚麼儀器上的影子變化來讀取時間？[19]", options: ["指南針", "日晷", "地動儀", "渾天儀"], ans: 1 },
+                { q: "月亮的形狀變化，大約多少天循環一次？[19]", options: ["7天", "15天", "30天", "365天"], ans: 2 },
+                { q: "農曆初一的月相稱為甚麼？[19]", options: ["滿月", "新月", "上弦月", "下弦月"], ans: 1 },
+                { q: "農曆十五的月相稱為甚麼？[19]", options: ["新月", "蛾眉月", "滿月", "殘月"], ans: 2 },
+                { q: "在城市裏，為甚麼很難看見星星？[21]", options: ["星星害怕城市", "城市晚上的燈光太多，光污染嚴重", "樓宇太高擋住了", "城市沒有星星"], ans: 1 },
+                { q: "在哪裏比較容易清晰看見星星？[19]", options: ["鬧市", "商場", "燈光較少的郊外", "體育館"], ans: 2 },
+                { q: "貓頭鷹和眼鏡猴主要在甚麼時候活動？[19]", options: ["白天", "晚上", "中午", "清晨"], ans: 1 },
+                { q: "貓頭鷹和蝙蝠屬於甚麼動物？[22]", options: ["日行動物", "夜行動物", "水生動物", "草食動物"], ans: 1 },
+                { q: "如果晚上沒有電燈，人們的生活會有甚麼影響？[16]", options: ["無法睡覺", "無法長高", "晚上活動極不方便", "天氣變熱"], ans: 2 },
+                { q: "蝙蝠在黑夜安全飛行，主要依靠甚麼？[20]", options: ["極佳的視力", "嗅覺", "發出聲波探路", "聽從其他動物指示"], ans: 2 },
+                { q: "我們在不同地方看見的星空是相同的嗎？[20]", options: ["完全相同", "不同", "只有一半相同", "視乎天氣"], ans: 1 },
+                { q: "太陽在正上空（高空）時，是甚麼時間？[19]", options: ["早上", "中午", "黃昏", "半夜"], ans: 1 },
+                { q: "地球是怎樣形成日與夜的交替？[19]", options: ["太陽繞著地球轉", "地球不停轉動並受太陽照射", "月亮擋住太陽", "雲層變化"], ans: 1 },
+                { q: "農曆廿五的月亮形狀通常是怎樣的？[19]", options: ["滿月", "新月", "殘月", "上弦月"], ans: 2 },
+                { q: "「氣溫較高，較多燈光亮著」這描述符合白天還是黑夜？[19]", options: ["白天", "黑夜", "兩者皆是", "兩者皆非"], ans: 1 },
+                { q: "如果在郊外觀星，遇到環境昏暗，應準備甚麼？[23]", options: ["太陽眼鏡", "手電筒", "雨傘", "指南針"], ans: 1 }
+            ]
+        },
+        5: {
+            title: "第五關：善用餘暇與玩具",
+            intro: "【核心重點】<br>1. 餘暇活動的好處：能增進知識、強身健體、發揮創意及學習與人相處。活動可分為靜態和動態 [6]。<br>2. 選擇活動的因素：要考慮自己有沒有興趣、時間是否配合、個人能力、以及費用是否合理 [6]。<br>3. 時間管理：時間一去不回頭，要好好分配作息時間，不可過度沉迷電子遊戲 [6]。<br>【5個必讀例子】<br>🎨 例子 1：繪畫、閱讀和彈奏樂器是「靜態」的活動，能夠幫助我們發揮創意和增進知識 [6]。<br>⚽ 例子 2：踢足球和打籃球是「羣體」及「動態」活動，能強身健體並學習與人相處 [6]。<br>🤔 例子 3：選擇參加興趣班時，要考慮自己能否應付（能力）以及是否會花費太多金錢（費用） [6]。<br>⏰ 例子 4：我們應該珍惜每一分每一秒，例如養成準時起牀和準時完成功課的良好習慣 [6]。<br>📱 例子 5：沉迷電子遊戲會嚴重影響健康（對眼睛和手指不好），並導致沒有時間做功課和休息 [6]。", 
+            easy: [
+                { q: "甚麼是「餘暇」時間？[24]", options: ["上課時間", "做完必須做的事情後餘下的時間", "睡覺時間", "考試時間"], ans: 1 },
+                { q: "閱讀和下棋屬於哪種餘暇活動？[24]", options: ["動態活動", "靜態活動", "水上活動", "極限運動"], ans: 1 },
+                { q: "跳繩和攀石屬於哪種餘暇活動？[24]", options: ["靜態活動", "動態活動", "藝術活動", "音樂活動"], ans: 1 },
+                { q: "參與個人餘暇活動（如參觀博物館）可以增進甚麼？[24]", options: ["肌肉", "知識", "體重", "身高"], ans: 1 },
+                { q: "參與群體活動（如踢足球）可以學習甚麼？[24]", options: ["與人相處", "獨處", "睡覺技巧", "畫畫"], ans: 0 },
+                { q: "繪畫和彈奏樂器可以發揮我們的甚麼？[24]", options: ["體力", "創意", "食量", "速度"], ans: 1 },
+                { q: "時間十分寶貴，我們應該怎樣？[25]", options: ["浪費時間", "好好珍惜", "隨便使用", "全部用來睡覺"], ans: 1 },
+                { q: "編排假日活動時，我們不應該沉迷甚麼？[24]", options: ["閱讀", "電子遊戲", "做運動", "幫忙家務"], ans: 1 },
+                { q: "選擇玩具時，最重要考慮甚麼？[26]", options: ["價錢是否最貴", "玩具是否安全", "包裝是否漂亮", "廣告是否好看"], ans: 1 },
+                { q: "廢紙、塑料瓶可以怎樣處理？[27]", options: ["隨地拋棄", "燒掉", "廢物再用，製作環保玩具", "埋在土裡"], ans: 2 },
+                { q: "玩玩具前，要先閱讀包裝上的甚麼？[25]", options: ["價錢牌", "說明", "圖案", "條碼"], ans: 1 },
+                { q: "力量可以改變物件的甚麼？[27]", options: ["顏色", "重量", "移動方向和形狀", "味道"], ans: 2 },
+                { q: "把玩具車移向自己，是用了甚麼力？[27]", options: ["推力", "拉力", "磁力", "電力"], ans: 1 },
+                { q: "把玩具車移離自己，是用了甚麼力？[27]", options: ["拉力", "推力", "磁力", "電力"], ans: 1 },
+                { q: "磁鐵可以吸引甚麼材質的物件？[27]", options: ["木頭", "塑膠", "部分金屬如鐵", "玻璃"], ans: 2 },
+                { q: "以下哪一項能被磁鐵吸引？[26]", options: ["書本", "毛巾", "曲別針/鐵釘", "原子筆"], ans: 2 },
+                { q: "磁鐵兩端分別是甚麼極？[27]", options: ["東極和西極", "上極和下極", "南極(S)和北極(N)", "左極和右極"], ans: 2 },
+                { q: "乾電池上的「+」代表甚麼？[28]", options: ["負極", "正極", "加號", "沒意思"], ans: 1 },
+                { q: "乾電池上的「-」代表甚麼？[28]", options: ["正極", "負極", "減號", "沒意思"], ans: 1 },
+                { q: "以下哪一項是中國古時流傳至今的玩具？[26]", options: ["機械人", "遙控車", "毽子", "遊戲機"], ans: 2 }
+            ],
+            hard: [
+                { q: "沉迷電子遊戲會對眼睛健康造成甚麼影響？[24]", options: ["視力變好", "近視加深/眼睛疲勞", "不會改變", "看到更遠"], ans: 1 },
+                { q: "選擇餘暇活動時，除了興趣，還要考慮甚麼？[24]", options: ["能力、時間和費用", "天氣", "朋友的衣服", "電視節目"], ans: 0 },
+                { q: "力度的改變會怎樣影響物件的移動？[27]", options: ["力度越大，速度越快", "力度越大，速度越慢", "力度不影響速度", "力度只改變顏色"], ans: 0 },
+                { q: "磁鐵有甚麼科學特性？[27]", options: ["同極相吸，異極相斥", "同極相斥，異極相吸", "不會互相影響", "只會相吸"], ans: 1 },
+                { q: "當兩塊磁鐵的「N極」和「N極」靠近時，會發生甚麼？[27]", options: ["互相吸引", "互相排斥", "黏在一起", "發出聲音"], ans: 1 },
+                { q: "當兩塊磁鐵的「N極」和「S極」靠近時，會發生甚麼？[27]", options: ["互相排斥", "互相吸引", "彈開", "沒有反應"], ans: 1 },
+                { q: "連接兩顆乾電池時，怎樣才能讓電流通過？[28]", options: ["正極連正極", "負極連負極", "正極和負極相連", "隨便放"], ans: 2 },
+                { q: "使用「蓄電池（充電池）」比棄置式乾電池有甚麼好處？[28]", options: ["更貴", "可以重複使用，較環保", "用完即棄", "顏色更美"], ans: 1 },
+                { q: "替充電池充電時，為甚麼需要成人在旁監督？[28]", options: ["因為成人喜歡看", "因為充電過程可能發生危險", "因為成人會收費", "沒有原因"], ans: 1 },
+                { q: "如果安排了太多課餘活動（如一天上四個興趣班），會有甚麼反效果？[29]", options: ["非常開心", "身心疲累，感到壓力", "變得更聰明", "身體更好"], ans: 1 },
+                { q: "怎樣才能改善課餘活動過多的問題？[29]", options: ["增加睡眠時間", "減少活動數量", "不吃飯", "逃學"], ans: 1 },
+                { q: "自製玩具（STEAM）可以訓練我們哪方面的能力？[27]", options: ["跑步速度", "思考和創造力", "說話能力", "唱歌技巧"], ans: 1 },
+                { q: "越靠近磁鐵的南極或北極，磁力會怎樣？[27]", options: ["越小", "越大", "消失", "不變"], ans: 1 },
+                { q: "以下哪種玩具需要使用電池推動？[30]", options: ["七巧板", "泥膠", "遙控飛機", "毽子"], ans: 2 },
+                { q: "以下哪種玩具屬於「益智類」玩具？[30]", options: ["拼圖", "遙控車", "VR眼鏡", "手提遊戲機"], ans: 0 },
+                { q: "與朋友玩玩具時發生爭執，應該怎樣做？[31]", options: ["互相搶奪", "大聲責罵", "互相禮讓，輪流玩", "把玩具弄壞"], ans: 2 },
+                { q: "玩完玩具後，應該養成甚麼好習慣？[31]", options: ["由媽媽收拾", "好好收拾放回原處", "放在地上", "丟掉"], ans: 1 },
+                { q: "在馬路旁玩遙控車是正確的行為嗎？[31]", options: ["正確，地方夠大", "錯誤，容易發生交通意外", "正確，有挑戰性", "沒有規定"], ans: 1 },
+                { q: "把球扔向窗外的行為可能導致甚麼後果？[31]", options: ["打破玻璃或擊中途人", "球彈得更高", "遊戲更好玩", "沒有危險"], ans: 0 },
+                { q: "拆除玩具車上的磁鐵後，車子仍被其他磁鐵吸引，由此推測車子是用甚麼製造的？[32]", options: ["木材", "鐵", "塑膠", "紙皮"], ans: 1 }
+            ]
+        },
+        6: {
+            title: "第六關：我愛社區",
+            intro: "【核心重點】<br>1. 環保自製玩具：利用廢紙、塑料瓶等廢物自製玩具，能實踐環保並發揮科學與創意（STEAM） [7]。<br>2. 力的科學原理：「力」可以使物體移動、改變形狀或速度。使用的力度越大，物體移動的速度越快 [7]。<br>3. 磁鐵的特性：磁鐵能吸引鐵製物件。兩端分為南極（S）和北極（N），同極相斥、異極相吸 [7]。<br>【5個必讀例子】<br>♻️ 例子 1：我們可以收集廢紙、紙包飲品盒或橡皮圈等環保物料來製作好玩的自製玩具 [7]。<br>🏎️ 例子 2：推拉紙盒玩具車時，你推或拉的「力度」越大，玩具車移動的「速度」就越快 [7]。<br>📎 例子 3：磁鐵可以吸引鐵製的物件，例如萬字夾、鐵尺和曲別針，但不能吸引膠尺或紙張 [7]。<br>🧲 例子 4：把兩塊磁鐵「相同」的極（例如北極 N 和北極 N）靠近時，它們會「互相排斥」 [7]。<br>💞 例子 5：把兩塊磁鐵「不同」的極（例如南極 S 和北極 N）靠近時，它們會「互相吸引」 [7]。", 
+            easy: [
+                { q: "香港主要分為哪三個區域？", options: ["香港島、九龍、新界", "長洲、南丫島、大嶼山", "沙田、大埔、粉嶺", "中環、灣仔、銅鑼灣"], ans: 0 },
+                { q: "以下哪一個地方位於九龍區？", options: ["尖沙咀", "沙田", "銅鑼灣", "長洲"], ans: 0 },
+                { q: "我們可以使用甚麼工具來幫助我們辨別方向？", options: ["溫度計", "指南針", "放大鏡", "手錶"], ans: 1 },
+                { q: "在圖書館內，我們應該保持甚麼態度？", options: ["大聲喧嘩", "安靜閱讀", "飲食", "到處奔跑"], ans: 1 },
+                { q: "以下哪一項屬於「康樂文娛」設施？", options: ["醫院", "警察局", "公園", "街市"], ans: 2 },
+                { q: "我們生病時，應該去哪個社區設施求診？", options: ["體育館", "消防局", "醫院/診所", "郵政局"], ans: 2 },
+                { q: "以下哪一項是交通設施？", options: ["港鐵站", "圖書館", "超級市場", "大會堂"], ans: 0 },
+                { q: "發生火警時，我們應該向誰求救？", options: ["警察", "醫生", "消防員", "郵差"], ans: 2 },
+                { q: "如果鄰居小女孩跌倒，你應該怎樣做？", options: ["不理會她", "嘲笑她", "上前扶起她並安慰", "馬上跑走"], ans: 2 },
+                { q: "在走廊遇到鄰居，我們應該怎樣做？", options: ["低頭走過", "主動打招呼", "裝作看不見", "大聲責罵"], ans: 1 },
+                { q: "以下哪一項是愛護社區設施的行為？", options: ["在公園塗鴉", "破壞巴士站", "正確使用康樂設施", "亂拋垃圾"], ans: 2 },
+                { q: "誰負責為我們派遞信件？", options: ["清潔工人", "司機", "郵差", "護士"], ans: 2 },
+                { q: "誰負責維持社會治安，捕捉壞人？", options: ["消防員", "警察", "醫生", "侍應"], ans: 1 },
+                { q: "想買新鮮的蔬菜和肉類，應該去哪裡？", options: ["圖書館", "街市", "體育館", "大會堂"], ans: 1 },
+                { q: "在劇院欣賞話劇時，我們不應該做甚麼？", options: ["保持安靜", "專心欣賞", "講手提電話", "拍手讚賞"], ans: 2 },
+                { q: "社區內有很多為我們服務的人，我們應該對他們有甚麼態度？", options: ["不理睬", "尊重和有禮貌", "命令他們", "隨便指使"], ans: 1 },
+                { q: "當鄰居拿著很多重物時，你可以怎樣幫忙？", options: ["主動替他開門", "把門關上", "在旁邊看", "大聲叫喊"], ans: 0 },
+                { q: "香港中央圖書館位於哪一個區域？", options: ["香港島", "九龍", "新界", "離島"], ans: 0 },
+                { q: "以下哪一項設施是方便市民購物的？", options: ["體育館", "便利店", "醫院", "警察局"], ans: 1 },
+                { q: "在社區中心，我們可以進行甚麼活動？", options: ["買菜", "看病", "參加文化及康樂活動", "搭飛機"], ans: 2 }
+            ],
+            hard: [
+                { q: "指南針平放停止轉動後，指針着色的一端是指向哪一個方向？", options: ["東方", "南方", "西方", "正北方"], ans: 3 },
+                { q: "閱讀地圖時，如果上方標示為北方，地圖的右方是甚麼方向？", options: ["東方", "南方", "西方", "北方"], ans: 0 },
+                { q: "繪畫圖像地圖時，我們除了畫上代表景物的圖像，還必須加上甚麼？", options: ["方向標", "溫度計", "價錢牌", "時鐘"], ans: 0 },
+                { q: "「引路徑」這種設施是專為哪一類有需要人士而設的？", options: ["孕婦", "視障人士", "聽障人士", "長者"], ans: 1 },
+                { q: "「暢通易達洗手間」主要是為了方便誰使用？", options: ["所有人", "殘疾人士 (如輪椅使用者)", "清潔工人", "消防員"], ans: 1 },
+                { q: "如果鄰居經常把雜物放在公眾走廊，我們應該怎樣做？", options: ["幫他丟掉", "有禮貌地勸告鄰居", "把自己的雜物也放出去", "大聲與他吵架"], ans: 1 },
+                { q: "參觀博物館時，為甚麼不能使用閃光燈拍照？", options: ["因為會浪費電力", "以免閃光燈破壞展品", "因為不夠光", "因為相片不美"], ans: 1 },
+                { q: "醫生和護士的主要職責是甚麼？", options: ["救治病人和為傷者檢查", "維持治安", "撲滅火災", "運送貨物"], ans: 0 },
+                { q: "社區內的無障礙設施如果指示不清晰，會導致甚麼後果？", options: ["變得更美觀", "令輪椅使用者不知道位置而無法使用", "節省電力", "沒有影響"], ans: 1 },
+                { q: "遇到緊急情況需要救護車，應該撥打甚麼電話號碼求救？", options: ["999", "112", "119", "992"], ans: 0 },
+                { q: "大會堂、戲院等設施，是為了滿足市民哪方面的需要？", options: ["醫療服務", "健康及文化活動", "交通需要", "購物需要"], ans: 1 },
+                { q: "在體育館借用羽毛球場，我們應該遵守甚麼規則？", options: ["超時使用", "按租用時間，準時離開場地", "在場內飲食", "破壞設施"], ans: 1 },
+                { q: "沙田望夫石屬於香港哪一個區域的景點？", options: ["香港島", "九龍", "新界", "離島"], ans: 2 },
+                { q: "如果大廈發生火警，消防員除了救火，還會做甚麼？", options: ["派信", "拯救被困市民", "清潔街道", "煮飯"], ans: 1 },
+                { q: "哺乳室的設立是為了方便哪一類人士？", options: ["視障人士", "婦女餵哺母乳", "受傷人士", "長者"], ans: 1 },
+                { q: "如果我們在路上迷路，應該使用地圖的哪個部分來幫助辨認方向？", options: ["顏色", "圖例", "方向標", "紙質"], ans: 2 },
+                { q: "以下哪一項不是與鄰居和睦相處的方法？", options: ["分享食物", "互相幫助", "互相禮讓", "佔用公眾地方"], ans: 3 },
+                { q: "警察為了保障市民的安全，會在社區進行甚麼工作？", options: ["舉辦滅罪宣傳活動", "修剪樹木", "售賣食物", "維修電梯"], ans: 0 },
+                { q: "要了解某個商場內店鋪的分佈，我們可以查看甚麼？", options: ["天氣預報", "商場平面圖", "世界地圖", "指南針"], ans: 1 },
+                { q: "在港鐵站內，哪一項設施能協助視障人士前往月台？", options: ["升降機", "引路徑 (地面鋪設觸覺物料)", "扶手電梯", "售票機"], ans: 1 }
+            ]
+        },
+        7: {
+            title: "第七關：郊遊樂",
+            intro: "【核心重點】<br>1. 閱讀地圖：香港分為香港島、九龍和新界。閱讀地圖需利用指南針找出「北、南、西、東」 [8]。<br>2. 社區設施：滿足市民需要，並為有需要人士（如殘疾人士、視障人士）提供專用無障礙設施 [9]。<br>3. 鄰里關係：與鄰居和睦相處，不佔用公眾地方，主動打招呼和幫助有需要的人 [10]。<br>【5個必讀例子】<br>🧭 例子 1：使用指南針時要平放，待指針停止轉動後，指針着色的一端會永遠指向「正北方」 [8]。<br>♿ 例子 2：社區有供輪椅使用的暢通易達洗手間，以及供視障人士使用的觸覺引路徑 [9]。<br>🏛️ 例子 3：使用設施要守規則，例如在圖書館和劇院要保持安靜，不可大聲談話騷擾別人 [9]。<br>🤝 例子 4：遇到鄰居受傷或提着重物時，我們應該主動慰問、幫忙開門，或請家人協助處理 [10]。<br>👮 例子 5：警察負責維持治安，消防員負責滅火救人，救護員負責為傷者急救並送院治理 [10]。", 
+            easy: [
+                { q: "出發郊遊前，我們必須先留意甚麼？", options: ["電視節目", "天氣情況", "超級市場特價", "朋友的衣服"], ans: 1 },
+                { q: "為了有充足體力郊遊，出發前一晚我們應該怎樣？", options: ["通宵打遊戲機", "有充足睡眠", "不吃晚餐", "做劇烈運動"], ans: 1 },
+                { q: "郊遊時，我們應該穿著哪種鞋子？", options: ["拖鞋", "高跟鞋", "涼鞋", "具防滑作用的運動鞋"], ans: 3 },
+                { q: "在郊野公園，我們可以進行甚麼活動？", options: ["遠足和野餐", "打遊戲機", "買衣服", "看電影"], ans: 0 },
+                { q: "郊遊時，我們應該自備甚麼來補充水分？", options: ["海水", "飲用水", "雨水", "泥水"], ans: 1 },
+                { q: "如果下雨，我們可以使用甚麼來擋雨？", options: ["報紙", "雨具 (如雨衣或雨傘)", "樹葉", "毛巾"], ans: 1 },
+                { q: "郊遊時產生的垃圾，我們應該怎樣處理？", options: ["隨地拋棄", "拋進海裡", "自己帶走或放進垃圾箱", "埋在泥土裡"], ans: 2 },
+                { q: "在郊野公園看到美麗的花朵，我們應該怎樣做？", options: ["馬上採摘", "只用眼睛欣賞，不破壞", "踩扁它", "帶回家"], ans: 1 },
+                { q: "為甚麼我們不應該在岩石上塗鴉？", options: ["破壞自然景觀", "會弄髒手", "岩石太硬", "畫得不漂亮"], ans: 0 },
+                { q: "在郊外遇到野生動物（如猴子），我們可以餵牠們嗎？", options: ["可以，牠們很可愛", "不可以，以免牠們失去野外覓食能力", "可以，給牠們吃零食", "只餵一點點"], ans: 1 },
+                { q: "如果在郊外迷路，我們絕對不能怎樣做？", options: ["保持鎮定", "留在原地等候", "擅自離隊亂走", "尋找緊急求助電話"], ans: 2 },
+                { q: "為了防曬，我們可以帶備甚麼物品？", options: ["雨靴", "防曬霜和帽子", "頸巾", "手套"], ans: 1 },
+                { q: "郊野公園是提供給市民作甚麼用途的地方？", options: ["康樂和保育", "居住", "購物", "辦公"], ans: 0 },
+                { q: "在郊外說話時，我們應該注意甚麼？", options: ["盡量大聲叫喊", "降低聲量，避免滋擾野生動物", "用擴音器說話", "唱歌"], ans: 1 },
+                { q: "燒烤完畢後，我們必須怎樣處理火種？", options: ["不理會", "用水撲熄，避免引起山火", "加更多樹枝", "用紙蓋住"], ans: 1 },
+                { q: "在出發郊遊當天早上，我們必須做甚麼來確保有體力？", options: ["吃豐富的早餐", "空肚子出發", "只喝汽水", "馬上睡覺"], ans: 0 },
+                { q: "哪一項物品有助我們在郊外辨別方向？", options: ["指南針", "哨子", "急救箱", "相機"], ans: 0 },
+                { q: "我們在郊野公園的「遊客中心」可以做甚麼？", options: ["買菜", "參觀展覽，了解自然生態", "睡覺", "游泳"], ans: 1 },
+                { q: "如果身體感到不適，我們還適合去郊遊嗎？", options: ["適合，呼吸新鮮空氣會好", "不適合，應該留在家休息", "適合，只要走慢一點", "沒有影響"], ans: 1 },
+                { q: "郊遊時帶備「急救箱」的目的是甚麼？", options: ["用來裝零食", "用來裝垃圾", "受傷時用來護理傷口", "用來聽音樂"], ans: 2 }
+            ],
+            hard: [
+                { q: "郊遊時，為甚麼建議穿著「淺色」的長袖衣物？", options: ["因為比較漂亮", "防止曬傷及被蚊叮蟲咬", "為了保暖", "容易被別人看見"], ans: 1 },
+                { q: "為甚麼我們不應該隨地拋棄垃圾？", options: ["破壞生態環境", "垃圾很重", "垃圾很香", "沒有原因"], ans: 0 },
+                { q: "如果不小心吃了野生有毒植物，會引致甚麼後果？", options: ["變得更健康", "中毒甚至有生命危險", "長得更高", "不會有事"], ans: 1 },
+                { q: "如果手提電話在郊外沒有信號，發生緊急事故時應怎樣求救？", options: ["大哭", "使用郊野公園的緊急求助電話", "放棄求救", "自己跑下山"], ans: 1 },
+                { q: "帶備「哨子」去郊遊有甚麼用途？", options: ["用來唱歌", "迷路或發生意外時吹響求救", "用來逗動物", "用來指揮交通"], ans: 1 },
+                { q: "在郊野公園內，甚麼設施可以標示我們所在的位置，方便求助？", options: ["垃圾箱", "標距柱", "洗手間", "大樹"], ans: 1 },
+                { q: "遇到野生猴子時，除了不餵飼，還要注意甚麼？", options: ["不要走近或嘗試觸摸牠們", "跟牠們拍照", "向牠們扔石頭", "大聲嚇跑牠們"], ans: 0 },
+                { q: "郊遊時，我們應該把自己的行程告訴誰？", options: ["家人或朋友", "警察", "不用告訴任何人", "陌生人"], ans: 0 },
+                { q: "為甚麼我們不可以攀爬岩石？", options: ["會弄髒衣服", "以免跌倒受傷", "岩石會痛", "會被別人罵"], ans: 1 },
+                { q: "「破壞樹木」除了影響植物生長，還違反了甚麼規定？", options: ["《郊野公園條例》", "《交通條例》", "《教育條例》", "《消防條例》"], ans: 0 },
+                { q: "如果天氣突變（例如突然下雷雨），我們應該怎樣做？", options: ["繼續行程", "在樹下避雨", "盡快走到安全的室內地方或提早結束行程", "在空曠地方跑"], ans: 2 },
+                { q: "在溪澗旁邊，為甚麼不應該嬉水？", options: ["水太冷", "以免滑倒，發生意外", "水太淺", "水裡有魚"], ans: 1 },
+                { q: "郊野公園的小賣部主要提供甚麼服務？", options: ["售賣衣服", "提供急救", "售賣食物、飲料供遊人選購", "出租單車"], ans: 2 },
+                { q: "在郊外迷路時，使用指南針配合甚麼工具最能幫助找回正確路線？", options: ["哨子", "地圖", "手電筒", "急救箱"], ans: 1 },
+                { q: "為甚麼我們不應該破壞鳥兒的棲身之所（如鳥巢）？", options: ["因為鳥巢很貴", "這是愛護自然生態和動物的表現", "因為鳥會攻擊我們", "因為樹會倒下"], ans: 1 },
+                { q: "如果夏天去郊遊，除了長袖衣服，衣料還應該具備甚麼特點？", options: ["非常厚", "透氣及有助排汗", "防水", "反光"], ans: 1 },
+                { q: "郊遊時，帶備手電筒有甚麼作用？", options: ["照明或發出求救信號", "用來取暖", "用來照亮太陽", "用來玩遊戲"], ans: 0 },
+                { q: "郊野公園常見的「自然景物」包括甚麼？", options: ["涼亭、指示牌", "花朵、蝴蝶、樹木", "垃圾箱、洗手間", "汽車、高樓"], ans: 1 },
+                { q: "如果在郊外受傷流血，第一步應該怎樣做？", options: ["繼續走路", "使用急救用品護理傷口", "大聲叫", "用水洗"], ans: 1 },
+                { q: "以下哪一個是位於香港島的郊野公園？", options: ["西貢西郊野公園", "龍虎山郊野公園", "清水灣郊野公園", "八仙嶺郊野公園"], ans: 1 }
+            ]
+        },
+        8: {
+            title: "第八關：公眾泳灘",
+            intro: "【核心重點】<br>1. 郊遊準備：出發前留意天文台天氣預報，了解身體狀況，並預先計劃行程 [11]。<br>2. 合適裝備：郊遊應穿淺色長袖衣物防蚊防曬，帶備地圖、指南針、哨子和充足水分 [11]。<br>3. 安全與保育：留意泳灘旗號，愛護自然環境，絕不隨地丟棄垃圾或破壞生態 [12, 13]。<br>【5個必讀例子】<br>👕 例子 1：郊遊時穿着「淺色的長袖上衣和長褲」，可以有效防止被陽光曬傷和蚊叮蟲咬 [11]。<br>🎒 例子 2：背包裡必須準備防曬防蚊用品、飲用水、急救箱、地圖、指南針和雨具 [11]。<br>🆘 例子 3：如果在郊野公園迷路，可以使用流動電話或沿途的「標距柱」和緊急求助電話求救 [11, 12]。<br>🗑️ 例子 4：郊遊時必須自己帶走垃圾，絕對不可餵飼野生動物，也不可在岩石上塗鴉破壞景觀 [12]。<br>🚩 例子 5：當公眾泳灘懸掛紅旗或鯊魚旗時，代表有危險，泳客應立刻離開海面，切勿下水 [13]。", 
+            easy: [
+                { q: "前往公眾泳灘游泳前，第一件要注意的事是甚麼？", options: ["買新泳衣", "留意天氣情況", "吃得很飽", "帶備玩具"], ans: 1 },
+                { q: "在泳灘上，甚麼顏色旗幟代表「有救生員當值」？", options: ["紅旗", "紅黃兩色旗", "鯊魚旗", "黑旗"], ans: 1 },
+                { q: "如果泳灘懸掛「紅旗」，代表甚麼意思？", options: ["海水很暖", "有危險，不可下水，並離開海面", "可以放心游泳", "有鯊魚出沒"], ans: 1 },
+                { q: "如果泳灘懸掛「鯊魚旗」，我們應該怎樣做？", options: ["去尋找鯊魚", "不要下水，並離開海面", "游快一點", "穿上救生衣下水"], ans: 1 },
+                { q: "小孩去公眾泳灘游泳時，必須由誰陪同？", options: ["朋友", "同學", "成人", "自己去"], ans: 2 },
+                { q: "公眾泳灘的「防鯊網」有甚麼作用？", options: ["用來捉魚", "防止鯊魚入侵，確保泳客安全", "用來掛衣服", "讓泳客休息"], ans: 1 },
+                { q: "在海面上的「浮台」有甚麼用途？", options: ["用來跳水", "供泳客在海面上稍作休息", "用來停泊船隻", "用來釣魚"], ans: 1 },
+                { q: "游泳後，我們可以在哪裡更換衣服？", options: ["沙灘上", "海裡", "更衣室", "小食亭"], ans: 2 },
+                { q: "淋浴設施的用途是甚麼？", options: ["供泳客沖洗身體", "供人喝水", "用來洗衣服", "用來洗車"], ans: 0 },
+                { q: "在沙灘上，我們絕對不可以做甚麼？", options: ["堆沙堡", "隨地拋棄垃圾", "塗防曬霜", "在太陽傘下休息"], ans: 1 },
+                { q: "我們在海灘見到寄居蟹，應該怎樣做？", options: ["帶回家養", "用腳踐踏", "只作觀賞，不觸摸和不帶走", "放進水樽"], ans: 2 },
+                { q: "游泳前，我們必須先做甚麼？", options: ["吃飯", "熱身運動", "喝冰水", "睡覺"], ans: 1 },
+                { q: "游泳時如果不聽從救生員的指示，容易發生甚麼？", options: ["意外", "變聰明", "游得更快", "贏得比賽"], ans: 0 },
+                { q: "如果在游泳時感到不適，應該怎樣做？", options: ["繼續游", "馬上潛入水中", "立刻上岸休息並尋求協助", "喝海水"], ans: 2 },
+                { q: "以下哪一項是不必要的泳灘用品？", options: ["毛巾", "防曬霜", "厚外套", "替換衣物"], ans: 2 },
+                { q: "「太陽傘和沙灘椅」有甚麼用途？", options: ["供遊客休息和曬太陽", "用來擋雨", "用來捉魚", "用來裝飾"], ans: 0 },
+                { q: "泳灘上的「垃圾箱」是用來做甚麼的？", options: ["收集泳客的垃圾，保持環境清潔", "用來藏東西", "用來裝海水", "沒有用"], ans: 0 },
+                { q: "在泳灘上奔跑或追逐是正確的行為嗎？", options: ["正確，很開心", "錯誤，容易撞倒他人或自己跌倒", "正確，可以熱身", "無所謂"], ans: 1 },
+                { q: "我們應該把垃圾棄置在哪裡？", options: ["海裡", "沙灘上", "垃圾箱", "洗手間地上"], ans: 2 },
+                { q: "甚麼人不適合前往泳灘游泳？", options: ["身體不適的人", "健康的人", "會游泳的人", "有成人陪同的小孩"], ans: 0 }
+            ],
+            hard: [
+                { q: "為甚麼我們必須在「防鯊網」的範圍內游泳？", options: ["網外水太清", "範圍外可能有鯊魚出沒或其他水上活動進行，容易受傷", "網外沒有水", "網內有寶藏"], ans: 1 },
+                { q: "如果把垃圾沖到大海後，海洋生物不慎吃下，會導致甚麼嚴重後果？", options: ["牠們會變飽", "可能中毒或死亡", "牠們會長大", "沒有影響"], ans: 1 },
+                { q: "人類吃下體內積聚毒素的海洋生物後，會對健康有甚麼影響？", options: ["變得更強壯", "有損健康", "沒有感覺", "治百病"], ans: 1 },
+                { q: "為甚麼在沒有救生員當值的泳灘游泳十分危險？", options: ["因為水特別冷", "一旦發生意外，得不到救援，有性命危險", "因為沒有人看著", "因為不夠熱鬧"], ans: 1 },
+                { q: "天氣突然變壞（如打雷），泳灘通常會掛起甚麼旗幟？", options: ["紅黃旗", "綠旗", "紅旗", "藍旗"], ans: 2 },
+                { q: "「高齡泳客」下水前，為確保安全，最理想是先進行甚麼？", options: ["身體檢查", "買新泳衣", "吃大餐", "跑步"], ans: 0 },
+                { q: "為甚麼我們不應該在沙灘上揭開石塊尋找海洋生物？", options: ["石頭太重", "會破壞海洋生物的棲息地", "石頭很髒", "會弄壞指甲"], ans: 1 },
+                { q: "如果帶備了浮板等「輔助浮物」，就可以不用成人陪同游泳嗎？", options: ["可以", "不可以，小孩必須由成人陪同", "在淺水區可以", "有救生員就可以"], ans: 1 },
+                { q: "參加「清潔海灘活動」有甚麼意義？", options: ["可以賺錢", "愛護海洋環境，保護生態", "可以認識名人", "可以游泳免費"], ans: 1 },
+                { q: "在浮台上「跳水」是安全的行為嗎？", options: ["安全", "危險，容易撞到水底或他人引致受傷", "安全，只要水夠深", "很好玩"], ans: 1 },
+                { q: "剛吃飽後，為甚麼不宜立刻下水游泳？", options: ["會沉下去", "影響消化，容易引起胃部不適", "游得太快", "容易肚餓"], ans: 1 },
+                { q: "把防曬用品塗在皮膚上，主要是為了防止甚麼？", options: ["被水母刺傷", "猛烈陽光曬傷皮膚", "皮膚變白", "鯊魚咬"], ans: 1 },
+                { q: "如果在海灘發現受傷的海洋生物（如海龜），應該怎樣做？", options: ["帶回家", "通知救生員或相關部門處理", "放進垃圾箱", "用棍子戳牠"], ans: 1 },
+                { q: "以下哪一個是香港著名的公眾泳灘？", options: ["維多利亞港", "淺水灣泳灘", "城門水塘", "香港仔避風塘"], ans: 1 },
+                { q: "公眾泳灘的急救站有甚麼用途？", options: ["賣零食", "為受傷或不適的遊人提供急救服務", "出租泳圈", "存放失物"], ans: 1 },
+                { q: "為甚麼不能把防鯊網當作玩具來攀爬？", options: ["會弄壞防鯊網，且容易割傷", "會被鯊魚吃掉", "防鯊網很貴", "沒有原因"], ans: 0 },
+                { q: "在泳灘聽收音機時，為甚麼要把聲量調低？", options: ["省電", "避免發出噪音，滋擾其他泳客", "怕收音機壞", "怕吵醒鯊魚"], ans: 1 },
+                { q: "公眾泳灘和海岸公園有甚麼分別？", options: ["完全一樣", "泳灘主要供人游泳；海岸公園主要為保育海洋生物", "海岸公園可以燒烤", "泳灘沒有救生員"], ans: 1 },
+                { q: "如果看見有人遇溺，作為小朋友應該怎樣做？", options: ["自己跳下水救人", "大聲呼救，通知救生員或成年人", "裝作看不見", "馬上回家"], ans: 1 },
+                { q: "為甚麼不應該把玻璃樽帶到沙灘？", options: ["太重", "打破後玻璃碎會嚴重割傷泳客", "不能裝水", "太反光"], ans: 1 }
+            ]
+        },
+        9: {
+            title: "第九關：中國歷史與發明",
+            intro: "【核心重點】<br>1. 歷史人物：炎帝和黃帝是中華民族的祖先。秦始皇是中國第一個皇帝；孫中山帶領革命結束帝制。<br>2. 國家的象徵：1949年10月1日中華人民共和國成立。國旗是五星紅旗，國歌是《義勇軍進行曲》。<br>3. 四大發明：造紙術(蔡倫改良)、活字印刷術(畢昇)、火藥、指南針，對世界文化傳播貢獻極大。<br>【5個必讀例子】<br>🇨🇳 例子 1：升國旗和奏國歌時，我們必須保持嚴肅和莊重的態度，面向國旗肅立，不可與別人交談。<br>🧭 例子 2：中國人很早就發明了辨別方向的工具，例如指南針和指南車，大大促進了世界航海事業發展。<br>🩺 例子 3：名醫扁鵲確立了中醫「望、聞、問、切」四種診斷方法，其中「切」是指替病人把脈。<br>📜 例子 4：在蔡倫改良造紙術前，古人要把文字記錄在非常昂貴且笨重的甲骨和竹簡上。<br>🪚 例子 5：被尊稱為「工匠祖師」的魯班受到野草邊緣啟發發明了鐵鋸；他發明的「榫卯技術」不需用釘子就能接合木材。",
+            easy: [
+                { q: "相傳哪兩位是中華民族的祖先？", options: ["炎帝和黃帝", "秦始皇", "孫中山", "毛澤東"], ans: 0 },
+                { q: "所以中國人常常自稱為甚麼？", options: ["龍的傳人", "炎黃子孫", "華人", "漢人"], ans: 1 },
+                { q: "中國第一個朝代是甚麼？", options: ["夏朝", "秦朝", "清朝", "唐朝"], ans: 0 },
+                { q: "中國第一個皇帝是誰？", options: ["大禹", "秦始皇", "孫中山", "黃帝"], ans: 1 },
+                { q: "秦始皇為了抵抗外族入侵，下令修築了甚麼偉大建築？", options: ["故宮", "長城", "兵馬俑", "圓明園"], ans: 1 },
+                { q: "中華人民共和國在哪一年宣告成立？", options: ["1911年", "1949年", "1997年", "2000年"], ans: 1 },
+                { q: "中華人民共和國的國慶日是哪一天？", options: ["1月1日", "7月1日", "10月1日", "12月25日"], ans: 2 },
+                { q: "中國國旗是甚麼顏色作底色的？", options: ["藍色", "黃色", "紅色", "綠色"], ans: 2 },
+                { q: "中國國旗的左上方有多少顆星？", options: ["三顆", "四顆", "五顆", "六顆"], ans: 2 },
+                { q: "中國國旗上的紅色象徵甚麼？", options: ["光明", "大地", "革命", "血液"], ans: 2 },
+                { q: "中華人民共和國國歌的名稱是甚麼？", options: ["東方紅", "義勇軍進行曲", "黃河大合唱", "歌唱祖國"], ans: 1 },
+                { q: "升國旗、奏國歌時，我們應該保持甚麼態度？", options: ["隨便談笑", "嚴肅和莊重", "大聲歡呼", "坐著不動"], ans: 1 },
+                { q: "以下哪一項是中國古代的「四大發明」之一？", options: ["電燈", "電話", "造紙術", "飛機"], ans: 2 },
+                { q: "誰改良了造紙術，製造出便宜和輕便的紙張？", options: ["畢昇", "蔡倫", "張衡", "魯班"], ans: 1 },
+                { q: "誰發明了「活字印刷術」？", options: ["蔡倫", "畢昇", "魯班", "扁鵲"], ans: 1 },
+                { q: "古代道士煉丹時，意外發明了甚麼？", options: ["指南針", "火藥", "紙張", "指南車"], ans: 1 },
+                { q: "火藥可以用來製作甚麼供人觀賞？", options: ["煙花", "圖畫", "衣服", "書籍"], ans: 0 },
+                { q: "指南針主要用來幫助人們辨別甚麼？", options: ["時間", "天氣", "方向", "溫度"], ans: 2 },
+                { q: "相傳指南車是由誰發明的？", options: ["黃帝", "炎帝", "秦始皇", "大禹"], ans: 0 },
+                { q: "中國的四大發明對世界有甚麼影響？", options: ["沒有影響", "令世界退步", "促進了世界的文化和知識傳播", "只在中國有用"], ans: 2 }
+            ],
+            hard: [
+                { q: "大禹因為治水有功，死後他的兒子啟成為首領，建立的朝代是？", options: ["商朝", "周朝", "夏朝", "秦朝"], ans: 2 },
+                { q: "是誰帶領革命，結束了中國最後一個朝代（清朝）的帝制時代？", options: ["毛澤東", "孫中山", "秦始皇", "溥儀"], ans: 1 },
+                { q: "1949年10月1日，誰在北京天安門宣告中華人民共和國成立？", options: ["孫中山", "毛澤東", "周恩來", "鄧小平"], ans: 1 },
+                { q: "國徽中間有五星照耀下的甚麼建築物圖案？", options: ["長城", "天安門", "故宮", "黃鶴樓"], ans: 1 },
+                { q: "在發明紙張之前，古人主要把文字刻在哪裡？（又重又昂貴）", options: ["樹葉上", "甲骨和竹簡上", "布匹上", "石頭上"], ans: 1 },
+                { q: "「活字印刷術」比起舊有的「雕版印刷」有甚麼優點？", options: ["刻錯字不需要重新雕刻整塊版，可以拆出膠泥字粒重用", "印出來有顏色", "不用墨水", "紙張不會破"], ans: 0 },
+                { q: "指南針的發明，大大促進了世界哪一個事業的發展？", options: ["農業", "航海事業", "建築業", "醫學"], ans: 1 },
+                { q: "被後世尊稱為「工匠祖師」的是誰？", options: ["張衡", "扁鵲", "魯班", "蔡倫"], ans: 2 },
+                { q: "魯班受到野草邊緣的啟發，發明了甚麼工具？", options: ["鐵鎚", "鐵鋸", "剪刀", "斧頭"], ans: 1 },
+                { q: "魯班發明的「榫卯技術」有甚麼特別之處？", options: ["不需要使用釘子就能接合木材", "用膠水黏合", "用鐵絲綁緊", "用火燒接合"], ans: 0 },
+                { q: "確立中醫「望、聞、問、切」四診斷方法的是誰？", options: ["華佗", "李時珍", "扁鵲", "張仲景"], ans: 2 },
+                { q: "中醫「四診」中的「切」是指甚麼？", options: ["切藥材", "替病人把脈", "做手術", "針灸"], ans: 1 },
+                { q: "張衡發明了「地動儀」，它的功用是甚麼？", options: ["觀察天象", "偵測地震方向", "預測天氣", "量度時間"], ans: 1 },
+                { q: "張衡發明的「渾天儀」是用來做甚麼的？", options: ["偵測地震", "觀察天象", "辨別方向", "計算數學"], ans: 1 },
+                { q: "以下哪一項歷史事件發生的時間最晚（最後發生）？", options: ["黃帝打敗蚩尤", "建立夏朝", "秦始皇統一中國", "中華人民共和國成立"], ans: 3 },
+                { q: "以下哪一項不是培養「發明家精神」的正確態度？", options: ["不怕困難", "勇於嘗試和創新", "對身邊事物漠不關心", "多觀察和具探究精神"], ans: 2 },
+                { q: "炎黃時期，先民懂得用甚麼來編織出輕而滑的布料做衣服？", options: ["棉花", "蠶絲", "羊毛", "麻布"], ans: 1 },
+                { q: "在國際運動比賽的頒獎禮上，如果中國運動員獲得金牌，會進行甚麼儀式？", options: ["放煙花", "升國旗，奏國歌", "跳舞", "大合唱"], ans: 1 },
+                { q: "火藥如果應用在軍事上，製造武器，會帶來甚麼負面影響？", options: ["促進世界和平", "危害人類的生命", "讓人變聰明", "保護環境"], ans: 1 },
+                { q: "下列哪一項關於中國四大發明的配對是正確的？", options: ["蔡倫 - 指南針", "畢昇 - 火藥", "蔡倫 - 改良造紙術", "魯班 - 活字印刷術"], ans: 2 }
+            ]
+        }
+    };
+
+    let currentLevel = 1;
+    let gameQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = []; 
+    let currentSessionScore = 0; 
+    
+    window.onload = function() {
+        renderLevelButtons();
+    };
+
+    function renderLevelButtons() {
+        const btnContainer = document.getElementById('level-buttons');
+        btnContainer.innerHTML = ''; 
+        const colors = ['#FF5722', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#00BCD4', '#E91E63', '#8BC34A', '#FF9800'];
+        const emojis = ['🍎', '🏃', '🌱', '☀️', '🎮', '🏘️', '🏕️', '🏖️', '📜'];
+        let highScores = JSON.parse(localStorage.getItem('teacherCatHighScores')) || {};
+
+        for (let i = 1; i <= 9; i++) {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.style.backgroundColor = colors[i-1];
+            
+            let titleText = levelData[i] ? levelData[i].title.split('：') : ["", "關卡建置中"];
+            
+            let score = highScores[i] !== undefined ? highScores[i] : 0;
+            let scoreHtml = '';
+            if (score === 20) {
+                scoreHtml = `<div class="level-score-text score-perfect">🌟🌟🌟 滿分</div>`;
+            } else if (score >= 10) {
+                scoreHtml = `<div class="level-score-text score-pass">⭐⭐ 合格 (${score}分)</div>`;
+            } else if (score > 0) {
+                scoreHtml = `<div class="level-score-text">最高分: ${score} / 20</div>`;
+            } else {
+                scoreHtml = `<div class="level-score-text score-none">(尚未挑戰)</div>`;
+            }
+            
+            btn.innerHTML = `
+                <div class="level-title-text">${emojis[i-1]} 第 ${i} 關</div>
+                <div class="level-theme-text">${titleText[titleText.length - 1]}</div>
+                ${scoreHtml}
+            `;
+            btn.onclick = () => selectLevel(i);
+            btnContainer.appendChild(btn);
+        }
+    }
+
+    function speakText(text) {
+        window.speechSynthesis.cancel();
+        const cleanText = text.replace(/<[^>]*>?/gm, ''); 
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'zh-HK'; utterance.rate = 1.1; 
+        window.speechSynthesis.speak(utterance);
+    }
+    function speakCurrentQuestion() { speakText(gameQuestions[currentQuestionIndex].q); }
+
+    function shuffleArray(array) { return [...array].sort(() => Math.random() - 0.5); }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        document.getElementById('hint-box').style.display = 'none';
+        
+        if(screenId === 'home-screen') {
+            renderLevelButtons();
+        }
+    }
+
+    function renderIntroWithAudio(containerId, introHtml) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const parts = introHtml.split('<br>');
+        parts.forEach(part => {
+            if(part.trim() === '') return;
+            let row = document.createElement('div');
+            row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '10px'; row.style.marginBottom = '12px';
+            
+            let btn = document.createElement('button');
+            btn.className = 'audio-btn'; btn.innerText = '🔊';
+            btn.onclick = () => speakText(part);
+            
+            let txt = document.createElement('div');
+            txt.innerHTML = part;
+            
+            row.appendChild(btn); row.appendChild(txt);
+            container.appendChild(row);
+        });
+    }
+
+    function clearProgress() {
+        if(confirm("確定要清除所有關卡的星星和成績記錄嗎？")) {
+            localStorage.removeItem('teacherCatHighScores'); 
+            renderLevelButtons(); 
+            alert("成績已全部清除！重新開始挑戰吧！");
+        }
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function selectLevel(level) {
+        currentLevel = level;
+        if(!levelData[level] || !levelData[level].easy) { alert("題庫尚未載入！老師稍後會補上喔！"); return; }
+        document.getElementById('intro-title').innerText = levelData[level].title + " - 課前預習";
+        renderIntroWithAudio('intro-text-container', levelData[level].intro);
+        showScreen('intro-screen');
+    }
+
+    function startQuiz() {
+        const easyPool = levelData[currentLevel].easy || [];
+        const hardPool = levelData[currentLevel].hard || [];
+        
+        if(easyPool.length === 0 || hardPool.length === 0) {
+            alert("這關的題目還沒準備好喔，請先玩其他關卡！");
+            return;
+        }
+
+        gameQuestions = shuffleArray(easyPool).slice(0, 10).concat(shuffleArray(hardPool).slice(0, 10));
+        
+        userAnswers = new Array(gameQuestions.length).fill(null);
+        currentSessionScore = 0;
+        currentQuestionIndex = 0;
+        
+        showScreen('quiz-screen');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const qData = gameQuestions[currentQuestionIndex];
+        document.getElementById('quiz-progress').innerText = `第 ${currentQuestionIndex + 1} 題 / 共 ${gameQuestions.length} 題`;
+        document.getElementById('question-text').innerText = qData.q;
+        
+        document.getElementById('hint-box').style.display = 'none';
+        
+        const optsContainer = document.getElementById('options-container');
+        optsContainer.innerHTML = '';
+        
+        qData.options.forEach((opt, index) => {
+            let row = document.createElement('div'); row.className = 'option-row';
+            
+            let audioBtn = document.createElement('button');
+            audioBtn.className = 'audio-btn'; audioBtn.innerText = '🔊';
+            audioBtn.onclick = (e) => { e.stopPropagation(); speakText(opt); };
+            
+            let btn = document.createElement('button');
+            btn.className = 'option-btn'; btn.innerText = opt;
+            
+            if (userAnswers[currentQuestionIndex] === "correct" || userAnswers[currentQuestionIndex] === "skipped") {
+                btn.disabled = true;
+                if (index === qData.ans) btn.style.backgroundColor = '#4caf50'; 
+            } else {
+                btn.onclick = () => checkAnswer(index, btn);
+            }
+            
+            row.appendChild(audioBtn); row.appendChild(btn);
+            optsContainer.appendChild(row);
+        });
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        const qData = gameQuestions[currentQuestionIndex];
+        
+        if (selectedIndex === qData.ans) {
+            userAnswers[currentQuestionIndex] = "correct";
+            btnElement.style.backgroundColor = '#4caf50';
+            
+            const buttons = document.querySelectorAll('#options-container .option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            triggerExaggeratedEffect();
+            
+            // 答對後自動跳轉到下一題
+            setTimeout(() => { autoNextQuestion(); }, 1000);
+        } else {
+            btnElement.style.backgroundColor = '#f44336';
+            btnElement.disabled = true; 
+            
+            document.querySelector('.container').style.animation = "shake 0.5s";
+            setTimeout(() => document.querySelector('.container').style.animation = "", 500);
+            
+            speakText("哎呀，不對喔！看看提示再試一次吧！");
+            
+            renderIntroWithAudio('hint-text-container', levelData[currentLevel].intro);
+            document.getElementById('hint-box').style.display = 'block';
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion();
+        } else {
+            speakText("這已經是第一題囉！");
+        }
+    }
+
+    function nextQuestion() {
+        if (userAnswers[currentQuestionIndex] === null) {
+            userAnswers[currentQuestionIndex] = "skipped";
+        }
+        autoNextQuestion();
+    }
+    
+    function autoNextQuestion() {
+        if (currentQuestionIndex < gameQuestions.length - 1) { 
+            currentQuestionIndex++; 
+            renderQuestion(); 
+        } else { 
+            showResult(); 
+        }
+    }
+
+    function triggerExaggeratedEffect() {
+        speakText("哇！你太棒了！答對啦！");
+        const effect = document.getElementById('correct-effect');
+        effect.style.display = 'flex';
+        setTimeout(() => { effect.style.display = 'none'; }, 2000);
+    }
+
+    function updateScoreDisplay() {
+        document.getElementById('final-score').innerText = `最終得分: ${currentSessionScore} / ${gameQuestions.length}`;
+        
+        let highScores = JSON.parse(localStorage.getItem('teacherCatHighScores')) || {};
+        let oldScore = highScores[currentLevel] || 0;
+        
+        if (currentSessionScore > oldScore) {
+            highScores[currentLevel] = currentSessionScore;
+            localStorage.setItem('teacherCatHighScores', JSON.stringify(highScores));
+            if(currentSessionScore === 20) speakText("滿分！你太厲害了，打破了最高分記錄！");
+            else speakText("恭喜你！創造了新的高分記錄！");
+        }
+        renderLevelButtons();
+    }
+
+    function showResult() {
+        currentSessionScore = 0;
+        const summaryContainer = document.getElementById('summary-container');
+        summaryContainer.innerHTML = '';
+
+        gameQuestions.forEach((q, idx) => {
+            const isCorrect = (userAnswers[idx] === "correct");
+            if(isCorrect) currentSessionScore++;
+            
+            let item = document.createElement('div');
+            item.className = 'summary-item';
+            let qText = `<span>${idx + 1}. ${q.q} ${isCorrect ? '✅' : '❌'}</span>`;
+            
+            if (!isCorrect) {
+                qText += `<button class="retry-btn" onclick="openRetryModal(${idx})">點擊重做</button>`;
+            }
+            item.innerHTML = qText;
+            summaryContainer.appendChild(item);
+        });
+
+        updateScoreDisplay();
+        showScreen('result-screen');
+    }
+
+    let retryIndex = -1;
+    function openRetryModal(idx) {
+        retryIndex = idx;
+        const qData = gameQuestions[idx];
+        document.getElementById('retry-modal').style.display = 'block';
+        document.getElementById('retry-question-text').innerText = qData.q;
+        document.getElementById('retry-q-audio').onclick = () => speakText(qData.q);
+        
+        renderIntroWithAudio('retry-hint-text-container', levelData[currentLevel].intro);
+        
+        const optsContainer = document.getElementById('retry-options-container');
+        optsContainer.innerHTML = '';
+        
+        qData.options.forEach((opt, index) => {
+            let row = document.createElement('div'); row.className = 'option-row';
+            
+            let audioBtn = document.createElement('button');
+            audioBtn.className = 'audio-btn'; audioBtn.innerText = '🔊';
+            audioBtn.onclick = (e) => { e.stopPropagation(); speakText(opt); };
+            
+            let btn = document.createElement('button');
+            btn.className = 'option-btn'; btn.innerText = opt;
+            btn.onclick = () => checkRetryAnswer(index, btn);
+            
+            row.appendChild(audioBtn); row.appendChild(btn);
+            optsContainer.appendChild(row);
+        });
+    }
+
+    function checkRetryAnswer(selectedIndex, btnElement) {
+        const qData = gameQuestions[retryIndex];
+        if (selectedIndex === qData.ans) {
+            btnElement.style.backgroundColor = '#4caf50';
+            triggerExaggeratedEffect();
+            
+            currentSessionScore++;
+            updateScoreDisplay(); 
+            
+            setTimeout(() => {
+                closeModal('retry-modal');
+                document.getElementsByClassName('summary-item')[retryIndex].innerHTML = `<span>${retryIndex + 1}. ${qData.q} 🔄 (已補回分數!)</span>`;
+            }, 2000);
+        } else {
+            btnElement.style.backgroundColor = '#f44336';
+            speakText("還是不對喔，仔細聽聽提示！");
+            document.getElementById('retry-modal').style.animation = "shake 0.5s";
+            setTimeout(() => document.getElementById('retry-modal').style.animation = "", 500);
+        }
+    }
+</script>
+
+</body>
+</html>
