@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Cat 的快樂AI教室 - 小二上文法大挑戰</title>
+    <style>
+        /* 🌈 童趣鮮豔漸層背景 */
+        body { 
+            font-family: 'Comic Sans MS', 'PingFang HK', sans-serif; 
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            background-attachment: fixed;
+            color: #333; text-align: center; margin: 0; 
+            padding: 20px; 
+        }
+        
+        /* 🌟 立體藝術字體標題 */
+        h1 { 
+            color: #ff4081; 
+            font-size: 3.2em; 
+            text-shadow: 3px 3px 0px #ffe082, 5px 5px 0px #ffb300, -2px -2px 0px #fff; 
+            margin-top: 50px; 
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        
+        /* Logo & Stars */
+        .logo { position: absolute; top: 15px; left: 15px; width: 90px; height: 90px; border-radius: 50%; border: 5px solid #ff4081; object-fit: cover; background-color: white; z-index: 100; box-shadow: 0 6px 12px rgba(0,0,0,0.3);}
+        .star-record { position: absolute; top: 20px; right: 20px; background: linear-gradient(to right, #fff9c4, #ffe082); border: 4px solid #ffb300; padding: 10px 20px; border-radius: 30px; font-size: 1.5em; font-weight: bold; color: #d84315; box-shadow: 0 6px 12px rgba(0,0,0,0.2); z-index: 100;}
+        
+        .container { max-width: 850px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 30px; box-shadow: 0 15px 25px rgba(0,0,0,0.2); position: relative; margin-bottom: 20px; border: 5px solid #fff;}
+        
+        /* 🍬 3D 糖果關卡按鈕 */
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .level-btn { 
+            background: linear-gradient(180deg, #42a5f5, #1e88e5); color: white; border: 4px solid #bbdefb; 
+            padding: 20px; font-size: 1.2em; border-radius: 25px; cursor: pointer; transition: all 0.1s ease-in-out; 
+            font-weight: bold; box-shadow: 0 8px 0 #0d47a1, 0 15px 20px rgba(0,0,0,0.2); text-shadow: 1px 1px 3px rgba(0,0,0,0.5); line-height: 1.4;
+        }
+        .level-btn:hover { background: linear-gradient(180deg, #64b5f6, #2196f3); transform: translateY(2px); box-shadow: 0 6px 0 #0d47a1, 0 12px 15px rgba(0,0,0,0.2); }
+        .level-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #0d47a1, 0 4px 6px rgba(0,0,0,0.2); }
+        .level-score-text { font-size: 0.85em; color: #fff9c4; font-weight: normal; display: block; margin-top: 8px; text-shadow: none; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 10px;}
+        
+        .nav-buttons { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 30px; border-top: 3px dashed #ccc; padding-top: 20px; }
+        .nav-btn { background-color: #9e9e9e; color: white; border: none; padding: 12px 25px; font-size: 1.2em; border-radius: 15px; cursor: pointer; box-shadow: 0 4px 0 #616161; transition: 0.1s;}
+        .nav-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #616161; }
+        .nav-btn.next { background-color: #ff4081; box-shadow: 0 4px 0 #c2185b; font-weight: bold;}
+        .nav-btn.next:active { box-shadow: 0 0 0 #c2185b; }
+        
+        /* 超大開始按鈕 */
+        .btn-start-huge { background: linear-gradient(135deg, #ff4081, #d81b60); color: white; font-size: 2.2em; font-weight: bold; padding: 20px 50px; border-radius: 50px; border: 5px solid #f8bbd0; cursor: pointer; transition: all 0.1s; box-shadow: 0 10px 0 #880e4f, 0 15px 25px rgba(255, 64, 129, 0.4); margin-top: 20px; margin-bottom: 20px;}
+        .btn-start-huge:active { transform: translateY(10px); box-shadow: 0 0 0 #880e4f, 0 5px 10px rgba(255, 64, 129, 0.4); }
+        
+        /* 遊戲區域 */
+        .question-box { font-size: 1.8em; margin: 20px 0; color: #00695c; display: flex; align-items: center; justify-content: center; gap: 15px; font-weight: bold; text-align: left; }
+        .options-grid { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .option-row { display: flex; align-items: center; gap: 15px; width: 100%; max-width: 450px; }
+        .option-btn { flex-grow: 1; background: linear-gradient(180deg, #81c784, #4caf50); color: white; border: 3px solid #c8e6c9; padding: 18px; font-size: 1.4em; border-radius: 15px; cursor: pointer; transition: 0.1s; box-shadow: 0 6px 0 #2e7d32; font-weight: bold;}
+        .option-btn.correct { background: linear-gradient(180deg, #ffb300, #ff9800) !important; border-color: #fff9c4; box-shadow: 0 0 20px #ff9800 !important; }
+        .option-btn.wrong { background: linear-gradient(180deg, #ef5350, #e53935) !important; border-color: #ffcdd2; }
+        
+        .btn-play { background: #ff9800; color: white; border: 3px solid #fff; border-radius: 50%; width: 60px; height: 60px; font-size: 1.8em; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 0 #f57f17; transition: 0.1s;}
+        .btn-play-small { background: #4fc3f7; width: 45px; height: 45px; font-size: 1.3em; border-radius: 50%; border: 2px solid #fff; color: white; cursor: pointer; box-shadow: 0 3px 0 #0288d1; transition: 0.1s;}
+        .btn-play-small:active { transform: translateY(3px); box-shadow: 0 0 0 #0288d1; }
+        
+        /* 提示 & 清除按鈕 */
+        .hint-box { background-color: #fff9c4; border: 4px dashed #ffb300; padding: 25px; border-radius: 20px; text-align: left; margin-top: 20px; font-size: 1.2em; animation: fadeIn 0.5s; box-shadow: inset 0 0 10px rgba(255, 179, 0, 0.2); }
+        .btn-clear { background-color: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 15px; cursor: pointer; font-size: 1.1em; box-shadow: 0 4px 0 #b71c1c; font-weight: bold; margin-bottom: 20px;}
+        
+        /* 結算與重試浮窗 */
+        .summary-list { text-align: left; max-height: 400px; overflow-y: auto; margin-top: 20px; border: 2px solid #e0e0e0; padding: 15px; border-radius: 15px; background: #fafafa;}
+        .summary-item { padding: 15px; border-bottom: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; border-radius: 10px; margin-bottom: 10px;}
+        .summary-item.wrong-item { background-color: #ffebee; border-left: 5px solid #f44336;}
+        .summary-item.correct-item { background-color: #e8f5e9; border-left: 5px solid #4caf50;}
+        .btn-retry { background-color: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #b71c1c;}
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;}
+        .modal-content { background: #fffde7; padding: 40px; border-radius: 30px; width: 90%; max-width: 650px; position: relative; border: 5px solid #ffb300; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+        .close-btn { position: absolute; top: -15px; right: -15px; font-size: 2em; cursor: pointer; background: #fff; border: 4px solid #d32f2f; color: #d32f2f; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3);}
+        
+        /* 特效 */
+        #fxLayer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 18em; opacity: 0; transition: opacity 0.3s; }
+        @keyframes pop { 0% {transform: scale(0.1) rotate(-20deg);} 50% {transform: scale(1.5) rotate(10deg);} 100% {transform: scale(1) rotate(0deg);} }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+        .show-fx { animation: pop 1s ease-out; opacity: 1 !important; }
+        .hidden { display: none !important; }
+        
+        /* 大冒險按鈕 */
+        .btn-adventure { display: inline-block; background: linear-gradient(180deg, #4caf50, #2e7d32); color: white; font-size: 1.6em; font-weight: bold; padding: 20px 40px; text-decoration: none; border-radius: 30px; margin-top: 30px; box-shadow: 0 8px 0 #1b5e20, 0 15px 20px rgba(0,0,0,0.3); border: 3px solid #a5d6a7;}
+        
+        /* 置底聯絡欄 */
+        .footer { margin: 40px auto 0 auto; max-width: 850px; background: linear-gradient(90deg, #ff4081, #e91e63); color: white; text-align: center; padding: 25px; font-size: 1.1em; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: 5px solid #f8bbd0;}
+        .footer a { color: #fff9c4; text-decoration: none; margin: 0 10px; font-weight: bold; display: inline-block; padding: 5px;}
+    </style>
+</head>
+<body>
+
+<img src="cat.jpeg" alt="Teacher Cat" class="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1864/1864514.png'">
+<div class="star-record">⭐ 星星: <span id="starCount">0</span></div>
+<div id="fxLayer"></div>
+
+<!-- ================= 首頁選單 ================= -->
+<div class="container" id="mainMenu">
+    <h1>🚀 小二上文法大挑戰 🚀</h1>
+    <p style="font-size: 1.3em; font-weight: bold; color: #555;">準備好挑戰了嗎？每關將隨機抽出題目，加油賺取大星星吧！</p>
+    
+    <button class="btn-clear" onclick="clearRecord()">🗑️ 清除所有闖關紀錄</button>
+    
+    <div class="level-grid" id="levelContainer"></div>
+    
+    <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-adventure">🌟 返回小朋友學習大冒險 🌟</a>
+</div>
+
+<!-- ================= 課前預習頁面 ================= -->
+<div class="container hidden" id="teachingScreen">
+    <h2 id="teachTitle" style="color: #e91e63; font-size: 2.2em; border-bottom: 3px dashed #ffb300; padding-bottom: 10px;"></h2>
+    <div id="teachContent"></div>
+    <button class="btn-start-huge" onclick="startGame()">🚀 準備好了，開始遊戲</button>
+    <div class="nav-buttons" style="justify-content: center; border-top: none;"><button class="nav-btn" onclick="showMenu()">🏠 返回首頁</button></div>
+</div>
+
+<!-- ================= 遊戲介面 ================= -->
+<div class="container hidden" id="gameScreen">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px dashed #ccc; padding-bottom: 10px;">
+        <h2 id="gameProgress" style="color: #1976d2; margin: 0;"></h2>
+        <div style="font-size: 1.5em; color: #d32f2f; font-weight: bold;">分數: <span id="score">0</span></div>
+    </div>
+    
+    <div class="question-box">
+        <button class="btn-play" onclick="speakText(currentQuestions[currentQIndex].q, 'en-GB')">🔊</button>
+        <div id="questionText"></div>
+    </div>
+    <div class="options-grid" id="optionsContainer"></div>
+    
+    <div id="hintContainer" class="hint-box hidden">
+        <h4 style="margin-top:0; color:#d84315; font-size: 1.3em; display:flex; align-items:center;">
+            <button class="btn-play-small" id="hintAudioBtn" style="margin-right:10px;">🔊</button> 💡 Teacher Cat 提示
+        </h4>
+        <div id="hintText"></div>
+    </div>
+    
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="prevQ()">⬅️ 上一頁</button>
+        <button class="nav-btn" onclick="showMenu()">🏠 回到主頁</button>
+        <button class="nav-btn next" id="btnNext" onclick="nextQ()">下一頁 (可跳過) ➡️</button>
+    </div>
+</div>
+
+<!-- ================= 成績總結 ================= -->
+<div class="container hidden" id="resultScreen">
+    <h1 style="font-size: 3.5em;">🎉 挑戰完成！ 🎉</h1>
+    <h2 id="finalScoreText" style="color: #0d47a1; font-size: 2em;"></h2>
+    <h3 id="starRewardText" style="font-size: 2.5em; margin: 20px 0; text-shadow: 2px 2px #fff;"></h3>
+    <div class="summary-list" id="summaryList"></div>
+    <div class="nav-buttons" style="justify-content: center; gap: 20px;">
+        <button class="nav-btn" onclick="showMenu()">🏠 返回首頁選關</button>
+        <button class="nav-btn next" onclick="startGame()">🔄 重新挑戰這一關</button>
+    </div>
+</div>
+
+<!-- ================= 無限重試彈出視窗 ================= -->
+<div id="retryModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeRetry()">✖</button>
+        <h2 style="color: #d32f2f; font-size: 2em; margin-top: 0;">重新挑戰</h2>
+        <div class="question-box">
+            <button class="btn-play" onclick="speakText(currentQuestions[retryIndex]?.q, 'en-GB')">🔊</button>
+            <div id="retryQuestionText"></div>
+        </div>
+        <div class="options-grid" id="retryOptionsContainer"></div>
+        
+        <div id="retryHintContainer" class="hint-box" style="margin-top: 30px;">
+            <h4 style="margin-top:0; color:#d84315; font-size: 1.3em; display:flex; align-items:center;">
+                <button class="btn-play-small" id="retryAudioBtn" style="margin-right:10px;">🔊</button> 💡 Teacher Cat 提示
+            </h4>
+            <div id="retryHintText"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 網頁最下方的聯絡欄 ================= -->
+<div class="footer">
+    <h3>Teacher Cat 的快樂AI教室</h3>
+    <div>
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> |
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> |
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> |
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a><br>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp 分享群</a><br>
+        <span style="display: inline-block; margin-top: 10px; font-weight: bold; color: #fff9c4; font-size: 1.1em;">抖音號: 74254902683</span>
+    </div>
+</div>
+
+<script>
+    // ================= 📚 題庫資料 (只含第1關與第16關) =================
+    const levelsData = [
+        { 
+            id: 1, title: "Level 1: Simple Present Tense I", 
+            intro: {
+                points: [
+                    { sound: "哈囉！我是 Teacher Cat！今天我們來學簡單現在式！", html: "哈囉！我是 Teacher Cat 🐱！今天我們來學<b>「簡單現在式 (Simple Present Tense)」</b>！" },
+                    { sound: "當我們想說常常重複的習慣或永遠不變的事實時，就會用這個魔法！", html: "<b>💡 這是什麼魔法？</b><br>當我們想說<b>「常常重複的習慣」</b>或<b>「永遠不變的事實」</b>時，就會用這個魔法！" },
+                    { sound: "當主角是 He, She, It 時，動詞最後面要加上小尾巴 s 喔！I, We, You, They 則不用加。", html: "<b>⚠️ Teacher Cat 的終極規則：</b><br>當主角是 <b>He / She / It</b> 時，動詞最後面要加上小尾巴 <b>「-s」</b>喔！" }
+                ],
+                examples: [
+                    { en: "Toby goes to school every morning.", zh: "習慣：Toby每天上學，加 es", html_en: "<b>Toby go<ins>es</ins> to school every morning.</b>", html_zh: "習慣：Toby每天上學，加 es" },
+                    { en: "He eats the apple.", zh: "He 做主角，eat 加上 s 變成 eats", html_en: "<b>He eat<ins>s</ins> the apple.</b>", html_zh: "He 做主角，eat 加上 s 變成 eats" }
+                ]
+            },
+            questions: [
+                // Easy (20題 🌱淺程度)
+                {q:"I ___ the apple.", o:["eat", "eats"], a:0, d:"easy"},
+                {q:"He ___ the apple.", o:["eats", "eat"], a:0, d:"easy"},
+                {q:"I ___ your cousin.", o:["am", "is"], a:0, d:"easy"},
+                {q:"She ___ hungry.", o:["is", "am"], a:0, d:"easy"},
+                {q:"They ___ in the classroom.", o:["are", "is"], a:0, d:"easy"},
+                {q:"He ___ around in the zoo.", o:["looks", "look"], a:0, d:"easy"},
+                {q:"I ___ warm in spring.", o:["feel", "feels"], a:0, d:"easy"},
+                {q:"They always ___ in the playground.", o:["run", "runs"], a:0, d:"easy"},
+                {q:"She ___ next to Janet.", o:["sits", "sit"], a:0, d:"easy"},
+                {q:"We ___ in Tai Po.", o:["live", "lives"], a:0, d:"easy"},
+                {q:"She sometimes ___ a letter.", o:["writes", "write"], a:0, d:"easy"},
+                {q:"He ___ a birthday present.", o:["gets", "get"], a:0, d:"easy"},
+                {q:"I ___ hello to the old man.", o:["say", "says"], a:0, d:"easy"},
+                {q:"He ___ milk every morning.", o:["drinks", "drink"], a:0, d:"easy"},
+                {q:"She ___ the football.", o:["kicks", "kick"], a:0, d:"easy"},
+                {q:"It ___ barking at me.", o:["is", "are"], a:0, d:"easy"},
+                {q:"We ___ at night.", o:["sleep", "sleeps"], a:0, d:"easy"},
+                {q:"I ___ a student.", o:["am", "is"], a:0, d:"easy"},
+                {q:"He ___ a pair of blue eyes.", o:["has", "have"], a:0, d:"easy"},
+                {q:"You ___ my friend.", o:["are", "is"], a:0, d:"easy"},
+                // Hard (20題 🔥深程度)
+                {q:"Katie ___ painting.", o:["likes", "like"], a:0, d:"hard"},
+                {q:"Eric and Jeff ___ about their dream jobs.", o:["talk", "talks"], a:0, d:"hard"},
+                {q:"My father ___ video games.", o:["plays", "play"], a:0, d:"hard"},
+                {q:"The Sun ___ in the morning.", o:["rises", "rise"], a:0, d:"hard"},
+                {q:"Chloe ___ the drum.", o:["plays", "play"], a:0, d:"hard"},
+                {q:"Eating carrots ___ keep your eyes healthy.", o:["helps", "help"], a:0, d:"hard"},
+                {q:"Craig ___ a shopping list.", o:["makes", "make"], a:0, d:"hard"},
+                {q:"In winter, we ___ trees with no leaves.", o:["see", "sees"], a:0, d:"hard"},
+                {q:"Birds ___ in the morning.", o:["sing", "sings"], a:0, d:"hard"},
+                {q:"The pupils ___ uniform to school every day.", o:["wear", "wears"], a:0, d:"hard"},
+                {q:"My dad ___ me to swimming class on Sundays.", o:["drives", "drive"], a:0, d:"hard"},
+                {q:"The monkeys ___ the tree.", o:["climb", "climbs"], a:0, d:"hard"},
+                {q:"Weather ___ all the time.", o:["changes", "change"], a:0, d:"hard"},
+                {q:"Jack and I ___ in the Christmas party.", o:["dance", "dances"], a:0, d:"hard"},
+                {q:"Elle ___ sorry to her mother.", o:["says", "say"], a:0, d:"hard"},
+                {q:"The dog ___ over the boxes.", o:["jumps", "jump"], a:0, d:"hard"},
+                {q:"Joseph ___ the library on Tuesdays.", o:["visits", "visit"], a:0, d:"hard"},
+                {q:"Jayden always ___ chocolate when he is hungry.", o:["eats", "eat"], a:0, d:"hard"},
+                {q:"Anson never ___ badminton.", o:["plays", "play"], a:0, d:"hard"},
+                {q:"In the evening, Mum ___ dinner.", o:["cooks", "cook"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 2, title: "Level 2: Simple Present Tense II (-es / -ies)", 
+            intro: {
+                points: [
+                    { sound: "上集說到 He, She, It 做主角要加 s，但遇到特殊結尾怎麼辦？", html: "上集說到 He/She/It 做主角要加 s，但遇到<b>特殊結尾</b>怎麼辦？" },
+                    { sound: "結尾是 o, s, z, sh, ch, x：加上 es。", html: "👉 結尾是 <b>o, s, z, sh, ch, x</b>：加上 <b>-es</b>。" },
+                    { sound: "結尾是「子音加上 y」：把 y 變不見，改成 ies。", html: "👉 結尾是「子音加上 <b>y</b>」：把 y 變不見，改成 <b>-ies</b>。" },
+                    { sound: "注意！如果是眾數，動詞什麼都不用加！", html: "👉 注意！如果是「眾數 (例如 My friends)」，動詞什麼都不用加！" }
+                ],
+                examples: [
+                    { en: "She washes dishes.", zh: "wash 結尾是 sh，所以加 es", html_en: "<b>She wash<ins>es</ins> dishes.</b>", html_zh: "wash 結尾是 sh，所以加 es" },
+                    { en: "Sam watches the news on TV.", zh: "watch 結尾是 ch，所以加 es", html_en: "<b>Sam watch<ins>es</ins> the news on TV.</b>", html_zh: "watch 結尾是 ch，所以加 es" },
+                    { en: "The bird flies.", zh: "fly 的 y 變成 ies", html_en: "<b>The bird fl<ins>ies</ins>.</b>", html_zh: "fly 的 y 變成 ies" },
+                    { en: "He tries hard.", zh: "try 的 y 變成 ies", html_en: "<b>He tr<ins>ies</ins> hard.</b>", html_zh: "try 的 y 變成 ies" },
+                    { en: "My friends love animals.", zh: "小心陷阱！friends 是眾數，love 不用加 s！", html_en: "<b>My friends <ins>love</ins> animals.</b>", html_zh: "⚠️ 小心陷阱！friends 是眾數，love 不用加 s！" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"Cherry ___ her homework.", o:["does", "do"], a:0, d:"easy"},
+                {q:"You ___ a great meal.", o:["order", "orders"], a:0, d:"easy"},
+                {q:"They ___ to school.", o:["walk", "walks"], a:0, d:"easy"},
+                {q:"Alan and Kate ___ lessons.", o:["have", "has"], a:0, d:"easy"},
+                {q:"Simon ___ the holiday.", o:["enjoys", "enjoy"], a:0, d:"easy"},
+                {q:"The birds ___.", o:["fly", "flies"], a:1, d:"easy"},
+                {q:"He ___ it in water.", o:["puts", "put"], a:0, d:"easy"},
+                {q:"The two babies ___.", o:["cry", "cries"], a:0, d:"easy"},
+                {q:"My friends ___ animals.", o:["love", "loves"], a:0, d:"easy"},
+                {q:"She ___ dishes.", o:["washes", "wash"], a:0, d:"easy"},
+                {q:"Sam ___ the news.", o:["watches", "watch"], a:0, d:"easy"},
+                {q:"The bird ___.", o:["flies", "fly"], a:0, d:"easy"},
+                {q:"He ___ hard.", o:["tries", "try"], a:0, d:"easy"},
+                {q:"I ___ my homework.", o:["do", "does"], a:0, d:"easy"},
+                {q:"We ___ in the park.", o:["play", "plays"], a:0, d:"easy"},
+                {q:"She ___ her mother.", o:["kisses", "kiss"], a:0, d:"easy"},
+                {q:"He ___ the TV.", o:["fixes", "fix"], a:0, d:"easy"},
+                {q:"The boy ___ the ball.", o:["catches", "catch"], a:0, d:"easy"},
+                {q:"They ___ to the music.", o:["dance", "dances"], a:0, d:"easy"},
+                {q:"You ___ a good job.", o:["do", "does"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"Natalie ___ hard.", o:["studies", "study"], a:0, d:"hard"},
+                {q:"Jacqueline ___.", o:["worries", "worry"], a:0, d:"hard"},
+                {q:"The calendar ___ us the days.", o:["shows", "show"], a:0, d:"hard"},
+                {q:"My brother and I ___ a picture.", o:["draw", "draws"], a:0, d:"hard"},
+                {q:"Monkeys ___ swimming.", o:["love", "loves"], a:0, d:"hard"},
+                {q:"An elephant ___ four legs.", o:["has", "have"], a:0, d:"hard"},
+                {q:"The birds ___ to the tree.", o:["fly", "flies"], a:0, d:"hard"},
+                {q:"Hailey ___ dishes after meal.", o:["washes", "wash"], a:0, d:"hard"},
+                {q:"Alvin ___ French.", o:["studies", "study"], a:0, d:"hard"},
+                {q:"My brother always ___ to be a doctor.", o:["wishes", "wish"], a:0, d:"hard"},
+                {q:"Helen and Eva ___ to me.", o:["reply", "replies"], a:0, d:"hard"},
+                {q:"Angela ___ all the examinations.", o:["passes", "pass"], a:0, d:"hard"},
+                {q:"The tiger ___ a goat in the wood.", o:["catches", "catch"], a:0, d:"hard"},
+                {q:"The moon ___ every day.", o:["rises", "rise"], a:0, d:"hard"},
+                {q:"Jenny ___ the exercises.", o:["finishes", "finish"], a:0, d:"hard"},
+                {q:"The man ___ his car.", o:["washes", "wash"], a:0, d:"hard"},
+                {q:"The girl ___ her toys.", o:["shares", "share"], a:0, d:"hard"},
+                {q:"The baby ___ loudly.", o:["cries", "cry"], a:0, d:"hard"},
+                {q:"The bee ___.", o:["buzzes", "buzz"], a:0, d:"hard"},
+                {q:"Dad ___ his clothes.", o:["dries", "dry"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 3, title: "Level 3: Negative Sentences", 
+            intro: {
+                points: [
+                    { sound: "想用英文說「不」的時候怎麼辦？Teacher Cat 教你最強的否定句魔法！", html: "想用英文說「不」的時候怎麼辦？Teacher Cat 🐱 教你最強的否定句魔法！" },
+                    { sound: "只要在 is, am, are 後面加上 not 就可以囉！", html: "只要在 is, am, are 後面加上 <b>not</b> 就可以囉！" },
+                    { sound: "is not 縮寫成 isn't，are not 縮寫成 aren't。", html: "👉 is not 可以縮寫成 <b>isn't</b>，are not 可以縮寫成 <b>aren't</b>。" },
+                    { sound: "大陷阱：am not 千萬不可以縮寫成 am'nt！只能分開寫！", html: "👉 <b>大陷阱：</b> am not 千萬不可以縮寫成 am'nt！只能分開寫！" }
+                ],
+                examples: [
+                    { en: "I am not a teacher.", zh: "我是小孩子，我「不是」老師", html_en: "<b>I <ins>am not</ins> a teacher.</b>", html_zh: "我是小孩子，我「不是」老師" },
+                    { en: "Jason isn't a good boy.", zh: "is not 縮寫成 isn't", html_en: "<b>Jason <ins>isn't</ins> a good boy.</b>", html_zh: "is not 縮寫成 isn't" },
+                    { en: "They aren't big cats.", zh: "are not 縮寫成 aren't", html_en: "<b>They <ins>aren't</ins> big cats.</b>", html_zh: "are not 縮寫成 aren't" },
+                    { en: "Are you doing homework? No, I am not.", zh: "千萬別寫 m'not 喔", html_en: "<b>Are you doing homework? No, I <ins>am not</ins>.</b>", html_zh: "千萬別寫 m'not 喔" },
+                    { en: "Desmond is not a thief.", zh: "is 後面加 not 表示否定", html_en: "<b>Desmond <ins>is not</ins> a thief.</b>", html_zh: "is 後面加 not 表示否定" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"I ___ a teacher.", o:["am not", "is not"], a:0, d:"easy"},
+                {q:"Jason ___ a good boy.", o:["isn't", "aren't"], a:0, d:"easy"},
+                {q:"They ___ big cats.", o:["aren't", "isn't"], a:0, d:"easy"},
+                {q:"Desmond ___ a thief.", o:["is not", "are not"], a:0, d:"easy"},
+                {q:"Daisy ___ a librarian.", o:["is", "am"], a:0, d:"easy"},
+                {q:"JoJo ___ human. It is a dog.", o:["isn't", "aren't"], a:0, d:"easy"},
+                {q:"Are you a student? No, I ___.", o:["am not", "m'not"], a:0, d:"easy"},
+                {q:"Earth ___ for us to destroy.", o:["is not", "are not"], a:0, d:"easy"},
+                {q:"I ___ a fan.", o:["am not", "am'nt"], a:0, d:"easy"},
+                {q:"The rabbit ___ eating.", o:["isn't", "aren't"], a:0, d:"easy"},
+                {q:"We ___ bosses.", o:["are not", "is not"], a:0, d:"easy"},
+                {q:"He ___ a bad boy.", o:["is not", "are not"], a:0, d:"easy"},
+                {q:"She ___ a princess.", o:["is not", "am not"], a:0, d:"easy"},
+                {q:"It ___ a rose.", o:["is not", "are not"], a:0, d:"easy"},
+                {q:"You ___ silly.", o:["are not", "is not"], a:0, d:"easy"},
+                {q:"I ___ a dreamer.", o:["am not", "is not"], a:0, d:"easy"},
+                {q:"They ___ fighting.", o:["are not", "is not"], a:0, d:"easy"},
+                {q:"We ___ friends.", o:["aren't", "isn't"], a:0, d:"easy"},
+                {q:"She ___ hungry.", o:["isn't", "aren't"], a:0, d:"easy"},
+                {q:"He ___ my cousin.", o:["isn't", "aren't"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"David and Gareth ___ players.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"Sorry, my name ___ Joseph.", o:["is not", "am not"], a:0, d:"hard"},
+                {q:"They ___ big cats. They are lions!", o:["are not", "is not"], a:0, d:"hard"},
+                {q:"My English teacher ___ patient.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"My dad ___ a good dentist.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"I ___ a good painter.", o:["am not", "is not"], a:0, d:"hard"},
+                {q:"Ray ___ a good listener.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"This ___ a book about history.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"The red one ___ an apple.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"All human beings ___ students.", o:["are not", "is not"], a:0, d:"hard"},
+                {q:"Music ___ pleasant. It is noise.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"Jason ___ a class monitor.", o:["isn't", "is't"], a:0, d:"hard"},
+                {q:"I ___ a fan of this book.", o:["am not", "am'nt"], a:0, d:"hard"},
+                {q:"Matt ___ an actor.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"Sandra ___ a good reader.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"The radio programme ___ funny.", o:["is not", "are not"], a:0, d:"hard"},
+                {q:"The two babies ___ crying.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"The children ___ playing.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"The dogs ___ barking.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"The people ___ happy.", o:["aren't", "isn't"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 4, title: "Level 4: Simple Present Tense IV (Questions)", 
+            intro: {
+                points: [
+                    { sound: "小朋友，想發問問題嗎？教你一招大搬風魔法！", html: "小朋友，想發問問題嗎？教你一招「大搬風」魔法！" },
+                    { sound: "只要把 Be 動詞 Is, Am, Are 搬到句子的最前面，就可以變成問題囉！", html: "只要把 Be 動詞 (<b>Is / Am / Are</b>) 搬到句子的「最前面」，就可以變成問題囉！" },
+                    { sound: "如果有 Who, What, Where，就把他們排在最最最前面。", html: "如果有 Who / What / Where，就把他們排在最最最前面。" }
+                ],
+                examples: [
+                    { en: "Are you pretty?", zh: "You are 變成 Are you", html_en: "<b><ins>Are</ins> you pretty?</b>", html_zh: "You are 變成 Are you" },
+                    { en: "Is it a dog?", zh: "It is 變成 Is it", html_en: "<b><ins>Is</ins> it a dog?</b>", html_zh: "It is 變成 Is it" },
+                    { en: "Am I good at running?", zh: "I am 變成 Am I", html_en: "<b><ins>Am</ins> I good at running?</b>", html_zh: "I am 變成 Am I" },
+                    { en: "Is Peter not a student?", zh: "加上 not 來問相反的問題", html_en: "<b><ins>Is</ins> Peter <ins>not</ins> a student?</b>", html_zh: "加上 not 來問相反的問題" },
+                    { en: "Are you doing your homework?", zh: "把 Are 搬到前面發問", html_en: "<b><ins>Are</ins> you doing your homework?</b>", html_zh: "把 Are 搬到前面發問" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"___ you pretty?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ it a dog?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ I good at running?", o:["Am", "Is"], a:0, d:"easy"},
+                {q:"___ the dog big?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the lady elegant?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ a monster scary?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ you happy?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ my brother a baby?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ I a student?", o:["Am", "Are"], a:0, d:"easy"},
+                {q:"___ Jason smart?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the pizza not tasty?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ I not stupid?", o:["Am", "Is"], a:0, d:"easy"},
+                {q:"___ it difficult?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ you busy?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ he your friend?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ she a teacher?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ it an apple?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ they cats?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ we ready?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ I late?", o:["Am", "Are"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"___ Damon an artist?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ Jasmine a teacher?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ they the members of the choir?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Gregory not a good student?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ the cats not fighting?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Ming and Jan not friends?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Mr. Chan not a lawyer?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ spiders not scary?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Miss Chan not an English teacher?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ your father not an astronaut?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ Ray not a good listener?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ the dishes not clean?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Jane not naughty?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ the trees not tall?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ you a prefect?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ Sara Lee a winner?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"Can you help me? I ___ good at mathematics.", o:["am not", "are not"], a:0, d:"hard"},
+                {q:"___ Peter not a student?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ the boys running?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"___ the children laughing?", o:["Are", "Is"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 5, title: "Level 5: Present Continuous Tense I (+ing)", 
+            intro: {
+                points: [
+                    { sound: "當你想表達現在這一刻正在發生的事情，我們就要使用現在進行式！", html: "當你想表達<b>「現在這一刻正在發生」</b>的事情，我們就要使用『現在進行式』！" },
+                    { sound: "公式是：is, am, are 加上 動詞加 ing！", html: "<b>⚠️ 公式：</b><br><span style='color:#d32f2f;'><b>is / am / are + (動詞 Verb) + ing</b></span>" },
+                    { sound: "記得！is, am, are 跟 ing 是好朋友，缺一不可喔！", html: "記得！is / am / are 跟 ing 是好朋友，缺一不可喔！" }
+                ],
+                examples: [
+                    { en: "I am eating.", zh: "我現在正在吃東西。", html_en: "<b>I <ins>am</ins> eat<ins>ing</ins>.</b>", html_zh: "我現在正在吃東西。" },
+                    { en: "The baby is crawling.", zh: "寶寶正在爬行。", html_en: "<b>The baby <ins>is</ins> crawl<ins>ing</ins>.</b>", html_zh: "寶寶正在爬行。" },
+                    { en: "We are washing our car.", zh: "我們正在洗車。", html_en: "<b>We <ins>are</ins> wash<ins>ing</ins> our car.</b>", html_zh: "我們正在洗車。" },
+                    { en: "The astronaut is walking on the moon.", zh: "太空人正在月球上漫步。", html_en: "<b>The astronaut <ins>is</ins> walk<ins>ing</ins> on the moon.</b>", html_zh: "太空人正在月球上漫步。" },
+                    { en: "Macy is talking.", zh: "大陷阱：不可以只寫 Macy talking，一定要加上 is 喔！", html_en: "<b>Macy <ins>is</ins> talk<ins>ing</ins>.</b>", html_zh: "大陷阱：不可以只寫 Macy talking，一定要加上 is 喔！" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"I ___ eating.", o:["am", "is"], a:0, d:"easy"},
+                {q:"The baby ___ crawling.", o:["is", "are"], a:0, d:"easy"},
+                {q:"We ___ washing our car.", o:["are", "is"], a:0, d:"easy"},
+                {q:"The astronaut ___ walking on the moon.", o:["is", "are"], a:0, d:"easy"},
+                {q:"The teacher ___ for answers.", o:["is waiting", "are waiting"], a:0, d:"easy"},
+                {q:"I ___ my homework.", o:["am doing", "is doing"], a:0, d:"easy"},
+                {q:"The baby ___ towards her toy.", o:["is crawling", "are crawling"], a:0, d:"easy"},
+                {q:"We ___ our car.", o:["are washing", "is washing"], a:0, d:"easy"},
+                {q:"The astronaut ___ on the moon.", o:["is walking", "are walking"], a:0, d:"easy"},
+                {q:"He ___ the ball.", o:["is kicking", "are kicking"], a:0, d:"easy"},
+                {q:"She ___ the door.", o:["is opening", "are opening"], a:0, d:"easy"},
+                {q:"I ___ the answers.", o:["am checking", "is checking"], a:0, d:"easy"},
+                {q:"They ___ the picture.", o:["are drawing", "is drawing"], a:0, d:"easy"},
+                {q:"We ___ the juice.", o:["are drinking", "is drinking"], a:0, d:"easy"},
+                {q:"It ___ raining outside.", o:["is", "are"], a:0, d:"easy"},
+                {q:"The boy ___ reading a book.", o:["is", "are"], a:0, d:"easy"},
+                {q:"The girl ___ singing a song.", o:["is", "are"], a:0, d:"easy"},
+                {q:"I ___ playing a game.", o:["am", "is"], a:0, d:"easy"},
+                {q:"You ___ listening to me.", o:["are", "is"], a:0, d:"easy"},
+                {q:"He ___ sleeping.", o:["is", "am"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"Mum ___ the clothes now.", o:["is folding", "are folding"], a:0, d:"hard"},
+                {q:"Brandon ___ a book.", o:["is reading", "are reading"], a:0, d:"hard"},
+                {q:"The kangaroos ___.", o:["are jumping", "is jumping"], a:0, d:"hard"},
+                {q:"The monkeys ___ a tree.", o:["are climbing", "is climbing"], a:0, d:"hard"},
+                {q:"I ___ in the bathroom.", o:["am singing", "are singing"], a:0, d:"hard"},
+                {q:"Stacy and David ___ Christmas cards.", o:["are drawing", "is drawing"], a:0, d:"hard"},
+                {q:"Stacy ___ some colour papers.", o:["is folding", "are folding"], a:0, d:"hard"},
+                {q:"David ___ a crayon in his hand.", o:["is holding", "are holding"], a:0, d:"hard"},
+                {q:"He ___ about what to draw.", o:["is thinking", "are thinking"], a:0, d:"hard"},
+                {q:"The song ___ on the radio.", o:["is playing", "are playing"], a:0, d:"hard"},
+                {q:"I ___ some animals.", o:["am drawing", "is drawing"], a:0, d:"hard"},
+                {q:"You ___ some flowers on the cards.", o:["are sticking", "is sticking"], a:0, d:"hard"},
+                {q:"A fairy ___ next to the Christmas tree.", o:["is standing", "are standing"], a:0, d:"hard"},
+                {q:"Birds ___ in the sky.", o:["are flying", "is flying"], a:0, d:"hard"},
+                {q:"Reindeers ___ grass by the river.", o:["are eating", "is eating"], a:0, d:"hard"},
+                {q:"Santa Claus ___ a bag of presents.", o:["is carrying", "are carrying"], a:0, d:"hard"},
+                {q:"Tommy ___ eating his dinner.", o:["isn't", "is't"], a:0, d:"hard"},
+                {q:"I am ___ a book.", o:["borrowing", "borrow"], a:0, d:"hard"},
+                {q:"Beatrice is ___ some food.", o:["buying", "buy"], a:0, d:"hard"},
+                {q:"The dogs are ___.", o:["fighting", "fight"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 6, title: "Level 6: Present Continuous Tense II (drop e)", 
+            intro: {
+                points: [
+                    { sound: "有時候加 ing 會遇到特殊情況喔！", html: "有時候加 ing 會遇到特殊情況喔！" },
+                    { sound: "如果動詞的結尾剛好是字母「e」，我們要先把「e」刪除，然後再加 ing！", html: "<b>⚠️ 變身規則：</b>如果動詞的結尾剛好是字母<b>「e」</b>，我們要先<b>把「e」刪除</b>，然後再大膽地加上 <b>-ing</b>！" }
+                ],
+                examples: [
+                    { en: "I am living with my parents.", zh: "live 刪除了 e 變成 living", html_en: "<b>I am liv<ins>ing</ins> with my parents.</b>", html_zh: "live 刪除了 e 變成 living" },
+                    { en: "He is making a cake.", zh: "make 刪除了 e 變成 making", html_en: "<b>He is mak<ins>ing</ins> a cake.</b>", html_zh: "make 刪除了 e 變成 making" },
+                    { en: "They are diving in the sea.", zh: "dive 刪除了 e 變成 diving", html_en: "<b>They are div<ins>ing</ins> in the sea.</b>", html_zh: "dive 刪除了 e 變成 diving" },
+                    { en: "She is riding a bicycle.", zh: "ride 刪除了 e 變成 riding", html_en: "<b>She is rid<ins>ing</ins> a bicycle.</b>", html_zh: "ride 刪除了 e 變成 riding" },
+                    { en: "He is drawing a picture.", zh: "draw 沒有 e 結尾，直接加 ing！", html_en: "<b>He is draw<ins>ing</ins> a picture.</b>", html_zh: "draw 沒有 e 結尾，直接加 ing！" }
+                ]
+            },
+            questions: [
+                {q:"I am ___ (smell) the flower.", o:["smelling", "smeling"], a:0, d:"easy"},
+                {q:"We are ___ (live) in Hong Kong.", o:["living", "liveing"], a:0, d:"easy"},
+                {q:"He is ___ (kick) the ball.", o:["kicking", "kickeing"], a:0, d:"easy"},
+                {q:"She is ___ (make) a cake.", o:["making", "makeing"], a:0, d:"easy"},
+                {q:"They are ___ (prepare) dinner.", o:["preparing", "prepareing"], a:0, d:"easy"},
+                {q:"Mable ___ her bicycle now.", o:["is riding", "are riding"], a:0, d:"easy"},
+                {q:"They ___ their bicycles now.", o:["are riding", "is riding"], a:0, d:"easy"},
+                {q:"I ___ my bicycle now.", o:["am riding", "is riding"], a:0, d:"easy"},
+                {q:"Timothy ___ grandma today.", o:["is visiting", "are visiting"], a:0, d:"easy"},
+                {q:"You ___ grandma today.", o:["are visiting", "is visiting"], a:0, d:"easy"},
+                {q:"We ___ grandma today.", o:["are visiting", "am visiting"], a:0, d:"easy"},
+                {q:"I am ___ (take) a photo.", o:["taking", "takeing"], a:0, d:"easy"},
+                {q:"She is ___ (clean) the blackboard.", o:["cleaning", "cleanning"], a:0, d:"easy"},
+                {q:"He is ___ (eat) an apple.", o:["eating", "eateing"], a:0, d:"easy"},
+                {q:"Mum is ___ (wash) the dishes.", o:["washing", "washeing"], a:0, d:"easy"},
+                {q:"The diver is ___ (dive) into the pool.", o:["diving", "diveing"], a:0, d:"easy"},
+                {q:"They are ___ (glue) the paper.", o:["gluing", "glueing"], a:0, d:"easy"},
+                {q:"The dog is ___ (bite) my shoe.", o:["biting", "biteing"], a:0, d:"easy"},
+                {q:"I am ___ (draw) a picture.", o:["drawing", "draweing"], a:0, d:"easy"},
+                {q:"She is ___ (believe) his story.", o:["believing", "believeing"], a:0, d:"easy"},
+                {q:"Gary and Jerry ___ in the sea.", o:["are diving", "is diving"], a:0, d:"hard"},
+                {q:"I ___ in the sea.", o:["am diving", "are diving"], a:0, d:"hard"},
+                {q:"The submarine ___ in the sea.", o:["is diving", "are diving"], a:0, d:"hard"},
+                {q:"Ssh! The principal ___ a speech.", o:["is giving", "are giving"], a:0, d:"hard"},
+                {q:"Ssh! The bride and groom ___ a speech.", o:["are giving", "is giving"], a:0, d:"hard"},
+                {q:"Ssh! I ___ a speech.", o:["am giving", "is giving"], a:0, d:"hard"},
+                {q:"Andy ___ the piano.", o:["is playing", "are playing"], a:0, d:"hard"},
+                {q:"Mallory and I ___ the piano.", o:["are playing", "is playing"], a:0, d:"hard"},
+                {q:"You ___ the piano.", o:["are playing", "is playing"], a:0, d:"hard"},
+                {q:"Look! The hawker ___ fruit.", o:["is selling", "are selling"], a:0, d:"hard"},
+                {q:"The driver ___ a bus right now.", o:["is driving", "are driving"], a:0, d:"hard"},
+                {q:"Oh no! The baby ___ up. It is too noisy.", o:["is waking", "are waking"], a:0, d:"hard"},
+                {q:"My sister and her friend ___ a cake in the kitchen.", o:["are baking", "is baking"], a:0, d:"hard"},
+                {q:"My brother ___ a bus to school.", o:["is taking", "are taking"], a:0, d:"hard"},
+                {q:"I ___ my own clothes.", o:["am folding", "is folding"], a:0, d:"hard"},
+                {q:"Mum ___ some vegetables in the supermarket.", o:["is buying", "are buying"], a:0, d:"hard"},
+                {q:"Jane ___ her teacher's questions in the classroom.", o:["is answering", "are answering"], a:0, d:"hard"},
+                {q:"Jack ___ happily.", o:["is dancing", "danceing"], a:0, d:"hard"},
+                {q:"The cat ___ under the table.", o:["is sleeping", "are sleeping"], a:0, d:"hard"},
+                {q:"I ___ for my test tomorrow.", o:["am preparing", "am prepareing"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 7, title: "Level 7: Present Continuous Tense III (Negative)", 
+            intro: {
+                points: [
+                    { sound: "正在進行的事情如果沒有發生，我們就要用否定句！", html: "正在進行的事情如果「沒有」發生，我們就要用否定句！" },
+                    { sound: "只要在 is, am, are 後面加上 not，再配合 ing 就可以了！", html: "只要在 is / am / are 後面加上 <b>not</b>，再配合 ing 就可以了！" },
+                    { sound: "常見的時間提示字有：now, Look, Listen, at present。", html: "常見的時間提示字有：<b>now, Look!, Listen!, at present</b>。" }
+                ],
+                examples: [
+                    { en: "I am not playing basketball.", zh: "我現在沒有在打籃球。", html_en: "<b>I <ins>am not</ins> playing basketball.</b>", html_zh: "我現在沒有在打籃球。" },
+                    { en: "The rabbit isn't eating carrots.", zh: "兔子現在沒有在吃紅蘿蔔。", html_en: "<b>The rabbit <ins>isn't</ins> eating carrots.</b>", html_zh: "兔子現在沒有在吃紅蘿蔔。" },
+                    { en: "The girls aren't dancing.", zh: "女孩們現在沒有在跳舞。", html_en: "<b>The girls <ins>aren't</ins> dancing.</b>", html_zh: "女孩們現在沒有在跳舞。" },
+                    { en: "Dan isn't doing his homework now.", zh: "Dan 現在沒有做功課，注意 now 提示字！", html_en: "<b>Dan <ins>isn't</ins> doing his homework <ins>now</ins>.</b>", html_zh: "Dan 現在沒有做功課，注意 now 提示字！" },
+                    { en: "Lydia is not baking a cake now.", zh: "Lydia 現在沒有在烤蛋糕。", html_en: "<b>Lydia <ins>is not</ins> baking a cake now.</b>", html_zh: "Lydia 現在沒有在烤蛋糕。" }
+                ]
+            },
+            questions: [
+                {q:"I ___ (not read) a book.", o:["am not reading", "is not reading"], a:0, d:"easy"},
+                {q:"He ___ (not sleep) now.", o:["isn't sleeping", "aren't sleeping"], a:0, d:"easy"},
+                {q:"She ___ (not jump) on the bed.", o:["isn't jumping", "aren't jumping"], a:0, d:"easy"},
+                {q:"They ___ (not eat) lunch.", o:["aren't eating", "isn't eating"], a:0, d:"easy"},
+                {q:"We ___ (not walk) in the park.", o:["aren't walking", "isn't walking"], a:0, d:"easy"},
+                {q:"You ___ (not listen) to me.", o:["aren't listening", "isn't listening"], a:0, d:"easy"},
+                {q:"The dog ___ (not bark).", o:["isn't barking", "aren't barking"], a:0, d:"easy"},
+                {q:"The cats ___ (not fight).", o:["aren't fighting", "isn't fighting"], a:0, d:"easy"},
+                {q:"It ___ (not snow) outside.", o:["isn't snowing", "aren't snowing"], a:0, d:"easy"},
+                {q:"I ___ (not learn) French.", o:["am not learning", "isn't learning"], a:0, d:"easy"},
+                {q:"He ___ (not hear) the sound.", o:["isn't hearing", "aren't hearing"], a:0, d:"easy"},
+                {q:"She ___ (not climb) the tree.", o:["isn't climbing", "aren't climbing"], a:0, d:"easy"},
+                {q:"They ___ (not study) hard.", o:["aren't studying", "isn't studying"], a:0, d:"easy"},
+                {q:"I ___ (not drink) milk.", o:["am not drinking", "isn't drinking"], a:0, d:"easy"},
+                {q:"We ___ (not dream) now.", o:["aren't dreaming", "isn't dreaming"], a:0, d:"easy"},
+                {q:"The boys ___ (not change) their clothes.", o:["aren't changing", "isn't changing"], a:0, d:"easy"},
+                {q:"The girl ___ (not talk).", o:["isn't talking", "aren't talking"], a:0, d:"easy"},
+                {q:"The baby ___ (not sleep).", o:["isn't sleeping", "aren't sleeping"], a:0, d:"easy"},
+                {q:"I ___ (not win) the game.", o:["am not winning", "isn't winning"], a:0, d:"easy"},
+                {q:"He ___ (not swim).", o:["isn't swimming", "aren't swimming"], a:0, d:"easy"},
+                {q:"Lydia ___ a cake now.", o:["is not baking", "are not baking"], a:0, d:"hard"},
+                {q:"Emily ___ a song now.", o:["is not singing", "are not singing"], a:0, d:"hard"},
+                {q:"Bob ___ in the garden now.", o:["is not walking", "are not walking"], a:0, d:"hard"},
+                {q:"Dan and Tim ___ dinner now.", o:["are not having", "is not having"], a:0, d:"hard"},
+                {q:"I ___ on the project now.", o:["am not working", "is not working"], a:0, d:"hard"},
+                {q:"You ___ the doll now.", o:["are not making", "is not making"], a:0, d:"hard"},
+                {q:"We ___ a ball now.", o:["are not kicking", "is not kicking"], a:0, d:"hard"},
+                {q:"The old man ___ the birds now.", o:["is not feeding", "are not feeding"], a:0, d:"hard"},
+                {q:"Cindy ___ a pet now.", o:["is not keeping", "are not keeping"], a:0, d:"hard"},
+                {q:"I ___ Peter now.", o:["am not calling", "is not calling"], a:0, d:"hard"},
+                {q:"Helen ___ angry now.", o:["is not feeling", "are not feeling"], a:0, d:"hard"},
+                {q:"Carmen ___ taking a shower.", o:["isn't", "aren't"], a:0, d:"hard"},
+                {q:"I ___ playing computer games.", o:["am not", "isn't"], a:0, d:"hard"},
+                {q:"Sarah and her sister ___ tidying their rooms.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"We ___ driving our car.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"The birds ___ flying in the sky.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"The children ___ playing outside.", o:["aren't", "isn't"], a:0, d:"hard"},
+                {q:"She ___ reading the newspaper now.", o:["isn't", "aren't"], a:0, d:"hard"},
+                {q:"Mary ___ listening to music now.", o:["isn't", "aren't"], a:0, d:"hard"},
+                {q:"The family ___ having a picnic.", o:["isn't", "aren't"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 8, title: "Level 8: Present Continuous Tense IV (Questions)", 
+            intro: {
+                points: [
+                    { sound: "怎麼在現在進行式裡問問題？", html: "怎麼在「現在進行式」裡問問題？" },
+                    { sound: "只要把 Am, Is, Are 搬到句子的最前面，就可以發問囉！", html: "只要把 <b>Am, Is, Are</b> 搬到句子的「最前面」，就可以發問囉！" },
+                    { sound: "如果有 What, Who, Where 這些字，記得把它們放在最最最前面。", html: "如果有 <b>What(什麼), Who(誰), Where(哪裡)</b> 這些字，記得把它們放在最最最前面。" }
+                ],
+                examples: [
+                    { en: "Am I walking?", zh: "我正在走路嗎？", html_en: "<b><ins>Am</ins> I walk<ins>ing</ins>?</b>", html_zh: "我正在走路嗎？" },
+                    { en: "Is the dog barking?", zh: "那隻狗正在吠嗎？", html_en: "<b><ins>Is</ins> the dog bark<ins>ing</ins>?</b>", html_zh: "那隻狗正在吠嗎？" },
+                    { en: "Are the boys running?", zh: "男孩們正在跑步嗎？", html_en: "<b><ins>Are</ins> the boys runn<ins>ing</ins>?</b>", html_zh: "男孩們正在跑步嗎？" },
+                    { en: "What are you doing?", zh: "What 放最前：你正在做什麼？", html_en: "<b><ins>What</ins> are you do<ins>ing</ins>?</b>", html_zh: "What 放最前：你正在做什麼？" },
+                    { en: "Who is eating a hamburger?", zh: "Who 放最前：誰正在吃漢堡？", html_en: "<b><ins>Who</ins> is eat<ins>ing</ins> a hamburger?</b>", html_zh: "Who 放最前：誰正在吃漢堡？" }
+                ]
+            },
+            questions: [
+                {q:"___ I turning 7 years old?", o:["Am", "Is"], a:0, d:"easy"},
+                {q:"___ the aeroplane flying in the sky?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the children laughing?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ you and I going to Causeway Bay?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ your brother talking on the phone?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ Dad going to work now?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ your grandparents living in Hong Kong?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ the cat eating fish?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ I talking to Mr. Chan?", o:["Am", "Are"], a:0, d:"easy"},
+                {q:"___ the animals dancing in the jungle?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ the baby crying?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ Joanne visiting Japan?", o:["Is", "Am"], a:0, d:"easy"},
+                {q:"___ the teacher asking a question?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the birds singing songs in the woods?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ Erica drawing a picture?", o:["Is", "Am"], a:0, d:"easy"},
+                {q:"___ the girl picking flowers?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the workers eating lunch?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ Mrs. Green cooking?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"___ the cuckoos singing?", o:["Are", "Is"], a:0, d:"easy"},
+                {q:"___ Judy sleeping?", o:["Is", "Are"], a:0, d:"easy"},
+                {q:"What ___ you doing?", o:["are", "is"], a:0, d:"hard"},
+                {q:"I ___ helping the teacher.", o:["am", "is"], a:0, d:"hard"},
+                {q:"What ___ you helping her to do?", o:["are", "is"], a:0, d:"hard"},
+                {q:"I ___ cleaning the blackboard.", o:["am", "is"], a:0, d:"hard"},
+                {q:"I ___ helping Miss Chan as well.", o:["am", "is"], a:0, d:"hard"},
+                {q:"I ___ tidying up the book shelf.", o:["am", "is"], a:0, d:"hard"},
+                {q:"Daisy ___ helping Miss Chan, too.", o:["is", "are"], a:0, d:"hard"},
+                {q:"What ___ Daisy doing?", o:["is", "are"], a:0, d:"hard"},
+                {q:"She ___ washing the floor.", o:["is", "are"], a:0, d:"hard"},
+                {q:"I ___ feeding the class rabbit now.", o:["am", "is"], a:0, d:"hard"},
+                {q:"What ___ you doing? (homework)", o:["am doing", "is doing"], a:0, d:"hard"},
+                {q:"What ___ the naughty boys doing? (fight)", o:["are fighting", "is fighting"], a:0, d:"hard"},
+                {q:"Where ___ Karen going? (home)", o:["is", "are"], a:0, d:"hard"},
+                {q:"What ___ Uncle Tom eating? (an apple)", o:["is", "are"], a:0, d:"hard"},
+                {q:"What ___ Mary and her sister watching?", o:["are", "is"], a:0, d:"hard"},
+                {q:"Where ___ the birds flying? (south)", o:["are", "is"], a:0, d:"hard"},
+                {q:"___ Amy and Andy going to school?", o:["Are", "Is"], a:0, d:"hard"},
+                {q:"The boys and girls ___ singing.", o:["are", "is"], a:0, d:"hard"},
+                {q:"___ the baby girl drinking milk?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"___ the dog barking?", o:["Is", "Are"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 9, title: "Level 9: Imperatives (祈使句)", 
+            intro: {
+                points: [
+                    { sound: "當我們要發出命令或是提出請求的時候，可以直接把動詞放在最前面！", html: "當我們要發出「命令」或是「提出請求」的時候，可以直接把動詞放在最前面！" },
+                    { sound: "最特別的是，這些句子開頭的動詞完全不需要變身，也就是不加 s 也不加 ing！", html: "最特別的是，這些句子開頭的動詞完全<b>「不需要變身」</b>，也就是<b>不加 -s 也不加 -ing</b>！" },
+                    { sound: "加上 please 會讓你變成有禮貌的乖孩子喔。", html: "加上 please 會讓你變成有禮貌的乖孩子喔。" }
+                ],
+                examples: [
+                    { en: "Sit down!", zh: "命令：坐下！動詞原形", html_en: "<b><ins>Sit</ins> down!</b>", html_zh: "命令：坐下！動詞原形" },
+                    { en: "Do not walk on the grass.", zh: "禁止：不要踐踏草地！", html_en: "<b><ins>Do not walk</ins> on the grass.</b>", html_zh: "禁止：不要踐踏草地！" },
+                    { en: "Give me that pencil, please.", zh: "請求：請把鉛筆給我。", html_en: "<b><ins>Give</ins> me that pencil, <ins>please</ins>.</b>", html_zh: "請求：請把鉛筆給我。" },
+                    { en: "Keep quiet, please.", zh: "大陷阱：千萬不要寫成 Keeps 喔！", html_en: "<b><ins>Keep</ins> quiet, please.</b>", html_zh: "大陷阱：千萬不要寫成 Keeps 喔！" },
+                    { en: "Stand up!", zh: "指示：起立！", html_en: "<b><ins>Stand</ins> up!</b>", html_zh: "指示：起立！" }
+                ]
+            },
+            questions: [
+                {q:"___ your textbook, please.", o:["Open", "Opens"], a:0, d:"easy"},
+                {q:"___ the blackboard, please.", o:["Clean", "Cleans"], a:0, d:"easy"},
+                {q:"___ the door, please.", o:["Close", "Closes"], a:0, d:"easy"},
+                {q:"___ quiet, please.", o:["Keep", "Keeps"], a:0, d:"easy"},
+                {q:"___ the T-shirt, please.", o:["Wash", "Washes"], a:0, d:"easy"},
+                {q:"___ the medicine, please.", o:["Take", "Takes"], a:0, d:"easy"},
+                {q:"___ some sugar in the tea, please.", o:["Add", "Adds"], a:0, d:"easy"},
+                {q:"___ the answers, please.", o:["Check", "Checks"], a:0, d:"easy"},
+                {q:"___ down!", o:["Sit", "Sits"], a:0, d:"easy"},
+                {q:"___ me the time.", o:["Tell", "Tells"], a:0, d:"easy"},
+                {q:"___ the library clean.", o:["Keep", "Keeps"], a:0, d:"easy"},
+                {q:"Do not ___.", o:["eat", "eats"], a:0, d:"easy"},
+                {q:"___ quiet.", o:["Keep", "Keeps"], a:0, d:"easy"},
+                {q:"___ your revision.", o:["Do", "Does"], a:0, d:"easy"},
+                {q:"___ softly.", o:["Speak", "Speaks"], a:0, d:"easy"},
+                {q:"___ to return your books.", o:["Remember", "Remembers"], a:0, d:"easy"},
+                {q:"___ only five books.", o:["Borrow", "Borrows"], a:0, d:"easy"},
+                {q:"___ a good child.", o:["Be", "Are"], a:0, d:"easy"},
+                {q:"___ on a piece of paper.", o:["Write", "Writes"], a:0, d:"easy"},
+                {q:"___ a seat.", o:["Take", "Takes"], a:0, d:"easy"},
+                {q:"Mr. Police, I ___ to go to Happy Primary School.", o:["want", "wants"], a:0, d:"hard"},
+                {q:"Would you ___ me the way?", o:["show", "shows"], a:0, d:"hard"},
+                {q:"First, ___ along this street.", o:["walk", "walks"], a:0, d:"hard"},
+                {q:"Then, ___ the road.", o:["cross", "crosses"], a:0, d:"hard"},
+                {q:"Remember to ___ only when you see the green light.", o:["cross", "crosses"], a:0, d:"hard"},
+                {q:"After that, ___ left to the next street.", o:["turn", "turns"], a:0, d:"hard"},
+                {q:"___ at the sign, it should say 'Happy Street'.", o:["Look", "Looks"], a:0, d:"hard"},
+                {q:"Go down the street, Happy Primary School ___ on your left.", o:["is", "are"], a:0, d:"hard"},
+                {q:"If you cannot see the school, find someone to ___ again.", o:["ask", "asks"], a:0, d:"hard"},
+                {q:"First, ___ the eggs in a bowl.", o:["put", "puts"], a:0, d:"hard"},
+                {q:"___ your uniform, please.", o:["Wear", "Wears"], a:0, d:"hard"},
+                {q:"___ up!", o:["Shut", "Shuts"], a:0, d:"hard"},
+                {q:"Now, ___ to your left.", o:["turn", "turns"], a:0, d:"hard"},
+                {q:"___ the car!", o:["Stop", "Stops"], a:0, d:"hard"},
+                {q:"___ up, please.", o:["Speak", "Speaks"], a:0, d:"hard"},
+                {q:"___ me some tea, please.", o:["Make", "Makes"], a:0, d:"hard"},
+                {q:"___ in your bed, please.", o:["Sleep", "Sleeps"], a:0, d:"hard"},
+                {q:"___ up your mind, please.", o:["Make", "Makes"], a:0, d:"hard"},
+                {q:"___ your homework, please.", o:["Do", "Does"], a:0, d:"hard"},
+                {q:"___ to school on time, please.", o:["Go", "Goes"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 10, title: "Level 10: Be, Have, Need & Want", 
+            intro: {
+                points: [
+                    { sound: "介紹幾個超級常用的好朋友：Be, Have, Need 和 Want！", html: "介紹幾個超級常用的好朋友：Be (是), Have (擁有), Need (需要) 和 Want (想要)！" },
+                    { sound: "He, She, It 做主角時，要用 has, needs, wants。", html: "He/She/It 做主角時，要用 <b>has, needs, wants</b>。" },
+                    { sound: "變成否定句時，加上 does not。", html: "變成否定句時，加上 <b>does not</b>。" },
+                    { sound: "does not 是照妖鏡，後面的動詞必須變回原形，絕對不准加 s！", html: "⚠️ does not 就像一個照妖鏡，<b>後面的動詞必須變回原形，絕對不准加 -s！</b>" }
+                ],
+                examples: [
+                    { en: "I am hungry.", zh: "Be動詞：我很餓", html_en: "<b>I <ins>am</ins> hungry.</b>", html_zh: "Be動詞：我很餓" },
+                    { en: "Matt has a comic book.", zh: "Matt是一個人，用 has", html_en: "<b>Matt <ins>has</ins> a comic book.</b>", html_zh: "Matt是一個人，用 has" },
+                    { en: "Christopher needs some water.", zh: "Christopher是一個人，need加 s", html_en: "<b>Christopher <ins>needs</ins> some water.</b>", html_zh: "Christopher是一個人，need加 s" },
+                    { en: "We want a table.", zh: "We 是眾數，want 不用加 s", html_en: "<b>We <ins>want</ins> a table.</b>", html_zh: "We 是眾數，want 不用加 s" },
+                    { en: "She does not have a pillow.", zh: "有了 does not，後面的 has 要變回原形 have！", html_en: "<b>She does not <ins>have</ins> a pillow.</b>", html_zh: "有了 does not，後面的 has 要變回原形 have！" }
+                ]
+            },
+            questions: [
+                {q:"Esther does not ___ the fruit salad.", o:["make", "makes"], a:0, d:"easy"},
+                {q:"A cow ___ four legs.", o:["has", "have"], a:0, d:"easy"},
+                {q:"Alan and Kate ___ dance lessons on Fridays.", o:["have", "has"], a:0, d:"easy"},
+                {q:"Ray and his family ___ buffet in Tsim Sha Tsui.", o:["have", "has"], a:0, d:"easy"},
+                {q:"Tommy ___ to take a rest.", o:["needs", "need"], a:0, d:"easy"},
+                {q:"Marcus ___ a pair of blue eyes.", o:["has", "have"], a:0, d:"easy"},
+                {q:"Anson never ___ badminton.", o:["plays", "play"], a:0, d:"easy"},
+                {q:"I don't ___ classical music.", o:["like", "likes"], a:0, d:"easy"},
+                {q:"The Maori people do not ___ in New Zealand.", o:["live", "lives"], a:0, d:"easy"},
+                {q:"Does the lady ___ any help?", o:["need", "needs"], a:0, d:"easy"},
+                {q:"The sick boy ___ some medicine.", o:["wants", "want"], a:0, d:"easy"},
+                {q:"Do you ___ a glass of water?", o:["have", "has"], a:0, d:"easy"},
+                {q:"Jane ___ a pencil to write a letter.", o:["wants", "want"], a:0, d:"easy"},
+                {q:"Daniel and I ___ television every day.", o:["watch", "watches"], a:0, d:"easy"},
+                {q:"Toby does not ___ any food. He is not hungry.", o:["want", "wants"], a:0, d:"easy"},
+                {q:"Mrs Tam ___ my class teacher.", o:["is", "are"], a:0, d:"easy"},
+                {q:"My neighbour and I often ___ to the school in a hurry.", o:["run", "runs"], a:0, d:"easy"},
+                {q:"Alfred ___ a big robot in his box.", o:["has", "have"], a:0, d:"easy"},
+                {q:"My sister and brother ___ older than me.", o:["are", "is"], a:0, d:"easy"},
+                {q:"I ___ a present from my friend in the party.", o:["get", "gets"], a:0, d:"easy"},
+                {q:"My parents usually ___ at 11 o'clock.", o:["sleep", "sleeps"], a:0, d:"hard"},
+                {q:"Dolly ___ some clothes. She is cold.", o:["needs", "need"], a:0, d:"hard"},
+                {q:"Brian is a doctor. He ___ after sick people.", o:["looks", "look"], a:0, d:"hard"},
+                {q:"Noris ___ an umbrella.", o:["wants", "want"], a:0, d:"hard"},
+                {q:"You ___ more rest.", o:["need", "needs"], a:0, d:"hard"},
+                {q:"I ___ not a naughty boy.", o:["am", "is"], a:0, d:"hard"},
+                {q:"Auntie Cherry does not ___ to Macau.", o:["go", "goes"], a:0, d:"hard"},
+                {q:"Mary, do you ___ to play a game?", o:["want", "wants"], a:0, d:"hard"},
+                {q:"Yes, I ___ bored.", o:["am", "is"], a:0, d:"hard"},
+                {q:"The game is 'Guess What'. You ___ to guess the thing.", o:["need", "needs"], a:0, d:"hard"},
+                {q:"OK. ___ it a kind of food?", o:["Is", "Are"], a:0, d:"hard"},
+                {q:"Yes, it ___ my brother's favourite food.", o:["is", "are"], a:0, d:"hard"},
+                {q:"Noodles? No. My brother does not ___ it.", o:["cook", "cooks"], a:0, d:"hard"},
+                {q:"He ___ bread and cheese only.", o:["uses", "use"], a:0, d:"hard"},
+                {q:"I ___ it! It is a sandwich!", o:["know", "knows"], a:0, d:"hard"},
+                {q:"The monkeys ___ eating apples.", o:["are", "is"], a:0, d:"hard"},
+                {q:"Do you ___ to take photos?", o:["want", "wants"], a:0, d:"hard"},
+                {q:"That man ___ a famous star.", o:["is", "are"], a:0, d:"hard"},
+                {q:"Enoch Chan ___ a library in his home.", o:["has", "have"], a:0, d:"hard"},
+                {q:"Does the clock ___ power?", o:["need", "needs"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 11, title: "Level 11: Let's & Shall", 
+            intro: {
+                points: [
+                    { sound: "當你想對朋友提出好主意時，用 Let's 或是 Shall。", html: "當你想對朋友提出好主意時，用 <b>Let's</b> (讓我們...) 或是 <b>Shall</b> (我們...好嗎？)。" },
+                    { sound: "Let's 和 Shall 非常霸道！它們後面的動詞必須是原形，絕對不能加 s 或是 ing！", html: "⚠️ 霸道規則！Let's 和 Shall 後面的動詞必須是<b>「原形」</b>，絕對不能加 -s 或是 -ing 喔！" }
+                ],
+                examples: [
+                    { en: "Let's take a walk outside.", zh: "讓我們去外面散步吧。", html_en: "<b><ins>Let's take</ins> a walk outside.</b>", html_zh: "讓我們去外面散步吧。" },
+                    { en: "Shall we take a walk outside?", zh: "我們去外面散步好嗎？", html_en: "<b><ins>Shall we take</ins> a walk outside?</b>", html_zh: "我們去外面散步好嗎？" },
+                    { en: "Let's have dinner now.", zh: "讓我們現在吃晚餐吧。", html_en: "<b><ins>Let's have</ins> dinner now.</b>", html_zh: "讓我們現在吃晚餐吧。" },
+                    { en: "Let's read the newspaper.", zh: "讓我們看報紙吧。", html_en: "<b><ins>Let's read</ins> the newspaper.</b>", html_zh: "讓我們看報紙吧。" },
+                    { en: "Shall I read the newspaper?", zh: "Shall 通常配 We 或 I 來發問喔。", html_en: "<b><ins>Shall I read</ins> the newspaper?</b>", html_zh: "Shall 通常配 We 或 I 來發問喔。" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"___ we buy a present?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Yes, ___ go to the store.", o:["let's", "shall"], a:0, d:"easy"},
+                {q:"___ clean the house.", o:["Let's", "Shall"], a:0, d:"easy"},
+                {q:"___ I order a burger?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Let's ___ the dishes.", o:["wash", "washes"], a:0, d:"easy"},
+                {q:"Let's ___ a card.", o:["write", "writing"], a:0, d:"easy"},
+                {q:"Shall I ___ piano?", o:["learn", "learns"], a:0, d:"easy"},
+                {q:"Let's ___ to the park.", o:["run", "runs"], a:0, d:"easy"},
+                {q:"Let's ___ the engine.", o:["turn", "turns"], a:0, d:"easy"},
+                {q:"___ we go to the museum?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Let's ___ a look.", o:["take", "takes"], a:0, d:"easy"},
+                {q:"Let's ___ space food.", o:["try", "tries"], a:0, d:"easy"},
+                {q:"___ we eat now?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Let's ___ games.", o:["play", "playing"], a:0, d:"easy"},
+                {q:"___ I read the book?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Let's ___ the holiday!", o:["enjoy", "enjoys"], a:0, d:"easy"},
+                {q:"Shall we ___ on the stage?", o:["dance", "dances"], a:0, d:"easy"},
+                {q:"Let's ___ a walk.", o:["take", "takes"], a:0, d:"easy"},
+                {q:"___ we send an email?", o:["Shall", "Let's"], a:0, d:"easy"},
+                {q:"Let's ___ outside.", o:["play", "plays"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"Shall we ___ the questions?", o:["ask", "asking"], a:0, d:"hard"},
+                {q:"Let's ___ English with Alvin.", o:["learn", "learns"], a:0, d:"hard"},
+                {q:"___ we take a photo together?", o:["Shall", "Let's"], a:0, d:"hard"},
+                {q:"Let's ___ the teeth now.", o:["brush", "brushes"], a:0, d:"hard"},
+                {q:"Shall we ___ a film?", o:["watch", "watches"], a:0, d:"hard"},
+                {q:"Let's ___ the library.", o:["visit", "visits"], a:0, d:"hard"},
+                {q:"___ I help you with that?", o:["Shall", "Let's"], a:0, d:"hard"},
+                {q:"Let's ___ to the teacher.", o:["listen", "listening"], a:0, d:"hard"},
+                {q:"___ we have dinner now?", o:["Shall", "Let's"], a:0, d:"hard"},
+                {q:"Let's ___ some animals.", o:["draw", "draws"], a:0, d:"hard"},
+                {q:"Shall we ___ some flowers?", o:["stick", "sticking"], a:0, d:"hard"},
+                {q:"Let's ___ the radio.", o:["turn on", "turns on"], a:0, d:"hard"},
+                {q:"___ I open the door for you?", o:["Shall", "Let's"], a:0, d:"hard"},
+                {q:"Let's ___ the room now.", o:["clean", "cleans"], a:0, d:"hard"},
+                {q:"Shall we ___ the answer?", o:["check", "checks"], a:0, d:"hard"},
+                {q:"Let's ___ quiet.", o:["keep", "keeps"], a:0, d:"hard"},
+                {q:"Let's ___ our homework.", o:["do", "does"], a:0, d:"hard"},
+                {q:"___ we invite Tom to the party?", o:["Shall", "Let's"], a:0, d:"hard"},
+                {q:"Let's ___ for the bus.", o:["wait", "waits"], a:0, d:"hard"},
+                {q:"Let's ___ the window.", o:["close", "closes"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 12, title: "Level 12: Can & Must I", 
+            intro: {
+                points: [
+                    { sound: "Can 代表能、可以，用來表示你有能力做或是被允許做。", html: "👉 <b>Can</b> 代表「能、可以」，用來表示你有能力做或是被允許做。" },
+                    { sound: "Must 代表必須、一定，用來表示一定要遵守的規則。", html: "👉 <b>Must</b> 代表「必須、一定」，用來表示一定要遵守的規則。" },
+                    { sound: "Can 和 Must 之後的動詞，永遠保持原形，千萬不可以加 s 也不可以加 ing！", html: "⚠️ <b>原形規則：</b> Can 和 Must 之後的動詞，永遠保持<b>「原形」</b>，千萬不可以加 -s 也不可以加 -ing！" }
+                ],
+                examples: [
+                    { en: "I can cook noodles.", zh: "能力：我會煮麵。", html_en: "<b>I <ins>can cook</ins> noodles.</b>", html_zh: "能力：我會煮麵。" },
+                    { en: "You can take the sweet on the table.", zh: "許可：你可以拿桌上的糖果。", html_en: "<b>You <ins>can take</ins> the sweet on the table.</b>", html_zh: "許可：你可以拿桌上的糖果。" },
+                    { en: "It must be a cat.", zh: "肯定：這一定是一隻貓。", html_en: "<b>It <ins>must be</ins> a cat.</b>", html_zh: "肯定：這一定是一隻貓。" },
+                    { en: "We must go to bed early.", zh: "必須：我們必須早點睡。", html_en: "<b>We <ins>must go</ins> to bed early.</b>", html_zh: "必須：我們必須早點睡。" },
+                    { en: "Janice can speak two languages.", zh: "千萬不要因為有 Janice 就把 speak 加上 s 喔！", html_en: "<b>Janice <ins>can speak</ins> two languages.</b>", html_zh: "千萬不要因為有 Janice 就把 speak 加上 s 喔！" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"I ___ cook noodles. (Ability)", o:["can", "must"], a:0, d:"easy"},
+                {q:"It ___ be a cat. (Certainty)", o:["must", "can"], a:0, d:"easy"},
+                {q:"You ___ take the sweet. (Permission)", o:["can", "must"], a:0, d:"easy"},
+                {q:"We ___ go to bed early. (Certain)", o:["must", "can"], a:0, d:"easy"},
+                {q:"I ___ ride a bicycle.", o:["can", "must"], a:0, d:"easy"},
+                {q:"She must ___ to her mother.", o:["talk", "talks"], a:0, d:"easy"},
+                {q:"Janice can ___ two languages.", o:["speak", "speaks"], a:0, d:"easy"},
+                {q:"You must ___ quiet.", o:["keep", "keeps"], a:0, d:"easy"},
+                {q:"A fish can ___ in the water.", o:["swim", "swims"], a:0, d:"easy"},
+                {q:"Watson can ___ a pencil to write.", o:["use", "uses"], a:0, d:"easy"},
+                {q:"Perry can ___ very loudly.", o:["shout", "shouts"], a:0, d:"easy"},
+                {q:"You must ___ to school now. It is late.", o:["go", "goes"], a:0, d:"easy"},
+                {q:"My dad can ___ the computer.", o:["fix", "fixes"], a:0, d:"easy"},
+                {q:"Thomas and I can ___.", o:["swim", "swims"], a:0, d:"easy"},
+                {q:"The washing machine can ___ our clothes.", o:["wash", "washes"], a:0, d:"easy"},
+                {q:"The dog must ___ dog food only.", o:["eat", "eats"], a:0, d:"easy"},
+                {q:"All people must ___ the rules.", o:["follow", "follows"], a:0, d:"easy"},
+                {q:"Davis can ___ very fast.", o:["read", "reads"], a:0, d:"easy"},
+                {q:"The basketball player must ___ very tall.", o:["be", "is"], a:0, d:"easy"},
+                {q:"You can ___ TV at night.", o:["watch", "watches"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"This animal must ___ a panda.", o:["be", "is"], a:0, d:"hard"},
+                {q:"Mr. Tang can ___ beautiful pictures.", o:["draw", "draws"], a:0, d:"hard"},
+                {q:"The monkeys can ___ a tree.", o:["climb", "climbs"], a:0, d:"hard"},
+                {q:"It must ___ very hot in summer.", o:["be", "is"], a:0, d:"hard"},
+                {q:"The pupils must ___ uniform to school.", o:["wear", "wears"], a:0, d:"hard"},
+                {q:"Jamie can ___ a car.", o:["drive", "drives"], a:0, d:"hard"},
+                {q:"A bird can ___ out of a tree.", o:["fly", "flies"], a:0, d:"hard"},
+                {q:"You must ___ all the questions.", o:["answer", "answers"], a:0, d:"hard"},
+                {q:"We can ___ the cake on the table.", o:["eat", "eats"], a:0, d:"hard"},
+                {q:"Amanda can ___ for 10 hours a day!", o:["sleep", "sleeps"], a:0, d:"hard"},
+                {q:"We must ___ sorry to John.", o:["say", "says"], a:0, d:"hard"},
+                {q:"Mary can ___ her shoelaces.", o:["tie", "ties"], a:0, d:"hard"},
+                {q:"Tara must ___ the doctor.", o:["see", "sees"], a:0, d:"hard"},
+                {q:"My sister can ___ English letters.", o:["read", "reads"], a:0, d:"hard"},
+                {q:"The sun must ___ very hot.", o:["be", "is"], a:0, d:"hard"},
+                {q:"Sarah can ___ very well.", o:["sing", "sings"], a:0, d:"hard"},
+                {q:"That man must ___ a policeman.", o:["be", "being"], a:0, d:"hard"},
+                {q:"You must ___ your brother.", o:["help", "helps"], a:0, d:"hard"},
+                {q:"I can ___ the computer game now.", o:["play", "plays"], a:0, d:"hard"},
+                {q:"She can ___ the future.", o:["know", "knows"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 13, title: "Level 13: Can & Must II (Negative)", 
+            intro: {
+                points: [
+                    { sound: "如果不能做或是絕對不可以做，我們就要把它們變成否定！", html: "如果「不能」做或是「絕對不可以」做，我們就要把它們變成否定！" },
+                    { sound: "Can 加 not 變成 cannot，縮寫是 can't。Must 加 not 變成 must not，縮寫是 mustn't。", html: "Can 加 not 變成 <b>cannot</b>，縮寫是 <b>can't</b>。<br>Must 加 not 變成 <b>must not</b>，縮寫是 <b>mustn't</b>。" },
+                    { sound: "超級大重點：cannot 是一個字，連在一起寫！絕對不能寫成 can not 喔！後面的動詞也是保持原形！", html: "<b>超級大重點：</b> cannot 是一個字，連在一起寫！絕對不能寫成 can not 喔！後面的動詞也是保持原形！" }
+                ],
+                examples: [
+                    { en: "Samuel cannot climb that tree.", zh: "Samuel 不能爬那棵樹。", html_en: "<b>Samuel <ins>cannot climb</ins> that tree.</b>", html_zh: "Samuel 不能爬那棵樹。" },
+                    { en: "You must not litter on the street.", zh: "你絕對不可以在街上亂丟垃圾。", html_en: "<b>You <ins>must not litter</ins> on the street.</b>", html_zh: "你絕對不可以在街上亂丟垃圾。" },
+                    { en: "Janice can't speak two languages.", zh: "cannot 的縮寫是 can't", html_en: "<b>Janice <ins>can't</ins> speak two languages.</b>", html_zh: "cannot 的縮寫是 can't" },
+                    { en: "You mustn't eat too much.", zh: "must not 的縮寫是 mustn't", html_en: "<b>You <ins>mustn't</ins> eat too much.</b>", html_zh: "must not 的縮寫是 mustn't" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"Samuel ___ climb that tree.", o:["cannot", "must not"], a:0, d:"easy"},
+                {q:"You ___ run in the corridor.", o:["cannot", "must not"], a:0, d:"easy"},
+                {q:"It ___ be an elephant.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"You ___ litter on the street.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"We ___ eat or drink on the train.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"Amy ___ run on the playground.", o:["cannot", "must not"], a:0, d:"easy"},
+                {q:"He ___ run very fast.", o:["cannot", "can not"], a:0, d:"easy"},
+                {q:"We ___ fly in the sky.", o:["cannot", "can not"], a:0, d:"easy"},
+                {q:"You must not ___ the watch in the water.", o:["put", "puts"], a:0, d:"easy"},
+                {q:"Janice ___ speak two languages.", o:["can't", "cant"], a:0, d:"easy"},
+                {q:"You ___ spit on the ground.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"We ___ feed the monkeys. They may hurt us.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"You ___ steal others' money.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"I ___ see the bird! It is in the nest.", o:["cannot", "must not"], a:0, d:"easy"},
+                {q:"Brian ___ hear anything. He is deaf.", o:["cannot", "can not"], a:0, d:"easy"},
+                {q:"We ___ pick the flowers in the park.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"You ___ lie to your mother.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"You ___ talk in class.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"We ___ waste food.", o:["must not", "cannot"], a:0, d:"easy"},
+                {q:"She ___ to you now. She is busy.", o:["can't talk", "can't talks"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"You ___ up late.", o:["mustn't wake", "mustn't wakes"], a:0, d:"hard"},
+                {q:"Flora ___ the bag. It is too heavy.", o:["cannot carry", "cannot carries"], a:0, d:"hard"},
+                {q:"Joe ___ the fish.", o:["cannot smell", "cannot smells"], a:0, d:"hard"},
+                {q:"We ___ lies.", o:["must not tell", "must not tells"], a:0, d:"hard"},
+                {q:"Kate ___ to the office.", o:["can't go", "can't goes"], a:0, d:"hard"},
+                {q:"You ___ the time.", o:["mustn't waste", "mustn't wastes"], a:0, d:"hard"},
+                {q:"People ___ on the grass.", o:["cannot walk", "cannot walks"], a:0, d:"hard"},
+                {q:"You must not ___ in the library.", o:["eat", "eats"], a:0, d:"hard"},
+                {q:"Mary can't ___ the dates.", o:["remember", "remembers"], a:0, d:"hard"},
+                {q:"He ___ read the words.", o:["cannot", "can not"], a:0, d:"hard"},
+                {q:"We ___ English on the train.", o:["cannot learn", "cannot learns"], a:0, d:"hard"},
+                {q:"The dog ___ the bone.", o:["cannot find", "cannot finds"], a:0, d:"hard"},
+                {q:"You ___ a good child.", o:["must be", "must is"], a:0, d:"hard"},
+                {q:"They ___ late for school.", o:["must not be", "must not are"], a:0, d:"hard"},
+                {q:"I ___ my dictionary!", o:["cannot find", "can not find"], a:0, d:"hard"},
+                {q:"The baby ___ now.", o:["cannot sleep", "cannot sleeps"], a:0, d:"hard"},
+                {q:"We ___ in the street.", o:["must not play", "must not plays"], a:0, d:"hard"},
+                {q:"You ___ the teacher's answers.", o:["must not copy", "must not copies"], a:0, d:"hard"},
+                {q:"He ___ very fast.", o:["cannot swim", "can not swim"], a:0, d:"hard"},
+                {q:"You ___ the animals.", o:["must not touch", "must not touches"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 14, title: "Level 14: Special Verb Forms (Present)", 
+            intro: {
+                points: [
+                    { sound: "當主角是 He, She, It 時，動詞變身有三個特殊情況！", html: "當主角是 He/She/It 時，動詞變身有三個特殊情況！" },
+                    { sound: "第一種：結尾是 o, s, z, sh, ch, x，加上 es。", html: "👉 第一種：結尾是 <b>o, s, z, sh, ch, x</b>，加上 <b>-es</b>。" },
+                    { sound: "第二種：結尾是「子音加上 y」，要去 y 加上 ies。", html: "👉 第二種：結尾是「子音加上 <b>y</b>」，要去 y 加上 <b>-ies</b>。" },
+                    { sound: "第三種：如果 y 的前面是母音 a, e, i, o, u，直接加上 s 就可以囉！", html: "👉 第三種：如果 y 的前面是母音 <b>a, e, i, o, u</b>，直接加上 <b>-s</b> 就可以囉！" }
+                ],
+                examples: [
+                    { en: "wash 變成 washes", zh: "結尾是 sh，加 es", html_en: "<b>wash 變成 wash<ins>es</ins></b>", html_zh: "結尾是 sh，加 es" },
+                    { en: "catch 變成 catches", zh: "結尾是 ch，加 es", html_en: "<b>catch 變成 catch<ins>es</ins></b>", html_zh: "結尾是 ch，加 es" },
+                    { en: "cry 變成 cries", zh: "去 y 變 ies", html_en: "<b>cry 變成 cr<ins>ies</ins></b>", html_zh: "去 y 變 ies" },
+                    { en: "play 變成 plays", zh: "y 前面是 a，所以直接加 s！", html_en: "<b>play 變成 play<ins>s</ins></b>", html_zh: "y 前面是 a，所以直接加 s！" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"wash -> ___", o:["washes", "washs"], a:0, d:"easy"},
+                {q:"catch -> ___", o:["catches", "catchs"], a:0, d:"easy"},
+                {q:"fly -> ___", o:["flies", "flys"], a:0, d:"easy"},
+                {q:"try -> ___", o:["tries", "trys"], a:0, d:"easy"},
+                {q:"play -> ___", o:["plays", "plaies"], a:0, d:"easy"},
+                {q:"do -> ___", o:["does", "dos"], a:0, d:"easy"},
+                {q:"go -> ___", o:["goes", "gos"], a:0, d:"easy"},
+                {q:"echo -> ___", o:["echoes", "echos"], a:0, d:"easy"},
+                {q:"finish -> ___", o:["finishes", "finishs"], a:0, d:"easy"},
+                {q:"guess -> ___", o:["guesses", "guesss"], a:0, d:"easy"},
+                {q:"buzz -> ___", o:["buzzes", "buzzs"], a:0, d:"easy"},
+                {q:"fix -> ___", o:["fixes", "fixs"], a:0, d:"easy"},
+                {q:"cry -> ___", o:["cries", "crys"], a:0, d:"easy"},
+                {q:"buy -> ___", o:["buys", "buies"], a:0, d:"easy"},
+                {q:"enjoy -> ___", o:["enjoys", "enjoies"], a:0, d:"easy"},
+                {q:"The girl ___ the floor.", o:["sweeps", "sweepes"], a:0, d:"easy"},
+                {q:"Jenny ___ to school by bus.", o:["goes", "gos"], a:0, d:"easy"},
+                {q:"Wing Sze ___ her homework.", o:["does", "dos"], a:0, d:"easy"},
+                {q:"Gerald ___ football.", o:["plays", "plaies"], a:0, d:"easy"},
+                {q:"Miss Lam ___ on the lights.", o:["switches", "switchs"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"The worshipper ___ to his god.", o:["prays", "praies"], a:0, d:"hard"},
+                {q:"The student ___ the exam.", o:["passes", "passies"], a:0, d:"hard"},
+                {q:"Fay ___ to run faster.", o:["tries", "trys"], a:0, d:"hard"},
+                {q:"Daisy ___ to the email.", o:["replies", "replys"], a:0, d:"hard"},
+                {q:"The dog ___ for food.", o:["searches", "searchs"], a:0, d:"hard"},
+                {q:"The dragonfly ___ the water.", o:["touches", "touchs"], a:0, d:"hard"},
+                {q:"The baby ___ at night.", o:["cries", "crys"], a:0, d:"hard"},
+                {q:"Mark ___ some water.", o:["drinks", "drinkes"], a:0, d:"hard"},
+                {q:"Grandma ___ her tea.", o:["finishes", "finishs"], a:0, d:"hard"},
+                {q:"The doorbell ___.", o:["buzzes", "buzzs"], a:0, d:"hard"},
+                {q:"The cat ___ a kite.", o:["flies", "flys"], a:0, d:"hard"},
+                {q:"The sun ___ in the sky.", o:["shines", "shins"], a:0, d:"hard"},
+                {q:"The river ___.", o:["flows", "flowes"], a:0, d:"hard"},
+                {q:"A princess ___ her hair.", o:["washes", "washs"], a:0, d:"hard"},
+                {q:"She ___ with the animals.", o:["plays", "plaies"], a:0, d:"hard"},
+                {q:"A witch ___ to kill the birds.", o:["tries", "trys"], a:0, d:"hard"},
+                {q:"She ___ the princess, too.", o:["catches", "catchs"], a:0, d:"hard"},
+                {q:"The poor princess ___.", o:["cries", "crys"], a:0, d:"hard"},
+                {q:"Mum ___ a cake.", o:["bakes", "bakeies"], a:0, d:"hard"},
+                {q:"The naughty boy ___.", o:["cries", "cryes"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 15, title: "Level 15: Special Forms in Present Continuous", 
+            intro: {
+                points: [
+                    { sound: "現在進行式的 ing 變身魔法有三個特別規則！", html: "現在進行式的 ing 變身魔法有三個特別規則！" },
+                    { sound: "字尾是 e 的，刪除 e 再加 ing。", html: "👉 規則一：字尾是 <b>e</b> 的，刪除 e 再加 <b>-ing</b>。" },
+                    { sound: "字尾是 ie 的，要把 ie 改成 y 再加 ing！", html: "👉 規則二：字尾是 <b>ie</b> 的，要把 ie 改成 <b>y</b> 再加 <b>-ing</b>！" },
+                    { sound: "字尾是短母音加單一子音的，要把最後一個字母寫兩次再加 ing。", html: "👉 規則三：字尾是短母音加單一子音的，要把<b>最後一個字母寫兩次</b>再加 <b>-ing</b>。" }
+                ],
+                examples: [
+                    { en: "live 變成 living", zh: "刪去 e 加 ing", html_en: "<b>live 變成 liv<ins>ing</ins></b>", html_zh: "刪去 e 加 ing" },
+                    { en: "die 變成 dying", zh: "ie 改成 y 加 ing", html_en: "<b>die 變成 d<ins>ying</ins></b>", html_zh: "ie 改成 y 加 ing" },
+                    { en: "get 變成 getting", zh: "短母音，把 t 寫兩次再加 ing", html_en: "<b>get 變成 get<ins>ting</ins></b>", html_zh: "短母音，把 t 寫兩次再加 ing" },
+                    { en: "swim 變成 swimming", zh: "短母音，把 m 寫兩次再加 ing", html_en: "<b>swim 變成 swim<ins>ming</ins></b>", html_zh: "短母音，把 m 寫兩次再加 ing" },
+                    { en: "see 變成 seeing", zh: "大陷阱：看到兩個 e 結尾的字，不用刪除，直接加 ing！", html_en: "<b>see 變成 see<ins>ing</ins></b>", html_zh: "大陷阱：看到兩個 e 結尾的字，不用刪除，直接加 ing！" }
+                ]
+            },
+            questions: [
+                // Easy (20)
+                {q:"live -> ___", o:["living", "liveing"], a:0, d:"easy"},
+                {q:"make -> ___", o:["making", "makeing"], a:0, d:"easy"},
+                {q:"change -> ___", o:["changing", "changeing"], a:0, d:"easy"},
+                {q:"die -> ___", o:["dying", "dieing"], a:0, d:"easy"},
+                {q:"lie -> ___", o:["lying", "lieing"], a:0, d:"easy"},
+                {q:"tie -> ___", o:["tying", "tieing"], a:0, d:"easy"},
+                {q:"get -> ___", o:["getting", "geting"], a:0, d:"easy"},
+                {q:"sit -> ___", o:["sitting", "siting"], a:0, d:"easy"},
+                {q:"swim -> ___", o:["swimming", "swiming"], a:0, d:"easy"},
+                {q:"win -> ___", o:["winning", "wining"], a:0, d:"easy"},
+                {q:"dance -> ___", o:["dancing", "danceing"], a:0, d:"easy"},
+                {q:"run -> ___", o:["running", "runing"], a:0, d:"easy"},
+                {q:"take -> ___", o:["taking", "takeing"], a:0, d:"easy"},
+                {q:"write -> ___", o:["writing", "writting"], a:0, d:"easy"},
+                {q:"give -> ___", o:["giving", "giveing"], a:0, d:"easy"},
+                {q:"ride -> ___", o:["riding", "rideing"], a:0, d:"easy"},
+                {q:"bake -> ___", o:["baking", "bakeing"], a:0, d:"easy"},
+                {q:"come -> ___", o:["coming", "comeing"], a:0, d:"easy"},
+                {q:"smile -> ___", o:["smiling", "smileing"], a:0, d:"easy"},
+                {q:"hide -> ___", o:["hiding", "hideing"], a:0, d:"easy"},
+                // Hard (20)
+                {q:"I am ___ in Causeway Bay.", o:["shopping", "shoping"], a:0, d:"hard"},
+                {q:"Jason is ___ a movie.", o:["seeing", "seing"], a:0, d:"hard"},
+                {q:"Mum is ___ dinner.", o:["making", "makeing"], a:0, d:"hard"},
+                {q:"They are ___ in Finland.", o:["living", "liveing"], a:0, d:"hard"},
+                {q:"Blake is ___ some wood.", o:["cutting", "cuting"], a:0, d:"hard"},
+                {q:"Macy and her sister are ___ the bed sheets.", o:["changing", "changeing"], a:0, d:"hard"},
+                {q:"Dennis is sad because his dog is ___.", o:["dying", "dieing"], a:0, d:"hard"},
+                {q:"Chris is ___ an email.", o:["writing", "writting"], a:0, d:"hard"},
+                {q:"We are ___ some aliens.", o:["shooting", "shoting"], a:0, d:"hard"},
+                {q:"Our hero is ___ across the river.", o:["swimming", "swiming"], a:0, d:"hard"},
+                {q:"When our hero is ___ a boat.", o:["making", "makeing"], a:0, d:"hard"},
+                {q:"He is ___ to us.", o:["coming", "comeing"], a:0, d:"hard"},
+                {q:"We are ___ the battle!", o:["losing", "loseing"], a:0, d:"hard"},
+                {q:"We are ___ into the TV.", o:["walking", "walkking"], a:0, d:"hard"},
+                {q:"We are ___ the aliens!", o:["fighting", "fightting"], a:0, d:"hard"},
+                {q:"We are ___ the war!", o:["winning", "wining"], a:0, d:"hard"},
+                {q:"We are ___ a lot of presents.", o:["receiving", "receiveing"], a:0, d:"hard"},
+                {q:"Ah Fook is ___ bamboo chopsticks.", o:["making", "makeing"], a:0, d:"hard"},
+                {q:"Candy is ___ breakfast.", o:["preparing", "prepareing"], a:0, d:"hard"},
+                {q:"The little bird is ___.", o:["dying", "dieing"], a:0, d:"hard"}
+            ]
+        },
+        { 
+            id: 16, title: "Level 16: Verbs with Prepositions", 
+            intro: {
+                points: [
+                    { sound: "在英文裡，動詞後面加上了介系詞，就會變成一個完全不同的新意思喔！", html: "在英文裡，動詞後面加上了「介系詞」(像是 in, on, at, up 等小字)，就會變成一個<b>完全不同的新意思</b>喔！" },
+                    { sound: "比如 get 是得到，但 get up 卻變成起床了！", html: "比如 get 是得到，但 <b>get up</b> 卻變成「起床」了！" },
+                    { sound: "記得配合前面學過的動詞變身規則，進行式要加 ing，如果是 He/She/It 做主角要加 s 喔！", html: "⚠️ <b>魔法結合：</b>記得配合前面學過的動詞變身規則，進行式要加 <b>-ing</b>，如果是 He/She/It 做主角要加 <b>-s</b> 喔！" }
+                ],
+                examples: [
+                    { en: "Sandra gets the book from the shelf.", zh: "get from：從某處拿取", html_en: "<b>Sandra <ins>gets</ins> the book <ins>from</ins> the shelf.</b>", html_zh: "get from：從某處拿取" },
+                    { en: "The boy gets up at 6:30am.", zh: "get up：起床", html_en: "<b>The boy <ins>gets up</ins> at 6:30am.</b>", html_zh: "get up：起床" },
+                    { en: "I am waiting for the bus.", zh: "wait for：等待", html_en: "<b>I am <ins>waiting for</ins> the bus.</b>", html_zh: "wait for：等待" },
+                    { en: "Mum looks after my little brother.", zh: "look after：照顧", html_en: "<b>Mum <ins>looks after</ins> my little brother.</b>", html_zh: "look after：照顧" },
+                    { en: "We agree with the teacher.", zh: "agree with：同意某人", html_en: "<b>We <ins>agree with</ins> the teacher.</b>", html_zh: "agree with：同意某人" }
+                ]
+            },
+            questions: [
+                // Easy (20題 🌱淺程度)
+                {q:"I agree ___ you.", o:["with", "to"], a:0, d:"easy"},
+                {q:"Please sit ___.", o:["down", "up"], a:0, d:"easy"},
+                {q:"He wakes ___ at 7 a.m.", o:["up", "on"], a:0, d:"easy"},
+                {q:"I am looking ___ my keys.", o:["for", "at"], a:0, d:"easy"},
+                {q:"She is looking ___ the flowers.", o:["at", "after"], a:0, d:"easy"},
+                {q:"Please stand ___.", o:["up", "at"], a:0, d:"easy"},
+                {q:"I believe ___ my father.", o:["in", "at"], a:0, d:"easy"},
+                {q:"He comes ___ Hong Kong.", o:["from", "in"], a:0, d:"easy"},
+                {q:"She smiles ___ the girl.", o:["at", "to"], a:0, d:"easy"},
+                {q:"We play ___ the basketball.", o:["with", "on"], a:0, d:"easy"},
+                {q:"Please turn ___ the computer.", o:["on", "in"], a:0, d:"easy"},
+                {q:"He asks ___ a drink.", o:["for", "to"], a:0, d:"easy"},
+                {q:"Please come ___ to the room.", o:["in", "at"], a:0, d:"easy"},
+                {q:"I put ___ the raincoat.", o:["on", "off"], a:0, d:"easy"},
+                {q:"You must listen ___ the teacher.", o:["to", "at"], a:0, d:"easy"},
+                {q:"I talk ___ Mary.", o:["to", "in"], a:0, d:"easy"},
+                {q:"Let's eat ___ tonight.", o:["out", "in"], a:0, d:"easy"},
+                {q:"Do not tear ___ the letter.", o:["up", "in"], a:0, d:"easy"},
+                {q:"I get ___ the train.", o:["on", "at"], a:0, d:"easy"},
+                {q:"I wait ___ the bus.", o:["for", "to"], a:0, d:"easy"},
+                // Hard (20題 🔥深程度)
+                {q:"She is listening ___ the radio. (Watch out!)", o:["to", "at"], a:0, d:"hard"},
+                {q:"I am looking ___ my sister because she is a baby.", o:["after", "at"], a:0, d:"hard"},
+                {q:"'___ up! Good morning class,' says the teacher.", o:["Stand", "Sit"], a:0, d:"hard"},
+                {q:"This is my stop. I have to ___ off the train.", o:["get", "walk"], a:0, d:"hard"},
+                {q:"'Don't ___ on him!' He is telling a lie.", o:["count", "look"], a:0, d:"hard"},
+                {q:"Please turn ___ the TV after watching.", o:["off", "up"], a:0, d:"hard"},
+                {q:"Mary is ___ after her baby sister.", o:["looking", "look"], a:0, d:"hard"},
+                {q:"The worshippers ___ in their god.", o:["believe", "believes"], a:0, d:"hard"},
+                {q:"Please ___ up and let the old lady have the seat.", o:["stand", "standing"], a:0, d:"hard"},
+                {q:"We are ___ for the bus at the bus stop.", o:["waiting", "wait"], a:0, d:"hard"},
+                {q:"Daisy ___ on the light because it is too dark.", o:["turns", "turn"], a:0, d:"hard"},
+                {q:"I am ___ to the teacher now.", o:["talking", "talk"], a:0, d:"hard"},
+                {q:"The students ___ with their teachers.", o:["agree", "agrees"], a:0, d:"hard"},
+                {q:"Granddad is ___ on his glasses.", o:["putting", "puts"], a:0, d:"hard"},
+                {q:"They are ___ into the problem.", o:["looking", "looks"], a:0, d:"hard"},
+                {q:"I am looking ___ my keys. I lost them.", o:["for", "after"], a:0, d:"hard"},
+                {q:"Get ___ ! It's 11am already. You are late!", o:["up", "in"], a:0, d:"hard"},
+                {q:"Put ___ your raincoat, it's raining.", o:["on", "off"], a:0, d:"hard"},
+                {q:"Turn ___ the lights please, it's dark.", o:["on", "in"], a:0, d:"hard"},
+                {q:"Where are you from? I ___ from Italy.", o:["come", "comes"], a:0, d:"hard"}
+            ]
+        }
+    ];
+
+    // 初始化將提示語組合
+    levelsData.forEach(lvl => {
+        lvl.hintHTML = lvl.intro.points.map(p => p.html).join("<br><br>");
+        lvl.hintSound = lvl.intro.points.map(p => p.sound).join(" ");
+    });
+
+    // ================= 狀態變數 =================
+    let currentLevel = null;
+    let currentQuestions = [];
+    let currentQIndex = 0;
+    let userAnswers = [];
+    let score = 0;
+    let retryIndex = 0;
+
+    // ================= 星星系統 =================
+    let totalStars = parseInt(localStorage.getItem('teacherCatStars')) || 0;
+    document.getElementById('starCount').innerText = totalStars;
+
+    function addStars(num) {
+        totalStars += num;
+        localStorage.setItem('teacherCatStars', totalStars);
+        document.getElementById('starCount').innerText = totalStars;
+    }
+
+    // ================= Progress Record 整合 =================
+    let levelScores = JSON.parse(localStorage.getItem('teacherCatLevelScores')) || {};
+
+    function saveScore(levelId, newScore) {
+        if (!levelScores[levelId] || newScore > levelScores[levelId]) {
+            levelScores[levelId] = newScore;
+            localStorage.setItem('teacherCatLevelScores', JSON.stringify(levelScores));
+        }
+        updateMenuButtons();
+    }
+
+    function clearRecord() {
+        if(confirm("確定要清除所有學習記錄嗎？")) {
+            levelScores = {};
+            localStorage.removeItem('teacherCatLevelScores');
+            localStorage.removeItem('teacherCatStars');
+            totalStars = 0;
+            document.getElementById('starCount').innerText = totalStars;
+            updateMenuButtons();
+        }
+    }
+
+    function updateMenuButtons() {
+        const grid = document.getElementById("levelContainer");
+        grid.innerHTML = "";
+        
+        levelsData.forEach(lvl => {
+            let btn = document.createElement("button");
+            btn.className = "level-btn";
+            
+            let s = levelScores[lvl.id];
+            let recordHtml = "";
+            if (s !== undefined) {
+                // 最大題數固定每次抽取 20 題 (每題 5 分 = 滿分 100)
+                let thisPlayCount = Math.min(lvl.questions.filter(q => q.d === 'easy').length, 10) + Math.min(lvl.questions.filter(q => q.d === 'hard').length, 10);
+                let actualMax = thisPlayCount * 5;
+                
+                let starIcon = s === actualMax ? "🌟" : (s >= (actualMax/2) ? "⭐" : "🌱");
+                recordHtml = `<span class="level-score-text">最高分: ${s} ${starIcon}</span>`;
+            }
+            
+            btn.innerHTML = `${lvl.title}${recordHtml}`; 
+            btn.onclick = () => showIntroScreen(lvl);
+            grid.appendChild(btn);
+        });
+    }
+
+    // ================= 頁面初始化 =================
+    window.onload = () => {
+        updateMenuButtons();
+    };
+
+    function showMenu() {
+        updateMenuButtons();
+        document.getElementById("mainMenu").classList.remove("hidden");
+        document.getElementById("teachingScreen").classList.add("hidden");
+        document.getElementById("gameScreen").classList.add("hidden");
+        document.getElementById("resultScreen").classList.add("hidden");
+        document.getElementById("retryModal").classList.add("hidden");
+    }
+
+    // ================= 課前預習頁面 =================
+    function showIntroScreen(lvl) {
+        currentLevel = lvl;
+        document.getElementById("teachTitle").innerText = lvl.title;
+        
+        let html = `<div style="font-size:1.5em; color:#d81b60; border-bottom:3px solid #ffb300; padding-bottom:10px; margin-bottom:15px; text-align:left;"><b>📖 學習重點：</b></div>`;
+
+        lvl.intro.points.forEach(p => {
+            html += `
+            <div style="display:flex; align-items:flex-start; margin-bottom:15px; text-align:left; background: #e3f2fd; padding: 15px; border-radius: 15px; box-shadow: 0 4px 0 #bbdefb;">
+                <button class="btn-play-small" style="flex-shrink:0; margin-right:15px;" onclick="speakText('${p.sound}', 'zh-HK')">🔊</button>
+                <div style="font-size:1.3em; line-height:1.5;">${p.html}</div>
+            </div>`;
+        });
+
+        html += `<div style="font-size:1.5em; color:#d81b60; border-bottom:3px solid #ffb300; padding-bottom:10px; margin-bottom:15px; margin-top:30px; text-align:left;"><b>🌟 5 個魔法例子：</b></div>`;
+
+        lvl.intro.examples.forEach((ex, idx) => {
+            let safeEn = ex.en.replace(/'/g, "\\'");
+            let safeZh = ex.zh.replace(/'/g, "\\'");
+            html += `
+            <div style="margin-bottom:15px; text-align:left; background: #fffde7; padding: 15px; border-radius: 15px; border: 3px dashed #ffb300;">
+                <div style="display:flex; align-items:flex-start; margin-bottom:10px;">
+                    <button class="btn-play-small" style="flex-shrink:0; margin-right:15px; background:#4caf50; box-shadow:0 3px 0 #2e7d32;" onclick="speakText('${safeEn}', 'en-GB')">🔊</button>
+                    <div style="font-size:1.4em; font-weight:bold; color:#1b5e20;">${idx+1}️⃣ ${ex.html_en}</div>
+                </div>
+                <div style="display:flex; align-items:flex-start;">
+                    <button class="btn-play-small" style="flex-shrink:0; margin-right:15px; width:35px; height:35px; font-size:1em;" onclick="speakText('${safeZh}', 'zh-HK')">🔊</button>
+                    <div style="font-size:1.2em; color:#d84315; margin-top:2px;">${ex.html_zh}</div>
+                </div>
+            </div>`;
+        });
+
+        document.getElementById("teachContent").innerHTML = html;
+        document.getElementById("mainMenu").classList.add("hidden");
+        document.getElementById("teachingScreen").classList.remove("hidden");
+        window.scrollTo(0,0);
+    }
+
+    // ================= 開始遊戲 =================
+    function startGame() {
+        // 從當前關卡題庫中隨機抽出 10 題淺、10 題深
+        let easys = currentLevel.questions.filter(q => q.d === 'easy').sort(() => 0.5 - Math.random()).slice(0, 10);
+        let hards = currentLevel.questions.filter(q => q.d === 'hard').sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        currentQuestions = [...easys, ...hards];
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("score").innerText = score;
+
+        document.getElementById("teachingScreen").classList.add("hidden");
+        document.getElementById("resultScreen").classList.add("hidden");
+        document.getElementById("gameScreen").classList.remove("hidden");
+        window.scrollTo(0,0);
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        document.getElementById("hintContainer").classList.add("hidden");
+        
+        let qData = currentQuestions[currentQIndex];
+        let diffLabel = currentQIndex < (currentQuestions.length/2) ? "🌱 淺程度" : "🔥 深程度";
+        document.getElementById("gameProgress").innerText = `第 ${currentQIndex + 1} / ${currentQuestions.length} 題 (${diffLabel})`;
+        document.getElementById("questionText").innerText = qData.q;
+        
+        let optContainer = document.getElementById("optionsContainer");
+        optContainer.innerHTML = "";
+        
+        qData.o.forEach((opt, index) => {
+            let row = document.createElement("div");
+            row.className = "option-row";
+            
+            let soundBtn = document.createElement("button");
+            soundBtn.className = "btn-play-small";
+            soundBtn.innerText = "🔊";
+            soundBtn.onclick = () => speakText(opt, 'en-GB');
+            
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            
+            if (userAnswers[currentQIndex] !== null) {
+                btn.disabled = true;
+                if (index === qData.a) btn.classList.add("correct");
+                else if (index === userAnswers[currentQIndex]) btn.classList.add("wrong");
+            } else {
+                btn.onclick = () => checkAnswer(index, qData.a, btn);
+            }
+            
+            row.appendChild(soundBtn);
+            row.appendChild(btn);
+            optContainer.appendChild(row);
+        });
+
+        let btnNext = document.getElementById("btnNext");
+        if (currentQIndex === currentQuestions.length - 1) {
+            btnNext.innerText = "完成交卷 📝";
+        } else {
+            if(userAnswers[currentQIndex] !== null) {
+                btnNext.innerText = "下一頁 ➡️";
+            } else {
+                btnNext.innerText = "下一頁 (可跳過) ➡️";
+            }
+        }
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, btnElement) {
+        if (userAnswers[currentQIndex] !== null) return; 
+        
+        userAnswers[currentQIndex] = selectedIndex;
+        let allBtns = document.getElementById("optionsContainer").querySelectorAll(".option-btn");
+        allBtns.forEach(b => b.disabled = true);
+        
+        if (selectedIndex === correctIndex) {
+            btnElement.classList.add("correct");
+            score += 5;
+            document.getElementById("score").innerText = score;
+            playExaggeratedEffect(true);
+            setTimeout(() => nextQ(), 1500); 
+        } else {
+            btnElement.classList.add("wrong");
+            allBtns[correctIndex].classList.add("correct"); 
+            playExaggeratedEffect(false);
+            
+            document.getElementById("hintText").innerHTML = currentLevel.hintHTML;
+            document.getElementById("hintAudioBtn").onclick = () => speakText(currentLevel.hintSound, 'zh-HK');
+            document.getElementById("hintContainer").classList.remove("hidden");
+            
+            // 答錯後更新按鈕文字
+            if (currentQIndex === currentQuestions.length - 1) {
+                document.getElementById("btnNext").innerText = "完成交卷 📝";
+            } else {
+                document.getElementById("btnNext").innerText = "下一頁 ➡️";
+            }
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    }
+
+    function prevQ() { if (currentQIndex > 0) { currentQIndex--; loadQuestion(); } }
+
+    function nextQ() {
+        if (currentQIndex < currentQuestions.length - 1) {
+            currentQIndex++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function playExaggeratedEffect(isCorrect) {
+        let fx = document.getElementById("fxLayer");
+        fx.innerText = isCorrect ? "🎉" : "💦";
+        fx.classList.add("show-fx");
+        speakText(isCorrect ? "Excellent!" : "Oops! Try again.", 'en-GB', isCorrect ? 1.2 : 0.8, isCorrect ? 1.5 : 0.5);
+        setTimeout(() => fx.classList.remove("show-fx"), 1000);
+    }
+
+    // ================= 結算頁面 =================
+    function showResult() {
+        document.getElementById("gameScreen").classList.add("hidden");
+        document.getElementById("resultScreen").classList.remove("hidden");
+        window.scrollTo(0,0);
+        
+        let maxScore = currentQuestions.length * 5;
+        document.getElementById("finalScoreText").innerText = `你的最終分數是: ${score} / ${maxScore} 分！`;
+        
+        saveScore(currentLevel.id, score);
+        
+        let starText = "";
+        if (score === maxScore) starText = "🌟 滿分大星星！太厲害了！🌟";
+        else if (score >= (maxScore/2)) starText = "⭐ 獲得合格小星星！繼續加油！⭐";
+        else starText = "再接再厲，下次一定可以拿到星星！";
+        
+        document.getElementById("starRewardText").innerText = starText;
+        
+        let list = document.getElementById("summaryList");
+        list.innerHTML = "";
+        
+        currentQuestions.forEach((q, i) => {
+            let isCorrect = userAnswers[i] === q.a;
+            let item = document.createElement("div");
+            item.className = `summary-item ${isCorrect ? 'correct-item' : 'wrong-item'}`;
+            
+            let statusText = "";
+            if(isCorrect) {
+                statusText = "✅ 答對";
+            } else if (userAnswers[i] === null) {
+                statusText = `⚠️ 未作答 (跳過)`;
+            } else {
+                statusText = `❌ 答錯 (你選: ${q.o[userAnswers[i]]})`;
+            }
+            
+            let html = `<div style="font-size:1.2em;"><b>Q${i+1}:</b> ${q.q} <br><span style="font-size:0.9em;">${statusText}</span></div>`;
+            if (!isCorrect) {
+                html += `<button class="btn-retry" onclick="openRetry(${i})">重新再做 🔄</button>`;
+            }
+            item.innerHTML = html;
+            list.appendChild(item);
+        });
+    }
+
+    // ================= 重做模式 =================
+    function openRetry(index) {
+        retryIndex = index;
+        let qData = currentQuestions[index];
+        
+        document.getElementById("retryQuestionText").innerText = qData.q;
+        let optContainer = document.getElementById("retryOptionsContainer");
+        optContainer.innerHTML = "";
+        
+        qData.o.forEach((opt, idx) => {
+            let row = document.createElement("div");
+            row.className = "option-row";
+            
+            let soundBtn = document.createElement("button");
+            soundBtn.className = "btn-play-small";
+            soundBtn.innerText = "🔊";
+            soundBtn.onclick = () => speakText(opt, 'en-GB');
+            
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkRetry(idx, qData.a, btn);
+            
+            row.appendChild(soundBtn);
+            row.appendChild(btn);
+            optContainer.appendChild(row);
+        });
+        
+        document.getElementById("retryHintText").innerHTML = currentLevel.hintHTML;
+        document.getElementById("retryAudioBtn").onclick = () => speakText(currentLevel.hintSound, 'zh-HK');
+        
+        document.getElementById("retryModal").classList.remove("hidden");
+    }
+
+    function checkRetry(selectedIndex, correctIndex, btnElement) {
+        if (selectedIndex === correctIndex) {
+            btnElement.classList.add("correct");
+            playExaggeratedEffect(true);
+            
+            if (userAnswers[retryIndex] !== correctIndex) {
+                userAnswers[retryIndex] = selectedIndex; 
+                score += 5; 
+                addStars(1); 
+            }
+            
+            setTimeout(() => {
+                closeRetry();
+                showResult(); 
+            }, 1000);
+        } else {
+            btnElement.classList.add("wrong");
+            playExaggeratedEffect(false);
+        }
+    }
+
+    function closeRetry() { document.getElementById("retryModal").classList.add("hidden"); }
+
+    // ================= 萬用語音朗讀 API =================
+    function speakText(text, lang='en-GB', rate=0.85, pitch=1) {
+        if(!text) return;
+        let cleaned = text.replace(/___/g, "blank").replace(/<[^>]*>?/gm, ''); 
+        const utterance = new SpeechSynthesisUtterance(cleaned);
+        utterance.lang = lang; 
+        utterance.rate = rate; 
+        utterance.pitch = pitch;
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
+</body>
+</html>
