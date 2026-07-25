@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Cat 的快樂AI教室 - 小三上數學大冒險</title>
+    <style>
+        /* 🌈 鮮豔美化的糖果色系背景 */
+        body {
+            font-family: 'Comic Sans MS', '微軟正黑體', sans-serif;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            background-attachment: fixed;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .logo { position: absolute; top: 15px; left: 15px; width: 90px; height: 90px; border-radius: 50%; border: 4px solid #FF4081; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 100; background-color: white;}
+        h1 { color: #E91E63; font-size: 3.2em; text-shadow: 3px 3px #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF; margin-top: 30px; font-weight: 900;}
+        .container { max-width: 950px; margin: 20px auto; background: rgba(255, 255, 255, 0.95); border-radius: 25px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; border: 5px solid #FFF;}
+        
+        /* 隱藏區塊 */
+        .hidden { display: none !important; }
+
+        /* 首頁關卡按鈕美化與進度整合 */
+        .record-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; }
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        
+        .level-btn { 
+            border: 4px solid #FFF; 
+            border-radius: 20px; 
+            padding: 25px 15px; 
+            font-size: 1.4em; 
+            font-weight: 900; 
+            color: #FFF; 
+            cursor: pointer; 
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2); 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            line-height: 1.4;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .level-btn:hover { transform: scale(1.05); }
+        .level-btn:active { transform: translateY(8px) scale(0.98); box-shadow: 0 0 0 transparent; }
+        
+        /* 遊戲介面與按鈕 */
+        .question-box { font-size: 1.8em; margin-bottom: 25px; font-weight: 900; padding: 30px; background: #E1F5FE; border-radius: 20px; border: 3px dashed #29B6F6; color: #0277BD;}
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .option-wrapper { display: flex; align-items: stretch; transition: transform 0.1s;}
+        .option-wrapper:hover { transform: scale(1.02); }
+        .option-btn { flex-grow: 1; background-color: #AB47BC; color: white; border: 3px solid #FFF; padding: 15px; font-size: 1.3em; font-weight: bold; border-radius: 15px 0 0 15px; cursor: pointer; box-shadow: 0 6px 0 #7B1FA2; }
+        .option-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .sound-btn { background: #FF5252; border: 3px solid #FFF; border-radius: 50%; width: 60px; height: 60px; font-size: 1.8em; color: white; cursor: pointer; margin-left: 15px; box-shadow: 0 6px 0 #D50000; flex-shrink: 0; transition: transform 0.1s;}
+        .sound-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .opt-sound-btn { background: #FF9800; border: 3px solid #FFF; border-left: none; border-radius: 0 15px 15px 0; width: 60px; font-size: 1.5em; color: white; cursor: pointer; box-shadow: 0 6px 0 #E65100; }
+        .opt-sound-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        
+        /* 導航與跳過按鈕 */
+        .nav-bar { display: flex; justify-content: space-between; margin-top: 35px; }
+        .nav-btn { color: white; border: 3px solid #FFF; padding: 12px 25px; font-size: 1.2em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: transform 0.1s;}
+        .nav-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent;}
+        .nav-btn.prev { background-color: #4CAF50; box-shadow: 0 6px 0 #2E7D32; }
+        .nav-btn.next { background-color: #4CAF50; box-shadow: 0 6px 0 #2E7D32; }
+        .nav-btn.home { background-color: #9E9E9E; box-shadow: 0 6px 0 #616161; }
+        .nav-btn.danger { background-color: #F44336; box-shadow: 0 6px 0 #C62828; }
+        .nav-btn.action { background-color: #2196F3; box-shadow: 0 6px 0 #1565C0; text-decoration: none; }
+        .skip-btn { background-color: #FF9800; color: white; border: 3px solid #FFF; padding: 15px 30px; font-size: 1.4em; font-weight: bold; border-radius: 15px; cursor: pointer; box-shadow: 0 6px 0 #E65100; margin: 25px auto; display: block; width: 80%; animation: pulse 1s infinite; }
+        
+        /* 誇張特效 */
+        @keyframes shake { 0%, 100% {transform: translate(0, 0) rotate(0deg);} 25% {transform: translate(-3px, 2px) rotate(-1deg);} 50% {transform: translate(3px, -2px) rotate(1deg);} 75% {transform: translate(-3px, -2px) rotate(-1deg);} }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .shake-effect { animation: shake 0.4s; }
+        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 180px; z-index: 9999; pointer-events: none; animation: popIn 1s ease-out forwards; text-shadow: 0 0 30px #FFEB3B; }
+        @keyframes popIn { 0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.3); } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+
+        /* 總結與重答區 */
+        .summary-list { text-align: left; max-height: 450px; overflow-y: auto; background: #F5F5F5; padding: 20px; border-radius: 15px; border: 3px solid #E0E0E0;}
+        .summary-item { padding: 15px; border-bottom: 2px solid #E0E0E0; font-size: 1.3em; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+        .summary-item.wrong { background-color: #FFEBEE; border-left: 8px solid #F44336; }
+        .summary-item.correct { background-color: #E8F5E9; border-left: 8px solid #4CAF50; }
+        .summary-item.skipped { background-color: #FFF3E0; border-left: 8px solid #FF9800; }
+        .retry-btn { background: #F44336; color: white; border: 2px solid #FFF; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #C62828; transition: transform 0.1s;}
+        .retry-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+        /* Intro & Hint Box */
+        .intro-box, .hint-box { background-color: #FFF9C4; border: 5px dashed #FBC02D; border-radius: 20px; padding: 30px; margin: 25px 0; font-size: 1.4em; text-align: left; }
+        .hint-title { color: #E65100; font-weight: 900; font-size: 1.5em; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;}
+        .huge-start-btn { font-size: 2.2em; font-weight: 900; padding: 25px 50px; background-color: #FF4081; color: white; border: 5px solid #FFF; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 0 #C2185B; margin-top: 20px; width: 100%; transition: all 0.2s; animation: pulse 1.5s infinite;}
+        .huge-start-btn:active { transform: translateY(10px); box-shadow: 0 0 0 transparent; animation: none;}
+
+        /* Footer (隨網頁捲動) */
+        .footer { background-color: #212121; color: white; text-align: center; padding: 25px 20px; width: 100%; font-size: 1.1em; box-sizing: border-box; border-top: 5px solid #FF4081; margin-top: 50px;}
+        .footer h3 { margin: 0 0 10px 0; color: #FF4081; font-size: 1.5em;}
+        .footer a { color: #40C4FF; text-decoration: none; margin: 0 12px; font-weight: bold; transition: color 0.2s; display: inline-block; padding: 5px 0;}
+        .footer a:hover { color: #FFCA28; }
+        .footer span { margin: 0 12px; color: #FFF; background: #FF9800; padding: 5px 10px; border-radius: 5px; display: inline-block;}
+    </style>
+</head>
+<body>
+
+    <img src="cat.jpeg" class="logo" alt="Teacher Cat Logo" onerror="this.src='https://via.placeholder.com/90?text=Cat'">
+
+    <h1>🌟 小三上數學大冒險 🌟</h1>
+    
+    <div id="app" class="container">
+        <div id="confetti" class="hidden">🎉✨💯</div>
+
+        <!-- 首頁：關卡選擇 -->
+        <div id="home-screen">
+            <div class="record-header">
+                <button class="nav-btn danger" onclick="clearRecords()">🗑️ 清除所有記錄</button>
+            </div>
+            <!-- 關卡按鈕區 -->
+            <div id="level-container" class="level-grid"></div>
+            
+            <br><hr style="border: 2px dashed #BDBDBD;"><br>
+            <a href="https://cat123teacher.github.io/chinese/main.html" class="nav-btn action" style="display:block; padding: 20px; font-size: 1.6em; width: 85%; margin: 0 auto;">
+                🔙 返回小朋友學習大冒險
+            </a>
+        </div>
+
+        <!-- 課前預習頁面 -->
+        <div id="intro-screen" class="hidden">
+            <h2 id="intro-title" style="color: #1565C0; font-size: 2.2em; font-weight: 900;"></h2>
+            <div class="intro-box">
+                <div class="hint-title">
+                    📖 學習重點與例子：
+                    <button class="nav-btn action" style="padding: 10px 15px; font-size: 0.8em; margin-left: auto;" onclick="playIntroSound()">🔊 讀出重點與例子</button>
+                </div>
+                <div id="intro-content"></div>
+            </div>
+            <button class="huge-start-btn" onclick="startActualGame()">🚀 準備好啦！開始挑戰！</button>
+            <br><br>
+            <button class="nav-btn home" onclick="showHome()">🏠 返回主頁</button>
+        </div>
+
+        <!-- 遊戲畫面 -->
+        <div id="game-screen" class="hidden">
+            <h3 id="progress-text" style="color: #1565C0; font-size: 1.6em; font-weight: bold;">題目: 1 / 20</h3>
+            
+            <div id="hint-box" class="hint-box hidden">
+                <div class="hint-title">
+                    🐱 Teacher Cat 提示： 
+                    <button class="nav-btn action" style="padding: 10px; font-size: 0.8em; margin-left: auto;" onclick="playHintSound()">🔊 讀出提示</button>
+                </div>
+                <div id="hint-text"></div>
+            </div>
+
+            <div class="question-box">
+                <span id="question-text">題目載入中...</span>
+                <button class="sound-btn" onclick="playText(document.getElementById('question-text').innerText)">🔊</button>
+            </div>
+            <div id="options-container" class="options-grid"></div>
+            
+            <button id="skip-btn" class="skip-btn hidden" onclick="goNext()">⏭️ 先跳到下一題 (稍後可重答)</button>
+            
+            <div class="nav-bar">
+                <button class="nav-btn prev" id="btn-prev" onclick="goPrev()">⬅️ 上一頁</button>
+                <button class="nav-btn home" onclick="showHome()">🏠 回到主頁</button>
+                <button class="nav-btn next" id="btn-next" onclick="goNext()">下一頁 ➡️</button>
+            </div>
+        </div>
+
+        <!-- 結算畫面 -->
+        <div id="summary-screen" class="hidden">
+            <h2>🏆 關卡總結 🏆</h2>
+            <h3 id="score-text" style="font-size: 2.8em; color: #E91E63; text-shadow: 2px 2px #FFF;"></h3>
+            <p style="font-size: 1.2em; color: #4CAF50; font-weight: bold;">(未作答或答錯的題目，重做答對即可即時加分喔！)</p>
+            <div id="summary-list" class="summary-list"></div>
+            <br>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <button class="nav-btn home" style="padding: 15px 30px; font-size:1.3em;" onclick="showHome()">🏠 回到主頁看星星</button>
+                <button class="nav-btn action" style="padding: 15px 30px; font-size:1.3em;" onclick="playLevel(currentLevel.id)">🔄 重新挑戰這一關</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer (隨網頁捲動) -->
+    <div class="footer">
+        <h3>🐱 Teacher Cat 的快樂AI教室</h3>
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> |
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> |
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> |
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a><br>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp 分享 Group</a> |
+        <span>抖音: 74254902683</span>
+    </div>
+
+    <script>
+        // 課前預習知識庫 (關卡按鈕顯示的文字會直接套用 title)
+        const levelsData = [
+            { id: 1, title: "第一關 - 五位數", tutorial: "<b>五位數的概念：</b><br>五位數有萬位、千位、百位、十位和個位。<br>例如：42,710 讀作「四萬二千七百一十」。<br><br><b>💡 Teacher Cat 秘訣：</b><br>比較大小時，要從最左邊的「萬位」開始比較哦！" },
+            { id: 2, title: "第二關 - 公里", tutorial: "<b>認識公里 (km)：</b><br>1 公里 (km) = 1000 米 (m)。<br><br><b>💡 Teacher Cat 秘訣：</b><br>我們通常用公里來量度較長的距離，例如汽車行駛的距離、香港到日本的距離等。" },
+            { id: 3, title: "第三關 - 毫米", tutorial: "<b>認識毫米 (mm)：</b><br>1 厘米 (cm) = 10 毫米 (mm)。<br><br><b>💡 Teacher Cat 秘訣：</b><br>毫米用來量度很微小的物件，例如硬幣的厚度、螞蟻的長度。" },
+            { id: 4, title: "第四關 - 合適的長度單位", tutorial: "<b>選擇合適的單位：</b><br>毫米(mm)極短，厘米(cm)量書本，米(m)量操場，公里(km)量車程。<br><br><b>💡 Teacher Cat 秘訣：</b><br>把單位代入生活，一本字典厚約 50mm，不是 50cm 哦！" },
+            { id: 5, title: "第五關 - 乘法(一)", tutorial: "<b>兩位數乘一位數：</b><br>例如：15 × 4 = 60。<br><br><b>💡 Teacher Cat 秘訣：</b><br>記得乘法可以交換相乘，結果是一樣的 (24 × 5 = 5 × 24)。" },
+            { id: 6, title: "第六關 - 乘法(二)", tutorial: "<b>三位數乘一位數：</b><br>例如：125 × 4 = 500。<br><br><b>💡 Teacher Cat 秘訣：</b><br>計算時要小心進位！如果估算，可以把 386 看成 400 來快算。" },
+            { id: 7, title: "第七關 - 乘法應用題", tutorial: "<b>解應用題技巧：</b><br>找出「每份有多少」和「共有多少份」。<br><br><b>💡 Teacher Cat 秘訣：</b><br>例如每盒有6件蛋糕，買4盒共有：6 × 4 = 24件。" },
+            { id: 8, title: "第八關 - 時間應用題", tutorial: "<b>計算時間間隔：</b><br>結束時間 - 開始時間 = 所用時間。<br><br><b>💡 Teacher Cat 秘訣：</b><br>如果經過了正午 12 點，要特別小心上午和下午的轉換喔！" },
+            { id: 9, title: "第九關 - 秒", tutorial: "<b>認識秒 (s)：</b><br>1 分鐘 = 60 秒 (s)。<br><br><b>💡 Teacher Cat 秘訣：</b><br>秒針走一小格就是1秒，走一圈就是60秒（即1分鐘）。" },
+            { id: 10, title: "第十關 - 除法(一)", tutorial: "<b>兩位數除以一位數：</b><br>例如：64 ÷ 2 = 32。<br><br><b>💡 Teacher Cat 秘訣：</b><br>如果有餘數，餘數必定要比「除數」小！" },
+            { id: 11, title: "第十一關 - 除法(二)", tutorial: "<b>三位數除以一位數：</b><br>例如：418 ÷ 4。<br><br><b>💡 Teacher Cat 秘訣：</b><br>要注意不夠除時，要在商的該位置補「0」。" },
+            { id: 12, title: "第十二關 - 除法應用題", tutorial: "<b>餘數的處理：</b><br>把東西平均分配就要用除法。<br><br><b>💡 Teacher Cat 秘訣：</b><br>如果問「最少要多少個盒子」，記得餘下的東西也要多加一個盒子喔！" },
+            { id: 13, title: "第十三關 - 比較重量", tutorial: "<b>天平的使用：</b><br>天平向下沉的一邊代表比較「重」，升起的一邊代表比較「輕」。<br><br><b>💡 Teacher Cat 秘訣：</b><br>如果天平平衡，代表兩邊的物件一樣重！" },
+            { id: 14, title: "第十四關 - 克和公斤", tutorial: "<b>認識重量單位：</b><br>1 公斤 (kg) = 1000 克 (g)。<br><br><b>💡 Teacher Cat 秘訣：</b><br>較輕的物件用「克」(例如：餅乾)，較重的物件用「公斤」(例如：西瓜、體重)。" },
+            { id: 15, title: "第十五關 - 平行線", tutorial: "<b>認識平行線：</b><br>兩條直線如果永遠保持相同的距離，無論畫多長都不會相交，它們就是「平行線」。<br><br><b>💡 Teacher Cat 秘訣：</b><br>就像火車路軌一樣，永遠平排！" },
+            { id: 16, title: "第十六關 - 平行四邊形", tutorial: "<b>平行四邊形的特性：</b><br>它有「兩組」對邊分別互相平行，而且對邊的長度相等。<br><br><b>💡 Teacher Cat 秘訣：</b><br>長方形和正方形都是平行四邊形的一種喔！" },
+            { id: 17, title: "第十七關 - 梯形", tutorial: "<b>梯形的特性：</b><br>梯形「只有一組」對邊互相平行。這組平行的邊叫做上底和下底。<br><br><b>💡 Teacher Cat 秘訣：</b><br>只要有兩組平行邊，它就變成平行四邊形，而不是梯形了。" },
+            { id: 18, title: "第十八關 - 24小時制", tutorial: "<b>報時制轉換：</b><br>把一天的時間由 0 時至 24 時表示。<br><br><b>💡 Teacher Cat 秘訣：</b><br>下午的時間，只要把 12 小時制的時數加上 12 就可以了！（例如下午1時 = 13:00）" }
+        ];
+
+        // =================================================================
+        // 🚨 題庫區 (僅保留 第 1 關 及 第 18 關，其餘留空)
+        // =================================================================
+        const questionBank = {
+            1: [
+                // 淺程度 (20題)
+                { q: "「三萬零八百九十五」寫成數字是？", options: ["A. 3895", "B. 30895", "C. 38095", "D. 300895"], ans: 1 },
+                { q: "在 56 798 這個數中，數字「6」在什麼位？", options: ["A. 萬位", "B. 千位", "C. 百位", "D. 十位"], ans: 1 },
+                { q: "最小的五位數是？", options: ["A. 10000", "B. 11111", "C. 10001", "D. 99999"], ans: 0 },
+                { q: "最大的五位數是？", options: ["A. 98765", "B. 10000", "C. 99999", "D. 90000"], ans: 2 },
+                { q: "「四萬三千七百零一」寫成數字是？", options: ["A. 43701", "B. 43071", "C. 43710", "D. 40371"], ans: 0 },
+                { q: "8萬2千零7 寫作數字是？", options: ["A. 8207", "B. 82007", "C. 80207", "D. 82070"], ans: 1 },
+                { q: "在 42 710 這個數裏，數字「2」表示的數值是？", options: ["A. 2", "B. 20", "C. 2000", "D. 20000"], ans: 2 },
+                { q: "30 895 讀作？", options: ["A. 三萬八百九十五", "B. 三萬零八百九十五", "C. 三千八百九十五", "D. 三萬八千九十五"], ans: 1 },
+                { q: "84 205 是單數還是雙數？", options: ["A. 單數", "B. 雙數", "C. 兩者皆是", "D. 無法分辨"], ans: 0 },
+                { q: "依規律填數：56 798, 56 799, ___, 56 801", options: ["A. 56 790", "B. 56 800", "C. 56 700", "D. 56 810"], ans: 1 },
+                { q: "依規律填數：97 001, 97 000, 96 999, ___", options: ["A. 96 998", "B. 96 900", "C. 96 990", "D. 97 002"], ans: 0 },
+                { q: "把 63 798 和 57 896 比較，哪一個較大？", options: ["A. 63 798", "B. 57 896", "C. 一樣大", "D. 不能比較"], ans: 0 },
+                { q: "12 657 比 12 723 (大/小)？", options: ["A. 大", "B. 小", "C. 相等", "D. 不確定"], ans: 1 },
+                { q: "在 30 562, 29 875, 29 314 中，哪個最大？", options: ["A. 30 562", "B. 29 875", "C. 29 314", "D. 一樣大"], ans: 0 },
+                { q: "一個五位數的最高位是甚麼位？", options: ["A. 個位", "B. 百位", "C. 千位", "D. 萬位"], ans: 3 },
+                { q: "20 000 是單數還是雙數？", options: ["A. 單數", "B. 雙數", "C. 不確定", "D. 不是數字"], ans: 1 },
+                { q: "在 56 173 中，十位數字是？", options: ["A. 1", "B. 3", "C. 7", "D. 6"], ans: 2 },
+                { q: "在 9677, 11 215, 10 358 中，哪個最小？", options: ["A. 9677", "B. 11 215", "C. 10 358", "D. 全部一樣"], ans: 0 },
+                { q: "依規律填數：10 400, 10 300, 10 200, ___", options: ["A. 10 100", "B. 10 000", "C. 9 100", "D. 10 500"], ans: 0 },
+                { q: "依規律填數：8750, ___, 10 750, 11 750", options: ["A. 9000", "B. 9750", "C. 9500", "D. 10 000"], ans: 1 },
+
+                // 深程度 (20題)
+                { q: "寫出一個比 9928 大，又比 10 127 小的「雙數」。", options: ["A. 9927", "B. 10 000", "C. 10 129", "D. 9920"], ans: 1 },
+                { q: "把 30 562, [?], 29 314 由大至小排列，[?] 可能是？", options: ["A. 31 280", "B. 30 176", "C. 29 875", "D. 29 200"], ans: 2 },
+                { q: "家明把一個五位數的萬位和十位數字調換了，錯寫成 30 172。原來的五位數是？", options: ["A. 10 372", "B. 13 702", "C. 70 132", "D. 73 012"], ans: 2 },
+                { q: "用 8, 3, 2, 7, 0, 1 組成千位數字是「2」的最小五位數是？", options: ["A. 12 037", "B. 10 237", "C. 12 370", "D. 32 017"], ans: 0 },
+                { q: "把 71 258, [?], 68 415 由大至小排列，[?] 可能是？", options: ["A. 72 060", "B. 71 690", "C. 69 710", "D. 67 220"], ans: 2 },
+                { q: "用 3, 2, 9, 5, 5 組成最小的五位雙數是？", options: ["A. 23 559", "B. 23 595", "C. 35 592", "D. 95 532"], ans: 2 },
+                { q: "「40 058」用中國數字寫出是？", options: ["A. 四萬五十八", "B. 四萬零五十八", "C. 四千零五十八", "D. 四十萬零五十八"], ans: 1 },
+                { q: "在 27 309 這個數裏，數字「7」表示的數值是多少？", options: ["A. 七萬", "B. 七百", "C. 七", "D. 七千"], ans: 3 },
+                { q: "在 12 693 中，百位數字(600)是個位數字(3)的多少倍？", options: ["A. 2倍", "B. 20倍", "C. 200倍", "D. 2000倍"], ans: 2 },
+                { q: "把算珠 5 粒放在算柱上，表示出最小的五位單數。這數是？", options: ["A. 10 004", "B. 40 001", "C. 50 000", "D. 10 013"], ans: 0 },
+                { q: "某品牌電視A款售9677，B款11215，C款10358。銷量由少至多排列是？", options: ["A. A, B, C", "B. A, C, B", "C. C, A, B", "D. B, C, A"], ans: 1 },
+                { q: "用 8, 5, 2, 0, 4 組成最小的五位數是？", options: ["A. 02 458", "B. 20 458", "C. 24 058", "D. 85 420"], ans: 1 },
+                { q: "用 8, 5, 2, 0, 4 組成最大的五位單數是？", options: ["A. 85 420", "B. 84 205", "C. 85 204", "D. 84 025"], ans: 1 },
+                { q: "一個五位數，萬位是4，千位比萬位少2，其餘位數是0。這數是？", options: ["A. 42 000", "B. 46 000", "C. 40 200", "D. 24 000"], ans: 0 },
+                { q: "如果一個五位數的萬位是9，它一定大於以下哪個數？", options: ["A. 89 999", "B. 90 001", "C. 99 999", "D. 91 000"], ans: 0 },
+                { q: "用阿拉伯數字寫出「六萬四千零九十」。", options: ["A. 64 900", "B. 64 090", "C. 60 490", "D. 64 009"], ans: 1 },
+                { q: "組成最大的五位單數，應把最小的單數放在哪一個位？", options: ["A. 萬位", "B. 千位", "C. 十位", "D. 個位"], ans: 3 },
+                { q: "以下哪一個是單數？", options: ["A. 20 000", "B. 12 640", "C. 38 590", "D. 12 657"], ans: 3 },
+                { q: "比 43 679 大，又比 43 681 小的數是？", options: ["A. 43 680", "B. 43 678", "C. 43 700", "D. 44 000"], ans: 0 },
+                { q: "「八萬二千零七」寫成數字是？", options: ["A. 8207", "B. 80 207", "C. 82 007", "D. 82 070"], ans: 2 }
+            ],
+            2: [
+                // 淺程度 (首 20 題)
+                { q: "1 公里 (km) 等於多少米 (m)？", options: ["A. 100", "B. 10", "C. 1000", "D. 10000"], ans: 2 },
+                { q: "爸爸在運動場跑了 2 公里，即跑了多少米？", options: ["A. 200", "B. 2000", "C. 20", "D. 20000"], ans: 1 },
+                { q: "3 km 等於多少 m？", options: ["A. 30", "B. 300", "C. 3000", "D. 30000"], ans: 2 },
+                { q: "機場快線全長約 35 000 米，即約多少公里？", options: ["A. 350", "B. 35", "C. 3.5", "D. 3500"], ans: 1 },
+                { q: "在 3 km, 400 m, 3500 m 中，哪一個長度最短？", options: ["A. 3 km", "B. 400 m", "C. 3500 m", "D. 一樣長"], ans: 1 },
+                { q: "在 3 km, 400 m, 3500 m 中，哪一個長度最長？", options: ["A. 3 km", "B. 400 m", "C. 3500 m", "D. 一樣長"], ans: 2 },
+                { q: "前往上海的飛行距離約 1200 公里，高雄約 650 公里。前往哪裏的距離較長？", options: ["A. 上海", "B. 高雄", "C. 一樣", "D. 無法比較"], ans: 0 },
+                { q: "廣深港高速鐵路全長約是多少？", options: ["A. 14米", "B. 14厘米", "C. 140米", "D. 140公里"], ans: 3 },
+                { q: "山頂纜車全長 1 公里 365 米，即多少米？", options: ["A. 1365", "B. 10365", "C. 136", "D. 365"], ans: 0 },
+                { q: "2 公里 50 米等於多少米？", options: ["A. 250", "B. 2050", "C. 2500", "D. 20050"], ans: 1 },
+                { q: "8000 米即是多少公里？", options: ["A. 80", "B. 800", "C. 8", "D. 0.8"], ans: 2 },
+                { q: "4 km 200 m = ? m", options: ["A. 420", "B. 4020", "C. 4200", "D. 40020"], ans: 2 },
+                { q: "下列哪一項的距離最適合用「公里」量度？", options: ["A. 書桌長度", "B. 操場一圈", "C. 香港到深圳", "D. 鉛筆長度"], ans: 2 },
+                { q: "7 公里等於多少米？", options: ["A. 700", "B. 70", "C. 7000", "D. 70000"], ans: 2 },
+                { q: "比較 1200 m 和 1 km，哪一個較長？", options: ["A. 1200 m", "B. 1 km", "C. 一樣長", "D. 不能比較"], ans: 0 },
+                { q: "10 公里即是多少米？", options: ["A. 1000", "B. 100", "C. 10000", "D. 100000"], ans: 2 },
+                { q: "5 km 和 5000 m，哪一個較長？", options: ["A. 5 km", "B. 5000 m", "C. 一樣長", "D. 無法比較"], ans: 2 },
+                { q: "9009 米轉換為公里和米是？", options: ["A. 9公里9米", "B. 9公里90米", "C. 90公里9米", "D. 9公里900米"], ans: 0 },
+                { q: "下列哪一個長度大於 2 km？", options: ["A. 200 m", "B. 2000 m", "C. 1999 m", "D. 2001 m"], ans: 3 },
+                { q: "前往台北距離 800 公里，河內 900 公里，兩地相差多少公里？", options: ["A. 100", "B. 1700", "C. 800", "D. 900"], ans: 0 },
+
+                // 深程度 (後 20 題)
+                { q: "志偉家與遊樂場相距 500 m，他在家和遊樂場之間來回走一次，共走了多少 km？", options: ["A. 1000 km", "B. 1 km", "C. 10 km", "D. 500 km"], ans: 1 },
+                { q: "由雪糕店經藥房(5km)走到花店(4km)，全程要走多少 km？", options: ["A. 9", "B. 1", "C. 20", "D. 54"], ans: 0 },
+                { q: "由麵包店經花店，最短的路程只需走多少 km？(直接過7km或經其他路)", options: ["A. 7", "B. 13", "C. 11", "D. 9"], ans: 0 },
+                { q: "以下哪一項的長度是最長的？", options: ["A. 1065 米", "B. 1 公里 65 米", "C. 165 米", "D. 1 km 650 m"], ans: 3 },
+                { q: "如果滾輪轉動一圈即 1 米，用滾輪量度 1 公里的路程，共會轉動多少圈？", options: ["A. 10", "B. 100", "C. 1000", "D. 10000"], ans: 2 },
+                { q: "八仙嶺自然教育徑全長約 4 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "美思由學校(3000米)經運動場去公園(2公里)，路程是多少？", options: ["A. 3002米", "B. 5公里", "C. 500米", "D. 2300米"], ans: 1 },
+                { q: "子華由家去圖書館，最短的路程是？(經運動場4km+2km=6km, 經公園2km+2km=4km)", options: ["A. 6 公里", "B. 4 公里", "C. 2004 米", "D. 8 公里"], ans: 1 },
+                { q: "哥哥和朋友參加步行籌款，他們最可能走的距離是？", options: ["A. 10 km", "B. 10 m", "C. 100 cm", "D. 100 mm"], ans: 0 },
+                { q: "遠足徑鳳凰徑約長 70 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "運動場一圈是 400 米，小明跑了 5 圈，即是跑了多少公里？", options: ["A. 2000公里", "B. 2公里", "C. 20公里", "D. 200公里"], ans: 1 },
+                { q: "一輛車每小時行駛 60 公里，半小時行駛多少公里？", options: ["A. 120", "B. 60", "C. 30", "D. 15"], ans: 2 },
+                { q: "把 3 km, 3500 m, 400 m 由長至短排列，正確的是？", options: ["A. 3500 m, 3 km, 400 m", "B. 3 km, 3500 m, 400 m", "C. 400 m, 3 km, 3500 m", "D. 3500 m, 400 m, 3 km"], ans: 0 },
+                { q: "一條大橋長 2 km 150 m，另一條隧道長 1900 m。相差多少米？", options: ["A. 250 m", "B. 150 m", "C. 350 m", "D. 2050 m"], ans: 0 },
+                { q: "地鐵站 A 到 B 距離 1 km 200 m，B 到 C 距離 800 m。A 經 B 到 C 共長？", options: ["A. 2 km", "B. 10 km", "C. 1 km 1000 m", "D. 2000 km"], ans: 0 },
+                { q: "跑道一圈長 200 m，要跑多少圈才足夠 1 km？", options: ["A. 10", "B. 5", "C. 50", "D. 2"], ans: 1 },
+                { q: "單車徑長 8 km，踩單車去程和回程共走了多少 m？", options: ["A. 16", "B. 160", "C. 1600", "D. 16000"], ans: 3 },
+                { q: "某人以滾輪量度路程，轉了 2500 圈 (每圈1米)，即是？", options: ["A. 25 km", "B. 2.5 km", "C. 250 km", "D. 0.25 km"], ans: 1 },
+                { q: "一隻麻雀飛了 10 km，一隻燕子飛了 10000 m。誰飛得較遠？", options: ["A. 麻雀", "B. 燕子", "C. 一樣遠", "D. 無法計算"], ans: 2 },
+                { q: "從香港到某城市的直線距離是 450 ___，最適當的單位是？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 3 }
+            ],
+
+            // ================= 第三關：毫米 =================
+            3: [
+                // 淺程度 (首 20 題)
+                { q: "1 厘米 (cm) 等於多少毫米 (mm)？", options: ["A. 10", "B. 100", "C. 1000", "D. 5"], ans: 0 },
+                { q: "9 cm 3 mm = ? mm", options: ["A. 93", "B. 903", "C. 39", "D. 12"], ans: 0 },
+                { q: "12 厘米 6 毫米 = ? 毫米", options: ["A. 126", "B. 1206", "C. 18", "D. 1260"], ans: 0 },
+                { q: "直尺上每一小格代表多少？", options: ["A. 1 mm", "B. 1 cm", "C. 1 m", "D. 10 mm"], ans: 0 },
+                { q: "一條長 10 mm 的線，即是多少 cm？", options: ["A. 1", "B. 10", "C. 100", "D. 1000"], ans: 0 },
+                { q: "25 mm = ? cm ? mm", options: ["A. 2 cm 5 mm", "B. 5 cm 2 mm", "C. 25 cm 0 mm", "D. 0 cm 25 mm"], ans: 0 },
+                { q: "7 厘米等於多少毫米？", options: ["A. 7", "B. 70", "C. 700", "D. 7000"], ans: 1 },
+                { q: "量度一粒米的長度，最適合的單位是？", options: ["A. km", "B. m", "C. cm", "D. mm"], ans: 3 },
+                { q: "50 mm 和 5 cm，哪一個較長？", options: ["A. 50 mm", "B. 5 cm", "C. 一樣長", "D. 無法比較"], ans: 2 },
+                { q: "8 cm 等於多少 mm？", options: ["A. 8", "B. 80", "C. 800", "D. 8000"], ans: 1 },
+                { q: "一張八達通卡的長度約是 85 mm 還是 850 mm？", options: ["A. 85 mm", "B. 850 mm", "C. 8.5 mm", "D. 8 mm"], ans: 0 },
+                { q: "10 厘米等於多少毫米？", options: ["A. 1", "B. 10", "C. 100", "D. 1000"], ans: 2 },
+                { q: "比較 45 mm 和 4 cm，哪一個較長？", options: ["A. 45 mm", "B. 4 cm", "C. 一樣長", "D. 無法比較"], ans: 0 },
+                { q: "6 cm 8 mm 即是多少 mm？", options: ["A. 68", "B. 86", "C. 608", "D. 806"], ans: 0 },
+                { q: "量度硬幣的厚度，最適當的單位是？", options: ["A. km", "B. m", "C. cm", "D. mm"], ans: 3 },
+                { q: "30 毫米即是多少厘米？", options: ["A. 3", "B. 30", "C. 300", "D. 0.3"], ans: 0 },
+                { q: "1 cm 5 mm 等於多少 mm？", options: ["A. 15", "B. 51", "C. 105", "D. 150"], ans: 0 },
+                { q: "半厘米即是多少毫米？", options: ["A. 0.5", "B. 5", "C. 50", "D. 500"], ans: 1 },
+                { q: "長尾夾的長度大約是 25 ___？", options: ["A. m", "B. cm", "C. mm", "D. km"], ans: 2 },
+                { q: "100 mm = ? cm", options: ["A. 1", "B. 10", "C. 100", "D. 1000"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "鑰匙 P(65mm), Q(4cm3mm), R(6cm)。最短的是？", options: ["A. P", "B. Q", "C. R", "D. 一樣"], ans: 1 },
+                { q: "香腸的一端在直尺的 1 cm，另一端在 9 cm，香腸的長度是多少毫米？", options: ["A. 8", "B. 80", "C. 10", "D. 100"], ans: 1 },
+                { q: "畫筆長19cm7mm，螢光筆長13cm。鉛筆比螢光筆長但比畫筆短，鉛筆可能長？", options: ["A. 122 mm", "B. 138 mm", "C. 152 mm", "D. 202 mm"], ans: 2 },
+                { q: "草蜢走到石頭，路徑甲是(35mm+50mm)，路徑乙是(28mm+40mm)。較長的路徑是？", options: ["A. 85 mm", "B. 8.5 cm", "C. 68 mm", "D. 以上A和B皆是"], ans: 3 },
+                { q: "一塊積木高 25 毫米，四塊相同的積木疊起來後，總高度約是？", options: ["A. 10 mm", "B. 100 mm", "C. 10 cm", "D. B和C皆正確"], ans: 3 },
+                { q: "絲帶一端在 2 cm，另一端在 12 cm，絲帶長多少毫米？", options: ["A. 100", "B. 10", "C. 120", "D. 140"], ans: 0 },
+                { q: "衣夾 A長 5 cm，B長 6 cm 5 mm。兩者相差多少 mm？", options: ["A. 15", "B. 10", "C. 5", "D. 20"], ans: 0 },
+                { q: "偉雄的鉛筆長 110 mm，子晴長 10 cm 2 mm。誰的較長？", options: ["A. 偉雄", "B. 子晴", "C. 一樣長", "D. 差 8 cm"], ans: 0 },
+                { q: "一個光碟盒厚 1 厘米，5 個疊起來高多少毫米？", options: ["A. 5", "B. 50", "C. 500", "D. 15"], ans: 1 },
+                { q: "一支鉛筆的長度約是？", options: ["A. 18 mm", "B. 180 mm", "C. 180 cm", "D. 18 m"], ans: 1 },
+                { q: "橡皮擦長 4 cm 2 mm，用去了 8 mm，還剩多少 mm？", options: ["A. 34", "B. 42", "C. 50", "D. 40"], ans: 0 },
+                { q: "把 3 條長 15 mm 的紙條接在一起，接駁處不重疊，總長是多少 cm？", options: ["A. 45", "B. 4.5", "C. 0.45", "D. 450"], ans: 1 },
+                { q: "50 張紙厚 5 mm，100 張紙厚多少 cm？", options: ["A. 10", "B. 1", "C. 100", "D. 1000"], ans: 1 },
+                { q: "昆蟲 A 長 1 cm 8 mm，昆蟲 B 長 24 mm。相差多少 mm？", options: ["A. 6", "B. 16", "C. 42", "D. 14"], ans: 0 },
+                { q: "一本書厚 2 cm 5 mm，把它放進高 3 cm 的信封裏，還剩多少空間(mm)？", options: ["A. 5", "B. 15", "C. 50", "D. 25"], ans: 0 },
+                { q: "量度螞蟻的長度，得到 6 ___，應填入什麼單位？", options: ["A. km", "B. m", "C. cm", "D. mm"], ans: 3 },
+                { q: "1 厘米的線段中，可以畫出多少個 1 毫米的小格？", options: ["A. 1", "B. 10", "C. 100", "D. 無限"], ans: 1 },
+                { q: "以下哪一項的長度剛好是 100 mm？", options: ["A. 1 m", "B. 1 cm", "C. 10 cm", "D. 10 m"], ans: 2 },
+                { q: "長度 234 mm 即是多少 cm 多少 mm？", options: ["A. 2 cm 34 mm", "B. 23 cm 4 mm", "C. 234 cm 0 mm", "D. 0 cm 234 mm"], ans: 1 },
+                { q: "手指甲的闊度大約是 1 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 1 }
+            ],
+
+            // ================= 第四關：合適的長度單位 =================
+            4: [
+                // 淺程度 (首 20 題)
+                { q: "牙刷長約 18 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 1 },
+                { q: "港鐵西鐵線長約 19 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "雙層巴士長約 13 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 2 },
+                { q: "日記簿厚約 20 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 0 },
+                { q: "一塊牛扒的厚度約是 10 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 0 },
+                { q: "香港和澳門相距約 65 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "一部計算機厚約 1 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 1 },
+                { q: "一個五角硬幣的厚度約是 2 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 0 },
+                { q: "香港電車全程的長度約是 15 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "一枝燈柱高約 5 ___？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 2 },
+                { q: "黑板的長度約是 3 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 2 },
+                { q: "書桌的高度約是 75 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 1 },
+                { q: "一隻螞蟻長約 4 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 0 },
+                { q: "大樹高約 10 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 2 },
+                { q: "運動場一圈長約 400 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 2 },
+                { q: "智能電話的長度約為 15 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 1 },
+                { q: "一粒綠豆的長度約 5 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 0 },
+                { q: "一層樓的高度約 3 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 2 },
+                { q: "飛機飛行的高度可達 10 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 3 },
+                { q: "成人步距約 50 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "甚麼工具最適合用來量度手提電話的厚度？", options: ["A. 直尺", "B. 滾輪", "C. 米尺", "D. 軟尺"], ans: 0 },
+                { q: "甚麼工具最適合用來量度美術室的長度？", options: ["A. 軟尺", "B. 滾輪", "C. 直尺", "D. 圓規"], ans: 1 },
+                { q: "甚麼工具最適合用來量度圍繞汽水罐一圈的長度？", options: ["A. 滾輪", "B. 軟尺", "C. 直尺", "D. 米尺"], ans: 1 },
+                { q: "以下哪一項最適合用來量度一個特色郵票的長度？", options: ["A. 直尺", "B. 長尾夾", "C. 指南針", "D. 滾輪"], ans: 0 },
+                { q: "捲尺不適合使用在以下哪一項量度？", options: ["A. 20元紙幣長度", "B. 字典的厚度", "C. 足球場的長度", "D. 水杯的高度"], ans: 2 },
+                { q: "以下哪一項最適合使用滾輪量度？", options: ["A. 褲子的長度", "B. 手錶的厚度", "C. 桌子的高度", "D. 緩跑徑的長度"], ans: 3 },
+                { q: "一粒白米的長度約是 6 ___？", options: ["A. km", "B. m", "C. cm", "D. mm"], ans: 3 },
+                { q: "艾菲爾鐵塔的高度約是 320 ___？", options: ["A. km", "B. m", "C. cm", "D. mm"], ans: 1 },
+                { q: "遠足徑鳳凰徑約長 70 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 3 },
+                { q: "量度一個西瓜的腰圍，應該用甚麼工具？", options: ["A. 直尺", "B. 軟尺", "C. 滾輪", "D. 捲尺"], ans: 1 },
+                { q: "量度班房門的高度，最適合用甚麼工具？", options: ["A. 直尺", "B. 軟尺", "C. 米尺 / 捲尺", "D. 滾輪"], ans: 2 },
+                { q: "量度高速公路的長度，會用到甚麼單位？", options: ["A. 毫米", "B. 厘米", "C. 米", "D. 公里"], ans: 3 },
+                { q: "以下哪一項的長度大約是 1 厘米？", options: ["A. 手指甲闊度", "B. 手臂長度", "C. 門的厚度", "D. 頭髮的粗度"], ans: 0 },
+                { q: "以下哪一項的長度大約是 1 毫米？", options: ["A. 硬幣厚度", "B. 擦膠長度", "C. 課本厚度", "D. 門的高度"], ans: 0 },
+                { q: "以下哪一項大約長 1 米？", options: ["A. 跨步的距離", "B. 鉛筆的長度", "C. 萬字夾的長度", "D. 汽車的長度"], ans: 0 },
+                { q: "以下哪一項大約長 1 公里？", options: ["A. 兩個巴士站距離", "B. 走廊長度", "C. 香港到日本", "D. 手指長度"], ans: 0 },
+                { q: "如果想量度一條彎曲小路的長度，最好用？", options: ["A. 直尺", "B. 滾輪", "C. 米尺", "D. 三角尺"], ans: 1 },
+                { q: "一本字典厚約 50 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 0 },
+                { q: "課室黑板長約 400 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 1 },
+                { q: "香港海洋公園纜車全長約 1.5 ___？", options: ["A. mm", "B. cm", "C. m", "D. km"], ans: 3 }
+            ],
+
+            // ================= 第五關：乘法(一) =================
+            5: [
+                // 淺程度 (首 20 題)
+                { q: "12 × 2 = ?", options: ["A. 24", "B. 14", "C. 10", "D. 22"], ans: 0 },
+                { q: "27 × 3 = ?", options: ["A. 61", "B. 71", "C. 81", "D. 91"], ans: 2 },
+                { q: "84 × 4 = ?", options: ["A. 336", "B. 326", "C. 316", "D. 346"], ans: 0 },
+                { q: "40 × 8 = ?", options: ["A. 320", "B. 300", "C. 340", "D. 360"], ans: 0 },
+                { q: "15 × 4 = ?", options: ["A. 50", "B. 60", "C. 70", "D. 80"], ans: 1 },
+                { q: "6 × 61 = ?", options: ["A. 366", "B. 360", "C. 376", "D. 666"], ans: 0 },
+                { q: "59 × 2 = ?", options: ["A. 108", "B. 118", "C. 128", "D. 98"], ans: 1 },
+                { q: "99 × 9 = ?", options: ["A. 891", "B. 991", "C. 881", "D. 801"], ans: 0 },
+                { q: "5 × 36 = ?", options: ["A. 180", "B. 150", "C. 160", "D. 170"], ans: 0 },
+                { q: "78 × 3 約等於多少？(估算)", options: ["A. 240", "B. 300", "C. 80", "D. 400"], ans: 0 },
+                { q: "53 × 8 約等於多少？(估算)", options: ["A. 300", "B. 400", "C. 450", "D. 500"], ans: 1 },
+                { q: "29 × 6 約等於多少？(估算: 30x6)", options: ["A. 120", "B. 150", "C. 180", "D. 200"], ans: 2 },
+                { q: "72 × 7 約等於多少？(估算: 70x7)", options: ["A. 420", "B. 490", "C. 560", "D. 700"], ans: 1 },
+                { q: "31 × 3 = ?", options: ["A. 63", "B. 93", "C. 39", "D. 33"], ans: 1 },
+                { q: "25 × 4 = ?", options: ["A. 100", "B. 80", "C. 120", "D. 125"], ans: 0 },
+                { q: "11 × 8 = ?", options: ["A. 18", "B. 81", "C. 88", "D. 80"], ans: 2 },
+                { q: "42 × 2 = ?", options: ["A. 82", "B. 84", "C. 44", "D. 48"], ans: 1 },
+                { q: "2 × 34 = ?", options: ["A. 68", "B. 86", "C. 58", "D. 78"], ans: 0 },
+                { q: "任何數乘 0 的結果是？", options: ["A. 原數", "B. 1", "C. 0", "D. 無限"], ans: 2 },
+                { q: "任何數乘 1 的結果是？", options: ["A. 原數", "B. 1", "C. 0", "D. 無限"], ans: 0 },
+
+                // 深程度 (後 20 題)
+                { q: "46 × 9 = ?", options: ["A. 54", "B. 404", "C. 414", "D. 3654"], ans: 2 },
+                { q: "以下哪一條算式的結果跟其他的不同？", options: ["A. 54 × 2", "B. 36 × 3", "C. 28 × 4", "D. 12 × 9"], ans: 2 },
+                { q: "以下哪一條算式的結果最接近 720？", options: ["A. 71 × 9", "B. 92 × 8", "C. 85 × 7", "D. 88 × 9"], ans: 1 },
+                { q: "利用 3, 7, 6 組成結果最大的算式，結果是多少？(73 x 6)", options: ["A. 438", "B. 468", "C. 428", "D. 498"], ans: 0 },
+                { q: "算式 P1 × Q = 486。找出 P + Q 等於多少？ (81 x 6)", options: ["A. 12", "B. 13", "C. 14", "D. 15"], ans: 2 },
+                { q: "87 × 6 = ?", options: ["A. 522", "B. 512", "C. 502", "D. 532"], ans: 0 },
+                { q: "每艘渡輪可載客 108 人，7 艘渡輪共可載客多少人？", options: ["A. 756", "B. 706", "C. 766", "D. 786"], ans: 0 },
+                { q: "一套書有 8 冊，每冊 117 頁，2 套共有多少頁？(117 x 16 其實是三位乘法，這題變奏：117x8 = 936, 936x2 = ?)", options: ["A. 1872", "B. 936", "C. 1072", "D. 1972"], ans: 0 },
+                { q: "停車場每層有車位 64 個，3 層共有車位多少個？", options: ["A. 192", "B. 182", "C. 172", "D. 162"], ans: 0 },
+                { q: "椅子的售價是 311 元，梳化的售價是椅子的 9 倍，梳化售？", options: ["A. 2799", "B. 2899", "C. 2790", "D. 2999"], ans: 0 },
+                { q: "管理費每月是 679 元，半年共須付多少元？", options: ["A. 4074", "B. 4064", "C. 4174", "D. 8148"], ans: 0 },
+                { q: "一份魚蛋有 7 粒，78 份魚蛋共有？", options: ["A. 546", "B. 556", "C. 536", "D. 566"], ans: 0 },
+                { q: "爆谷一桶 18 元，兩桶特價 30 元。買 4 桶最少須付？", options: ["A. 72", "B. 66", "C. 60", "D. 120"], ans: 2 },
+                { q: "模型 280 元。每星期儲蓄 54 元，儲蓄 5 星期，足夠購買嗎？", options: ["A. 足夠", "B. 不足夠", "C. 剛好", "D. 無法計算"], ans: 1 },
+                { q: "李小姐取回行李付了 77 元，每小時 7 元，她存了多少小時？(除法變奏)", options: ["A. 10", "B. 11", "C. 12", "D. 13"], ans: 1 },
+                { q: "84 × 5 和 42 × 10 的結果一樣嗎？", options: ["A. 一樣", "B. 不一樣", "C. 無法計算", "D. 相差 5"], ans: 0 },
+                { q: "如果 24 × 5 = 120，那麼 24 × 6 = ?", options: ["A. 144", "B. 126", "C. 134", "D. 140"], ans: 0 },
+                { q: "利用 2, 4, 5, 7 組成三位數乘一位數(457x2, etc)的最大積是？ (742 x 5)", options: ["A. 3710", "B. 3720", "C. 3510", "D. 3810"], ans: 0 },
+                { q: "一包手工紙有 45 張，平均分成 5 份，每份有？", options: ["A. 9", "B. 8", "C. 10", "D. 7"], ans: 0 },
+                { q: "一包手工紙有 45 張，現有 5 包，共有手工紙？", options: ["A. 225", "B. 215", "C. 235", "D. 245"], ans: 0 }
+            ],
+            6: [
+                // 淺程度 (首 20 題)
+                { q: "129 × 3 = ?", options: ["A. 387", "B. 367", "C. 377", "D. 397"], ans: 0 },
+                { q: "360 × 4 = ?", options: ["A. 1400", "B. 1440", "C. 1240", "D. 1340"], ans: 1 },
+                { q: "273 × 5 = ?", options: ["A. 1355", "B. 1365", "C. 1465", "D. 1265"], ans: 1 },
+                { q: "4 × 211 = ?", options: ["A. 844", "B. 822", "C. 444", "D. 888"], ans: 0 },
+                { q: "131 × 7 = ?", options: ["A. 917", "B. 927", "C. 817", "D. 827"], ans: 0 },
+                { q: "8 × 610 = ?", options: ["A. 4800", "B. 4880", "C. 4980", "D. 4680"], ans: 1 },
+                { q: "471 × 6 = ?", options: ["A. 2826", "B. 2426", "C. 2846", "D. 2726"], ans: 0 },
+                { q: "114 × 5 = ?", options: ["A. 550", "B. 560", "C. 570", "D. 580"], ans: 2 },
+                { q: "386 × 8 的估算結果大約是？(以400計算)", options: ["A. 3000", "B. 3200", "C. 2400", "D. 4000"], ans: 1 },
+                { q: "114 × 5 的估算結果大約是？(以100計算)", options: ["A. 400", "B. 500", "C. 600", "D. 700"], ans: 1 },
+                { q: "856 × 6 的估算結果大約是？(以900計算)", options: ["A. 4800", "B. 5000", "C. 5400", "D. 6000"], ans: 2 },
+                { q: "2 × 345 = ?", options: ["A. 680", "B. 690", "C. 670", "D. 700"], ans: 1 },
+                { q: "3 × 208 = ?", options: ["A. 624", "B. 614", "C. 604", "D. 634"], ans: 0 },
+                { q: "241 × 4 = ?", options: ["A. 944", "B. 954", "C. 964", "D. 974"], ans: 2 },
+                { q: "105 × 8 = ?", options: ["A. 800", "B. 840", "C. 850", "D. 880"], ans: 1 },
+                { q: "7 × 8 × 3 = ?", options: ["A. 158", "B. 178", "C. 168", "D. 188"], ans: 2 },
+                { q: "4 × 23 × 6 = ?", options: ["A. 532", "B. 542", "C. 552", "D. 562"], ans: 2 },
+                { q: "5 × 125 × 4 可以簡化為？", options: ["A. 125 × 9", "B. 125 × 20", "C. 25 × 4", "D. 125 × 10"], ans: 1 },
+                { q: "125 × 20 = ?", options: ["A. 250", "B. 2500", "C. 2000", "D. 3000"], ans: 1 },
+                { q: "102 × 3 = ?", options: ["A. 306", "B. 360", "C. 320", "D. 603"], ans: 0 },
+                
+                // 深程度 (後 20 題)
+                { q: "546 × 7 = ?", options: ["A. 3812", "B. 3822", "C. 3722", "D. 3922"], ans: 1 },
+                { q: "146 × 3 × 8 = ?", options: ["A. 3404", "B. 3504", "C. 3604", "D. 3304"], ans: 1 },
+                { q: "8 × 757 = ?", options: ["A. 6056", "B. 5956", "C. 6156", "D. 5856"], ans: 0 },
+                { q: "以下哪一條算式的結果與 84 × 5 的不同？", options: ["A. 70 × 6", "B. 5 × 84", "C. 42 × 2 × 5", "D. 21 × 4 × 6"], ans: 3 },
+                { q: "以下哪一條算式的結果最大？", options: ["A. 208 × 6", "B. 307 × 5", "C. 395 × 4", "D. 489 × 3"], ans: 2 },
+                { q: "如果 1234 × 5，結果是多少？", options: ["A. 5050", "B. 6160", "C. 5170", "D. 6170"], ans: 3 },
+                { q: "算式 2★9 × ● 能得出一個最大的「偶數」(雙數)，★和●應填上？(提示: 299x6=1794)", options: ["A. ★=8, ●=9", "B. ★=9, ●=6", "C. ★=7, ●=8", "D. ★=6, ●=7"], ans: 1 },
+                { q: "找出 [?] 的數值：[?] × 6 = 1842", options: ["A. 307", "B. 317", "C. 207", "D. 407"], ans: 0 },
+                { q: "216 × 3 的結果再乘以 2 是多少？", options: ["A. 1296", "B. 1286", "C. 1396", "D. 1276"], ans: 0 },
+                { q: "以下哪一個結果最接近 2500？", options: ["A. 302 × 8", "B. 490 × 5", "C. 605 × 4", "D. 810 × 3"], ans: 1 },
+                { q: "有三個數：8、125、9。把它們全部相乘，結果是？", options: ["A. 900", "B. 9000", "C. 8000", "D. 10000"], ans: 1 },
+                { q: "小明計錯了 405 × 6，他算成了 450 × 6。結果相差多少？", options: ["A. 45", "B. 90", "C. 270", "D. 300"], ans: 2 },
+                { q: "如果要令 [?]52 × 3 的結果是大於 2000，[?] 最小應填甚麼？", options: ["A. 5", "B. 6", "C. 7", "D. 8"], ans: 2 },
+                { q: "算式 P × Q = 1200，如果 P 變成原來的一半，結果會是？", options: ["A. 600", "B. 1200", "C. 2400", "D. 300"], ans: 0 },
+                { q: "25 × 4 × 7 × 3 = ?", options: ["A. 210", "B. 2100", "C. 1200", "D. 2800"], ans: 1 },
+                { q: "某數的 4 倍是 448，這數的 5 倍是多少？", options: ["A. 550", "B. 560", "C. 570", "D. 580"], ans: 1 },
+                { q: "以下哪一項是正確的？", options: ["A. 123×4 = 432×1", "B. 320×3 = 160×6", "C. 500×5 = 250×2", "D. 111×9 = 999×9"], ans: 1 },
+                { q: "把 3, 4, 5 組成一道「兩位數乘一位數」的算式，最大的積是？ (53x4)", options: ["A. 212", "B. 215", "C. 170", "D. 260"], ans: 0 },
+                { q: "計算 999 × 8，可以用以下哪個快速方法？", options: ["A. 1000×8 - 8", "B. 1000×8 - 1", "C. 900×8 + 99", "D. 1000×8 - 80"], ans: 0 },
+                { q: "把 502 × 4 的積加上 1992，答案是？", options: ["A. 4000", "B. 4008", "C. 2008", "D. 3992"], ans: 0 }
+            ],
+
+            // ================= 第七關：乘法應用題 =================
+            7: [
+                // 淺程度 (首 20 題)
+                { q: "停車場每層有車位 64 個，3 層共有車位多少個？", options: ["A. 192", "B. 182", "C. 172", "D. 162"], ans: 0 },
+                { q: "椅子的售價是 311 元，梳化的售價是椅子的 9 倍，梳化售？", options: ["A. 2790", "B. 2799", "C. 2899", "D. 2890"], ans: 1 },
+                { q: "一包手工紙有 45 張，現有 5 包，共有手工紙多少張？", options: ["A. 40", "B. 50", "C. 225", "D. 250"], ans: 2 },
+                { q: "每艘渡輪可載客 108 人，7 艘渡輪共可載客多少人？", options: ["A. 706", "B. 756", "C. 766", "D. 776"], ans: 1 },
+                { q: "張先生居住的單位管理費每月是 679 元，半年共須付多少元？", options: ["A. 4064", "B. 4074", "C. 4174", "D. 4274"], ans: 1 },
+                { q: "一份魚蛋有 7 粒，78 份魚蛋共有多少粒？", options: ["A. 536", "B. 546", "C. 556", "D. 566"], ans: 1 },
+                { q: "哥哥每天儲蓄 15 元，一星期共儲蓄了多少元？", options: ["A. 105", "B. 95", "C. 115", "D. 75"], ans: 0 },
+                { q: "一盒西餅有 12 件，買 6 盒共有西餅多少件？", options: ["A. 62", "B. 72", "C. 82", "D. 92"], ans: 1 },
+                { q: "每本筆記簿售 28 元，買 4 本須付多少元？", options: ["A. 102", "B. 112", "C. 122", "D. 132"], ans: 1 },
+                { q: "一套制服售 250 元，買 3 套須付多少元？", options: ["A. 500", "B. 750", "C. 650", "D. 850"], ans: 1 },
+                { q: "每個果籃有蘋果 14 個，5 個果籃共有蘋果多少個？", options: ["A. 60", "B. 70", "C. 80", "D. 90"], ans: 1 },
+                { q: "每張戲票售 65 元，爸爸買了 4 張，共須付？", options: ["A. 240", "B. 250", "C. 260", "D. 270"], ans: 2 },
+                { q: "小汽車玩具每架 125 元，買 6 架需要多少元？", options: ["A. 650", "B. 700", "C. 750", "D. 800"], ans: 2 },
+                { q: "每盒糖果有 35 粒，8 盒共有多少粒？", options: ["A. 260", "B. 270", "C. 280", "D. 290"], ans: 2 },
+                { q: "媽媽每天步行 30 分鐘，5 天共步行了多少分鐘？", options: ["A. 150", "B. 120", "C. 180", "D. 200"], ans: 0 },
+                { q: "一個水杯售 42 元，半打水杯共售多少元？", options: ["A. 242", "B. 252", "C. 262", "D. 210"], ans: 1 },
+                { q: "一排益力多有 5 支，34 排共有多少支？", options: ["A. 160", "B. 170", "C. 180", "D. 150"], ans: 1 },
+                { q: "工人每天工作 8 小時，25 天共工作多少小時？", options: ["A. 160", "B. 180", "C. 200", "D. 220"], ans: 2 },
+                { q: "每條毛巾重 110 克，6 條毛巾共重多少克？", options: ["A. 660", "B. 600", "C. 770", "D. 550"], ans: 0 },
+                { q: "一箱橙有 48 個，9 箱橙共有多少個？", options: ["A. 422", "B. 432", "C. 442", "D. 452"], ans: 1 },
+                
+                // 深程度 (後 20 題)
+                { q: "一套《兒童科學》有 8 冊，每冊有 117 頁，2 套共有多少頁？", options: ["A. 1872", "B. 936", "C. 1972", "D. 1772"], ans: 0 },
+                { q: "爆谷一桶 18 元，兩桶特價 30 元。哥哥買 4 桶最少須付？", options: ["A. 72", "B. 66", "C. 60", "D. 120"], ans: 2 },
+                { q: "一盒機械人模型 280 元。家雯每星期儲 54 元，5 星期後她夠錢買嗎？", options: ["A. 夠，還多 10 元", "B. 不夠，欠 10 元", "C. 夠，剛好", "D. 不夠，欠 20 元"], ans: 1 },
+                { q: "升學講座出席人數 400 人。學校應怎樣擺放座位才可容納所有人？", options: ["A. 48行,每行8個", "B. 43行,每行9個", "C. 9行,每行45個", "D. 6行,每行65個"], ans: 2 },
+                { q: "姨姨在書店工作，每天由 11:30 a.m. 至 3:30 p.m.。時薪 $40，一星期(7天)賺？", options: ["A. $1120", "B. $160", "C. $840", "D. $280"], ans: 0 },
+                { q: "每盒朱古力有 8 顆。李老師需要買 95 顆派給學生，他最少要買多少盒？", options: ["A. 11 盒", "B. 12 盒", "C. 87 盒", "D. 760 盒"], ans: 1 },
+                { q: "美玲、美娜和美鳳去買洋娃娃，共付 168 元，平均每個洋娃娃售多少元？", options: ["A. 56 元", "B. 84 元", "C. 336 元", "D. 504 元"], ans: 0 },
+                { q: "糖果店：A款售5元(賣312盒)，B款售4元(賣527盒)，總金額最高的是哪款？", options: ["A. A款", "B. B款", "C. 一樣", "D. 無法計算"], ans: 1 },
+                { q: "花店有玫瑰 298 朵，每 7 朵紮成一束，最多可紮成多少束？餘下多少朵？", options: ["A. 42束,餘4朵", "B. 41束,餘5朵", "C. 42束,餘2朵", "D. 43束,餘1朵"], ans: 0 },
+                { q: "陳先生買玫瑰(每枝$7) 28 枝。如改買康乃馨(每枝$9)，最多可買多少枝？", options: ["A. 20 枝", "B. 21 枝", "C. 22 枝", "D. 23 枝"], ans: 1 },
+                { q: "承上題，買完康乃馨後，他還餘下多少元？", options: ["A. 5 元", "B. 6 元", "C. 7 元", "D. 8 元"], ans: 2 },
+                { q: "哥哥做暑期工，每星期上班 6 天，每天工資 285 元。一星期後共得？", options: ["A. 1710", "B. 1610", "C. 1810", "D. 1700"], ans: 0 },
+                { q: "果汁每盒 6 元，水店售出果汁收得 786 元，即售出果汁多少盒？", options: ["A. 131", "B. 141", "C. 121", "D. 151"], ans: 0 },
+                { q: "遊樂場門票，成人 $120，小童 $85。爸爸媽媽帶 3 個小孩進場共付？", options: ["A. 495", "B. 515", "C. 475", "D. 535"], ans: 0 },
+                { q: "餅店每天售老婆餅 390 個，包裝成每 6 個一盒。一星期共有多少盒出售？", options: ["A. 455", "B. 65", "C. 425", "D. 505"], ans: 0 },
+                { q: "一件蛋糕 12 元，買半打的價錢是多少元？", options: ["A. 60", "B. 72", "C. 84", "D. 144"], ans: 1 },
+                { q: "把 3 箱蘋果平均分給 4 班，每箱有 48 個蘋果，每班可得多少個？", options: ["A. 36", "B. 48", "C. 12", "D. 24"], ans: 0 },
+                { q: "李先生買了 5 本相同的書，付了 500 元，找回 125 元。每本書售多少元？", options: ["A. 75", "B. 85", "C. 95", "D. 65"], ans: 0 },
+                { q: "郵票每套有 8 枚，每枚售 3 元。買 5 套共需付多少元？", options: ["A. 120", "B. 100", "C. 140", "D. 150"], ans: 0 },
+                { q: "餐廳有 25 張四人枱和 8 張雙人枱，最多可容納多少人？", options: ["A. 116", "B. 100", "C. 132", "D. 150"], ans: 0 }
+            ],
+
+            // ================= 第八關：時間應用題 =================
+            8: [
+                // 淺程度 (首 20 題)
+                { q: "薄餅美食車營業時間：10:15 a.m. 至 8:15 p.m.，共營業了多少小時？", options: ["A. 8 小時", "B. 9 小時", "C. 10 小時", "D. 12 小時"], ans: 2 },
+                { q: "關東煮美食車由 11:25 p.m. 開始營業，營業 7 小時，結束時間是？", options: ["A. 5:25 a.m.", "B. 6:25 a.m.", "C. 7:25 a.m.", "D. 6:25 p.m."], ans: 1 },
+                { q: "建文乘坐巴士在 3:35 p.m. 出發，39 分鐘後到達。到達時間是？", options: ["A. 4:14 p.m.", "B. 4:04 p.m.", "C. 4:24 p.m.", "D. 4:15 p.m."], ans: 0 },
+                { q: "圖書館一天的開放時間是上午 9:30 至下午 8:30。全日共開放多少小時？", options: ["A. 10 小時", "B. 11 小時", "C. 12 小時", "D. 9 小時"], ans: 1 },
+                { q: "電影長 1 小時 30 分鐘，在下午 2:00 開始，何時結束？", options: ["A. 3:30 p.m.", "B. 3:00 p.m.", "C. 4:30 p.m.", "D. 4:00 p.m."], ans: 0 },
+                { q: "小息由上午 10:20 開始，至 10:40 完結，小息共多少分鐘？", options: ["A. 15 分鐘", "B. 20 分鐘", "C. 25 分鐘", "D. 30 分鐘"], ans: 1 },
+                { q: "子欣玩跳飛機直至 11:20 a.m. 完結，共玩了 8 分鐘。她何時開始？", options: ["A. 11:12 a.m.", "B. 11:28 a.m.", "C. 11:10 a.m.", "D. 11:15 a.m."], ans: 0 },
+                { q: "鸚鵡劇場第一場在上午 10:35 分開始，志雅在 9:50 a.m. 到達，還要等多久？", options: ["A. 45 分鐘", "B. 35 分鐘", "C. 55 分鐘", "D. 25 分鐘"], ans: 0 },
+                { q: "下午 1 時即 24 小時制的什麼時間？", options: ["A. 01:00", "B. 13:00", "C. 11:00", "D. 15:00"], ans: 1 },
+                { q: "嘉明到圖書館溫習了 4 小時，在下午 3:25 離開，他何時開始溫習？", options: ["A. 上午 11:25", "B. 上午 10:25", "C. 下午 1:25", "D. 下午 7:25"], ans: 0 },
+                { q: "從上午 8:00 到下午 1:00，經過了多少小時？", options: ["A. 4 小時", "B. 5 小時", "C. 6 小時", "D. 7 小時"], ans: 1 },
+                { q: "一節課 35 分鐘，9:00 上課，何時下課？", options: ["A. 9:35", "B. 9:40", "C. 9:30", "D. 9:45"], ans: 0 },
+                { q: "蛋糕需要烤 45 分鐘，現在是下午 4:15，蛋糕何時出爐？", options: ["A. 4:50 p.m.", "B. 5:00 p.m.", "C. 5:15 p.m.", "D. 5:05 p.m."], ans: 1 },
+                { q: "從星期一早上 9 時到星期二早上 9 時，經過了多少小時？", options: ["A. 12 小時", "B. 24 小時", "C. 36 小時", "D. 48 小時"], ans: 1 },
+                { q: "媽媽去買菜用了 1 小時 15 分，下午 4 時回家，她何時出門？", options: ["A. 2:45 p.m.", "B. 3:15 p.m.", "C. 2:30 p.m.", "D. 3:45 p.m."], ans: 0 },
+                { q: "現在是 23:45，還有多少分鐘就到午夜 12 時？", options: ["A. 15 分鐘", "B. 25 分鐘", "C. 5 分鐘", "D. 45 分鐘"], ans: 0 },
+                { q: "測驗在 10:15 開始，歷時 50 分鐘，何時結束？", options: ["A. 11:05", "B. 11:15", "C. 10:55", "D. 11:00"], ans: 0 },
+                { q: "哥哥跑了 20 分鐘步，在 7:10 a.m. 停下，他何時開始跑？", options: ["A. 6:50 a.m.", "B. 7:30 a.m.", "C. 6:40 a.m.", "D. 6:30 a.m."], ans: 0 },
+                { q: "一集卡通片長 25 分鐘，連續看兩集共用多少分鐘？", options: ["A. 40", "B. 45", "C. 50", "D. 60"], ans: 2 },
+                { q: "上午 11:45 再過半小時是？", options: ["A. 12:00 p.m.", "B. 12:15 p.m.", "C. 12:30 p.m.", "D. 11:15 a.m."], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "雪糕車營業了 9 小時後，在 10:12 p.m. 結束。它在何時開始營業？", options: ["A. 1:12 p.m.", "B. 2:12 p.m.", "C. 1:12 a.m.", "D. 12:12 p.m."], ans: 0 },
+                { q: "媽媽用 48 分鐘煮晚餐，煮好的時間是 6:52 p.m.。她何時開始煮？", options: ["A. 6:04 p.m.", "B. 5:54 p.m.", "C. 6:14 p.m.", "D. 7:40 p.m."], ans: 0 },
+                { q: "話劇在晚上 7:15 開始上演，紫雯在 7:05 到達會場。她比上演時間早還是遲？", options: ["A. 早 10 分鐘", "B. 遲 10 分鐘", "C. 早 5 分鐘", "D. 遲 5 分鐘"], ans: 0 },
+                { q: "偉文在圖書館開門前 5 小時到達(開放: 9:30am)。他在何時到達？", options: ["A. 4:30 a.m.", "B. 5:30 a.m.", "C. 2:30 p.m.", "D. 4:30 p.m."], ans: 0 },
+                { q: "文風在鸚鵡劇場第二場(12:20 p.m.)開始前 34 分鐘到達，他到達的時間是？", options: ["A. 11:46 a.m.", "B. 11:56 a.m.", "C. 12:54 p.m.", "D. 11:36 a.m."], ans: 0 },
+                { q: "足球比賽下半場在 11:45 分開始，半場歷時 45 分鐘，比賽完結的時間是？", options: ["A. 12:30 p.m.", "B. 12:20 p.m.", "C. 12:45 p.m.", "D. 1:00 p.m."], ans: 0 },
+                { q: "郵局關門時間是下午 5:00。志文預計從文具店走去需 57 分鐘，他最遲要何時出發？", options: ["A. 4:03 p.m.", "B. 3:53 p.m.", "C. 4:13 p.m.", "D. 5:57 p.m."], ans: 0 },
+                { q: "志樂的時鐘比實際慢了2分鐘，顯示 02:20。小美的時鐘比實際快6分鐘。小美的時鐘顯示？", options: ["A. 02:24", "B. 02:28", "C. 02:16", "D. 02:30"], ans: 1 },
+                { q: "診所應診時間：10am-1pm, 4pm-9pm。全日共應診多少小時？", options: ["A. 6", "B. 8", "C. 9", "D. 7"], ans: 1 },
+                { q: "媽媽吃完下午茶是 3:10，她去診所看醫生(4:00開診)，她還要等多久？", options: ["A. 40 分鐘", "B. 50 分鐘", "C. 60 分鐘", "D. 30 分鐘"], ans: 1 },
+                { q: "外婆在下午 6:15 來到小山家，這時小山在做甚麼？(活動表:15:25長笛, 17:00電視, 18:30晚飯)", options: ["A. 練習長笛", "B. 看電視", "C. 吃晚飯", "D. 睡覺"], ans: 1 },
+                { q: "水族館開放時間 09:30-20:00。志康原打算 19:00 到達，但他遲了 50 分鐘，他可以進入嗎？", options: ["A. 可以", "B. 不可以", "C. 剛好關門", "D. 無法確定"], ans: 0 },
+                { q: "李小姐在 18:00 寄存行李，取回時付了 77 元 (每小時$7)。她在甚麼時間取回？", options: ["A. 20:00", "B. 21:00", "C. 翌日 05:00", "D. 23:00"], ans: 2 },
+                { q: "樂樂在 4:12 p.m. 放學回到家，他放學回家用了 27 分鐘，他何時放學？", options: ["A. 3:45 p.m.", "B. 3:35 p.m.", "C. 4:39 p.m.", "D. 3:55 p.m."], ans: 0 },
+                { q: "某電視節目在 21:45 開始，播放 1 小時 20 分鐘。何時完結？", options: ["A. 22:05", "B. 23:05", "C. 23:15", "D. 22:55"], ans: 1 },
+                { q: "小明從家走到學校需 18 分鐘，若他想在 7:55 a.m. 抵達，最遲何時出門？", options: ["A. 7:37 a.m.", "B. 7:27 a.m.", "C. 7:47 a.m.", "D. 7:17 a.m."], ans: 0 },
+                { q: "火車在 13:40 開出，車程 2 小時 35 分，到達時間是？", options: ["A. 15:15", "B. 16:15", "C. 16:05", "D. 15:05"], ans: 1 },
+                { q: "晚上 10:45 睡覺，早上 6:30 起床，共睡了多久？", options: ["A. 7 小時 45 分", "B. 8 小時 15 分", "C. 7 小時 15 分", "D. 8 小時 45 分"], ans: 0 },
+                { q: "現在是 3:15 p.m.，2 小時 50 分鐘前是甚麼時間？", options: ["A. 1:25 p.m.", "B. 12:25 p.m.", "C. 12:35 p.m.", "D. 1:35 p.m."], ans: 1 },
+                { q: "活動在上午 11 點開始，進行了 300 分鐘，結束時間是下午幾點？", options: ["A. 3:00", "B. 4:00", "C. 5:00", "D. 6:00"], ans: 1 }
+            ],
+
+            // ================= 第九關：秒 =================
+            9: [
+                // 淺程度 (首 20 題)
+                { q: "1 分鐘等於多少秒？", options: ["A. 10", "B. 60", "C. 100", "D. 3600"], ans: 1 },
+                { q: "2 分鐘等於多少秒？", options: ["A. 20", "B. 120", "C. 200", "D. 600"], ans: 1 },
+                { q: "秒針走一圈是多長時間？", options: ["A. 1 秒", "B. 1 分鐘", "C. 1 小時", "D. 12 小時"], ans: 1 },
+                { q: "建文寫字用了 24 秒，小偉用了 27 秒。誰用的時間較短？", options: ["A. 建文", "B. 小偉", "C. 一樣", "D. 無法比較"], ans: 0 },
+                { q: "用水和梘液洗手，完全清潔雙手約需要多少時間？", options: ["A. 5 秒", "B. 30 秒", "C. 600 秒", "D. 1 小時"], ans: 1 },
+                { q: "汽車在交通燈前等了 26 ___？", options: ["A. 小時", "B. 分鐘", "C. 秒", "D. 天"], ans: 2 },
+                { q: "半分鐘等於多少秒？", options: ["A. 15", "B. 30", "C. 45", "D. 50"], ans: 1 },
+                { q: "秒針從 12 走到 3，經過了多少秒？", options: ["A. 3", "B. 15", "C. 5", "D. 30"], ans: 1 },
+                { q: "秒針從 6 走到 12，經過了多少秒？", options: ["A. 6", "B. 12", "C. 30", "D. 60"], ans: 2 },
+                { q: "平板電腦下載文件用了 37 秒。秒針會走過多少個小格？", options: ["A. 37", "B. 5", "C. 12", "D. 60"], ans: 0 },
+                { q: "以下哪一個時間最適合用「秒」來量度？", options: ["A. 睡覺時間", "B. 眨眼一次", "C. 吃一頓晚飯", "D. 搭飛機去日本"], ans: 1 },
+                { q: "咖啡機倒滿玻璃杯用了 14 ___。", options: ["A. 秒", "B. 分鐘", "C. 小時", "D. 毫米"], ans: 0 },
+                { q: "1 分鐘 10 秒等於多少秒？", options: ["A. 110", "B. 70", "C. 100", "D. 610"], ans: 1 },
+                { q: "90 秒等於 1 分鐘又多少秒？", options: ["A. 10", "B. 20", "C. 30", "D. 40"], ans: 2 },
+                { q: "跑 100 米大約需要？", options: ["A. 15 秒", "B. 15 分鐘", "C. 15 小時", "D. 15 天"], ans: 0 },
+                { q: "以下哪一個時間剛好是 2 分鐘？", options: ["A. 60 秒", "B. 100 秒", "C. 120 秒", "D. 200 秒"], ans: 2 },
+                { q: "秒針走一小格代表多少時間？", options: ["A. 1 秒", "B. 5 秒", "C. 1 分鐘", "D. 1 小時"], ans: 0 },
+                { q: "鐘面上有三根針，走得最快的是哪一根？", options: ["A. 時針", "B. 分針", "C. 秒針", "D. 一樣快"], ans: 2 },
+                { q: "60 秒後，分針會走多少小格？", options: ["A. 1 格", "B. 5 格", "C. 60 格", "D. 12 格"], ans: 0 },
+                { q: "打一個噴嚏大約需要？", options: ["A. 1 秒", "B. 1 分鐘", "C. 1 小時", "D. 10 秒"], ans: 0 },
+
+                // 深程度 (後 20 題)
+                { q: "如果秒針在鐘面上走了 30 小格，秒針在這段時間內走了多少圈？", options: ["A. 半圈", "B. 1圈", "C. 30圈", "D. 5圈"], ans: 0 },
+                { q: "電視播廣告：粽子廣告長度是 9 秒，壽司廣告的長度是 11 秒。兩段共長？", options: ["A. 10 秒", "B. 20 秒", "C. 30 秒", "D. 1 分鐘"], ans: 1 },
+                { q: "三百米賽跑，子健用了 40 秒，志偉用了 42 秒，小傑用了 39 秒。誰跑得最快？", options: ["A. 子健", "B. 志偉", "C. 小傑", "D. 一樣快"], ans: 2 },
+                { q: "承上題，跑得最快和最慢的相差多少秒？", options: ["A. 1 秒", "B. 2 秒", "C. 3 秒", "D. 4 秒"], ans: 2 },
+                { q: "家光完成同一場賽跑所用的時間比志偉(42秒)慢 1 秒。家光用了多少秒？", options: ["A. 41 秒", "B. 43 秒", "C. 40 秒", "D. 44 秒"], ans: 1 },
+                { q: "以下哪一個時間剛好是 240 秒？", options: ["A. 2 分鐘", "B. 4 分鐘", "C. 24 分鐘", "D. 40 分鐘"], ans: 1 },
+                { q: "以下哪一項最適合以秒錶記錄時間長度？", options: ["A. 小樂跑步100米", "B. 一個月的長度", "C. 爸爸的上班時間", "D. 圖書館開放時間"], ans: 0 },
+                { q: "子健使用秒錶記錄朗讀一篇文章的時間(從0到50秒標記)。他共用了？", options: ["A. 50 秒", "B. 10 秒", "C. 60 秒", "D. 5 分鐘"], ans: 0 },
+                { q: "如果子聽跳繩 30 下用了 16 秒，秒針在鐘面上會走過多少大格？", options: ["A. 16 大格", "B. 大約 3 個大格", "C. 4 個大格", "D. 1 個大格"], ans: 1 },
+                { q: "永泰量度子聰跳繩30下，從(12正)開始，到秒針指着 3 和 4 之間(16小格)。用了？", options: ["A. 16 秒", "B. 3 分鐘", "C. 15 秒", "D. 20 秒"], ans: 0 },
+                { q: "小文和小華做數學測驗。小文秒針在 8，小華秒針在 4。小文比小華遲了多少秒完成？(假設分鐘相同)", options: ["A. 20 秒", "B. 40 秒", "C. 4 秒", "D. 8 秒"], ans: 0 },
+                { q: "2 分鐘 15 秒是等於多少秒？", options: ["A. 135 秒", "B. 215 秒", "C. 115 秒", "D. 75 秒"], ans: 0 },
+                { q: "300 秒等於多少分鐘？", options: ["A. 3 分鐘", "B. 4 分鐘", "C. 5 分鐘", "D. 6 分鐘"], ans: 2 },
+                { q: "秒針走了 2 圈半，即是過了多少秒？", options: ["A. 120 秒", "B. 150 秒", "C. 90 秒", "D. 180 秒"], ans: 1 },
+                { q: "一首歌長 3 分鐘 20 秒，即是多少秒？", options: ["A. 200 秒", "B. 320 秒", "C. 180 秒", "D. 220 秒"], ans: 0 },
+                { q: "一部升降機從 1 樓升到 10 樓需要 27 秒，升到 20 樓大約需要多少秒？", options: ["A. 54 秒", "B. 27 秒", "C. 81 秒", "D. 100 秒"], ans: 0 },
+                { q: "某人在水底閉氣 145 秒，這相當於？", options: ["A. 1分45秒", "B. 2分25秒", "C. 2分45秒", "D. 3分5秒"], ans: 1 },
+                { q: "計時器倒數從 2:00 變到 1:45，經過了多少秒？", options: ["A. 15 秒", "B. 25 秒", "C. 45 秒", "D. 55 秒"], ans: 0 },
+                { q: "如果 1 分鐘可以摺 2 隻紙船，150 秒內最多可以摺完多少隻？", options: ["A. 3 隻", "B. 4 隻", "C. 5 隻", "D. 6 隻"], ans: 2 },
+                { q: "運動員游 50 米用了 35 秒，他游 100 米(速度不變)需要？", options: ["A. 1 分鐘", "B. 1 分 10 秒", "C. 1 分 20 秒", "D. 70 分鐘"], ans: 1 }
+            ],
+
+            // ================= 第十關：除法(一) =================
+            10: [
+                // 淺程度 (首 20 題)
+                { q: "69 ÷ 3 = ?", options: ["A. 21", "B. 22", "C. 23", "D. 24"], ans: 2 },
+                { q: "80 ÷ 4 = ?", options: ["A. 10", "B. 15", "C. 20", "D. 25"], ans: 2 },
+                { q: "72 ÷ 6 = ?", options: ["A. 11", "B. 12", "C. 13", "D. 14"], ans: 1 },
+                { q: "90 ÷ 6 = ?", options: ["A. 14", "B. 15", "C. 16", "D. 17"], ans: 1 },
+                { q: "61 ÷ 3 = ?", options: ["A. 20...1", "B. 20", "C. 21", "D. 19...2"], ans: 0 },
+                { q: "87 ÷ 4 = ?", options: ["A. 21...2", "B. 21...3", "C. 22", "D. 20...7"], ans: 1 },
+                { q: "95 ÷ 7 = ?", options: ["A. 13...4", "B. 14", "C. 12...1", "D. 13...2"], ans: 0 },
+                { q: "62 ÷ 4 = ?", options: ["A. 14...2", "B. 15", "C. 15...2", "D. 16"], ans: 2 },
+                { q: "92 ÷ 8 = ?", options: ["A. 10...4", "B. 11", "C. 11...4", "D. 12"], ans: 2 },
+                { q: "76 ÷ 5 = ?", options: ["A. 15", "B. 15...1", "C. 16", "D. 14...2"], ans: 1 },
+                { q: "63 ÷ 6 = ?", options: ["A. 10...3", "B. 11", "C. 9...9", "D. 10"], ans: 0 },
+                { q: "64 ÷ 2 = 32。驗算是：32 × [ ? ] = 64", options: ["A. 2", "B. 4", "C. 32", "D. 64"], ans: 0 },
+                { q: "除法中，餘數必須比哪一個數小？", options: ["A. 被除數", "B. 除數", "C. 商", "D. 答案"], ans: 1 },
+                { q: "86 ÷ 4 = ?", options: ["A. 21", "B. 21...2", "C. 22", "D. 22...2"], ans: 1 },
+                { q: "「72 這個數中，包含了多少個 4？」代表甚麼算式？", options: ["A. 72 × 4", "B. 72 + 4", "C. 72 - 4", "D. 72 ÷ 4"], ans: 3 },
+                { q: "承上題，72 包含了多少個 4？", options: ["A. 13", "B. 18", "C. 68", "D. 288"], ans: 1 },
+                { q: "88 ÷ 8 = ?", options: ["A. 10", "B. 11", "C. 8", "D. 12"], ans: 1 },
+                { q: "55 ÷ 5 = ?", options: ["A. 11", "B. 10", "C. 5", "D. 12"], ans: 0 },
+                { q: "39 ÷ 3 = ?", options: ["A. 12", "B. 13", "C. 14", "D. 15"], ans: 1 },
+                { q: "如果在算式中「除數」是 6，最大的「餘數」可能是多少？", options: ["A. 5", "B. 6", "C. 7", "D. 無限"], ans: 0 },
+
+                // 深程度 (後 20 題)
+                { q: "以下哪一條算式的結果「沒有餘數」？", options: ["A. 78 ÷ 6", "B. 95 ÷ 8", "C. 63 ÷ 4", "D. 86 ÷ 7"], ans: 0 },
+                { q: "如果 82 ÷ 3 = 27 ... 1，驗算的算式是甚麼？", options: ["A. 27 × 1 + 3", "B. 27 × 3 + 1", "C. 3 × 1 + 27", "D. 82 × 3 + 1"], ans: 1 },
+                { q: "直式計算「93 ÷ 3」，百位沒有數字，十位的商應是？", options: ["A. 3", "B. 1", "C. 9", "D. 0"], ans: 0 },
+                { q: "「最大的兩位偶數(雙數) ÷ 最大的一位偶數」的結果是？ (98÷8)", options: ["A. 10...8", "B. 10...9", "C. 11", "D. 12...2"], ans: 3 },
+                { q: "算式 P ÷ 7 = 12 ... 3，求 P 的值。 (提示: 驗算方法)", options: ["A. 84", "B. 87", "C. 81", "D. 90"], ans: 1 },
+                { q: "在 [ ? ] ÷ 5 = 14 ... 2 中，被除數是？", options: ["A. 70", "B. 72", "C. 68", "D. 74"], ans: 1 },
+                { q: "觀察算式：96 ÷ 7，它的餘數是多少？", options: ["A. 3", "B. 4", "C. 5", "D. 13"], ans: 2 },
+                { q: "以下哪一個除法算式是錯誤的？", options: ["A. 50÷5=10", "B. 48÷4=12", "C. 72÷4=18", "D. 85÷3=28...2"], ans: 3 },
+                { q: "有 98 粒糖，每 6 粒包成一袋，最多可包裝成多少袋？", options: ["A. 15 袋", "B. 16 袋", "C. 17 袋", "D. 18 袋"], ans: 1 },
+                { q: "承上題，還剩下糖果多少粒？", options: ["A. 1 粒", "B. 2 粒", "C. 3 粒", "D. 4 粒"], ans: 1 },
+                { q: "老師有 75 張貼紙，平均分給 4 組同學，每組可得幾張？餘幾張？", options: ["A. 18張,餘3張", "B. 17張,餘7張", "C. 19張,餘0張", "D. 18張,餘2張"], ans: 0 },
+                { q: "某數除以 8 的商是 11，餘數是最大的可能值，某數是？", options: ["A. 95", "B. 88", "C. 96", "D. 97"], ans: 0 },
+                { q: "一件玩具售 9 元，小智有 50 元，最多可買玩具多少件？", options: ["A. 6件", "B. 5件", "C. 4件", "D. 7件"], ans: 1 },
+                { q: "媽媽把 84 個餃子平均 6 次烹調，每次煮調餃子多少個？", options: ["A. 12", "B. 13", "C. 14", "D. 15"], ans: 2 },
+                { q: "襪子 194 對，售貨員取去最多雙後，剩餘的剛好可分成每 3 對一包，剩餘多少對？(提示:194÷3)", options: ["A. 64包餘2對", "B. 取去2對,剩192", "C. 餘1對", "D. 取去1對"], ans: 1 },
+                { q: "下列哪一個數除以 5 沒有餘數？", options: ["A. 53", "B. 68", "C. 75", "D. 91"], ans: 2 },
+                { q: "計算 74 ÷ 6 = 12 ... 2。如果被除數增加 2，餘數會變成多少？", options: ["A. 0", "B. 2", "C. 4", "D. 6"], ans: 2 },
+                { q: "小明把一個兩位數除以 4，得到的商和餘數相同，這個兩位數可能是？(商3餘3)", options: ["A. 12", "B. 15", "C. 16", "D. 20"], ans: 1 },
+                { q: "一條絲帶長 95 厘米，每 8 厘米剪成一段，可以剪成多少段？", options: ["A. 10", "B. 11", "C. 12", "D. 13"], ans: 1 },
+                { q: "把 52 粒波子平均分給 7 人，最少要多加幾粒波子，才能讓大家分得一樣多而沒有剩餘？", options: ["A. 4 粒", "B. 3 粒", "C. 2 粒", "D. 1 粒"], ans: 0 }
+            ],
+            11: [
+                // 淺程度 (首 20 題)
+                { q: "639 ÷ 3 = ?", options: ["A. 213", "B. 203", "C. 313", "D. 233"], ans: 0 },
+                { q: "496 ÷ 8 = ?", options: ["A. 61", "B. 62", "C. 52", "D. 72"], ans: 1 },
+                { q: "479 ÷ 3 = ?", options: ["A. 159", "B. 159...2", "C. 158", "D. 158...2"], ans: 1 },
+                { q: "429 ÷ 2 = ?", options: ["A. 214", "B. 214...1", "C. 204...1", "D. 215"], ans: 1 },
+                { q: "873 ÷ 9 = ?", options: ["A. 96", "B. 97", "C. 98", "D. 87"], ans: 1 },
+                { q: "528 ÷ 3 = ?", options: ["A. 166", "B. 176", "C. 186", "D. 196"], ans: 1 },
+                { q: "962 ÷ 4 = ?", options: ["A. 240...2", "B. 240", "C. 241", "D. 230...2"], ans: 0 },
+                { q: "800 ÷ 6 = ?", options: ["A. 133", "B. 133...1", "C. 133...2", "D. 134"], ans: 2 },
+                { q: "783 ÷ 2 = ?", options: ["A. 391", "B. 391...1", "C. 390", "D. 390...1"], ans: 1 },
+                { q: "952 ÷ 7 = ?", options: ["A. 135", "B. 136", "C. 137", "D. 138"], ans: 1 },
+                { q: "377 ÷ 4 = ?", options: ["A. 94...1", "B. 93...1", "C. 95", "D. 94"], ans: 0 },
+                { q: "617 ÷ 3 = ?", options: ["A. 205", "B. 205...1", "C. 205...2", "D. 25...2"], ans: 2 },
+                { q: "597 ÷ 6 = ?", options: ["A. 99", "B. 99...3", "C. 98...3", "D. 99...1"], ans: 1 },
+                { q: "764 ÷ 5 = ?", options: ["A. 152...3", "B. 152...4", "C. 153", "D. 151...4"], ans: 1 },
+                { q: "915 ÷ 4 = ?", options: ["A. 228...3", "B. 228...2", "C. 227...3", "D. 229"], ans: 0 },
+                { q: "805 ÷ 7 = ?", options: ["A. 114", "B. 115", "C. 116", "D. 105"], ans: 1 },
+                { q: "418 ÷ 4 = ?", options: ["A. 14", "B. 104", "C. 14...2", "D. 104...2"], ans: 3 },
+                { q: "901 ÷ 3 = ?", options: ["A. 30", "B. 300...1", "C. 30...1", "D. 301"], ans: 1 },
+                { q: "600 ÷ 3 = ?", options: ["A. 20", "B. 200", "C. 2000", "D. 2"], ans: 1 },
+                { q: "505 ÷ 5 = ?", options: ["A. 11", "B. 101", "C. 100", "D. 110"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "估算 824 ÷ 6 的結果大約是？ (提示：把它當作 840÷6)", options: ["A. 120", "B. 140", "C. 160", "D. 180"], ans: 1 },
+                { q: "以下哪一條算式的餘數最大？", options: ["A. 136 ÷ 5", "B. 269 ÷ 7", "C. 824 ÷ 6", "D. 938 ÷ 8"], ans: 1 },
+                { q: "以下哪一條算式的商最小？", options: ["A. 432 ÷ 4", "B. 615 ÷ 5", "C. 588 ÷ 6", "D. 752 ÷ 8"], ans: 3 },
+                { q: "以下哪一條算式的結果與 512 ÷ 8 ÷ 2 的不同？", options: ["A. 512 ÷ 4", "B. 64 ÷ 2", "C. 512 ÷ 2 ÷ 8", "D. 512 ÷ 4 ÷ 4"], ans: 0 },
+                { q: "找出方格內的數值：[ ? ] 個 8 加起來等於 504。", options: ["A. 62", "B. 63", "C. 64", "D. 65"], ans: 1 },
+                { q: "在 12 693 中，百位數字代表的數值是個位數字代表的數值的多少倍？(600÷3)", options: ["A. 2倍", "B. 30倍", "C. 200倍", "D. 1000倍"], ans: 2 },
+                { q: "1000 ÷ 7 = ?", options: ["A. 14...2", "B. 140...2", "C. 142...6", "D. 143"], ans: 2 },
+                { q: "如果 A ÷ B = 105 ... 4，除數 B 最小可以是甚麼？", options: ["A. 3", "B. 4", "C. 5", "D. 6"], ans: 2 },
+                { q: "承上題，如果 B 是 5，被除數 A 是多少？(105×5+4)", options: ["A. 529", "B. 525", "C. 521", "D. 530"], ans: 0 },
+                { q: "小明把 452 除以 4，但他看錯符號算成了 452 減 4。兩個結果相差多少？", options: ["A. 113", "B. 448", "C. 335", "D. 565"], ans: 2 },
+                { q: "被除數是 365，除數是 9，商和餘數分別是？", options: ["A. 40...5", "B. 41", "C. 39...6", "D. 40...4"], ans: 0 },
+                { q: "如果 504 ÷ 8 = 63，那麼 5040 ÷ 8 = ?", options: ["A. 63", "B. 630", "C. 6300", "D. 603"], ans: 1 },
+                { q: "以下哪一個數除以 6 會有餘數 5？", options: ["A. 240", "B. 242", "C. 245", "D. 246"], ans: 2 },
+                { q: "算式 [ ? ] ÷ 7 = 120 ... 6 中，被除數是？", options: ["A. 840", "B. 846", "C. 850", "D. 834"], ans: 1 },
+                { q: "某數除以 8，商是 110，餘數是最大可能的數值。這數是？(110×8+7)", options: ["A. 880", "B. 887", "C. 888", "D. 889"], ans: 1 },
+                { q: "算式 704 ÷ 5 的商是幾位數？", options: ["A. 一位數", "B. 兩位數", "C. 三位數", "D. 四位數"], ans: 2 },
+                { q: "算式 342 ÷ 4 的商是幾位數？", options: ["A. 一位數", "B. 兩位數", "C. 三位數", "D. 四位數"], ans: 1 },
+                { q: "哪個算式的商最接近 100？", options: ["A. 895 ÷ 9", "B. 405 ÷ 5", "C. 600 ÷ 7", "D. 300 ÷ 4"], ans: 0 },
+                { q: "如果 942 ÷ 3 = 314，那麼 942 ÷ 6 = ?", options: ["A. 314", "B. 628", "C. 157", "D. 100"], ans: 2 },
+                { q: "在 8[?]4 ÷ 4 這道算式中，如果要令商的十位數字是 0，[?] 內可以是甚麼數字？", options: ["A. 0, 1, 2, 3", "B. 4, 5, 6", "C. 7, 8, 9", "D. 任何數字"], ans: 0 }
+            ],
+
+            // ================= 第12關：除法應用題 =================
+            12: [
+                // 淺程度 (首 20 題)
+                { q: "連鎖店把 96 部機械人平均送到 4 間分店出售，每間分店可得？", options: ["A. 24部", "B. 22部", "C. 26部", "D. 28部"], ans: 0 },
+                { q: "蘋果撻每個售 7 元。老師有 84 元，最多可買蘋果撻多少個？", options: ["A. 11個", "B. 12個", "C. 13個", "D. 14個"], ans: 1 },
+                { q: "雜果撻每個售 8 元。老師有 84 元，購買最多數量後，剩下多少元？", options: ["A. 3元", "B. 4元", "C. 5元", "D. 6元"], ans: 1 },
+                { q: "有 370 個迷你月餅，每 8 個放滿一盒，最多可放滿多少盒？", options: ["A. 45盒", "B. 46盒", "C. 47盒", "D. 48盒"], ans: 1 },
+                { q: "承上題，餘下迷你月餅多少個？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "一年級新生共 216 人，平均分派到 3 個學社，每個學社有新生多少人？", options: ["A. 70人", "B. 71人", "C. 72人", "D. 73人"], ans: 2 },
+                { q: "一卷絲帶長 6 米 (600厘米)，平均剪成 5 段，每段長多少厘米？", options: ["A. 100厘米", "B. 110厘米", "C. 120厘米", "D. 130厘米"], ans: 2 },
+                { q: "水果店有奇異果 887 個，用膠袋每 6 個包裝成一袋，最多可包裝多少袋？", options: ["A. 146袋", "B. 147袋", "C. 148袋", "D. 149袋"], ans: 1 },
+                { q: "承上題，還餘下奇異果多少個？", options: ["A. 4個", "B. 5個", "C. 6個", "D. 0個"], ans: 1 },
+                { q: "4 隻扇貝共售 76 元，平均每隻售多少元？", options: ["A. 18元", "B. 19元", "C. 20元", "D. 21元"], ans: 1 },
+                { q: "每包圖畫紙有 6 張。家雯需要 92 張畫紙，她最少要買多少包？(92÷6=15...2)", options: ["A. 15包", "B. 16包", "C. 17包", "D. 18包"], ans: 1 },
+                { q: "一輛玩具車需要 8 個車輪。工廠現有 950 個車輪，最多可做玩具車多少輛？", options: ["A. 117輛", "B. 118輛", "C. 119輛", "D. 120輛"], ans: 1 },
+                { q: "家傑、文軒和樂天一起去文具店，合資買筆盒付了 204 元。平均每人付多少元？", options: ["A. 68元", "B. 102元", "C. 51元", "D. 72元"], ans: 0 },
+                { q: "農夫把雞蛋每半打(6隻)分成一盒，有雞蛋 528 隻，可裝成多少盒？", options: ["A. 86盒", "B. 87盒", "C. 88盒", "D. 89盒"], ans: 2 },
+                { q: "餅店每天售出老婆餅 390 個，包裝成每 6 個一盒，共有多少盒出售？", options: ["A. 63盒", "B. 64盒", "C. 65盒", "D. 66盒"], ans: 2 },
+                { q: "哥哥做暑期工，每星期上班 6 天，一星期共得 1710 元。每天工資是？", options: ["A. 280元", "B. 285元", "C. 290元", "D. 295元"], ans: 1 },
+                { q: "花店有花 298 朵，每 7 朵紮成一束，最多可紮成多少束？", options: ["A. 41束", "B. 42束", "C. 43束", "D. 44束"], ans: 1 },
+                { q: "承上題，餘下花朵多少朵？", options: ["A. 3朵", "B. 4朵", "C. 5朵", "D. 6朵"], ans: 1 },
+                { q: "媽媽把 84 個餃子平均 6 次烹調，每次煮調餃子多少個？", options: ["A. 12個", "B. 13個", "C. 14個", "D. 15個"], ans: 2 },
+                { q: "360 粒糖果平均分給 8 個小朋友，每人分得幾粒？", options: ["A. 40粒", "B. 45粒", "C. 50粒", "D. 55粒"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "農夫把雞蛋每半打(6隻)分成一盒，528 隻雞蛋入盒後，再每 8 盒裝成一箱，可裝多少箱？", options: ["A. 10箱", "B. 11箱", "C. 12箱", "D. 13箱"], ans: 1 },
+                { q: "光碟每隻 $96。現買一套 6 隻特價，共獲減價 $72。平均每隻光碟平了多少？", options: ["A. $12", "B. $16", "C. $24", "D. $90"], ans: 0 },
+                { q: "有練習簿 276 本，平分給 3 班，剛好每人分得 4 本。三甲班有學生多少人？", options: ["A. 21人", "B. 22人", "C. 23人", "D. 24人"], ans: 2 },
+                { q: "蘋果每個 6 元，水果店售出蘋果收得 786 元，即共售出蘋果多少個？", options: ["A. 121個", "B. 131個", "C. 141個", "D. 151個"], ans: 1 },
+                { q: "家傑和 3 個朋友一起去吃飯，共付 340 元，平均每人付多少元？", options: ["A. 85元", "B. 113元", "C. 114元", "D. 80元"], ans: 0 },
+                { q: "老師有 95 顆朱古力，每盒朱古力有 8 顆。他最少要買多少盒才足夠派給 95 人？", options: ["A. 11盒", "B. 12盒", "C. 13盒", "D. 14盒"], ans: 1 },
+                { q: "旅行團有 358 人，每輛旅遊巴最多可載 60 人，最少需要多少輛旅遊巴？", options: ["A. 5輛", "B. 6輛", "C. 7輛", "D. 8輛"], ans: 1 },
+                { q: "把 405 粒糖果分給 5 班，每班有 9 組，平均每組分得多少粒？", options: ["A. 8粒", "B. 9粒", "C. 10粒", "D. 11粒"], ans: 1 },
+                { q: "電池每排 8 粒售 96 元，小明只想買 1 粒，平均每粒售多少元？", options: ["A. 12元", "B. 14元", "C. 16元", "D. 18元"], ans: 0 },
+                { q: "一條長 2 米的絲帶，每 8 厘米剪成一段，最多可剪成多少段？", options: ["A. 20段", "B. 25段", "C. 30段", "D. 35段"], ans: 1 },
+                { q: "買 3 件相同的玩具共付 285 元，買 5 件相同的玩具需要多少元？", options: ["A. 450元", "B. 465元", "C. 475元", "D. 485元"], ans: 2 },
+                { q: "水杯每個 8 元，半打共售 48 元。現有 100 元，最多可買水杯多少個？", options: ["A. 11個", "B. 12個", "C. 13個", "D. 14個"], ans: 1 },
+                { q: "遊樂場門票，成人 $120，小童半價。爸爸帶 2 個小孩進場，共須付多少元？", options: ["A. 240元", "B. 300元", "C. 360元", "D. 180元"], ans: 0 },
+                { q: "在 100 以內的數中，除以 7 餘數是 1 的「最大雙數」是甚麼？", options: ["A. 99", "B. 98", "C. 92", "D. 85"], ans: 2 },
+                { q: "某數除以 4 得 125，如果把它改為除以 5，商會是多少？", options: ["A. 100", "B. 125", "C. 150", "D. 500"], ans: 0 },
+                { q: "哥哥買了半打汽水，共付 42 元。平均每罐售多少元？", options: ["A. 6元", "B. 7元", "C. 8元", "D. 9元"], ans: 1 },
+                { q: "爸爸把 500 元分給三個孩子，每人分得 150 元，還剩多少元？", options: ["A. 10元", "B. 20元", "C. 50元", "D. 100元"], ans: 2 },
+                { q: "箱子裡有 234 個球，拿走 2 個後，剩下的平分給 4 個人，每人得多少個？", options: ["A. 57個", "B. 58個", "C. 59個", "D. 60個"], ans: 1 },
+                { q: "美玲、美娜和美鳳去買洋娃娃，共付 168 元，平均每個洋娃娃售多少元？", options: ["A. 56元", "B. 84元", "C. 336元", "D. 504元"], ans: 0 },
+                { q: "一本書有 144 頁，小明每天看 6 頁，兩星期(14天)後他看完了嗎？", options: ["A. 看完了", "B. 還欠 60 頁", "C. 還欠 84 頁", "D. 剛好看完一半"], ans: 1 }
+            ],
+
+            // ================= 第13關：認識及比較重量 =================
+            13: [
+                // 淺程度 (首 20 題)
+                { q: "天平左邊放蘋果，右邊放橙。如果左邊向下沉，代表甚麼？", options: ["A. 蘋果較重", "B. 橙較重", "C. 兩者一樣重", "D. 無法比較"], ans: 0 },
+                { q: "天平左右平衡，左邊放了2本書，右邊放了4個鉛筆盒。誰比較重？", options: ["A. 一本書", "B. 一個鉛筆盒", "C. 一樣重", "D. 無法確定"], ans: 0 },
+                { q: "大象的重量最適合用甚麼單位來表示？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 毫米 (mm)", "D. 公里 (km)"], ans: 1 },
+                { q: "天平左邊放1個西瓜，右邊放3個蘋果，天平平衡。這代表？", options: ["A. 西瓜較重", "B. 蘋果較重", "C. 1西瓜=3蘋果", "D. 無法比較"], ans: 2 },
+                { q: "天平左邊是A，右邊是B，左邊向上升。這表示？", options: ["A. A比B重", "B. A比B輕", "C. 兩者一樣重", "D. 磅秤壞了"], ans: 1 },
+                { q: "獅子布偶比鱷魚布偶輕，企鵝布偶比鱷魚布偶重。誰最輕？", options: ["A. 獅子", "B. 鱷魚", "C. 企鵝", "D. 一樣重"], ans: 0 },
+                { q: "量度一個大西瓜的重量，最適合的工具是？", options: ["A. 軟尺", "B. 天平", "C. 磅秤", "D. 溫度計"], ans: 2 },
+                { q: "量度一封信的重量，最適合的工具是？", options: ["A. 磅秤", "B. 天平或彈簧秤", "C. 軟尺", "D. 滾輪"], ans: 1 },
+                { q: "比較兩本書的重量，最直接準確的方法是使用？", options: ["A. 直尺", "B. 磅秤", "C. 天平", "D. 雙手估計"], ans: 2 },
+                { q: "1個木瓜等於2個蘋果重，1個蘋果等於3個奇異果重。1個木瓜等於幾個奇異果重？", options: ["A. 3個", "B. 5個", "C. 6個", "D. 8個"], ans: 2 },
+                { q: "天平左邊放3粒波子，右邊放1件橡皮擦，天平平衡。1件橡皮擦重多少？", options: ["A. 1粒波子", "B. 2粒波子", "C. 3粒波子", "D. 4粒波子"], ans: 2 },
+                { q: "以下哪種物件最適合用來作為「自訂單位」量度書本的重量？", options: ["A. 羽毛", "B. 積木或波子", "C. 氣球", "D. 樹葉"], ans: 1 },
+                { q: "A比B重，B比C重。這三件物件中最重的是？", options: ["A. A", "B. B", "C. C", "D. 一樣重"], ans: 0 },
+                { q: "兩件物件在天平上保持平衡，代表它們的什麼相同？", options: ["A. 顏色", "B. 體積", "C. 重量", "D. 長度"], ans: 2 },
+                { q: "小明雙手分別拿著蘋果和西瓜，覺得西瓜比較「墜手」。這表示？", options: ["A. 西瓜較輕", "B. 西瓜較重", "C. 兩者一樣重", "D. 西瓜較大"], ans: 1 },
+                { q: "X和Y放在天平兩邊，X上升，Y下降。即是代表？", options: ["A. X比Y重", "B. Y比X重", "C. X和Y一樣重", "D. 天平壞了"], ans: 1 },
+                { q: "將同一件物件放在不同的天平上量度，它的重量會改變嗎？", options: ["A. 會變重", "B. 會變輕", "C. 不會改變", "D. 視乎天平大小"], ans: 2 },
+                { q: "用泥膠捏成一隻小狗，再把牠搓成一個球。重量會改變嗎？", options: ["A. 會，球比較重", "B. 會，小狗比較重", "C. 不會改變", "D. 泥膠會變輕"], ans: 2 },
+                { q: "把一塊大餅乾折成兩塊小餅乾，兩塊小餅乾加起來的重量與原本比？", options: ["A. 變輕了", "B. 變重了", "C. 一樣重", "D. 碎掉的部份不算"], ans: 2 },
+                { q: "以下哪一項是重量的單位？", options: ["A. 厘米 (cm)", "B. 毫米 (mm)", "C. 克 (g)", "D. 公里 (km)"], ans: 2 },
+
+                // 深程度 (後 20 題)
+                { q: "如果 1個X = 2個Y，且 1個X = 2個Z。Y和Z誰較重？", options: ["A. Y較重", "B. Z較重", "C. 兩者一樣重", "D. 無法確定"], ans: 2 },
+                { q: "天平左邊有2個X，右邊有3個Y，天平平衡。X和Y哪一個較重？", options: ["A. X較重", "B. Y較重", "C. 一樣重", "D. 無法比較"], ans: 0 },
+                { q: "天平左邊放 1個蘋果和1個梨，右邊放 3個梨，天平平衡。1個蘋果等於幾個梨的重量？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "天平左邊 2個正方體，右邊 4個圓柱體，天平平衡。1個正方體等於幾個圓柱體？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "A比B重，B和C一樣重，D比A重。這四件物件中最重的是？", options: ["A. A", "B. B", "C. C", "D. D"], ans: 3 },
+                { q: "1包米重 8公斤，1包麵粉重 3公斤。天平左邊放2包米，右邊放5包麵粉。天平會？", options: ["A. 左邊下降", "B. 右邊下降", "C. 保持平衡", "D. 無法確定"], ans: 0 },
+                { q: "一個空玻璃杯重 100克，倒滿水後連杯重 350克。裡面的水重多少克？", options: ["A. 450克", "B. 350克", "C. 250克", "D. 100克"], ans: 2 },
+                { q: "2件不同的禮物共重 10個波子，其中一件重 4個波子，另一件重？", options: ["A. 4個波子", "B. 5個波子", "C. 6個波子", "D. 7個波子"], ans: 2 },
+                { q: "一件禮物重 1 kg，放在天平右邊，左邊要放多少個 500g 的砝碼才能平衡？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "哥哥重 35 kg，弟弟重 28 kg。兩人共重多少？", options: ["A. 53 kg", "B. 63 kg", "C. 73 kg", "D. 43 kg"], ans: 1 },
+                { q: "3個相同大小的蘋果重 1公斤。9個這樣的蘋果重多少公斤？", options: ["A. 2公斤", "B. 3公斤", "C. 4公斤", "D. 9公斤"], ans: 1 },
+                { q: "一排朱古力有 8 粒，全排共重 160 克。平均每粒朱古力重？", options: ["A. 10克", "B. 20克", "C. 30克", "D. 40克"], ans: 1 },
+                { q: "5 包相同的糖果共重 500 克。3 包這樣的糖果重多少克？", options: ["A. 100克", "B. 200克", "C. 300克", "D. 400克"], ans: 2 },
+                { q: "一個空水果籃重 500 克，放入 2 公斤的水果後，總共重多少？", options: ["A. 2.5克", "B. 700克", "C. 2公斤500克", "D. 2005克"], ans: 2 },
+                { q: "貓媽媽重 4 公斤，3 隻小貓每隻重 500 克。牠們一家共重多少？", options: ["A. 4公斤500克", "B. 5公斤", "C. 5公斤500克", "D. 19公斤"], ans: 2 },
+                { q: "一個西瓜切去一半後，剩下的一半重 1500 克。原來的西瓜重多少？", options: ["A. 3公斤", "B. 1.5公斤", "C. 300克", "D. 1500克"], ans: 0 },
+                { q: "天平左邊放 1個菠蘿和1個蘋果，右邊放 1個菠蘿和2個橙，天平平衡。1個蘋果的重量等於？", options: ["A. 1個橙", "B. 2個橙", "C. 1個菠蘿", "D. 3個橙"], ans: 1 },
+                { q: "罐頭湯連罐重 400 克，吃掉一半湯後，連罐重 250 克。空罐重多少克？", options: ["A. 150克", "B. 100克", "C. 50克", "D. 200克"], ans: 1 },
+                { q: "A比B輕 2kg，C比B重 1kg。A和C的重量相差多少kg？", options: ["A. 1kg", "B. 2kg", "C. 3kg", "D. 4kg"], ans: 2 },
+                { q: "在街市，1 斤豬肉等於 600 克。半斤豬肉重多少克？", options: ["A. 300克", "B. 400克", "C. 500克", "D. 1200克"], ans: 0 }
+            ],
+
+            // ================= 第14關：克和公斤 =================
+            14: [
+                // 淺程度 (首 20 題)
+                { q: "4 公斤 125 克 = ? 克", options: ["A. 4125", "B. 40125", "C. 412.5", "D. 525"], ans: 0 },
+                { q: "12 公斤 = ? 克", options: ["A. 120", "B. 1200", "C. 12000", "D. 12"], ans: 2 },
+                { q: "11 kg 317 g = ? g", options: ["A. 1131", "B. 11317", "C. 1417", "D. 110317"], ans: 1 },
+                { q: "3 kg 68 g = ? g", options: ["A. 368", "B. 3068", "C. 3680", "D. 30068"], ans: 1 },
+                { q: "2600 克 = ? 公斤 ? 克", options: ["A. 26公斤0克", "B. 2公斤60克", "C. 2公斤600克", "D. 0公斤2600克"], ans: 2 },
+                { q: "一張梳化椅約重 6 ___？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 毫米 (mm)", "D. 公里 (km)"], ans: 1 },
+                { q: "一本日記簿約重 200 ___？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 厘米 (cm)", "D. 米 (m)"], ans: 0 },
+                { q: "一個裝滿水的熱水瓶約重 1 ___？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 毫米 (mm)", "D. 公里 (km)"], ans: 1 },
+                { q: "一輛兒童單車約重 8000 ___？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 毫米 (mm)", "D. 公里 (km)"], ans: 0 },
+                { q: "1 公斤等於多少克？", options: ["A. 10", "B. 100", "C. 1000", "D. 10000"], ans: 2 },
+                { q: "2 kg 8 g = ? g", options: ["A. 28", "B. 208", "C. 2008", "D. 2800"], ans: 2 },
+                { q: "量度一部微波爐的重量，最適合的單位是？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 厘米 (cm)", "D. 升 (L)"], ans: 1 },
+                { q: "量度一個萬字夾的重量，最適合的單位是？", options: ["A. 克 (g)", "B. 公斤 (kg)", "C. 毫米 (mm)", "D. 米 (m)"], ans: 0 },
+                { q: "5000 克等於多少公斤？", options: ["A. 5", "B. 50", "C. 500", "D. 0.5"], ans: 0 },
+                { q: "比較 1 kg 和 900 g，哪一個較重？", options: ["A. 1 kg", "B. 900 g", "C. 一樣重", "D. 無法比較"], ans: 0 },
+                { q: "3 公斤半即是多少克？", options: ["A. 3005克", "B. 3050克", "C. 3500克", "D. 3.5克"], ans: 2 },
+                { q: "指針磅秤上，每一小格代表 100g，指針指著 500g 後的第 3 小格，重量是？", options: ["A. 503g", "B. 530g", "C. 800g", "D. 3500g"], ans: 2 },
+                { q: "半公斤等於多少克？", options: ["A. 5克", "B. 50克", "C. 500克", "D. 5000克"], ans: 2 },
+                { q: "10 kg 等於多少 g？", options: ["A. 1000", "B. 10000", "C. 100000", "D. 100"], ans: 1 },
+                { q: "去超市買 500 克的蔬菜，店員會用什麼磅秤來量度最準確？", options: ["A. 量體重的大磅", "B. 彈簧秤/克秤", "C. 軟尺", "D. 溫度計"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "下列哪一個重量與 2 kg 8 g 完全相同？", options: ["A. 28 g", "B. 208 g", "C. 2008 g", "D. 20 008 g"], ans: 2 },
+                { q: "一部雙門大雪櫃的重量大約是？", options: ["A. 4 g", "B. 40 g", "C. 4 kg", "D. 40 kg"], ans: 3 },
+                { q: "以下哪一個重量最適合用來記錄一箱橙汁 (150盒) 的重量？", options: ["A. 40 kg", "B. 4 kg", "C. 400 g", "D. 40 g"], ans: 0 },
+                { q: "媽媽買了 3斤排骨，街市每斤是 600克，排骨共重？", options: ["A. 1800克", "B. 1公斤800克", "C. 1.8公斤", "D. 以上皆是"], ans: 3 },
+                { q: "一件蛋撻重 50g，一盒有 9 件，全盒蛋撻共重？", options: ["A. 450 g", "B. 45 g", "C. 450 kg", "D. 509 g"], ans: 0 },
+                { q: "有 10 件完全相同的物件，把它們放在磅上共重 500g，每件物件重？", options: ["A. 50g", "B. 5g", "C. 10g", "D. 5000g"], ans: 0 },
+                { q: "一袋米重 8 kg。每天吃 400 g，吃了 10 天後，還剩多少？", options: ["A. 400g", "B. 4000g", "C. 4kg", "D. B 和 C 皆正確"], ans: 3 },
+                { q: "哥哥體重 42 kg 500 g，弟弟比哥哥輕 3 kg 200 g。弟弟體重是？", options: ["A. 39 kg 300 g", "B. 39 kg 700 g", "C. 45 kg 700 g", "D. 40 kg 300 g"], ans: 0 },
+                { q: "書包原重 3 kg，取出 800 g 的書本後，書包現重多少？", options: ["A. 2 kg 200 g", "B. 3 kg 800 g", "C. 2 kg 800 g", "D. 1 kg 200 g"], ans: 0 },
+                { q: "一個西瓜重 2 kg 400 g，一個蜜瓜重 1 kg 800 g。西瓜比蜜瓜重多少？", options: ["A. 400 g", "B. 600 g", "C. 800 g", "D. 1 kg 600 g"], ans: 1 },
+                { q: "磅秤最多只能量度 2 kg。現在要量度 5 kg 的米，最少需要分幾次量度？", options: ["A. 2次", "B. 3次", "C. 4次", "D. 5次"], ans: 1 },
+                { q: "4 包相同的糖果共重 1 kg，平均每包重多少？", options: ["A. 250 g", "B. 200 g", "C. 400 g", "D. 25 g"], ans: 0 },
+                { q: "5 個蘋果重 1 kg，30 個蘋果大約重多少公斤？", options: ["A. 5 kg", "B. 6 kg", "C. 7 kg", "D. 8 kg"], ans: 1 },
+                { q: "空紙箱重 500 g，放入 10 盒每盒重 200 g 的餅乾後，總重量是？", options: ["A. 2000 g", "B. 2500 g", "C. 1500 g", "D. 25 kg"], ans: 1 },
+                { q: "妹妹重 18 kg，爸爸的重量是妹妹的 4 倍。爸爸重多少公斤？", options: ["A. 62 kg", "B. 72 kg", "C. 82 kg", "D. 54 kg"], ans: 1 },
+                { q: "載客電梯限重 1000 kg。假設平均每人重 50 kg，電梯最多可載幾人？", options: ["A. 10人", "B. 20人", "C. 30人", "D. 40人"], ans: 1 },
+                { q: "一個 5 元硬幣約重 10 克，100 個 5 元硬幣約重多少？", options: ["A. 100 克", "B. 1000 克 (即1公斤)", "C. 10000 克", "D. 10 克"], ans: 1 },
+                { q: "媽媽買了 2 kg 櫻桃，吃掉 500 g 後，剩下的平分給 3 個孩子，每人得？", options: ["A. 500 g", "B. 400 g", "C. 300 g", "D. 600 g"], ans: 0 },
+                { q: "某物件的重量是最大的兩位數(以克為單位)，這物件重多少？", options: ["A. 90 g", "B. 98 g", "C. 99 g", "D. 100 g"], ans: 2 },
+                { q: "1 kg 的鐵塊和 1000 g 的棉花，哪一個比較重？", options: ["A. 鐵塊較重", "B. 棉花較重", "C. 一樣重", "D. 無法比較"], ans: 2 }
+            ],
+
+            // ================= 第15關：平行線、平行四邊形及梯形 =================
+            15: [
+                // 淺程度 (首 20 題)
+                { q: "甚麼是「平行線」？", options: ["A. 兩條互相交叉的線", "B. 兩條距離永遠保持不變，不會相交的直線", "C. 兩條長度一樣的線", "D. 彎曲的線"], ans: 1 },
+                { q: "以下哪一個大楷英文字母包含互相平行的線段？", options: ["A. A", "B. E", "C. V", "D. O"], ans: 1 },
+                { q: "以下哪一個大楷英文字母「沒有」互相平行的線段？", options: ["A. H", "B. V", "C. M", "D. Z"], ans: 1 },
+                { q: "梯形有多少組對邊互相平行？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 4組"], ans: 1 },
+                { q: "平行四邊形有多少組對邊互相平行？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 4組"], ans: 2 },
+                { q: "長方形是不是平行四邊形的一種？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 只有大長方形才是"], ans: 0 },
+                { q: "正方形是不是平行四邊形的一種？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 只有小正方形才是"], ans: 0 },
+                { q: "以下哪一個圖形必定有平行線？", options: ["A. 圓形", "B. 三角形", "C. 正方形", "D. 星形"], ans: 2 },
+                { q: "在數學中，「//」 這個符號通常代表甚麼意思？", options: ["A. 垂直", "B. 相等", "C. 平行", "D. 大於"], ans: 2 },
+                { q: "火車路軌上的兩條長長鐵軌，是甚麼線的最佳生活例子？", options: ["A. 垂直線", "B. 曲線", "C. 平行線", "D. 折線"], ans: 2 },
+                { q: "一個標準的長方形有幾組平行線？", options: ["A. 1組", "B. 2組", "C. 3組", "D. 4組"], ans: 1 },
+                { q: "大楷英文字母 \"H\" 中有幾對互相平行的線段？", options: ["A. 0對", "B. 1對 (左右兩條直的)", "C. 2對", "D. 3對"], ans: 1 },
+                { q: "過馬路時看到的斑馬線，上面一條條的白線互相？", options: ["A. 垂直", "B. 平行", "C. 交叉", "D. 重疊"], ans: 1 },
+                { q: "畫平行線時，我們可以用什麼文具工具來輔助會畫得最準確？", options: ["A. 圓規", "B. 量角器", "C. 兩把直尺或直尺加三角尺", "D. 橡皮擦"], ans: 2 },
+                { q: "「只有一組對邊平行」的四邊形叫做甚麼？", options: ["A. 正方形", "B. 平行四邊形", "C. 梯形", "D. 菱形"], ans: 2 },
+                { q: "「有兩組對邊分別互相平行」的四邊形叫做甚麼？", options: ["A. 梯形", "B. 平行四邊形", "C. 五邊形", "D. 圓形"], ans: 1 },
+                { q: "如果無限延長兩條平行線，它們相交的點在哪裡？", options: ["A. 左邊", "B. 右邊", "C. 中間", "D. 它們永遠不會相交"], ans: 3 },
+                { q: "一個房子形狀的五邊形(像個箭頭向上)，它的左右兩邊牆壁通常是？", options: ["A. 互相垂直", "B. 互相平行", "C. 互相交叉", "D. 沒有關係"], ans: 1 },
+                { q: "菱形有多少組對邊互相平行？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 4組"], ans: 2 },
+                { q: "梯形互相平行的那一組對邊，我們通常稱它們為？", options: ["A. 左邊和右邊", "B. 上底和下底", "C. 頂角和底角", "D. 對角線"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "沿著長方形的對角線剪開，會得到兩個直角三角形。這兩個三角形裡面有平行線嗎？", options: ["A. 有1組", "B. 有2組", "C. 完全沒有平行線", "D. 無法確定"], ans: 2 },
+                { q: "大楷英文字母 \"M\" 中有幾組互相平行的線段？", options: ["A. 0組", "B. 1組 (左右兩條直的)", "C. 2組", "D. 3組"], ans: 1 },
+                { q: "大楷英文字母 \"E\" 中有沒有互相平行的線段？", options: ["A. 沒有", "B. 有，它有互相平行的橫線", "C. 只有曲線", "D. 只有斜線"], ans: 1 },
+                { q: "把兩個完全相同的直角三角形拼合，以下哪一種圖形是「不可能」拼出來的？", options: ["A. 長方形", "B. 大等腰三角形", "C. 平行四邊形", "D. 五角星"], ans: 3 },
+                { q: "平行四邊形有兩條對角線，把它們畫出來後，這兩條對角線會互相平行嗎？", options: ["A. 會", "B. 不會，它們會在中間相交", "C. 只有長方形才會", "D. 只有菱形才會"], ans: 1 },
+                { q: "以下哪一個圖形不可能有互相平行的邊？", options: ["A. 正六邊形", "B. 等邊三角形", "C. 正八邊形", "D. 梯形"], ans: 1 },
+                { q: "在方格紙上，點A(1,1)和點B(1,5)連成的直線，與點C(3,1)和點D(3,5)連成的直線互相？", options: ["A. 垂直", "B. 平行", "C. 相交", "D. 重疊"], ans: 1 },
+                { q: "在圖形中，如果四條邊的長度都一樣長，而且有兩組對邊互相平行，這必定是甚麼圖形？", options: ["A. 梯形", "B. 長方形", "C. 菱形 (或正方形)", "D. 風箏形"], ans: 2 },
+                { q: "長方形、正方形和平行四邊形有以下哪一種「共同特性」？", options: ["A. 四個角都是直角", "B. 四條邊都一樣長", "C. 都有兩組對邊互相平行", "D. 都有沒有直角"], ans: 2 },
+                { q: "把兩個大小和形狀完全相同的梯形拼在一起，必定能拼成一個甚麼圖形？", options: ["A. 正方形", "B. 圓形", "C. 平行四邊形", "D. 大三角形"], ans: 2 },
+                { q: "把正方形的一個角剪去一個小三角形，剩下的圖形有幾組平行線？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 3組"], ans: 2 },
+                { q: "下列哪一個立體圖形或平面圖形「不是」四邊形的一種？", options: ["A. 梯形", "B. 平行四邊形", "C. 菱形", "D. 圓柱體"], ans: 3 },
+                { q: "正六邊形最多可以有多少組平行的對邊？", options: ["A. 1組", "B. 2組", "C. 3組", "D. 6組"], ans: 2 },
+                { q: "在一條直線上畫兩條垂直於它的線，這兩條新畫的線會互相？", options: ["A. 垂直", "B. 平行", "C. 相交", "D. 彎曲"], ans: 1 },
+                { q: "畫一個四邊形，如果它的四條邊都不互相平行，這種圖形一般稱為？", options: ["A. 任意四邊形 (不規則四邊形)", "B. 梯形", "C. 菱形", "D. 平行四邊形"], ans: 0 },
+                { q: "以下哪種摺紙方法可以輕鬆摺出多條平行線？", options: ["A. 隨便亂揉", "B. 將紙張向同一個方向對摺再對摺", "C. 剪成圓形", "D. 摺紙飛機的機頭"], ans: 1 },
+                { q: "大楷英文字母 \"Z\" 中有幾組平行線？", options: ["A. 0組", "B. 1組 (上下兩條橫線)", "C. 2組", "D. 3組"], ans: 1 },
+                { q: "大楷英文字母 \"N\" 中有幾組平行線？", options: ["A. 0組", "B. 1組 (左右兩條直線)", "C. 2組", "D. 3組"], ans: 1 },
+                { q: "下列哪一項「不是」平行四邊形的必然特性？", options: ["A. 有兩組對邊平行", "B. 對邊的長度相等", "C. 四個角必定都是直角", "D. 是一個四邊形"], ans: 2 },
+                { q: "把竹籤每2枝相同長度的分為一對。有 5cm, 5cm, 4cm, 6cm, 3cm, 5cm, 5cm, 5cm, 16cm。最多可拼出多少個平行四邊形？ (每2對可拼1個)", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 0 } // 5cm有5枝(即2對), 其他沒有成對的了。只能拼出一個菱形(也是平行四邊形)。
+            ],
+            16: [
+                // 淺程度 (首 20 題)
+                { q: "平行四邊形有多少組對邊互相平行？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 4組"], ans: 2 },
+                { q: "平行四邊形的對邊長度有什麼特點？", options: ["A. 長度不相等", "B. 長度相等", "C. 必定是相差 2 cm", "D. 只有一組相等"], ans: 1 },
+                { q: "長方形是不是平行四邊形的一種？", options: ["A. 是", "B. 不是", "C. 只有大長方形才是", "D. 不一定"], ans: 0 },
+                { q: "正方形是不是平行四邊形的一種？", options: ["A. 是", "B. 不是", "C. 只有小正方形才是", "D. 不一定"], ans: 0 },
+                { q: "平行四邊形的英文名稱與以下哪個字有關？", options: ["A. Parallel (平行)", "B. Circle (圓形)", "C. Triangle (三角形)", "D. Square (正方形)"], ans: 0 },
+                { q: "一個平行四邊形的左邊長 8 cm，它的右邊長多少？", options: ["A. 4 cm", "B. 8 cm", "C. 16 cm", "D. 無法確定"], ans: 1 },
+                { q: "一個平行四邊形的上邊長 12 cm，它的下邊長多少？", options: ["A. 6 cm", "B. 10 cm", "C. 12 cm", "D. 24 cm"], ans: 2 },
+                { q: "以下哪一個圖形「必定」有兩組對邊互相平行？", options: ["A. 梯形", "B. 平行四邊形", "C. 三角形", "D. 五邊形"], ans: 1 },
+                { q: "觀察平時用的長方形膠擦，它的對邊是互相？", options: ["A. 交叉", "B. 垂直", "C. 平行", "D. 彎曲"], ans: 2 },
+                { q: "如果把長方形推斜，它會變成一個沒有直角的？", options: ["A. 正方形", "B. 梯形", "C. 平行四邊形", "D. 圓形"], ans: 2 },
+                { q: "平行四邊形有幾個角？", options: ["A. 2個", "B. 3個", "C. 4個", "D. 5個"], ans: 2 },
+                { q: "平行四邊形有幾條邊？", options: ["A. 2條", "B. 3條", "C. 4條", "D. 5條"], ans: 2 },
+                { q: "以下哪一項是平行四邊形的特性？", options: ["A. 只有一組對邊平行", "B. 有兩組對邊平行", "C. 沒有邊互相平行", "D. 四條邊都彎曲"], ans: 1 },
+                { q: "所有的正方形都具有平行四邊形的特性嗎？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 視乎大小"], ans: 0 },
+                { q: "所有的平行四邊形都是正方形嗎？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 視乎大小"], ans: 1 },
+                { q: "如果一個四邊形有兩組對邊平行，它必定是？", options: ["A. 梯形", "B. 圓形", "C. 平行四邊形", "D. 三角形"], ans: 2 },
+                { q: "畫平行四邊形時，最少需要確定幾條邊的長度？(因為對邊相等)", options: ["A. 1條", "B. 2條", "C. 3條", "D. 4條"], ans: 1 },
+                { q: "菱形是不是平行四邊形的一種？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 只有紅色的才是"], ans: 0 },
+                { q: "以下哪一種紙張形狀最常見是平行四邊形(長方形)？", options: ["A. A4紙", "B. 圓形貼紙", "C. 三角形彩旗", "D. 心形卡片"], ans: 0 },
+                { q: "在點子紙上畫平行四邊形，相對的兩條邊除了要平行，還要？", options: ["A. 顏色一樣", "B. 長度相等", "C. 長度不一", "D. 互相垂直"], ans: 1 },
+
+                // 深程度 (後 20 題)
+                { q: "長方形、正方形和平行四邊形有以下哪一種共同特性？", options: ["A. 四個角都是直角", "B. 四條邊長度相等", "C. 有兩組對邊互相平行", "D. 沒有直角"], ans: 2 },
+                { q: "沿著虛線把一個長方形從對角線剪開，可以得出兩個什麼圖形？", options: ["A. 梯形", "B. 平行四邊形", "C. 三角形", "D. 正方形"], ans: 2 },
+                { q: "有一組竹籤：長 8cm 兩枝，長 5cm 兩枝。可以拼出平行四邊形嗎？", options: ["A. 可以", "B. 不可以", "C. 只能拼出梯形", "D. 只能拼出三角形"], ans: 0 },
+                { q: "有一組竹籤：長 6cm 三枝，長 4cm 一枝。可以拼出平行四邊形嗎？", options: ["A. 可以", "B. 不可以", "C. 只能拼出正方形", "D. 只能拼出長方形"], ans: 1 },
+                { q: "把兩個完全相同的直角三角形，斜邊貼斜邊拼合，必定能得出？", options: ["A. 梯形", "B. 長方形或平行四邊形", "C. 正六邊形", "D. 圓形"], ans: 1 },
+                { q: "沿著一條直線把一個正六邊形剪開一半，會得到兩個什麼圖形？", options: ["A. 梯形", "B. 平行四邊形", "C. 長方形", "D. 三角形"], ans: 0 },
+                { q: "把一個平行四邊形沿對角線剪開，會得到兩個？", options: ["A. 梯形", "B. 長方形", "C. 完全相同的三角形", "D. 正方形"], ans: 2 },
+                { q: "如果一個平行四邊形的四條邊都一樣長，它必定也是一個？", options: ["A. 梯形", "B. 菱形", "C. 長方形 (不一定正方)", "D. 圓形"], ans: 1 },
+                { q: "在點子圖上，把平行四邊形的底邊加長，它還會是平行四邊形嗎？(另一底邊不變)", options: ["A. 會", "B. 不會，會變成梯形", "C. 會變成正方形", "D. 會變成三角形"], ans: 1 },
+                { q: "有 10 枝 5cm 的竹籤，最多可拼出多少個獨立的菱形(四邊相等)？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "平行四邊形的對角(相對的角)大小有什麼關係？", options: ["A. 不相等", "B. 相等", "C. 相差 90 度", "D. 一定是直角"], ans: 1 },
+                { q: "用兩塊完全相同的梯形(不是平行四邊形)拼在一起，可以拼成平行四邊形嗎？", options: ["A. 可以，只要把它們倒轉拼合", "B. 絕對不可以", "C. 只能拼成長方形", "D. 只能拼成正方形"], ans: 0 },
+                { q: "「只有一對角相等」是平行四邊形的特性嗎？", options: ["A. 是", "B. 不是，平行四邊形兩對對角都相等", "C. 只有長方形才是", "D. 只有菱形才是"], ans: 1 },
+                { q: "把長方形的四個角各剪去一個小直角三角形，剩下的圖形最多有幾組平行邊？", options: ["A. 2組", "B. 3組", "C. 4組", "D. 1組"], ans: 0 },
+                { q: "下列哪個圖形不是平行四邊形？", options: ["A. 長方形", "B. 正方形", "C. 梯形", "D. 菱形"], ans: 2 },
+                { q: "要在釘板上圍出一個平行四邊形，最少需要多少條橡筋？", options: ["A. 1條", "B. 2條", "C. 3條", "D. 4條"], ans: 0 }, // 1條橡筋圍4個頂點
+                { q: "用 4 枝長度相同的竹籤，可以拼出正方形，輕輕一推可以變成？", options: ["A. 梯形", "B. 菱形 (平行四邊形的一種)", "C. 長方形", "D. 三角形"], ans: 1 },
+                { q: "如果一個平行四邊形有一個角是直角，那麼它必定是？", options: ["A. 長方形或正方形", "B. 梯形", "C. 菱形", "D. 五邊形"], ans: 0 },
+                { q: "平行四邊形的周界(四條邊總長)是 20 cm。如果一條邊長 6 cm，相鄰的邊長？", options: ["A. 6 cm", "B. 4 cm", "C. 14 cm", "D. 8 cm"], ans: 1 },
+                { q: "把平行四邊形畫在方格紙上，如果底邊佔 5 格，對面的邊必定佔？", options: ["A. 4 格", "B. 5 格", "C. 6 格", "D. 不一定"], ans: 1 }
+            ],
+
+            // ================= 第17關：梯形 =================
+            17: [
+                // 淺程度 (首 20 題)
+                { q: "梯形有多少組對邊互相平行？", options: ["A. 0組", "B. 1組", "C. 2組", "D. 4組"], ans: 1 },
+                { q: "梯形中互相平行的一組對邊，通常被稱為什麼？", options: ["A. 左邊和右邊", "B. 上底和下底", "C. 長邊和短邊", "D. 直線和橫線"], ans: 1 },
+                { q: "平行四邊形是梯形的一種嗎？", options: ["A. 是", "B. 不是，因為平行四邊形有兩組平行邊", "C. 只有長方形是", "D. 視乎大小"], ans: 1 },
+                { q: "一個四邊形如果「只有一組對邊平行」，它就是？", options: ["A. 長方形", "B. 梯形", "C. 菱形", "D. 正方形"], ans: 1 },
+                { q: "梯形的四條邊長度可以全部都不一樣嗎？", options: ["A. 可以", "B. 不可以，必定有兩邊相等", "C. 不可以，必定全部相等", "D. 只有直角梯形可以"], ans: 0 },
+                { q: "以下哪一個圖形有可能是梯形？", options: ["A. 三角形", "B. 圓形", "C. 四邊形", "D. 五邊形"], ans: 2 },
+                { q: "梯形有幾個角？", options: ["A. 3個", "B. 4個", "C. 5個", "D. 6個"], ans: 1 },
+                { q: "如果一個圖形有兩組對邊平行，它是梯形嗎？", options: ["A. 是", "B. 不是", "C. 不一定", "D. 只有大圖形才是"], ans: 1 },
+                { q: "日常生活中的「梯子」，側面看起來有點像梯形。梯形這名字與它有關嗎？", options: ["A. 有關", "B. 無關", "C. 梯子是圓形的", "D. 梯子是三角形的"], ans: 0 },
+                { q: "直角梯形是指梯形內部包含什麼角？", options: ["A. 銳角", "B. 鈍角", "C. 直角", "D. 平角"], ans: 2 },
+                { q: "等腰梯形是指哪兩條邊的長度相等？", options: ["A. 上底和下底", "B. 兩條不平行的斜邊", "C. 所有邊", "D. 相鄰的邊"], ans: 1 },
+                { q: "把長方形剪去一個角 (一條斜線切過相鄰兩邊)，剩下的圖形可能不是什麼？", options: ["A. 五邊形", "B. 梯形", "C. 三角形", "D. 視乎剪法，但可能是梯形(如切過對邊)"], ans: 3 },
+                { q: "如果四邊形的上下兩邊平行，左右兩邊不平行。這是什麼圖形？", options: ["A. 梯形", "B. 平行四邊形", "C. 長方形", "D. 菱形"], ans: 0 },
+                { q: "梯形的英文名稱是？", options: ["A. Triangle", "B. Trapezium", "C. Square", "D. Circle"], ans: 1 },
+                { q: "畫梯形時，最少要畫幾條平行的直線？", options: ["A. 1條", "B. 2條", "C. 3條", "D. 4條"], ans: 1 },
+                { q: "下列哪一個圖形不是由直線組成的？", options: ["A. 梯形", "B. 圓形", "C. 正方形", "D. 菱形"], ans: 1 },
+                { q: "在點子紙上畫梯形，如果上底佔 2 格，下底佔 4 格，這兩條邊必須？", options: ["A. 互相垂直", "B. 互相平行", "C. 長度相等", "D. 顏色不同"], ans: 1 },
+                { q: "梯形的上底和下底長度會一樣嗎？", options: ["A. 會", "B. 不會，如果一樣就變成平行四邊形了", "C. 永遠一樣", "D. 不一定"], ans: 1 },
+                { q: "一個梯形最多可以有多少組平行邊？", options: ["A. 1組", "B. 2組", "C. 3組", "D. 4組"], ans: 0 },
+                { q: "下列圖形中，哪一個具有「只有一組對邊平行」的特性？", options: ["A. 梯形", "B. 長方形", "C. 正方形", "D. 平行四邊形"], ans: 0 },
+
+                // 深程度 (後 20 題)
+                { q: "下列哪一項描述是正確的？", options: ["A. 梯形可有 3 個直角", "B. 梯形可有一組對邊長度相等", "C. 梯形的上下底長度相等", "D. 平行四邊形是梯形的一種"], ans: 1 },
+                { q: "沿著虛線把一個正方形剪開(一刀切成兩半)，「不可能」得出什麼圖形組合？", options: ["A. 兩個長方形", "B. 兩個三角形", "C. 兩個梯形", "D. 一個正方形和一個長方形"], ans: 3 },
+                { q: "把正方形剪去一個三角形，剩下的圖形如果是四邊形，它必定是？", options: ["A. 梯形", "B. 平行四邊形", "C. 菱形", "D. 圓形"], ans: 0 },
+                { q: "一個梯形最多可以有幾個直角？", options: ["A. 1個", "B. 2個", "C. 3個", "D. 4個"], ans: 1 },
+                { q: "如果一個四邊形有兩個直角，它可能是什麼圖形？", options: ["A. 梯形", "B. 菱形", "C. 平行四邊形 (非長方)", "D. 圓形"], ans: 0 },
+                { q: "把兩個大小和形狀完全相同的直角三角形拼合，不可能拼出？", options: ["A. 長方形", "B. 大等腰三角形", "C. 平行四邊形", "D. 梯形"], ans: 3 },
+                { q: "把兩個完全相同的梯形拼合，必定可以拼出什麼圖形？", options: ["A. 正方形", "B. 平行四邊形", "C. 梯形", "D. 三角形"], ans: 1 },
+                { q: "有一組竹籤：長 8cm 一枝，6cm 一枝，4cm 兩枝。可以拼出平行四邊形嗎？", options: ["A. 可以", "B. 不可以，但可以拼出梯形", "C. 只能拼出長方形", "D. 只能拼出正方形"], ans: 1 },
+                { q: "沿對角線把梯形剪開，會得到兩個什麼圖形？", options: ["A. 梯形", "B. 平行四邊形", "C. 三角形", "D. 長方形"], ans: 2 },
+                { q: "梯形的一組對邊平行，另一組對邊如果延長，最終會？", options: ["A. 永遠不相交", "B. 互相垂直", "C. 相交於一點", "D. 變成平行線"], ans: 2 },
+                { q: "以下哪一個字母的形狀最接近梯形？(上下平行，左右向內斜)", options: ["A. H", "B. T", "C. A (上半部梯形, 去掉頂點)", "D. X"], ans: 2 },
+                { q: "在一個平行四邊形中畫一條直線把它切開，可以得到兩個梯形嗎？", options: ["A. 可以", "B. 不可以", "C. 只能切出三角形", "D. 只能切出長方形"], ans: 0 },
+                { q: "一個等腰梯形的兩條不平行邊長度分別是 5 cm 和 [?] cm。空格應是？", options: ["A. 10", "B. 5", "C. 4", "D. 6"], ans: 1 },
+                { q: "如果把梯形的上底延長到與下底一樣長，它會變成什麼圖形？", options: ["A. 三角形", "B. 平行四邊形或長方形", "C. 菱形", "D. 圓形"], ans: 1 },
+                { q: "以下哪種圖形不屬於「四邊形家族」？", options: ["A. 梯形", "B. 平行四邊形", "C. 菱形", "D. 六邊形"], ans: 3 },
+                { q: "用三枝相同長度的竹籤和一枝較長的竹籤，可以拼出什麼圖形？", options: ["A. 正方形", "B. 長方形", "C. 等腰梯形", "D. 菱形"], ans: 2 },
+                { q: "一個圖形有 4 條邊，其中兩邊互相平行但長度不同，它是？", options: ["A. 長方形", "B. 梯形", "C. 菱形", "D. 正方形"], ans: 1 },
+                { q: "一張長方形紙，折一次後剪一刀，打開後可能是一個等腰梯形嗎？", options: ["A. 可能", "B. 不可能", "C. 只會是圓形", "D. 只會是星形"], ans: 0 },
+                { q: "把平行四邊形的左下角和右下角各剪去一個小三角形，剩下的中間部分是？", options: ["A. 梯形", "B. 長方形", "C. 菱形", "D. 不一定"], ans: 1 }, // 可能是長方形
+                { q: "梯形「只有」一組對邊平行。這句話中的「只有」非常重要，為什麼？", options: ["A. 沒有原因", "B. 因為如果有兩組平行，它就是平行四邊形了", "C. 因為它不能有平行線", "D. 因為它是三角形"], ans: 1 }
+            ],
+            18: [
+                // 淺程度 (20題)
+                { q: "「11:30 a.m.」寫成 24小時報時制是？", options: ["A. 11:30", "B. 23:30", "C. 01:30", "D. 13:30"], ans: 0 },
+                { q: "「17:27」寫成 12小時報時制是？", options: ["A. 上午 7 時 27 分", "B. 下午 5 時 27 分", "C. 上午 5 時 27 分", "D. 下午 7 時 27 分"], ans: 1 },
+                { q: "「09:03」是上午還是下午的時間？", options: ["A. 上午 9 時 03 分", "B. 下午 9 時 03 分", "C. 晚上 9 時 03 分", "D. 無法確定"], ans: 0 },
+                { q: "「7:22 a.m.」寫成 24小時報時制是？", options: ["A. 17:22", "B. 07:22", "C. 19:22", "D. 00:22"], ans: 1 },
+                { q: "「12:15 p.m.」寫成 24小時報時制是？", options: ["A. 00:15", "B. 24:15", "C. 12:15", "D. 13:15"], ans: 2 },
+                { q: "「下午 4 時 38 分」寫成 24小時報時制是？", options: ["A. 04:38", "B. 14:38", "C. 16:38", "D. 18:38"], ans: 2 },
+                { q: "「12:31 a.m. (午夜過後)」寫成 24小時報時制是？", options: ["A. 12:31", "B. 00:31", "C. 24:31", "D. 01:31"], ans: 1 },
+                { q: "「6:12 p.m.」寫成 24小時報時制是？", options: ["A. 06:12", "B. 16:12", "C. 18:12", "D. 20:12"], ans: 2 },
+                { q: "「上午 9 時 27 分」寫成 24小時報時制是？", options: ["A. 21:27", "B. 09:27", "C. 19:27", "D. 11:27"], ans: 1 },
+                { q: "「下午 11 時 48 分」寫成 24小時報時制是？", options: ["A. 11:48", "B. 21:48", "C. 23:48", "D. 00:48"], ans: 2 },
+                { q: "「3:05 a.m.」寫成 24小時報時制是？", options: ["A. 15:05", "B. 13:05", "C. 03:05", "D. 00:05"], ans: 2 },
+                { q: "「20:56」寫成 12小時報時制是？", options: ["A. 上午 8 時 56 分", "B. 下午 8 時 56 分", "C. 上午 10 時 56 分", "D. 下午 10 時 56 分"], ans: 1 },
+                { q: "「13:00」寫成 12小時報時制是？", options: ["A. 上午 1 時", "B. 下午 1 時", "C. 下午 3 時", "D. 凌晨 1 時"], ans: 1 },
+                { q: "數碼時鐘顯示「00:00」代表甚麼時間？", options: ["A. 中午 12 時", "B. 下午 1 時", "C. 午夜 12 時", "D. 上午 10 時"], ans: 2 },
+                { q: "在 24小時報時制中，15:00 即是？", options: ["A. 下午 5 時", "B. 下午 3 時", "C. 上午 3 時", "D. 上午 5 時"], ans: 1 },
+                { q: "「上午 8 時 15 分」寫作？", options: ["A. 20:15", "B. 18:15", "C. 08:15", "D. 00:15"], ans: 2 },
+                { q: "「下午 9 時 45 分」寫作？", options: ["A. 09:45", "B. 19:45", "C. 21:45", "D. 23:45"], ans: 2 },
+                { q: "「19:30」播出的電視節目是在甚麼時候？", options: ["A. 早上 7 時 30 分", "B. 晚上 7 時 30 分", "C. 晚上 9 時 30 分", "D. 早上 9 時 30 分"], ans: 1 },
+                { q: "「14:20」是下午幾時幾分？", options: ["A. 下午 2 時 20 分", "B. 下午 4 時 20 分", "C. 下午 12 時 20 分", "D. 下午 1 時 20 分"], ans: 0 },
+                { q: "「22:10」是晚上幾時幾分？", options: ["A. 晚上 8 時 10 分", "B. 晚上 10 時 10 分", "C. 晚上 12 時 10 分", "D. 晚上 9 時 10 分"], ans: 1 },
+
+                // 深程度 (20題)
+                { q: "觀光客輪「香江遊」第一程在 15:05 出發，即是？", options: ["A. 上午 3 時 5 分", "B. 下午 5 時 5 分", "C. 下午 3 時 5 分", "D. 下午 1 時 5 分"], ans: 2 },
+                { q: "承上題，如果班次為(15:05, 16:20, 17:35, 18:50)，在下午 6 時之前共有多少程出發？", options: ["A. 2 程", "B. 3 程", "C. 4 程", "D. 5 程"], ans: 1 },
+                { q: "嘉明在下午 8 時 30 分到達碼頭，他可以趕上哪一程「香江遊」？(第五程20:05, 第六程21:20)", options: ["A. 第五程", "B. 第六程", "C. 兩程都可以", "D. 已經沒有船了"], ans: 1 },
+                { q: "水族館一天開放時間是「09:30 - 20:00」。水族館在甚麼時間停止開放？", options: ["A. 下午 10 時", "B. 晚上 8 時", "C. 晚上 9 時", "D. 下午 6 時"], ans: 1 },
+                { q: "志康原本打算在下午7時到達水族館，但他遲了50分鐘(19:50)。他還可以進入水族館參觀嗎？(關門:20:00)", options: ["A. 可以，還未關門", "B. 不可以，已經關門", "C. 不確定", "D. 他需要買明天的票"], ans: 0 },
+                { q: "李小姐在上午9時38分到達展覽廳，用「24小時報時制」表示是？", options: ["A. 21:38", "B. 09:38", "C. 19:38", "D. 11:38"], ans: 1 },
+                { q: "儲物櫃收費每小時 $7 (不足一小時亦作一小時)。李小姐在 10:00 寄存，17:15 取回。共寄存了幾多小時來計算收費？", options: ["A. 7 小時", "B. 8 小時", "C. 9 小時", "D. 10 小時"], ans: 1 }, // 7h15m -> 8h
+                { q: "承上題，她需要付多少元？(每小時$7，共計8小時)", options: ["A. $49", "B. $56", "C. $63", "D. $70"], ans: 1 },
+                { q: "展覽廳每天開放時間為 10:00 - 17:15。每天共開放多久？", options: ["A. 7 小時 15 分鐘", "B. 8 小時 15 分鐘", "C. 6 小時 15 分鐘", "D. 7 小時 45 分鐘"], ans: 0 },
+                { q: "一齣電影在下午 1 時 35 分開始，用「24小時報時制」表示是？", options: ["A. 01:35", "B. 11:35", "C. 13:35", "D. 15:35"], ans: 2 },
+                { q: "運動場在 08:00 開放，22:30 關閉。22:30 即是？", options: ["A. 晚上 8 時 30 分", "B. 晚上 10 時 30 分", "C. 晚上 12 時 30 分", "D. 晚上 9 時 30 分"], ans: 1 },
+                { q: "現在是 23:45，再過 30 分鐘是明天的甚麼時間？", options: ["A. 24:15", "B. 00:15", "C. 01:15", "D. 23:15"], ans: 1 },
+                { q: "小明在 14:50 開始做功課，用了 40 分鐘，完成時間是？", options: ["A. 15:30", "B. 15:40", "C. 14:90", "D. 15:20"], ans: 0 },
+                { q: "圖書館 09:00 開門，19:00 關門。全日共開放了幾小時？", options: ["A. 9 小時", "B. 10 小時", "C. 11 小時", "D. 12 小時"], ans: 1 },
+                { q: "一班火車在 23:15 開出，車程 1 小時 10 分鐘，到達時間是明天的？", options: ["A. 24:25", "B. 01:25", "C. 00:25", "D. 00:15"], ans: 2 },
+                { q: "「15:45」是下午幾時幾分？", options: ["A. 下午 3 時 45 分", "B. 下午 5 時 45 分", "C. 下午 1 時 45 分", "D. 下午 4 時 45 分"], ans: 0 },
+                { q: "電子鐘顯示 00:00，表示新的一天開始，也就是？", options: ["A. 中午 12 時", "B. 凌晨 1 時", "C. 午夜 12 時", "D. 下午 12 時"], ans: 2 },
+                { q: "21:15 播映電影，片長 2 小時，何時播完？", options: ["A. 23:15", "B. 22:15", "C. 20:15", "D. 00:15"], ans: 0 },
+                { q: "如果李小姐使用儲物櫃付款 $77 (每小時$7)，她共寄存了幾多小時？", options: ["A. 9 小時", "B. 10 小時", "C. 11 小時", "D. 12 小時"], ans: 2 },
+                { q: "下午 11 時 59 分，再過 1 分鐘是？", options: ["A. 24:00 (或 00:00)", "B. 12:00", "C. 23:60", "D. 01:00"], ans: 0 }
+            ]
+        };
+
+        let currentLevel = null;
+        let selectedQuestions = [];
+        let userAnswers = []; 
+        let currentQIndex = 0;
+        let isRetryMode = false; 
+        
+        let progressScores = JSON.parse(localStorage.getItem('teacherCatScores')) || {};
+
+        const btnColors = [
+            "linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%)", 
+            "linear-gradient(to bottom, #84fab0 0%, #8fd3f4 100%)", 
+            "linear-gradient(to bottom, #fccb90 0%, #d57eeb 100%)", 
+            "linear-gradient(to bottom, #e0c3fc 0%, #8ec5fc 100%)"
+        ];
+
+        function initHome() {
+            const container = document.getElementById("level-container");
+            container.innerHTML = "";
+            
+            levelsData.forEach((level, index) => {
+                let btn = document.createElement("button");
+                btn.className = "level-btn";
+                btn.style.background = btnColors[index % btnColors.length];
+                btn.style.color = "#333";
+                
+                let maxScore = progressScores[level.id] || 0;
+                let starHTML = "";
+                if (maxScore === 20) {
+                    starHTML = `<div style="font-size: 1.8em; margin: 5px 0; text-shadow: 0 0 10px #FFEB3B;">🌟大星星🌟</div>`;
+                } else if (maxScore >= 10) {
+                    starHTML = `<div style="font-size: 1.3em; margin: 5px 0;">⭐小星星⭐</div>`;
+                } else {
+                    starHTML = `<div style="font-size: 1.1em; margin: 5px 0; color:#999;">☆☆☆</div>`;
+                }
+                
+                let scoreHTML = `<div style="font-size: 0.9em; background: rgba(255,255,255,0.7); border-radius: 10px; padding: 5px; margin-top: auto;">最高分數: <b>${maxScore}</b> / 20</div>`;
+                
+                // 顯示「第一關 - 五位數」這類的名稱
+                btn.innerHTML = `<span style="font-size:1.1em;">${level.title}</span>${starHTML}${scoreHTML}`;
+                btn.onclick = () => playLevel(level.id);
+                container.appendChild(btn);
+            });
+        }
+
+        function clearRecords() {
+            if (confirm("🚨 Teacher Cat 提提你：確定要清除所有辛苦獲得的星星與分數記錄嗎？")) {
+                localStorage.removeItem('teacherCatScores');
+                progressScores = {};
+                initHome();
+                alert("記錄已清除！重新開始挑戰吧！");
+            }
+        }
+
+        function playLevel(levelId) {
+            currentLevel = levelsData.find(l => l.id === levelId);
+            document.getElementById("home-screen").classList.add("hidden");
+            document.getElementById("summary-screen").classList.add("hidden");
+            
+            document.getElementById("intro-title").innerText = `【 ${currentLevel.title} 】 準備出發！`;
+            document.getElementById("intro-content").innerHTML = currentLevel.tutorial;
+            document.getElementById("intro-screen").classList.remove("hidden");
+            // 已移除 playIntroSound(); 的自動播放，小朋友需要手動點擊按鈕才會朗讀
+        }
+
+        function playIntroSound() {
+            let text = currentLevel.tutorial.replace(/<[^>]*>?/gm, ''); 
+            playText("學習重點： " + text);
+        }
+
+        function startActualGame() {
+            let questions = questionBank[currentLevel.id] || [];
+            
+            // 防呆機制：如果該關卡題庫為空，生成測試題
+            if (questions.length === 0) {
+                for(let i=0; i<40; i++) questions.push({ q: `開發中測試題目 ${i+1}`, options: ["A", "B", "C", "D"], ans: 0 });
+            }
+
+            let half = Math.floor(questions.length / 2);
+            let easyPool = shuffle(questions.slice(0, half)).slice(0, 10);
+            let hardPool = shuffle(questions.slice(half)).slice(0, 10);
+            selectedQuestions = easyPool.concat(hardPool);
+            
+            userAnswers = new Array(20).fill(-1);
+            currentQIndex = 0;
+            isRetryMode = false;
+            
+            document.getElementById("intro-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.remove("hidden");
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            document.getElementById("hint-box").classList.add("hidden");
+            document.getElementById("skip-btn").classList.add("hidden"); 
+            
+            let qData = selectedQuestions[currentQIndex];
+            
+            if (isRetryMode) {
+                document.getElementById("progress-text").innerText = `🔧 重做模式 (原第 ${currentQIndex + 1} 題)`;
+                document.getElementById("btn-prev").classList.add("hidden");
+                document.getElementById("btn-next").classList.add("hidden");
+            } else {
+                document.getElementById("progress-text").innerText = `📝 題目: ${currentQIndex + 1} / ${selectedQuestions.length}`;
+                document.getElementById("btn-prev").classList.toggle("hidden", currentQIndex === 0);
+                document.getElementById("btn-next").innerText = currentQIndex === selectedQuestions.length - 1 ? "完成並看成績 ➡️" : "下一頁 ➡️";
+                document.getElementById("btn-prev").classList.remove("hidden");
+                document.getElementById("btn-next").classList.remove("hidden");
+            }
+            
+            document.getElementById("question-text").innerText = qData.q;
+            let optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            qData.options.forEach((opt, index) => {
+                let wrapper = document.createElement("div");
+                wrapper.className = "option-wrapper";
+                
+                let btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                
+                if (!isRetryMode && userAnswers[currentQIndex] !== -1) {
+                    if (userAnswers[currentQIndex] === index) {
+                        btn.style.backgroundColor = userAnswers[currentQIndex] === qData.ans ? "#4CAF50" : "#F44336";
+                    }
+                }
+
+                btn.onclick = () => selectAnswer(index, qData.ans, btn);
+                
+                let soundBtn = document.createElement("button");
+                soundBtn.className = "opt-sound-btn";
+                soundBtn.innerText = "🔊";
+                soundBtn.onclick = (e) => { e.stopPropagation(); playText(opt); };
+                
+                wrapper.appendChild(btn);
+                wrapper.appendChild(soundBtn);
+                optionsContainer.appendChild(wrapper);
+            });
+        }
+
+        function selectAnswer(selectedIndex, correctIndex, btnElement) {
+            
+            // 已經答對過的不再處理
+            if (userAnswers[currentQIndex] === correctIndex && !isRetryMode) return;
+
+            userAnswers[currentQIndex] = selectedIndex; 
+            
+            if (selectedIndex === correctIndex) {
+                btnElement.style.backgroundColor = "#4CAF50";
+                playCorrectEffect();
+                document.getElementById("skip-btn").classList.add("hidden"); 
+
+                if (isRetryMode) {
+                    setTimeout(() => {
+                        alert("✅ 太棒了！答對啦！分數已經即時更新！");
+                        showSummary(); 
+                    }, 1500);
+                } else {
+                    setTimeout(goNext, 1500);
+                }
+            } else {
+                btnElement.style.backgroundColor = "#F44336";
+                playWrongEffect();
+                showHint(); 
+                if (!isRetryMode) {
+                    document.getElementById("skip-btn").classList.remove("hidden");
+                }
+            }
+        }
+
+        function goNext() {
+            if (currentQIndex < selectedQuestions.length - 1) {
+                currentQIndex++;
+                showQuestion();
+            } else {
+                // 不再阻擋未作答，直接進入結算
+                showSummary();
+            }
+        }
+
+        function goPrev() {
+            if (currentQIndex > 0) {
+                currentQIndex--;
+                showQuestion();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("summary-screen").classList.remove("hidden");
+            isRetryMode = false;
+            
+            let correctCount = 0;
+            let listHTML = "";
+            
+            userAnswers.forEach((ans, i) => {
+                let isCorrect = (ans === selectedQuestions[i].ans);
+                if (isCorrect) correctCount++;
+                
+                let icon = "";
+                let itemClass = "";
+                let actionBtn = "";
+
+                if (ans === -1) {
+                    icon = "⏭️ 未作答";
+                    itemClass = "summary-item skipped";
+                    actionBtn = `<button class="retry-btn" style="background:#FF9800; box-shadow:0 4px 0 #E65100;" onclick="retryQuestion(${i})">👆 點我補答加分</button>`;
+                } else if (isCorrect) {
+                    icon = "✅ 答對";
+                    itemClass = "summary-item correct";
+                } else {
+                    icon = "❌ 答錯";
+                    itemClass = "summary-item wrong";
+                    actionBtn = `<button class="retry-btn" onclick="retryQuestion(${i})">🔄 重新做這題加分</button>`;
+                }
+                
+                listHTML += `
+                    <div class="${itemClass}">
+                        <span>第 ${i+1} 題： ${icon}</span>
+                        ${actionBtn}
+                    </div>
+                `;
+            });
+            
+            document.getElementById("summary-list").innerHTML = listHTML;
+            document.getElementById("score-text").innerText = `🎯 總成績： ${correctCount} / 20`;
+            
+            let oldMax = progressScores[currentLevel.id] || 0;
+            if (correctCount > oldMax) {
+                progressScores[currentLevel.id] = correctCount;
+                localStorage.setItem('teacherCatScores', JSON.stringify(progressScores));
+            }
+        }
+
+        function retryQuestion(index) {
+            currentQIndex = index;
+            isRetryMode = true;
+            document.getElementById("summary-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.remove("hidden");
+            showQuestion();
+            showHint(); 
+        }
+
+        function showHint() {
+            document.getElementById("hint-box").classList.remove("hidden");
+            document.getElementById("hint-text").innerHTML = `<b>【溫故知新】</b><br>${currentLevel.tutorial}<br><br><span style="color:#D32F2F;"><i>再仔細諗諗啦！Teacher Cat 相信你可以做到的！</i></span>`;
+        }
+        
+        function playHintSound() {
+            let text = currentLevel.tutorial.replace(/<[^>]*>?/gm, '');
+            playText("Teacher Cat 提示： " + text + "。再仔細諗諗啦！");
+        }
+
+        function playCorrectEffect() {
+            document.body.classList.add('shake-effect');
+            let confetti = document.getElementById('confetti');
+            confetti.innerText = ["🎉", "✨", "💯", "🚀", "😻"][Math.floor(Math.random()*5)];
+            confetti.classList.remove('hidden');
+            
+            let u = new SpeechSynthesisUtterance(["太棒了！", "答啱啦！", "好叻呀！", "完美！"][Math.floor(Math.random()*4)]);
+            u.lang = 'zh-HK'; u.rate = 1.2; u.pitch = 1.6;
+            speechSynthesis.speak(u);
+            
+            setTimeout(() => {
+                document.body.classList.remove('shake-effect');
+                confetti.classList.add('hidden');
+            }, 1000);
+        }
+
+        function playWrongEffect() {
+            document.body.classList.add('shake-effect');
+            let u = new SpeechSynthesisUtterance("哎呀，差少少！");
+            u.lang = 'zh-HK'; u.pitch = 0.8;
+            speechSynthesis.speak(u);
+            setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+        }
+
+        function playText(text) {
+            speechSynthesis.cancel(); 
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-HK';
+            utterance.rate = 0.9; 
+            speechSynthesis.speak(utterance);
+        }
+
+        function showHome() {
+            document.getElementById("intro-screen").classList.add("hidden");
+            document.getElementById("game-screen").classList.add("hidden");
+            document.getElementById("summary-screen").classList.add("hidden");
+            document.getElementById("home-screen").classList.remove("hidden");
+            speechSynthesis.cancel();
+            initHome(); 
+        }
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        window.onload = initHome;
+    </script>
+</body>
+</html>
