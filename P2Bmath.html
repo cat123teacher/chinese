@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小二下數學大冒險 - Teacher Cat</title>
+    <style>
+        /* 鮮豔動態背景與基礎設定 */
+        @keyframes bg-pan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        body {
+            font-family: 'Comic Sans MS', '微軟正黑體', sans-serif;
+            background: linear-gradient(-45deg, #FF9A9E, #FECFEF, #A1C4FD, #C2E9FB);
+            background-size: 400% 400%;
+            animation: bg-pan 15s ease infinite;
+            margin: 0; 
+            padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        
+        #top-header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-img { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 4px solid #FFF;}
+
+        #game-container {
+            background-color: rgba(255, 255, 255, 0.95); border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%; max-width: 900px; padding: 25px; text-align: center; border: 6px solid #FFF; position: relative;
+            min-height: 75vh; 
+        }
+        h1 { color: #FF4081; font-size: 38px; text-shadow: 2px 2px 0px #FFCDD2, 4px 4px 0px rgba(255,64,129,0.2); margin-top: 0;}
+        
+        /* 清除記錄按鈕 */
+        .clear-btn { background-color: #F44336; color: white; border: 3px solid #FFF; padding: 10px 20px; border-radius: 15px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #C62828; font-size: 16px; transition: transform 0.1s;}
+        .clear-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 美化關卡按鈕 (內含分數與星星) */
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 15px; }
+        .level-btn {
+            color: white; padding: 15px;
+            border: 4px solid #FFF; border-radius: 25px; font-size: 18px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2), 0 15px 20px rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 140px;
+        }
+        .level-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
+        .level-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 rgba(0,0,0,0.2); }
+        
+        /* 關卡顏色分類 */
+        .level-btn.color-1 { background: linear-gradient(to bottom, #66BB6A, #43A047); box-shadow: 0 8px 0 #1B5E20; }
+        .level-btn.color-2 { background: linear-gradient(to bottom, #FFA726, #FB8C00); box-shadow: 0 8px 0 #E65100; }
+        .level-btn.color-3 { background: linear-gradient(to bottom, #AB47BC, #8E24AA); box-shadow: 0 8px 0 #4A148C; }
+        .level-btn.color-4 { background: linear-gradient(to bottom, #FF7043, #F4511E); box-shadow: 0 8px 0 #BF360C; }
+
+        /* 按鈕內的進度條小面板 */
+        .btn-progress-bar {
+            background: rgba(255, 255, 255, 0.25); width: 100%; border-radius: 12px; padding: 8px 10px; margin-top: 10px;
+            display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border: 2px dashed rgba(255,255,255,0.5);
+        }
+
+        .return-adv-btn {
+            display: inline-block; margin-top: 40px; background: linear-gradient(to right, #FF4081, #E040FB); color: white; padding: 15px 40px;
+            border-radius: 40px; font-size: 22px; font-weight: bold; text-decoration: none; box-shadow: 0 8px 0 #C2185B; transition: transform 0.2s;
+            border: 3px solid #FFF; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .return-adv-btn:active { transform: translateY(8px); box-shadow: none; }
+
+        /* 課前預習頁面 */
+        .lesson-box { background-color: #E3F2FD; padding: 25px; border-radius: 20px; font-size: 22px; margin: 20px 0; border: 4px dashed #2196F3; text-align: left; line-height: 1.6; }
+        .huge-start-btn {
+            background: linear-gradient(to bottom, #FF5252, #D32F2F); color: white; padding: 20px 60px; font-size: 32px; font-weight: 900; border: 4px solid #FFF; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 10px 0 #B71C1C; animation: pulse 1.5s infinite; margin-top: 20px; text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        }
+        .huge-start-btn:active { transform: translateY(10px); box-shadow: none; animation: none; }
+
+        /* 遊戲選項區 */
+        .question-box { font-size: 30px; font-weight: 900; margin: 20px 0; color: #333; display: flex; justify-content: center; align-items: center; gap: 15px; text-shadow: 1px 1px 0px #EEE;}
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+        .option-container { display: flex; align-items: center; gap: 10px; background-color: #F3E5F5; border-radius: 20px; padding: 10px 15px; border: 4px solid #CE93D8; transition: transform 0.1s;}
+        .option-container:hover { transform: scale(1.02); }
+        .option-btn { flex-grow: 1; background-color: transparent; border: none; font-size: 24px; font-weight: bold; color: #4A148C; cursor: pointer; text-align: left; padding: 10px; }
+        .audio-btn, .audio-btn-small { background-color: #2196F3; color: white; border: 3px solid #FFF; border-radius: 50%; width: 50px; height: 50px; font-size: 22px; cursor: pointer; box-shadow: 0 4px 0 #1976D2; flex-shrink: 0; }
+        .audio-btn-small { width: 45px; height: 45px; font-size: 20px; background-color: #00BCD4; box-shadow: 0 4px 0 #0097A7;}
+        .correct-ans { background-color: #C8E6C9 !important; border-color: #4CAF50 !important; color: #1B5E20 !important; }
+        .wrong-ans { background-color: #FFCDD2 !important; border-color: #F44336 !important; opacity: 0.7; }
+
+        /* 導航按鈕區 */
+        .nav-container { display: flex; justify-content: center; gap: 20px; margin-top: 35px; border-top: 3px dashed #EEE; padding-top: 25px;}
+        .nav-btn { padding: 15px 25px; font-size: 18px; font-weight: bold; border: 3px solid #FFF; border-radius: 15px; cursor: pointer; color: white; text-shadow: 1px 1px 0px rgba(0,0,0,0.2);}
+        .btn-prev { background-color: #9E9E9E; box-shadow: 0 6px 0 #757575; }
+        .btn-home { background-color: #FF9800; box-shadow: 0 6px 0 #F57C00; }
+        .btn-next { background-color: #4CAF50; box-shadow: 0 6px 0 #388E3C; }
+        .btn-skip { background-color: #F44336; box-shadow: 0 6px 0 #D32F2F; animation: pulse 1.5s infinite;}
+        .nav-btn:active { transform: translateY(6px); box-shadow: none; }
+        .nav-btn:disabled { background-color: #CCC; box-shadow: none; cursor: not-allowed; transform: none; border-color: #CCC;}
+        
+        .hint-box { background-color: #FFF9C4; padding: 20px; border-radius: 20px; border: 4px dashed #FBC02D; margin-top: 25px; display: flex; align-items: flex-start; gap: 15px; text-align: left; font-size: 20px; color: #D84315; animation: fadeIn 0.5s; font-weight: bold;}
+
+        /* 總結與重做網格 */
+        .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 25px; }
+        .summary-item { padding: 15px 5px; font-size: 18px; font-weight: bold; border-radius: 15px; border: 3px solid #FFF; color: white; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);}
+        .summary-item.right { background-color: #4CAF50; cursor: default; }
+        .summary-item.wrong { background-color: #F44336; animation: pulse 2s infinite; }
+        .summary-item.wrong:active { transform: translateY(4px); box-shadow: none;}
+        
+        /* 動畫 */
+        @keyframes shake { 0%, 100% {transform: translate(0,0);} 25% {transform: translate(-5px,3px);} 50% {transform: translate(5px,-3px);} 75% {transform: translate(-5px,-3px);} }
+        .shake-effect { animation: shake 0.4s; }
+        .popup-exaggerated { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; z-index: 9999; pointer-events: none; opacity: 0; animation: popUpAnim 1.5s ease-out forwards; text-shadow: 0 0 30px #FFF, 0 0 10px #FF4081; }
+        @keyframes popUpAnim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* 頁腳 (聯絡欄) 置底 */
+        footer { 
+            width: 100%; max-width: 900px; text-align: center; 
+            margin-top: 120px;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.9); padding: 25px; border-radius: 20px; 
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); font-size: 16px; line-height: 2.2; border: 4px solid #FFF;
+        }
+        footer a { color: #E91E63; text-decoration: none; font-weight: bold; margin: 0 10px; padding: 5px 10px; border-radius: 10px; transition: background 0.2s;}
+        footer a:hover { background-color: #FCE4EC; text-decoration: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="top-header">
+    <img src="cat.jpeg" alt="Teacher Cat Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/80?text=Cat'">
+</div>
+
+<div id="game-container">
+    <!-- 首頁 -->
+    <div id="home-screen">
+        <h1>🌟 小二下數學大冒險 🌟</h1>
+        <p style="font-size: 20px; color: #333; font-weight: bold; margin-bottom: 5px;">準備好挑戰了嗎？及格拿小星星⭐，滿分拿大星星🌟！</p>
+        
+        <div style="display: flex; justify-content: flex-end; width: 100%; padding-right: 10px; box-sizing: border-box;">
+            <button class="clear-btn" onclick="clearRecord()">🗑️ 清除所有記錄</button>
+        </div>
+
+        <!-- 關卡按鈕區 (內嵌星星記錄) -->
+        <div id="levels-container" class="level-grid"></div>
+        
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="return-adv-btn">🚀 返回小朋友學習大冒險</a>
+    </div>
+
+    <!-- 課前預習頁面 -->
+    <div id="intro-screen" class="hidden">
+        <h1 id="intro-title" style="color: #4CAF50; font-size: 40px;"></h1>
+        <h2 style="color: #1976D2;">📖 學習重點與例子</h2>
+        <div id="intro-lesson" class="lesson-box"></div>
+        
+        <button class="huge-start-btn" onclick="startGame()">🚀 正式開始遊戲</button>
+        <br><br>
+        <button class="nav-btn btn-home" style="padding: 15px 40px;" onclick="showHome()">🏠 回到主頁</button>
+    </div>
+
+    <!-- 遊戲頁面 -->
+    <div id="quiz-screen" class="hidden">
+        <h2 id="level-title-display" style="color:#FF9800; margin-top: 0; font-size: 32px;"></h2>
+        <h3 id="question-counter" style="color: #673AB7; font-size: 24px;"></h3>
+        
+        <div class="question-box">
+            <span id="question-text"></span>
+            <button class="audio-btn" onclick="playAudio('question-text')" title="朗讀題目">🔊</button>
+        </div>
+        
+        <div class="options-grid" id="options-container"></div>
+
+        <!-- Teacher Cat 提示框 -->
+        <div id="hint-box" class="hint-box hidden">
+            <img src="cat.jpeg" alt="Cat" style="width:60px; height:60px; border-radius:50%; border:3px solid #FFF;" onerror="this.src='https://via.placeholder.com/60?text=Cat'">
+            <div style="flex-grow: 1;">
+                <b>Teacher Cat 提示：</b><br>
+                <span id="hint-text"></span>
+            </div>
+            <button class="audio-btn-small" style="background-color:#FF9800; box-shadow:0 4px 0 #F57C00;" onclick="playAudio('hint-text')" title="朗讀提示">🔊</button>
+        </div>
+        
+        <div class="nav-container">
+            <button id="prev-btn" class="nav-btn btn-prev" onclick="prevQuestion()">⬅️ 上一頁</button>
+            <button id="home-btn" class="nav-btn btn-home" onclick="showHome()">🏠 回到主頁</button>
+            <button id="next-btn" class="nav-btn btn-next" onclick="nextQuestion()">下一頁 ➡️</button>
+            <button id="skip-btn" class="nav-btn btn-skip hidden" onclick="nextQuestion()">⏭️ 跳到下一題</button>
+        </div>
+    </div>
+
+    <!-- 結算總結頁面 -->
+    <div id="result-screen" class="hidden">
+        <h1 style="font-size: 45px;">🎉 關卡完成！ 🎉</h1>
+        <h2 id="score-display" style="font-size: 35px; color: #1976D2;"></h2>
+        <h2 id="star-award-display" style="font-size: 50px; margin: 15px 0;"></h2>
+        <p style="color: #D32F2F; font-weight: bold; font-size: 22px; background: #FFEBEE; padding: 15px; border-radius: 15px;">
+            💡 點擊下方紅色的錯誤題目，重新挑戰答對，分數會即時提高喔！
+        </p>
+        <div id="summary-grid" class="summary-grid"></div>
+        
+        <div style="margin-top: 35px; display: flex; justify-content: center; gap: 20px;">
+            <button class="nav-btn btn-home" style="padding: 15px 35px; font-size: 22px;" onclick="showHome()">🏠 返回主頁</button>
+            <button class="nav-btn btn-next" style="padding: 15px 35px; font-size: 22px; background: linear-gradient(to bottom, #42A5F5, #1E88E5); box-shadow:0 6px 0 #0D47A1;" onclick="showIntro(currentLevelData.id)">🔄 重新挑戰這一關</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <h3 style="margin:0 0 10px 0; color:#4A148C; font-size: 22px;">Teacher Cat 的快樂AI教室</h3>
+    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> |
+    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> |
+    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> |
+    <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a><br>
+    <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
+    <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp分享Group</a> |
+    <span style="color:#000; font-weight:900; margin-left: 10px; font-size: 18px;">抖音: 74254902683</span>
+</footer>
+
+<script>
+    const gameData = [
+        // ==========================================
+        // 第一關 (完整 40 題)
+        // ==========================================
+        {
+            id: 1, title: "第一關：乘法的認識",
+            lesson: "💡 <b>重點教學：</b><br>乘法是「同數相加」的簡便寫法。<br>例子：共有4碟蘋果，每碟有4個。4 + 4 + 4 + 4 就是「4個4相加」，寫成 4 × 4。",
+            easy: [
+                {q:"「2 + 2 + 2」等於多少個 2 相加？",options:["2個","3個","4個","5個"],ans:1},
+                {q:"「4 + 4」可以寫成哪一個乘法算式？",options:["4 × 2","2 × 2","4 × 4","4 + 2"],ans:0},
+                {q:"「5 + 5 + 5」代表甚麼？",options:["3個5相加","5個3相加","5加3","3加5"],ans:0},
+                {q:"「6 + 6 + 6 + 6」等於多少個 6 相加？",options:["3個","4個","5個","6個"],ans:1},
+                {q:"「7 + 7」用乘法算式表示是？",options:["7 × 7","2 × 2","7 × 2","7 + 2"],ans:2},
+                {q:"「8 + 8 + 8」可以寫成？",options:["8 × 3","3 × 3","8 × 8","8 + 3"],ans:0},
+                {q:"「9 + 9 + 9 + 9」代表甚麼？",options:["9個4相加","4個9相加","9乘9","4乘4"],ans:1},
+                {q:"「10 + 10」是幾多個 10 相加？",options:["1個","2個","3個","10個"],ans:1},
+                {q:"「1 + 1 + 1 + 1 + 1」用乘法表示是？",options:["1 × 5","5 × 5","1 × 1","1 + 5"],ans:0},
+                {q:"「3 + 3 + 3 + 3」是？",options:["4個3相加","3個4相加","3加4","3乘3"],ans:0},
+                {q:"2 個 5 相加，可以寫成？",options:["2 + 2","5 + 5","2 × 2","5 × 5"],ans:1},
+                {q:"4 個 2 相加，加法算式是？",options:["2 + 2 + 2 + 2","4 + 4","4 + 2","2 + 4"],ans:0},
+                {q:"3 個 7 相加，可以寫成？",options:["7 × 3","3 × 3","7 × 7","7 + 3"],ans:0},
+                {q:"5 個 6 相加，加法算式是？",options:["5 + 5 + 5 + 5 + 5","6 + 6 + 6 + 6 + 6","6 + 5","5 × 5"],ans:1},
+                {q:"2 個 9 相加，可以寫成？",options:["2 × 9","9 × 2","9 + 9","以上皆是"],ans:3},
+                {q:"4 個 4 相加，用乘法表示是？",options:["4 + 4","4 × 4","4 × 2","8 × 4"],ans:1},
+                {q:"3 個 10 相加，加法算式是？",options:["10 + 10 + 10","3 + 3 + 3","10 + 3","3 × 10"],ans:0},
+                {q:"2 個 8 相加，等於？",options:["8 + 8","2 + 2","8 × 8","2 × 2"],ans:0},
+                {q:"5 個 1 相加，用乘法表示是？",options:["1 × 5","5 × 1","5 + 1","1 + 5"],ans:0},
+                {q:"4 個 5 相加，加法算式是？",options:["4 + 4 + 4 + 4","5 + 5 + 5 + 5","4 + 5","5 × 5"],ans:1}
+            ],
+            hard: [
+                {q:"「7 + 7 + 7 + 7 + 7 + 7 + 7 + 7」與哪項結果相同？",options:["7 × 8","8 和 7","7 的 8 倍","7 + 8"],ans:0},
+                {q:"每盒有 6 件蛋糕，5 盒共有多少件？(加式表示)",options:["6+6+6+6+6","5+5+5+5+5","6+5","6×5"],ans:0},
+                {q:"買 4 枝鉛筆，每枝 2 元，共需付多少元？(乘式表示)",options:["4 × 2","2 × 4","2 + 4","4 + 4"],ans:1},
+                {q:"以下哪一個算式不是「同數相加」？",options:["2 + 2 + 2 + 2","1 + 3 + 5 + 7","9 + 9","7 + 7 + 7"],ans:1},
+                {q:"以下哪一個算式是「同數相加」？",options:["5 + 6 + 6 + 5","1 + 2 + 3","4 + 4 + 4 + 4","9 + 8 + 7"],ans:2},
+                {q:"「4 的 5 倍」等於？",options:["4 × 5","5 × 5","4 + 5","4 × 4"],ans:0},
+                {q:"「8 的 3 倍」與以下哪一項相同？",options:["8 + 3","8 × 3","3 × 3","8 × 8"],ans:1},
+                {q:"「6個4」和「4的6倍」結果相同嗎？",options:["不相同","相同","無法比較","有時相同"],ans:1},
+                {q:"媽媽買了 3 袋蘋果，每袋有 5 個，即是買了？",options:["3的5倍","3個5相加","5個3相加","5的3倍"],ans:1},
+                {q:"一輛汽車有 4 個車輪，3 輛共有多少個？(乘式表示)",options:["4 × 3","3 × 4","4 + 3","3 + 3 + 3"],ans:0},
+                {q:"「5 + 5 + 5 + 5」不等於以下哪一項？",options:["5 × 4","4 個 5 相加","5 的 4 倍","4 + 4 + 4 + 4 + 4"],ans:3},
+                {q:"「9 × 2」用加法算式表示是？",options:["9 + 9","2 + 2","9 + 2","2個9相乘"],ans:0},
+                {q:"一隻青蛙有 4 條腿，6 隻青蛙共有？",options:["6 × 4 條腿","4 × 6 條腿","6 + 4 條腿","4 + 6 條腿"],ans:1},
+                {q:"「7 的 4 倍」代表甚麼？",options:["4個7相加","7個4相加","7+4","7×7"],ans:0},
+                {q:"桌上有 5 碟壽司，每碟有 2 件，共有壽司？",options:["2 × 5 件","5 × 2 件","5 + 2 件","2 + 5 件"],ans:0},
+                {q:"「3 × 6」可以讀作？",options:["3 的 6 倍","6 的 3 倍","3 加 6","6 個 3"],ans:0},
+                {q:"「8 × 4」用加法表示正確的是？",options:["8+8+8+8","4+4+4+4+4+4+4+4","以上皆是","以上皆非"],ans:2},
+                {q:"哪一項與「2+2+2+2+2+2」的結果相同？",options:["2 × 6","6 × 2","2 的 6 倍","以上皆是"],ans:3},
+                {q:"有 4 個魚缸，每個魚缸有 7 條魚，共多少條？",options:["7 × 4","4 × 7","7 + 4","4 + 4"],ans:0},
+                {q:"「10的2倍」等於多少？",options:["10 + 2","10 × 2","2 × 10","2 + 2"],ans:1}
+            ]
+        },
+        {
+            id: 2, title: "第二關：乘法的計算（一）",
+            lesson: "💡 <b>重點教學：</b><br>學習基本乘法表，要注意任何數乘以 0，結果都是 0。<br>例子：5 × 4 = 20，0 × 7 = 0，1 × 9 = 9。",
+            easy: [
+                {q:"10 × 7 = ?",options:["17","70","710","7"],ans:1},
+                {q:"5 × 4 = ?",options:["9","20","1","45"],ans:1},
+                {q:"2 × 6 = ?",options:["8","12","26","62"],ans:1},
+                {q:"3 × 5 = ?",options:["15","8","53","35"],ans:0},
+                {q:"4 × 8 = ?",options:["12","24","32","48"],ans:2},
+                {q:"1 × 9 = ?",options:["10","9","19","91"],ans:1},
+                {q:"0 × 7 = ?",options:["7","0","70","17"],ans:1},
+                {q:"2 × 4 = ?",options:["6","8","24","42"],ans:1},
+                {q:"3 × 3 = ?",options:["6","9","33","0"],ans:1},
+                {q:"4 × 5 = ?",options:["9","20","45","54"],ans:1},
+                {q:"5 × 6 = ?",options:["11","30","56","65"],ans:1},
+                {q:"10 × 2 = ?",options:["12","20","102","210"],ans:1},
+                {q:"1 × 5 = ?",options:["6","5","15","51"],ans:1},
+                {q:"0 × 9 = ?",options:["9","0","90","19"],ans:1},
+                {q:"2 × 8 = ?",options:["10","16","28","82"],ans:1},
+                {q:"3 × 4 = ?",options:["7","12","34","43"],ans:1},
+                {q:"4 × 2 = ?",options:["6","8","42","24"],ans:1},
+                {q:"5 × 3 = ?",options:["8","15","53","35"],ans:1},
+                {q:"10 × 9 = ?",options:["19","90","109","910"],ans:1},
+                {q:"1 × 1 = ?",options:["2","1","11","0"],ans:1}
+            ],
+            hard: [
+                {q:"1 × [ ? ] = 8，括號內應填入？",options:["1","7","8","0"],ans:2},
+                {q:"100 × [ ? ] = 0，括號內應填入？",options:["100","0","1","10"],ans:1},
+                {q:"[ ? ] × 5 = 15，括號內應填入？",options:["2","3","4","5"],ans:1},
+                {q:"4 × [ ? ] = 36，括號內應填入？",options:["7","8","9","6"],ans:2},
+                {q:"摩天輪有 8 個車廂，每個車廂可載 5 人，共可載？",options:["40人","13人","35人","45人"],ans:0},
+                {q:"媽媽把湯丸分成 9 碗，每碗有 3 粒，共有湯丸？",options:["12粒","27粒","18粒","24粒"],ans:1},
+                {q:"桌子上有 7 杯水，每杯水裏有 2 粒冰塊，共有冰塊？",options:["9粒","12粒","14粒","16粒"],ans:2},
+                {q:"過了一會，7 杯水中的冰塊都不見了。現在共有冰塊？",options:["14粒","7粒","2粒","0粒"],ans:3},
+                {q:"每盒鉛筆 4 枝，李老師買 6 盒送給全班每人 1 枝，剛好分完。全班有多少人？",options:["10人","24人","16人","20人"],ans:1},
+                {q:"如果 0 × ★ = 0，★ 可以是甚麼數字？",options:["只有0","只有1","任何數字","只有10"],ans:2},
+                {q:"如果 10 × ⬤ = 50，那麼 ⬤ 是？",options:["4","5","6","10"],ans:1},
+                {q:"[ ? ] × 3 = 27，括號內應填入？",options:["7","8","9","6"],ans:2},
+                {q:"一盒雞蛋有 10 隻，買 4 盒共有雞蛋？",options:["14隻","40隻","20隻","30隻"],ans:1},
+                {q:"一星期有 7 天，2 星期共有多少天？",options:["9天","14天","12天","16天"],ans:1},
+                {q:"每碟有 5 件蛋糕，哥哥吃了 0 碟，他吃了多少件？",options:["5件","0件","10件","1件"],ans:1},
+                {q:"每輛單車有 2 個車輪，9 輛單車共有多少個車輪？",options:["11個","16個","18個","20個"],ans:2},
+                {q:"3 × 8 的結果比 3 × 7 的結果大多少？",options:["1","3","7","8"],ans:1},
+                {q:"5 × 6 的結果與下列哪一項相同？",options:["5+6","6×5","5×5","6×6"],ans:1},
+                {q:"如果有數字卡 0, 1, 3, 4，哪一條算式結果是 0？",options:["1 × 3","3 × 4","4 × 0","1 × 4"],ans:2},
+                {q:"如果有數字卡 0, 1, 3, 4，哪一條算式結果是 4？",options:["0 × 4","1 × 4","3 × 4","4 × 4"],ans:1}
+            ]
+        },
+        {
+            id: 3, title: "第三關：乘法的計算（二）",
+            lesson: "💡 <b>重點教學：</b><br>乘法具有交換性質，即使數字位置調換，答案也一樣。<br>例子：7 × 8 = 56，8 × 7 = 56。所以 7 × 8 = 8 × 7。",
+            easy: [
+                {q:"3 個 6 是多少？",options:["18","9","36","63"],ans:0},
+                {q:"4 個 7 相加是多少？",options:["11","28","47","74"],ans:1},
+                {q:"6 的 7 倍是多少？",options:["13","42","67","76"],ans:1},
+                {q:"7 的 6 倍是多少？",options:["42","13","67","76"],ans:0},
+                {q:"10 個 9 是多少？",options:["19","90","109","910"],ans:1},
+                {q:"11 個 9 是多少？",options:["20","99","119","911"],ans:1},
+                {q:"6 × 4 = ?",options:["10","24","64","46"],ans:1},
+                {q:"4 × 6 = ?",options:["10","24","46","64"],ans:1},
+                {q:"7 × 5 = ?",options:["12","35","75","57"],ans:1},
+                {q:"5 × 7 = ?",options:["12","35","57","75"],ans:1},
+                {q:"8 × 8 = ?",options:["16","64","88","0"],ans:1},
+                {q:"9 × 6 = ?",options:["15","54","96","69"],ans:1},
+                {q:"6 × 9 = ?",options:["15","54","69","96"],ans:1},
+                {q:"6 × 2 = ?",options:["8","12","62","26"],ans:1},
+                {q:"7 × 3 = ?",options:["10","21","73","37"],ans:1},
+                {q:"8 × 5 = ?",options:["13","40","85","58"],ans:1},
+                {q:"9 × 4 = ?",options:["13","36","94","49"],ans:1},
+                {q:"6 × 6 = ?",options:["12","36","66","0"],ans:1},
+                {q:"7 × 7 = ?",options:["14","49","77","0"],ans:1},
+                {q:"9 × 9 = ?",options:["18","81","99","0"],ans:1}
+            ],
+            hard: [
+                {q:"8 × [ ? ] = 48，括號內應填入？",options:["5","6","7","8"],ans:1},
+                {q:"9 × [ ? ] = 81，括號內應填入？",options:["7","8","9","10"],ans:2},
+                {q:"不用計算，5 × 9 的結果與哪一項相同？",options:["9 × 3","8 × 9","9 × 5","3 × 9"],ans:2},
+                {q:"不用計算，9 × 8 的結果與哪一項相同？",options:["8 × 9","9 × 5","5 × 9","8 × 3"],ans:0},
+                {q:"8 × 3 = 3 × [ ? ]",options:["3","8","24","11"],ans:1},
+                {q:"7 × [ ? ] = 8 × 7",options:["7","8","56","15"],ans:1},
+                {q:"5 × [ ? ] = [ ? ] × 5 (結果都是 30)，括號內填入？",options:["5","6","7","8"],ans:1},
+                {q:"9 × [ ? ] = 2 × [ ? ] (結果都是 18)，括號分別填入？",options:["2 和 9","9 和 2","1 和 18","3 和 6"],ans:0},
+                {q:"如果 ⬤ × ★ = 156，那麼 ★ × ⬤ = ?",options:["15","156","560","651"],ans:1},
+                {q:"如果 304 × ★ = 304，那麼 ★ = ?",options:["0","1","304","無法計算"],ans:1},
+                {q:"以下哪一項的結果與 4 × 5 不相同？",options:["4+4+4+4+4","5個4相加","4的5倍","5+5+5+5+5"],ans:3},
+                {q:"以下哪一題算式的結果最大？",options:["1 × 9","9 × 9","9 × 10","99 × 0"],ans:2},
+                {q:"6 的 10 倍是多少？",options:["16","60","600","610"],ans:1},
+                {q:"10 的 6 倍是多少？",options:["16","60","600","106"],ans:1},
+                {q:"製作一個圖形要 6 條幾何條，製作 7 個圖形要多少條？",options:["13條","42條","49條","36條"],ans:1},
+                {q:"8 × 7 = 7 × [ ? ]",options:["7","8","56","15"],ans:1},
+                {q:"7 個 8 相加，結果是？",options:["15","56","64","48"],ans:1},
+                {q:"9 的 7 倍，結果是？",options:["16","63","72","54"],ans:1},
+                {q:"[ ? ] × 6 = 42，括號內填入？",options:["6","7","8","9"],ans:1},
+                {q:"8 × 9 的結果比 8 × 8 的結果大多少？",options:["1","8","9","17"],ans:1}
+            ]
+        },
+        {
+            id: 4, title: "第四關：乘法應用題",
+            lesson: "💡 <b>重點教學：</b><br>在日常生活中運用乘法計算總數或總金額。注意隱藏數字如「半打(6)」、「一星期(7)」。<br>例子：每包餅乾售6元，買5包。算式是：6 × 5 = 30（元）。",
+            easy: [
+                {q:"每艘小艇可載 8 人，租用 4 艘，共可載多少人？",options:["12人","32人","24人","48人"],ans:1},
+                {q:"動物園有老虎 2 隻，猴子數量是老虎 5 倍。猴子有？",options:["7隻","10隻","12隻","25隻"],ans:1},
+                {q:"芝士蛋糕每件 7 元，買 6 件共需付多少元？",options:["13元","42元","35元","49元"],ans:1},
+                {q:"永文每天儲蓄 3 元，5 天共儲蓄多少元？",options:["8元","15元","18元","21元"],ans:1},
+                {q:"每包餅乾 6 元，買 5 包共需付多少元？",options:["11元","30元","36元","25元"],ans:1},
+                {q:"每包豬肉乾有 9 片，買 7 包共有多少片？",options:["16片","63片","54片","72片"],ans:1},
+                {q:"每盒鉛筆有 8 枝，買 3 盒共有多少枝？",options:["11枝","24枝","32枝","16枝"],ans:1},
+                {q:"每輛私家車可坐 5 人，6 輛車共可坐多少人？",options:["11人","30人","35人","25人"],ans:1},
+                {q:"蘋果每個售 4 元，買 9 個共付多少元？",options:["13元","36元","32元","40元"],ans:1},
+                {q:"貼紙每包有 10 張，買 4 包共有多少張？",options:["14張","40張","50張","30張"],ans:1},
+                {q:"每排座位有 6 個位，8 排共有多少個位？",options:["14個","48個","42個","54個"],ans:1},
+                {q:"郵票每張 2 元，買 9 張共需付多少元？",options:["11元","18元","16元","20元"],ans:1},
+                {q:"每束花有 7 朵，買 4 束共有多少朵花？",options:["11朵","28朵","35朵","21朵"],ans:1},
+                {q:"糖果每包 9 粒，買 2 包共有多少粒？",options:["11粒","18粒","27粒","16粒"],ans:1},
+                {q:"筆記本每本 8 元，買 5 本共付多少元？",options:["13元","40元","48元","32元"],ans:1},
+                {q:"每天看書 2 本，4 天共看了多少本？",options:["6本","8本","10本","12本"],ans:1},
+                {q:"紅花有 6 朵，黃花是紅花的 3 倍。黃花有？",options:["9朵","18朵","12朵","24朵"],ans:1},
+                {q:"買 3 件玩具，每件 10 元，共需付多少元？",options:["13元","30元","20元","40元"],ans:1},
+                {q:"每籠點心有 4 件，點了 7 籠，共有多少件？",options:["11件","28件","24件","32件"],ans:1},
+                {q:"橡皮擦每塊 3 元，買 9 塊共需付多少元？",options:["12元","27元","24元","30元"],ans:1}
+            ],
+            hard: [
+                {q:"芝士蛋糕每件 7 元，買「半打」共需付多少元？",options:["35元","42元","49元","84元"],ans:1},
+                {q:"永文每天儲蓄 3 元，「一星期」共儲蓄多少元？",options:["15元","18元","21元","30元"],ans:2},
+                {q:"餅乾每包 6 元，朱古力每包 7 元。1包餅乾和3包朱古力，相差多少元？",options:["15元","1元","8元","21元"],ans:0},
+                {q:"豬肉乾每包 9 片，牛肉乾每包 8 片。買1包豬肉乾和2包牛肉乾，共有多少片？",options:["25片","26片","17片","34片"],ans:0},
+                {q:"綠茶餅每包售 9 元，牛奶朱古力售價是它的 2 倍，牛奶朱古力售多少元？",options:["11元","18元","27元","7元"],ans:1},
+                {q:"綠茶餅 9 元，牛奶朱古力 18 元。買各 1 包共付多少？",options:["27元","36元","18元","45元"],ans:0},
+                {q:"答對1題得3分，愛心小學答對5題，他們共得多少分？",options:["8分","15分","12分","18分"],ans:1},
+                {q:"答錯1題扣2分，忠明小學答錯6題，共扣了多少分？",options:["8分","12分","10分","14分"],ans:1},
+                {q:"氣球每個 4 元，買「半打」共需付多少元？",options:["24元","20元","28元","48元"],ans:0},
+                {q:"每天喝 2 杯牛奶，「一星期」共喝了多少杯？",options:["10杯","12杯","14杯","16杯"],ans:2},
+                {q:"成人票 10 元，小童票 5 元。買 1 張成人和 2 張小童共付？",options:["15元","20元","25元","30元"],ans:1},
+                {q:"原子筆每枝 8 元，螢光筆每枝 6 元。買 2 枝原和 1 枝螢，共付？",options:["14元","20元","22元","28元"],ans:2},
+                {q:"一盒雞蛋有「半打」，媽媽買了 4 盒，共有雞蛋多少隻？",options:["24隻","20隻","28隻","48隻"],ans:0},
+                {q:"小明每天跑 4 圈，「一星期」共跑了多少圈？",options:["20圈","24圈","28圈","32圈"],ans:2},
+                {q:"蘋果每個 5 元，橙每個 4 元。買 3 個蘋果比 1 個橙貴多少？",options:["1元","11元","15元","19元"],ans:1},
+                {q:"排球每個 9 元，足球價錢是排球的 3 倍。足球售？",options:["12元","27元","36元","18元"],ans:1},
+                {q:"哥哥有 8 元，弟弟的錢是哥哥的 4 倍。兩人共有多少元？",options:["32元","40元","24元","12元"],ans:1},
+                {q:"每袋有 7 粒糖，分給 6 個小朋友每人一袋後，還餘 3 粒。原有多少粒？",options:["42粒","45粒","39粒","21粒"],ans:1},
+                {q:"一排有 9 個座位，共有 5 排。如果有 40 人來，座位夠嗎？",options:["夠，還多5個","不夠，欠5個","剛好夠","夠，還多1個"],ans:0},
+                {q:"西瓜每個 10 元，蜜瓜每個 8 元。買 2 個西瓜和 1 個蜜瓜共？",options:["18元","26元","28元","36元"],ans:2}
+            ]
+        },
+        {
+            id: 5, title: "第五關：報時和分鐘",
+            lesson: "💡 <b>重點教學：</b><br>鐘面上，時針走一大格是 1 小時，分針走一小格是 1 分鐘。<br>1 小時 = 60 分鐘。要懂得分辨哪件事用「小時」或「分鐘」量度。",
+            easy: [
+                {q:"時針指着 1 和 2 之間，分針指着第 6 小格，時間是？",options:["2時6分","1時6分","1時30分","2時30分"],ans:1},
+                {q:"電子鐘顯示「2:10」，這代表甚麼時間？",options:["2時10分","10時2分","2時2分","10時10分"],ans:0},
+                {q:"電子鐘顯示「6:04」，這代表甚麼時間？",options:["6時40分","4時6分","6時4分","6時20分"],ans:2},
+                {q:"鐘面上顯示 5 時 20 分，分針指着數字幾？",options:["2","4","5","20"],ans:1},
+                {q:"吃午飯所用的時間比 1 分鐘（長 / 短）？",options:["長","短","一樣","無法比較"],ans:0},
+                {q:"刷牙所用的時間大約是 3（分鐘 / 小時）？",options:["分鐘","小時","秒","天"],ans:0},
+                {q:"播放一集電視劇的時間大約是 1（分鐘 / 小時）？",options:["分鐘","小時","秒","天"],ans:1},
+                {q:"1 小時比 100 分鐘（長 / 短）？",options:["長","短","一樣","無法比較"],ans:1},
+                {q:"時針走一大格代表經過了多少時間？",options:["1分鐘","5分鐘","1小時","12小時"],ans:2},
+                {q:"分針走一小格代表經過了多少時間？",options:["1分鐘","5分鐘","1小時","1秒"],ans:0},
+                {q:"分針走一大格（從1走到2）代表經過了？",options:["1分鐘","5分鐘","1小時","10分鐘"],ans:1},
+                {q:"鐘面上「8時正」，分針指着數字幾？",options:["8","12","6","1"],ans:1},
+                {q:"電子鐘顯示「11:05」，代表？",options:["11時5分","11時50分","5時11分","11時正"],ans:0},
+                {q:"時針指着 9 和 10 之間，這是幾時多？",options:["8時多","9時多","10時多","11時多"],ans:1},
+                {q:"一節體育課大約是 35（分鐘 / 小時）？",options:["分鐘","小時","秒","天"],ans:0},
+                {q:"睡一覺大約需要 8（分鐘 / 小時）？",options:["分鐘","小時","秒","天"],ans:1},
+                {q:"洗一次手大約需要 20（分鐘 / 秒）？（提示：比分鐘短）",options:["小時","分鐘","秒","天"],ans:2},
+                {q:"時針一天會轉多少圈？",options:["1圈","2圈","12圈","24圈"],ans:1},
+                {q:"分針轉一圈代表經過了？",options:["1分鐘","1小時","1天","半小時"],ans:1},
+                {q:"時針指着 3，分針指着 12，現在是？",options:["12時3分","3時正","3時12分","12時15分"],ans:1}
+            ],
+            hard: [
+                {q:"清潔課室需 50 分鐘，清潔走廊需 15 分鐘。哪項需時最短？",options:["課室","走廊","一樣長","無法比較"],ans:1},
+                {q:"清潔廁所需 25 分鐘，清潔禮堂需 20 分鐘。哪項需時最長？",options:["廁所","禮堂","一樣長","無法比較"],ans:0},
+                {q:"清潔走廊(15分)、廁所(25分)和禮堂(20分)，共需多少時間？",options:["50分鐘","1小時","1小時10分","45分鐘"],ans:1},
+                {q:"承上題，15分 + 25分 + 20分 等於多少分鐘？",options:["50分鐘","60分鐘","70分鐘","80分鐘"],ans:1},
+                {q:"60 分鐘等於多少小時？",options:["1 小時","2 小時","半小時","10 小時"],ans:0},
+                {q:"媽媽看了 40 分鐘電視，比 1 小時（長 / 短）？",options:["長","短","一樣","無法比較"],ans:1},
+                {q:"爸爸看報紙用了 1 小時，即是用了多少分鐘？",options:["10分鐘","50分鐘","60分鐘","100分鐘"],ans:2},
+                {q:"半小時等於多少分鐘？",options:["15分鐘","30分鐘","45分鐘","60分鐘"],ans:1},
+                {q:"1 小時 10 分鐘，合共是多少分鐘？",options:["11分鐘","60分鐘","70分鐘","110分鐘"],ans:2},
+                {q:"80 分鐘可以寫成？",options:["1小時20分","1小時8分","8小時","2小時"],ans:0},
+                {q:"時針從 12 走到 3，經過了多少小時？",options:["1小時","2小時","3小時","15小時"],ans:2},
+                {q:"分針從 12 走到 3，經過了多少分鐘？",options:["3分鐘","10分鐘","15分鐘","20分鐘"],ans:2},
+                {q:"時針和分針重疊在一起指着 12，這是甚麼時間？",options:["6時正","12時正","12時30分","無法確定"],ans:1},
+                {q:"時針指着 6，分針指着 12，這時兩針形成甚麼形狀？",options:["一條直線","一個直角","重疊","一個圓"],ans:0},
+                {q:"做功課用了 45 分鐘，看電視用了 1 小時。哪項用時較長？",options:["做功課","看電視","一樣長","無法比較"],ans:1},
+                {q:"電子鐘顯示「00:00」，這代表？",options:["正午12時","午夜12時","沒有這個時間","上午10時"],ans:1},
+                {q:"分針走半圈代表經過了？",options:["15分鐘","30分鐘","45分鐘","60分鐘"],ans:1},
+                {q:"以下哪一項的活動時間通常最長？",options:["眨眼","吃早餐","在學校上課","唱一首歌"],ans:2},
+                {q:"「一刻鐘」通常是指多少分鐘？",options:["1分鐘","5分鐘","15分鐘","30分鐘"],ans:2},
+                {q:"如果分針指着 9，代表這小時已經過去了多少分鐘？",options:["9分鐘","15分鐘","30分鐘","45分鐘"],ans:3}
+            ]
+        },
+        {
+            id: 6, title: "第六關：時間間隔",
+            lesson: "💡 <b>重點教學：</b><br>計算兩件事情之間經歷了多少時間。<br>例子：9時32分開始，過了10分鐘，就是9時42分。注意分鐘相加後如果超過 60 分鐘，就要進位變成 1 小時喔！",
+            easy: [
+                {q:"9:00 開始，過了 10 分鐘，現在是？",options:["9:00","9:10","9:20","10:00"],ans:1},
+                {q:"志偉 7:08 出發，步行 8 分鐘到巴士站，到達時間是？",options:["7:16","7:10","7:18","8:00"],ans:0},
+                {q:"10:15 開始小息，過了 5 分鐘，時間是？",options:["10:15","10:30","10:20","10:25"],ans:2},
+                {q:"2:20 上車，車程 12 分鐘，下車時間是？",options:["2:42","2:30","2:32","3:00"],ans:2},
+                {q:"4:00 開始做功課，用了 35 分鐘，完成時間是？",options:["4:30","4:35","4:50","5:00"],ans:1},
+                {q:"8:30 開始刷牙，用了 10 分鐘，完成時間是？",options:["8:50","8:40","9:00","8:20"],ans:1},
+                {q:"11:11 開始畫畫，過了 11 分鐘，時間是？",options:["11:20","11:30","11:22","12:00"],ans:2},
+                {q:"1:05 開始吃飯，用了 20 分鐘，完成時間是？",options:["1:30","1:15","1:25","2:00"],ans:2},
+                {q:"妙怡在 3:48 到達公園，可琳 5 分鐘後到達。可琳到達時間是？",options:["3:53","3:50","3:55","4:00"],ans:0},
+                {q:"5:10 開始看書，看了 40 分鐘，時間是？",options:["5:40","5:30","5:50","6:00"],ans:2},
+                {q:"6:25 開始洗手，用了 4 分鐘，完成時間是？",options:["6:20","6:29","6:30","6:35"],ans:1},
+                {q:"12:40 開始收拾書包，用了 15 分鐘，時間是？",options:["12:50","1:00","12:55","1:10"],ans:2},
+                {q:"7:30 開始看電視，看了 15 分鐘，時間是？",options:["7:45","8:00","7:50","7:35"],ans:0},
+                {q:"8:05 開始跑步，跑了 22 分鐘，時間是？",options:["8:30","8:27","8:25","8:40"],ans:1},
+                {q:"比賽 9:32 開始，子健用了 26 分鐘完成，完成時間是？",options:["10:00","9:55","9:58","10:05"],ans:2},
+                {q:"2:10 開始排隊，排了 30 分鐘，時間是？",options:["2:30","2:40","2:50","3:00"],ans:1},
+                {q:"3:15 開始唱歌，唱了 15 分鐘，時間是？",options:["3:30","3:40","3:45","4:00"],ans:0},
+                {q:"4:40 開始休息，休息了 10 分鐘，時間是？",options:["4:50","5:00","4:45","5:10"],ans:0},
+                {q:"10:00 開始考試，考了 55 分鐘，時間是？",options:["10:45","10:55","11:00","11:05"],ans:1},
+                {q:"11:20 開始洗澡，用了 30 分鐘，時間是？",options:["11:40","11:50","12:00","12:10"],ans:1}
+            ],
+            hard: [
+                {q:"9:50 開始上課，上了 20 分鐘，下課時間是？",options:["10:10","10:20","10:00","9:70"],ans:0},
+                {q:"10:45 開始小息，過了 30 分鐘，時間是？",options:["11:00","11:20","11:15","11:30"],ans:2},
+                {q:"7:55 開始吃早餐，用了 10 分鐘，完成時間是？",options:["8:00","8:05","8:10","8:15"],ans:1},
+                {q:"2:48 開始乘車，車程 25 分鐘，下車時間是？",options:["3:03","3:18","3:13","3:23"],ans:2},
+                {q:"11:40 開始看電影，看了 35 分鐘，時間是？",options:["12:10","12:15","12:20","12:25"],ans:1},
+                {q:"活動在 8:55 開始，9:20 完結，共用了多少分鐘？",options:["20分鐘","25分鐘","30分鐘","35分鐘"],ans:1},
+                {q:"比賽 9:32 開始，永德用了 42 分鐘完成，完成時間是？",options:["10:04","10:14","10:24","9:74"],ans:1},
+                {q:"比賽 9:32 開始，麗芬用了 35 分鐘完成，完成時間是？",options:["10:07","10:17","9:67","10:00"],ans:0},
+                {q:"妙怡在 3:48 到達，雅文在 10 分鐘後到達，雅文到達時間是？",options:["3:58","4:08","3:38","4:00"],ans:0},
+                {q:"媽媽 8:55 開始看電視，看了 40 分鐘，關電視時間是？",options:["9:25","9:45","9:35","10:05"],ans:2},
+                {q:"1:45 開始睡午覺，睡了 20 分鐘，醒來時間是？",options:["2:15","2:00","2:05","2:10"],ans:2},
+                {q:"6:50 開始吃晚餐，吃了 15 分鐘，完成時間是？",options:["7:15","7:00","7:10","7:05"],ans:3},
+                {q:"5:30 開始打球，打了 45 分鐘，完成時間是？",options:["6:25","6:15","6:00","6:30"],ans:1},
+                {q:"12:50 開始午膳，用了 30 分鐘，完成時間是？",options:["1:30","1:10","1:20","1:40"],ans:2},
+                {q:"4:45 開始做手作，用了 30 分鐘，完成時間是？",options:["5:25","5:05","5:15","5:30"],ans:2},
+                {q:"哥哥做功課用了 25 分鐘，在 10:00 完成。他甚麼時候開始？",options:["9:25","9:35","9:45","10:25"],ans:1},
+                {q:"姐姐洗澡用了 15 分鐘，在 8:10 完成。她甚麼時候開始？",options:["7:55","8:05","7:45","8:25"],ans:0},
+                {q:"11:35 開始會議，開了 50 分鐘，結束時間是？",options:["12:15","12:35","12:25","12:45"],ans:2},
+                {q:"2:55 開始聽歌，聽了 15 分鐘，時間是？",options:["3:05","3:15","3:10","3:20"],ans:2},
+                {q:"火警鐘在 12:03 響起，響了 2 分鐘後停下。停下時間是？",options:["12:10","12:01","12:05","1:05"],ans:2}
+            ]
+        },
+        {
+            id: 7, title: "第七關：一天的時間",
+            lesson: "💡 <b>重點教學：</b><br>分辨上午(a.m.)和下午(p.m.)。正午 12 時起至午夜 12 時止是下午。<br>午夜 12 時是一天的開始。",
+            easy: [
+                {q:"正午 12 時起至午夜 12 時止是（上午 / 下午）？",options:["上午","下午","全日","清晨"],ans:1},
+                {q:"午夜 12 時是一天的（開始 / 結束）？",options:["結束","中午","開始","下午"],ans:2},
+                {q:"早上上學的時間通常是？",options:["a.m.","p.m.","無法確定","正午"],ans:0},
+                {q:"晚上睡覺的時間通常是？",options:["a.m.","p.m.","正午","清晨"],ans:1},
+                {q:"電子鐘顯示 8:14 a.m.，這即是？",options:["下午8時14分","上午8時14分","晚上8時14分","午夜8時14分"],ans:1},
+                {q:"電子鐘顯示 10:03 p.m.，這即是？",options:["上午10時3分","下午10時3分","清晨10時3分","中午10時3分"],ans:1},
+                {q:"6:38 a.m. 即是？",options:["上午6時38分","下午6時38分","上午8時36分","下午8時36分"],ans:0},
+                {q:"12:05 p.m. 即是？",options:["上午12時5分","下午12時5分","午夜12時5分","凌晨12時5分"],ans:1},
+                {q:"中午吃午飯的時間通常在？",options:["a.m.","p.m.","清晨","午夜"],ans:1},
+                {q:"下午茶時間通常在？",options:["a.m.","p.m.","凌晨","午夜"],ans:1},
+                {q:"清晨起牀的時間通常在？",options:["a.m.","p.m.","中午","傍晚"],ans:0},
+                {q:"太陽下山的時間通常在？",options:["a.m.","p.m.","正午","凌晨"],ans:1},
+                {q:"健康講座在 10:32 a.m. 開始，即是在甚麼時候？",options:["上午","下午","中午","晚上"],ans:0},
+                {q:"齊齊做運動在 2:42 p.m. 開始，即是在甚麼時候？",options:["上午","下午","清晨","午夜"],ans:1},
+                {q:"晚上 8 時正，可以寫成？",options:["8:00 a.m.","8:00 p.m.","20:00 a.m.","12:00 p.m."],ans:1},
+                {q:"早上 7 時 30 分，可以寫成？",options:["7:30 p.m.","7:30 a.m.","17:30 a.m.","19:30 p.m."],ans:1},
+                {q:"午夜 12 時，即是？",options:["12:00 a.m.","12:00 p.m.","12:00 中午","1:00 a.m."],ans:0},
+                {q:"正午 12 時，即是？",options:["12:00 a.m.","12:00 p.m.","12:00 午夜","1:00 p.m."],ans:1},
+                {q:"下午 1 時 12 分，可以寫成？",options:["1:12 a.m.","1:12 p.m.","12:12 p.m.","11:12 a.m."],ans:1},
+                {q:"上午 11 時 40 分，可以寫成？",options:["11:40 a.m.","11:40 p.m.","10:40 a.m.","12:40 p.m."],ans:0}
+            ],
+            hard: [
+                {q:"根據活動時間表，下午 1 時 12 分，同學們正在做甚麼？",options:["問答時間","午膳","看影片","做運動"],ans:1},
+                {q:"11:50 a.m.，同學們正在做甚麼？",options:["健康講座","問答時間","午膳","齊齊做運動"],ans:1},
+                {q:"2:00 p.m.，同學們正在做甚麼？",options:["午膳","問答時間","觀看健康飲食影片","齊齊做運動"],ans:2},
+                {q:"「齊齊做運動」在 2:42 p.m. 開始，進行了 15 分鐘，何時完結？",options:["2:57 a.m.","2:57 p.m.","3:02 p.m.","2:27 p.m."],ans:1},
+                {q:"健康飲食影片播放中，鐘面顯示「1:50」，這時是？",options:["上午","下午","清晨","午夜"],ans:1},
+                {q:"爸爸晚上看報紙，8:15 開始，8:40 結束，用了多少分鐘？",options:["15分鐘","25分鐘","35分鐘","45分鐘"],ans:1},
+                {q:"媽媽看電視用了 40 分鐘，爸爸看報紙 25 分鐘，誰用的時間較長？",options:["爸爸","媽媽","一樣長","無法比較"],ans:1},
+                {q:"12:03 a.m. (午夜過後)，我們通常正在做甚麼？",options:["吃午飯","吃晚飯","睡覺","上學"],ans:2},
+                {q:"講座從 10:32 a.m. 到 11:28 a.m.，歷時多少分鐘？",options:["46分鐘","56分鐘","66分鐘","1小時"],ans:1},
+                {q:"問答時間從 11:40 a.m. 到 12:15 p.m.，歷時多少分鐘？",options:["25分鐘","35分鐘","45分鐘","55分鐘"],ans:1},
+                {q:"午膳時間從 12:25 p.m. 到 1:30 p.m.，歷時多少時間？",options:["1小時5分","55分鐘","1小時15分","1小時"],ans:0},
+                {q:"健康飲食影片 1:36 p.m. 到 2:35 p.m.，歷時多少分鐘？",options:["49分鐘","59分鐘","69分鐘","1小時"],ans:1},
+                {q:"下午 12:05 即是甚麼時候？",options:["午夜剛過5分鐘","正午剛過5分鐘","凌晨12時5分","晚上12時5分"],ans:1},
+                {q:"凌晨 1:00，電子鐘會顯示？",options:["1:00 p.m.","1:00 a.m.","13:00 a.m.","12:00 a.m."],ans:1},
+                {q:"上午 11:59 的下一分鐘是？",options:["12:00 a.m.","12:00 p.m.","11:60 a.m.","1:00 p.m."],ans:1},
+                {q:"下午 11:59 的下一分鐘是？",options:["12:00 p.m.","12:00 a.m.","11:60 p.m.","1:00 a.m."],ans:1},
+                {q:"一天共有多少個小時？",options:["12個","24個","60個","365個"],ans:1},
+                {q:"從上午 8 時到下午 8 時，經過了多少小時？",options:["8小時","12小時","24小時","16小時"],ans:1},
+                {q:"下午 3 時 45 分，鐘面上的時針指在哪裏？",options:["正指着3","正指着4","在3和4之間","在4和5之間"],ans:2},
+                {q:"12:30 a.m. 時，天空的顏色通常是？",options:["明亮的","黑的","黃昏的顏色","日出的顏色"],ans:1}
+            ]
+        },
+        {
+            id: 8, title: "第八關：日數",
+            lesson: "💡 <b>重點教學：</b><br>大月有 31 天，小月有 30 天。<br>平年一年有 365 天，二月有 28 天；閏年一年有 366 天，二月有 29 天。",
+            easy: [
+                {q:"一年有幾多天的平年？",options:["360","365","366","300"],ans:1},
+                {q:"三月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:0},
+                {q:"一年中，最少日數的是哪一個月？",options:["一月","二月","十二月","八月"],ans:1},
+                {q:"閏年的二月有幾多天？",options:["28天","29天","30天","31天"],ans:1},
+                {q:"平年的二月有幾多天？",options:["28天","29天","30天","31天"],ans:0},
+                {q:"七月有幾多天？",options:["28天","29天","30天","31天"],ans:3},
+                {q:"八月有幾多天？",options:["28天","29天","30天","31天"],ans:3},
+                {q:"九月有幾多天？",options:["28天","29天","30天","31天"],ans:2},
+                {q:"十月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:0},
+                {q:"十一月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:1},
+                {q:"一星期有幾多天？",options:["5天","6天","7天","8天"],ans:2},
+                {q:"大月有幾多天？",options:["28天","29天","30天","31天"],ans:3},
+                {q:"小月有幾多天？",options:["28天","29天","30天","31天"],ans:2},
+                {q:"一年有幾個月？",options:["10個","12個","24個","365個"],ans:1},
+                {q:"一年有幾個大月？",options:["4個","5個","6個","7個"],ans:3},
+                {q:"一年有幾個小月？",options:["4個","5個","6個","7個"],ans:0},
+                {q:"五月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:0},
+                {q:"六月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:1},
+                {q:"四月有幾多天？",options:["28天","29天","30天","31天"],ans:2},
+                {q:"一月是（大月 / 小月）？",options:["大月","小月","平月","閏月"],ans:0}
+            ],
+            hard: [
+                {q:"2024 年是閏年，下一個閏年是哪一年？",options:["2025年","2026年","2027年","2028年"],ans:3},
+                {q:"2023 年是平年，2023 年 3 月 1 日的前一天是幾月幾日？",options:["2月28日","2月29日","2月30日","3月31日"],ans:0},
+                {q:"閏年一年有幾多天？",options:["360天","365天","366天","364天"],ans:2},
+                {q:"2020 年是閏年，2021 年是（平年 / 閏年）？",options:["平年","閏年","大年","小年"],ans:0},
+                {q:"如果今天是 7 月 31 日，明天是幾月幾日？",options:["7月32日","8月1日","8月31日","9月1日"],ans:1},
+                {q:"如果今天是 12 月 31 日，明天是幾月幾日？",options:["12月32日","1月1日","11月1日","2月1日"],ans:1},
+                {q:"小食店只會在大月的最後一天休息，全年共休息多少天？",options:["4天","7天","12天","31天"],ans:1},
+                {q:"一年中，連續兩個都是大月的是哪兩個月？",options:["6月和7月","7月和8月","8月和9月","12月和1月"],ans:1},
+                {q:"如果 8 月 1 日是星期日，8 月 8 日是星期幾？",options:["星期六","星期日","星期一","星期二"],ans:1},
+                {q:"慧敏說：「我在每月的最後一天才可出來。」她能在 6 月哪天出來？",options:["6月29日","6月30日","6月31日","6月28日"],ans:1},
+                {q:"家明說：「月小的月份我才有空。」他在 7 月有空嗎？",options:["有空","沒有空，7月是大月","無法確定","有時有空"],ans:1},
+                {q:"如果平年的 2 月有四個星期，剛好是幾多天？",options:["28天","29天","30天","31天"],ans:0},
+                {q:"2024 年（閏年）的 2 月最後一天是幾月幾日？",options:["2月28日","2月29日","2月30日","3月1日"],ans:1},
+                {q:"一年之中，日數剛好是 30 天的月份共有幾個？",options:["4個","5個","6個","7個"],ans:0},
+                {q:"如果 10 月 1 日是星期一，10 月 15 日是星期幾？",options:["星期日","星期一","星期二","星期六"],ans:1},
+                {q:"3 月有 31 天，如果 3 月 1 日是星期五，3 月最後一天是星期幾？",options:["星期五","星期六","星期日","星期一"],ans:2},
+                {q:"「今年全年有 366 天」，這年的二月有多少天？",options:["28天","29天","30天","31天"],ans:1},
+                {q:"如果 9 月 30 日是星期三，10 月 1 日是星期幾？",options:["星期二","星期三","星期四","星期五"],ans:2},
+                {q:"下半年（7至12月）共有幾個大月？",options:["3個","4個","5個","6個"],ans:1},
+                {q:"上半年（1至6月）共有幾個大月？",options:["2個","3個","4個","5個"],ans:1}
+            ]
+        },
+        {
+            id: 9, title: "第九關：日期應用題",
+            lesson: "💡 <b>重點教學：</b><br>推算活動的日期。如果跨月推算，要注意那個月份有多少天（大月還是小月）。<br>例子：6月28日關閉至7月4日，6月有30天，所以6月關了3天(28,29,30)，7月關了4天，合共7天。",
+            easy: [
+                {q:"參加 6 月 5 日出發的旅行團，為期 4 天，幾月幾日回港？",options:["6月7日","6月8日","6月9日","6月10日"],ans:1},
+                {q:"旅遊保險 6 月 12 日開始，買了 10 天，結束日期是？",options:["6月20日","6月21日","6月22日","6月23日"],ans:1},
+                {q:"活動在 7 月 13 日開始，7 月 19 日結束，為期幾天？",options:["6天","7天","8天","9天"],ans:1},
+                {q:"展覽在 8 月 1 日開始，為期 5 天，最後一天是？",options:["8月4日","8月5日","8月6日","8月7日"],ans:1},
+                {q:"宿營在 7 月 10 日入營，7 月 12 日出營，為期幾天？",options:["2天","3天","4天","5天"],ans:1},
+                {q:"哥哥 2 月 4 日入營，為期 3 天，幾日出營？",options:["2月5日","2月6日","2月7日","2月8日"],ans:1},
+                {q:"10 月 5 日借書，借期 7 天，應在 10 月幾日還書？",options:["10月10日","10月11日","10月12日","10月13日"],ans:1},
+                {q:"8 月 8 日開始一連 3 天舉行活動，活動在幾日完結？",options:["8月9日","8月10日","8月11日","8月12日"],ans:1},
+                {q:"9 月 2 日開始，9 月 10 日結束，共多少天？",options:["8天","9天","10天","11天"],ans:1},
+                {q:"11 月 11 日購物節為期 2 天，幾日完結？",options:["11月11日","11月12日","11月13日","11月14日"],ans:1},
+                {q:"4 月 15 日開始放假，放了 10 天，最後一日假期是？",options:["4月23日","4月24日","4月25日","4月26日"],ans:1},
+                {q:"5 月 1 日學校放假 1 天，5 月 2 日要上學嗎？",options:["要","不要","不確定","由校長決定"],ans:0},
+                {q:"從 1 月 5 日到 1 月 9 日，共有幾天？",options:["4天","5天","6天","7天"],ans:1},
+                {q:"書展 7 月 20 日開始，為期 7 天，結束日期是？",options:["7月25日","7月26日","7月27日","7月28日"],ans:1},
+                {q:"從 3 月 10 日到 3 月 15 日，共多少天？",options:["5天","6天","7天","8天"],ans:1},
+                {q:"音樂會在 12 月 24 日和 25 日舉行，為期幾天？",options:["1天","2天","3天","4天"],ans:1},
+                {q:"兒童節活動為期 3 天，6 月 1 日開始，結束日期是？",options:["6月2日","6月3日","6月4日","6月5日"],ans:1},
+                {q:"從 8 月 20 日到 8 月 28 日，共多少天？",options:["7天","8天","9天","10天"],ans:2},
+                {q:"中秋節 9 月 15 日開始，連續放假 4 天，最後一天假期是？",options:["9月17日","9月18日","9月19日","9月20日"],ans:1},
+                {q:"電影 2 月 10 日上映，2 月 23 日最後一天，共上映幾天？",options:["12天","13天","14天","15天"],ans:2}
+            ],
+            hard: [
+                {q:"日本六天旅行團，6 月 15 日出發，多留 2 天，幾月幾日回港？",options:["6月21日","6月22日","6月23日","6月24日"],ans:1},
+                {q:"最多逗留 30 天，6 月 25 日進入越南，最遲幾月幾日離開？",options:["7月23日","7月24日","7月25日","7月26日"],ans:1},
+                {q:"卡通動畫展 7 月 30 日至 8 月 3 日舉行，為期幾天？",options:["4天","5天","6天","7天"],ans:1},
+                {q:"美食展一連 8 天舉行，8 月 13 日完結。幾日開始？",options:["8月5日","8月6日","8月7日","8月8日"],ans:1},
+                {q:"展覽館 6 月 28 日至 7 月 4 日關閉，共關閉幾天？（提示：6月是小月）",options:["6天","7天","8天","9天"],ans:1},
+                {q:"祖父住院 5 天，平年 3 月 2 日出院，他入院日期是？",options:["2月25日","2月26日","2月27日","2月28日"],ans:1},
+                {q:"電影 2 月 10 日上映，2 月 23 日最後一天，共上映幾天？",options:["12天","13天","14天","15天"],ans:2},
+                {q:"某年 12 月 28 日開始放假，放了 7 天，最後一日假期是？",options:["1月2日","1月3日","1月4日","1月5日"],ans:1},
+                {q:"旅行團 1 月 29 日出發，為期 5 天，回港日期是？",options:["2月1日","2月2日","2月3日","2月4日"],ans:1},
+                {q:"活動從 10 月 28 日到 11 月 2 日，共多少天？",options:["5天","6天","7天","8天"],ans:1},
+                {q:"從 5 月 1 日放假到 5 月 7 日，若多請 3 天假，共放多少天？",options:["8天","9天","10天","11天"],ans:2},
+                {q:"6 月 20 日借書，借期 14 天，應在幾月幾日還書？",options:["7月2日","7月3日","7月4日","7月5日"],ans:1},
+                {q:"參加為期 8 天的訓練營，8 月 5 日完結，入營日期是？",options:["7月28日","7月29日","7月30日","7月31日"],ans:1},
+                {q:"2024年(閏年) 2 月 25 日出發去旅行，為期 6 天，回港日期是？",options:["3月1日","3月2日","2月30日","3月3日"],ans:0},
+                {q:"如果 8 月 30 日買了 7 天的保險，最後一天有效是？",options:["9月4日","9月5日","9月6日","9月7日"],ans:1},
+                {q:"從 9 月 29 日到 10 月 4 日，展覽共舉行了多少天？",options:["5天","6天","7天","8天"],ans:1},
+                {q:"媽媽去歐洲 14 天，12 月 20 日出發，幾月幾日回港？",options:["1月1日","1月2日","1月3日","1月4日"],ans:1},
+                {q:"暑期班由 7 月 15 日開始，一連 20 天，最後一堂是？",options:["8月2日","8月3日","8月4日","8月5日"],ans:1},
+                {q:"展覽會在 4 月 28 日開幕，5 月 5 日閉幕，共展出幾天？",options:["7天","8天","9天","10天"],ans:1},
+                {q:"2023年(平年) 2 月 26 日開始修路，為期 5 天，哪天完工？",options:["3月1日","3月2日","3月3日","3月4日"],ans:1}
+            ]
+        },
+        {
+            id: 10, title: "第十關：立體圖形",
+            lesson: "💡 <b>重點教學：</b><br>認識立體圖形的特徵。<br>角柱有 2 個大小相同的底；角錐只有 1 個底；圓錐有 1 個圓形的底和 1 個曲面。",
+            easy: [
+                {q:"哪一個立體圖形只有 1 個圓形的底和 1 個曲面？",options:["圓錐","球體","圓柱","三角錐"],ans:0},
+                {q:"哪一個圖形有兩個大小相同，而且都是圓形的面（底）？",options:["圓柱","球體","圓錐","長方體"],ans:0},
+                {q:"只有 1 個曲面，沒有平面的圖形是？",options:["球體","圓柱","圓錐","正方體"],ans:0},
+                {q:"圓柱有幾個底？",options:["0個","1個","2個","3個"],ans:2},
+                {q:"圓錐有幾個底？",options:["0個","1個","2個","3個"],ans:1},
+                {q:"球體有幾個平面？",options:["0個","1個","2個","無數個"],ans:0},
+                {q:"角柱有幾個大小相同的底？",options:["0個","1個","2個","3個"],ans:2},
+                {q:"角錐有幾個底？",options:["0個","1個","2個","3個"],ans:1},
+                {q:"長方體屬於哪一類立體圖形？",options:["角柱","角錐","圓柱","圓錐"],ans:0},
+                {q:"正方體屬於哪一類立體圖形？",options:["角柱","角錐","圓柱","球體"],ans:0},
+                {q:"三角錐的底是甚麼形狀？",options:["圓形","三角形","四邊形","五邊形"],ans:1},
+                {q:"四角柱的底是甚麼形狀？",options:["圓形","三角形","四邊形","五邊形"],ans:2},
+                {q:"五角錐的底是甚麼形狀？",options:["圓形","三角形","四邊形","五邊形"],ans:3},
+                {q:"六角柱有幾個底？",options:["1個","2個","6個","8個"],ans:1},
+                {q:"六角錐有幾個底？",options:["1個","2個","6個","7個"],ans:0},
+                {q:"圓柱的側面是一個甚麼面？",options:["平面","曲面","三角形","正方形"],ans:1},
+                {q:"圓錐的側面是一個甚麼面？",options:["平面","曲面","三角形","圓形"],ans:1},
+                {q:"一個圖形有 2 個三角形底，它是？",options:["三角錐","三角柱","四角柱","圓柱"],ans:1},
+                {q:"一個圖形有 1 個四邊形底，它是？",options:["四角錐","四角柱","圓錐","三角錐"],ans:0},
+                {q:"足球的形狀是？",options:["圓錐","圓柱","球體","角柱"],ans:2}
+            ],
+            hard: [
+                {q:"有一個立體圖形，底是六邊形，其餘面都是三角形，它是？",options:["六角柱","六角錐","三角柱","三角錐"],ans:1},
+                {q:"有一個角柱，它的所有面都是四邊形，這是？",options:["四角柱 (長方體/正方體)","三角柱","圓柱","四角錐"],ans:0},
+                {q:"五角柱共有多少個面？",options:["5個","6個","7個","8個"],ans:2},
+                {q:"四角錐共有多少個面？",options:["4個","5個","6個","7個"],ans:1},
+                {q:"六角柱共有多少個側面？",options:["4個","5個","6個","8個"],ans:2},
+                {q:"一個立體圖形有 2 個三角形底和 3 個四邊形側面，它是？",options:["三角錐","三角柱","五角柱","五角錐"],ans:1},
+                {q:"三角錐共有多少個面？",options:["3個","4個","5個","6個"],ans:1},
+                {q:"一個立體圖形共有 5 個面，其中 1 個是四邊形，4 個是三角形，它是？",options:["三角柱","四角柱","四角錐","五角錐"],ans:2},
+                {q:"只有平面構成的立體圖形中，最少有幾個面？",options:["2個","3個","4個","5個"],ans:2},
+                {q:"圓柱有 2 個平面和 1 個曲面，總共有幾個面？",options:["2個","3個","4個","無數個"],ans:1},
+                {q:"圓錐有 1 個平面和 1 個曲面，總共有幾個面？",options:["1個","2個","3個","無數個"],ans:1},
+                {q:"一個角柱有 8 個側面，它叫甚麼名字？",options:["六角柱","七角柱","八角柱","九角柱"],ans:2},
+                {q:"一個角錐有 7 個面，它的底是甚麼形狀？",options:["五邊形","六邊形","七邊形","八邊形"],ans:1},
+                {q:"一個角柱共有 6 個面，它是甚麼？",options:["三角柱","四角柱","五角柱","六角柱"],ans:1},
+                {q:"下列哪一個立體圖形可以順暢地朝不同方向滾動？",options:["四角錐","三角柱","球體","正方體"],ans:2},
+                {q:"如果把圓柱從中間橫切開，切出來的面是甚麼形狀？",options:["正方形","長方形","三角形","圓形"],ans:3},
+                {q:"常見的玩樂骰子是甚麼立體圖形？",options:["正方體 (四角柱)","長方體","三角柱","球體"],ans:0},
+                {q:"汽水罐通常是甚麼立體圖形？",options:["圓錐","圓柱","角柱","球體"],ans:1},
+                {q:"生日派對帽通常是甚麼立體圖形？",options:["圓柱","圓錐","角錐","球體"],ans:1},
+                {q:"厚厚的字典通常是甚麼立體圖形？",options:["長方體 (四角柱)","正方體","三角柱","圓柱"],ans:0}
+            ]
+        },
+        {
+            id: 11, title: "第十一關：記時方法和計時工具",
+            lesson: "💡 <b>重點教學：</b><br>現今一天有 24 小時。中國古代將一天分為 12 個「時辰」（如子時、丑時）。<br>1 個時辰等於 2 個小時。請留意時辰表的時間，以及古代與現代計時工具的分別喔！",
+            easy: [
+                {q:"現今的記時方法，一天有多少小時？",options:["12小時","24小時","60小時","365小時"],ans:1},
+                {q:"古代的中國人將一天分為多少個時辰？",options:["12個","24個","10個","60個"],ans:0},
+                {q:"1 個時辰等於多少個小時？",options:["1個小時","2個小時","3個小時","4個小時"],ans:1},
+                {q:"2 個時辰，即是多少個小時？",options:["2個小時","4個小時","12個小時","24個小時"],ans:1},
+                {q:"3 個時辰，即是多少個小時？",options:["3個小時","5個小時","6個小時","8個小時"],ans:2},
+                {q:"4 個時辰，即是多少個小時？",options:["4個小時","6個小時","8個小時","10個小時"],ans:2},
+                {q:"5 個時辰，即是多少個小時？",options:["5個小時","10個小時","12個小時","24個小時"],ans:1},
+                {q:"半個時辰，即是多少個小時？",options:["半小時","1個小時","1.5個小時","2個小時"],ans:1},
+                {q:"10 個小時等於多少個時辰？",options:["5個","10個","12個","20個"],ans:0},
+                {q:"24 個小時（即一天）等於多少個時辰？",options:["12個","24個","48個","6個"],ans:0},
+                {q:"以下哪一個是古代的計時工具？",options:["手錶","手提電話","水鐘","數字鐘"],ans:2},
+                {q:"以下哪一個是古代的計時工具？",options:["沙漏","電熱水瓶","廚房用計時器","數字鐘"],ans:0},
+                {q:"以下哪一個是古代的計時工具？",options:["秒錶","數字鐘","手提電話","銅壺滴漏"],ans:3},
+                {q:"以下哪一個是古代的計時工具？",options:["蠟燭鐘","檯燈","手錶","秒錶"],ans:0},
+                {q:"以下哪一個是現今（現代）的計時工具？",options:["蠟燭鐘","水鐘","銅壺滴漏","手錶"],ans:3},
+                {q:"以下哪一個是現今（現代）的計時工具？",options:["手提電話","沙漏","水鐘","日晷"],ans:0},
+                {q:"以下哪一個是現今（現代）的計時工具？",options:["蠟燭鐘","數字鐘","沙漏","銅壺滴漏"],ans:1},
+                {q:"以下哪一件物品「不是」計時工具？",options:["手錶","數字鐘","檯燈","沙漏"],ans:2},
+                {q:"以下哪一件物品「不是」計時工具？",options:["秒錶","電熱水瓶","廚房用計時器","水鐘"],ans:1},
+                {q:"廚房用計時器屬於甚麼時代的計時工具？",options:["古代","現今","未來","史前"],ans:1}
+            ],
+            hard: [
+                {q:"上午 1 時正至上午 3 時正是甚麼時辰？",options:["子時","丑時","寅時","卯時"],ans:1},
+                {q:"下午 4 時正是甚麼時辰？（提示：下午3時至5時）",options:["寅時","卯時","申時","酉時"],ans:2},
+                {q:"巳時是在甚麼時候？（提示：上午9時至11時）",options:["上午","下午","正午","午夜"],ans:0},
+                {q:"亥時即是下午 9 時正至甚麼時間？",options:["上午9時正","上午11時正","下午10時正","下午11時正"],ans:3},
+                {q:"上午 7 時至上午 9 時是甚麼時辰？",options:["卯時","辰時","巳時","午時"],ans:1},
+                {q:"上午 11 時至下午 1 時是甚麼時辰？",options:["巳時","午時","未時","申時"],ans:1},
+                {q:"下午 1 時至下午 3 時是甚麼時辰？",options:["午時","未時","申時","酉時"],ans:1},
+                {q:"下午 5 時至下午 7 時是甚麼時辰？",options:["申時","酉時","戌時","亥時"],ans:1},
+                {q:"下午 7 時至下午 9 時是甚麼時辰？",options:["酉時","戌時","亥時","子時"],ans:1},
+                {q:"上午 3 時至上午 5 時是甚麼時辰？",options:["丑時","寅時","卯時","辰時"],ans:1},
+                {q:"上午 5 時至上午 7 時是甚麼時辰？",options:["寅時","卯時","辰時","巳時"],ans:1},
+                {q:"下午 11 時（晚上11時）至上午 1 時是甚麼時辰？",options:["戌時","亥時","子時","丑時"],ans:2},
+                {q:"中午 12 時正，屬於哪一個時辰？",options:["辰時","巳時","午時","未時"],ans:2},
+                {q:"午夜 12 時正，屬於哪一個時辰？",options:["亥時","子時","丑時","寅時"],ans:1},
+                {q:"下午 2 時 30 分，屬於哪一個時辰？",options:["午時","未時","申時","酉時"],ans:1},
+                {q:"晚上 8 時 15 分，屬於哪一個時辰？",options:["申時","酉時","戌時","亥時"],ans:2},
+                {q:"早上 8 時正，屬於哪一個時辰？",options:["卯時","辰時","巳時","午時"],ans:1},
+                {q:"哪一個時辰橫跨了「上午」和「下午」？",options:["子時","辰時","午時","亥時"],ans:2},
+                {q:"哪一個時辰橫跨了「今天」和「明天」？",options:["子時","丑時","午時","亥時"],ans:0},
+                {q:"如果活動從下午 1 時進行到下午 5 時，經歷了哪兩個時辰？",options:["午時和未時","未時和申時","申時和酉時","酉時和戌時"],ans:1}
+            ]
+        }
+    ];
+
+    // =========================================
+    // 遊戲核心邏輯引擎
+    // =========================================
+    
+    let currentLevelData = null;
+    let quizQueue = [];
+    let userAnswers = []; 
+    let currentQuestionIndex = 0;
+    let isRetryMode = false; 
+    let synth = window.speechSynthesis;
+    let userProgress = JSON.parse(localStorage.getItem('teachercat_progress')) || {};
+
+    function getThemeStyling(title, index) {
+        let emoji = "🌟";
+        if (title.includes("乘法")) emoji = "✖️";
+        else if (title.includes("時間") || title.includes("報時") || title.includes("分鐘") || title.includes("記時")) emoji = "⏰";
+        else if (title.includes("日數") || title.includes("日期")) emoji = "📅";
+        else if (title.includes("立體圖形")) emoji = "🧊";
+        
+        const colorClass = "color-" + ((index % 4) + 1); 
+        return { emoji, colorClass };
+    }
+
+    // 重新繪製首頁，並把星星記錄直接放入關卡按鈕中
+    function initHome() {
+        const levelsContainer = document.getElementById('levels-container');
+        levelsContainer.innerHTML = '';
+
+        gameData.forEach((level, index) => {
+            const style = getThemeStyling(level.title, index);
+            const parts = level.title.split("：");
+            const levelNum = parts ? parts : "";
+            const levelTheme = parts ? parts : level.title;
+
+            // 抓取進度與星星狀態
+            let score = userProgress[level.id] !== undefined ? userProgress[level.id] : 0;
+            let starHTML = '⚪'; 
+            if (score >= 20) { starHTML = '🌟'; } else if (score >= 10) { starHTML = '⭐'; }
+
+            const btn = document.createElement('button');
+            btn.className = `level-btn ${style.colorClass}`;
+            btn.innerHTML = `
+                <div style="width: 100%;">
+                    <div style="font-size:16px; opacity:0.9; margin-bottom:5px;">${levelNum}</div>
+                    <div style="font-size:24px; font-weight:900;">${style.emoji} ${levelTheme}</div>
+                </div>
+                <!-- 嵌入到按鈕底部的進度條 -->
+                <div class="btn-progress-bar">
+                    <span style="font-size: 16px; font-weight: bold; text-shadow: none;">最高分: ${score}/20</span>
+                    <span style="font-size: 22px; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.2));">${starHTML}</span>
+                </div>
+            `;
+            btn.onclick = () => showIntro(level.id);
+            levelsContainer.appendChild(btn);
+        });
+    }
+
+    initHome();
+
+    function clearRecord() {
+        if(confirm("確定要清除所有學習記錄和星星嗎？這無法復原喔！")) {
+            userProgress = {};
+            localStorage.removeItem('teachercat_progress');
+            initHome(); alert("記錄已成功清除！");
+        }
+    }
+
+    function showScreen(screenId) {
+        ['home-screen', 'intro-screen', 'quiz-screen', 'result-screen'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(screenId).classList.remove('hidden');
+        synth.cancel();
+        document.getElementById('hint-box').classList.add('hidden');
+    }
+
+    function showHome() {
+        if (document.getElementById('quiz-screen').classList.contains('hidden') === false) {
+            if(!confirm("確定要回到主頁嗎？目前的進度將不會儲存喔！")) return;
+        }
+        initHome(); 
+        showScreen('home-screen');
+    }
+
+    function showIntro(levelId) {
+        currentLevelData = gameData.find(l => l.id === levelId);
+        document.getElementById('intro-title').innerText = currentLevelData.title;
+        document.getElementById('intro-lesson').innerHTML = currentLevelData.lesson;
+        showScreen('intro-screen');
+    }
+
+    function startGame() {
+        let easyQ = [...currentLevelData.easy].sort(() => 0.5 - Math.random()).slice(0, 10);
+        let hardQ = [...currentLevelData.hard].sort(() => 0.5 - Math.random()).slice(0, 10);
+        quizQueue = [...easyQ, ...hardQ];
+        userAnswers = new Array(quizQueue.length).fill(null);
+        currentQuestionIndex = 0;
+        isRetryMode = false;
+        
+        document.getElementById('level-title-display').innerText = currentLevelData.title;
+        showScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function stripHtml(html) { let tmp = document.createElement("DIV"); tmp.innerHTML = html; return tmp.textContent || tmp.innerText || ""; }
+    
+    function playAudio(elementIdOrText) {
+        synth.cancel();
+        let text = document.getElementById(elementIdOrText) ? document.getElementById(elementIdOrText).innerText : elementIdOrText;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-HK'; utterance.rate = 0.9; synth.speak(utterance);
+    }
+
+    function playWinEffects() {
+        const container = document.getElementById('game-container');
+        container.classList.add('shake-effect');
+        setTimeout(() => container.classList.remove('shake-effect'), 400);
+
+        const emoji = document.createElement('div');
+        emoji.innerText = "🎉✨ 答對了！ ✨🎉";
+        emoji.className = "popup-exaggerated"; document.body.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 1500);
+
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator(); const gainNode = ctx.createGain();
+            osc.type = 'triangle'; osc.connect(gainNode); gainNode.connect(ctx.destination);
+            osc.frequency.setValueAtTime(400, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.4, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc.start(); osc.stop(ctx.currentTime + 0.5);
+        } catch(e) {}
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= quizQueue.length && !isRetryMode) { endQuiz(); return; }
+        const qData = quizQueue[currentQuestionIndex];
+        
+        document.getElementById('prev-btn').disabled = (currentQuestionIndex === 0);
+        document.getElementById('hint-box').classList.add('hidden');
+        document.getElementById('skip-btn').classList.add('hidden');
+        document.getElementById('next-btn').classList.remove('hidden');
+
+        if (isRetryMode) {
+            document.getElementById('question-counter').innerText = `🔥 錯誤重做：第 ${currentQuestionIndex + 1} 題`;
+            document.getElementById('prev-btn').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('hint-box').classList.remove('hidden');
+            document.getElementById('hint-text').innerText = "提示：\n" + stripHtml(currentLevelData.lesson);
+        } else {
+            document.getElementById('question-counter').innerText = `第 ${currentQuestionIndex + 1} 題 / 共 ${quizQueue.length} 題`;
+            document.getElementById('prev-btn').classList.remove('hidden');
+            
+            // 已經解除必須作答才能跳轉的限制，讓按鈕隨時保持可按狀態
+            document.getElementById('next-btn').disabled = false;
+            
+            if(userAnswers[currentQuestionIndex] === false) {
+                document.getElementById('skip-btn').classList.remove('hidden');
+                document.getElementById('next-btn').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('question-text').innerText = qData.q;
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        qData.options.forEach((opt, index) => {
+            const wrapper = document.createElement('div'); wrapper.className = 'option-container';
+            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt;
+            
+            if (!isRetryMode && userAnswers[currentQuestionIndex] === true) {
+                btn.disabled = true;
+                if (index === qData.ans) wrapper.classList.add('correct-ans');
+            } else {
+                btn.onclick = () => checkAnswer(index, qData.ans, btn, wrapper);
+            }
+
+            const audioBtn = document.createElement('button'); audioBtn.className = 'audio-btn-small'; audioBtn.innerText = '🔊';
+            audioBtn.onclick = (e) => { e.stopPropagation(); playAudio(opt); };
+            wrapper.appendChild(btn); wrapper.appendChild(audioBtn); optionsContainer.appendChild(wrapper);
+        });
+    }
+
+    function saveScoreDynamically() {
+        let score = userAnswers.filter(a => a === true).length;
+        let oldScore = userProgress[currentLevelData.id] || 0;
+        if (score > oldScore) {
+            userProgress[currentLevelData.id] = score;
+            localStorage.setItem('teachercat_progress', JSON.stringify(userProgress));
+        }
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, btnElement, wrapperElement) {
+        const allOptionBtns = document.querySelectorAll('.option-btn');
+        
+        if (selectedIndex === correctIndex) {
+            wrapperElement.classList.add('correct-ans');
+            playWinEffects();
+            document.getElementById('hint-box').classList.add('hidden');
+
+            if (isRetryMode) {
+                userAnswers[currentQuestionIndex] = true; 
+                saveScoreDynamically(); 
+                setTimeout(() => { alert("太棒了！你已經學會這題了！分數提升啦！"); endQuiz(); }, 1200);
+            } else {
+                allOptionBtns.forEach(b => b.disabled = true);
+                userAnswers[currentQuestionIndex] = true; 
+                
+                document.getElementById('next-btn').disabled = false;
+                document.getElementById('skip-btn').classList.add('hidden');
+                document.getElementById('next-btn').classList.remove('hidden');
+                setTimeout(() => nextQuestion(), 1200);
+            }
+        } else {
+            wrapperElement.classList.add('wrong-ans');
+            document.getElementById('hint-box').classList.remove('hidden');
+            document.getElementById('hint-text').innerText = "哎呀，答案不對喔！看看提示：\n" + stripHtml(currentLevelData.lesson);
+
+            if (isRetryMode) {
+                btnElement.disabled = true; 
+            } else {
+                btnElement.disabled = true; 
+                if (userAnswers[currentQuestionIndex] === null) {
+                    userAnswers[currentQuestionIndex] = false; 
+                }
+                document.getElementById('skip-btn').classList.remove('hidden');
+                document.getElementById('next-btn').classList.add('hidden');
+            }
+        }
+    }
+
+    function prevQuestion() { if (currentQuestionIndex > 0) { currentQuestionIndex--; loadQuestion(); } }
+    function nextQuestion() { currentQuestionIndex++; loadQuestion(); }
+
+    function endQuiz() {
+        isRetryMode = false;
+        showScreen('result-screen');
+        
+        saveScoreDynamically(); 
+        
+        // 遇到跳過的題目(null)時，結算時將不計入得分，只計算 userAnswers 內為 true 的數量
+        let score = userAnswers.filter(a => a === true).length;
+        document.getElementById('score-display').innerText = `本次得分：${score} / ${quizQueue.length}`;
+        
+        let starAward = '';
+        if (score >= 20) starAward = '🌟 滿分太棒了！獲得大星星！ 🌟';
+        else if (score >= 10) starAward = '⭐ 做得好！獲得小星星！ ⭐';
+        else starAward = '💪 加油！點擊紅色題目再試一次吧！';
+        document.getElementById('star-award-display').innerText = starAward;
+        
+        const grid = document.getElementById('summary-grid');
+        grid.innerHTML = '';
+        userAnswers.forEach((isCorrect, index) => {
+            const btn = document.createElement('button');
+            // 跳過的題目(null)與錯題(false)都會顯示成紅色 ❌，讓小朋友有機會點擊重做
+            btn.className = 'summary-item ' + (isCorrect ? 'right' : 'wrong');
+            btn.innerText = `第 ${index + 1} 題\n${isCorrect ? '✅' : '❌'}`;
+            if (!isCorrect) { btn.title = "點擊重新挑戰這題！"; btn.onclick = () => startRetry(index); }
+            grid.appendChild(btn);
+        });
+    }
+
+    function startRetry(index) {
+        isRetryMode = true; currentQuestionIndex = index;
+        showScreen('quiz-screen'); loadQuestion();
+    }
+</script>
+
+</body>
+</html>
