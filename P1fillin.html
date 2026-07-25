@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teacher Cat 的快樂AI教室 - P1 填充詞語運用</title>
+    
+    <!-- 引入 Font Awesome 作為圖標 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Confetti 特效庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- 引入 Mobile Drag and Drop Polyfill 以支援手機/平板觸控拖拉 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@3.0.0-beta.0/default.css">
+    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@3.0.0-beta.0/index.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #FF9800;
+            --secondary: #4CAF50;
+            --text: #333;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', '微軟正黑體', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--text);
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ffecd2, #fcb69f);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .logo { position: absolute; top: 10px; left: 10px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; }
+        .top-right-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
+        .record-btn { background: rgba(255, 255, 255, 0.9); padding: 10px 15px; border-radius: 30px; font-size: 16px; font-weight: bold; color: #1976D2; border: 2px solid #1976D2; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .record-btn:hover { background: #E3F2FD; transform: scale(1.05); }
+        .clear-btn { color: #D32F2F; border: 2px solid #D32F2F; }
+        .clear-btn:hover { background: #FFCDD2; }
+
+        .container { flex: 1; max-width: 900px; margin: 80px auto 30px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); text-align: center; width: 90%; position: relative; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { color: var(--primary); text-shadow: 2px 2px 4px rgba(0,0,0,0.1); font-size: 32px; }
+        
+        .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
+        .btn-level { color: white; padding: 20px 15px; border-radius: 20px; border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-level:nth-child(4n+1) { background-color: #FF5252; box-shadow: 0 8px 0 #D32F2F, 0 15px 20px rgba(0,0,0,0.2); }
+        .btn-level:nth-child(4n+2) { background-color: #4CAF50; box-shadow: 0 8px 0 #388E3C, 0 15px 20px rgba(0,0,0,0.2); }
+        .btn-level:nth-child(4n+3) { background-color: #448AFF; box-shadow: 0 8px 0 #1976D2, 0 15px 20px rgba(0,0,0,0.2); }
+        .btn-level:nth-child(4n+4) { background-color: #FFC107; color: #333; box-shadow: 0 8px 0 #FFA000, 0 15px 20px rgba(0,0,0,0.2); }
+        .btn-level:active { transform: translateY(8px); box-shadow: 0 0 0 transparent, 0 5px 10px rgba(0,0,0,0.2) !important; }
+        .btn-level:hover { transform: translateY(-3px) scale(1.02); filter: brightness(1.1); }
+        
+        .btn { background-color: var(--secondary); color: white; border: none; padding: 12px 24px; margin: 10px; font-size: 18px; border-radius: 10px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .btn:hover { transform: scale(1.05); }
+        .btn-nav { background-color: #2196F3; }
+        .btn-skip { background-color: #9E9E9E; }
+        .btn-rocket { background-color: #E91E63; font-size: 24px; padding: 15px 30px; border-radius: 15px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .btn-adventure { background-color: #8E24AA; width: 80%; max-width: 400px; font-size: 20px; border-radius: 15px; }
+        
+        .question-text { font-size: 26px; margin-bottom: 40px; line-height: 2.2; font-weight: bold; text-align: left; background: #fff; padding: 20px; border-radius: 15px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); border: 2px solid #eee; }
+        
+        /* === 每一句發音按鈕及排版 === */
+        .sentence-block { display: inline; margin-right: 8px; line-height: 2.5; }
+        .tts-btn-small { background: #4CAF50; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s; color:#fff; vertical-align: middle; margin: 0 8px 5px 2px; }
+        .tts-btn-small:hover { transform: scale(1.15); background: #388E3C; }
+
+        /* === 拖拉與填空區塊專用 CSS === */
+        .drop-zone {
+            display: inline-block; min-width: 80px; height: 45px; line-height: 45px; margin: 0 8px; border: 3px dashed #FF9800; background: #FFF3E0; border-radius: 10px; vertical-align: middle; text-align: center; color: #FF9800; font-size: 20px; transition: all 0.3s;
+        }
+        .drop-zone.drag-over { background: #FFE082; border-color: #E65100; transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 152, 0, 0.5); }
+        .filled-correct {
+            display: inline-block; min-width: 80px; padding: 0 10px; height: 45px; line-height: 45px; margin: 0 8px; border: 3px solid #4CAF50; background: #E8F5E9; color: #2E7D32; border-radius: 10px; vertical-align: middle; text-align: center; font-weight: bold; font-size: 26px; animation: popCorrect 0.5s ease;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .option-card {
+            display: flex; align-items: center; justify-content: space-between; background: #E3F2FD; padding: 15px 20px; border-radius: 15px; font-size: 24px; border: 3px solid #64B5F6; cursor: grab; box-shadow: 0 6px 0 #2196F3, 0 10px 15px rgba(0,0,0,0.1); transition: all 0.2s; font-weight: bold; color: #0D47A1;
+        }
+        .option-card:active { cursor: grabbing; box-shadow: 0 0 0 transparent !important; transform: translateY(6px); }
+        .option-card:hover { filter: brightness(1.05); }
+        
+        .tts-btn { background: #FFCA28; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 22px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: all 0.2s; color:#333; }
+        .tts-btn:hover { transform: scale(1.15) rotate(10deg); background: #FFB300; }
+
+        .hint-box { display: none; background: #FFE082; padding: 15px; border-radius: 15px; margin-top: 20px; font-size: 20px; color: #D84315; animation: shake 0.5s; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
+
+        /* 課前預習區塊 */
+        .intro-box { background: #FFF3E0; border: 4px dashed #FF9800; padding: 25px; border-radius: 20px; margin: 20px 0; text-align: left; font-size: 22px; line-height: 1.8; }
+        .intro-header { display: flex; justify-content: space-between; align-items: center; color: #E65100; font-weight: bold; font-size: 26px; border-bottom: 2px solid #FFCC80; padding-bottom: 10px; margin-bottom: 15px; }
+        .highlight { color: #D32F2F; font-weight: bold; background: #FFCDD2; padding: 2px 8px; border-radius: 8px; }
+
+        .new-record-banner { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #E91E63; color: white; padding: 15px 40px; border-radius: 30px; font-size: 24px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 3000; animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideDown { from { top: -100px; } to { top: 20px; } }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 25px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .record-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 2px dashed #eee; font-size: 20px; }
+        .star-small { color: #FFC107; font-size: 24px; }
+        .star-big { color: #FFD700; font-size: 36px; text-shadow: 0 0 15px #FF9800; }
+        .star-empty { color: #ccc; font-size: 20px; }
+
+        @keyframes popCorrect { 0% { transform: scale(0.8); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        .exaggerated-correct { animation: popCorrect 0.8s ease-in-out; background-color: #E8F5E9 !important; border-color: #4CAF50 !important; }
+
+        .result-list { text-align: left; margin-top: 20px; font-size: 20px; }
+        .result-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .result-item:hover { background: #f9f9f9; }
+        .result-item.wrong { color: #E53935; background: #FFEBEE; border-radius: 10px; border-left: 5px solid #E53935;}
+        .result-item.correct { color: #2E7D32; border-radius: 10px; border-left: 5px solid #2E7D32; }
+
+        #footer { background: rgba(255, 204, 128, 0.9); text-align: center; padding: 25px; margin-top: auto; border-top: 5px solid var(--primary); backdrop-filter: blur(5px); }
+        #footer h3 { margin: 0 0 15px 0; color: #E65100; font-size: 22px;}
+        #footer a { color: #1565C0; text-decoration: none; font-weight: bold; margin: 5px 15px; display: inline-block; font-size: 18px;}
+        #footer a:hover { text-decoration: underline; color: #0D47A1; }
+    </style>
+</head>
+<body>
+
+    <!-- 初始化觸控拖拉庫 -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            MobileDragDrop.polyfill({
+                dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+            });
+        });
+        window.addEventListener('touchmove', function() {}, {passive: false});
+    </script>
+
+    <div id="new-record-banner" class="new-record-banner">🎉 分數突破！最新最高分！ 🎉</div>
+    <img src="cat.jpeg" alt="Teacher Cat" class="logo" onerror="this.src='https://via.placeholder.com/80?text=Cat'">
+
+    <div class="top-right-bar">
+        <button class="record-btn" onclick="openProgressModal()"><i class="fas fa-chart-bar"></i> Progress Record</button>
+        <button class="record-btn clear-btn" onclick="clearProgress()"><i class="fas fa-trash-alt"></i> 清除記錄</button>
+    </div>
+
+    <!-- 音效 -->
+    <audio id="sound-pop" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2997/2997-preview.mp3"></audio>
+
+    <div id="progress-modal" class="modal-overlay" onclick="closeProgressModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 style="color: #1976D2; text-align: center; font-size: 30px;">🏆 學習進度板 🏆</h2>
+            <p style="text-align: center; font-size: 16px; color: #666; font-weight:bold;">🌟 大星星 = 滿分 (20分) | ⭐ 小星星 = 合格 (10-19分)</p>
+            <div id="record-list-container" style="margin-top:20px;"></div>
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn" style="font-size:20px; padding:10px 40px;" onclick="document.getElementById('progress-modal').style.display='none'">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 主頁 -->
+        <div id="home-screen" class="screen active">
+            <h1 style="font-size: 38px;">Teacher Cat 的快樂AI教室<br>P1 填充詞語運用</h1>
+            <p style="font-size: 22px; font-weight:bold; color:#E65100;">請選擇關卡，把正確的詞語「拖拉」進句子裡！</p>
+            <div id="level-buttons" class="level-grid"></div>
+            <hr style="margin: 40px 0; border: 1px dashed #ccc;">
+            <a href="https://cat123teacher.github.io/chinese/main.html" class="btn btn-adventure" style="display:inline-block; text-decoration:none;"><i class="fas fa-map-marked-alt"></i> 返回小朋友學習大冒險</a>
+        </div>
+
+        <!-- 課前預習頁面 -->
+        <div id="intro-screen" class="screen">
+            <h1 id="intro-title" style="font-size: 34px;"></h1>
+            <div class="intro-box">
+                <div class="intro-header"><span><i class="fas fa-lightbulb"></i> 學習重點</span></div>
+                <p id="intro-point" style="white-space: pre-line; line-height: 2; margin-top:0;"></p>
+                
+                <div class="intro-header" style="margin-top:35px;"><span><i class="fas fa-book-open"></i> 經典例子 (5句)</span></div>
+                <!-- 5個例子會生成在這裡 -->
+                <div id="intro-example-container" style="line-height: 2.5;"></div>
+            </div>
+            <button class="btn btn-rocket" onclick="startRealGame()">🚀 開始遊戲</button>
+            <br><br>
+            <button class="btn btn-nav" onclick="goHome()"><i class="fas fa-arrow-left"></i> 返回主頁</button>
+        </div>
+
+        <!-- 遊戲介面 -->
+        <div id="game-screen" class="screen">
+            <h2 id="level-title-game" style="color:#D32F2F; font-size: 28px;">關卡標題</h2>
+            <h3 id="question-counter" style="color:#1976D2; font-size: 22px;">題數: 1 / 20</h3>
+            
+            <div style="text-align: right; color:#888; font-weight:bold; margin-bottom: 5px;">
+                <i class="fas fa-hand-pointer"></i> 請拖拉下方藍色詞語到虛線框內，點擊 🔊 聽聽句子發音
+            </div>
+            
+            <!-- 修改：題目容器，內含發音按鈕 -->
+            <div id="question-container" class="question-text"></div>
+            
+            <div class="options-grid" id="options-container"></div>
+
+            <div id="hint-container" class="hint-box">
+                <i class="fas fa-lightbulb"></i> <strong id="hint-text"></strong>
+            </div>
+
+            <button class="btn btn-skip" id="btn-skip" style="display:none; font-size: 20px;" onclick="skipQuestion()">⏭️ 跳過此題</button>
+
+            <hr style="margin-top:30px;">
+            <div style="margin-top: 20px;">
+                <button class="btn btn-nav" id="btn-prev" onclick="changeQuestion(-1)"><i class="fas fa-arrow-left"></i> 上一頁</button>
+                <button class="btn btn-nav" style="background:#FF9800;" onclick="goHome()"><i class="fas fa-home"></i> 回到主頁</button>
+                <button class="btn btn-nav" id="btn-next" onclick="changeQuestion(1)">下一頁 <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-nav" id="btn-back-summary" style="display:none;" onclick="showSummary()">回到總結</button>
+            </div>
+        </div>
+
+        <!-- 結算介面 -->
+        <div id="summary-screen" class="screen">
+            <h1 style="font-size: 38px;">🎉 關卡完成！ 🎉</h1>
+            <h2 style="font-size: 30px;">你的得分：<span id="final-score" style="color:#D32F2F; font-size:40px;"></span> / 20</h2>
+            <p style="font-size: 22px; font-weight:bold; color:#E65100;">點擊紅色的答錯題目，可以重新挑戰修正分數哦！</p>
+            <button class="btn btn-nav" onclick="goHome()"><i class="fas fa-home"></i> 回到主頁</button>
+            <button class="btn" style="background:#E91E63;" onclick="showIntro(currentLevelData)"><i class="fas fa-redo"></i> 重新挑戰這一關</button>
+            <div class="result-list" id="result-list"></div>
+        </div>
+    </div>
+
+    <!-- 頁腳 -->
+    <div id="footer">
+        <h3>Teacher Cat 的快樂AI教室</h3>
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank"><i class="fab fa-youtube"></i> YouTube</a> |
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank"><i class="fab fa-instagram"></i> Instagram</a> |
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank"><i class="fab fa-facebook"></i> Facebook</a> |
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank"><i class="fab fa-threads"></i> Threads</a> |
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp 群組</a>
+        <br><br>
+        <span style="font-weight: bold; color: #d81b60; font-size:20px;"><i class="fab fa-tiktok"></i> 抖音：74254902683</span>
+    </div>
+
+<script>
+// =========================================================================
+// 題庫數據 (包含最新擴充的 5個例子 與 詳細學習重點)
+// =========================================================================
+const gameData = [
+    {
+        level: 1,
+        title: "第一關：晴天雨天",
+        point: "1. 認識與天氣有關的詞語。\n2. 學習運用描寫顏色和聲音的詞語。",
+        examples: [
+            "天氣<span class='highlight'>晴朗</span>，藍藍的天空上飄着幾朵白雲。",
+            "雨停了，太陽露出了<span class='highlight'>笑臉</span>。",
+            "窗外，小雨正<span class='highlight'>沙沙</span>地下着。",
+            "天空被夕陽染成<span class='highlight'>橙紅色</span>，真美麗！",
+            "雨後，花園裏的花朵顯得格外<span class='highlight'>漂亮</span>。"
+        ],
+        easyQuestions: [
+            { text: "今天天氣[blank]，藍藍的[blank]上飄着幾朵[blank]。我們去公園[blank]吧。", answers: ["晴朗", "天空", "白雲", "玩耍"], options: ["晴朗", "天空", "白雲", "玩耍"] },
+            { text: "雨停了，[blank]露出了笑臉。天邊出現了美麗的[blank]。花園裏的花朵顯得格外[blank]。小鳥[blank]地唱着歌。", answers: ["太陽", "彩虹", "漂亮", "快樂"], options: ["太陽", "彩虹", "漂亮", "快樂"] },
+            { text: "窗外，[blank]正沙沙地下着。北風[blank]地吹着。雷聲[blank]地響着。河水[blank]地流着。", answers: ["小雨", "呼呼", "轟隆隆", "嘩嘩"], options: ["小雨", "呼呼", "轟隆隆", "嘩嘩"] },
+            { text: "天空被[blank]染成[blank]色，真[blank]！大家都在欣賞這[blank]的景色。", answers: ["夕陽", "橙紅", "美麗", "迷人"], options: ["夕陽", "橙紅", "美麗", "迷人"] },
+            { text: "春雨[blank]地下起來，[blank]，[blank]，小草伸出嫩綠的葉子輕輕地[blank]。", answers: ["悄悄", "沙沙", "沙沙", "搖擺"], options: ["悄悄", "沙沙", "沙沙", "搖擺"] },
+            { text: "在所有的天氣當中，我最[blank]的就是[blank]。因為我可以去看藍色的[blank]，可以去郊外放[blank]。", answers: ["喜歡", "晴天", "大海", "風箏"], options: ["喜歡", "晴天", "大海", "風箏"] },
+            { text: "天氣炎熱，太陽像一個大[blank]一樣掛在天空。大家都躲在[blank]裏吹冷氣。喝一杯[blank]的水，感覺非常[blank]。", answers: ["火球", "家", "冰涼", "舒服"], options: ["火球", "家", "冰涼", "舒服"] },
+            { text: "下雨了，我打着[blank]上學去。路上的行人被雨水[blank]了。雨愈下愈[blank]。老婆婆不小心[blank]了。", answers: ["雨傘", "淋濕", "大", "跌倒"], options: ["雨傘", "淋濕", "大", "跌倒"] },
+            { text: "下午，天空佈滿了[blank]，接着便下起[blank]。沒有帶傘的人[blank]尋找地方避雨。下雨天真是太不[blank]了。", answers: ["烏雲", "大雨", "匆匆", "方便"], options: ["烏雲", "大雨", "匆匆", "方便"] },
+            { text: "媽媽可以將被子曬得很[blank]，睡起來[blank]極了。你看！[blank]多好啊！因此我最喜歡[blank]。", answers: ["柔軟", "舒服", "晴天", "晴天"], options: ["柔軟", "舒服", "晴天", "晴天"] },
+            { text: "天氣晴朗的時候，太陽[blank]地照耀着大地。蝴蝶在[blank]的花朵中跳舞。青蛙跳出[blank]。青蛙呱呱地[blank]。", answers: ["溫暖", "五顏六色", "池塘", "說話"], options: ["溫暖", "五顏六色", "池塘", "說話"] },
+            { text: "晴天真像一幅[blank]而又[blank]的圖畫。我的心情會變得很高興。我可以去公園[blank]。還能拍很多好看的[blank]。", answers: ["美麗", "動人", "畫畫", "照片"], options: ["美麗", "動人", "畫畫", "照片"] },
+            { text: "狂風[blank]地下着，大家都不敢出門。天空變得灰濛濛的，沒有一絲[blank]。樹葉被風吹得[blank]。地上的水窪積滿了[blank]。", answers: ["暴雨", "陽光", "亂飛", "雨水"], options: ["暴雨", "陽光", "亂飛", "雨水"] },
+            { text: "早上，[blank]的陽光溫暖地照耀着大地。草地上的露珠閃閃發光。空氣非常[blank]。我深呼吸一口[blank]，感覺精神[blank]。", answers: ["金色", "清新", "空氣", "百倍"], options: ["金色", "清新", "空氣", "百倍"] },
+            { text: "媽媽下班回家，身上的衣服被雨水[blank]了。我連忙拿來[blank]給媽媽擦乾。媽媽換上[blank]的衣服。我端上一杯熱茶給她[blank]。", answers: ["淋濕", "毛巾", "乾淨", "喝"], options: ["淋濕", "毛巾", "乾淨", "喝"] },
+            { text: "雨後，[blank]的彩虹掛在天空上。天空中出現了一道彩色的[blank]。小朋友們開心地指着[blank]。大家都覺得大自然很[blank]。", answers: ["七彩", "橋", "天空", "奇妙"], options: ["七彩", "橋", "天空", "奇妙"] },
+            { text: "秋天的天氣很[blank]。微風吹過，讓人感覺十分[blank]。我們一家人去山上[blank]。看到了許多紅色的[blank]。", answers: ["涼爽", "舒服", "遠足", "楓葉"], options: ["涼爽", "舒服", "遠足", "楓葉"] },
+            { text: "春天到了，花園裏開滿了[blank]的花朵。有紅的、黃的、紫的，真是[blank]啊！蜜蜂在花叢中[blank]。蝴蝶在空中[blank]。", answers: ["五顏六色", "萬紫千紅", "採蜜", "飛舞"], options: ["五顏六色", "萬紫千紅", "採蜜", "飛舞"] },
+            { text: "烏雲[blank]了太陽，課室裏變得很暗。老師打開了[blank]。陽光照亮了[blank]，我們又可以清楚地看見黑板上的[blank]了。", answers: ["遮住", "電燈", "課室", "字"], options: ["遮住", "電燈", "課室", "字"] },
+            { text: "下雨天，我喜歡坐在窗前看雨。雨滴[blank]地落在玻璃上。外面的世界變得[blank]的。這是一段十分[blank]的時光，讓我感到很放鬆[blank]。", answers: ["滴滴答答", "白茫茫", "寧靜", "心情"], options: ["滴滴答答", "白茫茫", "寧靜", "心情"] }
+        ],
+        hardQuestions: [
+            { text: "今天早上，天空[blank]，太陽公公早早地起了床。我背着書包，帶着愉快的心情去[blank]。一路上，我看到許多小鳥在樹枝上[blank]地唱歌，好像在跟我說[blank]。", answers: ["萬里無雲", "上學", "快樂", "早安"], options: ["萬里無雲", "上學", "快樂", "早安"] },
+            { text: "到了下午，天氣突然變得[blank]起來。不一會兒，天空中佈滿了[blank]。接着，狂風大作，雷聲[blank]地響起，豆大的雨點從天上[blank]下來。", answers: ["潮濕", "烏雲", "轟隆隆", "掉"], options: ["潮濕", "烏雲", "轟隆隆", "掉"] },
+            { text: "路上的行人紛紛撐開了[blank]。沒有帶傘的人[blank]跑到屋檐下避雨。我幸好帶了傘，但鞋子還是被地上的積水弄[blank]了。這場[blank]來得真突然。", answers: ["雨傘", "急匆匆", "濕", "大雨"], options: ["雨傘", "急匆匆", "濕", "大雨"] },
+            { text: "雨一直下到傍晚才[blank]。雨後，空氣變得格外[blank]。天邊出現了一道美麗的[blank]，像一座七彩的橋樑跨過天空。大家都忍不住停下腳步[blank]這美景。", answers: ["停", "清新", "彩虹", "欣賞"], options: ["停", "清新", "彩虹", "欣賞"] },
+            { text: "週末，天氣非常[blank]，太陽像個大火球一樣烤着大地。我們一家人去海灘[blank]。沙灘上的沙子被曬得滾燙，海水卻十分[blank]。我們在海裏玩得[blank]。", answers: ["炎熱", "游泳", "清涼", "不亦樂乎"], options: ["炎熱", "游泳", "清涼", "不亦樂乎"] },
+            { text: "傍晚，夕陽西下，天空被染成了[blank]色。海面上波光粼粼，閃爍着[blank]的光芒。微風吹來，帶來一陣陣海水的[blank]。這真是一幅美麗的[blank]。", answers: ["橙紅", "金色", "鹹味", "畫卷"], options: ["橙紅", "金色", "鹹味", "畫卷"] },
+            { text: "春雨悄悄地下起來，[blank]、[blank]，小草伸出嫩綠的葉子輕輕地[blank]，好像在跳舞。春雨落在小河裏，刷刷、刷刷，小河裏的魚兒開心地跳出[blank]。", answers: ["沙沙", "沙沙", "搖擺", "水面"], options: ["沙沙", "沙沙", "搖擺", "水面"] },
+            { text: "魚兒好像在說：「春雨姐姐，[blank]你！」春雨滋潤了大地，萬物都充滿了[blank]。農夫看到這場春雨，臉上露出了[blank]的笑容。今年一定會有個好[blank]。", answers: ["謝謝", "生機", "欣慰", "收成"], options: ["謝謝", "生機", "欣慰", "收成"] },
+            { text: "秋天，天氣漸漸變涼，天空總是顯得特別[blank]和高遠。大雁排成整齊的隊伍向[blank]飛去。樹上的葉子變黃了，隨着秋風[blank]落下。地上像鋪了一層金色的[blank]。", answers: ["晴朗", "南方", "緩緩", "地毯"], options: ["晴朗", "南方", "緩緩", "地毯"] },
+            { text: "冬天的早晨，外面[blank]的，下起了大雪。樹枝上掛滿了雪白的冰晶，像一朵朵盛開的[blank]。孩子們在雪地裏打雪仗、堆[blank]，玩得十分[blank]。", answers: ["白茫茫", "梨花", "雪人", "開心"], options: ["白茫茫", "梨花", "雪人", "開心"] },
+            { text: "媽媽常常告訴我，無論是晴天還是[blank]，都有它獨特的美。晴天讓我們感到充滿[blank]，雨天則讓我們感到寧靜和[blank]。我們要學會欣賞大自然的每一個[blank]。", answers: ["雨天", "活力", "放鬆", "瞬間"], options: ["雨天", "活力", "放鬆", "瞬間"] },
+            { text: "昨天晚上，外面下起了[blank]。風吹得窗戶[blank]作響，我躲在被窩裏有些害怕。媽媽走過來[blank]我，給我講了一個溫馨的故事，我才慢慢進入[blank]。", answers: ["狂風暴雨", "呼呼", "安慰", "夢鄉"], options: ["狂風暴雨", "呼呼", "安慰", "夢鄉"] },
+            { text: "第二天早上，我推開窗戶，發現院子裏的落葉滿地都是。但是，花壇裏的幾株菊花卻依然[blank]着。它們的花瓣上掛着晶瑩的[blank]，顯得更加嬌艷[blank]。我為它們的堅強感到[blank]。", answers: ["挺立", "露珠", "動人", "驕傲"], options: ["挺立", "露珠", "動人", "驕傲"] },
+            { text: "老師帶領我們去郊外寫生。我們選擇了一片[blank]的草地坐下。天空中的白雲像一羣可愛的[blank]在吃草。大家拿起畫筆，認真地把這美麗的[blank]畫在紙上。這是一次難忘的[blank]。", answers: ["碧綠", "小綿羊", "風景", "活動"], options: ["碧綠", "小綿羊", "風景", "活動"] },
+            { text: "在所有的天氣當中，我最喜歡的就是[blank]。因為我可以去公園[blank]，還可以去郊外[blank]。陽光照在身上暖洋洋的，感覺[blank]極了。", answers: ["晴天", "散步", "遠足", "舒服"], options: ["晴天", "散步", "遠足", "舒服"] },
+            { text: "雖然我不喜歡陰天，因為天空總是[blank]的，讓人覺得有些[blank]。但是陰天的時候，空氣通常比較[blank]，很適合在圖書館裏安靜地[blank]。", answers: ["灰濛濛", "沉悶", "濕潤", "閱讀"], options: ["灰濛濛", "沉悶", "濕潤", "閱讀"] },
+            { text: "夏天的雷陣雨總是來得快去得也[blank]。剛才還是豔陽高照，轉眼間就大雨[blank]。路上的行人紛紛躲避，車輛也放慢了[blank]。雨水沖洗了街道，讓城市煥然一[blank]。", answers: ["快", "傾盆", "速度", "新"], options: ["快", "傾盆", "速度", "新"] },
+            { text: "我站在窗前，看着雨滴[blank]地落在玻璃上，匯成一條條小水流。外面的景色變得[blank]起來，像隔着一層薄紗。我喜歡這種[blank]的感覺，讓我能靜下心來[blank]。", answers: ["滴滴答答", "模糊", "朦朧", "思考"], options: ["滴滴答答", "模糊", "朦朧", "思考"] },
+            { text: "氣象台預報明天會有颱風，爸爸和媽媽連忙在窗戶上貼上[blank]。我們還準備了手電筒和充足的[blank]。雖然外面狂風[blank]，但我們一家人待在安全的家裏，感到十分[blank]。", answers: ["膠紙", "食物", "怒號", "溫馨"], options: ["膠紙", "食物", "怒號", "溫馨"] },
+            { text: "雨過天晴，大自然又恢復了[blank]。蜘蛛在樹枝間重新織起了[blank]。小鳥在枝頭梳理着[blank]的羽毛。一切都顯得那麼生機勃勃，充滿[blank]。", answers: ["平靜", "網", "潮濕", "希望"], options: ["平靜", "網", "潮濕", "希望"] }
+        ]
+    },
+    {
+        level: 2,
+        title: "第二關：上學去",
+        point: "1. 認識與學校生活有關的詞語。\n2. 學習按照時間、地點和人物寫作句子。",
+        examples: [
+            "同學們在<span class='highlight'>課室</span>裏認真地聽老師<span class='highlight'>講課</span>。",
+            "<span class='highlight'>花園</span>裏的花都開了，真美麗！",
+            "大家<span class='highlight'>喜歡</span>聽老師講<span class='highlight'>有趣</span>的故事。",
+            "下課了，同學們在<span class='highlight'>操場</span>上愉快地<span class='highlight'>玩遊戲</span>。",
+            "在學校裏，我<span class='highlight'>認識</span>了很多好<span class='highlight'>朋友</span>。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題 (基礎詞彙與短句)
+            { text: "同學們在[blank]裏認真地聽[blank]講課。下課了，大家在[blank]上愉快地玩[blank]。", answers: ["課室", "老師", "操場", "遊戲"], options: ["課室", "老師", "操場", "遊戲"] },
+            { text: "見到[blank]，我會向他[blank]。同學們聽到[blank]的鈴聲都很[blank]。", answers: ["校長", "行禮", "下課", "開心"], options: ["校長", "行禮", "下課", "開心"] },
+            { text: "「叮鈴鈴」[blank]響起了，同學們一個跟着一個走出了[blank]。有些同學在操場上踢[blank]，有些在花園裏捉[blank]。", answers: ["電鈴", "課室", "足球", "迷藏"], options: ["電鈴", "課室", "足球", "迷藏"] },
+            { text: "早晨，同學們穿着整齊的[blank]上學去。小息時，大家在小賣部排隊購買[blank]。放學後，我先做[blank]，再看[blank]。", answers: ["校服", "零食", "功課", "動畫片"], options: ["校服", "零食", "功課", "動畫片"] },
+            { text: "今天是我第一天去[blank]上學，心情十分[blank]。我喜歡上學，因為這裏有[blank]的同學，還有教我讀書寫字的[blank]。", answers: ["學校", "緊張", "友好", "老師"], options: ["學校", "緊張", "友好", "老師"] },
+            { text: "兒童節那天，同學們在學校[blank]欣賞表演。老師提問時，我們[blank]後再站起來回答。我喜歡[blank]的生活，在這裏我很[blank]。", answers: ["禮堂", "舉手", "學校", "快樂"], options: ["禮堂", "舉手", "學校", "快樂"] },
+            { text: "我的[blank]是一位溫柔的老師，她每天在[blank]門口迎接我們。上課時，同學們都會安靜地[blank]她講故事，大家都覺得很[blank]。", answers: ["班主任", "課室", "聽", "有趣"], options: ["班主任", "課室", "聽", "有趣"] },
+            { text: "每天早上，[blank]叔叔都會把校園打掃得乾乾淨淨。我們在[blank]裏看到五顏六色的花朵。小息時，我和朋友在[blank]旁邊聊天，感覺很[blank]。", answers: ["校工", "花園", "球場", "放鬆"], options: ["校工", "花園", "球場", "放鬆"] },
+            { text: "九月一日是[blank]的日子，全校師生齊聚在[blank]。[blank]在台上講話，鼓勵我們要努力[blank]。", answers: ["開學", "禮堂", "校長", "讀書"], options: ["開學", "禮堂", "校長", "讀書"] },
+            { text: "明天有數學[blank]，我今晚要好好溫習。做完[blank]後，媽媽讓我早點休息，準備迎接明天的[blank]，希望能考取好[blank]。", answers: ["考試", "功課", "挑戰", "成績"], options: ["考試", "功課", "挑戰", "成績"] },
+            { text: "體育課時，老師帶領我們在[blank]做體操。同學們排成整齊的[blank]，跟着音樂的節奏[blank]。運動讓我們身體更[blank]。", answers: ["操場", "隊伍", "跳動", "健康"], options: ["操場", "隊伍", "跳動", "健康"] },
+            { text: "下午[blank]後，我參加了畫畫興趣班。在美術[blank]裏，我畫了一幅美麗的風景畫。老師稱讚我畫得[blank]，我心裏十分[blank]。", answers: ["放學", "室", "好", "高興"], options: ["放學", "室", "好", "高興"] },
+            { text: "音樂課上，同學們一起大聲[blank]。美妙的歌聲在[blank]裏迴盪。音樂老師彈奏着[blank]，大家隨着音樂輕輕[blank]。", answers: ["唱歌", "課室", "鋼琴", "搖擺"], options: ["唱歌", "課室", "鋼琴", "搖擺"] },
+            { text: "圖書館裏有很多好看的[blank]。小息時，我喜歡到那裏借閱[blank]。管理員阿姨提醒我們要保持[blank]，不可以大聲[blank]。", answers: ["圖書", "故事書", "安靜", "說話"], options: ["圖書", "故事書", "安靜", "說話"] },
+            { text: "每天上學前，媽媽會幫我整理好[blank]。我帶着[blank]的文具盒，背上書包出門。走到學校[blank]，我大聲向老師說[blank]。", answers: ["校服", "漂亮", "大門", "早晨"], options: ["校服", "漂亮", "大門", "早晨"] },
+            { text: "放假的日子，雖然不用[blank]，但我還是會想念學校的[blank]。我期待假期結束後，能再次和大家一起[blank]、一起[blank]。", answers: ["上學", "同學", "學習", "玩耍"], options: ["上學", "同學", "學習", "玩耍"] },
+            { text: "常識課教我們認識不同的[blank]。老師拿出許多植物的圖片讓我們[blank]。同學們積極地舉手[blank]，課堂氣氛很[blank]。", answers: ["植物", "觀察", "回答", "熱烈"], options: ["植物", "觀察", "回答", "熱烈"] },
+            { text: "中午[blank]時間，大家拿出自己準備的午餐。飯盒裏有[blank]的飯菜，我們一邊吃，一邊和旁邊的同學[blank]，十分[blank]。", answers: ["吃飯", "美味", "聊天", "開心"], options: ["吃飯", "美味", "聊天", "開心"] },
+            { text: "我的好朋友叫小健，我們每天一起[blank]。下課時，我們會一起去[blank]喝水。我們約好週末一起去圖書館[blank]，做個勤勞的[blank]。", answers: ["上學", "小賣部", "溫習", "學生"], options: ["上學", "小賣部", "溫習", "學生"] },
+            { text: "今天天氣很熱，上完體育課後大家滿頭[blank]。回到[blank]，吹着冷氣，感覺[blank]多了。下一節是中文課，我要把[blank]準備好。", answers: ["大汗", "課室", "舒服", "課本"], options: ["大汗", "課室", "舒服", "課本"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題 (長句與段落理解)
+            { text: "今天在常識課時，老師讓同學們玩[blank]的「摸蔬菜」遊戲。小美把手裏的東西摸了摸，[blank]地說：「圓的，[blank]的……」同學們聽了，都[blank]。", answers: ["有趣", "自言自語", "光滑", "哈哈大笑"], options: ["有趣", "自言自語", "光滑", "哈哈大笑"] },
+            { text: "小美用鼻子聞了聞，說：「我知道了，是洋蔥。」大家都[blank]表示正確。之後，老師又讓同學們摸了蘿蔔、[blank]和青瓜。上完這節課，我們都認識了常見蔬菜的[blank]，真希望以後能經常上這樣的[blank]。", answers: ["鼓掌", "大蒜", "特點", "課"], options: ["鼓掌", "大蒜", "特點", "課"] },
+            { text: "上課了，老師說：「這節課我們來學習[blank]課文。」老師先讀了一遍，同學們[blank]地坐着，[blank]地聽。老師說：「聲音一定要[blank]。」", answers: ["朗讀", "安靜", "認真", "響亮"], options: ["朗讀", "安靜", "認真", "響亮"] },
+            { text: "這時，老師突然叫美怡來朗讀第一課。美怡心裏很[blank]，聲音忽大忽小，還讀錯了不少地方。老師拍拍她的[blank]說：「別害怕，只要多[blank]，就能把課文朗讀好。」美怡聽了，心裏想以後一定要多讀課文，這樣就[blank]出錯了。", answers: ["緊張", "肩膀", "練習", "不會"], options: ["緊張", "肩膀", "練習", "不會"] },
+            { text: "九月一日，全校[blank]在[blank]參加開學禮。昨天，老師[blank]我們去參觀[blank]，我們學到了很多防火知識。", answers: ["師生", "禮堂", "帶領", "消防局"], options: ["師生", "禮堂", "帶領", "消防局"] },
+            { text: "下課了，同學們在操場上踢[blank]，有些同學悄悄地躲在[blank]裏，他們正在捉[blank]呢！還有幾個同學圍在一起，[blank]最近看的動畫片。", answers: ["足球", "花園", "迷藏", "談論"], options: ["足球", "花園", "迷藏", "談論"] },
+            { text: "這是我第一天去學校上學，早上出門時心情十分[blank]。一路上，我緊緊牽着媽媽的手。走到學校[blank]，看到和藹的校長，我大聲說：「校長[blank]！」校長微笑着點點頭，我的心情放鬆了[blank]。", answers: ["緊張", "大門", "早晨", "不少"], options: ["緊張", "大門", "早晨", "不少"] },
+            { text: "上第一節課時，我坐得[blank]，認真地聽老師講話。老師教我們讀書和[blank]。我發現原來上學這麼有趣，因為這裏有[blank]的同學，還有教導我們的[blank]。", answers: ["端端正正", "寫字", "友好", "老師"], options: ["端端正正", "寫字", "友好", "老師"] },
+            { text: "「叮鈴鈴」小息的鐘聲響了，同學們像小鳥一樣飛出[blank]。大家在操場上[blank]地玩遊戲。有的在跳繩，有的在[blank]，校園裏充滿了我們的[blank]聲。", answers: ["課室", "快樂", "跑步", "歡笑"], options: ["課室", "快樂", "跑步", "歡笑"] },
+            { text: "放學後，我回到家第一件事就是做[blank]。遇到不懂的問題，我會[blank]思考，或者請教[blank]。做完作業後，我才安心地去看最喜歡的[blank]。", answers: ["功課", "認真", "爸爸", "動畫片"], options: ["功課", "認真", "爸爸", "動畫片"] },
+            { text: "學校要舉行運動會了，同學們都在積極[blank]。小健每天放學後都在操場[blank]跑步。美兒則在練習跳遠，大家都希望能為班級爭取[blank]的成績，獲得老師的[blank]。", answers: ["練習", "努力", "優秀", "稱讚"], options: ["練習", "努力", "優秀", "稱讚"] },
+            { text: "今天是學校的[blank]日，許多家長來到學校參觀。同學們在禮堂表演了精彩的[blank]。我參加了合唱團，站在台上看到台下的家長熱烈[blank]，我感到非常[blank]。", answers: ["開放", "節目", "拍手", "自豪"], options: ["開放", "節目", "拍手", "自豪"] },
+            { text: "每個星期三是我們的圖書館課。老師會帶領大家到[blank]借書。我在書架上挑選了一本關於[blank]的故事書。坐在舒適的椅子上，我[blank]地閱讀，進入了奇妙的[blank]世界。", answers: ["圖書館", "恐龍", "專心", "童話"], options: ["圖書館", "恐龍", "專心", "童話"] },
+            { text: "美術課上，老師教我們用泥膠捏[blank]。我捏了一隻可愛的小兔，小明捏了一輛[blank]。老師把我們的作品展示在[blank]上，課室變得更加[blank]了。", answers: ["動物", "汽車", "壁報板", "漂亮"], options: ["動物", "汽車", "壁報板", "漂亮"] },
+            { text: "天氣變冷了，有些同學[blank]了。班主任提醒我們要多穿[blank]，多喝熱水。學校是我們的第二個[blank]，老師就像父母一樣[blank]我們。", answers: ["生病", "衣服", "家", "關心"], options: ["生病", "衣服", "家", "關心"] },
+            { text: "聖誕節快到了，學校舉辦了慶祝[blank]。我們在課室裏掛滿了彩色的[blank]和閃亮的星星。大家互相交換[blank]，品嘗美味的小食，度過了一個[blank]的下午。", answers: ["派對", "氣球", "禮物", "難忘"], options: ["派對", "氣球", "禮物", "難忘"] },
+            { text: "今天我值日，負責擦[blank]和整理講台。放學後，我和另外兩位同學一起把課室打掃得[blank]。雖然有些[blank]，但看到整潔的課室，我們都很[blank]。", answers: ["黑板", "乾乾淨淨", "辛苦", "滿足"], options: ["黑板", "乾乾淨淨", "辛苦", "滿足"] },
+            { text: "校長在早會上宣佈，我們學校獲得了清潔比賽的[blank]。全校師生都歡呼[blank]。校長鼓勵大家繼續保持[blank]的校園環境，養成良好的[blank]習慣。", answers: ["冠軍", "雀躍", "優美", "衛生"], options: ["冠軍", "雀躍", "優美", "衛生"] },
+            { text: "下週一要進行中文默書，老師發了[blank]範圍。週末時，我讓媽媽幫我[blank]溫習。我把錯字在練習簿上寫了幾遍，確保下次不會再[blank]，希望能拿到一百[blank]。", answers: ["溫習", "聽寫", "寫錯", "分"], options: ["溫習", "聽寫", "寫錯", "分"] },
+            { text: "學校的旅行日到了，我們坐上旅遊巴前往[blank]公園。在旅途中，同學們在車上合唱[blank]。到達目的地後，我們分組進行定向[blank]，學習了團結[blank]的精神。", answers: ["郊野", "兒歌", "遊戲", "合作"], options: ["郊野", "兒歌", "遊戲", "合作"] }
+        ]
+    },
+    {
+        level: 3,
+        title: "第三關：我的校園 (校園設施與空間順序)",
+        point: "1. 認識校園設施和景物有關的詞語。\n2. 認識按照空間順序寫作景物。",
+        examples: [
+            "學校的<span class='highlight'>圍牆</span>上爬滿了<span class='highlight'>美麗</span>的牽牛花。",
+            "<span class='highlight'>淡淡</span>的花香隨風<span class='highlight'>飄進</span>了禮堂。",
+            "清晨，同學們<span class='highlight'>繞着</span>運動場跑步。",
+            "老師在<span class='highlight'>音樂室</span>裏教同學們唱歌。",
+            "學校的<span class='highlight'>圖書館</span>裏有<span class='highlight'>許多有趣</span>的圖書。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題 (基礎詞彙與短句)
+            { text: "走進校園，[blank]有一棟教學大樓，大樓內打掃得[blank]。我的課室在二樓，課室裏[blank]地擺放着[blank]。", answers: ["裏面", "乾乾淨淨", "整整齊齊", "桌椅"], options: ["裏面", "乾乾淨淨", "整整齊齊", "桌椅"] },
+            { text: "教學大樓[blank]是寬敞的[blank]。每到星期一，全校師生都會在這裏參加[blank]。操場[blank]種滿了花草樹木。", answers: ["旁邊", "操場", "升旗禮", "周圍"], options: ["旁邊", "操場", "升旗禮", "周圍"] },
+            { text: "小息時，我最愛到操場玩耍。有時我坐在[blank]上休息，有時和同學們一起踢[blank]，大家玩得十分[blank]，校園裏充滿了[blank]。", answers: ["椅子", "毽子", "開心", "歡笑"], options: ["椅子", "毽子", "開心", "歡笑"] },
+            { text: "同學們背着[blank]高高興興地走進學校。上課鈴響了，老師抱着[blank]走進課室。小息時，同學們都到操場去[blank]，或者到小賣部購買零食和[blank]。", answers: ["書包", "作業本", "玩耍", "飲料"], options: ["書包", "作業本", "玩耍", "飲料"] },
+            { text: "春天一到，樹木發芽，花兒[blank]，校園裏到處都能聽到鳥叫聲，還有陣陣花香[blank]校園。啊！我的校園真[blank]，我愛我的[blank]。", answers: ["開放", "飄滿", "美麗", "校園"], options: ["開放", "飄滿", "美麗", "校園"] },
+            { text: "每天早晨，我都背着書包[blank]地來到學校。來到校門口，[blank]就能看見「文樂小學」四個大字。我的校園在山腰上，那是一座美麗[blank]的[blank]。", answers: ["高高興興", "抬頭", "整潔", "校園"], options: ["高高興興", "抬頭", "整潔", "校園"] },
+            { text: "學校的[blank]裏有許多電腦，我們在那裏學習打字。音樂室在圖書館的[blank]，經常傳出優美的[blank]。我喜歡在[blank]借書看。", answers: ["電腦室", "旁邊", "旋律", "圖書館"], options: ["電腦室", "旁邊", "旋律", "圖書館"] },
+            { text: "操場的[blank]有一個很大的籃球架。我們學校的環境很[blank]。放學後，校園變得十分[blank]，再也聽不到同學們的[blank]聲。", answers: ["中間", "優美", "寧靜", "讀書"], options: ["中間", "優美", "寧靜", "讀書"] },
+            { text: "課室的[blank]面是走廊，[blank]面是操場。黑板在課室的[blank]方，後面是一塊色彩豐富的[blank]板。", answers: ["外", "裏", "前", "壁報"], options: ["外", "裏", "前", "壁報"] },
+            { text: "我們學校的[blank]很寬敞，可以容納全校師生。雨天時，我們在禮堂裏上[blank]課。禮堂的台上鋪着[blank]色的地毯，看起來很[blank]。", answers: ["禮堂", "體育", "紅", "高貴"], options: ["禮堂", "體育", "紅", "高貴"] },
+            { text: "校園的[blank]邊種了一排高大的樹木，[blank]邊有一個小花園。花園裏開滿了[blank]的牽牛花，引來了許多小[blank]。", answers: ["左", "右", "美麗", "蝴蝶"], options: ["左", "右", "美麗", "蝴蝶"] },
+            { text: "小賣部在操場的[blank]，同學們排隊購買[blank]。大家手裏拿着[blank]和果汁，吃得津津有[blank]。", answers: ["角落", "小食", "餅乾", "味"], options: ["角落", "小食", "餅乾", "味"] },
+            { text: "圖書館的書架上[blank]地擺放着各類圖書。圖書管理員要求我們[blank]圖書，閱讀後要把書放回[blank]處，保持圖書館[blank]。", answers: ["整齊", "愛護", "原", "整潔"], options: ["整齊", "愛護", "原", "整潔"] },
+            { text: "今天有體育課，我們在[blank]上練習跑步。紅色的[blank]上畫着白色的線條。我們在陽光下揮灑[blank]，感覺十分[blank]。", answers: ["運動場", "跑道", "汗水", "暢快"], options: ["運動場", "跑道", "汗水", "暢快"] },
+            { text: "課室裏，[blank]上放着同學的作業本。[blank]上掛着時鐘。天花板上有明亮的[blank]。我們在這樣[blank]的環境中學習。", answers: ["桌子", "牆壁", "燈光", "舒適"], options: ["桌子", "牆壁", "燈光", "舒適"] },
+            { text: "學校的[blank]大門非常堅固。大門[blank]站着保安叔叔。每天他都會微笑着跟我們說[blank]，保護我們的[blank]。", answers: ["鐵", "旁邊", "早晨", "安全"], options: ["鐵", "旁邊", "早晨", "安全"] },
+            { text: "洗手間在走廊的[blank]，每天校工都會把它打掃得[blank]。我們應該養成良好的[blank]習慣，保持校園[blank]。", answers: ["盡頭", "乾淨", "衛生", "清潔"], options: ["盡頭", "乾淨", "衛生", "清潔"] },
+            { text: "音樂室裏擺放了許多[blank]，有鋼琴、木琴和沙槌。老師教我們認識不同的[blank]，我們開心地敲打出[blank]的[blank]。", answers: ["樂器", "音符", "美妙", "節奏"], options: ["樂器", "音符", "美妙", "節奏"] },
+            { text: "校長室在教員室的[blank]。老師們在教員室裏[blank]功課、備課。有時我會把作業本[blank]去給老師[blank]。", answers: ["隔壁", "批改", "交", "檢查"], options: ["隔壁", "批改", "交", "檢查"] },
+            { text: "我的校園雖然不[blank]，但設施很[blank]。我在這裏結識了很多好[blank]，度過了許多[blank]的時光。", answers: ["大", "齊全", "朋友", "歡樂"], options: ["大", "齊全", "朋友", "歡樂"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題 (長句與段落理解)
+            { text: "今天是學校開放日，學校舉行了升旗禮。同學們穿着[blank]的校服，排着[blank]的隊伍站在操場上。這時，雄壯的[blank]響起了，鮮豔的[blank]在微風中飄揚起來。", answers: ["整齊", "整潔", "音樂", "旗子"], options: ["整齊", "整潔", "音樂", "旗子"] },
+            { text: "學校的校門由兩扇大鐵門組成，穿過鐵門走進學校，就能[blank]一個大操場。操場的四周[blank]了許多花，一到鮮花開放的季節，就會[blank]成群的蝴蝶。操場旁邊是教學大樓，這就是我們[blank]的地方。", answers: ["看見", "種植", "吸引", "學習"], options: ["看見", "種植", "吸引", "學習"] },
+            { text: "操場上設有籃球架，小息時，我和同學們經常到這裏打[blank]。操場的四邊有菊花，有月季，還有[blank]。一到鮮花開放的季節，就會吸引成群的[blank]和蜜蜂到來。排隊購買各種[blank]。", answers: ["籃球", "牽牛花", "蝴蝶", "小食"], options: ["籃球", "牽牛花", "蝴蝶", "小食"] },
+            { text: "課室的正前方是黑板，[blank]在我們背後的[blank]上。我天天在這裏和同學們一起讀書、學習。校長講完話，同學們熱烈[blank]。校園裏傳來[blank]的讀書聲。", answers: ["壁報板", "牆壁", "鼓掌", "響亮"], options: ["壁報板", "牆壁", "鼓掌", "響亮"] },
+            { text: "一走進學校的大門，就能看見一個[blank]的操場。有時，我們一起玩老鷹捉[blank]的遊戲。學校的音樂室裏傳出[blank]的歌聲，圖書館裏有許多[blank]的圖書。", answers: ["方方正正", "小雞", "美妙", "有趣"], options: ["方方正正", "小雞", "美妙", "有趣"] },
+            { text: "校工叔叔把小樹修剪得[blank]。運動場上有[blank]的跑道。老師走進課室，同學們[blank]下來。我一走進校門，上課[blank]就響了。", answers: ["整整齊齊", "磚紅色", "安靜", "鈴聲"], options: ["整整齊齊", "磚紅色", "安靜", "鈴聲"] },
+            { text: "我們學校的名字叫「德文小學」。教學大樓一共有[blank]層，我的課室在三樓。站在走廊上往外看，可以[blank]整個操場。操場上有同學在練習[blank]，看起來充滿了[blank]。", answers: ["五", "俯瞰", "跑步", "活力"], options: ["五", "俯瞰", "跑步", "活力"] },
+            { text: "學校的圖書館在教學樓的最高層，那裏非常[blank]。走進圖書館，一排排書架[blank]在眼前。陽光透過窗戶灑在[blank]上，給人一種[blank]的感覺。", answers: ["寧靜", "展現", "書桌", "溫馨"], options: ["寧靜", "展現", "書桌", "溫馨"] },
+            { text: "花園的角落裏有一個小小的[blank]池，裏面養着幾條紅色的金魚。小息時，同學們喜歡圍在水池[blank]觀察。金魚在水裏自由自在地[blank]，我們都覺得很[blank]。", answers: ["水", "旁邊", "游來游去", "有趣"], options: ["水", "旁邊", "游來游去", "有趣"] },
+            { text: "禮堂的舞台上佈置了精美的[blank]板。明天學校將舉行[blank]比賽，參賽的同學都在後台緊張地[blank]。這座禮堂見證了我們許多[blank]的時刻。", answers: ["佈景", "朗誦", "準備", "精彩"], options: ["佈景", "朗誦", "準備", "精彩"] },
+            { text: "雨天的校園別有一番[blank]。雨滴落在操場的水窪裏，濺起一圈圈[blank]。教學樓的屋簷下，掛着一排排水珠，像[blank]一樣晶瑩[blank]。", answers: ["景象", "波紋", "珍珠", "剔透"], options: ["景象", "波紋", "珍珠", "剔透"] },
+            { text: "我最喜歡學校的美術室，裏面掛滿了同學們的[blank]作品。牆壁上塗上了五顏六色的[blank]。在這裏，我們可以發揮[blank]，創作出[blank]的畫作。", answers: ["優秀", "顏料", "想像力", "獨特"], options: ["優秀", "顏料", "想像力", "獨特"] },
+            { text: "放學的鐘聲敲響了，原本[blank]的校園頓時變得[blank]起來。同學們背起書包，排着隊走出[blank]。校車已經在門外等候，接載我們[blank]。", answers: ["寧靜", "熱鬧", "校門", "回家"], options: ["寧靜", "熱鬧", "校門", "回家"] },
+            { text: "校園裏有一棵古老的[blank]樹，據說已經有幾十年的歷史了。夏天時，它為我們遮擋[blank]；秋天時，它的葉子變黃飄落，像一隻隻金色的[blank]在[blank]。", answers: ["榕", "烈日", "蝴蝶", "飛舞"], options: ["榕", "烈日", "蝴蝶", "飛舞"] },
+            { text: "電腦室裏排列着幾十台[blank]的電腦。上課時，大家戴上耳機，專心地聽從老師的[blank]。我們學習了如何使用繪圖軟件畫出一間[blank]的小[blank]。", answers: ["嶄新", "指示", "漂亮", "屋"], options: ["嶄新", "指示", "漂亮", "屋"] },
+            { text: "運動會那天，操場的四周插滿了彩色的[blank]。啦啦隊在看台上大聲[blank]打氣。運動員在紅色的跑道上奮力[blank]，展現出拼搏的[blank]。", answers: ["旗幟", "歡呼", "衝刺", "精神"], options: ["旗幟", "歡呼", "衝刺", "精神"] },
+            { text: "校長室門外有一塊榮譽[blank]板，上面貼滿了學校在各項比賽中獲得的[blank]。每次經過這裏，我都暗自下定決心，要努力[blank]，為校爭[blank]。", answers: ["佈告", "獎狀", "學習", "光"], options: ["佈告", "獎狀", "學習", "光"] },
+            { text: "每年的植樹節，學校會組織我們在花園裏種植[blank]。大家分工合作，有的挖坑，有的[blank]，有的澆水。看着小樹苗迎風[blank]，我們對未來充滿[blank]。", answers: ["樹苗", "培土", "搖曳", "希望"], options: ["樹苗", "培土", "搖曳", "希望"] },
+            { text: "為了迎接聖誕節，校工叔叔在校園的大樹上掛滿了[blank]的燈飾。夜晚來臨時，整個校園變得[blank]奪目。大家圍繞在樹下唱聖誕歌，氣氛非常[blank]和[blank]。", answers: ["閃亮", "光彩", "溫馨", "祥和"], options: ["閃亮", "光彩", "溫馨", "祥和"] },
+            { text: "這就是我的校園，一個充滿歡笑和[blank]的地方。我在這裏學習知識，結交[blank]，每天都在快樂地[blank]。我深愛着這個美麗的[blank]。", answers: ["溫暖", "朋友", "成長", "校園"], options: ["溫暖", "朋友", "成長", "校園"] }
+        ]
+    },
+    {
+        level: 4,
+        title: "第四關：有趣的課外活動 (有的...有的...句式)",
+        point: "1. 認識與課外活動有關的詞語。\n2. 學習運用「有的……有的……有的……」的句式。",
+        examples: [
+            "同學們站在金紫荊廣場<span class='highlight'>觀看</span>升旗禮。",
+            "星期天，老師<span class='highlight'>帶領</span>同學們到郊外<span class='highlight'>採集</span>樹葉。",
+            "能夠加入<span class='highlight'>童軍</span>是我最大的<span class='highlight'>願望</span>。",
+            "大家在<span class='highlight'>沙灘</span>上玩起了<span class='highlight'>堆沙堡</span>。",
+            "這是我第一次上台<span class='highlight'>表演</span>，我的心情非常<span class='highlight'>緊張</span>。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "星期天，老師帶領同學們到[blank]採集[blank]。我們在草地上開心地[blank]，感覺真[blank]！", answers: ["郊外", "樹葉", "奔跑", "愉快"], options: ["郊外", "樹葉", "奔跑", "愉快"] },
+            { text: "同學們站在金紫荊[blank]觀看升旗[blank]。大家保持[blank]，不發出[blank]的聲音。", answers: ["廣場", "禮", "安靜", "嘈吵"], options: ["廣場", "禮", "安靜", "嘈吵"] },
+            { text: "大家在[blank]上玩起了堆[blank]。[blank]的海風吹來，讓人感到很[blank]。", answers: ["沙灘", "沙堡", "涼爽", "舒服"], options: ["沙灘", "沙堡", "涼爽", "舒服"] },
+            { text: "這是我第一天上台[blank]，我的心情非常[blank]。我深呼吸一口[blank]，希望能表現得[blank]。", answers: ["表演", "緊張", "空氣", "精彩"], options: ["表演", "緊張", "空氣", "精彩"] },
+            { text: "農場裏種植了不少[blank]。農夫用嫩綠的青草[blank]牛和[blank]。我們學到了很多[blank]。", answers: ["果樹", "餵養", "羊", "知識"], options: ["果樹", "餵養", "羊", "知識"] },
+            { text: "今天天氣很好，老師帶領同學們到郊外[blank]。這裏的景色真美！天空[blank]的，草地上盛開着[blank]的花朵，吸引了無數的小蜜蜂前來[blank]。", answers: ["寫生", "藍藍", "五顏六色", "採蜜"], options: ["寫生", "藍藍", "五顏六色", "採蜜"] },
+            { text: "這天，老師帶領同學高高興興地來到公園[blank]。他們有的[blank]水，有的[blank]土，有的在給小樹苗[blank]。", answers: ["植樹", "抬", "培", "澆水"], options: ["植樹", "抬", "培", "澆水"] },
+            { text: "在廣闊的[blank]上，同學們開心地奔跑。課外活動令我們的[blank]生活更[blank]。大家都覺得很有[blank]。", answers: ["田野", "學校", "精彩", "意義"], options: ["田野", "學校", "精彩", "意義"] },
+            { text: "兒童節那天，我們去動植物[blank]遊玩。猴子有的[blank]在假山上曬太陽，有的掛在樹上盪[blank]，看上去[blank]極了。", answers: ["公園", "伏", "秋千", "有趣"], options: ["公園", "伏", "秋千", "有趣"] },
+            { text: "我和美美提着小桶，在沙灘上仔細地找[blank]，我將它放在[blank]，裏面傳來「呼呼」的聲音，真[blank]！我們還要保持沙灘的[blank]。", answers: ["貝殼", "耳邊", "有趣", "清潔"], options: ["貝殼", "耳邊", "有趣", "清潔"] },
+            { text: "能夠加入[blank]是我最大的願望。今天我們參加了拔河[blank]，大家在操場上用力[blank]，最後我們[blank]了。", answers: ["童軍", "比賽", "拉", "贏"], options: ["童軍", "比賽", "拉", "贏"] },
+            { text: "我們到海邊去[blank]，[blank]的風景令人心曠神怡。平靜的[blank]上，有幾隻小船在[blank]。", answers: ["遊玩", "美麗", "湖面", "飄盪"], options: ["遊玩", "美麗", "湖面", "飄盪"] },
+            { text: "週末，我們去探訪老人[blank]。公公和婆婆拿着我們製作的[blank]，都很[blank]。這真是一次有意義的[blank]。", answers: ["中心", "心意卡", "開心", "活動"], options: ["中心", "心意卡", "開心", "活動"] },
+            { text: "去太空館[blank]是一件令人興奮的事。裏面有許多神奇的[blank]模型。大家都[blank]地聽導賞員[blank]。", answers: ["參觀", "宇宙", "留心", "講解"], options: ["參觀", "宇宙", "留心", "講解"] },
+            { text: "大家在農場裏拔[blank]。鮮豔的[blank]開滿了四周。清新的[blank]讓人覺得心曠神怡，茂盛的[blank]為我們遮擋陽光。", answers: ["蘿蔔", "花朵", "空氣", "大樹"], options: ["蘿蔔", "花朵", "空氣", "大樹"] },
+            { text: "老師教大家用樹葉[blank]書籤。我挑選了一片紅色的[blank]，小心地把它夾在[blank]裏，[blank]能做得很漂亮。", answers: ["製作", "落葉", "書本", "希望"], options: ["製作", "落葉", "書本", "希望"] },
+            { text: "賣旗籌款可以幫助有需要的人。同學們拿着[blank]袋，走到[blank]的街道上，禮貌地請途人[blank]，大家都很有[blank]。", answers: ["錢", "擁擠", "捐款", "愛心"], options: ["錢", "擁擠", "擁擠", "愛心"] },
+            { text: "體育課時，大家在操場上進行[blank]比賽。兩隊同學都出盡[blank]，旁邊的同學大聲[blank]，氣氛十分[blank]。", answers: ["拔河", "力氣", "打氣", "熱烈"], options: ["拔河", "力氣", "打氣", "熱烈"] },
+            { text: "去郊外遠足時，大家[blank]走着。一路上我們談天[blank]，有時還停下來[blank]風景，感覺非常[blank]。", answers: ["手牽手", "說地", "欣賞", "輕鬆"], options: ["手牽手", "說地", "欣賞", "輕鬆"] },
+            { text: "我們帶着[blank]的心情去主題樂園。那裏的遊戲設施十分[blank]。雖然人多有些[blank]，但我們還是玩得滿頭[blank]。", answers: ["愉快", "刺激", "擁擠", "大汗"], options: ["愉快", "刺激", "擁擠", "大汗"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "兒童節那天，老師組織大家到動植物公園[blank]。我們在動物園看到許多[blank]，有的[blank]在假山上曬太陽，有的掛在樹上盪[blank]。", answers: ["遊玩", "猴子", "伏", "秋千"], options: ["遊玩", "猴子", "伏", "秋千"] },
+            { text: "還有的小猴子[blank]在籠子裏睡覺，看上去[blank]極了。老師提醒我們要保持[blank]，不要大聲叫喊，以免顯得太[blank]。", answers: ["躺", "有趣", "安靜", "嘈吵"], options: ["躺", "有趣", "安靜", "嘈吵"] },
+            { text: "今天天氣很好，老師帶領同學們到[blank]寫生。這裏的景色真美！天空藍藍的，像一塊巨大的[blank]。朵朵白雲就像一隻隻可愛的小[blank]，在天上[blank]。", answers: ["郊外", "藍寶石", "綿羊", "飄浮"], options: ["郊外", "藍寶石", "綿羊", "飄浮"] },
+            { text: "老師說：「同學們，快把你們看到的大自然畫出來吧！」同學們[blank]地翻開速寫本，有的坐在樹下畫近處的花草，有的[blank]地畫線條，有的用筆頂着下巴[blank]，大家都很[blank]。", answers: ["迅速", "認真", "思考", "專心"], options: ["迅速", "認真", "思考", "專心"] },
+            { text: "我畫了綠色的草地、紅色的[blank]，還有高高的[blank]和正在唱歌的小鳥。老師看了我的畫，說：「你畫得真[blank]！」我聽了心裏十分[blank]。", answers: ["小花", "大樹", "不錯", "高興"], options: ["小花", "大樹", "不錯", "高興"] },
+            { text: "畫完了圖畫，老師便帶着大家坐在草地上吃[blank]。今天真是愉快的[blank]，我不但去了郊外遊玩，還畫了一幅[blank]的畫，留下了美好的[blank]。", answers: ["午餐", "一天", "美麗", "回憶"], options: ["午餐", "一天", "美麗", "回憶"] },
+            { text: "為了綠化環境，這天老師帶領同學高高興興地來到郊野公園[blank]。大家分工合作，有的[blank]，有的[blank]，有的培土，有的給小樹苗[blank]。", answers: ["植樹", "抬水", "栽樹", "澆水"], options: ["植樹", "抬水", "栽樹", "澆水"] },
+            { text: "大家都希望小樹苗快快[blank]，長成一棵棵高大的[blank]。為大自然增添一片[blank]，這是一次十分有[blank]的課外活動。", answers: ["長大", "樹木", "綠色", "意義"], options: ["長大", "樹木", "綠色", "意義"] },
+            { text: "今天，老師帶領大家探訪[blank]中心。在那裏，我們表演了各種[blank]，公公和婆婆看着我們的表演，都開心地[blank]起來，氣氛非常[blank]。", answers: ["老人", "節目", "拍手", "熱鬧"], options: ["老人", "節目", "拍手", "熱鬧"] },
+            { text: "表演結束後，我們還送上自己[blank]的心意卡。公公和婆婆拿着心意卡，臉上露出[blank]的笑容。我們也感到很[blank]，因為能為長者帶來[blank]。", answers: ["製作", "慈祥", "愉快", "歡樂"], options: ["製作", "慈祥", "愉快", "歡樂"] },
+            { text: "來到海邊，涼爽的[blank]讓人感到很舒服，同學們開心地朝[blank]跑去。他們有的跳進水裏[blank]，有的在淺水區玩起了[blank]。", answers: ["海風", "沙灘", "游泳", "沙子"], options: ["海風", "沙灘", "游泳", "沙子"] },
+            { text: "我和美美提着小桶，在沙灘上仔細地[blank]貝殼。終於，我找到了一個[blank]色的貝殼，我將它放在[blank]，裏面傳來「呼呼」的聲音，好像大海在[blank]。", answers: ["尋找", "白", "耳邊", "說話"], options: ["尋找", "白", "耳邊", "說話"] },
+            { text: "離開海灘前，老師提醒我們應該保持沙灘的[blank]。我們把吃剩的食物和[blank]都收拾好，放進[blank]箱裏，做個愛護[blank]的好孩子。", answers: ["清潔", "垃圾", "廢物", "環境"], options: ["清潔", "垃圾", "廢物", "環境"] },
+            { text: "星期六，學校舉辦了親子[blank]活動。我們一家人來到科學園。那裏的[blank]很寬闊，我們參觀了許多有趣的[blank]展覽，學到了很多課本以外的[blank]。", answers: ["同樂", "廣場", "科技", "知識"], options: ["同樂", "廣場", "科技", "知識"] },
+            { text: "這是我第一次參加學校的[blank]團。我們坐着旅遊巴前往博物館[blank]。在車上，同學們有的在唱歌，有的在玩[blank]，大家都對接下來的行程充滿[blank]。", answers: ["參觀", "遊覽", "遊戲", "期待"], options: ["參觀", "遊覽", "遊戲", "期待"] },
+            { text: "到了博物館，導賞員為我們[blank]了恐龍的歷史。我們看到巨大的恐龍[blank]，有的同學還拿出筆記本把重點[blank]下來。這是一次非常[blank]的學習經歷。", answers: ["介紹", "骨骼", "記錄", "難忘"], options: ["介紹", "骨骼", "記錄", "難忘"] },
+            { text: "秋天是[blank]的好季節。我們背着背包，沿着山徑向上[blank]。雖然走得很[blank]，但到達山頂時，看到山下美麗的[blank]，大家都覺得很值得。", answers: ["遠足", "爬", "辛苦", "風景"], options: ["遠足", "爬", "辛苦", "風景"] },
+            { text: "在郊野公園的草地上，大家攤開[blank]布準備野餐。同學們帶來了豐富的[blank]，有的帶來了三文治，有的帶來了[blank]，大家互相分享，吃得津津有[blank]。", answers: ["野餐", "食物", "水果", "味"], options: ["野餐", "食物", "水果", "味"] },
+            { text: "今天學校舉行了[blank]籌款活動。我和同學站在街頭，每當有路人[blank]時，我們就會說聲「謝謝」。雖然站了半天覺得很[blank]，但能幫助別人讓我們感到很[blank]。", answers: ["賣旗", "捐款", "疲倦", "滿足"], options: ["賣旗", "捐款", "疲倦", "滿足"] },
+            { text: "課外活動不僅能讓我們放鬆[blank]，還能培養我們不同的[blank]。無論是參觀、繪畫還是[blank]，都能讓我們的校園生活變得更加[blank]。", answers: ["心情", "興趣", "植樹", "豐富"], options: ["心情", "興趣", "植樹", "豐富"] }
+        ]
+    },
+    {
+        level: 5,
+        title: "第五關：我長大了 (人稱代詞與身體描寫)",
+        point: "1. 學習運用人稱代詞。\n2. 認識與身體有關的詞語。\n3. 學習聯繫生活經驗構思寫作內容。",
+        examples: [
+            "姐姐的臉上總是帶着<span class='highlight'>甜甜</span>的笑容。",
+            "媽媽用<span class='highlight'>驚訝</span>的眼神看着我自己收拾書包。",
+            "肥胖的弟弟長着一個<span class='highlight'>圓滾滾</span>的肚子。",
+            "哥哥<span class='highlight'>懂得</span>如何<span class='highlight'>照顧</span>好弟弟和妹妹。",
+            "吃過晚飯後，我<span class='highlight'>幫忙</span>媽媽把盤子<span class='highlight'>端進</span>廚房。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "天氣變涼了，[blank]從衣櫃裏拿出厚衣服給[blank]穿。我穿上毛衣，哎呀！竟然[blank]不上了，是我長[blank]了嗎？", answers: ["媽媽", "我", "扣", "胖"], options: ["媽媽", "我", "扣", "胖"] },
+            { text: "婆婆用[blank]看報紙。哥哥用[blank]聽音樂。弟弟用[blank]踢足球。妹妹用[blank]聞花香。", answers: ["眼睛", "耳朵", "腳", "鼻子"], options: ["眼睛", "耳朵", "腳", "鼻子"] },
+            { text: "妹妹聽到鄰居誇獎[blank]懂事，[blank]很高興。我上學前，爸爸說：「放學後，我會去接[blank]。」媽媽生病了，我送給[blank]一張心意卡。", answers: ["她", "她", "你", "她"], options: ["她", "她", "你", "她"] },
+            { text: "肥胖的弟弟長着一個[blank]的肚子。哥哥懂得如何[blank]好弟弟和妹妹。吃過晚飯後，我幫媽媽把盤子[blank]進廚房。爸爸驚奇地問：「寶貝，[blank]今天怎麼了？」", answers: ["圓滾滾", "照顧", "端", "你"], options: ["圓滾滾", "照顧", "端", "你"] },
+            { text: "媽媽的[blank]彎彎的，很好看。姐姐的[blank]細細長長的，很瘦弱。弟弟的臉蛋紅通通的，看起來很[blank]。妹妹的眼睛[blank]的，看起來很有神。", answers: ["眉毛", "腿", "可愛", "水汪汪"], options: ["眉毛", "腿", "可愛", "水汪汪"] },
+            { text: "這天早上，文文準備自己[blank]書包，媽媽說：「讓我來收拾。你還[blank]呢！」文文只好站在一旁看媽媽收拾。文文只[blank]說：「[blank]吧！」", answers: ["收拾", "小", "好", "好吧"], options: ["收拾", "小", "好", "好吧"] },
+            { text: "姐姐的臉上總是帶着[blank]的笑容。我幫爸爸拿來了[blank]。媽媽每天為[blank]準備美味的早餐。我們一家人生活得非常[blank]。", answers: ["甜甜", "拖鞋", "我們", "幸福"], options: ["甜甜", "拖鞋", "我們", "幸福"] },
+            { text: "我的同桌叫小明，[blank]是一個活潑的男孩。我們經常一起在操場上[blank]。有時候[blank]會借給我橡皮擦。我很喜歡和[blank]做朋友。", answers: ["他", "玩耍", "他", "他"], options: ["他", "玩耍", "他", "他"] },
+            { text: "外婆年紀大了，她的[blank]有些白了。我喜歡牽着她溫暖的[blank]去公園散步。外婆總是笑眯眯地看着[blank]，說我長高了[blank]。", answers: ["頭髮", "手", "我", "不少"], options: ["頭髮", "手", "我", "不少"] },
+            { text: "那個小男孩長得很[blank]，手臂很有力氣。他一隻手就能舉起重重的[blank]。大家都稱讚[blank]是個小大力士，[blank]聽了很開心。", answers: ["強壯", "沙包", "他", "他"], options: ["強壯", "沙包", "他", "他"] },
+            { text: "下雨了，我趕緊給爸爸送[blank]。爸爸拍拍我的[blank]說：「謝謝你，我的好孩子。」我幫爸爸拍去衣服上的[blank]，爸爸高興地[blank]了。", answers: ["傘", "肩膀", "雨水", "笑"], options: ["傘", "肩膀", "雨水", "笑"] },
+            { text: "做完功課後，我會主動幫媽媽捶[blank]。媽媽說她感覺[blank]多了。我對媽媽說：「等[blank]長大了，會做更多家務幫[blank]。」", answers: ["背", "舒服", "我", "您"], options: ["背", "舒服", "我", "您"] },
+            { text: "爸爸生病了，我倒了一杯溫[blank]給他。爸爸喝了水，臉色看起來紅[blank]了一些。我希望[blank]能快點好起來，帶[blank]去公園玩。", answers: ["水", "潤", "他", "我們"], options: ["水", "潤", "他", "我們"] },
+            { text: "今天體育課練習跑步，我的[blank]跑得好酸。同學扶着[blank]的手臂，讓我慢慢走。我對[blank]說：「謝謝你的[blank]。」", answers: ["腿", "我", "他", "幫忙"], options: ["腿", "我", "他", "幫忙"] },
+            { text: "弟弟是個[blank]的小男孩，走起路來搖搖晃晃的。他不小心跌倒了，擦傷了[blank]。我連忙把他扶起來，安慰[blank]不要[blank]。", answers: ["胖墩墩", "膝蓋", "他", "哭"], options: ["胖墩墩", "膝蓋", "他", "哭"] },
+            { text: "妹妹梳着兩條小辮子，戴着[blank]的髮夾。她穿着新買的[blank]，在鏡子前轉來轉去。她問：「[blank]漂亮嗎？」我們都說[blank]很漂亮。", answers: ["亮晶晶", "裙子", "我", "她"], options: ["亮晶晶", "裙子", "我", "她"] },
+            { text: "每天早上，我都會自己穿衣服和[blank]鞋子。我還會把[blank]收拾得整整齊齊。媽媽誇獎[blank]變得越來越[blank]了。", answers: ["穿", "書包", "我", "獨立"], options: ["穿", "書包", "我", "獨立"] },
+            { text: "哥哥的視力不好，他看書時總是要把書貼近[blank]。醫生建議[blank]配一副眼鏡。現在哥哥戴上眼鏡，看東西[blank]多了，[blank]很高興。", answers: ["眼睛", "他", "清楚", "他"], options: ["眼睛", "他", "清楚", "他"] },
+            { text: "秋天到了，樹葉落了下來。我們一起在公園裏掃[blank]。[blank]用掃把，我用簸箕。我們合作得很好，很快就把[blank]打掃乾淨了。", answers: ["落葉", "你", "地", "地方"], options: ["落葉", "你", "地", "地方"] },
+            { text: "表姐來我家作客，[blank]給我們帶來了好吃的點心。我們請[blank]坐在沙發上，大家一起開心地[blank]。這是一個愉快的[blank]。", answers: ["她", "她", "聊天", "下午"], options: ["她", "她", "聊天", "下午"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "這幾天，我發現有一顆牙齒有些[blank]，用[blank]舔一舔，牙齒[blank]起來。我害怕牙齒[blank]了，就不敢再動它。", answers: ["鬆動", "舌頭", "東搖西晃", "掉"], options: ["鬆動", "舌頭", "東搖西晃", "掉"] },
+            { text: "早晨，媽媽給了我一個[blank]的大蘋果，我張嘴一咬，「哎呀！」一陣[blank]，我吐出一顆白白的[blank]。「嗚嗚嗚……」我[blank]地哭了起來。", answers: ["紅通通", "疼痛", "牙齒", "傷心"], options: ["紅通通", "疼痛", "牙齒", "傷心"] },
+            { text: "聽到我的哭聲，媽媽跑過來問我：「怎麼哭啦？」我滿是[blank]地說：「我再也不能吃[blank]了。」「為甚麼呢？」「我[blank]了，祖父沒有牙齒，也就吃不了雞腿。」", answers: ["委屈", "雞腿", "掉牙", "委屈"], options: ["委屈", "雞腿", "掉牙", "委屈"] },
+            { text: "第二天，媽媽回到家後感覺很[blank]，坐在沙發上[blank]了一會兒。文文告訴媽媽她已經把書包[blank]好了，看到媽媽不大相信的樣子，文文拿出書包給媽媽[blank]。", answers: ["累", "休息", "收拾", "檢查"], options: ["累", "休息", "收拾", "檢查"] },
+            { text: "媽媽再試試褲子，怎麼小腿都露在[blank]了？我問媽媽：「衣服怎麼放了一段時間就變[blank]了呢？」媽媽看看衣服，又看看我，說：「傻孩子，不是衣服變小了，是你[blank]了。」哦！[blank]是這樣。", answers: ["外面", "小", "長大", "原來"], options: ["外面", "小", "長大", "原來"] },
+            { text: "過了些天，我[blank]長出一顆新牙來，我才知道：小孩長大都[blank]掉牙的。媽媽聽我的話，大笑起來，說：「別[blank]，過幾天你就會長出一顆新牙。」我一聽，就不再[blank]了。", answers: ["果真", "要", "擔心", "哭"], options: ["果真", "要", "擔心", "哭"] },
+            { text: "媽媽回到家，我遞給媽媽一塊毛巾，說：「媽媽，[blank]擦擦手吧！」爸爸回到家，我拿出[blank]說：「爸爸，快換上拖鞋。」爸爸媽媽[blank]地看着我。", answers: ["你", "拖鞋", "驚訝", "驚訝"], options: ["你", "拖鞋", "驚訝", "驚訝"] },
+            { text: "爸爸奇怪地問：「寶貝，[blank]今天怎麼了？」我不好意思地[blank]頭說：「我長大了，應該多幫[blank]做些事。」爸爸媽媽聽了，都[blank]地笑了。", answers: ["你", "低着", "你們", "欣慰"], options: ["你", "低着", "你們", "欣慰"] },
+            { text: "今天，文文比平時[blank]起床。她自己穿好校服，還把[blank]疊得整整齊齊。走到廚房，她對正在做早餐的媽媽說：「媽媽[blank]，今天[blank]自己準備好了！」", answers: ["早", "被子", "早晨", "我"], options: ["早", "被子", "早晨", "我"] },
+            { text: "媽媽用[blank]的眼神看着文文，摸着[blank]的頭說：「文文真的[blank]了，變得這麼懂事。」文文聽了，臉頰紅撲撲的，心裏覺得很[blank]。", answers: ["驚訝", "她", "長大", "自豪"], options: ["驚訝", "她", "長大", "自豪"] },
+            { text: "放學後，天空突然下起了大雨。我正[blank]沒有帶傘，突然看到一個熟悉的身影。是[blank]！他拿着一把大雨傘在校門口等[blank]，我高興地跑向[blank]。", answers: ["發愁", "哥哥", "我", "他"], options: ["發愁", "哥哥", "我", "他"] },
+            { text: "哥哥把傘撐在我的[blank]上，自己的[blank]卻被雨淋濕了。我對哥哥說：「哥哥，傘歪了。」哥哥笑着說：「沒關係，只要[blank]不淋濕就好。」我很感動，緊緊拉着[blank]的手。", answers: ["頭", "肩膀", "你", "他"], options: ["頭", "肩膀", "你", "他"] },
+            { text: "奶奶的眼睛不太好，看報紙時總是看不[blank]。今天，我主動坐在奶奶[blank]，用清脆的聲音把報紙上的新聞[blank]給她聽。奶奶[blank]地說：「我的乖孫真棒！」", answers: ["清楚", "身邊", "讀", "高興"], options: ["清楚", "身邊", "讀", "高興"] },
+            { text: "我的弟弟是個小調皮，他長着一雙[blank]的大眼睛，總是充滿了好奇。有一次，[blank]偷偷用媽媽的口紅在牆上畫畫。媽媽發現後，[blank]卻躲在門後不敢[blank]。", answers: ["水汪汪", "他", "他", "出來"], options: ["水汪汪", "他", "他", "出來"] },
+            { text: "媽媽並沒有[blank]弟弟，而是耐心地告訴[blank]不能在牆上亂畫。弟弟低着[blank]，小聲說：「我[blank]了。」從那以後，他再也沒有在牆上畫過畫。", answers: ["責罵", "他", "頭", "錯"], options: ["責罵", "他", "頭", "錯"] },
+            { text: "上體育課時，小明不小心摔倒了，[blank]流血了。老師趕緊帶[blank]去醫療室。我們都很[blank]他。放學後，我們幾個同學一起去[blank]他。", answers: ["膝蓋", "他", "關心", "探望"], options: ["膝蓋", "他", "關心", "探望"] },
+            { text: "小明看到[blank]來了，非常高興。他說：「謝謝[blank]來看我，我已經不痛了。」我們看到[blank]精神很好，也就放心了。大家又開心地[blank]起來。", answers: ["我們", "你們", "他", "聊天"], options: ["我們", "你們", "他", "聊天"] },
+            { text: "隨着年齡的增長，我發現自己的[blank]發生了很多變化。我的個子長[blank]了，力氣也變[blank]了。以前搬不動的箱子，現在[blank]能輕鬆搬起。", answers: ["身體", "高", "大", "我"], options: ["身體", "高", "大", "我"] },
+            { text: "我明白了「我長大了」不只是[blank]上的變化，更是要變得更加[blank]和有責任感。我會努力學習，照顧好[blank]，不讓爸爸媽媽[blank]。", answers: ["外表", "懂事", "自己", "擔心"], options: ["外表", "懂事", "自己", "擔心"] },
+            { text: "每年的生日，媽媽都會在牆上為我量[blank]。看着牆上那些高高低低的[blank]，我知道那是我[blank]的印記。我期待着有一天，[blank]能長得和爸爸一樣高。", answers: ["身高", "記號", "成長", "我"], options: ["身高", "記號", "成長", "我"] }
+        ]
+    },
+    {
+        level: 6,
+        title: "第六關：日常用品 (多感官觀察與描寫)",
+        point: "1. 認識與日常用品有關的詞語。\n2. 學習運用形容詞、顏色詞描寫日常用品。\n3. 學習運用多感官觀察法(視覺、聽覺、觸覺)寫作句子。",
+        examples: [
+            "<span class='highlight'>客廳</span>裏擺放着一張<span class='highlight'>紅色</span>的大沙發。",
+            "媽媽送給我一枝<span class='highlight'>漂亮</span>的<span class='highlight'>圓珠筆</span>。",
+            "<span class='highlight'>盤子</span>的四周畫滿了<span class='highlight'>翠綠色</span>的竹子。",
+            "姑媽給我帶來一個<span class='highlight'>可愛</span>的新書包。",
+            "<span class='highlight'>首飾盒</span>的盒蓋上有幾顆<span class='highlight'>亮晶晶</span>的寶石。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "爸爸新買了一台[blank]，我按了一下[blank]，打開了電視機。[blank]出現了，也聽到了[blank]。", answers: ["電視機", "遙控器", "畫面", "聲音"], options: ["電視機", "遙控器", "畫面", "聲音"] },
+            { text: "客廳裏擺放着一張[blank]的大沙發。媽媽送給我一枝[blank]的圓珠筆。盤子的四周畫滿了[blank]的竹子。首飾盒的盒蓋上有幾顆[blank]的寶石。", answers: ["紅色", "漂亮", "翠綠色", "亮晶晶"], options: ["紅色", "漂亮", "翠綠色", "亮晶晶"] },
+            { text: "[blank]裏冷藏着飲料和蔬菜。小枱燈[blank]我學習，是我的好夥伴。我收集了各種各樣造型可愛的[blank]。一轉動開關，[blank]就「咕嚕嚕」地響起來。", answers: ["電冰箱", "陪伴", "膠擦", "洗衣機"], options: ["電冰箱", "陪伴", "膠擦", "洗衣機"] },
+            { text: "生日那天，媽媽給我買了一盒[blank]，鉛筆是用[blank]做的，鉛筆的頂端有許多好看的造型，有小貓、小狗，還有五顏六色的[blank]。鉛筆的筆尖像一把[blank]。", answers: ["鉛筆", "木頭", "小花", "小傘"], options: ["鉛筆", "木頭", "小花", "小傘"] },
+            { text: "我收到了一件禮物，是一個[blank]顏色的[blank]。碗櫃裏擺放着一些[blank]的盤子。鐘面上有十二個數字，都是[blank]的。", answers: ["紅色", "書包", "圓形", "金光閃閃"], options: ["紅色", "書包", "圓形", "金光閃閃"] },
+            { text: "今天，媽媽送給我一把非常好看的[blank]。這把雨傘是[blank]色的，傘面上畫着一隻小熊坐在[blank]上玩耍，還有幾隻蝴蝶在花叢中飛舞，[blank]極了。", answers: ["雨傘", "粉紅", "草地", "漂亮"], options: ["雨傘", "粉紅", "草地", "漂亮"] },
+            { text: "桌子上放着一個[blank]的茶杯。奶奶用[blank]的毛巾擦臉。姑媽給我帶來一個[blank]的新書包。我的文具盒十分[blank]。", answers: ["透明", "柔軟", "可愛", "精緻"], options: ["透明", "柔軟", "可愛", "精緻"] },
+            { text: "這把[blank]的直尺可以用來畫直線。我用[blank]的鉛筆寫字。筆記本的封面是[blank]色的。這個書包不僅好看，而且很[blank]。", answers: ["長長", "尖尖", "藍", "耐用"], options: ["長長", "尖尖", "藍", "耐用"] },
+            { text: "炎熱的夏天，[blank]為我們帶來涼風。洗衣機在轉動時會發出[blank]的聲音。雪櫃裏的東西摸起來[blank]的。剛出爐的麵包聞起來[blank]的。", answers: ["電風扇", "嗡嗡", "冷冰冰", "香噴噴"], options: ["電風扇", "嗡嗡", "冷冰冰", "香噴噴"] },
+            { text: "我有一個[blank]的小鬧鐘。它的外形像一隻[blank]的小狗。每天早上，它會發出[blank]的鈴聲，叫我[blank]。", answers: ["小巧", "斑點", "清脆", "起床"], options: ["小巧", "斑點", "清脆", "起床"] },
+            { text: "媽媽的衣櫃裏掛滿了[blank]的衣服。爸爸出門時會提着一個[blank]色的公事包。我喜歡穿那雙[blank]的運動鞋去[blank]。", answers: ["五顏六色", "黑", "舒適", "跑步"], options: ["五顏六色", "黑", "舒適", "跑步"] },
+            { text: "餐桌上放着幾雙[blank]的筷子。我用[blank]的玻璃杯喝果汁。沙發上放着幾個[blank]的抱枕。客廳的地上鋪着一塊[blank]的地毯。", answers: ["木製", "透明", "軟綿綿", "灰色"], options: ["木製", "透明", "軟綿綿", "灰色"] },
+            { text: "今天美術課，我帶了一盒[blank]的顏色筆。我用綠色畫了[blank]的大樹。用[blank]色畫了太陽。最後用[blank]擦去了畫錯的地方。", answers: ["全新", "茂盛", "紅", "膠擦"], options: ["全新", "茂盛", "紅", "膠擦"] },
+            { text: "這個[blank]的氣球飛上了天空。妹妹手裏拿着一個[blank]的洋娃娃。哥哥的桌子上放着一台[blank]色的電腦。電腦屏幕發出[blank]的光。", answers: ["鼓鼓", "漂亮", "銀", "明亮"], options: ["鼓鼓", "漂亮", "銀", "明亮"] },
+            { text: "廚房裏傳來陣陣飯菜的[blank]。媽媽把炒好的菜盛在[blank]的盤子裏。我們一家人圍坐在[blank]的餐桌旁，吃着[blank]的晚飯。", answers: ["香味", "白色", "圓形", "美味"], options: ["香味", "白色", "圓形", "美味"] },
+            { text: "洗手間的鏡子擦得十分[blank]。架子上放着一塊[blank]的肥皂。洗手時，肥皂會產生許多[blank]的泡泡。水龍頭流出[blank]的水。", answers: ["明亮", "香香", "白色", "清涼"], options: ["明亮", "香香", "白色", "清涼"] },
+            { text: "下雨天，我穿着[blank]色的雨靴。打着一把[blank]的小雨傘。走在路上，聽着雨滴打在傘面上發出[blank]的聲音。感覺非常[blank]。", answers: ["黃", "彩色", "滴答", "有趣"], options: ["黃", "彩色", "滴答", "有趣"] },
+            { text: "這是一本[blank]的故事書。書的封面畫着一隻[blank]的小貓。書裏的文字[blank]的，插圖[blank]的，我非常喜歡看。", answers: ["厚厚", "可愛", "黑黑", "豐富多彩"], options: ["厚厚", "可愛", "黑黑", "豐富多彩"] },
+            { text: "冬天到了，媽媽給我買了一條[blank]的圍巾。圍巾摸起來很[blank]。戴在脖子上感覺十分[blank]。它的顏色是鮮豔的[blank]色。", answers: ["長長", "柔軟", "溫暖", "紅"], options: ["長長", "柔軟", "溫暖", "紅"] },
+            { text: "房間的窗戶上掛着[blank]的窗簾。陽光透過窗簾照進來，房間變得十分[blank]。書桌上擺放着一個[blank]的相框，裏面放着我們一家人的[blank]。", answers: ["淺藍色", "明亮", "精緻", "照片"], options: ["淺藍色", "明亮", "精緻", "照片"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "我放學回到家，爸爸剛從外地[blank]回來，他[blank]地對我說：「猜猜我給你帶了甚麼[blank]？」我高興得[blank]了起來。", answers: ["出差", "神秘", "禮物", "跳"], options: ["出差", "神秘", "禮物", "跳"] },
+            { text: "爸爸說完了，從身後拿出一個[blank]的盒子。我接過盒子搖了搖，很[blank]，放在耳邊聽聽，裏面傳來[blank]的滴答聲。「是[blank]！」", answers: ["方形", "輕", "清脆", "鬧鐘"], options: ["方形", "輕", "清脆", "鬧鐘"] },
+            { text: "我小心地拿出鬧鐘。鬧鐘的外形是一隻可愛的[blank]，脖子上繫着[blank]的銅鈴，斑點狗的嘴巴張得大大的，露出[blank]的小舌頭。鐘面在斑點狗胸前，上面罩着[blank]的玻璃。", answers: ["斑點狗", "金色", "紅色", "透明"], options: ["斑點狗", "金色", "紅色", "透明"] },
+            { text: "透過透明的玻璃，能清楚地看到裏面的[blank]正滴滴答答地走着。我真喜歡這個小鬧鐘，它不但外形[blank]，而且能叫我[blank]，上學，陪我進入[blank]，它可真是我的時間小管家。", answers: ["指針", "可愛", "起床", "夢鄉"], options: ["指針", "可愛", "起床", "夢鄉"] },
+            { text: "一次，我把傘丟在[blank]上忘記帶回家。丟失了心愛的雨傘，我心裏很[blank]。晚上，我夢見小雨傘回來了。我[blank]着小雨傘又唱又跳，還[blank]笑了起來。", answers: ["操場", "難過", "摟", "哈哈大"], options: ["操場", "難過", "摟", "哈哈大"] },
+            { text: "過了幾天，班主任交給我一把傘，原來是有同學[blank]了我的雨傘。我[blank]抱着小雨傘，生怕再把它[blank]了。失而復得的感覺真[blank]。", answers: ["撿到", "緊緊地", "弄丟", "好"], options: ["撿到", "緊緊地", "弄丟", "好"] },
+            { text: "爸爸新買了一台電視機。這台電視機的屏幕很[blank]，機身是[blank]色的。我按了一下遙控器，打開了電視機。畫面出現了，看，多麼[blank]的畫面，多麼[blank]的聲音。", answers: ["大", "黑", "清晰", "悅耳"], options: ["大", "黑", "清晰", "悅耳"] },
+            { text: "我最喜歡用這台新電視機看卡通片。鮮豔的[blank]和生動的[blank]讓我看得入迷。媽媽提醒我，看電視要注意[blank]，不能離得太[blank]。", answers: ["色彩", "角色", "保護眼睛", "近"], options: ["色彩", "角色", "保護眼睛", "近"] },
+            { text: "我的文具盒是個長方形的[blank]盒子，上面印着我最喜歡的[blank]圖案。打開文具盒，裏面分成了兩層。上層放着幾枝削得[blank]的鉛筆，下層放着直尺和[blank]。", answers: ["鐵", "卡通", "尖尖", "膠擦"], options: ["鐵", "卡通", "尖尖", "膠擦"] },
+            { text: "這個文具盒已經陪伴我[blank]了。雖然它的邊角有些[blank]，但我依然很[blank]它。每天做完功課，我都會把文具[blank]地放回文具盒裏。", answers: ["很久", "磨損", "愛惜", "整齊"], options: ["很久", "磨損", "愛惜", "整齊"] },
+            { text: "廚房裏的電冰箱是一個高大的[blank]長方體。打開冰箱門，一陣[blank]的空氣迎面撲來。冰箱上層是冷凍室，用來存放[blank]和雪糕；下層是冷藏室，放滿了新鮮的[blank]和飲料。", answers: ["白色", "冰涼", "肉類", "蔬菜"], options: ["白色", "冰涼", "肉類", "蔬菜"] },
+            { text: "冰箱運作時會發出輕微的[blank]聲。媽媽說冰箱是我們家保持食物[blank]的好幫手。我們要記得隨手[blank]冰箱門，這樣才能節約[blank]。", answers: ["嗡嗡", "新鮮", "關好", "能源"], options: ["嗡嗡", "新鮮", "關好", "能源"] },
+            { text: "書桌上擺放着一盞[blank]色的小枱燈。它的底座是圓形的，燈罩像一頂小[blank]。打開開關，枱燈發出[blank]的光芒，照亮了我的[blank]。", answers: ["藍", "帽子", "柔和", "書本"], options: ["藍", "帽子", "柔和", "書本"] },
+            { text: "這盞枱燈不僅能調節[blank]，還能改變燈光的[blank]。它每天晚上都[blank]着我溫習功課，是我的好[blank]。", answers: ["亮度", "顏色", "陪伴", "夥伴"], options: ["亮度", "顏色", "陪伴", "夥伴"] },
+            { text: "今天媽媽大掃除，把家裏的[blank]洗得乾乾淨淨。洗衣機在運作時發出「咕嚕嚕」的聲音。洗完的衣服散發着[blank]的香氣，摸起來十分[blank]。媽媽把它們掛在陽台上[blank]。", answers: ["衣服", "淡淡", "柔軟", "晾乾"], options: ["衣服", "淡淡", "柔軟", "晾乾"] },
+            { text: "客廳裏那張紅色的[blank]沙發是全家人的最愛。它坐上去[blank]的，非常舒服。沙發上還放着幾個印着[blank]圖案的抱枕。晚上，我們一家人經常坐在沙發上[blank]。", answers: ["大", "軟綿綿", "花朵", "聊天"], options: ["大", "軟綿綿", "花朵", "聊天"] },
+            { text: "姑媽從外國回來，送給我一個[blank]的新書包。書包是粉紅色的，上面掛着一個[blank]的小熊毛公仔。書包有很多個[blank]，可以把書本和文具分門別類地放好，非常[blank]。", answers: ["漂亮", "毛茸茸", "隔層", "實用"], options: ["漂亮", "毛茸茸", "隔層", "實用"] },
+            { text: "我把書包背在肩上，感覺很[blank]。我迫不及待地想背着它去[blank]，給同學們看看我的新[blank]。我一定會好好[blank]它的。", answers: ["輕便", "上學", "禮物", "愛護"], options: ["輕便", "上學", "禮物", "愛護"] },
+            { text: "餐桌上的那個玻璃花瓶晶瑩[blank]。媽媽在花瓶裏插了幾枝剛買回來的[blank]。鮮豔的花朵配上透明的花瓶，顯得格外[blank]。微風吹過，帶來陣陣[blank]。", answers: ["剔透", "百合花", "高雅", "清香"], options: ["剔透", "百合花", "高雅", "清香"] },
+            { text: "家裏的日常用品雖然看似[blank]，但每一件都有它獨特的[blank]。只要我們仔細[blank]，就能發現它們在生活中的[blank]。我們要愛惜每一件物品。", answers: ["平凡", "用途", "觀察", "重要性"], options: ["平凡", "用途", "觀察", "重要性"] }
+        ]
+    },
+    {
+        level: 7,
+        title: "第七關：健康飲食 (形容食物的詞語與比喻句)",
+        point: "1. 認識與食物有關的詞語。\n2. 認識形容顏色、形狀、味道、觸感的詞語。\n3. 學習運用「……像……」的句式。",
+        examples: [
+            "<span class='highlight'>香甜</span>的牛奶含有豐富的<span class='highlight'>營養</span>。",
+            "妹妹最喜歡吃<span class='highlight'>又香又脆</span>的薯片。",
+            "多吃<span class='highlight'>新鮮</span>的<span class='highlight'>蔬菜</span>有益於身體健康。",
+            "我們不要買在路邊擺賣的<span class='highlight'>油炸食物</span>。",
+            "小孩子經常吃<span class='highlight'>漢堡包</span>容易引致肥胖。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "弟弟是個小胖子，他非常愛吃[blank]的薯條。可是媽媽說吃薯條容易長[blank]，不讓弟弟多吃。弟弟生日時許了個[blank]：希望自己變瘦，這樣就能吃很多[blank]了。", answers: ["香脆", "胖", "願望", "薯條"], options: ["香脆", "胖", "願望", "薯條"] },
+            { text: "吃過[blank]後，我和爸爸去樓下散步。媽媽為我們做了一桌[blank]的飯菜。我們不但要吃肉類，還應該多吃[blank]。早上，我吃了一碗麥片和一塊[blank]。", answers: ["晚飯", "可口", "蔬菜", "麵包"], options: ["晚飯", "可口", "蔬菜", "麵包"] },
+            { text: "這裏有[blank]的雞腿，[blank]的蛋糕，[blank]的可樂，[blank]的西瓜。每一種食物都讓人垂涎三尺。", answers: ["香噴噴", "鬆軟", "冰涼", "又大又圓"], options: ["香噴噴", "鬆軟", "冰涼", "又大又圓"] },
+            { text: "樹上的蘋果像[blank]的燈籠。夜晚的月亮像黃色的[blank]。天空上的彩雲像軟綿綿的[blank]。閃爍的星星像發光的[blank]。", answers: ["紅色", "香蕉", "棉花糖", "寶石"], options: ["紅色", "香蕉", "棉花糖", "寶石"] },
+            { text: "香甜的牛奶含有[blank]的營養。妹妹最喜歡吃又香又脆的[blank]。多吃新鮮的蔬菜有益於身體[blank]。小孩經常吃漢堡包容易引致[blank]。", answers: ["豐富", "薯片", "健康", "肥胖"], options: ["豐富", "薯片", "健康", "肥胖"] },
+            { text: "圓圓最愛吃[blank]。每天小息時，圓圓都會跑到小賣部買[blank]，邊走邊吃。放學後，她還會買路邊小販的[blank]。到了吃晚飯的時間，圓圓卻[blank]。", answers: ["零食", "薯片", "咖喱魚丸", "吃不下"], options: ["零食", "薯片", "咖喱魚丸", "吃不下"] },
+            { text: "我們應該多吃對身體有[blank]的食物。不要買在[blank]擺賣的油炸食物。新鮮的[blank]有益於健康。每天喝一杯[blank]能讓我們長得更高。", answers: ["益", "路邊", "蔬菜", "牛奶"], options: ["益", "路邊", "蔬菜", "牛奶"] },
+            { text: "我喜歡吃[blank]的玉米。媽媽煮的米飯是[blank]的。這盤青菜看起來非常[blank]。那個番茄是[blank]的，看起來很好吃。", answers: ["金黃", "雪白", "青翠", "鮮紅"], options: ["金黃", "雪白", "青翠", "鮮紅"] },
+            { text: "這杯苦瓜汁味道很[blank]。這碟辣椒炒肉非常[blank]。這碗湯的味道有點[blank]。這顆檸檬吃起來[blank]的。", answers: ["苦", "辣", "鹹", "酸溜溜"], options: ["苦", "辣", "鹹", "酸溜溜"] },
+            { text: "這塊餅乾是[blank]的。那根香腸是[blank]的。這根麵條很[blank]。那根香蕉是[blank]的。", answers: ["方形", "長長", "幼", "彎彎"], options: ["方形", "長長", "幼", "彎彎"] },
+            { text: "這塊薄餅是[blank]的。蘋果的形狀是[blank]的。這塊餅乾吃起來很[blank]。這塊冰塊摸起來[blank]的。", answers: ["三角形", "圓圓", "脆", "冷冰冰"], options: ["三角形", "圓圓", "脆", "冷冰冰"] },
+            { text: "姐姐喜歡吃[blank]的水果。葡萄像寶石，餃子像[blank]。多吃蔬菜可以令身體更[blank]。我們不要做個[blank]的孩子。", answers: ["多汁", "元寶", "健康", "挑食"], options: ["多汁", "元寶", "健康", "挑食"] },
+            { text: "這塊蛋糕看起來非常[blank]。吃下去的感覺[blank]的。西瓜的果肉是[blank]的。夏天吃西瓜感覺非常[blank]。", answers: ["鬆軟", "甜絲絲", "鮮紅", "爽口"], options: ["鬆軟", "甜絲絲", "鮮紅", "爽口"] },
+            { text: "我買了一包[blank]的薯片。這個橙子[blank]的，很好吃。哥哥喝了一杯[blank]的果汁。弟弟吃了一口[blank]的巧克力。", answers: ["香脆", "多汁", "冰涼", "香甜"], options: ["香脆", "多汁", "冰涼", "香甜"] },
+            { text: "芳芳每日三餐都很有[blank]。每天早晨，芳芳一定吃[blank]。吃飯時，她一點也不[blank]。蔬菜和肉類她都[blank]。", answers: ["營養", "早餐", "挑食", "愛吃"], options: ["營養", "早餐", "挑食", "愛吃"] },
+            { text: "一有空，芳芳便會去公園[blank]。所以，芳芳的身體非常[blank]。小朋友，我們應該向[blank]學習呢？我們應該養成良好的[blank]習慣。", answers: ["跑步", "結實", "誰", "飲食"], options: ["跑步", "結實", "誰", "飲食"] },
+            { text: "外婆去市場買了一些[blank]的青菜。媽媽用這些青菜做了一道[blank]的菜。我吃得津津有[blank]。爸爸說我今天表現得[blank]。", answers: ["新鮮", "美味", "味", "很好"], options: ["新鮮", "美味", "味", "很好"] },
+            { text: "這碗湯太[blank]了，我需要喝點水。這塊糖果[blank]的，妹妹很喜歡。這杯茶有點[blank]，爺爺卻覺得好喝。這盤菜有點[blank]，需要加點鹽。", answers: ["鹹", "甜絲絲", "苦", "淡淡"], options: ["鹹", "甜絲絲", "苦", "淡淡"] },
+            { text: "弟弟吃炸雞腿吃得滿嘴是[blank]。媽媽遞給他一張[blank]擦嘴。媽媽說：「下次不能吃這麼[blank]了。」弟弟連忙點點[blank]。", answers: ["油", "紙巾", "多", "頭"], options: ["油", "紙巾", "多", "頭"] },
+            { text: "我把蘋果切成[blank]的形狀。把西瓜切成[blank]的形狀。水果拼盤看起來[blank]的。大家吃得非常[blank]。", answers: ["方形", "三角形", "五顏六色", "開心"], options: ["方形", "三角形", "五顏六色", "開心"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "我今年八歲，喜歡學習，喜歡唱歌，還會下棋。大家都誇我[blank]可愛，可是爸爸媽媽卻對我有些[blank]，因為我總是[blank]。", answers: ["聰明", "頭痛", "挑食", "偏食"], options: ["聰明", "頭痛", "挑食", "偏食"] },
+            { text: "「多吃蔬菜，別只吃肉。」每次吃飯時，都能聽到爸爸媽媽這樣[blank]我。我從小就愛吃肉，甚麼[blank]呀，牛肉呀，我都愛吃，[blank]不愛吃蔬菜。", answers: ["提醒", "雞腿", "偏偏", "就是"], options: ["提醒", "雞腿", "偏偏", "就是"] },
+            { text: "吃飯時，媽媽總是一邊給我[blank]蔬菜，一邊說：「蔬菜裏有許多[blank]，能讓你的身體健康。看這個蘑菇像小傘一樣，多可愛啊，快把它[blank]吧！不要像小貓一樣吃那麼[blank]。」", answers: ["夾", "維生素", "吃掉", "少"], options: ["夾", "維生素", "吃掉", "少"] },
+            { text: "我決心改掉自己的[blank]。在爸爸媽媽的幫助下，我終於慢慢喜歡吃蔬菜了，青菜、[blank]成了我的好朋友。我的身體也變得更加[blank]了，爸爸媽媽再不用[blank]了。", answers: ["缺點", "胡蘿蔔", "健康", "發愁"], options: ["缺點", "胡蘿蔔", "健康", "發愁"] },
+            { text: "圓圓和芳芳是好朋友。圓圓最愛吃[blank]。每天小息時，圓圓都會跑到小賣部買薯片，邊走邊[blank]。放學後，她還會買路邊小販的咖喱[blank]。", answers: ["零食", "吃", "魚丸", "魚蛋"], options: ["零食", "吃", "魚丸", "魚蛋"] },
+            { text: "到了吃晚飯的時間，圓圓卻[blank]了。就這樣，圓圓身體[blank]，經常[blank]。我們不要像圓圓那樣，養成不良的[blank]習慣。", answers: ["吃不下", "瘦弱", "生病", "飲食"], options: ["吃不下", "瘦弱", "生病", "飲食"] },
+            { text: "芳芳每日三餐都很有[blank]。每天早晨，芳芳一定吃[blank]。吃飯時，她一點也不挑食，蔬菜和[blank]她都愛吃。一有空，芳芳便會去公園[blank]。", answers: ["營養", "早餐", "肉類", "跑步"], options: ["營養", "早餐", "肉類", "跑步"] },
+            { text: "星期天，我跟外婆去市場買菜。市場裏可真[blank]，我們先來到菜檔，菜檔裏擺滿了各種[blank]的蔬菜，有綠油油的青菜，有紅通通的[blank]，還有雪白的大[blank]。", answers: ["熱鬧", "新鮮", "番茄", "蘿蔔"], options: ["熱鬧", "新鮮", "番茄", "蘿蔔"] },
+            { text: "我們走到一個攤位前，菜心綠油油的，很新鮮。外婆問我：「[blank]好不好？」我想了想說：「好，爸爸媽媽都愛吃牛肉炒[blank]。」外婆笑着[blank]。", answers: ["買菜心", "菜心", "點點頭", "答應"], options: ["買菜心", "菜心", "點點頭", "答應"] },
+            { text: "買完青菜，我們又去肉檔買了牛肉。最後，我們還在水果檔買了[blank]和蘋果。今天的[blank]真不小，我們[blank]而歸，真豐富[blank]！", answers: ["香蕉", "收穫", "滿載", "啊"], options: ["香蕉", "收穫", "滿載", "啊"] },
+            { text: "吃過晚飯，媽媽端出一盤[blank]的水果。有[blank]的西瓜，[blank]的葡萄，還有[blank]的香蕉。大家一邊吃水果，一邊看電視。", answers: ["豐富", "鮮紅", "紫亮", "彎彎"], options: ["豐富", "鮮紅", "紫亮", "彎彎"] },
+            { text: "我不喜歡吃苦瓜，因為它的味道太[blank]了。但我知道苦瓜對身體有[blank]，所以我還是[blank]吃了一點。媽媽稱讚我是一個[blank]的孩子。", answers: ["苦", "益處", "忍着", "懂事"], options: ["苦", "益處", "忍着", "懂事"] },
+            { text: "哥哥最喜歡吃快餐店的[blank]。那些食物雖然[blank]，但含有太多脂肪。醫生建議他減少吃[blank]食物，多吃[blank]和蔬菜。", answers: ["漢堡包", "香脆", "油炸", "水果"], options: ["漢堡包", "香脆", "油炸", "水果"] },
+            { text: "早餐是一天中最[blank]的一餐。我每天早上都會吃一個[blank]的雞蛋，喝一杯[blank]的牛奶。這樣我才有充足的[blank]去上學。", answers: ["重要", "白煮", "溫熱", "精力"], options: ["重要", "白煮", "溫熱", "精力"] },
+            { text: "今天天氣很熱，我從冰箱裏拿出一根[blank]的雪條。咬一口，感覺[blank]的，非常舒服。不過，吃太多生冷食物會引起[blank]，所以我只吃了[blank]。", answers: ["冷冰冰", "透心涼", "胃痛", "一根"], options: ["冷冰冰", "透心涼", "胃痛", "一根"] },
+            { text: "秋天到了，市場裏有許多[blank]的柿子。柿子像一個個紅色的[blank]掛在樹上。咬一口，果肉[blank]的，味道[blank]的，真好吃。", answers: ["成熟", "燈籠", "軟綿綿", "甜絲絲"], options: ["成熟", "燈籠", "軟綿綿", "甜絲絲"] },
+            { text: "我不小心吃到了一口辣椒，辣得我眼淚都[blank]出來了。我趕緊喝了一大口[blank]。原來這道菜裏加了[blank]的朝天椒，真是太[blank]了！", answers: ["流", "冰水", "鮮紅", "刺激"], options: ["流", "冰水", "鮮紅", "刺激"] },
+            { text: "晚飯時，桌上有一道紅燒魚。魚肉非常[blank]，而且沒有魚骨。我吃了[blank]一碗飯。媽媽笑着說：「看來你今天胃口[blank]啊！」", answers: ["鮮嫩", "滿滿", "真好", "不錯"], options: ["鮮嫩", "滿滿", "真好", "不錯"] },
+            { text: "有些小朋友不愛吃[blank]，只愛吃零食，這樣容易導致營養[blank]。我們應該保持飲食[blank]，甚麼食物都要吃一些，才能健康[blank]。", answers: ["正餐", "不良", "均衡", "成長"], options: ["正餐", "不良", "均衡", "成長"] },
+            { text: "看見那盤金黃色的炸雞，我忍不住[blank]。但我記起醫生的[blank]，於是放下了筷子，夾了一口青翠的[blank]。我為自己的[blank]感到自豪。", answers: ["流口水", "吩咐", "蔬菜", "堅持"], options: ["流口水", "吩咐", "蔬菜", "堅持"] }
+        ]
+    },
+    {
+        level: 8,
+        title: "第八關：奇思妙想 (動作與心理描寫、擬人比喻)",
+        point: "1. 認識與動作和心理有關的詞語。\n2. 學習運用擬人和比喻。\n3. 學習展開豐富的想像寫作詩歌。",
+        examples: [
+            "星星在夜空中<span class='highlight'>快活</span>地<span class='highlight'>眨着</span>眼睛。",
+            "<span class='highlight'>害羞</span>的夕陽<span class='highlight'>躲</span>在彩雲身後不肯出來。",
+            "泉水唱着<span class='highlight'>叮叮咚咚</span>的歌<span class='highlight'>奔向</span>遠方。",
+            "陽光灑在河面上，河水<span class='highlight'>好像</span>一條金色的帶子。",
+            "彎彎的月兒<span class='highlight'>像</span>一隻小小的船，在夜空中航行。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "[blank]在夜空中快活地[blank]着眼睛。[blank]的夕陽躲在彩雲身後不肯出來。[blank]唱着叮咚叮咚的歌奔向遠方。", answers: ["星星", "眨", "害羞", "泉水"], options: ["星星", "眨", "害羞", "泉水"] },
+            { text: "我最大的夢想就是去太空[blank]。弟弟[blank]自己長了一對會飛的翅膀。機械人博士[blank]了新型的電子書包。我們在一個用糖果做成的小屋裏[blank]。", answers: ["旅行", "幻想", "發明", "睡覺"], options: ["旅行", "幻想", "發明", "睡覺"] },
+            { text: "我來到一個[blank]的地方，這裏的地上鋪着厚厚的白雪，卻一點也不覺得[blank]。雪地上到處盛開着五顏六色的鮮花，可愛的小動物在[blank]地玩耍。", answers: ["神奇", "寒冷", "快樂", "快樂"], options: ["神奇", "寒冷", "快樂", "快樂"] },
+            { text: "星星像[blank]又像[blank]。小雨像銀針又像[blank]。樹葉像手掌又像[blank]。彩虹像一座彩橋出現在天上。", answers: ["寶石", "眼睛", "絲線", "扇子"], options: ["寶石", "眼睛", "絲線", "扇子"] },
+            { text: "太陽高高地掛在天空，像個紅色的[blank]。頑皮的弟弟跳上跳下，像一隻小[blank]。小水珠在荷葉上滾動，像閃亮的[blank]。", answers: ["燈籠", "猴子", "珍珠", "珍珠"], options: ["燈籠", "猴子", "珍珠", "珍珠"] },
+            { text: "溫暖的春風輕輕地[blank]着我的臉。調皮的小雨點在雨傘上跳起了歡快的[blank]。夜空中的小星星衝着大地[blank]。", answers: ["撫摸", "舞蹈", "眨眼睛", "眨眼睛"], options: ["撫摸", "舞蹈", "眨眼睛", "眨眼睛"] },
+            { text: "看見美麗的彩虹，我[blank]地笑了。聽到這個壞消息，妹妹[blank]地哭了起來。找不到心愛的玩具，弟弟感到很[blank]。考試得了一百分，我心裏十分[blank]。", answers: ["微笑", "傷心", "着急", "興奮"], options: ["微笑", "傷心", "着急", "興奮"] },
+            { text: "陽光灑在河面上，河水[blank]一條金色的帶子。白雲輕輕，[blank]羽毛。摘下一朵白雲，[blank]一[blank]，做成大抱枕。", answers: ["好像", "像", "揉", "揉"], options: ["好像", "像", "揉", "揉"] },
+            { text: "嫦娥姐姐帶着玉兔來地球[blank]人類。我們在一個用糖果做成的[blank]裏睡覺。這真是一次[blank]的經歷。我[blank]這不是一場夢。", answers: ["探訪", "小屋", "奇妙", "希望"], options: ["探訪", "小屋", "奇妙", "希望"] },
+            { text: "我一邊看着天上的[blank]，一邊[blank]。如果我能飛到[blank]上，那該有多好啊！我會和外星人做[blank]。", answers: ["星星", "思考", "月球", "朋友"], options: ["星星", "思考", "月球", "朋友"] },
+            { text: "秋風吹過，樹葉在空中[blank]。它們好像在向大樹[blank]告別。落葉鋪在地上，變成了一張[blank]色的[blank]。", answers: ["飛舞", "揮手", "金", "地毯"], options: ["飛舞", "揮手", "金", "地毯"] },
+            { text: "花蝴蝶碰一碰我，頓時，我也變得輕飄飄的。我在花園[blank]時，遇到一隻[blank]的花蝴蝶。我和蝴蝶手牽着手[blank]，真[blank]啊！", answers: ["散步", "美麗", "跳舞", "快樂"], options: ["散步", "美麗", "跳舞", "快樂"] },
+            { text: "蝴蝶帶我來到蝴蝶王國，我[blank]了很多蝴蝶朋友。天上朵朵白雲[blank]，白雲雪白，像[blank]。白雲輕輕，像[blank]。", answers: ["認識", "飄", "棉花", "羽毛"], options: ["認識", "飄", "棉花", "羽毛"] },
+            { text: "我向遠方的朋友[blank]。他高興地向我[blank]。我們雖然相隔很遠，但心卻[blank]在一起。這就是[blank]的力量。", answers: ["揮手", "點頭", "連", "友誼"], options: ["揮手", "點頭", "連", "友誼"] },
+            { text: "小草從泥土裏[blank]出頭來。它們好奇地[blank]着這個世界。春雨給它們[blank]澡，太陽給它們[blank]衣服。", answers: ["探", "打量", "洗", "穿"], options: ["探", "打量", "洗", "穿"] },
+            { text: "夜空中的月亮像一隻小小的[blank]。我坐在小小的船裏，微風輕輕地[blank]着我的臉龐。我身邊有無數顆小星星，它們就像一顆顆[blank]。", answers: ["船", "撫摸", "鑽石", "鑽石"], options: ["船", "撫摸", "鑽石", "鑽石"] },
+            { text: "大樹張開[blank]的手臂，為小鳥遮風擋雨。小鳥在枝頭[blank]地唱歌，好像在[blank]大樹。森林裏充滿了[blank]的氣氛。", answers: ["粗壯", "快活", "感謝", "歡樂"], options: ["粗壯", "快活", "感謝", "歡樂"] },
+            { text: "鬧鐘每天早上都會[blank]我起床。它發出「滴答滴答」的[blank]，好像在說：「快起來，不要[blank]了！」它真是我的好[blank]。", answers: ["叫醒", "聲音", "遲到", "管家"], options: ["叫醒", "聲音", "遲到", "管家"] },
+            { text: "鉛筆搖搖頭說：「我沒有用，我容易[blank]。」膠擦趕緊[blank]鉛筆說：「你有地方比別人強。」文具們互相[blank]，不再[blank]了。", answers: ["摔斷", "安慰", "幫助", "爭吵"], options: ["摔斷", "安慰", "幫助", "爭吵"] },
+            { text: "書包張開大嘴巴，把課本都[blank]了進去。它每天背着沉重的書本，卻從不[blank]。它是我們學習上的好[blank]，我們應該[blank]它。", answers: ["吞", "抱怨", "夥伴", "愛惜"], options: ["吞", "抱怨", "夥伴", "愛惜"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "晚上，文具盒裏傳來一陣陣[blank]。「唉！我愈來愈沒[blank]了。唉！小主人愈來愈不需要我了。」聽完鉛筆的[blank]，直尺十分同情他。鉛筆卻哭得更[blank]了。", answers: ["歎息聲", "用處", "訴說", "傷心"], options: ["歎息聲", "用處", "訴說", "傷心"] },
+            { text: "文具盒裏的其他文具聽到鉛筆的歎氣聲，都[blank]起鉛筆來。原來，自從小主人有了一枝自動鉛筆後，就把他扔在一邊，不再[blank]他了。「原來是這樣，的確是很讓人[blank]。」", answers: ["關心", "理睬", "難過", "難過"], options: ["關心", "理睬", "難過", "難過"] },
+            { text: "膠擦趕緊[blank]鉛筆說：「你也有地方比自動鉛筆強。」鉛筆[blank]說：「沒有！我容易[blank]，又經常把文具盒[blank]。唉！」", answers: ["安慰", "搖搖頭", "摔斷", "弄髒"], options: ["安慰", "搖搖頭", "摔斷", "弄髒"] },
+            { text: "這時，小主人[blank]地走過來，原來她在寫作業的時候，發現自動鉛筆沒有[blank]了，於是過來拿鉛筆去用。鉛筆發現自己還是有用的，而且有比自動鉛筆強的地方，不禁[blank]笑了。", answers: ["急匆匆", "鉛芯", "眉開眼", "眉開眼"], options: ["急匆匆", "鉛芯", "眉開眼", "眉開眼"] },
+            { text: "夏天的夜空真美麗啊！彎彎的月兒像一隻小小的[blank]。我坐在小小的船裏，晚風輕輕地[blank]着我的臉龐。我身邊有無數顆小星星，它們就像一顆顆[blank]，不停地閃耀着，美麗極了。", answers: ["船", "撫摸", "鑽石", "鑽石"], options: ["船", "撫摸", "鑽石", "鑽石"] },
+            { text: "天上朵朵白雲飄，白雲雪白，像[blank]。白雲輕輕，像[blank]。摘下一朵白雲，揉一揉，做成大抱枕，送給[blank]靠一靠。", answers: ["棉花", "羽毛", "婆婆", "婆婆"], options: ["棉花", "羽毛", "婆婆", "婆婆"] },
+            { text: "如果我有一支神筆，我會畫出[blank]的翅膀，讓自己在天空[blank]。我會畫出無數的美食，分給[blank]的小朋友。我還會畫出一個美麗的花園，讓大家在裏面[blank]。", answers: ["彩色", "飛翔", "飢餓", "遊玩"], options: ["彩色", "飛翔", "飢餓", "遊玩"] },
+            { text: "花兒[blank]了笑臉，迎接春天的到來。小草從泥土裏探出頭，[blank]地呼吸着新鮮空氣。微風吹過，柳樹姑娘在河邊[blank]着自己長長的[blank]。", answers: ["綻放", "貪婪", "梳理", "辮子"], options: ["綻放", "貪婪", "梳理", "辮子"] },
+            { text: "雷公公在天上敲起了[blank]，發出轟隆隆的聲音。閃電婆婆揮舞着[blank]，劃破了黑夜的天空。風伯伯鼓起腮幫子，[blank]地吹着。雨滴弟弟們[blank]地跳到了大地上。", answers: ["大鼓", "利劍", "用力", "歡快"], options: ["大鼓", "利劍", "用力", "歡快"] },
+            { text: "橡皮擦是一個[blank]的魔術師。當我在紙上寫錯字時，它就會[blank]跳出來。它在紙上輕輕一[blank]，錯字就消失得無影無蹤了。它真是我的好[blank]。", answers: ["神奇", "挺身而出", "擦", "幫手"], options: ["神奇", "挺身而出", "擦", "幫手"] },
+            { text: "夜深了，城市進入了[blank]。路燈像一位位[blank]的士兵，筆直地站在街道兩旁。它們散發出溫暖的[blank]，照亮了夜歸人回家的[blank]。", answers: ["夢鄉", "忠誠", "光芒", "路"], options: ["夢鄉", "忠誠", "光芒", "路"] },
+            { text: "雪花像潔白的[blank]，在空中翩翩起舞。它們輕輕地落在樹枝上，給大樹披上了一件[blank]的銀裝。大地變成了一個[blank]的童話世界。孩子們在雪地裏玩得[blank]。", answers: ["精靈", "厚厚", "美麗", "不亦樂乎"], options: ["精靈", "厚厚", "美麗", "不亦樂乎"] },
+            { text: "小溪唱着[blank]的歌，一路向東奔流。它遇到石頭，就激起雪白的[blank]。它遇到小魚，就和它們做[blank]。它最終投入了[blank]的懷抱。", answers: ["歡快", "浪花", "遊戲", "大海"], options: ["歡快", "浪花", "遊戲", "大海"] },
+            { text: "秋風像一把神奇的[blank]，把樹葉染成了金黃色和火紅色。樹葉帶着[blank]的心情，依依不捨地離開了樹媽媽。它們在空中[blank]了一會兒，最後落在了[blank]上。", answers: ["刷子", "不捨", "盤旋", "泥土"], options: ["刷子", "不捨", "盤旋", "泥土"] },
+            { text: "雲朵在天上玩[blank]。一會兒變成奔跑的[blank]，一會兒變成可愛的小白兔。風兒一吹，它們又[blank]了。天空真是一個充滿[blank]的遊樂場。", answers: ["變魔術", "白馬", "散開", "奇妙"], options: ["變魔術", "白馬", "散開", "奇妙"] },
+            { text: "冰箱是一個冷酷的[blank]。它把食物都[blank]在自己的肚子裏。只要一打開門，它就會吐出[blank]的冷氣。但是，它保護了食物，不讓它們[blank]。", answers: ["守衛", "關", "冰涼", "變壞"], options: ["守衛", "關", "冰涼", "變壞"] },
+            { text: "書本是一位知識[blank]的老師。它[blank]地等待着我們去翻閱。只要我們用心去[blank]，它就會把所有的秘密都[blank]給我們。", answers: ["淵博", "靜靜", "閱讀", "告訴"], options: ["淵博", "靜靜", "閱讀", "告訴"] },
+            { text: "鬧鐘的指針像參加[blank]的運動員。秒針跑得最[blank]，分針緊跟其後，時針則像個[blank]的老爺爺，慢吞吞地走着。它們每天都在[blank]着時間。", answers: ["賽跑", "快", "慢條斯理", "記錄"], options: ["賽跑", "快", "慢條斯理", "記錄"] },
+            { text: "月亮像一面[blank]的鏡子，高高地掛在天上。星星們圍着它，好像在聽它講[blank]。夜空顯得那麼[blank]和[blank]。", answers: ["明亮", "故事", "寧靜", "神秘"], options: ["明亮", "故事", "寧靜", "神秘"] },
+            { text: "我的想像力像一隻不受[blank]的小鳥。它帶我飛過高山，飛過[blank]。在奇思妙想的世界裏，一切皆有[blank]。我喜歡這種[blank]的感覺。", answers: ["拘束", "海洋", "可能", "自由"], options: ["拘束", "海洋", "可能", "自由"] }
+        ]
+    },
+    {
+        level: 9,
+        title: "第九關：生日會 (活動描寫與賀卡寫作)",
+        point: "1. 認識與生日有關的詞語。\n2. 學習寫作賀卡、邀請卡、感謝卡。",
+        examples: [
+            "我把送給婆婆的生日<span class='highlight'>禮物</span>放在桌子上。",
+            "許多朋友都來參加我的生日<span class='highlight'>聚會</span>。",
+            "我對着蛋糕上的<span class='highlight'>蠟燭</span>許了一個<span class='highlight'>願望</span>。",
+            "生日蛋糕上擺滿了<span class='highlight'>鮮紅</span>的草莓。",
+            "弟弟最想收到的禮物是<span class='highlight'>飛機模型</span>。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "今天是我的[blank]，爸爸媽媽為我舉辦了一個生日會。媽媽送給我一個可愛的小熊[blank]，表哥和表姐也來為我[blank]。我們吃完蛋糕後一起[blank]。", answers: ["生日", "玩具", "慶祝", "唱歌"], options: ["生日", "玩具", "慶祝", "唱歌"] },
+            { text: "今天是我表姐的生日。爸爸、媽媽和我一起為她[blank]。表姐正在[blank]生日蛋糕上的蠟燭。媽媽送的禮物是玩具，哥哥的禮物是[blank]。大家都感到很[blank]。", answers: ["慶祝", "吹熄", "圖書", "快樂"], options: ["慶祝", "吹熄", "圖書", "快樂"] },
+            { text: "媽媽為我舉辦了一個[blank]的生日會。生日會上，媽媽做了許多[blank]的小吃。我們在生日會上玩得很[blank]。度過了一個[blank]的夜晚。", answers: ["熱鬧", "美味", "開心", "難忘"], options: ["熱鬧", "美味", "開心", "難忘"] },
+            { text: "生日蛋糕上插着八枝[blank]。我的生日[blank]是全家人每天都快樂。媽媽祝賀我又[blank]了一歲。我對着蛋糕[blank]許願。", answers: ["蠟燭", "願望", "長大", "閉上眼睛"], options: ["蠟燭", "願望", "長大", "閉上眼睛"] },
+            { text: "親愛的[blank]：明天是您七十歲的生日，祝您生日快樂，身體[blank]，天天都有好[blank]！孫女小美[blank]。", answers: ["祖母", "健康", "心情", "敬上"], options: ["祖母", "健康", "心情", "敬上"] },
+            { text: "我把送給婆婆的生日禮物放在[blank]上。許許多多朋友來參加我的生日[blank]。弟弟最想收到的禮物是飛機[blank]。大家都帶來了[blank]的禮物。", answers: ["桌子", "聚會", "模型", "精美"], options: ["桌子", "聚會", "模型", "精美"] },
+            { text: "收到邀請卡，我會準時[blank]生日會。我提前祝好朋友生日[blank]。我們在生日會上一起[blank]遊戲。氣氛非常[blank]。", answers: ["出席", "快樂", "玩", "熱鬧"], options: ["出席", "快樂", "玩", "熱鬧"] },
+            { text: "爸爸買了一個[blank]的生日蛋糕。蛋糕上面鋪滿了新鮮的[blank]。我點燃了蛋糕上的[blank]。大家為我唱起[blank]。", answers: ["美味", "草莓", "蠟燭", "生日歌"], options: ["美味", "草莓", "蠟燭", "生日歌"] },
+            { text: "我把心意卡[blank]給老師。卡片上寫滿了[blank]的字句。老師看了感到很[blank]。我祝老師節日[blank]。", answers: ["送", "祝福", "欣慰", "快樂"], options: ["送", "祝福", "欣慰", "快樂"] },
+            { text: "生日會的房間裏掛滿了彩色的[blank]。桌子上擺放着各種[blank]。客人都帶着[blank]的笑容。我們一起合照[blank]。", answers: ["氣球", "食物", "燦爛", "留念"], options: ["氣球", "食物", "燦爛", "留念"] },
+            { text: "這份禮物包裝得非常[blank]。我小心翼翼地[blank]包裝紙。裏面是我夢寐以求的[blank]。我高興地向媽媽道[blank]。", answers: ["精緻", "拆開", "禮物", "謝"], options: ["精緻", "拆開", "禮物", "謝"] },
+            { text: "今天是外公的[blank]大壽。全家人去酒樓為他[blank]。我們為外公準備了[blank]的壽桃。外公笑得合不攏[blank]。", answers: ["八十", "慶祝", "香甜", "嘴"], options: ["八十", "慶祝", "香甜", "嘴"] },
+            { text: "妹妹[blank]雙手，對着蛋糕許願。她希望自己能得到一個新的[blank]。許完願，她用力一吹，把蠟燭都[blank]了。大家都為她[blank]。", answers: ["合攏", "洋娃娃", "吹滅", "鼓掌"], options: ["合攏", "洋娃娃", "吹滅", "鼓掌"] },
+            { text: "我用彩色筆親手[blank]了一張生日卡。卡面上畫了一個大[blank]。我寫上：「祝你[blank]成真！」這是一份充滿[blank]的禮物。", answers: ["製作", "蛋糕", "願望", "心意"], options: ["製作", "蛋糕", "願望", "心意"] },
+            { text: "生日會結束後，我站在門口[blank]客人。我對他們說：「[blank]你們來參加！」客人們也對我說：「[blank]！」這真是[blank]的一天。", answers: ["歡送", "謝謝", "再見", "美好"], options: ["歡送", "謝謝", "再見", "美好"] },
+            { text: "這是一張生日[blank]卡。上面寫清楚了日期、時間和[blank]。我把它交給我的好[blank]。[blank]他能來參加我的生日會。", answers: ["邀請", "地點", "朋友", "希望"], options: ["邀請", "地點", "朋友", "希望"] },
+            { text: "生日蛋糕切開了，大家津津有[blank]地吃着。蛋糕甜絲絲的，就像我們[blank]的心情。今天我又[blank]了一歲，應該變得更加[blank]。", answers: ["味", "快樂", "長大", "懂事"], options: ["味", "快樂", "長大", "懂事"] },
+            { text: "大家為壽星送上[blank]的祝福。祝他身體健康，學業[blank]。壽星連忙說[blank]。房間裏充滿了[blank]的笑聲。", answers: ["真誠", "進步", "謝謝", "歡樂"], options: ["真誠", "進步", "謝謝", "歡樂"] },
+            { text: "為了佈置生日會，我們在牆上貼了[blank]彩帶。天花板上飄着五顏六色的[blank]。整個房間看起來充滿了[blank]的氣氛。大家一進來都發出[blank]的讚歎。", answers: ["彩色", "氣球", "節日", "驚喜"], options: ["彩色", "氣球", "節日", "驚喜"] },
+            { text: "媽媽為我準備了一套新[blank]作為生日禮物。穿上新衣服，我覺得自己很[blank]。我帶着[blank]的心情迎接每一位來賓。這是一個充滿[blank]的生日。", answers: ["衣服", "神氣", "興奮", "愛"], options: ["衣服", "神氣", "興奮", "愛"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "今天是我的生日。一早，媽媽便去蛋糕店買了一個大大的生日蛋糕。蛋糕放在[blank]裏，我總是[blank]打開冰箱門去看看，[blank]夜晚快點來臨。", answers: ["冰箱", "偷偷", "希望", "盼望"], options: ["冰箱", "偷偷", "希望", "盼望"] },
+            { text: "太陽勞累了一天，終於下山了，月亮在天邊[blank]探出頭來。晚上七點，我們拿出蛋糕，[blank]蠟燭。爸爸跟媽媽為我唱起了[blank]。之後媽媽說：「許個願吧！」", answers: ["悄悄地", "點燃", "生日歌", "生日歌"], options: ["悄悄地", "點燃", "生日歌", "生日歌"] },
+            { text: "許完願，我開始吹蠟燭，「一、二、三，吹！」隨着大家的[blank]，我用力吹一口氣，把蠟燭[blank]了。我們都[blank]起來。該切蛋糕了，爸爸[blank]我的手，把蛋糕分成了三份。", answers: ["口令", "吹滅", "歡呼", "握着"], options: ["口令", "吹滅", "歡呼", "握着"] },
+            { text: "我們[blank]地吃着蛋糕，開心極了。今晚，我度過了一次[blank]的生日，我又長大了一歲。我會在心裏感謝父母對我的[blank]和[blank]。", answers: ["津津有味", "難忘", "愛護", "照顧"], options: ["津津有味", "難忘", "愛護", "照顧"] },
+            { text: "志新想邀請文文參加生日會。邀請卡寫着：後天是我的生日，爸爸將為我[blank]生日會，希望你能夠來[blank]。地點在美味[blank]，時間是晚上六點。", answers: ["舉辦", "參加", "餐廳", "出席"], options: ["舉辦", "參加", "餐廳", "出席"] },
+            { text: "文文收到邀請卡很高興，回信寫着：感謝你邀請我[blank]生日會，我會準時[blank]，並提前祝你[blank]快樂。期待在生日會上與大家[blank]。", answers: ["參加", "出席", "生日", "相聚"], options: ["參加", "出席", "生日", "相聚"] },
+            { text: "為了給媽媽一個驚喜，我和爸爸[blank]籌備了她的生日會。我們買了媽媽最喜歡的百合花，還親手[blank]了一張巨大的賀卡。當媽媽下班回家打開門時，我們齊聲說：「生日[blank]！」", answers: ["秘密", "製作", "快樂", "驚喜"], options: ["秘密", "製作", "快樂", "驚喜"] },
+            { text: "媽媽看到這一切，感動得熱淚[blank]。她抱住我和爸爸說：「這是我收過最[blank]的禮物。」我們一家人緊緊擁抱在一起，感受着家庭的[blank]和[blank]。", answers: ["盈眶", "珍貴", "溫暖", "幸福"], options: ["盈眶", "珍貴", "溫暖", "幸福"] },
+            { text: "生日會上，大家玩起了「擊鼓傳花」的[blank]。鼓聲一停，拿到花的人就要表演[blank]。輪到我時，我為大家朗誦了一首[blank]，贏得了熱烈的[blank]。", answers: ["遊戲", "節目", "詩歌", "掌聲"], options: ["遊戲", "節目", "詩歌", "掌聲"] },
+            { text: "外婆的八十大壽在一家大酒樓舉行。親戚朋友們都來[blank]。宴席上，大家舉杯向外婆[blank]，祝她福如東海，壽比南山。外婆笑得[blank]。", answers: ["道賀", "祝酒", "合不攏嘴", "喜氣洋洋"], options: ["道賀", "祝酒", "合不攏嘴", "喜氣洋洋"] },
+            { text: "寫賀卡時要注意格式。開頭要頂格寫[blank]，然後寫上祝福語。最後在右下方寫上[blank]和日期。一張充滿心意的賀卡就[blank]了。", answers: ["稱呼", "署名", "完成", "寄出"], options: ["稱呼", "署名", "完成", "寄出"] },
+            { text: "我的生日願望是希望有一隻小狗。當爸爸拿進一個會動的[blank]時，我驚喜萬分。打開一看，真的是一隻可愛的[blank]！我高興地把它[blank]在懷裏。", answers: ["紙箱", "小狗", "抱", "親吻"], options: ["紙箱", "小狗", "抱", "親吻"] },
+            { text: "在同學的生日派對上，我們進行了切蛋糕[blank]。壽星切下第一塊蛋糕遞給他的[blank]，感謝他們的養育之恩。這是一個非常有[blank]的舉動，值得我們[blank]。", answers: ["儀式", "父母", "意義", "學習"], options: ["儀式", "父母", "意義", "學習"] },
+            { text: "拆禮物環節是最令人期待的。我收到了一套百科全書，一本[blank]的故事書，還有一個精緻的八音盒。我對每一位送禮物的朋友都表達了[blank]的[blank]。", answers: ["有趣", "由衷", "感謝", "感激"], options: ["有趣", "由衷", "感謝", "感激"] },
+            { text: "生日意味着我又成長了一步。我不僅個子長[blank]了，還要變得更加懂事。我會主動幫媽媽做[blank]，在學校裏認真[blank]，做一個好孩子。", answers: ["高", "家務", "學習", "努力"], options: ["高", "家務", "學習", "努力"] },
+            { text: "這場生日會的主題是「海洋世界」。房間裏佈置了許多藍色的[blank]，還有各種海洋生物的[blank]。大家都穿着藍色的[blank]，彷彿置身於[blank]之中。", answers: ["裝飾", "圖案", "衣服", "大海"], options: ["裝飾", "圖案", "衣服", "大海"] },
+            { text: "宴會結束後，我親自把邀請來的客人送到[blank]。我對他們說：「感謝你們的[blank]，今天我過得非常愉快。」客人們帶着[blank]的笑容離開了。", answers: ["門口", "光臨", "滿意", "高興"], options: ["門口", "光臨", "滿意", "高興"] },
+            { text: "每年生日，媽媽都會帶我去影樓拍一張[blank]。看着相冊裏從小到大的照片，我感歎時間過得真[blank]。我要珍惜每一天的[blank]，努力實現自己的[blank]。", answers: ["照片", "快", "時光", "夢想"], options: ["照片", "快", "時光", "夢想"] },
+            { text: "今天我收到了一張[blank]的生日卡。原來是在外國讀書的表哥[blank]給我的。卡片上寫着滿滿的祝福，雖然相隔萬里，但我能感受到他的[blank]。", answers: ["特別", "寄", "心意", "關心"], options: ["特別", "寄", "心意", "關心"] },
+            { text: "在生日會上，媽媽端出了一碗長壽麪。她說吃長壽麪代表着[blank]和長壽。我用筷子挑起長長的[blank]，小心翼翼地吃進嘴裏，心裏充滿了對未來的[blank]。", answers: ["健康", "麵條", "期盼", "祝福"], options: ["健康", "麵條", "期盼", "祝福"] }
+        ]
+    },
+    {
+        level: 10,
+        title: "第十關：我的家人",
+        point: "1. 認識家人稱謂。\n2. 學習運用人稱代詞和疑問代詞。\n3. 學習運用形容詞描寫人物外貌。",
+        examples: [
+            "爸爸喜歡在<span class='highlight'>假日</span>的時候去釣魚。",
+            "媽媽會製作各種<span class='highlight'>美味</span>的糕點。",
+            "姐姐最喜歡吃的水果是<span class='highlight'>櫻桃</span>。",
+            "我向祖父學習<span class='highlight'>書法</span>和畫水墨畫。",
+            "外婆每天早晨都要去公園打<span class='highlight'>太極拳</span>。"
+        ],
+        easyQuestions: [
+            { text: "爸爸喜歡在[blank]的時候去釣魚。媽媽會製作各種[blank]的糕點。姐姐最喜歡吃的水果是[blank]。我向祖父學習書法和畫[blank]。", answers: ["假日", "美味", "櫻桃", "水墨畫"], options: ["假日", "美味", "櫻桃", "水墨畫"] },
+            { text: "弟弟的頭髮是[blank]的。妹妹的眼睛是[blank]的。哥哥的牙齒是[blank]的。爸爸的手臂是[blank]的。", answers: ["烏黑", "明亮", "潔白", "長長"], options: ["烏黑", "明亮", "潔白", "長長"] },
+            { text: "吃過晚飯後，[blank]和我在廚房洗碗，[blank]在看報紙，[blank]在織毛衣，姐姐在[blank]。", answers: ["媽媽", "爸爸", "外婆", "畫畫"], options: ["媽媽", "爸爸", "外婆", "畫畫"] },
+            { text: "姐姐的頭髮看起來很漂亮。姐姐的頭髮[blank]，看起來很漂亮。弟弟的臉蛋看起來很可愛。弟弟的臉蛋[blank]，看起來很[blank]。哥哥的身體[blank]，十分強壯。", answers: ["長長的", "紅通通的", "可愛", "胖乎乎"], options: ["長長的", "紅通通的", "可愛", "胖乎乎"] },
+            { text: "我的姐姐是三年級的學生，她梳着兩條長長的[blank]，樣子非常好看。姐姐學習很勤奮，每門功課都很[blank]，經常得到老師的[blank]。她是我學習的好[blank]。", answers: ["辮子", "優秀", "誇獎", "榜樣"], options: ["辮子", "優秀", "誇獎", "榜樣"] },
+            { text: "星期天，[blank]和我去打羽毛球。開心的動畫片，[blank]和弟弟最喜歡看。外婆每天早晨都要去公園打[blank]。爺爺在客廳裏喝[blank]。", answers: ["爸爸", "我", "太極拳", "熱茶"], options: ["爸爸", "我", "太極拳", "熱茶"] },
+            { text: "妹妹找不到[blank]便哭起來。中間那個[blank]的男孩是雪兒的哥哥。[blank]在廚房裏洗碗？[blank]有美麗的花朵？", answers: ["玩具", "高高", "誰", "哪裏"], options: ["玩具", "高高", "誰", "哪裏"] },
+            { text: "哥哥的眼睛[blank]，看起來很有神。妹妹的臉龐[blank]，像個洋娃娃。爸爸的眉毛[blank]，顯得很威武。弟弟的身體[blank]，十分可愛。", answers: ["大大的", "白淨", "濃密", "圓滾滾"], options: ["大大的", "白淨", "濃密", "圓滾滾"] },
+            { text: "上午，哥哥去公園[blank]。媽媽問小美：「你和爸爸[blank]時候回來？」我和姐姐一起收拾[blank]。志文和志新都愛看[blank]。", answers: ["玩耍", "甚麼", "房間", "動畫片"], options: ["玩耍", "甚麼", "房間", "動畫片"] },
+            { text: "祖父的頭髮是[blank]的。祖母的臉上有[blank]。叔叔的個子很[blank]。阿姨的笑容很[blank]。", answers: ["花白", "皺紋", "高大", "甜美"], options: ["花白", "皺紋", "高大", "甜美"] },
+            { text: "媽媽是家中[blank]清潔的人，她總是將家裏的每個角落都收拾得[blank]。我[blank]看動畫片和收集[blank]。", answers: ["最愛", "乾乾淨淨", "喜歡", "郵票"], options: ["最愛", "乾乾淨淨", "喜歡", "郵票"] },
+            { text: "我們一家[blank]口人，[blank]得非常快樂。爸爸是個[blank]的人，臉上總是帶着[blank]。", answers: ["三", "生活", "幽默", "微笑"], options: ["三", "生活", "幽默", "微笑"] },
+            { text: "[blank]人喜歡在假日時去釣魚？[blank]女孩是你的妹妹？你[blank]完成這份功課？[blank]有賣美味的糕點？", answers: ["甚麼", "哪個", "怎樣", "哪裏"], options: ["甚麼", "哪個", "怎樣", "哪裏"] },
+            { text: "爺爺喜歡在[blank]看電視。奶奶喜歡在[blank]種花。我喜歡在[blank]看書。我們一家人[blank]得很好。", answers: ["客廳", "陽台", "房間", "相處"], options: ["客廳", "陽台", "房間", "相處"] },
+            { text: "表哥今年讀[blank]。表姐彈鋼琴很[blank]。舅舅送給我一盒[blank]。姑姑帶我去[blank]玩。", answers: ["五年級", "好聽", "巧克力", "遊樂場"], options: ["五年級", "好聽", "巧克力", "遊樂場"] },
+            { text: "弟弟的臉蛋[blank]的，像個紅蘋果。姐姐的聲音[blank]，像小鳥唱歌。哥哥的力氣很[blank]，能搬起重物。我的手[blank]，還需要多鍛鍊。", answers: ["圓溜溜", "清脆", "大", "小小的"], options: ["圓溜溜", "清脆", "大", "小小的"] },
+            { text: "媽媽穿上新買的[blank]，看起來很[blank]。爸爸換上[blank]，準備去上班。我穿上[blank]，背着書包去上學。", answers: ["裙子", "美麗", "西裝", "校服"], options: ["裙子", "美麗", "西裝", "校服"] },
+            { text: "外公喜歡[blank]，每天早上都會去公園。外婆喜歡[blank]收音機。他們兩位老人家身體都非常[blank]。我們都很[blank]他們。", answers: ["散步", "聽", "健康", "愛"], options: ["散步", "聽", "健康", "愛"] },
+            { text: "[blank]的鉛筆掉在地上了？那是[blank]的鉛筆。請把它還給[blank]，好[blank]？", answers: ["誰", "我", "我", "嗎"], options: ["誰", "我", "我", "嗎"] },
+            { text: "這個[blank]的課室是我們的。那個[blank]的男孩是誰？這件[blank]的外套是哥哥的。那條[blank]的褲子是爸爸的。", answers: ["明亮", "胖乎乎", "藍色", "長長"], options: ["明亮", "胖乎乎", "藍色", "長長"] }
+        ],
+        hardQuestions: [
+            { text: "我的爸爸[blank]很高，[blank]的臉龐，[blank]的眉毛，還戴着一副眼鏡，說話的時候，聲音很[blank]。", answers: ["個子", "方形", "粗粗", "溫和"], options: ["個子", "方形", "粗粗", "溫和"] },
+            { text: "爸爸很[blank]我的學習。每天回到家，爸爸一放下[blank]，就會問我：「今天在學校[blank]？功課做完了[blank]？」", answers: ["關心", "公事包", "怎樣", "嗎"], options: ["關心", "公事包", "怎樣", "嗎"] },
+            { text: "每次我做完功課後，爸爸都會為我[blank]。溫習功課時，我有不[blank]的地方，爸爸也會很[blank]地給我[blank]。", answers: ["檢查", "懂", "耐心", "解答"], options: ["檢查", "懂", "耐心", "解答"] },
+            { text: "爸爸的工作很忙，常常不能跟我們一起吃[blank]。有時候我睡了他才回家，早晨，我還沒有[blank]，他已經去[blank]了。我希望爸爸不要這麼[blank]。", answers: ["晚飯", "起床", "工作", "辛苦"], options: ["晚飯", "起床", "工作", "辛苦"] },
+            { text: "我[blank]爸爸能有更多的時間陪我，更希望他不要這麼辛苦地[blank]。爸爸很愛我，我也很[blank]我的[blank]。", answers: ["希望", "工作", "愛", "爸爸"], options: ["希望", "工作", "愛", "爸爸"] },
+            { text: "爸爸是個幽默的人，他[blank]，臉上總是帶着微笑。當我的字寫得不整齊時，他會[blank]地說：「你真棒！竟然會閉着眼睛寫字。」我只好承認自己不夠[blank]，馬上重新[blank]。", answers: ["長得胖胖的", "幽默", "認真", "書寫"], options: ["長得胖胖的", "幽默", "認真", "書寫"] },
+            { text: "媽媽是家中最愛[blank]的人，她總是將家裏的每個[blank]都收拾得[blank]，物品擺放得[blank]。", answers: ["清潔", "角落", "乾乾淨淨", "整整齊齊"], options: ["清潔", "角落", "乾乾淨淨", "整整齊齊"] },
+            { text: "我的姐姐是三年級的[blank]，她梳着兩條[blank]的辮子，樣子非常[blank]。姐姐學習很[blank]。", answers: ["學生", "長長", "好看", "勤奮"], options: ["學生", "長長", "好看", "勤奮"] },
+            { text: "姐姐每門功課都很[blank]，經常得到老師的[blank]。我非常喜歡[blank]，她是我學習的好[blank]。", answers: ["優秀", "誇獎", "姐姐", "榜樣"], options: ["優秀", "誇獎", "姐姐", "榜樣"] },
+            { text: "吃過晚飯後，我們一家人在客廳裏[blank]。爸爸在[blank]，媽媽在看電視，我和弟弟在地毯上玩[blank]。家庭的氣氛十分[blank]。", answers: ["休息", "看報紙", "積木", "溫馨"], options: ["休息", "看報紙", "積木", "溫馨"] },
+            { text: "突然，門鈴[blank]。原來是叔叔和阿姨帶着表弟來[blank]我們。家裏頓時變得[blank]起來，充滿了[blank]聲。", answers: ["響了", "探望", "熱鬧", "歡笑"], options: ["響了", "探望", "熱鬧", "歡笑"] },
+            { text: "表弟長得[blank]的，一雙大眼睛[blank]地轉。他看到我的玩具車，就走過去拿起來[blank]。我[blank]地把玩具借給他。", answers: ["胖乎乎", "骨碌碌", "玩", "大方"], options: ["胖乎乎", "骨碌碌", "玩", "大方"] },
+            { text: "媽媽從廚房端出[blank]的水果，熱情地[blank]客人。大家一邊吃水果，一邊談天[blank]，氣氛十分[blank]。", answers: ["切好", "招呼", "說地", "融洽"], options: ["切好", "招呼", "說地", "融洽"] },
+            { text: "到了晚上十點，叔叔一家人準備[blank]了。我們站在門口和他們[blank]。表弟依依不捨地[blank]說：「下次再來[blank]！」", answers: ["回家", "道別", "揮手", "玩"], options: ["回家", "道別", "揮手", "玩"] },
+            { text: "星期天，我們全家人一起去郊外[blank]。一路上，爸爸給我們講了許多[blank]的故事，逗得大家[blank]，笑聲在山谷中[blank]。", answers: ["遠足", "有趣", "哈哈大笑", "迴盪"], options: ["遠足", "有趣", "哈哈大笑", "迴盪"] },
+            { text: "走到半山腰，妹妹覺得[blank]了，走不動了。爸爸便把妹妹[blank]在背上。看到爸爸滿頭[blank]，我連忙遞上[blank]。", answers: ["累", "背", "大汗", "毛巾"], options: ["累", "背", "大汗", "毛巾"] },
+            { text: "終於到達了山頂，[blank]的風景展現在我們眼前。我們找了一塊[blank]的草地坐下，開始[blank]。大家分享着[blank]的食物。", answers: ["美麗", "平坦", "野餐", "美味"], options: ["美麗", "平坦", "野餐", "美味"] },
+            { text: "媽媽為大家拍了許多[blank]，留下了[blank]的回憶。雖然遠足有些[blank]，但能和家人一起親近[blank]，我覺得很開心。", answers: ["照片", "美好", "辛苦", "大自然"], options: ["照片", "美好", "辛苦", "大自然"] },
+            { text: "祖父是一位[blank]的老人。他喜歡在院子裏種植各種各樣的[blank]。每天傍晚，他都會拿着水壺給植物[blank]，照顧得十分[blank]。", answers: ["慈祥", "花草", "澆水", "周到"], options: ["慈祥", "花草", "澆水", "周到"] },
+            { text: "我經常幫祖父[blank]和捉蟲。祖父誇我是他的小[blank]。看着花園裏開滿了[blank]的花朵，我們心裏充滿了[blank]。", answers: ["拔草", "幫手", "五顏六色", "成就感"], options: ["成就感", "五顏六色", "幫手", "拔草"] }
+        ]
+    },
+    {
+        level: 11,
+        title: "第十一關：做家務",
+        point: "1. 認識與家居和做家務有關的詞語。\n2. 學習運用「……還……」的句式。\n3. 學習寫作做家務的過程。",
+        examples: [
+            "我會主動<span class='highlight'>收拾</span>自己的<span class='highlight'>房間</span>。",
+            "媽媽將地板<span class='highlight'>擦</span>得很<span class='highlight'>乾淨</span>。",
+            "婆婆<span class='highlight'>提着籃子</span>去市場買菜。",
+            "爸爸將新<span class='highlight'>窗簾</span>掛在窗戶上。",
+            "媽媽每天為家人<span class='highlight'>做美味</span>的飯菜。"
+        ],
+        easyQuestions: [
+            { text: "我會主動[blank]自己的[blank]。媽媽將[blank]擦得很[blank]。", answers: ["收拾", "房間", "地板", "乾淨"], options: ["收拾", "房間", "地板", "乾淨"] },
+            { text: "今天，我[blank]做完功課，看見媽媽正在[blank]。我走過去說：「媽媽，我來[blank]吧！」我[blank]媽媽把挑好的菜裝在籃子裏。", answers: ["很早", "挑菜", "幫您", "和"], options: ["很早", "挑菜", "幫您", "和"] },
+            { text: "我會[blank]，還會[blank]。媽媽買了[blank]，還買了[blank]。", answers: ["掃地", "擦桌子", "魚", "蔬菜"], options: ["掃地", "擦桌子", "魚", "蔬菜"] },
+            { text: "我和弟弟一起把[blank]收拾得[blank]。媽媽將疊好的[blank]放進[blank]裏。", answers: ["房間", "乾乾淨淨", "衣服", "衣櫃"], options: ["房間", "乾乾淨淨", "衣服", "衣櫃"] },
+            { text: "今天是[blank]，媽媽提議全家來大[blank]。媽媽[blank]窗戶，爸爸[blank]桌子。", answers: ["周末", "掃除", "擦", "抹"], options: ["周末", "掃除", "擦", "抹"] },
+            { text: "星期天，我跟外婆去[blank]買菜。市場裏可真[blank]，我們先來到菜檔，菜檔裏擺滿了各種新鮮的[blank]，有綠油油的[blank]。", answers: ["市場", "熱鬧", "蔬菜", "青菜"], options: ["市場", "熱鬧", "蔬菜", "青菜"] },
+            { text: "吃過早飯，爸爸在[blank]裏抹沙發。我在[blank]裏疊被子。媽媽在[blank]裏洗碗。大家都在忙着做[blank]。", answers: ["客廳", "臥室", "廚房", "家務"], options: ["客廳", "臥室", "廚房", "家務"] },
+            { text: "我拿起掃把，把[blank]掃進垃圾桶。然後用拖把將[blank]拖乾淨。最後把垃圾[blank]掉。媽媽稱讚我是個好[blank]。", answers: ["垃圾", "地板", "倒", "孩子"], options: ["垃圾", "地板", "倒", "孩子"] },
+            { text: "奶奶在[blank]上晾衣服。風兒吹過，衣服輕輕[blank]。陽光照在衣服上，散發出[blank]的味道。衣服很快就[blank]了。", answers: ["陽台", "搖擺", "好聞", "乾"], options: ["陽台", "搖擺", "好聞", "乾"] },
+            { text: "媽媽把[blank]衣服放進[blank]裏。加入洗衣粉後，按下[blank]。機器開始[blank]起來。", answers: ["髒", "洗衣機", "按鈕", "轉動"], options: ["髒", "洗衣機", "按鈕", "轉動"] },
+            { text: "哥哥在洗手順便[blank]洗臉盆。他用刷子用力[blank]。洗臉盆變得[blank]的。哥哥真[blank]。", answers: ["清洗", "刷", "白白淨淨", "勤勞"], options: ["清洗", "刷", "白白淨淨", "勤勞"] },
+            { text: "吃完晚飯，我幫忙收拾[blank]。把剩下的飯菜放進[blank]。然後把碗碟放進[blank]裏。廚房變得[blank]了。", answers: ["餐桌", "電冰箱", "洗碗盆", "整潔"], options: ["餐桌", "電冰箱", "洗碗盆", "整潔"] },
+            { text: "週末，爸爸修理壞了的[blank]。他用錘子敲打[blank]。修理好後，椅子變得非常[blank]。爸爸真[blank]。", answers: ["椅子", "釘子", "堅固", "厲害"], options: ["椅子", "釘子", "堅固", "厲害"] },
+            { text: "我和妹妹整理[blank]。把積木放進[blank]裏。把圖書放回[blank]上。房間不再[blank]了。", answers: ["玩具", "盒子", "書架", "凌亂"], options: ["玩具", "盒子", "書架", "凌亂"] },
+            { text: "媽媽在[blank]，鍋裏發出滋滋的聲音。爸爸在幫忙[blank]。我負責擺放[blank]。我們合作得[blank]。", answers: ["煮飯", "切菜", "碗筷", "很好"], options: ["煮飯", "切菜", "碗筷", "很好"] },
+            { text: "玻璃窗上有很多[blank]。我用濕[blank]擦拭。窗戶變得十分[blank]。陽光照進來感覺很[blank]。", answers: ["灰塵", "抹布", "明亮", "溫暖"], options: ["灰塵", "抹布", "明亮", "溫暖"] },
+            { text: "媽媽去[blank]購買日用品。買了牙膏、洗潔精和[blank]。還買了一些[blank]。提着[blank]的袋子回家。", answers: ["超市", "肥皂", "零食", "沉重"], options: ["超市", "肥皂", "零食", "沉重"] },
+            { text: "每天早上，我都會[blank]床鋪。把枕頭放[blank]。把被子疊得像一塊[blank]。房間看起來很[blank]。", answers: ["整理", "好", "豆腐", "舒服"], options: ["整理", "好", "豆腐", "舒服"] },
+            { text: "媽媽教我[blank]破了的衣服。我小心地拿着[blank]。一針一線地[blank]起來。雖然縫得不漂亮，但我[blank]了一項新技能。", answers: ["縫補", "針線", "縫", "學會"], options: ["縫補", "針線", "縫", "學會"] },
+            { text: "爸爸整理了書桌，[blank]整理了書架。媽媽買了魚，[blank]買了蔬菜。我會掃地，[blank]會擦桌子。做家務是一件[blank]的事。", answers: ["還", "還", "還", "有意義"], options: ["還", "還", "還", "有意義"] }
+        ],
+        hardQuestions: [
+            { text: "吃過[blank]後，媽媽提議我來[blank]。我覺得洗碗很有[blank]，就[blank]答應了。", answers: ["晚飯", "洗碗", "意思", "滿口"], options: ["晚飯", "洗碗", "意思", "滿口"] },
+            { text: "我走進[blank]，學着媽媽的樣子，繫上[blank]，把袖子[blank]高高的，以免[blank]了衣服。", answers: ["廚房", "圍裙", "挽得", "弄髒"], options: ["廚房", "圍裙", "挽得", "弄髒"] },
+            { text: "開始洗了，我先往池子裏[blank]洗潔精，接着放滿水，然後[blank]將碗一個一個洗乾淨，最後用[blank]沖洗一遍，這樣[blank]就洗好了。", answers: ["滴幾滴", "小心地", "清水", "碗"], options: ["滴幾滴", "小心地", "清水", "碗"] },
+            { text: "媽媽走進廚房[blank]了，笑着說：「茜茜，你做得真[blank]！」我有些不好意思了，一邊擦手一邊說：「媽媽，我以後會[blank]洗碗，還要幫您做更多[blank]。」", answers: ["看見", "不錯", "幫忙", "家務"], options: ["看見", "不錯", "幫忙", "家務"] },
+            { text: "首先先用[blank]將手帕[blank]。接着，在手帕上[blank]一些[blank]。", answers: ["水", "打濕", "抹上", "肥皂"], options: ["水", "打濕", "抹上", "肥皂"] },
+            { text: "輕輕一[blank]，手帕上就起了很多[blank]。然後用清水沖乾淨，最後掛在衣架上[blank]。今天，我想把[blank]洗一洗。", answers: ["搓", "泡泡", "晾乾", "髒手帕"], options: ["搓", "泡泡", "晾乾", "髒手帕"] },
+            { text: "今天是大除夕，媽媽說：「我們要大掃除，[blank]新的一年。」媽媽開始分配工作：我和弟弟打掃自己的[blank]，媽媽負責[blank]客廳，爸爸負責擦[blank]。", answers: ["迎接", "房間", "清潔", "窗子"], options: ["迎接", "房間", "清潔", "窗子"] },
+            { text: "爸爸挽起[blank]，站在椅子上，從上到下地[blank]。媽媽拿着[blank]仔細地清潔地板。不一會兒，地板就被吸得[blank]。", answers: ["袖子", "擦拭", "吸塵器", "乾乾淨淨"], options: ["袖子", "擦拭", "吸塵器", "乾乾淨淨"] },
+            { text: "我和弟弟分工[blank]，很快將房間收拾得[blank]。大掃除結束了，雖然很[blank]，但大家都覺得非常[blank]。", answers: ["合作", "整整齊齊", "累", "開心"], options: ["合作", "整整齊齊", "累", "開心"] },
+            { text: "媽媽買了魚，還買了[blank]。爸爸整理了書桌，還整理了[blank]。我會掃地，還會[blank]。我們一家人都很勤勞，家裏總是保持[blank]。", answers: ["蔬菜", "書架", "擦桌子", "整潔"], options: ["蔬菜", "書架", "擦桌子", "整潔"] },
+            { text: "星期天，我跟外婆去市場買菜。市場裏可真熱鬧，我們先來到菜檔，菜檔裏擺滿了[blank]，有綠油油的青菜，有紅通通的[blank]，還有雪白的大[blank]。外婆仔細地[blank]。", answers: ["各種新鮮的蔬菜", "番茄", "蘿蔔", "挑選"], options: ["各種新鮮的蔬菜", "番茄", "蘿蔔", "挑選"] },
+            { text: "我們走到一個攤位前，菜心綠油油的，很新鮮。外婆問我：「[blank]？」我想了想說：「好，爸爸媽媽都愛吃牛肉炒[blank]。」外婆[blank]買了兩斤。我們還買了[blank]。", answers: ["買菜心好不好", "菜心", "高興地", "魚"], options: ["買菜心好不好", "菜心", "高興地", "魚"] },
+            { text: "買完青菜，我們又去肉檔買了牛肉。最後，我們還在水果檔買了[blank]。今天的[blank]真不小，真[blank]啊！我們提着沉重的袋子，滿載而[blank]。", answers: ["一些蘋果帶回家", "收穫", "豐富", "歸"], options: ["一些蘋果帶回家", "收穫", "豐富", "歸"] },
+            { text: "媽媽在廚房裏忙碌着，她熟練地將蔬菜[blank]，放入鍋中。鍋裏立刻發出「劈啪」的聲音，飄出陣陣[blank]。我在一旁幫忙[blank]調味料，最後把菜[blank]上桌。", answers: ["切碎", "香味", "遞", "端"], options: ["切碎", "香味", "遞", "端"] },
+            { text: "洗衣機洗完衣服後，發出「滴滴」的[blank]音。我幫媽媽把[blank]的衣服拿出來，放進籃子裏。我們一起把衣服[blank]在陽台的竹竿上，讓太陽把它們[blank]。", answers: ["提示", "濕漉漉", "晾", "曬乾"], options: ["提示", "濕漉漉", "晾", "曬乾"] },
+            { text: "週末，爸爸決定把客廳的牆壁重新粉刷一遍。他戴上[blank]做的帽子，拿起刷子，沾上白色的[blank]，在牆上[blank]地塗抹。牆壁立刻變得[blank]。", answers: ["報紙", "油漆", "均勻", "雪白"], options: ["報紙", "油漆", "均勻", "雪白"] },
+            { text: "我也想幫忙，爸爸便給我一把小刷子，讓我在[blank]刷。雖然我不小心把油漆弄到了[blank]，但看着煥然一新的牆壁，我們都充滿了[blank]。媽媽稱讚我們是好[blank]。", answers: ["低處", "臉上", "成就感", "拍檔"], options: ["低處", "臉上", "成就感", "拍檔"] },
+            { text: "晚上，我幫忙把洗好的衣服[blank]整齊。我學着媽媽的樣子，先將衣服的袖子向內[blank]，然後再對摺。不一會兒，衣服就疊成了一座小[blank]，我把它們放進[blank]裏。", answers: ["摺疊", "摺", "山", "衣櫃"], options: ["摺疊", "摺", "山", "衣櫃"] },
+            { text: "鞋櫃裏的鞋子有些[blank]。我把它們一雙雙拿出來，用抹布擦去上面的[blank]。然後按照四季和款式[blank]，整齊地放回鞋櫃。找鞋子時就[blank]多了。", answers: ["凌亂", "灰塵", "分類", "方便"], options: ["凌亂", "灰塵", "分類", "方便"] },
+            { text: "照顧寵物也是做家務的一部分。每天放學後，我會給小狗[blank]和換水。週末還會幫牠洗澡。雖然有些[blank]，但看到小狗[blank]快樂地成長，我覺得很[blank]。", answers: ["餵食", "麻煩", "健康", "值得"], options: ["餵食", "麻煩", "健康", "值得"] }
+        ]
+    },
+    {
+        level: 12,
+        title: "第十二關：快樂星期天",
+        point: "1. 認識與休閒活動有關的詞語。\n2. 學習寫出星期天發生的趣事與樂事。",
+        examples: [
+            "爸爸帶我到公園去<span class='highlight'>觀賞</span>菊花。",
+            "我們一邊<span class='highlight'>釣魚</span>，一邊欣賞周圍的<span class='highlight'>景色</span>。",
+            "秋天到了，我們<span class='highlight'>手牽手</span>到郊外<span class='highlight'>遠足</span>。",
+            "大家在海邊玩得<span class='highlight'>滿頭大汗</span>，開心極了。",
+            "小鳥在天空中<span class='highlight'>自由自在</span>地飛翔，我們都覺得心情很<span class='highlight'>放鬆</span>。"
+        ],
+        easyQuestions: [
+            { text: "爸爸帶我到[blank]去[blank]菊花。我們一邊[blank]，一邊欣賞周圍的[blank]。", answers: ["公園", "觀賞", "釣魚", "景色"], options: ["公園", "觀賞", "釣魚", "景色"] },
+            { text: "秋天到了，我們[blank]到郊外[blank]。大家在海邊玩得[blank]，開心[blank]。", answers: ["手牽手", "遠足", "滿頭大汗", "極了"], options: ["手牽手", "遠足", "滿頭大汗", "極了"] },
+            { text: "姐姐跟外婆學習[blank][blank]的小餅乾。媽媽給我講了一個[blank]的[blank]。", answers: ["製作", "可口", "有趣", "故事"], options: ["製作", "可口", "有趣", "故事"] },
+            { text: "我和家人到西貢的海岸公園[blank]。星期天，我們去[blank]外公和[blank]。我第一次和爸爸來海邊釣魚，覺得很[blank]。", answers: ["遊玩", "探望", "外婆", "興奮"], options: ["遊玩", "探望", "外婆", "興奮"] },
+            { text: "我和媽媽來到[blank]，我開心跑上[blank]，沙子十分[blank]，踩上去很[blank]。", answers: ["海邊", "沙灘", "柔軟", "舒服"], options: ["海邊", "沙灘", "柔軟", "舒服"] },
+            { text: "我立刻把[blank]脱掉，將雙腳埋在[blank]裏，媽媽拿出[blank]拍照，說要留住這些[blank]的時光。", answers: ["鞋", "沙子", "照相機", "美好"], options: ["鞋", "沙子", "照相機", "美好"] },
+            { text: "哥哥在籃球場上[blank]。妹妹在花園裏[blank]。我們在草地上[blank]。爺爺在樹下[blank]。", answers: ["打球", "散步", "燒烤", "喝茶"], options: ["打球", "散步", "燒烤", "喝茶"] },
+            { text: "週末，我們去商場[blank]。買了許多[blank]的物品。中午在餐廳吃[blank]。下午去戲院看[blank]。", answers: ["逛街", "喜歡", "午餐", "電影"], options: ["逛街", "喜歡", "午餐", "電影"] },
+            { text: "弟弟在遊樂場裏[blank]。他玩得非常[blank]。媽媽提醒他要[blank]。不要[blank]在危險的地方。", answers: ["追逐", "淘氣", "小心", "躲藏"], options: ["追逐", "淘氣", "小心", "躲藏"] },
+            { text: "參加休閒活動可以讓我們得到[blank]。還能[blank]心情。和家人一起玩樂能增進[blank]。對身體[blank]也有好處。", answers: ["休息", "放鬆", "感情", "健康"], options: ["休息", "放鬆", "感情", "健康"] },
+            { text: "天空中的風箏[blank]地飛翔。我們拉着線，在草地上[blank]。風箏越飛越[blank]。我們笑得合不攏[blank]。", answers: ["自由自在", "奔跑", "高", "嘴"], options: ["自由自在", "奔跑", "高", "嘴"] },
+            { text: "我們帶着[blank]去露營。晚上在草地上[blank]星星。聽着蟲子的[blank]聲入睡。早晨被鳥兒的歌聲[blank]。", answers: ["帳篷", "觀察", "鳴叫", "喚醒"], options: ["帳篷", "觀察", "鳴叫", "喚醒"] },
+            { text: "哥哥教我騎[blank]。我戴上頭盔和[blank]。雖然摔了幾次，但我沒有[blank]。最後終於學[blank]了。", answers: ["自行車", "護膝", "放棄", "會"], options: ["自行車", "護膝", "放棄", "會"] },
+            { text: "爸爸買了一個哈密瓜，這個哈密瓜是[blank]的，像[blank]一樣，表皮上有[blank]的花紋。聞起來[blank]的。", answers: ["橢圓形", "橄欖球", "網狀", "香香"], options: ["橢圓形", "橄欖球", "網狀", "香香"] },
+            { text: "爸爸切開哈密瓜，哇！裏面是[blank]色的。咬上一口，[blank]的，真[blank]呀！大家都吃得很[blank]。", answers: ["橙紅", "甜絲絲", "好吃", "開心"], options: ["橙紅", "甜絲絲", "好吃", "開心"] },
+            { text: "弟弟在公園裏[blank]。他戴着[blank]，滑得飛[blank]。我為他[blank]加油。他表現得十分神氣。", answers: ["溜冰", "護具", "快", "鼓掌"], options: ["溜冰", "護具", "快", "鼓掌"] },
+            { text: "下午，我們去圖書館[blank]。那裏非常[blank]。我們挑選了自己喜歡的[blank]。沉浸在知識的[blank]中。", answers: ["閱讀", "安靜", "圖書", "海洋"], options: ["閱讀", "安靜", "圖書", "海洋"] },
+            { text: "今天是公眾[blank]。爸爸帶我和哥哥去郊外[blank]。媽媽還帶了[blank]食物。吃過東西，爸爸和媽媽坐在樹下[blank]。", answers: ["假期", "遊玩", "許多", "聊天"], options: ["假期", "遊玩", "許多", "聊天"] },
+            { text: "我和哥哥去放[blank]。風箏終於飛起來了，我們[blank]得跳起來。爸爸和媽媽也開心地為我們[blank]。度過了[blank]的一天。", answers: ["風箏", "興奮", "鼓掌", "愉快"], options: ["風箏", "興奮", "鼓掌", "愉快"] },
+            { text: "晚上，我們去看[blank]表演。煙花在天空中綻放，發出耀眼的[blank]。形狀千變萬化，十分[blank]。大家都看[blank]了。", answers: ["煙花", "光芒", "美麗", "陶醉"], options: ["煙花", "光芒", "美麗", "陶醉"] }
+        ],
+        hardQuestions: [
+            { text: "星期天，媽媽帶我和妹妹一起去[blank]的農場裏[blank]。來到草莓園，卻只看到一大片[blank]。走進帳篷，一眼望去，一片[blank]的草莓像一頂頂尖尖的小紅帽。", answers: ["伯父", "摘草莓", "帳篷", "綠油油"], options: ["伯父", "摘草莓", "帳篷", "綠油油"] },
+            { text: "妹妹拍着手說：「我們來[blank]，看誰摘得多吧！」我才不會[blank]呢！我走到草莓旁，一邊[blank]草莓，一邊抓藤，輕輕一拉，只聽見「啪」的一聲[blank]，草莓被摘了下來。", answers: ["比賽", "輸", "抓住", "脆響"], options: ["比賽", "輸", "抓住", "脆響"] },
+            { text: "不一會，我就摘了[blank]。再看看妹妹，她滿頭是[blank]，嘴裏還一個勁地叫着：「哇！多麼[blank]的草莓啊！」比賽[blank]了，我摘了五十二顆。", answers: ["半籃子", "汗", "大", "結束"], options: ["半籃子", "汗", "大", "結束"] },
+            { text: "[blank]，媽媽帶我去表姐家做客。一會兒跑到屋外捉迷藏，我[blank]表姐一會兒在屋內看[blank]。吃過晚飯後，我才和[blank]告別。", answers: ["星期天", "和", "動畫片", "表姐"], options: ["星期天", "和", "動畫片", "表姐"] },
+            { text: "今天是星期天，爸爸帶我去[blank]看書。這是我[blank]來到圖書館，感覺特別[blank]。圖書館裏的圖書真多呀！它們都[blank]地擺在書架上。", answers: ["圖書館", "第一次", "新鮮", "整整齊齊"], options: ["圖書館", "第一次", "新鮮", "整整齊齊"] },
+            { text: "我來到[blank]，這裏有許多人在[blank]地看書。爸爸告訴我，在圖書館裏要[blank]，不能大聲[blank]。", answers: ["二樓", "認真", "保持安靜", "說話"], options: ["二樓", "認真", "保持安靜", "說話"] },
+            { text: "我點點頭，走到兒童圖書區，選了一本《恐龍世界》，[blank]看起來。書裏介紹了劍龍、霸王龍等，我看得[blank]。我[blank]這裏的環境，十分[blank]。", answers: ["坐在椅子上", "津津有味", "喜歡", "舒適"], options: ["坐在椅子上", "津津有味", "喜歡", "舒適"] },
+            { text: "到了[blank]的時間，我借了一本畫冊帶回家。我[blank]去圖書館，因為可以[blank]到很多知識。豐富了我的[blank]生活。", answers: ["回家", "喜歡", "學習", "課餘"], options: ["回家", "喜歡", "學習", "課餘"] },
+            { text: "昨天晚上，吃過晚飯，我們便去石澳觀看流星雨。出發前，我問爸爸為甚麼要去石澳看[blank]。爸爸說因為那裏沒有城市裏的[blank]影響。星星會顯得更[blank]，更[blank]。", answers: ["流星雨", "燈光", "明亮", "清晰"], options: ["流星雨", "燈光", "明亮", "清晰"] },
+            { text: "到了石澳，我和爸爸媽媽坐在沙灘上看[blank]。過了一會兒，流星出現了，一顆、兩顆、三顆……一顆顆流星劃過天空，比[blank]還要燦爛。我們都[blank]在這美景中。這真是[blank]的一夜。", answers: ["天空", "煙花", "陶醉", "難忘"], options: ["天空", "煙花", "陶醉", "難忘"] },
+            { text: "假期的第一天，我們全家去海洋公園遊玩。剛進大門，就被精彩的噴泉[blank]吸引住了。水柱隨着音樂的[blank]高低起伏，在陽光的照射下，還出現了一道微型的[blank]，美麗[blank]了。", answers: ["表演", "節奏", "彩虹", "極"], options: ["表演", "節奏", "彩虹", "極"] },
+            { text: "我們排隊乘坐了高空[blank]。坐在纜車上，可以俯瞰整個公園的[blank]和遠處蔚藍的[blank]。雖然有些害怕，但風景的[blank]讓我們忘記了恐懼。", answers: ["纜車", "全貌", "大海", "壯麗"], options: ["纜車", "全貌", "大海", "壯麗"] },
+            { text: "下午，我們去觀看了海豚表演。聰明的海豚在水中躍起，準確地頂到懸掛在空中的[blank]。觀眾們發出陣陣的[blank]聲和熱烈的[blank]，氣氛達到了[blank]。", answers: ["皮球", "歡呼", "掌聲", "高潮"], options: ["皮球", "歡呼", "掌聲", "高潮"] },
+            { text: "週末，我和小夥伴們在屋邨的空地上舉行了一場小型的足球[blank]。大家在場上奔跑、傳球、射門，[blank]濕透了衣服，但沒有人喊[blank]。這項運動不僅鍛鍊了身體，還培養了我們的[blank]精神。", answers: ["比賽", "汗水", "累", "團隊"], options: ["比賽", "汗水", "累", "團隊"] },
+            { text: "在一個陽光明媚的星期天，我們一家人來到歷史博物館[blank]。館內陳列着許多珍貴的[blank]和圖片，生動地展示了香港的發展[blank]。這次參觀讓我對這座城市有了更深的[blank]。", answers: ["參觀", "文物", "歷程", "了解"], options: ["參觀", "文物", "歷程", "了解"] },
+            { text: "星期天的下午，我參加了社區舉辦的繪畫[blank]。我用畫筆描繪了我心目中的[blank]城市。雖然沒有獲獎，但老師對我的創意表示了[blank]，讓我對畫畫產生了更濃厚的[blank]。", answers: ["比賽", "未來", "肯定", "興趣"], options: ["比賽", "未來", "肯定", "興趣"] },
+            { text: "秋高氣爽的日子，爸爸帶我去郊野公園[blank]。我們一起搭帳篷、生火[blank]。夜晚，遠離了城市的喧囂，聽着大自然的[blank]聲，我感到前所未有的[blank]與放鬆。", answers: ["露營", "燒烤", "蟲鳴", "寧靜"], options: ["露營", "燒烤", "蟲鳴", "寧靜"] },
+            { text: "星期六，我們去探望住在鄉下的[blank]。外婆準備了豐盛的農家菜招待我們。飯後，我和表哥在田野裏追逐[blank]，捉[blank]，體驗了城市裏沒有的[blank]樂趣。", answers: ["外婆", "蝴蝶", "螞蚱", "田園"], options: ["外婆", "蝴蝶", "螞蚱", "田園"] },
+            { text: "今天，爸爸教我下[blank]。他耐心地講解了每個棋子的[blank]和規則。雖然我一開始總是輸，但在爸爸的[blank]下，我漸漸掌握了一些技巧。下棋真是一項考驗[blank]的遊戲。", answers: ["象棋", "走法", "指導", "智力"], options: ["象棋", "走法", "指導", "智力"] },
+            { text: "難得的週末，外面卻下起了[blank]。我們只好待在家裏。媽媽提議全家一起玩[blank]遊戲。遊戲過程中充滿了歡聲[blank]，原來即使不出門，一家人在一起也能度過[blank]的時光。", answers: ["大雨", "大富翁", "笑語", "愉快"], options: ["大雨", "大富翁", "笑語", "愉快"] }
+        ]
+    },
+    {
+        level: 13,
+        title: "第十三關：對與錯 (人物心理與事件順序)",
+        point: "1. 認識與人物心理、性格、行為有關的詞語。\n2. 認識按時間、地點、人物、事情發展順序敘事。",
+        examples: [
+            "我把蘋果<span class='highlight'>讓給</span>弟弟吃。",
+            "在公共場所不要大聲<span class='highlight'>吵鬧</span>。",
+            "我們不可以在<span class='highlight'>圖書館</span>內玩耍。",
+            "校車來了，大家上車時要<span class='highlight'>守秩序</span>。",
+            "老師不在時，我們仍然會<span class='highlight'>安靜</span>地學習。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "我把蘋果[blank]弟弟吃。在公共場所不要大聲[blank]。我們不可以在[blank]內玩耍。校車來了，大家上車時要守[blank]。", answers: ["讓給", "吵鬧", "圖書館", "秩序"], options: ["讓給", "吵鬧", "圖書館", "秩序"] },
+            { text: "小息時，同學們在操場上[blank]。小康不小心[blank]了文文的腳。小康[blank]對文文說：「對不起，我不是[blank]的。」", answers: ["玩耍", "踩到", "趕緊", "故意"], options: ["玩耍", "踩到", "趕緊", "故意"] },
+            { text: "天黑了，哥哥還沒回家，爸爸很[blank]。哥哥總是撒謊，令媽媽很[blank]。快要遲到了，我[blank]地趕去車站。魔術表演就要開始了，妹妹[blank]極了。", answers: ["擔心", "傷心", "着急", "高興"], options: ["擔心", "傷心", "着急", "高興"] },
+            { text: "下午，我和弟弟都想玩皮球，我[blank]把弟弟推倒在地上，弟弟一邊[blank]去找媽媽。媽媽[blank]了我一頓，說我應該[blank]弟弟。", answers: ["用力", "哭", "教訓", "禮讓"], options: ["用力", "哭", "教訓", "禮讓"] },
+            { text: "在醫院裏，要[blank]。做完功課後，我會[blank]書包。每天晚上，要按時[blank]。媽媽不在家，不要給[blank]開門。", answers: ["保持安靜", "收拾", "睡覺", "陌生人"], options: ["保持安靜", "收拾", "睡覺", "陌生人"] },
+            { text: "把垃圾丟在地上是不對的行為。我們應該把[blank]扔進[blank]裏。做個有[blank]的好孩子，大家都會[blank]你。", answers: ["垃圾", "垃圾桶", "禮貌", "喜歡"], options: ["垃圾", "垃圾桶", "禮貌", "喜歡"] },
+            { text: "志明是個[blank]的孩子，遇到困難就會退縮。美美是個[blank]的女孩，臉上總是帶着笑容。王伯伯很[blank]，經常幫助窮人。小華很[blank]，總是丟三落四。", answers: ["膽小", "開朗", "善良", "粗心"], options: ["膽小", "開朗", "善良", "粗心"] },
+            { text: "弟弟的玩具車壞了，他[blank]得哭了起來。我安慰他說：「別[blank]，哥哥幫你修好。」弟弟聽了，馬上[blank]起來，對我說了聲[blank]。", answers: ["難過", "哭", "笑", "謝謝"], options: ["難過", "哭", "笑", "謝謝"] },
+            { text: "我們在圖書館裏要[blank]安靜，不可以大聲[blank]天。閱讀完畢後，要把圖書[blank]地放回書架，做個守[blank]的好學生。", answers: ["保持", "談", "整齊", "規矩"], options: ["保持", "談", "整齊", "規矩"] },
+            { text: "小紅不小心打碎了媽媽心愛的花瓶，心裏很[blank]。她決定向媽媽說出[blank]，媽媽沒有[blank]她，反而誇她誠實。小紅不再感到[blank]了。", answers: ["害怕", "真相", "責備", "內疚"], options: ["害怕", "真相", "責備", "內疚"] },
+            { text: "同學們在操場上[blank]，有說有笑。突然，大明和小強因為一件小事[blank]起來。班長上前[blank]，讓他們互相道歉。他們又和好如[blank]了。", answers: ["打鬧", "爭吵", "勸阻", "初"], options: ["打鬧", "爭吵", "勸阻", "初"] },
+            { text: "老師不在課室時，我們仍然會[blank]地學習。班長負責維持班上的[blank]。大家低着頭認真做[blank]，沒有人[blank]講話。", answers: ["安靜", "秩序", "功課", "隨便"], options: ["安靜", "秩序", "功課", "隨便"] },
+            { text: "妹妹性格很[blank]，總是容易發脾氣。媽媽教導她要學會[blank]情緒。現在她變得[blank]多了，遇到事情不再輕易[blank]。", answers: ["急躁", "控制", "溫和", "發怒"], options: ["急躁", "控制", "溫和", "發怒"] },
+            { text: "哥哥常常因為[blank]大意而做錯題目。老師提醒他考試時要[blank]檢查。他聽從了老師的[blank]，終於取得了[blank]的成績。", answers: ["粗心", "仔細", "建議", "滿意"], options: ["粗心", "仔細", "建議", "滿意"] },
+            { text: "公園裏的花朵開得很美麗，我們不可以隨便[blank]。如果人人都[blank]花朵，公園就會變得不漂亮了。我們要愛護[blank]，保護[blank]。", answers: ["採摘", "採摘", "花草", "環境"], options: ["採摘", "採摘", "花草", "環境"] },
+            { text: "這個人真[blank]，總是講笑話逗大家開心。大家都喜歡和他[blank]朋友。和他在一起，不會感到[blank]，每天都充滿了[blank]。", answers: ["風趣", "做", "沉悶", "歡樂"], options: ["風趣", "做", "沉悶", "歡樂"] },
+            { text: "我把座位[blank]給一位老爺爺。老爺爺對我說：「謝謝你，真是個好[blank]。」我聽了心裏美[blank]的。助人為快樂之[blank]。", answers: ["讓", "孩子", "滋滋", "本"], options: ["讓", "孩子", "滋滋", "本"] },
+            { text: "不要[blank]比自己弱小的人。同學之間應該互相[blank]和幫助。只有[blank]友愛，班級才會像一個溫暖的[blank]。", answers: ["欺負", "關心", "團結", "大家庭"], options: ["欺負", "關心", "團結", "大家庭"] },
+            { text: "昨天我對媽媽發脾氣，今天覺得很[blank]。我主動向媽媽[blank]，說了聲「對不起」。媽媽摸摸我的[blank]，表示[blank]了我。", answers: ["後悔", "道歉", "頭", "原諒"], options: ["後悔", "道歉", "頭", "原諒"] },
+            { text: "上公共汽車時，大家排好隊，不推不[blank]。上車後，主動往車廂[blank]走。這體現了良好的社會[blank]，我們都要[blank]遵守。", answers: ["擠", "裏面", "風氣", "共同"], options: ["擠", "裏面", "風氣", "共同"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "星期天，我做完功課後，就拿出[blank]在客廳裏[blank]起來。我一邊拍球，一邊數數，接着，我[blank]一拍，桌上的花瓶掉在地上，[blank]粉碎。", answers: ["皮球", "拍", "用力", "摔得"], options: ["皮球", "拍", "用力", "摔得"] },
+            { text: "看着地上的[blank]，我嚇壞了。這可是外婆送給媽媽的[blank]，這時，媽媽回來了，我[blank]地說：「媽媽，剛才一陣風把花瓶吹倒了。」媽媽沒有說[blank]。", answers: ["碎片", "禮物", "慌張", "甚麼"], options: ["碎片", "禮物", "慌張", "甚麼"] },
+            { text: "晚上，我怎麼也睡不着，想到自己竟然[blank]，覺得很[blank]。我走進媽媽的房間，告訴媽媽事情的[blank]。媽媽[blank]我的頭說：「知錯能改還是好孩子。」", answers: ["撒謊", "後悔", "真相", "摸着"], options: ["撒謊", "後悔", "真相", "摸着"] },
+            { text: "今天是周末，我和[blank]一起去[blank]看書。我們來到車站，等車的人[blank]。表哥說：「我們是小孩，可以站到[blank]去。」", answers: ["表哥", "圖書館", "很多", "前面"], options: ["表哥", "圖書館", "很多", "前面"] },
+            { text: "說完，表哥就拉着我的手[blank]隊伍前面去。這時，人群中有人在小聲地[blank]我們，覺得十分[blank]。過了一會，我看見公共汽車[blank]了。", answers: ["跑到", "議論", "不好意思", "開過來"], options: ["跑到", "議論", "不好意思", "開過來"] },
+            { text: "我趕緊對表哥說：「表哥，快看！車來了。」趁着表哥不[blank]，我趕緊[blank]他[blank]到隊伍最後面去[blank]排隊。", answers: ["注意", "拉着", "退回", "重新"], options: ["注意", "拉着", "退回", "重新"] },
+            { text: "小明是個[blank]的孩子，看到一隻小蟲子也會嚇得大叫。有一天，他在花園裏遇到了一隻受傷的[blank]。他鼓起勇氣，輕輕地把小鳥捧在[blank]裏，帶回家請媽媽幫忙[blank]。", answers: ["膽小", "小鳥", "手", "包紮"], options: ["膽小", "小鳥", "手", "包紮"] },
+            { text: "媽媽誇獎小明有一顆[blank]的心。經過幾天的照顧，小鳥的傷[blank]了。小明帶着小鳥來到公園，依依不捨地把它[blank]回大自然。小明覺得自己變[blank]了。", answers: ["善良", "好", "放", "勇敢"], options: ["善良", "好", "放", "勇敢"] },
+            { text: "小華性格十分[blank]，做事總是風風火火的。今天早上，他[blank]地出門，結果把功課[blank]在了家裏。到了學校才發現，急得像熱鍋上的[blank]。", answers: ["急躁", "急急忙忙", "忘", "螞蟻"], options: ["急躁", "急急忙忙", "忘", "螞蟻"] },
+            { text: "老師沒有嚴厲地[blank]他，而是耐心地說：「下次出門前要仔細[blank]書包。」小華感到很[blank]，暗暗決定以後做事要[blank]，不再粗心大意。", answers: ["批評", "檢查", "羞愧", "穩重"], options: ["批評", "檢查", "羞愧", "穩重"] },
+            { text: "班上轉來了一位新同學，他性格[blank]，很快就和大家打成一片。下課時，他總是用[blank]的語言給大家講故事，逗得大家[blank]。我們都很喜歡這位新[blank]。", answers: ["開朗", "風趣", "哈哈大笑", "朋友"], options: ["開朗", "風趣", "哈哈大笑", "朋友"] },
+            { text: "在醫院的候診室裏，大家都[blank]地坐着等候。有一個小男孩卻在走廊裏四處[blank]，大聲喧嘩。護士阿姨走過來，輕聲提醒他要[blank]。小男孩聽了，乖乖地回到座位上[blank]。", answers: ["安靜", "亂跑", "保持安靜", "坐好"], options: ["安靜", "亂跑", "保持安靜", "坐好"] },
+            { text: "弟弟為了搶電視遙控器，動手[blank]了妹妹。妹妹委屈地[blank]了起來。爸爸嚴肅地[blank]了弟弟，讓他向妹妹道歉。弟弟低着頭，[blank]地說了對不起。", answers: ["推倒", "哭", "教訓", "誠懇"], options: ["推倒", "哭", "教訓", "誠懇"] },
+            { text: "放學後，我到超市購買[blank]。付款時，我發現前面有一位老奶奶。我主動把位置[blank]給她，讓她先結帳。老奶奶微笑着對我說：「真是個懂事的[blank]。」我感到十分[blank]。", answers: ["零食", "禮讓", "孩子", "自豪"], options: ["零食", "禮讓", "孩子", "自豪"] },
+            { text: "體育課上，大家正在進行接力[blank]。小強不小心摔倒了，膝蓋擦[blank]了。後面的同學沒有[blank]他，反而停下來把它扶起。雖然我們班輸了比賽，但贏得了[blank]。", answers: ["比賽", "破", "埋怨", "友誼"], options: ["比賽", "破", "埋怨", "友誼"] },
+            { text: "我曾經因為貪玩而[blank]了考試。看着不及格的成績單，我感到非常[blank]。從那以後，我每天都按時完成[blank]，認真溫習。終於在期末考試中取得了[blank]的成績。", answers: ["搞砸", "後悔", "功課", "優異"], options: ["搞砸", "後悔", "功課", "優異"] },
+            { text: "週末，我和家人去酒樓[blank]。等候入座的客人很多，大家都自覺地[blank]。這時，有個人想[blank]，被服務員制止了。這告訴我們，任何時候都要遵守[blank]。", answers: ["飲茶", "排隊", "插隊", "秩序"], options: ["飲茶", "排隊", "插隊", "秩序"] },
+            { text: "小美的鉛筆盒不見了，她[blank]地到處尋找。同桌小明熱心地幫她一起找，最後在書桌[blank]找到了。小美鬆了一口[blank]，對小明說了聲[blank]。", answers: ["着急", "底下", "氣", "謝謝"], options: ["着急", "底下", "氣", "謝謝"] },
+            { text: "犯錯並不可怕，可怕的是不敢承認[blank]。只要我們有勇氣說出[blank]，並努力去[blank]，就一定能得到別人的諒解。做一個誠實[blank]的人，才是最重要的。", answers: ["錯誤", "真相", "改正", "善良"], options: ["錯誤", "真相", "改正", "善良"] },
+            { text: "這天下午，天空佈滿了烏雲，快要下雨了。同學們沒有[blank]，而是排着整齊的隊伍登上校車。老師對我們說：「上車要守[blank]，這才是[blank]的表現。」我們聽了都[blank]了。", answers: ["亂跑", "秩序", "乖巧", "笑"], options: ["亂跑", "秩序", "乖巧", "笑"] }
+        ]
+    },
+    {
+        level: 14,
+        title: "第十四關：公園裏 (自然景觀與活動描寫)",
+        point: "1. 認識與公園及大自然有關的詞語。\n2. 認識字詞疊用的形式。\n3. 學習運用「有……還有……」的句式。",
+        examples: [
+            "公園裏有一架滑梯和幾個<span class='highlight'>鞦韆</span>。",
+            "<span class='highlight'>一隻隻</span>蝴蝶在花叢中飛舞。",
+            "我們不要隨便<span class='highlight'>採摘</span>公園裏的花朵。",
+            "我們去海洋樂園觀看<span class='highlight'>海豚</span>表演。",
+            "祖父坐在公園的<span class='highlight'>長椅</span>上休息。"
+        ],
+        easyQuestions: [
+            // 淺程度 20 題
+            { text: "公園裏有一架[blank]和幾個[blank]。一隻隻[blank]在花叢中飛舞。我們不要隨便採摘公園裏的[blank]。", answers: ["滑梯", "秋千", "蝴蝶", "花朵"], options: ["滑梯", "秋千", "蝴蝶", "花朵"] },
+            { text: "今天是公眾假期，爸爸帶我和弟弟去公園[blank]。公園裏有攀爬架，還有[blank]。我和弟弟去[blank]秋千，這一天我們玩得真[blank]啊！", answers: ["玩耍", "搖搖板", "盪", "開心"], options: ["玩耍", "搖搖板", "盪", "開心"] },
+            { text: "樂樂在公園的[blank]裏玩得很開心。海洋樂園裏，海豚在水池中盡情地[blank]。爸爸每天都要去公園[blank]。我們躺在草地上，看着晴朗的[blank]。", answers: ["遊樂場", "跳躍", "跑步", "天空"], options: ["遊樂場", "跳躍", "跑步", "天空"] },
+            { text: "我和表姐到公園玩耍。公園裏的[blank]真美麗，到處盛開着[blank]的花朵。我們走進樹林，地上鋪滿了[blank]，踩上去發出「沙沙沙」的[blank]。", answers: ["景色", "五顏六色", "落葉", "聲音"], options: ["景色", "五顏六色", "落葉", "聲音"] },
+            { text: "春天的公園，到處是[blank]的草地。我坐在桂花樹下，涼風送來[blank]花香。暖暖的陽光照在身上真[blank]啊！公園裏盛開着一叢叢紅紅的杜鵑花，像[blank]一樣。", answers: ["綠油油", "一陣陣", "舒服", "火"], options: ["綠油油", "一陣陣", "舒服", "火"] },
+            { text: "週末，我來到公園。花園裏有[blank]，還有[blank]。水池裏有[blank]，還有[blank]。", answers: ["花朵", "大樹", "金魚", "烏龜"], options: ["花朵", "大樹", "金魚", "烏龜"] },
+            { text: "祖父喜歡坐在公園的[blank]上休息。那裏有一個古色古香的[blank]。人們在亭子裏[blank]天、下棋。這裏的空氣十分[blank]。", answers: ["長椅", "亭子", "聊", "清新"], options: ["長椅", "亭子", "聊", "清新"] },
+            { text: "小鳥在樹枝上[blank]地唱歌。小狗在草地上[blank]。幾隻白鵝在湖面上[blank]。大自然真是[blank]啊！", answers: ["快樂", "蹦蹦跳跳", "游水", "奇妙"], options: ["快樂", "蹦蹦跳跳", "游水", "奇妙"] },
+            { text: "天氣真好，我們一家人去郊野公園[blank]。我們在草地上鋪上墊子，拿出美味的[blank]。大家一邊吃一邊[blank]，度過了一個愉快的[blank]。", answers: ["野餐", "食物", "說笑", "下午"], options: ["野餐", "食物", "說笑", "下午"] },
+            { text: "我和朋友們在公園的空地上玩[blank]。我躲在大樹[blank]，小明來找我。我們玩得滿頭[blank]，最後依依不捨地[blank]。", answers: ["捉迷藏", "後面", "大汗", "回家"], options: ["捉迷藏", "後面", "大汗", "回家"] },
+            { text: "每天清晨，許多人來到公園[blank]。有的人在做體操，有的人在[blank]。大家都想鍛鍊出[blank]的身體，迎接[blank]的一天。", answers: ["晨運", "緩步跑", "健康", "新"], options: ["晨運", "緩步跑", "健康", "新"] },
+            { text: "秋天到了，公園裏的樹葉變成了[blank]色。一陣秋風吹過，落葉像蝴蝶一樣在空中[blank]。地上鋪滿了厚厚的落葉，像一張金色的[blank]。秋天的景色真[blank]。", answers: ["黃", "飛舞", "地毯", "迷人"], options: ["黃", "飛舞", "地毯", "迷人"] },
+            { text: "魚池裏的水[blank]的，可以看見底部的石頭。五顏六色的錦鯉在水中[blank]。我撒下一些魚糧，魚兒們爭先恐後地游過來[blank]。真有[blank]！", answers: ["清澈", "穿梭", "搶食", "趣"], options: ["清澈", "穿梭", "搶食", "趣"] },
+            { text: "媽媽用照相機為我[blank]。我站在[blank]前，擺出一個可愛的姿勢。照片洗出來後，我把它夾在[blank]裏。留下這段美好的[blank]。", answers: ["拍照", "花叢", "相冊", "回憶"], options: ["拍照", "花叢", "相冊", "回憶"] },
+            { text: "公園裏種植了許多高大的[blank]。夏天的中午，大樹為我們遮擋炎熱的[blank]。我們坐在樹蔭下乘涼，感覺[blank]的。大樹真是我們的好[blank]。", answers: ["樹木", "太陽", "涼快", "朋友"], options: ["樹木", "太陽", "涼快", "朋友"] },
+            { text: "花園裏的花朵[blank]。有紅的、黃的、紫的，[blank]。吸引了蜜蜂來[blank]。這是一幅生機勃勃的[blank]。", answers: ["盛開", "多姿多彩", "採蜜", "圖畫"], options: ["盛開", "多姿多彩", "採蜜", "圖畫"] },
+            { text: "下過一場春雨，公園裏的空氣變得[blank]。泥土散發出陣陣[blank]。小草喝足了水分，顯得更加[blank]了。大自然充滿了[blank]。", answers: ["清新", "芳香", "翠綠", "生機"], options: ["清新", "芳香", "翠綠", "生機"] },
+            { text: "傍晚，夕陽西下，天空變成了[blank]色。公園裏的街燈亮了起來，發出溫暖的[blank]。人們陸續[blank]了公園，結束了一天的[blank]。", answers: ["橙紅", "光芒", "離開", "活動"], options: ["橙紅", "光芒", "離開", "活動"] },
+            { text: "爸爸帶我去海洋樂園觀看[blank]表演。海豚非常聰明，會表演各種[blank]。觀眾們熱烈地[blank]，現場充滿了[blank]聲。", answers: ["海豚", "動作", "鼓掌", "歡呼"], options: ["海豚", "動作", "鼓掌", "歡呼"] },
+            { text: "我們不要在公園的牆上[blank]。要愛護公共[blank]。把垃圾扔進[blank]裏。共同維護公園的[blank]。", answers: ["塗鴉", "設施", "垃圾箱", "整潔"], options: ["塗鴉", "設施", "垃圾箱", "整潔"] }
+        ],
+        hardQuestions: [
+            // 深程度 20 題
+            { text: "今天是周末，天氣[blank]，一朵朵白雲飄浮在藍藍的天上。媽媽帶我和妹妹去公園[blank]。到公園遊玩的人很多，有[blank]和小孩，還有[blank]。", answers: ["晴朗", "遊玩", "成年人", "公公婆婆"], options: ["晴朗", "遊玩", "成年人", "公公婆婆"] },
+            { text: "大家有的在跑步，有的在談天[blank]，有的在[blank]看報紙。媽媽在長椅上坐下休息，我和妹妹在[blank]盪秋千。妹妹指着鮮花說：「這些花兒開得多[blank]啊！」", answers: ["說地", "靜靜地", "一旁", "燦爛"], options: ["說地", "靜靜地", "一旁", "燦爛"] },
+            { text: "媽媽走過來對我們說：「公園裏的花是給大家[blank]的，不能隨便[blank]。」我和妹妹聽了[blank]。最後，媽媽拿出[blank]，為我和妹妹在花園前拍照。", answers: ["觀賞", "採摘", "點點頭", "照相機"], options: ["觀賞", "採摘", "點點頭", "照相機"] },
+            { text: "志新和表哥一起到海洋樂園遊玩，公園裏[blank]得很。志新坐在飛鷹，[blank]，像老鷹在藍藍的天上飛來飛去。志新幾乎被轉暈了，[blank]！", answers: ["熱鬧", "在空中轉了幾個圈", "嚇得大叫起來", "刺激"], options: ["熱鬧", "在空中轉了幾個圈", "嚇得大叫起來", "刺激"] },
+            { text: "之後，他們一起去觀看海豚表演，海豚在訓練員的指揮下，[blank]，一會兒頂着球在水中直立「行走」，[blank]極了。最後，志新去了鯊魚館看[blank]的鯊魚。", answers: ["一會兒從水中躍起", "精彩", "兇猛", "可怕"], options: ["一會兒從水中躍起", "精彩", "兇猛", "可怕"] },
+            { text: "星期天，爸爸帶文新去公園遊玩。一到公園，文新就去玩[blank]。旋轉木馬[blank]，文新高興得大叫起來。後來，爸爸又帶文新去玩[blank]。文新玩得很[blank]。", answers: ["旋轉木馬", "很好玩", "攀爬架", "開心"], options: ["旋轉木馬", "很好玩", "攀爬架", "開心"] },
+            { text: "公園裏的自然景觀真是[blank]。有綠油油的草地，還有長滿花朵的[blank]。我們在草地上奔跑，在花叢中尋找[blank]。大自然給我們帶來了無盡的[blank]。", answers: ["美不勝收", "花叢", "蝴蝶", "樂趣"], options: ["美不勝收", "花叢", "蝴蝶", "樂趣"] },
+            { text: "清晨的公園非常[blank]。湖面上飄着一層薄薄的[blank]。老人們在湖邊打[blank]，動作非常緩慢而有力。太陽升起後，霧氣[blank]了，公園變得明亮起來。", answers: ["寧靜", "晨霧", "太極拳", "散去"], options: ["寧靜", "晨霧", "太極拳", "散去"] },
+            { text: "學校組織我們去郊野公園進行生態[blank]。我們帶着放大鏡和[blank]，觀察各種植物和昆蟲。老師給我們講解了葉子的[blank]，我們學到了很多課本以外的[blank]。", answers: ["考察", "筆記本", "構造", "知識"], options: ["考察", "筆記本", "構造", "知識"] },
+            { text: "妹妹最喜歡公園裏的[blank]池。池子裏有很多白色的[blank]在游來游去。妹妹買了一包飼料，[blank]地拋向水面。天鵝們優雅地伸長脖子，[blank]着食物。", answers: ["天鵝", "天鵝", "輕輕", "啄食"], options: ["天鵝", "天鵝", "輕輕", "啄食"] },
+            { text: "秋天的週末，我們一家人去公園[blank]。我們找了一個舒適的[blank]，把帶來的食物擺滿了一桌。有三文治、壽司，還有[blank]的水果。大家邊吃邊聊，享受着[blank]的時光。", answers: ["野餐", "涼亭", "香甜", "溫馨"], options: ["野餐", "涼亭", "香甜", "溫馨"] },
+            { text: "突然，天空中傳來一陣[blank]聲。原來是幾架風箏在天上[blank]。有一架風箏像一條長長的[blank]，在雲端威風地擺動着尾巴。看得我們都[blank]了。", answers: ["呼嘯", "飛翔", "蜈蚣", "入迷"], options: ["呼嘯", "飛翔", "蜈蚣", "入迷"] },
+            { text: "公園的角落裏有一個健身[blank]。那裏有許多運動器材，如單槓、[blank]等。許多年輕人在那裏[blank]身體，他們練得滿身是[blank]。", answers: ["區", "雙槓", "鍛鍊", "汗"], options: ["區", "雙槓", "鍛鍊", "汗"] },
+            { text: "我和幾個同學約好在公園的籃球場打[blank]。我們分成兩隊進行[blank]。大家在場上激烈地拼搶，[blank]不斷。最後我們隊以微弱的優勢[blank]了。", answers: ["籃球", "比賽", "汗水", "獲勝"], options: ["籃球", "比賽", "汗水", "獲勝"] },
+            { text: "傍晚時分，公園的廣場上聚集了許多[blank]。隨着歡快的[blank]響起，大家整齊地跳起了[blank]。他們的臉上洋溢着幸福的笑容，為公園增添了一道亮麗的[blank]。", answers: ["人群", "音樂", "廣場舞", "風景線"], options: ["人群", "音樂", "廣場舞", "風景線"] },
+            { text: "我撿了一些形狀各異的[blank]帶回家。我把它們洗乾淨，夾在[blank]裏壓平。幾天後，我把它們貼在卡紙上，做成了一幅美麗的[blank]畫，準備送給[blank]。", answers: ["落葉", "書本", "樹葉", "老師"], options: ["落葉", "書本", "樹葉", "老師"] },
+            { text: "公園裏的噴泉開始[blank]了。水柱隨着音樂的節奏高低[blank]。在彩色燈光的照射下，噴泉變得[blank]奪目。許多遊客拿出手機，記錄下這[blank]的一刻。", answers: ["表演", "起伏", "光彩", "精彩"], options: ["表演", "起伏", "光彩", "精彩"] },
+            { text: "春天，萬物[blank]。公園裏的柳樹抽出了嫩綠的[blank]。桃花、杏花競相[blank]，爭奇鬥豔。小鳥在枝頭築[blank]，準備迎接新生命的到來。", answers: ["復蘇", "枝條", "開放", "巢"], options: ["復蘇", "枝條", "開放", "巢"] },
+            { text: "為了保護公園的環境，志願者們在週末開展了[blank]活動。他們拿着夾子和垃圾袋，[blank]地撿拾地上的紙屑和空瓶。我們要向他們[blank]，做一個愛護環境的[blank]。", answers: ["清潔", "仔細", "學習", "好公民"], options: ["清潔", "仔細", "學習", "好公民"] },
+            { text: "離開海洋樂園時，我[blank]地回頭望了一眼。今天我看到了海豚、海獅，還看到了巨大的[blank]。這次遊玩讓我感受到了海洋生物的[blank]，我會永遠[blank]這一天。", answers: ["依依不捨", "鯨魚", "奇妙", "記住"], options: ["依依不捨", "鯨魚", "奇妙", "記住"] }
+        ]
+    },
+    {
+        level: 15,
+        title: "第十五關：童話故事",
+        point: "1. 認識童話常用的詞語。\n2. 學習運用「……也……」、「……和……都……」的句式。",
+        examples: [
+            "大灰狼<span class='highlight'>偷偷</span>地躲在小豬的房子後面。",
+            "黑貓發出一聲「喵！」，第一個<span class='highlight'>抓住</span>了老鼠。",
+            "兩隻小雞為了一條小青蟲<span class='highlight'>爭吵</span>起來。",
+            "小兔子唱着歌<span class='highlight'>蹦蹦跳跳</span>地去山上採蘑菇。",
+            "勤勞的螞蟻準備了<span class='highlight'>豐富</span>的食物過冬。"
+        ],
+        easyQuestions: [
+            { text: "大灰狼[blank]地躲在小豬的房子後面。黑貓第一時間[blank]了老鼠。兩隻小雞為了一條小青蟲[blank]起來。勤勞的螞蟻準備了[blank]的食物過冬。", answers: ["偷偷", "抓住", "爭吵", "豐富"], options: ["偷偷", "抓住", "爭吵", "豐富"] },
+            { text: "老奶奶把[blank]的小豆子種在地裏。每天，老奶奶都來[blank]。這天，小豆子發芽了，並[blank]地長大，很快又結出了一顆閃着[blank]的金豆子。", answers: ["神奇", "澆水", "迅速", "光芒"], options: ["神奇", "澆水", "迅速", "光芒"] },
+            { text: "[blank]的夜晚。 [blank]的故事。[blank]的小草。[blank]的石頭。", answers: ["寧靜", "動人", "嫩綠", "堅硬"], options: ["寧靜", "動人", "嫩綠", "堅硬"] },
+            { text: "三隻小豬修建了三座[blank]。小紅帽給外婆送去可口的[blank]。青蛙媽媽帶着孩子在[blank]裏學習游泳。小動物在[blank]裏舉行了新年演唱會。", answers: ["房子", "點心", "池塘", "森林"], options: ["房子", "點心", "池塘", "森林"] },
+            { text: "兔子[blank]烏龜[blank]參加跑步比賽。百靈鳥是歌唱能手。畫眉鳥[blank]是歌唱能手。百靈鳥和畫眉鳥都是歌唱[blank]。", answers: ["和", "都", "也", "能手"], options: ["和", "都", "也", "能手"] },
+            { text: "小白兔愛種花，[blank]愛種菜。今天是新年，[blank]小熊的生日。小白兔送來鮮花，也送來新鮮的[blank]。小動物來拜年，也來給小熊[blank]生日。", answers: ["也", "也是", "蔬菜", "慶祝"], options: ["也", "也是", "蔬菜", "慶祝"] },
+            { text: "小鳥在天空中[blank]地飛翔。魚兒在水裏自由地[blank]。猴子在樹上[blank]地跳躍。烏龜在地上[blank]地爬行。", answers: ["輕快", "游水", "靈活", "緩慢"], options: ["輕快", "游水", "靈活", "緩慢"] },
+            { text: "狐狸非常[blank]，經常欺騙其他小動物。小白兔很[blank]，大家都很喜歡她。老黃牛很[blank]，每天都在田裏工作。獅子很[blank]，是森林之王。", answers: ["狡猾", "善良", "勤勞", "威武"], options: ["狡猾", "善良", "勤勞", "威武"] },
+            { text: "冬天快到了，小松鼠在忙着[blank]食物。大黑熊鑽進樹洞準備[blank]。小燕子飛到[blank]的南方去了。青蛙也躲在泥土裏[blank]了。", answers: ["儲存", "冬眠", "溫暖", "睡覺"], options: ["儲存", "冬眠", "溫暖", "睡覺"] },
+            { text: "國王舉辦了一場盛大的[blank]。灰姑娘穿上美麗的[blank]，坐着南瓜車去參加。王子邀請她一起[blank]。到了午夜，她急忙[blank]了。", answers: ["舞會", "裙子", "跳舞", "離開"], options: ["舞會", "裙子", "跳舞", "離開"] },
+            { text: "醜小鴨每天都要做很多[blank]。她的姐姐們總是[blank]她。後來她變成了一隻美麗的[blank]。大家都很[blank]她的美麗。", answers: ["家務", "欺負", "白天鵝", "驚訝"], options: ["家務", "欺負", "白天鵝", "驚訝"] },
+            { text: "白雪公主吃下了毒[blank]，昏死了過去。七個[blank]非常傷心。後來王子吻了她，她[blank]了過來。他們過上了[blank]的生活。", answers: ["蘋果", "小矮人", "醒", "幸福"], options: ["蘋果", "小矮人", "醒", "幸福"] },
+            { text: "小人魚救了落水的[blank]。為了能和他在一起，她用聲音換來了[blank]。但王子最後娶了別人。小人魚化成了海上的[blank]，飛向了[blank]。", answers: ["王子", "雙腿", "泡沫", "天空"], options: ["王子", "雙腿", "泡沫", "天空"] },
+            { text: "賣火柴的小女孩在[blank]的街頭走着。她點燃了一根[blank]，看到了溫暖的火爐和烤[blank]。最後她微笑着跟着[blank]飛走了。", answers: ["寒冷", "火柴", "鵝", "奶奶"], options: ["寒冷", "火柴", "鵝", "奶奶"] },
+            { text: "傑克用一頭牛換來了幾顆[blank]的豆子。豆子長成了參天大樹，一直伸到[blank]上。他爬上去，偷走了巨人的[blank]和會下金蛋的[blank]。", answers: ["神奇", "雲端", "金幣", "雞"], options: ["神奇", "雲端", "金幣", "雞"] },
+            { text: "阿里巴巴喊了一聲「[blank]」，山洞的門打開了。裏面堆滿了閃閃發光的[blank]。四十大盜發現後非常[blank]。最後聰明的女僕用熱[blank]燙死了他們。", answers: ["芝麻開門", "寶物", "生氣", "油"], options: ["芝麻開門", "寶物", "生氣", "油"] },
+            { text: "匹諾曹是一個愛[blank]的木偶。每次撒謊，他的[blank]就會變長。經歷了許多困難後，他學會了[blank]和勇敢。仙女把他變成了一個真正的[blank]。", answers: ["撒謊", "鼻子", "誠實", "男孩"], options: ["撒謊", "鼻子", "誠實", "男孩"] },
+            { text: "小飛俠帶着孩子們飛向了[blank]島。那裏有海盜、印第安人和[blank]。他們經歷了一場激烈的[blank]。最後孩子們還是選擇回到了[blank]。", answers: ["夢幻", "人魚", "戰鬥", "家"], options: ["夢幻", "人魚", "戰鬥", "家"] },
+            { text: "小精靈在花朵中[blank]。他們用花瓣做[blank]，用露水做[blank]。他們的世界充滿了[blank]和歡樂。我們要在夢中才能見到他們。", answers: ["飛舞", "衣服", "飲料", "魔法"], options: ["飛舞", "衣服", "飲料", "魔法"] },
+            { text: "童話故事裏充滿了豐富的[blank]。讀童話可以讓我們學到很多[blank]。故事裏的好人總會得到[blank]，壞人會受到[blank]。", answers: ["想像力", "道理", "好報", "懲罰"], options: ["想像力", "道理", "好報", "懲罰"] }
+        ],
+        hardQuestions: [
+            { text: "一天，老鼠吱吱在花園裏[blank]，發現草叢裏有一隻[blank]的皮鞋，吱吱[blank]皮鞋看了看。吱吱找出[blank]，忙了一上午，終於把皮鞋改裝成了一輛小汽車。", answers: ["散步", "巨大", "繞着", "工具箱"], options: ["散步", "巨大", "繞着", "工具箱"] },
+            { text: "「現在可以出去[blank]了！」吱吱拍拍手，跳上了汽車。吱吱開着汽車真[blank]啊！「吱吱，可以帶我去學校嗎？」小兔子問。「當然可以，[blank]吧！」吱吱很[blank]。", answers: ["兜風", "神氣", "上來", "開心"], options: ["兜風", "神氣", "上來", "開心"] },
+            { text: "接着，吱吱在路上又[blank]了青蛙兄弟、蝸牛一家，小汽車坐得[blank]的。「格拉格拉」小汽車發出[blank]的聲音，「嘩啦！」一聲，小汽車[blank]了。", answers: ["捎上", "滿滿", "奇怪", "散架"], options: ["捎上", "滿滿", "奇怪", "散架"] },
+            { text: "小雞獨自出去玩耍，[blank]，就跳進裏面玩。西瓜皮真有趣，像個小搖籃。小雞在裏面[blank]，開心極了。這時，[blank]，小雞嚇得大叫：[blank]！", answers: ["看到河邊有半個西瓜皮", "在西瓜皮裏跳來跳去", "西瓜皮滑進了小河裏", "救命啊！救命啊"], options: ["看到河邊有半個西瓜皮", "在西瓜皮裏跳來跳去", "西瓜皮滑進了小河裏", "救命啊！救命啊"] },
+            { text: "小雞不會游泳，他很[blank]，一邊緊緊抓住西瓜皮，一邊大喊：「[blank]」這時，小鴨聽到小雞的[blank]聲，急忙跳到水裏，[blank]。", answers: ["害怕", "救命", "呼救", "把小雞背上了岸"], options: ["害怕", "救命", "呼救", "把小雞背上了岸"] },
+            { text: "自從黃鼠狼偷雞蛋被[blank]後，他對美味的雞蛋一直念念不忘。這天，他[blank]一袋玉米來到母雞家。「雞媽媽，你願意跟我做[blank]嗎？」母雞知道黃鼠狼的[blank]。", answers: ["發現", "背着", "朋友", "心思"], options: ["發現", "背着", "朋友", "心思"] },
+            { text: "母雞說：「好啊，快進來坐吧！正好大黃狗也在呢！」黃鼠狼聽了，嚇得[blank]玉米，[blank]就跑。他知道大黃狗是專門對付[blank]的。從此，黃鼠狼再也不敢來[blank]了。", answers: ["丟下", "轉身", "壞人", "搗亂"], options: ["丟下", "轉身", "壞人", "搗亂"] },
+            { text: "森林裏舉行了一場別開生面的[blank]。小動物們都展示了自己的[blank]。猴子表演了翻跟頭，孔雀跳了優美的[blank]，大象舉起了重重的[blank]。", answers: ["才藝比賽", "絕活", "舞蹈", "圓木"], options: ["才藝比賽", "絕活", "舞蹈", "圓木"] },
+            { text: "評委們對大家的表演都給予了[blank]。最後，勤勞的小蜜蜂獲得了[blank]，因為她釀造的蜂蜜最[blank]。大家為她熱烈地[blank]，森林裏充滿了歡樂。", answers: ["肯定", "冠軍", "香甜", "鼓掌"], options: ["肯定", "冠軍", "香甜", "鼓掌"] },
+            { text: "從前，有一隻愛慕虛榮的[blank]。她看到天鵝的羽毛很漂亮，就把撿來的白色羽毛插在自己[blank]。她跑到天鵝群中[blank]，結果被天鵝們發現並[blank]了出來。", answers: ["烏鴉", "身上", "炫耀", "趕"], options: ["烏鴉", "身上", "炫耀", "趕"] },
+            { text: "烏鴉回到自己的同伴中，但同伴們也不[blank]她，覺得她太[blank]了。這個故事告訴我們，不要盲目去[blank]別人，做真實的[blank]才是最好的。", answers: ["理睬", "虛偽", "模仿", "自己"], options: ["理睬", "虛偽", "模仿", "自己"] },
+            { text: "小馬馱着半口袋麥子去磨坊。一條小河擋住了[blank]。老牛說水很[blank]，松鼠卻說水很[blank]。小馬不知道該聽[blank]的。", answers: ["去路", "淺", "深", "誰"], options: ["去路", "淺", "深", "誰"] },
+            { text: "小馬跑回家問媽媽。媽媽鼓勵他自己去[blank]。小馬[blank]地蹚過小河，原來河水既不像老牛說的淺，也不像松鼠說的深。凡事要[blank]嘗試才能知道[blank]。", answers: ["試試", "小心", "親自", "真相"], options: ["試試", "小心", "親自", "真相"] },
+            { text: "狐狸請仙鶴吃飯，卻把肉湯裝在[blank]的盤子裏。仙鶴的嘴巴很[blank]，一口也喝不到。狐狸在一旁[blank]地喝着。仙鶴覺得受到了[blank]。", answers: ["平平", "長", "津津有味", "侮辱"], options: ["平平", "長", "津津有味", "侮辱"] },
+            { text: "第二天，仙鶴回請狐狸，把碎肉裝在[blank]的瓶子裏。狐狸的嘴巴伸不進去，只能聞着[blank]乾着急。仙鶴用長嘴巴吃得[blank]。狐狸只好餓着肚子[blank]了。", answers: ["長頸", "香味", "飽飽的", "溜走"], options: ["長頸", "香味", "飽飽的", "溜走"] },
+            { text: "小蝸牛想去山頂看[blank]。雖然他爬得很[blank]，但他每天都在堅持不懈地[blank]。路上，嘲笑他的小鳥早已飛走了。最後，小蝸牛憑着毅力到達了山頂，看到了壯麗的[blank]。", answers: ["日出", "慢", "努力", "景色"], options: ["日出", "慢", "努力", "景色"] },
+            { text: "獅子在森林裏睡覺，一隻小老鼠不小心[blank]了他。獅子抓住老鼠，老鼠苦苦[blank]，說以後一定會[blank]他。獅子覺得好笑，就把老鼠[blank]了。", answers: ["吵醒", "哀求", "報答", "放"], options: ["吵醒", "哀求", "報答", "放"] },
+            { text: "幾天後，獅子掉進了獵人的[blank]裏，無法脫身。小老鼠聽到獅子的[blank]，跑過來咬斷了[blank]，救出了獅子。這說明，再微小的人也能發揮巨大的[blank]。", answers: ["陷阱", "吼叫", "繩子", "作用"], options: ["陷阱", "吼叫", "繩子", "作用"] },
+            { text: "善良的小矮人收留了[blank]的白雪公主。他們白天去山上[blank]採礦，晚上回來聽公主講[blank]。公主還為他們做[blank]的晚餐。小木屋裏充滿了歡聲笑語。", answers: ["無家可歸", "辛苦地", "故事", "豐盛"], options: ["無家可歸", "辛苦地", "故事", "豐盛"] },
+            { text: "這天，[blank]扮成一個賣蘋果的老太婆來到小木屋。她用甜言蜜語騙公主吃下了[blank]的蘋果。公主[blank]倒在了地上。幸好後來[blank]出現，救了公主一命。", answers: ["惡毒的王后", "有毒", "撲通一聲", "王子"], options: ["惡毒的王后", "有毒", "撲通一聲", "王子"] }
+        ]
+    }
+];
+
+// =========================================================================
+// 遊戲運作邏輯 (支援拖拉與觸控，句子逐句拆分與獨立發音)
+// =========================================================================
+let currentLevelData = null;
+let selectedQuestions = [];
+let currentIndex = 0;
+let userAnswers = []; 
+let isRetryMode = false;
+let currentHint = "";
+let justRetriedAndCorrect = false;
+let blanksToFill = 0; 
+
+let levelScores = JSON.parse(localStorage.getItem('teacherCatScores')) || {};
+
+const levelButtonsDiv = document.getElementById('level-buttons');
+gameData.forEach(level => {
+    let btn = document.createElement('button');
+    btn.className = 'btn-level';
+    btn.innerHTML = `<div style="font-size:16px; opacity:0.9; margin-bottom:5px;"><i class="fas fa-gamepad"></i> 開始挑戰</div>
+                     <strong style="font-size:22px; line-height:1.4;">${level.title}</strong>`;
+    btn.onclick = () => showIntro(level); 
+    levelButtonsDiv.appendChild(btn);
+});
+
+// TTS 朗讀過濾標籤與空格
+function speak(text, event) {
+    if(event) {
+        event.stopPropagation();
+        event.preventDefault(); 
+    }
+    // 把 HTML 標籤移除，並把 [blank] 讀成「空格」
+    const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/\[blank\]/g, '空格');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'zh-HK'; 
+    speechSynthesis.speak(utterance);
+}
+
+function speakHint() { speak(currentHint); }
+
+function switchScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+
+function goHome() {
+    isRetryMode = false;
+    switchScreen('home-screen');
+    window.scrollTo(0,0);
+}
+
+function showIntro(level) {
+    currentLevelData = level;
+    document.getElementById('intro-title').innerText = level.title;
+    document.getElementById('intro-point').innerText = level.point;
+    
+    // 渲染 5 個經典例子 (附帶個別發音)
+    let exampleHtml = "";
+    if(Array.isArray(level.examples)) {
+        level.examples.forEach((ex, idx) => {
+            exampleHtml += `
+                <div style="margin-bottom:15px;">
+                    <button class="tts-btn-small" onclick="speak('${ex}', event)">🔊</button>
+                    <span style="font-size:22px; vertical-align: middle;">${idx + 1}. ${ex}</span>
+                </div>
+            `;
+        });
+    } else {
+        // 相容舊資料
+        exampleHtml = `
+            <div style="margin-bottom:15px;">
+                <button class="tts-btn-small" onclick="speak('${level.example}', event)">🔊</button>
+                <span style="font-size:22px; vertical-align: middle;">${level.example}</span>
+            </div>
+        `;
+    }
+    document.getElementById('intro-example-container').innerHTML = exampleHtml;
+    
+    switchScreen('intro-screen');
+    window.scrollTo(0,0);
+}
+
+function startRealGame() {
+    let easy = [...currentLevelData.easyQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+    let hard = [...currentLevelData.hardQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+    selectedQuestions = [...easy, ...hard]; 
+    
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    currentIndex = 0;
+    isRetryMode = false;
+    
+    document.getElementById('level-title-game').innerText = currentLevelData.title;
+    switchScreen('game-screen');
+    renderQuestion();
+}
+
+function renderQuestion() {
+    document.getElementById('hint-container').style.display = 'none';
+    document.getElementById('btn-skip').style.display = 'none';
+    document.getElementById('question-container').classList.remove('exaggerated-correct');
+    
+    const q = selectedQuestions[currentIndex];
+    
+    if(isRetryMode) {
+        document.getElementById('question-counter').innerHTML = `<span style="color:#E91E63;">【錯題重做模式】</span>`;
+        document.getElementById('btn-prev').style.display = 'none';
+        document.getElementById('btn-next').style.display = 'none';
+        document.getElementById('btn-back-summary').style.display = 'inline-block';
+        
+        currentHint = `Teacher Cat 提示：\n${currentLevelData.point}`;
+        document.getElementById('hint-text').innerText = currentHint;
+        document.getElementById('hint-container').style.display = 'block';
+    } else {
+        document.getElementById('question-counter').innerText = `題數: ${currentIndex + 1} / ${selectedQuestions.length}`;
+        document.getElementById('btn-prev').style.display = 'inline-block';
+        document.getElementById('btn-next').style.display = 'inline-block';
+        document.getElementById('btn-back-summary').style.display = 'none';
+        document.getElementById('btn-prev').disabled = (currentIndex === 0);
+    }
+
+    // --- 把段落按標點符號「。！？，」或空白拆分成句子 ---
+    // 這能讓每一小句都有獨立的發音按鈕
+    let textSnippets = q.text.match(/[^。！？]+[。！？]*/g) || [q.text];
+    let html = "";
+    let blankIndex = 0;
+    blanksToFill = 0;
+
+    textSnippets.forEach(snippet => {
+        if(snippet.trim().length === 0) return;
+
+        let sentenceHtml = snippet;
+        let cleanTTS = snippet; // 保存供 TTS 讀音使用的字串
+
+        // 如果這題已經被成功答對 (非重做模式下)，直接顯示答案
+        if (!isRetryMode && userAnswers[currentIndex] === true) {
+            while(sentenceHtml.includes('[blank]')) {
+                let ans = q.answers[blankIndex] || "";
+                sentenceHtml = sentenceHtml.replace('[blank]', `<span class='filled-correct'>${ans}</span>`);
+                cleanTTS = cleanTTS.replace('[blank]', ans);
+                blankIndex++;
+            }
+        } else {
+            // 還沒答對，把 [blank] 替換成虛線拖拉框
+            cleanTTS = cleanTTS.replace(/\[blank\]/g, '空格');
+            while(sentenceHtml.includes('[blank]')) {
+                let expectedAnswer = q.answers[blankIndex] || ""; 
+                sentenceHtml = sentenceHtml.replace('[blank]', `<span class="drop-zone" data-answer="${expectedAnswer}">請拖入</span>`);
+                blankIndex++;
+                blanksToFill++;
+            }
+        }
+        
+        // 將每一句用 span 包起來，並加上獨立的發音按鈕
+        html += `<span class="sentence-block">
+                    ${sentenceHtml} 
+                    <button class="tts-btn-small" onclick="speak('${cleanTTS}', event)">🔊</button>
+                 </span>`;
+    });
+
+    document.getElementById('question-container').innerHTML = html;
+
+    // 如果這題已答對過，只顯示句子，清除選項
+    if (!isRetryMode && userAnswers[currentIndex] === true) {
+        document.getElementById('question-container').insertAdjacentHTML('afterbegin', `<div style='color:#2E7D32; font-weight:bold; font-size:28px; margin-bottom:15px;'>✅ 已答對！</div>`);
+        document.getElementById('options-container').innerHTML = ''; 
+        return; 
+    }
+
+    // --- 綁定接收拖拉事件 (Drop Zone Events) ---
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', e => {
+            e.preventDefault(); 
+            zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', e => {
+            zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', handleDrop);
+    });
+
+    // --- 渲染選項 (Draggable Cards) ---
+    const optsDiv = document.getElementById('options-container');
+    optsDiv.innerHTML = '';
+    
+    let displayOptions = q.options ? [...q.options] : [...q.answers];
+    displayOptions.sort(() => 0.5 - Math.random());
+
+    displayOptions.forEach((opt, i) => {
+        let card = document.createElement('div');
+        card.className = 'option-card';
+        card.draggable = true; 
+        card.id = 'opt-card-' + i;
+        card.dataset.text = opt;
+        
+        card.innerHTML = `
+            <span><i class="fas fa-arrows-alt"></i> ${opt}</span>
+            <button class="tts-btn" onclick="speak('${opt}', event)">🔊</button>
+        `;
+        
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', opt);
+            e.dataTransfer.setData('cardId', card.id);
+            e.dataTransfer.effectAllowed = 'copyMove';
+        });
+        
+        optsDiv.appendChild(card);
+    });
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.target.classList.remove('drag-over');
+    
+    if (!e.target.classList.contains('drop-zone')) return;
+
+    let draggedText = e.dataTransfer.getData('text/plain');
+    let cardId = e.dataTransfer.getData('cardId');
+    let expected = e.target.dataset.answer;
+
+    if (draggedText === expected) {
+        document.getElementById('sound-pop').play();
+        e.target.innerText = draggedText;
+        e.target.classList.remove('drop-zone');
+        e.target.classList.add('filled-correct');
+        
+        if (cardId && document.getElementById(cardId)) {
+            document.getElementById(cardId).style.visibility = 'hidden';
+        }
+        
+        blanksToFill--; 
+
+        if (blanksToFill === 0) {
+            questionCompletedSuccessfully();
+        }
+
+    } else {
+        document.getElementById('sound-wrong').play();
+        e.target.style.animation = 'shake 0.5s';
+        setTimeout(() => e.target.style.animation = '', 500);
+
+        if (!isRetryMode && userAnswers[currentIndex] !== true) {
+            userAnswers[currentIndex] = false;
+            document.getElementById('btn-skip').style.display = 'inline-block';
+        }
+        
+        currentHint = `Teacher Cat 提示：\n${currentLevelData.point}`;
+        document.getElementById('hint-text').innerText = currentHint;
+        document.getElementById('hint-container').style.display = 'block';
+    }
+}
+
+function questionCompletedSuccessfully() {
+    document.getElementById('sound-correct').play();
+    document.getElementById('question-container').classList.add('exaggerated-correct');
+    document.getElementById('btn-skip').style.display = 'none';
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    
+    if (userAnswers[currentIndex] !== true) {
+        userAnswers[currentIndex] = true;
+    }
+
+    setTimeout(() => {
+        if (isRetryMode) {
+            justRetriedAndCorrect = true; 
+            showSummary();
+        } else {
+            changeQuestion(1); 
+        }
+    }, 1500);
+}
+
+function skipQuestion() {
+    changeQuestion(1);
+}
+
+function changeQuestion(step) {
+    if (currentIndex + step >= 0 && currentIndex + step < selectedQuestions.length) {
+        currentIndex += step;
+        renderQuestion();
+    } else if (currentIndex + step >= selectedQuestions.length) {
+        showSummary();
+    }
+}
+
+function showSummary() {
+    isRetryMode = false;
+    switchScreen('summary-screen');
+    window.scrollTo(0,0);
+    
+    let previousBest = levelScores[currentLevelData.level] || 0;
+    let score = userAnswers.filter(a => a === true).length;
+    document.getElementById('final-score').innerText = score;
+    
+    if (score > previousBest) {
+        levelScores[currentLevelData.level] = score;
+        localStorage.setItem('teacherCatScores', JSON.stringify(levelScores));
+        
+        if (justRetriedAndCorrect) {
+            let banner = document.getElementById('new-record-banner');
+            banner.style.display = 'block';
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.3 } });
+            setTimeout(() => banner.style.display = 'none', 4000);
+        }
+    }
+    justRetriedAndCorrect = false;
+    
+    const listDiv = document.getElementById('result-list');
+    listDiv.innerHTML = '';
+
+    selectedQuestions.forEach((q, index) => {
+        let status = userAnswers[index] === true ? "✅ 答對" : "❌ 答錯 (點擊重做)";
+        let item = document.createElement('div');
+        item.className = `result-item ${userAnswers[index] === true ? 'correct' : 'wrong'}`;
+        item.innerHTML = `<div><strong>第 ${index + 1} 題：</strong> ${q.text.substring(0, 15)}...</div> <div>${status}</div>`;
+        
+        if (userAnswers[index] !== true) {
+            item.style.cursor = 'pointer';
+            item.onclick = () => retryQuestion(index);
+        }
+        
+        listDiv.appendChild(item);
+    });
+}
+
+function retryQuestion(index) {
+    currentIndex = index;
+    isRetryMode = true;
+    switchScreen('game-screen');
+    renderQuestion();
+}
+
+function openProgressModal() {
+    const listContainer = document.getElementById('record-list-container');
+    listContainer.innerHTML = '';
+
+    gameData.forEach(lvl => {
+        let bestScore = levelScores[lvl.level] || 0;
+        let starHtml = "<span class='star-empty'>⚪ 未合格</span>";
+        
+        if (bestScore === 20) { starHtml = "<span class='star-big'>🌟</span> (滿分)"; } 
+        else if (bestScore >= 10) { starHtml = "<span class='star-small'>⭐</span> (合格)"; }
+
+        let item = document.createElement('div');
+        item.className = 'record-list-item';
+        item.innerHTML = `<div><strong>${lvl.title}</strong><br><span style="font-size:16px; color:#666;">最高分：${bestScore} / 20</span></div>
+                          <div>${starHtml}</div>`;
+        listContainer.appendChild(item);
+    });
+
+    document.getElementById('progress-modal').style.display = 'flex';
+}
+
+function closeProgressModal(e) {
+    if(e.target.id === 'progress-modal') document.getElementById('progress-modal').style.display = 'none';
+}
+
+function clearProgress() {
+    if(confirm("確定要清除所有關卡的最高分與星星記錄嗎？(此動作無法復原)")) {
+        localStorage.removeItem('teacherCatScores');
+        levelScores = {};
+        alert("記錄已清除！");
+        if(document.getElementById('progress-modal').style.display === 'flex') openProgressModal();
+    }
+}
+</script>
+</body>
+</html>
