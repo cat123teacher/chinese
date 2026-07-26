@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <!-- 確保手機裝置正確縮放的 meta 標籤 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Letterland 英文拼音老虎機(3個字母)</title>
+    <style>
+        /* 基本重置，確保排版不會溢出 */
+        * { box-sizing: border-box; }
+        
+        /* 糖果風活潑背景 */
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            text-align: center;
+            background: repeating-linear-gradient(
+                45deg,
+                #e0f7fa,
+                #e0f7fa 20px,
+                #b2ebf2 20px,
+                #b2ebf2 40px
+            );
+            color: #333;
+            margin: 0;
+            padding: 15px;
+            overflow-x: hidden; /* 防止手機橫向捲動 */
+        }
+        
+        /* 跳動的彩虹標題 */
+        h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px #fff, 5px 5px 0px rgba(0,0,0,0.1);
+            line-height: 1.2;
+        }
+        h1 span:nth-child(1) { color: #f44336; }
+        h1 span:nth-child(2) { color: #ff9800; }
+        h1 span:nth-child(3) { color: #4caf50; }
+        h1 span:nth-child(4) { color: #2196f3; }
+        h1 span:nth-child(5) { color: #9c27b0; }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .bouncing-title {
+            display: inline-block;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        p.instruction {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00695c;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px dashed #009688;
+            line-height: 1.5;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+            max-width: 100%;
+        }
+        
+        /* 圓潤可愛的字母鎖定器 (加入 flex 自動換行) */
+        .lock-panel {
+            background: linear-gradient(135deg, #fff9c4, #ffecb3);
+            border: 4px solid #ffb300;
+            border-radius: 25px;
+            padding: 15px;
+            margin: 10px auto 20px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            max-width: 100%;
+            font-size: 20px;
+            font-weight: bold;
+            color: #e65100;
+            box-shadow: 0px 8px 0px #ffb300, 0px 12px 15px rgba(0,0,0,0.2);
+        }
+        .lock-panel select {
+            font-size: 18px;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 3px solid #ff9800;
+            cursor: pointer;
+            background-color: white;
+            color: #d32f2f;
+            font-weight: bold;
+            outline: none;
+            box-shadow: inset 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 3D 玩具機台外觀 */
+        .slot-machine {
+            background: linear-gradient(to bottom, #ffe082, #ffca28);
+            border: 12px solid #ff5252;
+            border-radius: 40px;
+            display: inline-block;
+            padding: 25px 20px 30px 20px;
+            box-shadow: 0px 15px 0px #d32f2f, 0px 25px 20px rgba(0,0,0,0.3);
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 100%;
+            width: 100%;
+            max-width: 550px; 
+        }
+        
+        /* 專屬貓咪圖標 */
+        .brand-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 0 15px #ffeb3b, 0 5px 10px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            background-color: white;
+        }
+
+        /* 紅、藍、綠 經典三色格子 */
+        .slots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .slot {
+            width: 110px;
+            height: 130px;
+            background: white;
+            border-radius: 20px;
+            font-size: 90px;
+            line-height: 130px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: inset 0px 8px 10px rgba(0,0,0,0.1), 0px 6px 0px rgba(0,0,0,0.2);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #slot1 { border: 8px solid #ff1744; color: #d50000; }
+        #slot2 { border: 8px solid #2979ff; color: #2962ff; }
+        #slot3 { border: 8px solid #00e676; color: #00c853; }
+
+        .slot:hover:not(.disabled) { transform: scale(1.05); }
+        .slot:active:not(.disabled) { transform: scale(0.95); }
+        .slot.disabled { cursor: default; }
+
+        /* 轉動時的震動特效 */
+        @keyframes slot-shake {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-8px); }
+            50% { transform: translateY(8px); }
+            75% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
+        }
+        .spinning-effect .slot:not(.locked) {
+            animation: slot-shake 0.1s infinite;
+            filter: blur(1px);
+        }
+        
+        /* 果凍光澤大拉桿按鈕 */
+        .pull-btn {
+            font-size: 30px;
+            padding: 15px 30px;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #ff5252, #d32f2f);
+            color: white;
+            border: 3px solid #b71c1c;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0px 8px 0px #b71c1c, 0px 15px 20px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 0px #b71c1c;
+            transition: all 0.1s;
+            max-width: 90%;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pull-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0px 0px 0px #b71c1c, 0px 5px 10px rgba(0,0,0,0.3);
+        }
+        .pull-btn:disabled {
+            background: #bdbdbd;
+            border-color: #9e9e9e;
+            box-shadow: 0px 8px 0px #757575;
+            color: #f5f5f5;
+            text-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .action-btns {
+            margin-top: 30px;
+            display: none; 
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .action-btn {
+            font-size: 20px;
+            padding: 12px 20px;
+            cursor: pointer;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: transparent;
+            flex: 1 1 auto;
+        }
+        .btn-sound { background: linear-gradient(to bottom, #66bb6a, #388e3c); box-shadow: 0px 6px 0px #2e7d32; }
+        .btn-meaning { background: linear-gradient(to bottom, #42a5f5, #1976d2); box-shadow: 0px 6px 0px #1565c0; }
+        .btn-dict { background: linear-gradient(to bottom, #ab47bc, #7b1fa2); box-shadow: 0px 6px 0px #4a148c; display: none; }
+        
+        .action-btn:active { transform: translateY(6px); box-shadow: 0px 0px 0px; }
+        
+        /* 中文解釋顯示區域 */
+        #result-text {
+            margin-top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            min-height: 45px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 8px 15px;
+            display: inline-block;
+            border: 3px dashed #ff9800;
+            max-width: 100%;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* 🎵 專屬中文語音小按鈕 🎵 */
+        .ch-sound-btn {
+            font-size: 18px;
+            padding: 6px 15px;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #ffca28, #ff8f00);
+            color: white;
+            border: 2px solid #e65100;
+            border-radius: 15px;
+            font-weight: bold;
+            box-shadow: 0px 4px 0px #e65100;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.1s;
+        }
+        .ch-sound-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #e65100;
+        }
+
+        /* 返回大冒險按鈕 */
+        .return-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: linear-gradient(to bottom, #00acc1, #00838f);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 40px;
+            border: 3px solid #006064;
+            box-shadow: 0px 8px 0px #004d40, 0px 10px 15px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 0px #004d40;
+            transition: all 0.1s;
+            max-width: 95%;
+        }
+        .return-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0px 0px 0px #004d40;
+        }
+
+        /* 聯絡欄設計 */
+        .contact-footer {
+            margin-top: 35px;
+            padding: 20px;
+            background-color: #fff8e1;
+            border-radius: 30px;
+            border: 5px dashed #ffca28;
+            display: inline-block;
+            width: 100%;
+            max-width: 850px;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+        }
+        .contact-footer h3 {
+            color: #f57f17;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 22px;
+            text-shadow: 1px 1px 0px #ffe082;
+        }
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .contact-links a, .contact-links span {
+            display: inline-block;
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: #00838f;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            border: 3px solid #80deea;
+            box-shadow: 0px 4px 0px #b2ebf2;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 紙花特效畫布 */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* =========================================
+           針對手機與小螢幕的專屬 RWD 響應式優化 
+           ========================================= */
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            p.instruction { font-size: 16px; padding: 8px 15px; }
+            .slot-machine {
+                border-width: 8px; 
+                padding: 15px 10px 20px 10px;
+                border-radius: 25px;
+            }
+            .brand-icon {
+                width: 60px; height: 60px;
+                border-width: 3px; margin-bottom: 10px;
+            }
+            .slots { gap: 8px; margin-bottom: 15px; }
+            .slot {
+                width: 75px; height: 95px;
+                font-size: 60px; line-height: 95px;
+                border-width: 5px !important; border-radius: 12px;
+            }
+            .pull-btn { font-size: 22px; padding: 10px 20px; }
+            .action-btn { font-size: 16px; padding: 8px 10px; }
+            #result-text { font-size: 20px; padding: 5px 10px; }
+            .ch-sound-btn { font-size: 14px; padding: 4px 10px; } 
+            .return-btn { font-size: 16px; padding: 12px 20px; }
+            .contact-footer h3 { font-size: 18px; }
+            .contact-links a, .contact-links span { font-size: 14px; padding: 6px 12px; }
+            .lock-panel { font-size: 16px; padding: 10px; }
+            .lock-panel select { font-size: 14px; padding: 2px 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 紙花特效畫布 -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <h1 class="bouncing-title">
+        <span>🎰</span> <span>L</span><span>e</span><span>t</span><span>t</span><span>e</span><span>r</span><span>l</span><span>a</span><span>n</span><span>d</span> 
+        <span style="color:#f44336;">英</span><span style="color:#ff9800;">文</span><span style="color:#4caf50;">拼</span><span style="color:#2196f3;">音</span>老虎機(3個字母) <span>🎰</span>
+    </h1>
+    <br>
+    <p class="instruction">
+        🎯 可以在上方「鎖定」想要專注練習的字母<br>
+        🕹️ 點擊「拉動老虎機」抽出超酷單字<br>
+        👆 點擊單一字母聽發音，再用「🔊 連續發音」拼讀 (Blending)！
+    </p>
+
+    <!-- 字母鎖定器面板 -->
+    <div class="lock-panel">
+        <label>第1格: <select id="lock1"></select></label>
+        <label>第2格: <select id="lock2"></select></label>
+        <label>第3格: <select id="lock3"></select></label>
+    </div>
+
+    <div class="slot-machine" id="machineContainer">
+        <!-- 專屬貓咪圖標 -->
+        <img src="cat.jpeg" alt="Teacher Cat" class="brand-icon">
+        
+        <div class="slots" id="slotsArea">
+            <div class="slot disabled" id="slot1" onclick="playLetterSound('slot1')">?</div>
+            <div class="slot disabled" id="slot2" onclick="playLetterSound('slot2')">?</div>
+            <div class="slot disabled" id="slot3" onclick="playLetterSound('slot3')">?</div>
+        </div>
+        
+        <button class="pull-btn" id="spinBtn" onclick="startSpin()">🕹️ 拉動老虎機！</button>
+        
+        <div class="action-btns" id="actionBtns" style="display:none;">
+            <button class="action-btn btn-sound" onclick="playWordSoundFast()">🔊 連續發音</button>
+            <button class="action-btn btn-meaning" onclick="showMeaning()">📖 中文解釋</button>
+            <button class="action-btn btn-dict" id="btnDict" onclick="playDictionarySound()">🗣️ 字典發音</button>
+        </div>
+        
+        <!-- 解釋顯示區域 (結合按鈕) -->
+        <div id="result-text" style="display:none;"></div>
+    </div>
+
+    <br>
+    <!-- 返回按鈕 -->
+    <div>
+        <a href="https://cat123teacher.github.io/chinese/main.html" class="return-btn">🚀 返回小朋友學習大冒險</a>
+    </div>
+
+    <!-- 社群聯絡欄 -->
+    <div class="contact-footer">
+        <h3>✨ Teacher Cat 的快樂AI教室 ✨</h3>
+        <div class="contact-links">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank">▶️ YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">🧵 Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
+            <span>🎵 抖音: 74254902683</span>
+        </div>
+    </div>
+
+    <script>
+        const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+        
+        // --- ★ 小朋友專屬：高頻詞與常用 CVC 字庫 (約150字) ★ ---
+        const commonKidsWords = [
+            "act","add","age","air","all","and","ant","any","ape","are","arm","art","ask","ate",
+            "bad","bag","bat","bed","bee","beg","big","bin","bit","box","boy","bug","bus","but","buy","bye",
+            "can","cap","car","cat","cow","cry","cub","cup","cut",
+            "dad","day","did","die","dig","dip","dog","dry",
+            "ear","eat","egg","end","eye",
+            "fan","far","fat","few","fit","fly","fog","for","fox","fun",
+            "get","god","got","gum","gun","gym",
+            "had","hat","hen","her","hid","him","his","hit","hot","how","hug","ice","ill","ink",
+            "jam","jar","jaw","jet","job","jog","joy","key","kid",
+            "lay","leg","let","lie","lip","log","lot","low",
+            "mad","man","map","mat","may","men","mix","mom","moo","mud","mug","mum",
+            "net","new","nod","not","now","nut","oak","off","oil","old","one","out","owl","own",
+            "pan","pay","pea","pen","pet","pie","pig","pin","pot","put",
+            "rag","ran","rat","red","rib","rub","run",
+            "sad","saw","say","sea","see","set","she","sit","six","sky","son","sun",
+            "tea","ten","tie","toe","top","toy","try","tub","two","use","van","vet",
+            "war","was","wax","way","web","wet","who","why","win","wow","yes","yet","you","zoo"
+        ];
+
+        // 初始化下拉選單
+        window.onload = function() {
+            const selects = ['lock1', 'lock2', 'lock3'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = '<option value="?">🎲 隨機</option>';
+                alphabet.forEach(letter => {
+                    el.innerHTML += `<option value="${letter}">${letter}</option>`;
+                });
+            });
+            initCanvas(); 
+        };
+
+        // ====== 特效與音效系統 (Web Audio API) ======
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let spinTickInterval;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, type, duration, vol=0.1) {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startSpinSound() {
+            initAudio();
+            let freq = 300;
+            spinTickInterval = setInterval(() => {
+                playTone(freq, 'triangle', 0.05, 0.05);
+                freq = freq === 300 ? 400 : 300; 
+            }, 100);
+        }
+
+        function stopSpinSound() {
+            clearInterval(spinTickInterval);
+        }
+
+        function playWinSound() {
+            setTimeout(() => playTone(523.25, 'sine', 0.3, 0.2), 0);   
+            setTimeout(() => playTone(659.25, 'sine', 0.3, 0.2), 150); 
+            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.2), 300); 
+            setTimeout(() => playTone(1046.50, 'sine', 0.6, 0.3), 450); 
+        }
+
+        function playNeutralSound() {
+            setTimeout(() => playTone(300, 'square', 0.2, 0.05), 0);
+            setTimeout(() => playTone(250, 'square', 0.4, 0.05), 150);
+        }
+
+        // ====== 紙花大噴發特效 ======
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        function fireConfetti() {
+            particles = [];
+            let isMobile = window.innerWidth < 600;
+            let confettiCount = isMobile ? 80 : 150; 
+            
+            for(let i=0; i<confettiCount; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2 + 100, 
+                    r: Math.random() * 8 + 4,
+                    dx: Math.random() * 20 - 10,
+                    dy: Math.random() * -15 - 10,
+                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    tilt: Math.random() * 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            particles.forEach(p => {
+                p.tiltAngle += p.tiltAngleInc;
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.5; 
+                p.tilt = Math.sin(p.tiltAngle) * 15;
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                ctx.stroke();
+
+                if(p.y < canvas.height) active = true;
+            });
+            if(active) {
+                requestAnimationFrame(updateConfetti);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // 1900+ 個 3 字母單字字典
+        const wordDictionary = {
+            "aah":"發出啊聲", "aal":"東印度灌木", "aar":"阿勒河", "aas":"火山灰", "aba":"毛織物", "abb":"紗線", "abc":"美國廣播公司(簡寫)", "abd":"阿伯丁", "abe":"亞伯(人名)", "abo":"澳洲原住民", "abp":"血壓(簡寫)", "abs":"腹肌(簡寫)", "abu":"阿布(地名)", "aby":"贖罪", "aca":"特許會計師(簡寫)", "acc":"行政控制委員會(簡寫)", "ace":"王牌", "act":"行動", "add":"增加", "ado":"忙亂", "adp":"安道爾比塞塔(簡寫)", "ads":"廣告(簡寫)", "adz":"錛子", "aed":"阿聯酋迪拉姆(簡寫)", "aff":"肯定", "afg":"阿富汗(簡寫)", "aft":"在船尾", "aga":"土耳其長官", "age":"年齡", "ago":"以前", "ags":"農業(簡寫)", "aha":"啊哈", "ahi":"黃鰭鮪魚", "ahs":"發出啊聲", "aid":"幫助", "ail":"生病", "aim":"目標", "ain":"自己的", "air":"空氣", "ais":"三趾樹懶", "ait":"小島", "aja":"阿賈(人名)", "aka":"又名(簡寫)", "ala":"翅膀", "alb":"白麻布聖職衣", "ale":"麥酒", "ali":"阿里(人名)", "all":"全部", "alp":"高山", "als":"植物名", "alt":"替換(簡寫)", "ama":"海女", "ami":"朋友", "amp":"安培(簡寫)", "ams":"阿姆斯特丹(簡寫)", "amu":"原子質量單位(簡寫)", "amy":"艾米(人名)", "ana":"語錄", "and":"和", "ane":"一個", "ani":"黑鵑", "ann":"安(人名)", "ant":"螞蟻", "any":"任何", "apa":"美國心理學會(簡寫)", "ape":"猿", "api":"應用程式介面(簡寫)", "apk":"Android安裝包(簡寫)", "apo":"最高點", "app":"應用程式(簡寫)", "apt":"適合的", "ara":"天壇座", "arb":"套利者", "arc":"弧形", "are":"是", "arf":"狗叫聲", "arg":"阿根廷(簡寫)", "ari":"阿里(人名)", "ark":"方舟", "arm":"手臂", "art":"藝術", "asa":"亞撒(人名)", "ash":"灰燼", "ask":"問", "asp":"毒蛇", "ass":"驢子", "ast":"大西洋標準時間(簡寫)", "ate":"吃(過去式)", "atg":"安地卡及巴布達(簡寫)", "atm":"自動提款機(簡寫)", "att":"寮國硬幣", "auk":"海雀", "aus":"澳洲(簡寫)", "aut":"奧地利(簡寫)", "ava":"艾娃(人名)", "ave":"大街(簡寫)", "avo":"酪梨(簡寫)", "awa":"離開", "awb":"航空貨運單(簡寫)", "awe":"敬畏", "awl":"錐子", "awn":"芒", "aws":"亞馬遜雲端(簡寫)", "axe":"斧頭", "aye":"贊成", "ays":"贊成者", "aze":"亞塞拜然(簡寫)", "azo":"偶氮的", 
+            "b2b":"企業對企業(簡寫)", "b2c":"企業對消費者(簡寫)", "baa":"羊的叫聲", "bac":"細菌(簡寫)", "bad":"壞的", "bae":"寶貝/親愛的", "bag":"袋子", "bah":"呸", "bal":"峇里", "bam":"砰", "ban":"禁止", "bap":"小圓麵包", "bar":"酒吧/棒", "bas":"低音", "bat":"蝙蝠", "bay":"海灣", "bbc":"英國廣播公司(簡寫)", "bbq":"燒烤(簡寫)", "bcc":"密件副本(簡寫)", "bcd":"二進碼十進數(簡寫)", "bce":"西元前(簡寫)", "bcf":"十億立方英尺(簡寫)", "bdi":"蒲隆地(簡寫)", "bdp":"民主黨(簡寫)", "bed":"床", "bee":"蜜蜂", "beg":"乞求", "bel":"貝爾(音量)", "ben":"內室", "bet":"打賭", "bey":"總督", "bez":"寶石", "bff":"永遠的好朋友(簡寫)", "bgd":"保加利亞(簡寫)", "bha":"巴哈馬(簡寫)", "bhr":"巴林(簡寫)", "bib":"圍兜", "bid":"出價", "big":"大", "bin":"垃圾桶", "bio":"生物(簡寫)", "bis":"兩次", "bit":"一小塊", "biz":"商業(簡寫)", "bkk":"曼谷(簡寫)", "boa":"蟒蛇", "bob":"上下跳動", "bod":"身體(簡寫)", "bog":"沼澤", "boo":"噓聲", "bop":"流行舞", "bos":"牛", "bot":"機器人(簡寫)", "bow":"鞠躬", "box":"盒子", "boy":"男孩", "bpm":"每分鐘節拍(簡寫)", "bps":"每秒位元(簡寫)", "bra":"胸罩(簡寫)", "brb":"馬上回來(簡寫)", "bro":"兄弟(簡寫)", "brr":"好冷", "bsa":"童子軍(簡寫)", "btc":"比特幣(簡寫)", "bub":"小子", "bud":"芽", "bug":"蟲子", "bum":"流浪漢", "bun":"小圓麵包", "bur":"毛刺", "bus":"巴士", "but":"但是", "buy":"買", "bwa":"哇塞", "bye":"再見", "bys":"旁", "bzz":"嗡嗡聲", 
+            "cab":"計程車", "cad":"無賴", "caf":"咖啡館(簡寫)", "cag":"一種夾克", "cal":"卡路里(簡寫)", "cam":"凸輪/相機(簡寫)", "can":"可以", "cap":"鴨舌帽", "car":"汽車", "cat":"貓", "caw":"鴉叫聲", "cay":"珊瑚礁", "caz":"非正式的(簡寫)", "cbc":"加拿大廣播(簡寫)", "cbd":"大麻二酚(簡寫)", "cbs":"哥倫比亞廣播(簡寫)", "cca":"冷氣(簡寫)", "ccc":"驗證(簡寫)", "cct":"閉路(簡寫)", "cdc":"疾控中心(簡寫)", "cee":"字母C", "cel":"賽璐珞", "ceo":"執行長(簡寫)", "cep":"牛肝菌", "cfo":"財務長(簡寫)", "cgf":"總目錄(簡寫)", "cgi":"電腦生成圖像(簡寫)", "chf":"瑞士法郎(簡寫)", "chi":"氣", "cia":"中情局(簡寫)", "cig":"香煙(簡寫)", "cis":"順式", "cmd":"命令(簡寫)", "cmo":"行銷長(簡寫)", "cnn":"有線電視新聞網(簡寫)", "cny":"人民幣(簡寫)", "co2":"二氧化碳(簡寫)", "cob":"玉米芯", "cod":"鱈魚", "cog":"齒輪", "col":"山口", "con":"欺騙", "coo":"咕咕聲", "cop":"警察", "cor":"心", "cos":"生菜", "cot":"小床", "cow":"牛", "cox":"舵手", "coy":"害羞的", "coz":"因為/堂親(簡寫)", "cpa":"會計師(簡寫)", "cpi":"消費者物價指數(簡寫)", "cpr":"心肺復甦術(簡寫)", "cpu":"中央處理器(簡寫)", "cro":"克羅埃西亞(簡寫)", "crt":"陰極射線管(簡寫)", "cru":"葡萄園", "cry":"哭泣", "csi":"犯罪現場調查(簡寫)", "css":"層疊樣式表(簡寫)", "csv":"逗號分隔值(簡寫)", "cto":"技術長(簡寫)", "cub":"幼獸", "cud":"反芻食物", "cue":"提示", "cum":"附帶", "cup":"杯子", "cur":"野狗", "cut":"剪", "cvs":"便利店(簡寫)", "cwm":"冰斗", 
+            "dab":"輕觸", "dad":"爸爸", "dag":"羊毛結", "dah":"達(摩斯密碼)", "dak":"驛站", "dal":"豆泥", "dam":"水壩", "dan":"段(柔道)", "dap":"輕拍", "daw":"寒鴉", "day":"日子", "dba":"數據庫管理(簡寫)", "deb":"初入社會的女孩(簡寫)", "dec":"十二月(簡寫)", "def":"極好的(簡寫)", "del":"刪除(簡寫)", "den":"獸穴", "dep":"部門(簡寫)", "dev":"開發者(簡寫)", "dew":"露水", "dex":"右", "dey":"總督", "dib":"蘸", "did":"做過", "die":"死亡", "dig":"挖掘", "dim":"昏暗的", "din":"喧鬧", "dip":"沾/浸", "dis":"不尊重(簡寫)", "dit":"點", "div":"分割(簡寫)", "diy":"自己動手做(簡寫)", "djb":"吉布地(簡寫)", "dkk":"丹麥克朗(簡寫)", "dna":"去氧核糖核酸(簡寫)", "doa":"到院前死亡(簡寫)", "dob":"出生日期(簡寫)", "doc":"醫生(簡寫)", "dod":"國防部(簡寫)", "doe":"母鹿", "dog":"狗", "dol":"度(痛覺)", "dom":"領地", "don":"穿上", "dor":"甲蟲", "dos":"磁碟操作系統(簡寫)", "dot":"點", "dow":"道瓊斯(簡寫)", "dpi":"解析度(簡寫)", "dry":"乾的", "dss":"社會服務部(簡寫)", "dub":"配音", "dud":"無用之物", "due":"到期的", "dug":"挖(過去式)", "duh":"廢話", "dui":"酒駕(簡寫)", "dun":"暗褐色", "duo":"二重唱", "dup":"欺騙", "dvd":"數位影音光碟(簡寫)", "dvr":"數位錄影機(簡寫)", "dye":"染料", "dys":"不良", 
+            "ear":"耳朵", "eat":"吃", "eau":"水", "ebb":"退潮", "ebt":"福利轉帳卡(簡寫)", "ecb":"歐洲央行(簡寫)", "ecg":"心電圖(簡寫)", "eco":"生態(簡寫)", "ecu":"歐洲貨幣(簡寫)", "edh":"古英語字母", "eds":"編輯(簡寫)", "edu":"教育(簡寫)", "eeg":"腦電圖(簡寫)", "eek":"呀(驚嚇聲)", "eel":"鰻魚", "eem":"電子", "eew":"噁", "eff":"粗話", "efs":"字母F", "eft":"小蠑螈", "egg":"雞蛋", "ego":"自我", "egy":"埃及(簡寫)", "ekg":"心電圖(簡寫)", "eke":"勉強維持", "eld":"老年", "elf":"精靈", "elk":"麋鹿", "ell":"長度單位", "elm":"榆樹", "els":"字母L", "eme":"舅舅", "emo":"情緒化(簡寫)", "emp":"員工(簡寫)", "ems":"字母M", "emt":"救護技術員(簡寫)", "emu":"鴯鶓", "end":"結束", "eng":"字母N", "ens":"字母N", "ent":"耳鼻喉科(簡寫)", "eod":"炸彈處理(簡寫)", "eoe":"平等機會(簡寫)", "eon":"紀元", "epa":"環保署(簡寫)", "epo":"促紅血球生成素(簡寫)", "eqp":"設備(簡寫)", "era":"時代", "ere":"在...之前", "erg":"爾格", "ern":"海雕", "err":"犯錯", "ers":"野碗豆", "esp":"西班牙(簡寫)", "ess":"字母S", "est":"東部時間(簡寫)", "eta":"希臘字母/預計到達時間(簡寫)", "etf":"指數型基金(簡寫)", "eth":"古英語字母", "eur":"歐元(簡寫)", "eve":"前夕", "ewe":"母羊", "eye":"眼睛", 
+            "fab":"極好的(簡寫)", "fad":"狂熱", "fag":"苦工", "fah":"音符", "fan":"風扇", "faq":"常見問題(簡寫)", "far":"遠", "fas":"音符", "fat":"胖", "fax":"傳真(簡寫)", "fay":"仙女", "fbi":"聯邦調查局(簡寫)", "fca":"英國金融行為(簡寫)", "fcc":"聯邦通信委員會(簡寫)", "fco":"羅馬機場(簡寫)", "fda":"食品藥物管理局(簡寫)", "fdic":"聯邦存款保險(簡寫)", "feb":"二月(簡寫)", "fed":"餵(過去式)", "fee":"費用", "feg":"小塊", "feh":"希伯來字母", "fem":"女性(簡寫)", "fen":"沼澤", "fer":"為了", "fes":"節日", "fet":"節日", "feu":"封地", "few":"很少", "fey":"古怪的", "fez":"土耳其氈帽", "fib":"小謊", "fid":"木釘", "fie":"呸", "fig":"無花果", "fil":"硬幣", "fin":"魚鰭", "fir":"冷杉", "fit":"適合的", "fix":"修理", "fiz":"嘶嘶聲", "flu":"流感(簡寫)", "fly":"飛", "fob":"錶鏈", "foe":"敵人", "fog":"霧", "foh":"呸", "fon":"風", "fop":"花花公子", "for":"給", "fou":"醉的", "fox":"狐狸", "foy":"告別宴", "fra":"兄弟", "fri":"星期五(簡寫)", "fro":"向後", "fry":"油炸", "fta":"自由貿易協定(簡寫)", "fub":"笨人", "fud":"古板的人", "fug":"悶熱", "fun":"有趣", "fur":"毛", "fyi":"供您參考(簡寫)", 
+            "gab":"閒聊", "gad":"遊蕩", "gag":"惡作劇", "gal":"女孩", "gam":"鯨群", "gan":"開始", "gap":"缺口", "gar":"雀鱔", "gas":"氣體", "gat":"手槍", "gay":"快樂的", "gbp":"英鎊(簡寫)", "gdp":"國內生產毛額(簡寫)", "ged":"狗魚", "gee":"天啊", "gel":"凝膠", "gem":"寶石", "gen":"情報(簡寫)", "get":"得到", "gey":"相當", "ghi":"酥油", "gib":"閹貓", "gid":"羊暈病", "gig":"演出", "gin":"琴酒", "gip":"騙取", "git":"飯桶", "gmp":"優良製造標準(簡寫)", "gmt":"格林威治時間(簡寫)", "gnu":"牛羚", "goa":"藏羚羊", "gob":"嘴巴", "god":"神", "goe":"去", "goo":"黏稠物", "gor":"血塊", "gos":"去", "got":"得到", "gov":"政府(簡寫)", "gox":"液氧(簡寫)", "gpa":"學業平均成績(簡寫)", "gps":"全球定位系統(簡寫)", "gsa":"政府總署(簡寫)", "gsm":"全球行動通訊(簡寫)", "gui":"圖形使用者介面(簡寫)", "gum":"口香糖", "gun":"槍", "gut":"腸道", "guv":"老闆(簡寫)", "guy":"傢伙", "gym":"體育館(簡寫)", "gyp":"騙取", 
+            "had":"有(過去式)", "hae":"有", "hag":"老巫婆", "hah":"哈", "haj":"朝覲", "ham":"火腿", "hao":"角(貨幣)", "hap":"偶然發生", "has":"有", "hat":"帽子", "haw":"山楂", "hay":"乾草", "hbo":"家庭票房(簡寫)", "hdd":"硬碟(簡寫)", "hdt":"高畫質(簡寫)", "heh":"嘿", "hem":"裙邊", "hen":"母雞", "hep":"時髦的", "her":"她的", "hes":"他", "het":"激動的", "hew":"砍劈", "hex":"巫術", "hey":"嘿", "hic":"呃逆", "hid":"躲藏", "hie":"催促", "him":"他的(受格)", "hin":"欣(液量單位)", "hip":"臀部", "his":"他的", "hit":"擊打", "hiv":"人類免疫缺乏病毒(簡寫)", "hkd":"港幣(簡寫)", "hkg":"香港(簡寫)", "hmm":"嗯", "hmo":"健康維護組織(簡寫)", "hoa":"哇", "hob":"滾刀", "hoc":"這", "hod":"灰斗", "hoe":"鋤頭", "hog":"豬", "hoi":"喂", "hon":"親愛的(簡寫)", "hop":"跳躍", "hot":"熱", "how":"如何", "hoy":"喂", "hq":"總部(簡寫)", "hrd":"人力資源開發(簡寫)", "hrh":"殿下(簡寫)", "htm":"網頁檔(簡寫)", "hub":"中心", "hud":"房屋及城市發展部(簡寫)", "hue":"顏色", "hug":"擁抱", "huh":"蛤", "hum":"哼唱", "hun":"匈奴人", "hup":"向上", "hut":"小屋", "hyp":"注射器(簡寫)", "hys":"歇斯底里(簡寫)", 
+            "ian":"伊恩(人名)", "ibm":"萬國商業機器(簡寫)", "ice":"冰", "ich":"我", "icu":"加護病房(簡寫)", "icy":"冰冷的", "ida":"國際開發協會(簡寫)", "idc":"國際數據資訊(簡寫)", "ids":"本我", "iff":"若且唯若(簡寫)", "ifs":"條件", "ig":"Instagram(簡寫)", "igg":"忽視", "ilk":"同類", "ill":"生病", "ilo":"國際勞工組織(簡寫)", "imf":"國際貨幣基金(簡寫)", "imo":"在我看來(簡寫)", "imp":"小惡魔", "inc":"股份有限公司(簡寫)", "ink":"墨水", "inn":"客棧", "ins":"進入", "ioc":"國際奧委會(簡寫)", "ion":"離子", "iot":"物聯網(簡寫)", "iou":"欠條(簡寫)", "ipo":"首次公開募股(簡寫)", "iq":"智商(簡寫)", "ira":"個人退休帳戶(簡寫)", "ire":"憤怒", "irk":"激怒", "irs":"美國國稅局(簡寫)", "ism":"主義", "iso":"國際標準化組織(簡寫)", "isp":"網際網路服務提供商(簡寫)", "it":"資訊科技(簡寫)", "its":"它的", "iv":"靜脈注射(簡寫)", "ivy":"常春藤", 
+            "jab":"戳", "jag":"參差不齊", "jam":"果醬", "jan":"一月(簡寫)", "jap":"日本(簡寫)", "jar":"罐子", "jaw":"下巴", "jay":"松鴉", "jee":"吉普車", "jet":"噴射機", "jeu":"遊戲", "jfk":"甘迺迪機場(簡寫)", "jib":"帆", "jig":"輕快舞蹈", "jin":"神怪", "job":"工作", "joe":"咖啡", "jog":"慢跑", "jot":"匆匆記下", "jow":"狗吠", "joy":"快樂", "jpy":"日圓(簡寫)", "jug":"水壺", "jul":"七月(簡寫)", "jun":"六月(簡寫)", "jus":"果汁", "jut":"突出", 
+            "kab":"古代容量", "kae":"寒鴉", "kaf":"阿拉伯字母", "kas":"卡斯", "kat":"阿拉伯茶", "kay":"字母K", "kea":"啄羊鸚鵡", "kef":"大麻", "keg":"小木桶", "ken":"知識範圍", "kep":"接住", "kex":"乾莖", "key":"鑰匙", "kfc":"肯德基(簡寫)", "kgb":"克格勃(簡寫)", "khi":"希臘字母", "kid":"小孩", "kif":"大麻", "kin":"親戚", "kip":"小睡", "kir":"基爾酒", "kit":"裝備包", "kkk":"3K黨(簡寫)", "koa":"相思樹", "kob":"水羚", "koi":"錦鯉", "kop":"小山", "kor":"希伯來容量", "kos":"印度長度", "kpi":"關鍵績效指標(簡寫)", "krw":"丹麥克朗(簡寫)", "kue":"字母Q", "kwd":"韓元(簡寫)", 
+            "lab":"實驗室(簡寫)", "lac":"漆", "lad":"男孩", "lag":"落後", "lam":"逃跑", "lap":"大腿", "lar":"家神", "las":"音符", "lat":"前鋸肌", "lav":"廁所(簡寫)", "law":"法律", "lax":"洛杉磯(簡寫)", "lay":"放置", "lbo":"槓桿收購(簡寫)", "lcd":"液晶顯示器(簡寫)", "ldc":"開發中國家(簡寫)", "ldl":"低密度脂蛋白(簡寫)", "lea":"草地", "led":"帶領(過去式)/發光二極體(簡寫)", "lee":"避風處", "leg":"腿", "lei":"花環", "lek":"阿爾巴尼亞幣", "let":"讓", "leu":"羅馬尼亞幣", "lev":"保加利亞幣", "lex":"法律", "ley":"草地", "lez":"女同性戀(簡寫)", "lhr":"倫敦希斯洛(簡寫)", "lib":"解放(簡寫)", "lid":"蓋子", "lie":"躺/說謊", "lin":"椴樹", "lip":"嘴唇", "lit":"點燃", "llc":"有限責任公司(簡寫)", "llp":"有限責任合夥(簡寫)", "lob":"拋", "log":"圓木", "lon":"倫敦(簡寫)", "loo":"廁所", "lop":"修剪", "lor":"看哪", "lot":"許多", "low":"低的", "lox":"燻鮭魚", "lsd":"迷幻藥(簡寫)", "ltd":"有限公司(簡寫)", "lug":"拖拉", "lum":"煙囪", "luv":"愛", "lux":"照度(光度)", "lye":"鹼水", 
+            "m&a":"併購(簡寫)", "mac":"雨衣(簡寫)", "mad":"生氣", "mae":"多", "mag":"彈匣(簡寫)", "man":"男人", "map":"地圖", "mar":"損壞", "mas":"母親", "mat":"墊子", "maw":"胃", "max":"最大(簡寫)", "may":"可以", "mba":"企管碩士(簡寫)", "med":"醫療的(簡寫)", "meg":"兆(簡寫)", "mel":"蜂蜜", "mem":"希伯來字母", "men":"男人們", "met":"遇見(過去式)", "mew":"貓叫聲", "mho":"姆歐", "mia":"邁阿密(簡寫)", "mib":"彈珠", "mic":"麥克風(簡寫)", "mid":"中間", "mig":"米格機", "mil":"毫升", "mim":"做作的", "mir":"村社", "mis":"音符", "mit":"麻省理工(簡寫)", "mix":"混合", "mla":"現代語言協會(簡寫)", "mls":"多重上市服務(簡寫)", "mm":"毫米(簡寫)", "mna":"併購(簡寫)", "moa":"恐鳥", "mob":"暴民", "moc":"莫卡辛鞋", "mod":"現代的(簡寫)", "mog":"貓", "moi":"我", "mol":"摩爾(簡寫)", "mom":"媽媽", "mon":"星期一(簡寫)", "moo":"牛叫", "mop":"拖把", "mor":"森林腐殖質", "mos":"月", "mot":"警句", "mow":"割草", "mpg":"每加侖英哩(簡寫)", "mph":"每小時英哩(簡寫)", "mri":"核磁共振(簡寫)", "ms":"女士(簡寫)", "msg":"味精(簡寫)", "mtb":"山地車(簡寫)", "mtv":"音樂電視網(簡寫)", "mud":"泥巴", "mug":"馬克杯", "mum":"媽媽", "mun":"人", "mus":"希臘字母", "mut":"雜種狗", "mvp":"最有價值球員(簡寫)", 
+            "nab":"抓住", "naacp":"有色人種協進會(簡寫)", "nae":"沒有", "nag":"嘮叨", "nah":"不", "nam":"南", "nan":"奶奶", "nap":"小睡", "naw":"不", "nay":"不", "nba":"美國職籃(簡寫)", "nbc":"美國全國廣播公司(簡寫)", "neb":"鳥嘴", "nee":"原名", "net":"網", "new":"新", "nfl":"國家美式足球聯盟(簡寫)", "nhl":"國家冰球聯盟(簡寫)", "nib":"筆尖", "nih":"美國國家衛生院(簡寫)", "nil":"零", "nim":"偷", "nip":"捏", "nit":"蝨卵", "nix":"拒絕", "nob":"大人物", "nod":"點頭", "nog":"蛋酒", "noh":"能劇", "nom":"名字", "non":"非", "noo":"現在", "nor":"也不", "nos":"數字(簡寫)", "not":"不", "nov":"十一月(簡寫)", "now":"現在", "npr":"全國公共廣播電台(簡寫)", "nrt":"成田機場(簡寫)", "nsa":"國家安全局(簡寫)", "nsf":"國家科學基金會(簡寫)", "nth":"第n個", "nub":"結節", "nun":"修女", "nus":"希臘字母", "nut":"堅果", "nyd":"新年(簡寫)", "nyu":"紐約大學(簡寫)", "nzd":"紐西蘭元(簡寫)", 
+            "oaf":"笨蛋", "oak":"橡樹", "oar":"船槳", "oas":"美洲國家組織(簡寫)", "oat":"燕麥", "oba":"首領", "obe":"巫術", "obg":"婦產科(簡寫)", "obi":"和服腰帶", "oca":"酢漿薯", "ocd":"強迫症(簡寫)", "oct":"十月(簡寫)", "odd":"奇怪的", "ode":"頌歌", "ods":"奇特", "oes":"食道", "off":"離開", "oft":"經常", "ohm":"歐姆", "oho":"哦", "oil":"油", "oka":"土耳其重量", "oke":"好", "old":"老", "ole":"好極了", "oma":"奶奶", "one":"一", "ono":"小野魚", "ons":"上", "ooh":"哦", "oot":"出去", "ope":"打開", "ops":"行動", "opt":"選擇", "ora":"口", "orb":"球體", "orc":"獸人", "ord":"芝加哥機場(簡寫)", "ore":"礦石", "ors":"或", "ort":"剩菜", "ose":"蛇形丘", "osha":"職安署(簡寫)", "otc":"非處方(簡寫)", "oud":"烏德琴", "our":"我們的", "out":"外面", "ova":"卵子", "owe":"欠", "owl":"貓頭鷹", "own":"自己的", "oxo":"牛肉精", "oxy":"氧(簡寫)", 
+            "pac":"軟鞋/政治行動委員會(簡寫)", "pad":"墊板", "pah":"呸", "pal":"朋友", "pam":"梅花J", "pan":"平底鍋", "pap":"軟食", "par":"標準", "pas":"舞步", "pat":"輕拍", "paw":"動物爪子", "pax":"和平", "pay":"支付", "pbs":"公共廣播電視(簡寫)", "pc":"個人電腦(簡寫)", "pci":"周邊組件(簡寫)", "pcp":"天使塵(簡寫)", "pd":"警察局(簡寫)", "pdf":"可攜式文件(簡寫)", "pdo":"保護原產地(簡寫)", "pea":"豌豆", "pec":"胸肌(簡寫)", "ped":"行人(簡寫)", "pee":"尿", "peg":"釘子", "peh":"希伯來字母", "pen":"筆", "pep":"活力", "per":"每", "pes":"腳", "pet":"寵物", "pew":"長椅", "ph":"酸鹼度(簡寫)", "phd":"博士學位(簡寫)", "phi":"希臘字母", "php":"菲律賓披索(簡寫)", "pht":"噓聲", "pia":"軟腦膜", "pic":"照片(簡寫)", "pie":"派", "pig":"豬", "pin":"大頭針/密碼(簡寫)", "pip":"種子", "pis":"希臘字母", "pit":"坑洞", "piu":"更", "pix":"照片(簡寫)", "pki":"公開金鑰(簡寫)", "plc":"公眾有限公司(簡寫)", "ply":"使用", "pms":"經前症候群(簡寫)", "po":"郵局(簡寫)", "poa":"早熟禾", "pod":"豆莢", "poh":"呸", "poi":"芋泥", "pol":"政客(簡寫)", "pom":"英國人", "poo":"屎", "pop":"砰的聲響/流行", "pos":"銷售點(簡寫)", "pot":"鍋子", "pow":"戰俘(簡寫)", "pox":"痘", "pp":"頁碼(簡寫)", "ppc":"點擊付費(簡寫)", "ppi":"生產者物價(簡寫)", "ppt":"簡報(簡寫)", "pr":"公關(簡寫)", "prc":"中國(簡寫)", "pro":"專業(簡寫)", "pry":"撬開", "psa":"公共服務宣導(簡寫)", "psd":"Photoshop文件(簡寫)", "psi":"磅每平方英寸(簡寫)", "pst":"太平洋標準時間(簡寫)", "pt":"物理治療(簡寫)", "pto":"請翻頁(簡寫)", "ptp":"點對點(簡寫)", "pub":"酒吧(簡寫)", "pud":"布丁(簡寫)", "pug":"哈巴狗", "pul":"阿富汗幣", "pun":"雙關語", "pup":"小狗", "pur":"貓呼嚕聲", "pus":"膿", "put":"放", "pvc":"聚氯乙烯(簡寫)", "pwa":"漸進式網頁(簡寫)", "pya":"緬甸幣", "pye":"狗", "pyx":"聖體盒", 
+            "qatar":"卡達", "qat":"阿拉伯茶", "qua":"作為", "qvc":"電視購物(簡寫)", 
+            "r&d":"研發(簡寫)", "r&r":"休息與娛樂(簡寫)", "rad":"急進的(簡寫)", "rag":"抹布", "rah":"好啊", "rai":"日本幣", "raj":"統治", "ram":"公羊", "ran":"跑(過去式)", "rap":"敲擊", "ras":"首領", "rat":"老鼠", "raw":"生的", "rax":"伸展", "ray":"光線", "rbc":"加拿大皇家銀行(簡寫)", "rbi":"打點(簡寫)", "rca":"美國無線電(簡寫)", "rcp":"皇家學院(簡寫)", "reb":"叛軍(簡寫)", "rec":"錄音(簡寫)", "red":"紅色", "ree":"母羊", "ref":"裁判(簡寫)", "reg":"規定(簡寫)", "rei":"葡萄牙幣", "rem":"雷姆", "rep":"代表(簡寫)", "res":"事物", "ret":"浸泡", "rev":"加速(簡寫)", "rex":"國王", "rfp":"提案請求(簡寫)", "rho":"希臘字母", "ria":"溺谷", "rib":"肋骨", "rid":"擺脫", "rif":"解雇", "rig":"裝備", "rim":"邊緣", "rin":"日本幣", "rip":"撕裂", "rna":"核糖核酸(簡寫)", "rob":"搶劫", "rod":"竿子", "roe":"魚卵", "roi":"投資報酬率(簡寫)", "rom":"吉普賽人/唯讀記憶體(簡寫)", "rot":"腐爛", "row":"划船", "rpa":"機器人流程(簡寫)", "rpm":"每分鐘轉速(簡寫)", "rtc":"即時時鐘(簡寫)", "rub":"摩擦", "rue":"後悔", "rug":"地毯", "rum":"蘭姆酒", "run":"跑", "rut":"車轍", "rya":"瑞典地毯", "rye":"黑麥", 
+            "sa":"南非(簡寫)", "sab":"哭泣", "sac":"小囊", "sad":"傷心", "sae":"所以", "sag":"下垂", "sal":"鹽", "sap":"汁液", "sat":"坐(過去式)", "sau":"硬幣", "saw":"看見", "sax":"薩克斯風(簡寫)", "say":"說", "sba":"中小企業局(簡寫)", "sbi":"印度國家銀行(簡寫)", "sca":"次級頻道(簡寫)", "scc":"最高法院(簡寫)", "sdh":"同步數位階層(簡寫)", "sea":"海", "sec":"秒(簡寫)", "see":"看見", "seg":"片段(簡寫)", "sei":"鯨魚", "sel":"自我", "sen":"分(錢幣)", "seq":"序列(簡寫)", "ser":"印度重量", "set":"設定", "sew":"縫紉", "sex":"性別", "sfo":"舊金山(簡寫)", "sgi":"矽谷圖形(簡寫)", "sh":"噓", "sha":"安靜", "she":"她", "shh":"噓", "shy":"害羞的", "sib":"手足(簡寫)", "sic":"原文如此", "sim":"模擬(簡寫)", "sin":"罪/新加坡(簡寫)", "sip":"啜飲", "sir":"先生", "sis":"姊妹(簡寫)", "sit":"坐", "six":"六", "ska":"斯卡音樂", "ski":"滑雪", "sky":"天空", "sly":"狡猾的", "sms":"簡訊(簡寫)", "snl":"週六夜現場(簡寫)", "sob":"啜泣", "soc":"社會(簡寫)", "sod":"草皮", "soh":"音符", "sol":"太陽", "som":"吉爾吉斯幣", "son":"兒子", "sop":"標準作業程序(簡寫)", "sos":"求救信號(簡寫)", "sot":"醉漢", "sou":"法國古幣", "sow":"播種", "soy":"大豆", "spa":"水療", "spc":"統計過程控制(簡寫)", "spf":"防曬係數(簡寫)", "spy":"間諜", "ssa":"社會保障局(簡寫)", "ssi":"補充安全收入(簡寫)", "ssn":"社會安全號碼(簡寫)", "sst":"超音速客機(簡寫)", "su":"蘇聯(簡寫)", "sub":"潛水艇(簡寫)", "sud":"肥皂水", "sue":"控告", "suk":"市場", "sum":"總和", "sun":"太陽", "sup":"吃晚餐", "suq":"市場", "suv":"休旅車(簡寫)", "syd":"雪梨(簡寫)", "syn":"合成(簡寫)", "sys":"系統(簡寫)", 
+            "tab":"標籤", "tad":"少量", "tae":"去", "tag":"標籤", "tah":"謝謝", "taj":"塔吉帽", "tam":"蘇格蘭帽", "tan":"曬黑", "tao":"道", "tap":"輕拍/水龍頭", "tar":"焦油", "tas":"謝謝", "tat":"破布", "tau":"希臘字母", "tav":"希伯來字母", "taw":"大彈珠", "tax":"稅金", "tba":"待定(簡寫)", "tbd":"待確定(簡寫)", "tbs":"電視頻道(簡寫)", "tbt":"懷舊星期四(簡寫)", "tcm":"中醫(簡寫)", "tcp":"傳輸控制協定(簡寫)", "tcs":"塔塔諮詢(簡寫)", "tcu":"德州基督教大學(簡寫)", "tdc":"上死點(簡寫)", "tea":"茶", "ted":"翻曬", "tee":"T恤", "teg":"羊", "tel":"電話(簡寫)", "ten":"十", "tet":"希伯來字母", "tew":"努力", "the":"這/那", "tho":"雖然(簡寫)", "thy":"你的", "tic":"抽搐", "tie":"領帶", "til":"直到", "tin":"錫罐", "tip":"提示", "tis":"是", "tit":"山雀", "tlc":"溫柔呵護(簡寫)", "tmc":"交通信息頻道(簡寫)", "tnt":"炸藥(簡寫)", "toe":"腳趾", "tog":"衣服", "tom":"公貓", "ton":"噸", "too":"也", "top":"頂部", "tor":"岩山", "tot":"幼童", "tow":"拖曳", "toy":"玩具", "tps":"第三人稱射擊(簡寫)", "tqm":"全面品質管理(簡寫)", "try":"嘗試", "tsa":"運輸安全(簡寫)", "tsk":"嘖嘖", "tsp":"茶匙(簡寫)", "tub":"浴缸", "tug":"拖拉", "tui":"紐西蘭鳥", "tun":"大酒桶", "tup":"公羊", "tut":"嘖嘖聲", "tux":"燕尾服(簡寫)", "twa":"兩個", "twd":"台幣(簡寫)", "two":"二", "tye":"礦槽", 
+            "uae":"阿聯酋(簡寫)", "uav":"無人機(簡寫)", "ucf":"中佛羅里達大學(簡寫)", "ucl":"倫敦大學學院(簡寫)", "ucs":"統一通訊(簡寫)", "udo":"獨活", "ufc":"終極格鬥(簡寫)", "ufo":"不明飛行物(簡寫)", "ugh":"呃", "uhf":"特高頻(簡寫)", "uic":"伊利諾大學(簡寫)", "uk":"英國(簡寫)", "uke":"烏克麗麗(簡寫)", "ul":"保險商實驗室(簡寫)", "ump":"裁判(簡寫)", "un":"聯合國(簡寫)", "unc":"北卡羅來納大學(簡寫)", "uns":"一", "upi":"合眾國際社(簡寫)", "upo":"在...之上", "ups":"聯合包裹(簡寫)", "ur":"你的(縮寫)", "urb":"市區(簡寫)", "urd":"烏爾都豆", "url":"網址(簡寫)", "urn":"甕", "urp":"嘔吐", "us":"我們/美國(簡寫)", "usa":"美國(簡寫)", "usc":"南加州大學(簡寫)", "usd":"美元(簡寫)", "use":"使用", "usm":"海軍陸戰隊(簡寫)", "usn":"美國海軍(簡寫)", "uss":"美國船艦(簡寫)", "ust":"美國信託(簡寫)", "ut":"猶他(簡寫)", "uta":"大蜥蜴", "utc":"協調世界時(簡寫)", "ute":"多用途車(簡寫)", "utep":"德州大學(簡寫)", "uts":"音符", "uv":"紫外線(簡寫)", "uva":"維吉尼亞大學(簡寫)", "uw":"華盛頓大學(簡寫)", 
+            "va":"維吉尼亞(簡寫)", "vac":"吸塵器(簡寫)", "van":"客貨車", "var":"變數(簡寫)", "vas":"血管", "vat":"增值稅(簡寫)/大桶", "vau":"希伯來字母", "vav":"希伯來字母", "vaw":"希伯來字母", "vcr":"錄影機(簡寫)", "vct":"創投信託(簡寫)", "vdc":"直流電壓(簡寫)", "vdp":"可變數據(簡寫)", "vee":"V字形", "veg":"蔬菜(簡寫)", "vet":"獸醫(簡寫)", "vex":"煩惱", "vhf":"甚高頻(簡寫)", "vhs":"家用錄影系統(簡寫)", "via":"經由", "vid":"視頻(簡寫)", "vie":"競爭", "vig":"活力", "vim":"精力", "vin":"車輛識別碼(簡寫)", "vip":"貴賓(簡寫)", "vis":"力量", "voe":"小海灣", "vow":"發誓", "vox":"聲音", "vps":"虛擬專用伺服器(簡寫)", "vr":"虛擬實境(簡寫)", "vs":"對決(簡寫)", "vt":"佛蒙特(簡寫)", "vug":"晶洞", "vum":"發誓", "vw":"福斯汽車(簡寫)", 
+            "wab":"網", "wad":"一團", "wae":"悲哀", "wag":"搖擺", "wan":"蒼白的", "wap":"輕擊", "war":"戰爭", "was":"是", "wat":"泰國寺廟", "waw":"波浪", "wax":"蠟", "way":"方式", "wc":"廁所(簡寫)", "web":"網", "wed":"結婚(簡寫)", "wee":"微小", "wen":"粉瘤", "wet":"濕", "wga":"編劇工會(簡寫)", "wha":"什麼", "who":"誰/世衛組織(簡寫)", "why":"為什麼", "wig":"假髮", "win":"贏", "wis":"知道", "wit":"機智", "wiz":"奇才(簡寫)", "wmd":"大規模殺傷武器(簡寫)", "woe":"悲哀", "wok":"炒鍋", "won":"贏得", "woo":"求愛", "wop":"義大利人", "wos":"悲哀", "wot":"知道", "wow":"哇", "wry":"苦笑的", "wto":"世貿組織(簡寫)", "wud":"瘋狂的", "wwe":"世界摔角娛樂(簡寫)", "wwf":"世界自然基金會(簡寫)", "wwii":"二戰(簡寫)", "www":"全球資訊網(簡寫)", "wye":"字母Y", "wyn":"古英語字母", 
+            "xis":"希臘字母", "xml":"可延伸標記語言(簡寫)", "xrp":"瑞波幣(簡寫)",
+            "y2k":"千禧蟲(簡寫)", "yag":"人造鑽石(簡寫)", "yah":"呀", "yak":"犛牛", "yam":"山藥", "yap":"狂吠", "yar":"敏捷的", "yaw":"偏航", "yay":"耶", "yea":"是", "yeh":"是", "yen":"日圓", "yep":"是", "yes":"是", "yet":"然而", "yew":"紫杉", "yid":"猶太人", "yin":"陰", "yip":"小狗叫", "ymca":"基督教青年會(簡寫)", "yob":"小流氓", "yod":"希伯來字母", "yon":"那邊的", "you":"你", "yow":"哎喲", "yuk":"噁心", "yum":"美味", "yup":"是", "ywca":"基督教女青年會(簡寫)", 
+            "zag":"Z字形", "zap":"擊潰", "zas":"披薩", "zax":"石斧", "zea":"玉米", "zed":"字母Z", "zee":"字母Z", "zek":"囚犯", "zen":"禪", "zep":"三明治(簡寫)", "zig":"急轉彎", "zin":"仙粉黛(簡寫)", "zip":"拉鍊", "zit":"青春痘", "zoa":"動物", "zoo":"動物園(簡寫)"
+        };
+
+        let currentWord = "";
+        let isSpinning = false;
+        let currentAudio = null; 
+
+        function startSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            document.getElementById("actionBtns").style.display = "none";
+            document.getElementById("result-text").style.display = "none";
+            document.getElementById("result-text").innerHTML = "";
+            
+            const spinBtn = document.getElementById("spinBtn");
+            spinBtn.disabled = true; 
+            
+            startSpinSound();
+            document.getElementById("machineContainer").classList.add("spinning-effect");
+
+            // 處理格子外觀與鎖定狀態
+            const l1 = document.getElementById("lock1").value;
+            const l2 = document.getElementById("lock2").value;
+            const l3 = document.getElementById("lock3").value;
+
+            document.querySelectorAll('.slot').forEach(el => {
+                el.classList.add('disabled');
+                el.classList.remove('locked');
+            });
+            if(l1 !== '?') document.getElementById("slot1").classList.add('locked');
+            if(l2 !== '?') document.getElementById("slot2").classList.add('locked');
+            if(l3 !== '?') document.getElementById("slot3").classList.add('locked');
+
+            // --- 機率分配核心邏輯 ---
+            const allWords = Object.keys(wordDictionary);
+            const validWords = allWords.filter(w => {
+                return (l1 === '?' || w.charAt(0) === l1) &&
+                       (l2 === '?' || w.charAt(1) === l2) &&
+                       (l3 === '?' || w.charAt(2) === l3);
+            });
+
+            const abbrWords = validWords.filter(w => wordDictionary[w].includes("簡寫"));
+            const normalWords = validWords.filter(w => !wordDictionary[w].includes("簡寫"));
+            const commonWords = normalWords.filter(w => commonKidsWords.includes(w));
+            const otherWords = normalWords.filter(w => !commonKidsWords.includes(w));
+
+            let targetWord = "";
+            const rand = Math.random();
+
+            if (rand < 0.70) {
+                if (commonWords.length > 0) targetWord = commonWords[Math.floor(Math.random() * commonWords.length)];
+                else if (otherWords.length > 0) targetWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+                else if (abbrWords.length > 0) targetWord = abbrWords[Math.floor(Math.random() * abbrWords.length)];
+            } else if (rand < 0.90) {
+                if (abbrWords.length > 0) targetWord = abbrWords[Math.floor(Math.random() * abbrWords.length)];
+                else if (commonWords.length > 0) targetWord = commonWords[Math.floor(Math.random() * commonWords.length)];
+                else if (otherWords.length > 0) targetWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+            } else {
+                if (Math.random() < 0.5 && otherWords.length > 0) {
+                    targetWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+                }
+            }
+
+            if (!targetWord) {
+                targetWord = (l1 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l1) +
+                             (l2 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l2) +
+                             (l3 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l3);
+            }
+
+            let spinCount = 0;
+            const maxSpins = 20; 
+
+            const spinInterval = setInterval(() => {
+                document.getElementById("slot1").innerText = l1 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l1;
+                document.getElementById("slot2").innerText = l2 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l2;
+                document.getElementById("slot3").innerText = l3 === '?' ? alphabet[Math.floor(Math.random() * 26)] : l3;
+                
+                spinCount++;
+                if (spinCount >= maxSpins) {
+                    clearInterval(spinInterval);
+                    
+                    document.getElementById("slot1").innerText = targetWord.charAt(0);
+                    document.getElementById("slot2").innerText = targetWord.charAt(1);
+                    document.getElementById("slot3").innerText = targetWord.charAt(2);
+                    
+                    finishSpin(targetWord); 
+                    spinBtn.disabled = false;
+                }
+            }, 100); 
+        }
+
+        function finishSpin(finalWord) {
+            isSpinning = false;
+            currentWord = finalWord;
+            
+            stopSpinSound();
+            document.getElementById("machineContainer").classList.remove("spinning-effect");
+            document.querySelectorAll('.slot').forEach(el => el.classList.remove('disabled', 'locked'));
+            document.getElementById("actionBtns").style.display = "flex";
+
+            if (wordDictionary[currentWord]) {
+                document.getElementById("btnDict").style.display = "inline-block";
+                playWinSound();
+                fireConfetti(); 
+            } else {
+                document.getElementById("btnDict").style.display = "none";
+                playNeutralSound(); 
+            }
+        }
+
+        function playLetterSound(slotId) {
+            if (isSpinning) return;
+            const letter = document.getElementById(slotId).innerText;
+            if (letter === "?") return;
+
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentAudio = new Audio(letter + '.mp3');
+            currentAudio.playbackRate = 1.0; 
+            currentAudio.play().catch(error => {
+                alert("找不到音檔：" + letter + ".mp3！請確認音檔放在同一個資料夾。");
+            });
+        }
+
+        // --- ⭐ 修改：連讀速度調整回 2 倍速 ⭐ ---
+        function playWordSoundFast() {
+            if (currentWord.length !== 3) return;
+
+            let letters = currentWord.split("");
+            let index = 0;
+
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            function playNextLetter() {
+                if (index < letters.length) {
+                    currentAudio = new Audio(letters[index] + ".mp3");
+                    currentAudio.playbackRate = 2.0; // 從 3.0 改回 2.0 倍速
+                    currentAudio.onended = playNextLetter; 
+                    currentAudio.play().catch(error => {
+                        console.log("找不到音檔：" + letters[index] + ".mp3");
+                        index++;
+                        playNextLetter();
+                    });
+                    index++;
+                }
+            }
+            playNextLetter();
+        }
+
+        function playDictionarySound() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                let utterance = new SpeechSynthesisUtterance(currentWord);
+                utterance.lang = 'en-US'; 
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("你的瀏覽器不支援語音功能哦！");
+            }
+        }
+
+        function playChineseSound(textToRead) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                let cleanText = textToRead.replace(/\(簡寫\)/g, ""); 
+                let utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'zh-HK'; 
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("你的瀏覽器不支援語音功能哦！");
+            }
+        }
+
+        function showMeaning() {
+            const meaning = wordDictionary[currentWord];
+            const resultBox = document.getElementById("result-text");
+            resultBox.style.display = "flex";
+            
+            if (meaning) {
+                resultBox.innerHTML = `
+                    <span>${meaning}</span>
+                    <button class="ch-sound-btn" onclick="playChineseSound('${meaning}')">📢 聽中文</button>
+                `;
+                resultBox.style.color = "#d84315"; 
+                resultBox.style.borderColor = "#4caf50";
+            } else {
+                resultBox.innerHTML = "<span>没有解釋</span>";
+                resultBox.style.color = "#9e9e9e"; 
+                resultBox.style.borderColor = "#f44336";
+            }
+        }
+    </script>
+
+</body>
+</html>
