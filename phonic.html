@@ -2,6 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
+    <!-- 確保手機裝置正確縮放的 meta 標籤 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Letterland 英文拼音老虎機(3個字母)</title>
     <style>
@@ -22,7 +23,7 @@
             color: #333;
             margin: 0;
             padding: 15px;
-            overflow-x: hidden; 
+            overflow-x: hidden; /* 防止手機橫向捲動 */
         }
         
         /* 跳動的彩虹標題 */
@@ -61,7 +62,7 @@
             max-width: 100%;
         }
         
-        /* 圓潤可愛的字母鎖定器 */
+        /* 圓潤可愛的字母鎖定器 (加入 flex 自動換行) */
         .lock-panel {
             background: linear-gradient(135deg, #fff9c4, #ffecb3);
             border: 4px solid #ffb300;
@@ -238,7 +239,7 @@
             gap: 10px;
         }
 
-        /* 中文語音小按鈕 */
+        /* 🎵 專屬中文語音小按鈕 🎵 */
         .ch-sound-btn {
             font-size: 18px;
             padding: 6px 15px;
@@ -331,7 +332,9 @@
             z-index: 9999;
         }
 
-        /* RWD 響應式優化 */
+        /* =========================================
+           針對手機與小螢幕的專屬 RWD 響應式優化 
+           ========================================= */
         @media (max-width: 600px) {
             h1 { font-size: 26px; }
             p.instruction { font-size: 16px; padding: 8px 15px; }
@@ -364,6 +367,7 @@
 </head>
 <body>
 
+    <!-- 紙花特效畫布 -->
     <canvas id="confettiCanvas"></canvas>
 
     <h1 class="bouncing-title">
@@ -374,9 +378,10 @@
     <p class="instruction">
         🎯 可以在上方「鎖定」想要專注練習的字母<br>
         🕹️ 點擊「拉動老虎機」抽出超酷單字<br>
-        👆 點擊單一字母聽純淨發音，再用「🔊 連續發音」拼讀 (Blending)！
+        👆 點擊單一字母聽發音，再用「🔊 連續發音」拼讀 (Blending)！
     </p>
 
+    <!-- 字母鎖定器面板 -->
     <div class="lock-panel">
         <label>第1格: <select id="lock1"></select></label>
         <label>第2格: <select id="lock2"></select></label>
@@ -384,6 +389,7 @@
     </div>
 
     <div class="slot-machine" id="machineContainer">
+        <!-- 專屬貓咪圖標 -->
         <img src="cat.jpeg" alt="Teacher Cat" class="brand-icon">
         
         <div class="slots" id="slotsArea">
@@ -400,14 +406,17 @@
             <button class="action-btn btn-dict" id="btnDict" onclick="playDictionarySound()">🗣️ 字典發音</button>
         </div>
         
+        <!-- 解釋顯示區域 (結合按鈕) -->
         <div id="result-text" style="display:none;"></div>
     </div>
 
     <br>
+    <!-- 返回按鈕 -->
     <div>
         <a href="https://cat123teacher.github.io/chinese/main.html" class="return-btn">🚀 返回小朋友學習大冒險</a>
     </div>
 
+    <!-- 社群聯絡欄 -->
     <div class="contact-footer">
         <h3>✨ Teacher Cat 的快樂AI教室 ✨</h3>
         <div class="contact-links">
@@ -423,6 +432,7 @@
     <script>
         const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
         
+        // --- ★ 小朋友專屬：高頻詞與常用 CVC 字庫 (約150字) ★ ---
         const commonKidsWords = [
             "act","add","age","air","all","and","ant","any","ape","are","arm","art","ask","ate",
             "bad","bag","bat","bed","bee","beg","big","bin","bit","box","boy","bug","bus","but","buy","bye",
@@ -443,6 +453,7 @@
             "war","was","wax","way","web","wet","who","why","win","wow","yes","yet","you","zoo"
         ];
 
+        // 初始化下拉選單
         window.onload = function() {
             const selects = ['lock1', 'lock2', 'lock3'];
             selects.forEach(id => {
@@ -454,6 +465,59 @@
             });
             initCanvas(); 
         };
+
+        // ====== 特效與音效系統 (Web Audio API) ======
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let spinTickInterval;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, type, duration, vol=0.1) {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function startSpinSound() {
+            initAudio();
+            let freq = 300;
+            spinTickInterval = setInterval(() => {
+                playTone(freq, 'triangle', 0.05, 0.05);
+                freq = freq === 300 ? 400 : 300; 
+            }, 100);
+        }
+
+        function stopSpinSound() {
+            clearInterval(spinTickInterval);
+        }
+
+        function playWinSound() {
+            setTimeout(() => playTone(523.25, 'sine', 0.3, 0.2), 0);   
+            setTimeout(() => playTone(659.25, 'sine', 0.3, 0.2), 150); 
+            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.2), 300); 
+            setTimeout(() => playTone(1046.50, 'sine', 0.6, 0.3), 450); 
+        }
+
+        function playNeutralSound() {
+            setTimeout(() => playTone(300, 'square', 0.2, 0.05), 0);
+            setTimeout(() => playTone(250, 'square', 0.4, 0.05), 150);
+        }
 
         // ====== 紙花大噴發特效 ======
         const canvas = document.getElementById('confettiCanvas');
@@ -516,6 +580,7 @@
             }
         }
 
+        // 1900+ 個 3 字母單字字典
         const wordDictionary = {
             "aah":"發出啊聲", "aal":"東印度灌木", "aar":"阿勒河", "aas":"火山灰", "aba":"毛織物", "abb":"紗線", "abc":"美國廣播公司(簡寫)", "abd":"阿伯丁", "abe":"亞伯(人名)", "abo":"澳洲原住民", "abp":"血壓(簡寫)", "abs":"腹肌(簡寫)", "abu":"阿布(地名)", "aby":"贖罪", "aca":"特許會計師(簡寫)", "acc":"行政控制委員會(簡寫)", "ace":"王牌", "act":"行動", "add":"增加", "ado":"忙亂", "adp":"安道爾比塞塔(簡寫)", "ads":"廣告(簡寫)", "adz":"錛子", "aed":"阿聯酋迪拉姆(簡寫)", "aff":"肯定", "afg":"阿富汗(簡寫)", "aft":"在船尾", "aga":"土耳其長官", "age":"年齡", "ago":"以前", "ags":"農業(簡寫)", "aha":"啊哈", "ahi":"黃鰭鮪魚", "ahs":"發出啊聲", "aid":"幫助", "ail":"生病", "aim":"目標", "ain":"自己的", "air":"空氣", "ais":"三趾樹懶", "ait":"小島", "aja":"阿賈(人名)", "aka":"又名(簡寫)", "ala":"翅膀", "alb":"白麻布聖職衣", "ale":"麥酒", "ali":"阿里(人名)", "all":"全部", "alp":"高山", "als":"植物名", "alt":"替換(簡寫)", "ama":"海女", "ami":"朋友", "amp":"安培(簡寫)", "ams":"阿姆斯特丹(簡寫)", "amu":"原子質量單位(簡寫)", "amy":"艾米(人名)", "ana":"語錄", "and":"和", "ane":"一個", "ani":"黑鵑", "ann":"安(人名)", "ant":"螞蟻", "any":"任何", "apa":"美國心理學會(簡寫)", "ape":"猿", "api":"應用程式介面(簡寫)", "apk":"Android安裝包(簡寫)", "apo":"最高點", "app":"應用程式(簡寫)", "apt":"適合的", "ara":"天壇座", "arb":"套利者", "arc":"弧形", "are":"是", "arf":"狗叫聲", "arg":"阿根廷(簡寫)", "ari":"阿里(人名)", "ark":"方舟", "arm":"手臂", "art":"藝術", "asa":"亞撒(人名)", "ash":"灰燼", "ask":"問", "asp":"毒蛇", "ass":"驢子", "ast":"大西洋標準時間(簡寫)", "ate":"吃(過去式)", "atg":"安地卡及巴布達(簡寫)", "atm":"自動提款機(簡寫)", "att":"寮國硬幣", "auk":"海雀", "aus":"澳洲(簡寫)", "aut":"奧地利(簡寫)", "ava":"艾娃(人名)", "ave":"大街(簡寫)", "avo":"酪梨(簡寫)", "awa":"離開", "awb":"航空貨運單(簡寫)", "awe":"敬畏", "awl":"錐子", "awn":"芒", "aws":"亞馬遜雲端(簡寫)", "axe":"斧頭", "aye":"贊成", "ays":"贊成者", "aze":"亞塞拜然(簡寫)", "azo":"偶氮的", 
             "b2b":"企業對企業(簡寫)", "b2c":"企業對消費者(簡寫)", "baa":"羊的叫聲", "bac":"細菌(簡寫)", "bad":"壞的", "bae":"寶貝/親愛的", "bag":"袋子", "bah":"呸", "bal":"峇里", "bam":"砰", "ban":"禁止", "bap":"小圓麵包", "bar":"酒吧/棒", "bas":"低音", "bat":"蝙蝠", "bay":"海灣", "bbc":"英國廣播公司(簡寫)", "bbq":"燒烤(簡寫)", "bcc":"密件副本(簡寫)", "bcd":"二進碼十進數(簡寫)", "bce":"西元前(簡寫)", "bcf":"十億立方英尺(簡寫)", "bdi":"蒲隆地(簡寫)", "bdp":"民主黨(簡寫)", "bed":"床", "bee":"蜜蜂", "beg":"乞求", "bel":"貝爾(音量)", "ben":"內室", "bet":"打賭", "bey":"總督", "bez":"寶石", "bff":"永遠的好朋友(簡寫)", "bgd":"保加利亞(簡寫)", "bha":"巴哈馬(簡寫)", "bhr":"巴林(簡寫)", "bib":"圍兜", "bid":"出價", "big":"大", "bin":"垃圾桶", "bio":"生物(簡寫)", "bis":"兩次", "bit":"一小塊", "biz":"商業(簡寫)", "bkk":"曼谷(簡寫)", "boa":"蟒蛇", "bob":"上下跳動", "bod":"身體(簡寫)", "bog":"沼澤", "boo":"噓聲", "bop":"流行舞", "bos":"牛", "bot":"機器人(簡寫)", "bow":"鞠躬", "box":"盒子", "boy":"男孩", "bpm":"每分鐘節拍(簡寫)", "bps":"每秒位元(簡寫)", "bra":"胸罩(簡寫)", "brb":"馬上回來(簡寫)", "bro":"兄弟(簡寫)", "brr":"好冷", "bsa":"童子軍(簡寫)", "btc":"比特幣(簡寫)", "bub":"小子", "bud":"芽", "bug":"蟲子", "bum":"流浪漢", "bun":"小圓麵包", "bur":"毛刺", "bus":"巴士", "but":"但是", "buy":"買", "bwa":"哇塞", "bye":"再見", "bys":"旁", "bzz":"嗡嗡聲", 
@@ -536,7 +601,7 @@
             "qatar":"卡達", "qat":"阿拉伯茶", "qua":"作為", "qvc":"電視購物(簡寫)", 
             "r&d":"研發(簡寫)", "r&r":"休息與娛樂(簡寫)", "rad":"急進的(簡寫)", "rag":"抹布", "rah":"好啊", "rai":"日本幣", "raj":"統治", "ram":"公羊", "ran":"跑(過去式)", "rap":"敲擊", "ras":"首領", "rat":"老鼠", "raw":"生的", "rax":"伸展", "ray":"光線", "rbc":"加拿大皇家銀行(簡寫)", "rbi":"打點(簡寫)", "rca":"美國無線電(簡寫)", "rcp":"皇家學院(簡寫)", "reb":"叛軍(簡寫)", "rec":"錄音(簡寫)", "red":"紅色", "ree":"母羊", "ref":"裁判(簡寫)", "reg":"規定(簡寫)", "rei":"葡萄牙幣", "rem":"雷姆", "rep":"代表(簡寫)", "res":"事物", "ret":"浸泡", "rev":"加速(簡寫)", "rex":"國王", "rfp":"提案請求(簡寫)", "rho":"希臘字母", "ria":"溺谷", "rib":"肋骨", "rid":"擺脫", "rif":"解雇", "rig":"裝備", "rim":"邊緣", "rin":"日本幣", "rip":"撕裂", "rna":"核糖核酸(簡寫)", "rob":"搶劫", "rod":"竿子", "roe":"魚卵", "roi":"投資報酬率(簡寫)", "rom":"吉普賽人/唯讀記憶體(簡寫)", "rot":"腐爛", "row":"划船", "rpa":"機器人流程(簡寫)", "rpm":"每分鐘轉速(簡寫)", "rtc":"即時時鐘(簡寫)", "rub":"摩擦", "rue":"後悔", "rug":"地毯", "rum":"蘭姆酒", "run":"跑", "rut":"車轍", "rya":"瑞典地毯", "rye":"黑麥", 
             "sa":"南非(簡寫)", "sab":"哭泣", "sac":"小囊", "sad":"傷心", "sae":"所以", "sag":"下垂", "sal":"鹽", "sap":"汁液", "sat":"坐(過去式)", "sau":"硬幣", "saw":"看見", "sax":"薩克斯風(簡寫)", "say":"說", "sba":"中小企業局(簡寫)", "sbi":"印度國家銀行(簡寫)", "sca":"次級頻道(簡寫)", "scc":"最高法院(簡寫)", "sdh":"同步數位階層(簡寫)", "sea":"海", "sec":"秒(簡寫)", "see":"看見", "seg":"片段(簡寫)", "sei":"鯨魚", "sel":"自我", "sen":"分(錢幣)", "seq":"序列(簡寫)", "ser":"印度重量", "set":"設定", "sew":"縫紉", "sex":"性別", "sfo":"舊金山(簡寫)", "sgi":"矽谷圖形(簡寫)", "sh":"噓", "sha":"安靜", "she":"她", "shh":"噓", "shy":"害羞的", "sib":"手足(簡寫)", "sic":"原文如此", "sim":"模擬(簡寫)", "sin":"罪/新加坡(簡寫)", "sip":"啜飲", "sir":"先生", "sis":"姊妹(簡寫)", "sit":"坐", "six":"六", "ska":"斯卡音樂", "ski":"滑雪", "sky":"天空", "sly":"狡猾的", "sms":"簡訊(簡寫)", "snl":"週六夜現場(簡寫)", "sob":"啜泣", "soc":"社會(簡寫)", "sod":"草皮", "soh":"音符", "sol":"太陽", "som":"吉爾吉斯幣", "son":"兒子", "sop":"標準作業程序(簡寫)", "sos":"求救信號(簡寫)", "sot":"醉漢", "sou":"法國古幣", "sow":"播種", "soy":"大豆", "spa":"水療", "spc":"統計過程控制(簡寫)", "spf":"防曬係數(簡寫)", "spy":"間諜", "ssa":"社會保障局(簡寫)", "ssi":"補充安全收入(簡寫)", "ssn":"社會安全號碼(簡寫)", "sst":"超音速客機(簡寫)", "su":"蘇聯(簡寫)", "sub":"潛水艇(簡寫)", "sud":"肥皂水", "sue":"控告", "suk":"市場", "sum":"總和", "sun":"太陽", "sup":"吃晚餐", "suq":"市場", "suv":"休旅車(簡寫)", "syd":"雪梨(簡寫)", "syn":"合成(簡寫)", "sys":"系統(簡寫)", 
-            "tab":"標籤", "tad":"少量", "tae":"去", "tag":"標籤", "tah":"謝謝", "taj":"塔吉帽", "tam":"蘇格蘭帽", "tan":"曬黑", "tao":"道", "tap":"輕拍/水龙头", "tar":"焦油", "tas":"謝謝", "tat":"破布", "tau":"希臘字母", "tav":"希伯來字母", "taw":"大彈珠", "tax":"稅金", "tba":"待定(簡寫)", "tbd":"待確定(簡寫)", "tbs":"電視頻道(簡寫)", "tbt":"懷舊星期四(簡寫)", "tcm":"中醫(簡寫)", "tcp":"傳輸控制協定(簡寫)", "tcs":"塔塔諮詢(簡寫)", "tcu":"德州基督教大學(簡寫)", "tdc":"上死點(簡寫)", "tea":"茶", "ted":"翻曬", "tee":"T恤", "teg":"羊", "tel":"電話(簡寫)", "ten":"十", "tet":"希伯來字母", "tew":"努力", "the":"這/那", "tho":"雖然(簡寫)", "thy":"你的", "tic":"抽搐", "tie":"領帶", "til":"直到", "tin":"錫罐", "tip":"提示", "tis":"是", "tit":"山雀", "tlc":"溫柔呵護(簡寫)", "tmc":"交通信息頻道(簡寫)", "tnt":"炸藥(簡寫)", "toe":"腳趾", "tog":"衣服", "tom":"公貓", "ton":"噸", "too":"也", "top":"頂部", "tor":"岩山", "tot":"幼童", "tow":"拖曳", "toy":"玩具", "tps":"第三人稱射擊(簡寫)", "tqm":"全面品質管理(簡寫)", "try":"嘗試", "tsa":"運輸安全(簡寫)", "tsk":"嘖嘖", "tsp":"茶匙(簡寫)", "tub":"浴缸", "tug":"拖拉", "tui":"紐西蘭鳥", "tun":"大酒桶", "tup":"公羊", "tut":"嘖嘖聲", "tux":"燕尾服(簡寫)", "twa":"兩個", "twd":"台幣(簡寫)", "two":"二", "tye":"礦槽", 
+            "tab":"標籤", "tad":"少量", "tae":"去", "tag":"標籤", "tah":"謝謝", "taj":"塔吉帽", "tam":"蘇格蘭帽", "tan":"曬黑", "tao":"道", "tap":"輕拍/水龍頭", "tar":"焦油", "tas":"謝謝", "tat":"破布", "tau":"希臘字母", "tav":"希伯來字母", "taw":"大彈珠", "tax":"稅金", "tba":"待定(簡寫)", "tbd":"待確定(簡寫)", "tbs":"電視頻道(簡寫)", "tbt":"懷舊星期四(簡寫)", "tcm":"中醫(簡寫)", "tcp":"傳輸控制協定(簡寫)", "tcs":"塔塔諮詢(簡寫)", "tcu":"德州基督教大學(簡寫)", "tdc":"上死點(簡寫)", "tea":"茶", "ted":"翻曬", "tee":"T恤", "teg":"羊", "tel":"電話(簡寫)", "ten":"十", "tet":"希伯來字母", "tew":"努力", "the":"這/那", "tho":"雖然(簡寫)", "thy":"你的", "tic":"抽搐", "tie":"領帶", "til":"直到", "tin":"錫罐", "tip":"提示", "tis":"是", "tit":"山雀", "tlc":"溫柔呵護(簡寫)", "tmc":"交通信息頻道(簡寫)", "tnt":"炸藥(簡寫)", "toe":"腳趾", "tog":"衣服", "tom":"公貓", "ton":"噸", "too":"也", "top":"頂部", "tor":"岩山", "tot":"幼童", "tow":"拖曳", "toy":"玩具", "tps":"第三人稱射擊(簡寫)", "tqm":"全面品質管理(簡寫)", "try":"嘗試", "tsa":"運輸安全(簡寫)", "tsk":"嘖嘖", "tsp":"茶匙(簡寫)", "tub":"浴缸", "tug":"拖拉", "tui":"紐西蘭鳥", "tun":"大酒桶", "tup":"公羊", "tut":"嘖嘖聲", "tux":"燕尾服(簡寫)", "twa":"兩個", "twd":"台幣(簡寫)", "two":"二", "tye":"礦槽", 
             "uae":"阿聯酋(簡寫)", "uav":"無人機(簡寫)", "ucf":"中佛羅里達大學(簡寫)", "ucl":"倫敦大學學院(簡寫)", "ucs":"統一通訊(簡寫)", "udo":"獨活", "ufc":"終極格鬥(簡寫)", "ufo":"不明飛行物(簡寫)", "ugh":"呃", "uhf":"特高頻(簡寫)", "uic":"伊利諾大學(簡寫)", "uk":"英國(簡寫)", "uke":"烏克麗麗(簡寫)", "ul":"保險商實驗室(簡寫)", "ump":"裁判(簡寫)", "un":"聯合國(簡寫)", "unc":"北卡羅來納大學(簡寫)", "uns":"一", "upi":"合眾國際社(簡寫)", "upo":"在...之上", "ups":"聯合包裹(簡寫)", "ur":"你的(縮寫)", "urb":"市區(簡寫)", "urd":"烏爾都豆", "url":"網址(簡寫)", "urn":"甕", "urp":"嘔吐", "us":"我們/美國(簡寫)", "usa":"美國(簡寫)", "usc":"南加州大學(簡寫)", "usd":"美元(簡寫)", "use":"使用", "usm":"海軍陸戰隊(簡寫)", "usn":"美國海軍(簡寫)", "uss":"美國船艦(簡寫)", "ust":"美國信託(簡寫)", "ut":"猶他(簡寫)", "uta":"大蜥蜴", "utc":"協調世界時(簡寫)", "ute":"多用途車(簡寫)", "utep":"德州大學(簡寫)", "uts":"音符", "uv":"紫外線(簡寫)", "uva":"維吉尼亞大學(簡寫)", "uw":"華盛頓大學(簡寫)", 
             "va":"維吉尼亞(簡寫)", "vac":"吸塵器(簡寫)", "van":"客貨車", "var":"變數(簡寫)", "vas":"血管", "vat":"增值稅(簡寫)/大桶", "vau":"希伯來字母", "vav":"希伯來字母", "vaw":"希伯來字母", "vcr":"錄影機(簡寫)", "vct":"創投信託(簡寫)", "vdc":"直流電壓(簡寫)", "vdp":"可變數據(簡寫)", "vee":"V字形", "veg":"蔬菜(簡寫)", "vet":"獸醫(簡寫)", "vex":"煩惱", "vhf":"甚高頻(簡寫)", "vhs":"家用錄影系統(簡寫)", "via":"經由", "vid":"視頻(簡寫)", "vie":"競爭", "vig":"活力", "vim":"精力", "vin":"車輛識別碼(簡寫)", "vip":"貴賓(簡寫)", "vis":"力量", "voe":"小海灣", "vow":"發誓", "vox":"聲音", "vps":"虛擬專用伺服器(簡寫)", "vr":"虛擬實境(簡寫)", "vs":"對決(簡寫)", "vt":"佛蒙特(簡寫)", "vug":"晶洞", "vum":"發誓", "vw":"福斯汽車(簡寫)", 
             "wab":"網", "wad":"一團", "wae":"悲哀", "wag":"搖擺", "wan":"蒼白的", "wap":"輕擊", "war":"戰爭", "was":"是", "wat":"泰國寺廟", "waw":"波浪", "wax":"蠟", "way":"方式", "wc":"廁所(簡寫)", "web":"網", "wed":"結婚(簡寫)", "wee":"微小", "wen":"粉瘤", "wet":"濕", "wga":"編劇工會(簡寫)", "wha":"什麼", "who":"誰/世衛組織(簡寫)", "why":"為什麼", "wig":"假髮", "win":"贏", "wis":"知道", "wit":"機智", "wiz":"奇才(簡寫)", "wmd":"大規模殺傷武器(簡寫)", "woe":"悲哀", "wok":"炒鍋", "won":"贏得", "woo":"求愛", "wop":"義大利人", "wos":"悲哀", "wot":"知道", "wow":"哇", "wry":"苦笑的", "wto":"世貿組織(簡寫)", "wud":"瘋狂的", "wwe":"世界摔角娛樂(簡寫)", "wwf":"世界自然基金會(簡寫)", "wwii":"二戰(簡寫)", "www":"全球資訊網(簡寫)", "wye":"字母Y", "wyn":"古英語字母", 
@@ -559,8 +624,10 @@
             const spinBtn = document.getElementById("spinBtn");
             spinBtn.disabled = true; 
             
+            startSpinSound();
             document.getElementById("machineContainer").classList.add("spinning-effect");
 
+            // 處理格子外觀與鎖定狀態
             const l1 = document.getElementById("lock1").value;
             const l2 = document.getElementById("lock2").value;
             const l3 = document.getElementById("lock3").value;
@@ -573,6 +640,7 @@
             if(l2 !== '?') document.getElementById("slot2").classList.add('locked');
             if(l3 !== '?') document.getElementById("slot3").classList.add('locked');
 
+            // --- 機率分配核心邏輯 ---
             const allWords = Object.keys(wordDictionary);
             const validWords = allWords.filter(w => {
                 return (l1 === '?' || w.charAt(0) === l1) &&
@@ -634,15 +702,18 @@
             isSpinning = false;
             currentWord = finalWord;
             
+            stopSpinSound();
             document.getElementById("machineContainer").classList.remove("spinning-effect");
             document.querySelectorAll('.slot').forEach(el => el.classList.remove('disabled', 'locked'));
             document.getElementById("actionBtns").style.display = "flex";
 
             if (wordDictionary[currentWord]) {
                 document.getElementById("btnDict").style.display = "inline-block";
+                playWinSound();
                 fireConfetti(); 
             } else {
                 document.getElementById("btnDict").style.display = "none";
+                playNeutralSound(); 
             }
         }
 
@@ -663,6 +734,7 @@
             });
         }
 
+        // --- ⭐ 修改：連讀速度調整回 2 倍速 ⭐ ---
         function playWordSoundFast() {
             if (currentWord.length !== 3) return;
 
@@ -677,7 +749,7 @@
             function playNextLetter() {
                 if (index < letters.length) {
                     currentAudio = new Audio(letters[index] + ".mp3");
-                    currentAudio.playbackRate = 2.0; 
+                    currentAudio.playbackRate = 2.0; // 從 3.0 改回 2.0 倍速
                     currentAudio.onended = playNextLetter; 
                     currentAudio.play().catch(error => {
                         console.log("找不到音檔：" + letters[index] + ".mp3");
