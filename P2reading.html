@@ -465,7 +465,7 @@
                 <div class="game-nav-bar">
                     <button id="prev-btn" class="nav-btn blue-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
                     <button id="home-btn" class="nav-btn" onclick="goHome()">🏠 回到書櫃</button>
-                    <button id="next-btn" class="nav-btn blue-btn hidden" onclick="nextQuestion()">下一題 ➡️</button>
+                    <button id="next-btn" class="nav-btn blue-btn" onclick="nextQuestion()">下一題 ➡️</button>
                 </div>
             </div>
         </div>
@@ -774,13 +774,11 @@
                 
                 var titleObj = storyTitles[id] || { en: 'Story ' + i, zh: '故事 ' + i };
                 var safeEnTitle = titleObj.en.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                // 取得安全的中文書名字串
                 var safeZhTitle = titleObj.zh.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 
                 var title = document.createElement('div');
                 title.className = 'btn-title';
                 
-                // 改為呼叫 speakBilingual 雙語發音
                 title.innerHTML = 
                     '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">' +
                         '<button class="small-speak-btn" style="margin:0; width:30px; height:30px; min-width:30px; font-size:1em;" onclick="speakBilingual(\'' + safeEnTitle + '\', \'' + safeZhTitle + '\', event)">🔊</button>' +
@@ -826,7 +824,6 @@
             return arr;
         }
 
-        // 單一語言的發音（供內文及題目使用，保持英文）
         function speakText(text, event) {
             if (event) {
                 event.stopPropagation();
@@ -840,21 +837,18 @@
             }
         }
         
-        // 【新增】雙語連續發音功能（供首頁書名使用）
         function speakBilingual(enText, zhText, event) {
             if (event) {
                 event.stopPropagation();
             }
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // 先取消目前的所有發音
+                window.speechSynthesis.cancel(); 
                 
-                // 1. 先讀英文
                 var utteranceEn = new SpeechSynthesisUtterance(enText);
                 utteranceEn.lang = 'en-US';
                 utteranceEn.rate = 0.85; 
                 window.speechSynthesis.speak(utteranceEn);
                 
-                // 2. 接著排隊讀中文 (使用香港/繁體中文語音)
                 var utteranceZh = new SpeechSynthesisUtterance(zhText);
                 utteranceZh.lang = 'zh-HK'; 
                 utteranceZh.rate = 0.85; 
@@ -886,6 +880,7 @@
                             fragment.appendChild(document.createTextNode(uncaptured));
                         }
                         
+                        // 【關鍵修復 1】原本寫錯成 match.replace，這裡必須使用 match[1] 來處理
                         var sentence = match[1].replace(/@@/g, '.');
                         var trailingSpace = match[2] || "";
                         
@@ -970,6 +965,7 @@
             document.getElementById('story-image').src = imgId + ".jpg";
             
             var extractedText = storyTexts[imgId] || "<p>Story text not found.</p>";
+            // 如果 formatStoryWithAudio 在處理文字崩潰，就會停在這裡，導致題目和文字都空掉。現在已經修好了！
             document.getElementById('story-text-container').innerHTML = formatStoryWithAudio(extractedText);
             
             var allQ = db[imgId];
@@ -995,14 +991,23 @@
         function renderQuestion() {
             try {
                 document.getElementById('feedback').innerHTML = '';
-                document.getElementById('next-btn').classList.add('hidden'); 
+                
+                var nextBtn = document.getElementById('next-btn');
+                nextBtn.classList.remove('hidden'); 
                 
                 var qData = currentQuestions[currentQIndex];
                 if (!qData) return;
                 
                 document.getElementById('progress').innerText = "Question " + (currentQIndex + 1) + " / 3";
                 document.getElementById('prev-btn').disabled = (currentQIndex === 0);
+                
+                if (currentQIndex === 2) {
+                    nextBtn.innerText = "完成！🏠";
+                } else {
+                    nextBtn.innerText = "下一題 ➡️";
+                }
 
+                // 【關鍵修復 2】這裡必須加上 , [1] 等陣列索引，否則題目選項會讀不到字串而變成亂碼！
                 var qText = qData;
                 var correctAns = qData[1];
                 var wrong1 = qData[2];
@@ -1095,19 +1100,6 @@
                 if (!qScored[currentQIndex]) {
                     qScored[currentQIndex] = true; 
                     currentRoundStars++;
-                    
-                    if (currentRoundStars > (parseInt(levelScores[currentLevelId], 10) || 0)) {
-                        levelScores[currentLevelId] = currentRoundStars;
-                        localStorage.setItem('teacherCatLevelScores', JSON.stringify(levelScores));
-                        document.getElementById('level-best-count').innerText = currentRoundStars;
-                    }
-                    
-                    updateTotalStarsDisplay();
-                    
-                    var starHud = document.getElementById('star-hud');
-                    starHud.classList.add('star-animate');
-                    setTimeout(function() { starHud.classList.remove('star-animate'); }, 500);
-                    
                     feedback.innerHTML += "<br><span class='earn-star-text'>⭐ You earned a star!</span>";
                 }
 
@@ -1126,8 +1118,6 @@
                 }
                 
                 var nextBtn = document.getElementById('next-btn');
-                nextBtn.classList.remove('hidden');
-                
                 var isFinished = (currentQIndex === 2);
 
                 if (isFinished) {
@@ -1140,7 +1130,7 @@
                 clearTimeout(autoAdvanceTimer);
                 autoAdvanceTimer = setTimeout(function() {
                     if (isFinished) {
-                        goHome();
+                        finishGame(); 
                     } else {
                         nextQuestion();
                     }
@@ -1156,13 +1146,30 @@
             }
         }
 
+        function finishGame() {
+            clearTimeout(autoAdvanceTimer);
+            
+            var best = parseInt(levelScores[currentLevelId], 10) || 0;
+            if (currentRoundStars > best) {
+                levelScores[currentLevelId] = currentRoundStars;
+                localStorage.setItem('teacherCatLevelScores', JSON.stringify(levelScores));
+                
+                var starHud = document.getElementById('star-hud');
+                starHud.classList.add('star-animate');
+                setTimeout(function() { starHud.classList.remove('star-animate'); }, 500);
+            }
+            
+            updateTotalStarsDisplay();
+            goHome();
+        }
+
         function nextQuestion() {
             clearTimeout(autoAdvanceTimer); 
             if (currentQIndex < 2) {
                 currentQIndex++;
                 renderQuestion();
             } else {
-                goHome();
+                finishGame();
             }
         }
 
