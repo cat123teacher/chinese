@@ -76,10 +76,24 @@
         .story-item:nth-child(3n) { border-left-color: #22c55e; background: linear-gradient(135deg, #fff 0%, #dcfce7 100%); }
         .story-item:nth-child(4n) { border-left-color: #f59e0b; background: linear-gradient(135deg, #fff 0%, #fef3c7 100%); }
         .story-item:hover { transform: translateY(-12px) scale(1.05); box-shadow: 10px 15px 25px rgba(0,0,0,0.2); }
-        .book-bg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.2; z-index: 0; }
+        .book-bg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.15; z-index: 0; }
         .book-content { position: relative; z-index: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; width: 100%;}
-        .story-icon { font-size: 45px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-top: 10px; }
-        .story-title { font-size: 15px; font-weight: bold; color: #333; line-height: 1.2; text-shadow: 0px 0px 5px white, 0px 0px 10px white; margin-bottom: 5px; }
+        
+        /* 🌟 新增：故事按鈕上的縮圖圖片 (取代原本的 Emoji) */
+        .story-cover-img {
+            width: 85px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            margin-top: 5px;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        .story-item:hover .story-cover-img { transform: scale(1.08) rotate(3deg); }
+
+        .story-title { font-size: 14px; font-weight: bold; color: #333; line-height: 1.2; text-shadow: 0px 0px 5px white, 0px 0px 10px white; margin-bottom: 5px; }
         .story-num-badge { position: absolute; top: 8px; left: 8px; background: white; border: 2px solid #ccc; color: #555; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; justify-content: center; align-items: center; z-index: 2; }
         .book-audio-btn { background: #4facfe; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; margin-bottom: 5px; padding:0; display: flex; justify-content: center; align-items: center;}
         .book-audio-btn:hover { background: #00f2fe; transform: scale(1.1); }
@@ -440,9 +454,7 @@
     }
 
     function startPos(e) { 
-        // 💡 只因為「完成手寫」而鎖定畫板，如果小朋友只點了選擇題，還是可以畫圖！
         if(writtenAnswers[currentQuestionIndex]) return; 
-        
         e.preventDefault(); 
         drawing = true; 
         const pos = getPointerPos(e);
@@ -577,11 +589,8 @@
 
     let currentStoryId = null;
     let currentQuiz = [];
-    
-    // ✨ 將選擇題與手寫區的答案狀態完全獨立分開 ✨
     let mcAnswers = [];
     let writtenAnswers = [];
-    
     let currentQuestionIndex = 0;
     
     let completedLevels = JSON.parse(localStorage.getItem("p1_completed")) || [];
@@ -638,12 +647,13 @@
             
             const stampHtml = isCompleted ? `<div class="completed-stamp" title="已過關！You did it!">⭐</div>` : '';
 
+            // 🌟 在這裡移除了 Emoji，改為顯示獨立的縮圖圖片 `<img class="story-cover-img">`
             li.innerHTML = `
-                <img src="${s.img}" class="book-bg" alt="book cover">
+                <img src="${s.img}" class="book-bg" alt="book background">
                 <div class="story-num-badge">${displayIndex}</div>
                 ${stampHtml} 
                 <div class="book-content">
-                    <span class="story-icon">${s.e}</span> 
+                    <img src="${s.img}" class="story-cover-img" alt="story image">
                     <span class="story-title">${s.t}</span>
                     <button class="book-audio-btn" title="聽英文發音" onclick="event.stopPropagation(); playAudio('${s.t.replace(/'/g, "\\'")}')">🔊</button>
                 </div>
@@ -667,6 +677,7 @@
         currentStoryId = id;
         const s = storyDB[id];
         
+        // 標題部分如果想要 Emoji 可以保留在這邊，如果不想要也可以把 ${s.e} 拿掉
         document.getElementById('sv-title').innerHTML = `${s.e} ${s.t}`;
         document.getElementById('sv-img-container').innerHTML = `<img src="${s.img}" class="story-img-clickable" onclick="openLightbox('${s.img}')" alt="Story Image" title="點擊放大圖片">`;
 
@@ -691,7 +702,6 @@
         let shuffled = [...s.q].sort(() => 0.5 - Math.random());
         currentQuiz = shuffled.slice(0, 3);
         
-        // 初始化兩組答案紀錄
         mcAnswers = new Array(3).fill(null);
         writtenAnswers = new Array(3).fill(false);
         currentQuestionIndex = 0;
@@ -726,7 +736,6 @@
             
             btn.innerHTML = `<button class="audio-btn" title="聽選項發音" style="background:#fbc531; margin-right:15px;" onclick="event.stopPropagation(); playAudio('${opt.replace(/'/g, "\\'")}')">🔊</button> ${opt}`;
             
-            // 如果已經選過選擇題，鎖定選項按鈕
             if (mcAnswers[currentQuestionIndex] !== null) {
                 if (optIndex === qObj.a) {
                     btn.classList.add('correct-choice'); 
@@ -740,7 +749,6 @@
             div.appendChild(btn);
         });
 
-        // 只要完成「選擇題」或「手寫」任一種，就會跳出這句鼓勵！
         if (mcAnswers[currentQuestionIndex] !== null || writtenAnswers[currentQuestionIndex]) {
             let encourageMsg = `
                 <div style="margin: 15px 0; padding: 15px; background: #ebf8ff; border: 2px dashed #4facfe; border-radius: 10px; font-weight: bold; color: #0984e3; text-align: center; font-size: 18px; animation: popIn 0.4s forwards;">
@@ -779,7 +787,6 @@
 
         initCanvas();
         
-        // 畫板的完成按鈕，只受畫板自己的狀態控制
         if(writtenAnswers[currentQuestionIndex]) {
             document.getElementById('btn-submit-written').disabled = true;
             document.getElementById('btn-submit-written').innerText = "已完成 ✅";
@@ -791,7 +798,6 @@
     }
 
     function selectOption(optIndex, btn) {
-        // 只檢查有沒有選過選擇題，不管有沒有畫過圖
         if (mcAnswers[currentQuestionIndex] !== null) return; 
         
         mcAnswers[currentQuestionIndex] = optIndex;
@@ -806,7 +812,6 @@
     }
 
     function changeQuestion(direction) {
-        // 檢查如果「完全沒有作答（兩個都沒選）」才能阻止換題
         if (direction === 1 && mcAnswers[currentQuestionIndex] === null && !writtenAnswers[currentQuestionIndex]) {
             alert("Please select an answer or draw it first! (請先選擇答案或完成手寫！)");
             playSoundEffect('wrong');
@@ -823,7 +828,6 @@
     function submitQuiz() {
         let correctCount = 0;
         currentQuiz.forEach((qObj, index) => {
-            // 只要選擇題答對，或是手寫區有提交，都算是過關
             if(mcAnswers[index] === qObj.a || writtenAnswers[index]) correctCount++;
         });
 
