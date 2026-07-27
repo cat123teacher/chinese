@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2 English Reading Fun - Teacher Cat</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background-color: #f0f8ff;
+            background-image: radial-gradient(#add8e6 15%, transparent 15%), radial-gradient(#add8e6 15%, transparent 15%);
+            background-position: 0 0, 25px 25px;
+            background-size: 50px 50px;
+            text-align: center;
+            color: #333;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #main-content-wrapper {
+            flex: 1 0 auto; 
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border: 2px solid #e6e6fa;
+        }
+        
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.15);
+            background-color: white;
+            object-fit: cover;
+            border: 3px solid #ff69b4;
+        }
+
+        #star-hud {
+            background: #fff;
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 8px 15px;
+            font-weight: bold;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+        }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.2em;
+            color: #ff8c00;
+        }
+        .hud-best {
+            font-size: 0.9em;
+            color: #32cd32;
+        }
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .star-animate { animation: starPop 0.5s ease; }
+
+        .main-title-box {
+            background: rgba(255,255,255,0.85);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #ff69b4;
+            font-size: 2.2em;
+            text-shadow: 2px 2px #fff;
+            margin: 5px 0;
+        }
+        p.subtitle {
+            font-size: 1.1em;
+            color: #555;
+            margin: 5px 0;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+        
+        .book-btn {
+            background: linear-gradient(to right, #ffffff, #f4f4f4);
+            border: 1px solid #dcdcdc;
+            border-left: 14px solid #ff8c00; 
+            border-radius: 4px 12px 12px 4px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.12), inset -4px 0 5px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .book-btn::after {
+            content: '';
+            position: absolute;
+            top: 4px; bottom: 4px; right: 4px;
+            width: 3px;
+            border-right: 1px solid #eaeaea;
+            border-radius: 50%;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 8px 12px 20px rgba(0,0,0,0.18), inset -4px 0 5px rgba(0,0,0,0.03);
+            background: linear-gradient(to right, #ffffff, #ffffe0);
+        }
+        
+        .btn-img {
+            width: 100%;
+            height: 180px; 
+            object-fit: contain; 
+            object-position: center;
+            background-color: #fff; 
+            border-radius: 3px 8px 8px 3px;
+            margin-bottom: 12px;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .btn-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.3;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .perfect-stamp {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #ffd700;
+            color: #d2691e;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+            transform: rotate(15deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.25);
+            z-index: 10;
+            line-height: 1.2;
+            text-align: center;
+            animation: stampPop 0.5s ease-out;
+        }
+        @keyframes stampPop {
+            0% { transform: scale(3) rotate(0deg); opacity: 0; }
+            100% { transform: scale(1) rotate(15deg); opacity: 1; }
+        }
+        
+        .hidden { display: none !important; }
+        
+        #game-screen {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+            border: 3px solid #add8e6;
+        }
+        
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #b0c4de;
+        }
+
+        img.story-img {
+            width: auto;
+            max-width: 100%;
+            max-height: 35vh;
+            border-radius: 12px;
+            border: 4px solid #ffb6c1;
+            margin-bottom: 15px;
+            object-fit: contain;
+            background: #fff;
+            cursor: zoom-in;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        img.story-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        #image-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        #modal-img {
+            max-width: 95vw;
+            max-height: 85vh;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.2);
+            object-fit: contain;
+        }
+        .modal-close-btn {
+            margin-top: 15px;
+            background: #ff6347;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover { background: #dc143c; }
+
+        .story-text-box {
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 1.25em;
+            line-height: 2.2; 
+            text-align: left;
+            color: #444;
+            background: #fffafa;
+            border-radius: 15px;
+            border: 2px dashed #ffb6c1;
+        }
+        
+        .sentence-item { display: inline; margin-right: 6px; }
+        .small-speak-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            font-size: 1.1em;
+            margin: 0 6px 0 0;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0ffff;
+            border: 2px solid #87ceeb;
+            border-radius: 50%;
+            vertical-align: middle;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .small-speak-btn:hover { background: #b0e0e6; transform: translateY(-2px) scale(1.1); }
+        .small-speak-btn:active { transform: translateY(0) scale(0.95); }
+        
+        .quiz-section { padding-top: 15px; }
+        .quiz-title {
+            color: #483d8b;
+            font-size: 1.6em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px #fff;
+        }
+        
+        #progress { font-size: 1.2em; color: #ff8c00; margin-bottom: 15px; font-weight: bold; }
+        
+        .question-box {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 1.25em;
+            border: 2px solid #b0c4de;
+        }
+        
+        .q-text-wrap {
+            display: flex; align-items: flex-start; margin-bottom: 25px;
+            font-weight: bold; color: #483d8b; font-size: 1.1em;
+        }
+        
+        .option-wrap { display: flex; align-items: center; margin: 12px 0; }
+        
+        .speak-btn {
+            background: #ffdab9; border: 2px solid #ff8c00; border-radius: 50%;
+            min-width: 45px; height: 45px; font-size: 1.4em;
+            cursor: pointer; margin-right: 15px; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.1s, background 0.2s; flex-shrink: 0;
+        }
+        .speak-btn:hover { transform: scale(1.1); background: #ffdead; }
+        .speak-btn:active { transform: scale(0.9); }
+        
+        .option-btn {
+            flex-grow: 1; background: #fff; border: 3px solid #3cb371;
+            border-radius: 12px; padding: 15px; font-size: 1em;
+            font-family: inherit; cursor: pointer; text-align: left;
+            transition: all 0.2s; color: #333; min-height: 55px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .option-btn:hover:not(:disabled) { background: #e0ffe0; transform: translateX(5px); }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.9;}
+        
+        #feedback { font-size: 1.3em; font-weight: bold; min-height: 40px; margin: 15px 0; }
+        .correct-text { color: #32cd32; }
+        .wrong-text { color: #dc143c; }
+        .earn-star-text { color: #ff8c00; font-size: 0.9em; display: block; margin-top: 5px; }
+        
+        .game-nav-bar, .utility-nav-bar {
+            display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap;
+        }
+        .utility-nav-bar { margin-top: 5px; margin-bottom: 10px; }
+        
+        .nav-btn {
+            background: #ff6347; color: white; border: none;
+            padding: 15px 25px; font-size: 1.15em; font-family: inherit;
+            border-radius: 12px; cursor: pointer; box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .nav-btn:hover { background: #ff4500; transform: translateY(-2px); }
+        .nav-btn:active { transform: translateY(1px); }
+        
+        .blue-btn { background: #1e90ff; }
+        .blue-btn:hover { background: #0000cd; }
+        .green-btn { background: #32cd32; }
+        .green-btn:hover { background: #228b22; }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none;}
+        
+        .site-footer {
+            flex-shrink: 0; background: rgba(255, 255, 255, 0.95);
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            padding: 30px 20px; margin-top: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            text-align: center; width: 100%; box-sizing: border-box; border-top: 3px solid #ffb6c1;
+        }
+        .site-footer h3 { color: #ff69b4; margin-top: 0; margin-bottom: 20px; font-size: 1.8em; text-shadow: 1px 1px #eee; }
+        .social-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 1000px; margin: 0 auto; }
+        .social-links a, .social-text {
+            text-decoration: none; color: #fff; padding: 12px 20px; border-radius: 12px;
+            font-weight: bold; font-size: 1.05em; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+        }
+        .social-links a:hover { transform: scale(1.05); box-shadow: 3px 3px 12px rgba(0,0,0,0.25);}
+        .bg-yt { background: #ff0000; } .bg-yt:hover { background: #cc0000; }
+        .bg-ig { background: #e1306c; } .bg-ig:hover { background: #c13584; }
+        .bg-fb { background: #1877f2; } .bg-fb:hover { background: #165eab; }
+        .bg-th { background: #000000; } .bg-th:hover { background: #333333; }
+        .bg-xh { background: #ff2442; } .bg-xh:hover { background: #d01d36; }
+        .bg-wa { background: #25d366; } .bg-wa:hover { background: #128c7e; }
+        .bg-dy { background: #000000; border: 2px solid #25f4ee; color: #fff;}
+        
+        .confetti {
+            position: fixed; top: -20px; width: 10px; height: 10px;
+            z-index: 9999; opacity: 0.9; border-radius: 2px;
+            animation: fall linear forwards; pointer-events: none;
+        }
+        @keyframes fall {
+            0% { top: -20px; transform: rotate(0deg); }
+            100% { top: 100vh; transform: rotate(720deg); }
+        }
+
+        @media (max-width: 600px) {
+            .app-header { padding: 10px; border-radius: 15px;}
+            .logo-img { width: 60px; height: 60px; }
+            #star-hud { padding: 5px 10px; }
+            .hud-row { font-size: 1em; }
+            h1 { font-size: 1.8em; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 15px;}
+            .btn-img { height: 140px; }
+            .book-btn { padding: 8px; border-left-width: 10px;}
+            .btn-title { font-size: 0.9em; }
+            .perfect-stamp { width: 45px; height: 45px; font-size: 0.75em; top: -8px; right: -8px; }
+            #game-screen { padding: 15px; }
+            .story-text-box { font-size: 1.15em; padding: 10px;}
+            .speak-btn { min-width: 38px; height: 38px; font-size: 1.2em; }
+            .option-btn { padding: 12px; font-size: 0.95em; }
+            .nav-btn { padding: 10px 15px; font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-content-wrapper">
+        <header class="app-header">
+            <img src="cat.jpeg" class="logo-img" alt="Teacher Cat Logo">
+            <div id="star-hud">
+                <div class="hud-row">🏆 滿分關卡: <span id="star-count">0</span>/26</div>
+                <div id="level-best-hud" class="hud-best hidden">🏆 Level Best: <span id="level-best-count">0</span>/3</div>
+            </div>
+        </header>
+
+        <div id="home-screen">
+            <div class="main-title-box">
+                <h1>📚 P2 English Reading Fun! 📚</h1>
+                <p class="subtitle">聽一聽，讀一讀，選出正確的完整句子！<br>(點擊書本開始，點擊 🔊 按鈕聽發音)</p>
+            </div>
+            
+            <div class="grid" id="book-grid"></div>
+            
+            <div style="margin: 35px auto 10px; text-align: center;">
+                <a href="https://cat123teacher.github.io/chinese/main.html" class="nav-btn green-btn" style="text-decoration: none; display: inline-block; font-size: 1.2em; padding: 15px 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                    🚀 返回小朋友學習大冒險
+                </a>
+            </div>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <h2 id="story-title" style="color: #ff4500; margin-top: 0; font-size: 1.6em;"></h2>
+            
+            <div class="image-container">
+                <img id="story-image" class="story-img" src="" alt="Story Image" onclick="openModal()" title="點擊放大圖片">
+                <div class="utility-nav-bar">
+                    <button class="nav-btn blue-btn" style="padding: 10px 20px; font-size: 1em;" onclick="openModal()">🔍 放大圖片</button>
+                    <button class="nav-btn green-btn" style="padding: 10px 20px; font-size: 1em;" onclick="printStory()">🖨️ 列印文章</button>
+                </div>
+            </div>
+            
+            <div id="story-text-container" class="story-text-box"></div>
+            
+            <div class="quiz-section">
+                <h3 id="quiz-title-display" class="quiz-title">📝 Reading Quiz</h3>
+                <div id="progress">Question 1 / 3</div>
+                <div id="question-area" class="question-box"></div>
+                <div id="feedback"></div>
+                <div class="game-nav-bar">
+                    <button id="prev-btn" class="nav-btn blue-btn" onclick="prevQuestion()">⬅️ 上一頁</button>
+                    <button id="home-btn" class="nav-btn" onclick="goHome()">🏠 回到書櫃</button>
+                    <button id="next-btn" class="nav-btn blue-btn hidden" onclick="nextQuestion()">下一題 ➡️</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="image-modal">
+        <img id="modal-img" src="">
+        <button class="modal-close-btn" onclick="closeModal()">關閉 ❌</button>
+    </div>
+
+    <div class="site-footer">
+        <h3>✨ Teacher Cat 的快樂AI教室 ✨</h3>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="bg-yt">▶️ YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="bg-ig">📸 Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="bg-fb">📘 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="bg-th">🧵 Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="bg-xh">📕 小紅書</a>
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="bg-wa">💬 WhatsApp 群組</a>
+            <span class="social-text bg-dy">🎵 抖音: 74254902683</span>
+        </div>
+    </div>
+
+    <script>
+        var storyTitles = {
+            "p2001": { en: "Amazing Animal Friends!", zh: "奇妙的動物朋友！" },
+            "p2002": { en: "The Squirrel Joined A Bakery!", zh: "加入麵包店的松鼠！" },
+            "p2003": { en: "Squirrel Opens Park Library!", zh: "松鼠開設公園圖書館！" },
+            "p2004": { en: "A Penguin Goes Shopping!", zh: "企鵝去購物！" },
+            "p2005": { en: "Smallest Penguin Wins Art Prize!", zh: "最小企鵝贏得藝術大獎！" },
+            "p2006": { en: "The Octopus Who Stole A Camera!", zh: "偷走相機的章魚！" },
+            "p2007": { en: "A Bear-y Big Ice Cream Thief!", zh: "超大隻的雪糕小偷！" },
+            "p2008": { en: "Puppy Opened His Own Library!", zh: "自己開圖書館的小狗！" },
+            "p2009": { en: "The Lizard Who Became A Rockstar!", zh: "成為搖滾巨星的蜥蜴！" },
+            "p2010": { en: "The Goat Who Loved To Skateboard!", zh: "愛玩滑板的山羊！" },
+            "p2011": { en: "The Pig Who Became A Painter!", zh: "成為畫家的豬！" },
+            "p2012": { en: "Tiny Dog Detective!", zh: "小小狗偵探！" },
+            "p2013": { en: "Penguin Became A Sneaker Star!", zh: "成為球鞋明星的企鵝！" },
+            "p2014": { en: "Escape Artist Hamster!", zh: "逃脫大師倉鼠！" },
+            "p2015": { en: "Monkey Driver Causes Traffic Jam!", zh: "猴子司機造成大塞車！" },
+            "p2016": { en: "The Cow Who Thought She Was A Horse!", zh: "以為自己是馬的牛！" },
+            "p2017": { en: "The Sheep Who Became A Doggy Hero!", zh: "成為狗狗英雄的綿羊！" },
+            "p2018": { en: "A Bear-y Big Ice Cream Thief!", zh: "超大隻的雪糕小偷！(二)" },
+            "p2019": { en: "Elephant Painter!", zh: "大象畫家！" },
+            "p2020": { en: "Surf's Up, Goat!", zh: "去衝浪吧，山羊！" },
+            "p2021": { en: "Cow Becomes A Police Officer!", zh: "聰明牛牛成為警察！" },
+            "p2022": { en: "The Dancing Penguin!", zh: "跳舞的企鵝！" },
+            "p2023": { en: "Baby Elephant Steals School Bus!", zh: "小象偷走校巴！" },
+            "p2024": { en: "The Talking Dolphin!", zh: "會說話的海豚！" },
+            "p2025": { en: "Dancing Penguin Steals The Show!", zh: "跳舞企鵝搶盡風頭！" },
+            "p2026": { en: "A Monkey Stole a Police Hat!", zh: "猴子偷了警察帽！" }
+        };
+
+        var storyTexts = {
+            "p2001": "<p><strong>WOW! Amazing Animal Friends!</strong></p><p>Have you ever heard of a cat who loves to ride the bus? Meet 'Cassie,' a brave ginger cat who lives in a small town in England. Cassie loves to go for rides on the red 'Number 44' bus. She jumps on every morning, sits on her favorite seat near the back, and enjoys the view as the bus travels around the countryside.</p><p>The friendly bus drivers and passengers all know Cassie very well and make sure she gets off safely near her favorite fish and chip shop. She has her very own 'Bus Pass' on a tiny collar! She is the town's favorite little traveler and has become a famous local celebrity. Now, her owner is writing a book all about her incredible adventures.</p>",
+            "p2002": "<p><strong>WACKY WORLD NEWS: THE SQUIRREL WHO JOINED A BAKERY!</strong></p><p>Have you ever heard of a squirrel with a sweet tooth? This week, in a little town in England, a cheeky squirrel named 'Nutty' became the star assistant at a local bakery! Nutty the squirrel didn't just visit for nuts. One morning, he sneaked past the baker, Mr. Puggins, and hopped right onto the counter.</p><p>Instead of causing chaos, Nutty stood on his back legs and carefully used his little paws to help 'knead' the dough for blueberry muffins! Mr. Puggins was so surprised, he decided to give Nutty a tiny baker's hat. He helps roll out pie crusts (with his nose!) and even 'decorates' cupcakes by sprinkling sugar. His favorite is taste-testing the frosting.</p>",
+            "p2003": "<p><strong>SUPER SQUIRREL LIBRARIAN OPENS TINY PARK LIBRARY!</strong></p><p>Meet Nutty! Nutty isn't just any squirrel in a lovely English park; he's a genius squirrel librarian! Last week, he started a very special project. Nutty noticed children dropping their tiny, waterproof picture books and comics. He decided to 'borrow' them!</p><p>Nutty used his sharp teeth to carefully carry the books to a hollow tree. He made a little sign from bark and berries that says 'NUTTY'S LIBRARY'. Now, every day, children come to the tree. They look at the books, share them, and even leave Nutty a special acorn treat!</p>",
+            "p2004": "<p><strong>Wacky News: Supermarket Surprise! A Penguin Goes Shopping.</strong></p><p>This week, a little penguin named 'Pip' caused a big stir at a London aquarium. During the night, Pip used his flippers to carefully unlock his enclosure, then he waddled right out of the aquarium door and into the busy city streets!</p><p>Just after dawn, shoppers at the local 'Super-Fresh' supermarket were shocked to see Pip waddling down the 'Frozen Foods' aisle. Pip used his beak to pick out a shiny, silver fish from the freezer, then he pushed a miniature shopping cart toward the checkout counter. Police arrived and finally caught him with a soft net.</p>",
+            "p2005": "<p><strong>WORLD'S SMALLEST PENGUIN WINS EGG-CELLENT ART PRIZE!</strong></p><p>Meet Pip! Pip is the world's smallest penguin, living in a sunny zoo in Australia. Last week, a special art contest was held for all the zoo animals. Pip wanted to join! But Pip's feet are too small to hold big paintbrushes, and his flippers are too round.</p><p>Then, Pip had a GREAT idea! He waddled over to a patch of colourful, safe, non-toxic berry juice and stepped right into it! Pip did a happy dance on a giant piece of paper. He danced and spun, creating a beautiful splashy rainbow. The judges gave Pip the First Place Prize!</p>",
+            "p2006": "<p><strong>WACKY WORLD NEWS: THE OCTOPUS WHO STOLE A SHINY CAMERA!</strong></p><p>This week, in a beautiful coral reef in faraway Australia, a very cheeky octopus named 'Inky' became a worldwide superstar! One morning, she saw a scuba diver taking pictures of the colorful fish.</p><p>While the diver was busy looking at a turtle, Inky, with her eight arms, gently reached out and... She took the diver's bright yellow underwater camera! Inky tried to 'take a selfie' by pointing the camera at her own funny, many-armed face! The diver had to offer her favorite tasty crab snack to get the camera back.</p>",
+            "p2007": "<p><strong>Wacky News: A Bear-y Big Ice Cream Thief!</strong></p><p>This week, a very clever brown bear cub named 'Barnaby' caused a big stir! He loves sweet treats. He managed to open the back door of Barnaby's Ice Cream Shop while the owner was busy. Sneaking in, he went straight for the freezer, which was full of yummy 'Salmon Surprise' flavor (his favorite!) and 'Honey Berry' flavor.</p><p>People walking past were shocked to see a big, fluffy bear waddling down the street with a giant pint of ice cream in his paws! Police arrived, but they had to be very gentle. They used a trail of honey to guide him back to the edge of town.</p>",
+            "p2008": "<p><strong>WACKY WORLD NEWS: THE PUPPY WHO OPENED HIS OWN LIBRARY!</strong></p><p>This week, in a sunny park in California, a clever Golden Retriever named 'Barnaby' became the star librarian! Barnaby's owner, Maya, noticed her fluffy friend loved to carry books in his mouth.</p><p>One day, Barnaby trotted over to a park bench and gently placed it next to an elderly man reading a newspaper. Maya set up a tiny, decorated book cart for Barnaby. Now, Barnaby waits for people coming into the park, picks a colorful picture book from his cart, and offers it to them. He even 'reads' (howls softly) to the children.</p>",
+            "p2009": "<p><strong>WACKY WORLD NEWS: THE LIZARD WHO BECAME A ROCKSTAR!</strong></p><p>In a small, sunny town in faraway Australia, a very cheeky blue-tongued lizard named 'Ziggy' became an international music sensation! Ziggy loves to listen to his owner, Mia, practice her electric guitar.</p><p>One afternoon, Ziggy waddled onto the patio, grabbed a small, felt guitar pick with his mouth, and started to tap-tap-tap it on the guitar strings. <i>Strum! Strum!</i> Now, Ziggy is a pro! He holds the guitar pick with his front foot and strums with his nose. His favorite song is a fast, happy tune, and he even bobs his little head to the beat.</p>",
+            "p2010": "<p><strong>WACKY WORLD NEWS: THE GOAT WHO LOVED TO SKATEBOARD!</strong></p><p>This week, in a small, sunny town in California, a very clever goat named 'Billy' became a viral superstar! One morning, Billy wandered into the farmer's garage and saw an old, brightly colored skateboard.</p><p>Instead of being scared, Billy nudged it with his nose. Then, to everyone's amazement, he hopped onto the board with all four hooves and pushed off! Now, Billy is a pro. He loves to go skateboarding down the gentle slope of the farm driveway. His favorite trick is jumping over a tiny ramp onto a soft haystack.</p>",
+            "p2011": "<p><strong>WACKY WORLD NEWS: THE PIG WHO BECAME A PAINTER!</strong></p><p>In a small, sunny town in faraway New Zealand, a very clever pig named 'Picasso' became an international art sensation! Picasso the pig loved to watch her owner, Mrs. Jones, paint beautiful pictures.</p><p>One day, Picasso waddled over, grabbed a paint-filled brush with her mouth, and made a big, colorful swirl on a canvas. Mrs. Jones was so surprised, she gave Picasso more non-toxic paints and brushes. Now, Picasso is a pro! She holds the brush with her snout and paints amazing, happy blobs of color. She even signs her paintings with a special hoof print.</p>",
+            "p2012": "<p><strong>TINY DOG DETECTIVE SNIFFS OUT MISSING SOCK MYSTERY!</strong></p><p>Meet 'Peanut'! Peanut is a tiny, fluffy Chihuahua living in a big apartment in New York City. He is a super-sleuth! Last week, a little girl named Lily was very sad. Her favorite cozy rainbow sock had disappeared!</p><p>Lily's mom called Peanut for help. Peanut wagged his tail and got to work. He sniffed Lily's shoe. Sniff, sniff, sniff! He marched into the kitchen, pushed open a cabinet door, and started barking. There, hidden in a dark corner behind a bag of potatoes, was her rainbow sock!</p>",
+            "p2013": "<p><strong>WACKY WORLD NEWS: THE PENGUIN WHO BECAME A SNEAKER STAR!</strong></p><p>This week, in a world-famous zoo in Japan, a clever Adélie penguin named 'Penny' became an internet sensation! She loves to watch the zookeepers wear their colorful sneakers.</p><p>One morning, she sneaked into the zookeeper's office and grabbed a tiny, bright red sneaker with her beak. Instead of hiding it, she tried it on! The zookeepers were so surprised, they made her a special, teeny-tiny pair of soft red shoes. Penny now wears them every day. She loves to show off her 'sneakers' by high-stepping for the crowd.</p>",
+            "p2014": "<p><strong>Wacky News: Escape Artist Hamster! A Very Tiny Jailbreak!</strong></p><p>This week, a tiny hamster named 'Houdini' caused a big stir in Tokyo, Japan. Houdini's owner, Kenji, was very surprised to find his hamster's cage empty every morning, even though the door was locked tight!</p><p>The clever hamster learned to use his little nose and paws to carefully unlock the cage door from the inside! One night, Houdini waddled into the kitchen and found a bag of yummy cheese crackers. The next morning, Kenji found Houdini fast asleep in a shoe box.</p>",
+            "p2015": "<p><strong>Wacky News: Monkey Driver Causes Traffic Jam in London!</strong></p><p>A very cheeky monkey caused a big surprise in London this week! The monkey, who is famous at the local zoo for being clever, somehow unlocked the zookeeper's golf buggy. Not just that, but it started the engine and drove it right out of the zoo!</p><p>People driving their cars could not believe their eyes. 'I saw a monkey driving a car, and it was using the turn signal!' laughed Mr. Brown, a surprised taxi driver. In the end, the monkey parked the buggy perfectly outside a banana shop.</p>",
+            "p2016": "<p><strong>WACKY WORLD NEWS: THE COW WHO THOUGHT SHE WAS A HORSE!</strong></p><p>In a small town in New Zealand, a very funny cow named 'Moo-ana' became a world-famous superstar! She loves to watch the neighbor's beautiful horses run and jump over tall fences.</p><p>One day, Moo-ana saw an old, dusty obstacle course. Instead of being scared, she waddled over, tucked her legs, and... hop! She tried to jump over the first hurdle! The farmer was so surprised, he built her a special, low cow-sized jumping course. Now, Moo-ana is a pro!</p>",
+            "p2017": "<p><strong>WACKY WORLD NEWS: THE SHEEP WHO BECAME A DOGGY HERO!</strong></p><p>This week, in a small green town in Wales, a cheeky sheep named 'Baa-bara' did something amazing! Baa-bara was raised on a farm with a family of Golden Retriever puppies.</p><p>One morning, when the farmer took the dogs for a walk, Baa-bara decided to join the pack! When the farmer threw a tennis ball, Baa-bara didn't eat the grass; she grabbed the ball with her teeth and brought it right back! Now, Baa-bara plays a perfect game of fetch, and even gives a little 'Baa!' instead of a bark.</p>",
+            "p2018": "<p><strong>Wacky News: A Bear-y Big Ice Cream Thief!</strong></p><p>This week in a quiet town in Canada, a very clever brown bear cub named 'Barnaby' caused a big stir! He loves sweet treats. He managed to open the back door of Barnaby's Ice Cream Shop while the owner was busy.</p><p>Sneaking in, he went straight for the freezer, which was full of yummy 'Salmon Surprise' flavor and 'Honey Berry' flavor. People walking past were shocked to see a big bear waddling down the street with a giant pint of ice cream in his paws! Police used a trail of honey to guide him back to the forest.</p>",
+            "p2019": "<p><strong>ELEPHANT PAINTER STAMPS HIS WAY TO ART FAME!</strong></p><p>Meet 'Jumbo', the world's most colourful elephant artist! Jumbo lives in a sunny animal sanctuary in Thailand. He loves to paint, but he doesn't use small brushes. No, Jumbo uses his BIG, round feet!</p><p>His human friends set up a HUGE canvas. They gave Jumbo giant foot-pads dipped in safe, non-toxic paints. Jumbo stepped onto the canvas. He stomped, he danced, and he wiggled his toes! Splat! Squish! The art judges were so impressed! Jumbo won the 'Trunk-tastic Art Prize.'</p>",
+            "p2020": "<p><strong>SURF'S UP, GOAT! MOUNTAIN GOAT CATCHES WAVES IN SCOTLAND!</strong></p><p>Meet 'Barnaby', the most adventurous goat in all of Scotland! Last week, Barnaby was taking a walk near the ocean when he saw something new. A group of people were learning to surf!</p><p>When no one was looking, Barnaby trotted over to an extra surfboard left on the sand. He stepped onto it with his sturdy little hooves. A friendly wave rolled in, and just like that - Barnaby was surfing! He balanced perfectly! Up and down, side to side. He even got his very own tiny, goat-sized wetsuit!</p>",
+            "p2021": "<p><strong>Wacky News: Super-Sniffer! A Very Clever Cow Becomes a Police Officer!</strong></p><p>This week, a very unusual new police officer started work in Chur, Switzerland. The police chief swore in a very clever cow named 'Daisy'! Daisy has a super-sniffer nose, just like a police dog.</p><p>One day, a little boy lost his favorite toy bear in the big forest. Daisy nodded, put her nose to the ground, and walked right into the forest. After sniffing around some trees, she pulled a shiny red toy bear from some bushes with her mouth! She is now the official 'Lost Toy Detective'!</p>",
+            "p2022": "<p><strong>WEIRD NEWS: THE DANCING PENGUIN!</strong></p><p>Last Monday, in a sunny park in London, a very silly thing happened! A chubby Emperor penguin named Waddles walked right out of a delivery truck.</p><p>He jumped into a puddle and started dancing! He did the twist and the moonwalk. A big crowd of people took videos. The zookeepers were so surprised! Finally, a little girl named Lily gave him a red balloon. Waddles grabbed the string and slid down a grassy hill into his new pool at the zoo.</p>",
+            "p2023": "<p><strong>BABY ELEPHANT STEALS SCHOOL BUS!</strong></p><p>Last Monday, in a sunny jungle town, a funny thing happened! A cute baby elephant named Ellie walked into a schoolyard. She thought the big yellow school bus was a new toy!</p><p>Ellie picked up the bus with her long trunk. All the children laughed and laughed. Tommy, a boy in second grade, gave Ellie some sweet bananas. Ellie put the bus down gently and ate the bananas. The zookeeper came and took Ellie home to the animal park. The bus was not broken, just a little sticky!</p>",
+            "p2024": "<p><strong>THE TALKING DOLPHIN!</strong></p><p>Last week in sunny Australia, a very smart dolphin swam right up to a yellow boat! His name is Luna. Luna can talk! He popped his head out of the water and said 'Hello friends!' to the surprised fishermen.</p><p>The fishermen gave Luna a big blue ball to play with. Luna laughed and jumped high in the air, splashing water everywhere! Now, every morning, Luna waits by the dock to say good morning to all the children going to school.</p>",
+            "p2025": "<p><strong>DANCING PENGUIN STEALS THE SHOW!</strong></p><p>A very silly and funny thing happened at the zoo this week! A big penguin named Bouncy found a shiny red button. When he tapped it with his beak, loud disco music started playing!</p><p>Bouncy could not stop dancing! He waved his flippers and slid on his belly across the ice. All the zookeepers and visitors laughed and clapped for him. Bouncy is now the most famous dancing penguin in the world!</p>",
+            "p2026": "<p><strong>WEIRD NEWS! A Monkey Stole a Police Hat!</strong></p><p>Last Monday in India, a funny monkey took a police officer's hat! The officer was resting on a park bench. The monkey jumped down from a tall tree and grabbed the brown hat.</p><p>Then, the monkey sat on a stone wall and wore the hat! All the people in the park laughed. The police officer smiled and gave the monkey a yellow banana. The monkey gave the hat back and ate the banana happily.</p>"
+        };
+
+        var db = {
+            "p2001": [
+                ["What kind of animal is Cassie?","Cassie is a brave ginger cat.","Cassie is a small dog.","Cassie is a green turtle."],
+                ["Where does Cassie like to sit?","She sits on her favorite seat near the back.","She sits on the roof of the bus.","She sits next to the driver."],
+                ["What does Cassie wear on her collar?","She wears her very own bus pass.","She wears a tiny silver bell.","She wears a blue ribbon."],
+                ["Which bus does Cassie ride?","She rides the red number forty-four bus.","She rides the yellow school bus.","She rides the blue number ten bus."],
+                ["Where does Cassie get off the bus?","She gets off near her favorite fish and chip shop.","She gets off at the big park.","She gets off at the supermarket."]
+            ],
+            "p2002": [
+                ["Who is Nutty?","Nutty is a cheeky squirrel.","Nutty is a little bird.","Nutty is a brown bear."],
+                ["Where did Nutty become a star assistant?","Nutty joined a local bakery.","Nutty joined a big supermarket.","Nutty joined a busy hospital."],
+                ["What did Mr. Puggins give to Nutty?","He gave Nutty a tiny baker's hat.","He gave Nutty a shiny silver coin.","He gave Nutty a new recipe book."],
+                ["How does Nutty help roll out pie crusts?","He helps roll out pie crusts with his nose.","He helps roll out pie crusts with his tail.","He helps roll out pie crusts with a rolling pin."],
+                ["What is Nutty's favorite thing to do?","His favorite is taste-testing the frosting.","His favorite is washing the dishes.","His favorite is sweeping the floor."]
+            ],
+            "p2003": [
+                ["What is Nutty's special job in the park?","He is a genius squirrel librarian.","He is a fast police officer.","He is a busy park cleaner."],
+                ["What did Nutty decide to borrow?","He borrowed waterproof picture books and comics.","He borrowed shiny coins and keys.","He borrowed small apples and nuts."],
+                ["Where did Nutty carry the books?","He carried them to a hollow tree.","He carried them to a deep hole.","He carried them to a wooden bench."],
+                ["What does the sign made from bark say?","It says Nutty's Library.","It says No Animals Allowed.","It says Welcome to the Park."],
+                ["What do children leave for Nutty?","They leave Nutty a special acorn treat.","They leave Nutty a piece of bread.","They leave Nutty a sweet carrot."]
+            ],
+            "p2004": [
+                ["How did Pip the penguin escape?","He used his flippers to unlock his enclosure.","He dug a hole under the wall.","He climbed over the tall fence."],
+                ["Where did shoppers see Pip?","They saw Pip in the Frozen Foods aisle.","They saw Pip in the toy shop.","They saw Pip at the park."],
+                ["What did Pip push toward the checkout?","He pushed a miniature shopping cart.","He pushed a big blue box.","He pushed a yellow plastic bag."],
+                ["What was Pip looking for in the freezer?","He picked out a shiny silver fish.","He picked out a sweet ice cream.","He picked out a bag of peas."],
+                ["What did the police use to catch Pip?","They caught him with a soft net.","They caught him with a big cage.","They caught him with a long rope."]
+            ],
+            "p2005": [
+                ["What is special about Pip?","Pip is the world's smallest penguin.","Pip is the fastest running bird.","Pip is a very loud singer."],
+                ["Why was Pip sad at first?","His feet were too small to hold big paintbrushes.","He could not find his favorite toy.","He did not have any friends to play with."],
+                ["What did Pip step into?","He stepped into safe, non-toxic berry juice.","He stepped into a big muddy puddle.","He stepped into a bucket of cold water."],
+                ["What did Pip create by dancing?","He created a beautiful splashy rainbow.","He created a picture of a fish.","He created a drawing of a tree."],
+                ["What did the judges give to Pip?","They gave Pip the First Place Prize.","They gave Pip a small red ribbon.","They gave Pip a box of sweet berries."]
+            ],
+            "p2006": [
+                ["Who is Inky?","Inky is a cheeky octopus.","Inky is a fast green turtle.","Inky is a small yellow fish."],
+                ["What did Inky take from the diver?","She took the bright yellow underwater camera.","She took the diver's shiny watch.","She took the diver's black flippers."],
+                ["What did Inky try to do with the camera?","She tried to take a selfie.","She tried to eat the camera.","She tried to hide it in the sand."],
+                ["How many arms does Inky have?","Inky has eight arms.","Inky has six arms.","Inky has ten arms."],
+                ["What did the diver offer to get the camera back?","The diver offered her a tasty crab snack.","The diver offered her a shiny shell.","The diver offered her a small green plant."]
+            ],
+            "p2007": [
+                ["Who is Barnaby?","Barnaby is a clever brown bear cub.","Barnaby is a fast white rabbit.","Barnaby is a large grey elephant."],
+                ["What did Barnaby take from the shop?","He took a giant pint of ice cream.","He took a big box of chocolates.","He took a sweet apple pie."],
+                ["What was Barnaby's favorite flavor?","His favorite was Salmon Surprise.","His favorite was Chocolate Chip.","His favorite was Strawberry Dream."],
+                ["How did the police guide Barnaby back?","They used a trail of honey.","They used a loud police siren.","They used a piece of fresh fish."],
+                ["What did the shop owner install?","The owner installed a bear-proof lock.","The owner installed a loud alarm.","The owner installed a new glass door."]
+            ],
+            "p2008": [
+                ["Who is Barnaby in this story?","Barnaby is a clever Golden Retriever.","Barnaby is a small brown monkey.","Barnaby is a fast running horse."],
+                ["What did Barnaby love to carry in his mouth?","He loved to carry books in his mouth.","He loved to carry a red ball.","He loved to carry a wooden stick."],
+                ["Where did Barnaby place the book one day?","He placed it next to an elderly man.","He placed it under a big green tree.","He placed it inside a small box."],
+                ["What did Maya set up for Barnaby?","She set up a tiny decorated book cart.","She set up a new wooden doghouse.","She set up a big swimming pool."],
+                ["How does Barnaby read to children?","He howls softly to the children.","He barks loudly at the children.","He sings a happy song."]
+            ],
+            "p2009": [
+                ["Who is Ziggy?","Ziggy is a blue-tongued lizard.","Ziggy is a green jumping frog.","Ziggy is a small brown mouse."],
+                ["What does Ziggy love to listen to?","He loves to listen to Mia practice her guitar.","He loves to listen to the birds singing.","He loves to listen to the loud radio."],
+                ["What did Ziggy tap on the guitar strings?","He tapped a small felt guitar pick.","He tapped a small wooden stick.","He tapped a shiny silver coin."],
+                ["How did Mia feel when Ziggy played?","Mia was so surprised.","Mia was very sad and angry.","Mia was sleepy and tired."],
+                ["What does Ziggy do to the beat?","He bobs his little head to the beat.","He jumps up and down to the beat.","He runs around in circles."]
+            ],
+            "p2010": [
+                ["Who is Billy?","Billy is a clever goat.","Billy is a funny little pig.","Billy is a fast white horse."],
+                ["What did Billy find in the garage?","He saw an old, brightly colored skateboard.","He saw a big red tractor.","He saw a small green bicycle."],
+                ["How did Billy get onto the board?","He hopped onto the board with all four hooves.","He carefully stepped on with two feet.","He sat down on the board."],
+                ["Where does Billy love to go skateboarding?","He loves skateboarding down the gentle slope.","He loves skateboarding in the busy street.","He loves skateboarding inside the house."],
+                ["What is Billy's favorite trick?","His favorite trick is jumping over a tiny ramp.","His favorite trick is spinning in a circle.","His favorite trick is standing on one leg."]
+            ],
+            "p2011": [
+                ["Who is Picasso?","Picasso is a clever pig.","Picasso is a noisy dog.","Picasso is a sleepy cat."],
+                ["What did Picasso grab with her mouth?","She grabbed a paint-filled brush.","She grabbed a red apple.","She grabbed a big bone."],
+                ["What does Picasso paint?","She paints amazing happy blobs of color.","She paints cars and buses.","She paints numbers and letters."],
+                ["How does Picasso sign her paintings?","She signs with a special hoof print.","She signs with a pencil.","She signs with a sticker."],
+                ["What is Picasso's favorite color?","Her favorite color is bright yellow.","Her favorite color is blue.","Her favorite color is red."]
+            ],
+            "p2012": [
+                ["Who is Peanut?","Peanut is a tiny, fluffy Chihuahua.","Peanut is a large bulldog.","Peanut is a black cat."],
+                ["What did Lily lose?","She lost her favorite cozy rainbow sock.","She lost her blue hat.","She lost her yellow jacket."],
+                ["What did Peanut sniff first?","He sniffed Lily's shoe.","He sniffed Lily's hand.","He sniffed the kitchen table."],
+                ["Where did Peanut find the sock?","It was hidden behind a bag of potatoes.","It was under the bed.","It was inside the toy box."],
+                ["How did Peanut tell them he found it?","He started barking and wagging his tail.","He started jumping on the bed.","He fell asleep on the floor."]
+            ],
+            "p2013": [
+                ["Who is Penny?","Penny is a clever Adelie penguin.","Penny is a tall ostrich.","Penny is a small green parrot."],
+                ["What did Penny grab with her beak?","She grabbed a tiny bright red sneaker.","She grabbed a big blue hat.","She grabbed a yellow scarf."],
+                ["What did the zookeepers make for Penny?","They made her a teeny-tiny pair of soft red shoes.","They made her a warm winter coat.","They made her a small wooden house."],
+                ["What is Penny's favorite thing to do?","Her favorite thing is to tap-tap-tap shoes on the ground.","Her favorite thing is swimming in cold water.","Her favorite thing is eating green fish."],
+                ["What does Penny do for the crowd?","She shows off her sneakers by high-stepping.","She hides behind the big rocks.","She sings a loud song."]
+            ],
+            "p2014": [
+                ["Who is Houdini?","Houdini is a tiny hamster.","Houdini is a large grey rabbit.","Houdini is a small green turtle."],
+                ["How did Houdini open the door?","He used his little nose and paws to carefully unlock it.","He chewed through the metal bars.","He dug a deep tunnel."],
+                ["What did Houdini find in the kitchen?","He found a bag of yummy cheese crackers.","He found a bowl of sweet apples.","He found a plate of carrots."],
+                ["Where did Kenji find Houdini sleeping?","Kenji found him fast asleep in a shoe box.","Kenji found him sleeping on the sofa.","Kenji found him sleeping under the table."],
+                ["What did Kenji buy for the cage?","He bought a super-special hamster-proof lock.","He bought a new running wheel.","He bought a soft warm blanket."]
+            ],
+            "p2015": [
+                ["Who is Bongo?","Bongo is a very cheeky monkey.","Bongo is a tall yellow giraffe.","Bongo is a big brown bear."],
+                ["What did Bongo drive out of the zoo?","He drove the zookeeper's golf buggy.","He drove a big yellow school bus.","He drove a small red bicycle."],
+                ["What surprised the taxi driver?","The monkey was using the turn signal.","The monkey was eating a banana.","The monkey was singing a song."],
+                ["Where did Bongo park the buggy?","He parked perfectly outside a banana shop.","He parked in the school playground.","He parked outside the police station."],
+                ["What did the Zoo Director say?","She said he doesn't have a driver's license.","She said Bongo is a good singer.","She said Bongo is very hungry."]
+            ],
+            "p2016": [
+                ["Who is Moo-ana?","Moo-ana is a very funny cow.","Moo-ana is a brave little sheep.","Moo-ana is a fast brown horse."],
+                ["What does Moo-ana like to watch?","She loves to watch horses run and jump over fences.","She loves to watch pigs play in mud.","She loves to watch ducks swim in the pond."],
+                ["What did Moo-ana do at the obstacle course?","She tucked her legs and tried to jump.","She sat down and ate grass.","She ran away quickly."],
+                ["What did the farmer build for Moo-ana?","He built her a low cow-sized jumping course.","He built her a big warm barn.","He built her a new wooden fence."],
+                ["What is Moo-ana's favorite treat?","Her favorite treat is a carrot.","Her favorite treat is a sweet red apple.","Her favorite treat is a big green leaf."]
+            ],
+            "p2017": [
+                ["Who is Baa-bara?","Baa-bara is a cheeky sheep.","Baa-bara is a fluffy white dog.","Baa-bara is a small brown cat."],
+                ["Who was Baa-bara raised with?","She was raised with a family of Golden Retriever puppies.","She was raised with a family of grey rabbits.","She was raised with a family of black pigs."],
+                ["What did Baa-bara do when the farmer threw a ball?","She grabbed the ball with her teeth and brought it right back.","She ran away from the ball.","She kicked the ball with her foot."],
+                ["What does Baa-bara give instead of a bark?","She gives a little 'Baa!'.","She gives a loud 'Moo!'.","She gives a soft 'Meow!'."],
+                ["What does the town call her?","They call her 'Doggy Baa-bara'.","They call her 'Jumping Baa-bara'.","They call her 'Fast Baa-bara'."]
+            ],
+            "p2018": [
+                ["Where did this story happen?","It happened in a quiet town in Canada.","It happened in a sunny town in Australia.","It happened in a busy city in England."],
+                ["What flavor of ice cream did Barnaby take?","He took Salmon Surprise and Honey Berry flavors.","He took Chocolate and Vanilla.","He took Strawberry and Mint."],
+                ["How did the bear carry the ice cream?","He waddled down the street with a giant pint in his paws.","He put it in a shopping cart.","He carried it in a red bag."],
+                ["What did the shocked neighbor say?","She laughed and said he just wanted a snack.","She cried and called for help.","She was angry and shouted loudly."],
+                ["What is the new flavor named?","The new flavor is called Barnaby's Bear-y Good Berry.","The new flavor is Barnaby's Sweet Honey.","The new flavor is Barnaby's Fishy Ice Cream."]
+            ],
+            "p2019": [
+                ["Who is Jumbo?","Jumbo is the world's most colourful elephant artist.","Jumbo is a loud and funny monkey.","Jumbo is a sleepy brown bear."],
+                ["What does Jumbo use to paint?","Jumbo uses his big round feet.","Jumbo uses his long grey trunk.","Jumbo uses his large floppy ears."],
+                ["What did the human friends give to Jumbo?","They gave him giant foot-pads dipped in safe, non-toxic paints.","They gave him a small box of crayons.","They gave him a blue plastic pen."],
+                ["What did Jumbo do on the canvas?","He stomped, he danced, and he wiggled his toes.","He jumped up and down very fast.","He rolled around on his back."],
+                ["What prize did Jumbo win?","Jumbo won the Trunk-tastic Art Prize.","Jumbo won the Best Elephant Award.","Jumbo won the Fastest Runner Medal."]
+            ],
+            "p2020": [
+                ["Who is Barnaby in this story?","Barnaby is the most adventurous goat in all of Scotland.","Barnaby is a cute black and white penguin.","Barnaby is a lazy green turtle."],
+                ["What did Barnaby see near the ocean?","He saw a group of people learning to surf.","He saw people building a sandcastle.","He saw people building a boat."],
+                ["What did Barnaby step onto?","He stepped onto an extra surfboard left on the sand.","He stepped onto a big wooden boat.","He stepped onto a red plastic chair."],
+                ["How did Barnaby ride the waves?","He balanced perfectly up and down, side to side.","He fell into the water right away.","He sat down and closed his eyes."],
+                ["What does Barnaby have now?","He has his very own tiny goat-sized wetsuit.","He has his own tiny sunglasses.","He has his own yellow hat."]
+            ],
+            "p2021": [
+                ["Who is Daisy?","Daisy is a very clever cow with a super-sniffer nose.","Daisy is a brave police dog.","Daisy is a fast jumping horse."],
+                ["What did the little boy lose in the forest?","He lost his favorite toy bear.","He lost his new red bicycle.","He lost his small blue ball."],
+                ["How did Daisy find the toy?","She sniffed around trees and pulled it from bushes.","She dug a deep hole in the ground.","She climbed up a tall tree."],
+                ["What special job did the police give Daisy?","She is now the official Lost Toy Detective.","She is the new police chief.","She is the traffic police."],
+                ["What does Daisy wear on her ear?","Daisy wears a tiny police badge on her ear.","Daisy wears a shiny silver star.","Daisy wears a small yellow flower."]
+            ],
+            "p2022": [
+                ["What is the name of the dancing penguin?","His name is Waddles.","His name is Bouncy.","His name is Pip."],
+                ["Where did Waddles walk out of?","He walked right out of a delivery truck.","He walked out of a big supermarket.","He walked out of the zoo gate."],
+                ["What did Waddles do in the puddle?","He jumped into a puddle and started dancing.","He sat in the puddle to sleep.","He drank water from the puddle."],
+                ["What did the little girl give to Waddles?","The little girl gave him a red balloon.","The little girl gave him a tasty fish.","The little girl gave him a yellow hat."],
+                ["Where did the penguin slide down to?","He slid down a grassy hill into his new pool.","He slid down into a big muddy hole.","He slid down into the busy street."]
+            ],
+            "p2023": [
+                ["Who is Ellie?","Ellie is a cute baby elephant.","Ellie is a small brown monkey.","Ellie is a fast green lizard."],
+                ["What did Ellie think the school bus was?","She thought the big yellow school bus was a new toy.","She thought it was a big piece of food.","She thought it was a place to sleep."],
+                ["What did Tommy give to Ellie?","Tommy gave Ellie some sweet bananas.","Tommy gave Ellie some green apples.","Tommy gave Ellie some fresh leaves."],
+                ["What did Ellie do with the bus after eating?","Ellie put the bus down gently.","Ellie pushed the bus into the river.","Ellie broke the bus."],
+                ["How was the bus at the end?","The bus was not broken, just a little sticky.","The bus was completely broken.","The bus was very clean."]
+            ],
+            "p2024": [
+                ["Where did the dolphin swim to?","She swam right up to a yellow boat.","She swam to the sandy beach.","She swam to a big blue ship."],
+                ["What is the name of the dolphin?","His name is Luna.","His name is Bouncy.","His name is Ziggy."],
+                ["What did the dolphin say to the fishermen?","He popped his head out and said 'Hello friends!'.","He said 'I am very hungry!'.","He said 'Let us play a game!'."],
+                ["What did the fishermen give to Luna?","They gave Luna a big blue ball to play with.","They gave Luna a small red fish.","They gave Luna a shiny silver ring."],
+                ["What does Luna do every morning now?","She waits by the dock to say good morning to children.","She sleeps deeply on the soft sand.","She swims far away into the ocean."]
+            ],
+            "p2025": [
+                ["What is the name of the penguin?","His name is Bouncy.","His name is Waddles.","His name is Pip."],
+                ["What color was the button he found?","He found a shiny red button.","He found a big green button.","He found a small blue button."],
+                ["What happened when he tapped the button?","Loud disco music started playing.","A big door opened slowly.","The lights went off."],
+                ["What did Bouncy do on the ice?","He waved his flippers and slid on his belly across the ice.","He sat down and started crying.","He dug a hole in the ice."],
+                ["How did the zookeepers react?","All the zookeepers and visitors laughed and clapped for him.","They were very angry and shouted.","They ran away in fear."]
+            ],
+            "p2026": [
+                ["Where did the monkey take the hat?","The monkey jumped from a tall tree and grabbed the brown hat.","He took it from the police car.","He found it on the grass."],
+                ["What was the police officer doing?","The officer was resting on a park bench.","The officer was eating a sandwich.","The officer was running fast."],
+                ["What color was the police hat?","The hat was brown.","The hat was black.","The hat was blue."],
+                ["What did the police officer give to the monkey?","The police officer smiled and gave the monkey a yellow banana.","He gave the monkey a shiny coin.","He gave the monkey a red apple."],
+                ["What did the monkey do with the hat?","The monkey gave the hat back and ate the banana happily.","The monkey threw the hat in the river.","The monkey hid the hat in the tree."]
+            ]
+        };
+
+        var spineColors = ['#ff6347', '#1e90ff', '#32cd32', '#ff69b4', '#ffa500', '#9370db', '#20b2aa'];
+
+        var levelScores = JSON.parse(localStorage.getItem('teacherCatLevelScores')) || {};
+        
+        var currentQuestions = [];
+        var currentQIndex = 0;
+        var currentLevelId = "";
+        var currentRoundStars = 0; 
+        
+        var qScored = {}; 
+        var autoAdvanceTimer = null; 
+
+        window.onload = function() {
+            updateTotalStarsDisplay();
+            renderHomeGrid();
+        };
+        
+        function renderHomeGrid() {
+            var grid = document.getElementById('book-grid');
+            grid.innerHTML = '';
+            for (var i = 1; i <= 26; i++) {
+                var numStr = i < 10 ? '0' + i : i;
+                var id = 'p20' + numStr;
+                var best = parseInt(levelScores[id], 10) || 0;
+                
+                var btn = document.createElement('div');
+                btn.className = 'book-btn';
+                btn.style.borderLeftColor = spineColors[(i - 1) % spineColors.length];
+                
+                (function(idCopy, numCopy) {
+                    btn.onclick = function() { startGame(idCopy, numCopy); };
+                })(id, i);
+                
+                var img = document.createElement('img');
+                img.src = id + '.jpg';
+                img.className = 'btn-img';
+                img.alt = 'Story ' + i;
+                
+                var titleObj = storyTitles[id] || { en: 'Story ' + i, zh: '故事 ' + i };
+                var safeEnTitle = titleObj.en.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                // 取得安全的中文書名字串
+                var safeZhTitle = titleObj.zh.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                
+                var title = document.createElement('div');
+                title.className = 'btn-title';
+                
+                // 改為呼叫 speakBilingual 雙語發音
+                title.innerHTML = 
+                    '<div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">' +
+                        '<button class="small-speak-btn" style="margin:0; width:30px; height:30px; min-width:30px; font-size:1em;" onclick="speakBilingual(\'' + safeEnTitle + '\', \'' + safeZhTitle + '\', event)">🔊</button>' +
+                        '<span style="font-size:1em; color:#000; text-align: left; line-height: 1.2;">' + titleObj.en + '</span>' +
+                    '</div>' +
+                    '<span style="font-size:0.95em; color:#666; font-weight:normal;">' + titleObj.zh + '</span><br>' +
+                    '<span style="color:#ff8c00; font-size:0.9em; margin-top:5px; display:inline-block;">最高分: ' + best + '/3 ⭐</span>';
+                
+                btn.appendChild(img);
+                btn.appendChild(title);
+                
+                if (best === 3) {
+                    var stamp = document.createElement('div');
+                    stamp.className = 'perfect-stamp';
+                    stamp.innerHTML = '⭐⭐⭐<br>滿分';
+                    btn.appendChild(stamp);
+                }
+
+                grid.appendChild(btn);
+            }
+        }
+        
+        function updateTotalStarsDisplay() {
+            var perfectCount = 0;
+            for (var key in levelScores) {
+                if (levelScores.hasOwnProperty(key)) {
+                    if (parseInt(levelScores[key], 10) === 3) {
+                        perfectCount++;
+                    }
+                }
+            }
+            document.getElementById('star-count').innerText = perfectCount;
+        }
+
+        function shuffleArray(array) {
+            var arr = array.slice();
+            for (var i = arr.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+            return arr;
+        }
+
+        // 單一語言的發音（供內文及題目使用，保持英文）
+        function speakText(text, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // 【新增】雙語連續發音功能（供首頁書名使用）
+        function speakBilingual(enText, zhText, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // 先取消目前的所有發音
+                
+                // 1. 先讀英文
+                var utteranceEn = new SpeechSynthesisUtterance(enText);
+                utteranceEn.lang = 'en-US';
+                utteranceEn.rate = 0.85; 
+                window.speechSynthesis.speak(utteranceEn);
+                
+                // 2. 接著排隊讀中文 (使用香港/繁體中文語音)
+                var utteranceZh = new SpeechSynthesisUtterance(zhText);
+                utteranceZh.lang = 'zh-HK'; 
+                utteranceZh.rate = 0.85; 
+                window.speechSynthesis.speak(utteranceZh);
+            }
+        }
+
+        function formatStoryWithAudio(htmlString) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            
+            function processNode(node) {
+                if (node.nodeType === 3) {
+                    var text = node.nodeValue;
+                    if (!text.trim()) return; 
+
+                    var safeText = text.replace(/Mr\./g, 'Mr@@').replace(/Mrs\./g, 'Mrs@@').replace(/Ms\./g, 'Ms@@').replace(/Dr\./g, 'Dr@@');
+                    var matchRegex = /([^.!?]+[.!?]+)(\s*)/g;
+                    var match;
+                    var lastIndex = 0;
+                    var fragment = document.createDocumentFragment();
+                    var hasSentences = false;
+
+                    while ((match = matchRegex.exec(safeText)) !== null) {
+                        hasSentences = true;
+                        
+                        if (match.index > lastIndex) {
+                            var uncaptured = safeText.substring(lastIndex, match.index).replace(/@@/g, '.');
+                            fragment.appendChild(document.createTextNode(uncaptured));
+                        }
+                        
+                        var sentence = match[1].replace(/@@/g, '.');
+                        var trailingSpace = match[2] || "";
+                        
+                        var span = document.createElement('span');
+                        span.className = 'sentence-item';
+                        
+                        var btn = document.createElement('button');
+                        btn.className = 'small-speak-btn';
+                        btn.innerHTML = '🔊';
+                        
+                        var safeClickText = sentence.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ");
+                        btn.setAttribute('onclick', "speakText('" + safeClickText + "', event)");
+                        
+                        span.appendChild(btn);
+                        span.appendChild(document.createTextNode(sentence));
+                        
+                        fragment.appendChild(span);
+                        if (trailingSpace) {
+                            fragment.appendChild(document.createTextNode(trailingSpace));
+                        }
+                        
+                        lastIndex = matchRegex.lastIndex;
+                    }
+                    
+                    if (hasSentences) {
+                        if (lastIndex < safeText.length) {
+                            fragment.appendChild(document.createTextNode(safeText.substring(lastIndex).replace(/@@/g, '.')));
+                        }
+                        node.parentNode.replaceChild(fragment, node);
+                    }
+                } else if (node.nodeType === 1) {
+                    if (node.nodeName !== 'BUTTON') {
+                        var children = Array.prototype.slice.call(node.childNodes);
+                        for (var i = 0; i < children.length; i++) {
+                            processNode(children[i]);
+                        }
+                    }
+                }
+            }
+            
+            var childNodes = Array.prototype.slice.call(tempDiv.childNodes);
+            for (var j = 0; j < childNodes.length; j++) {
+                processNode(childNodes[j]);
+            }
+            return tempDiv.innerHTML;
+        }
+
+        function openModal() {
+            var modal = document.getElementById('image-modal');
+            var img = document.getElementById('modal-img');
+            img.src = document.getElementById('story-image').src;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').style.display = 'none';
+        }
+        
+        document.getElementById('image-modal').addEventListener('click', function(e) {
+            if(e.target === this) { closeModal(); }
+        });
+
+        function printStory() {
+            var imgUrl = document.getElementById('story-image').src;
+            var currentTitle = document.getElementById('story-title').innerText;
+            var newWin = window.open("", "_blank");
+            newWin.document.write(
+                '<html lang="zh-HK">' +
+                '<head><title>Print - ' + currentTitle + '</title><style>body { margin: 0; padding: 20px; text-align: center; background: #fff; } img { max-width: 100%; height: auto; border: 2px solid #ccc; }</style></head>' +
+                '<body><img src="' + imgUrl + '" onload="window.print();"></body></html>'
+            );
+            newWin.document.close();
+        }
+
+        function startGame(imgId, storyNum) {
+            clearTimeout(autoAdvanceTimer); 
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            var titleObj = storyTitles[imgId] || { en: "Story " + storyNum, zh: "" };
+            document.getElementById('story-title').innerText = "📖 " + titleObj.en + " \n (" + titleObj.zh + ")";
+            document.getElementById('story-image').src = imgId + ".jpg";
+            
+            var extractedText = storyTexts[imgId] || "<p>Story text not found.</p>";
+            document.getElementById('story-text-container').innerHTML = formatStoryWithAudio(extractedText);
+            
+            var allQ = db[imgId];
+            if (!allQ) {
+                document.getElementById('question-area').innerHTML = "<p style='color:red;'>找不到題目資料，請返回首頁。</p>";
+                return; 
+            }
+            
+            currentQuestions = shuffleArray(allQ).slice(0, 3);
+            currentQIndex = 0;
+            currentLevelId = imgId;
+            currentRoundStars = 0;
+            
+            qScored = {}; 
+            
+            document.getElementById('level-best-hud').classList.remove('hidden');
+            document.getElementById('level-best-count').innerText = levelScores[imgId] || 0;
+            
+            renderQuestion();
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuestion() {
+            try {
+                document.getElementById('feedback').innerHTML = '';
+                document.getElementById('next-btn').classList.add('hidden'); 
+                
+                var qData = currentQuestions[currentQIndex];
+                if (!qData) return;
+                
+                document.getElementById('progress').innerText = "Question " + (currentQIndex + 1) + " / 3";
+                document.getElementById('prev-btn').disabled = (currentQIndex === 0);
+
+                var qText = qData;
+                var correctAns = qData[1];
+                var wrong1 = qData[2];
+                var wrong2 = qData[3];
+                
+                var options = shuffleArray([
+                    { text: correctAns, isCorrect: true },
+                    { text: wrong1, isCorrect: false },
+                    { text: wrong2, isCorrect: false }
+                ]);
+                
+                function escapeStr(str) {
+                    if (typeof str !== 'string') return '';
+                    return str.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                }
+
+                var safeQText = escapeStr(qText);
+                var html = 
+                    '<div class="q-text-wrap">' +
+                        '<button class="speak-btn" onclick="speakText(\'' + safeQText + '\', event)">🔊</button>' +
+                        '<div>' + qText + '</div>' +
+                    '</div>';
+                
+                for (var i = 0; i < options.length; i++) {
+                    var opt = options[i];
+                    var safeText = escapeStr(opt.text);
+                    html += 
+                        '<div class="option-wrap">' +
+                            '<button class="speak-btn" style="min-width:40px;height:40px;font-size:1.1em;" onclick="speakText(\'' + safeText + '\', event)">🔊</button>' +
+                            '<button class="option-btn" onclick="checkAnswer(this, ' + opt.isCorrect + ', \'' + safeText + '\')">' + opt.text + '</button>' +
+                        '</div>';
+                }
+                
+                document.getElementById('question-area').innerHTML = html;
+            } catch (error) {
+                console.error(error);
+                document.getElementById('question-area').innerHTML = "<p style='color:red;font-size:1.2em;font-weight:bold;'>載入發生錯誤，請按「🏠 回到書櫃」重試。</p>";
+            }
+        }
+
+        function playSuccessEffects() {
+            try {
+                var AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    var ctx = new AudioContext();
+                    var osc = ctx.createOscillator();
+                    var gainNode = ctx.createGain();
+                    osc.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    osc.type = 'triangle';
+                    
+                    var now = ctx.currentTime;
+                    osc.frequency.setValueAtTime(523.25, now);       
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); 
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); 
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3); 
+                    
+                    gainNode.gain.setValueAtTime(0, now);
+                    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch (e) { }
+
+            var colors = ['#FFD700', '#FF6347', '#32CD32', '#1E90FF', '#FF69B4'];
+            for (var i = 0; i < 50; i++) {
+                var conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                conf.style.transform = 'translateX(' + (Math.random() * 100 - 50) + 'px)';
+                document.body.appendChild(conf);
+                
+                (function(element) {
+                    setTimeout(function() { element.remove(); }, 3500);
+                })(conf);
+            }
+        }
+
+        function checkAnswer(btn, isCorrect, textStr) {
+            var feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                feedback.innerHTML = "Correct! 🌟 答對了！";
+                feedback.className = "correct-text";
+                
+                if (!qScored[currentQIndex]) {
+                    qScored[currentQIndex] = true; 
+                    currentRoundStars++;
+                    
+                    if (currentRoundStars > (parseInt(levelScores[currentLevelId], 10) || 0)) {
+                        levelScores[currentLevelId] = currentRoundStars;
+                        localStorage.setItem('teacherCatLevelScores', JSON.stringify(levelScores));
+                        document.getElementById('level-best-count').innerText = currentRoundStars;
+                    }
+                    
+                    updateTotalStarsDisplay();
+                    
+                    var starHud = document.getElementById('star-hud');
+                    starHud.classList.add('star-animate');
+                    setTimeout(function() { starHud.classList.remove('star-animate'); }, 500);
+                    
+                    feedback.innerHTML += "<br><span class='earn-star-text'>⭐ You earned a star!</span>";
+                }
+
+                playSuccessEffects();
+                
+                var speakStr = textStr.replace(/&quot;/g, '"').replace(/\\'/g, "'");
+                speakText("Correct! " + speakStr);
+                
+                btn.style.background = "#32cd32";
+                btn.style.color = "#fff";
+                btn.style.borderColor = "#228b22";
+                
+                var allBtns = document.querySelectorAll('.option-btn');
+                for (var j = 0; j < allBtns.length; j++) {
+                    allBtns[j].disabled = true;
+                }
+                
+                var nextBtn = document.getElementById('next-btn');
+                nextBtn.classList.remove('hidden');
+                
+                var isFinished = (currentQIndex === 2);
+
+                if (isFinished) {
+                    nextBtn.innerText = "完成！🏠 (自動跳轉)";
+                    feedback.innerHTML += "<br>Amazing! 恭喜完成所有題目！ 🎉";
+                } else {
+                    nextBtn.innerText = "下一題 ➡️ (自動跳轉)";
+                }
+
+                clearTimeout(autoAdvanceTimer);
+                autoAdvanceTimer = setTimeout(function() {
+                    if (isFinished) {
+                        goHome();
+                    } else {
+                        nextQuestion();
+                    }
+                }, 2500); 
+
+            } else {
+                feedback.innerHTML = "Try again! ❌ 再試一次！";
+                feedback.className = "wrong-text";
+                speakText("Try again.");
+                
+                btn.style.background = "#ffb6c1";
+                btn.disabled = true; 
+            }
+        }
+
+        function nextQuestion() {
+            clearTimeout(autoAdvanceTimer); 
+            if (currentQIndex < 2) {
+                currentQIndex++;
+                renderQuestion();
+            } else {
+                goHome();
+            }
+        }
+
+        function prevQuestion() {
+            clearTimeout(autoAdvanceTimer);
+            if (currentQIndex > 0) {
+                currentQIndex--;
+                renderQuestion();
+            }
+        }
+
+        function goHome() {
+            clearTimeout(autoAdvanceTimer);
+            window.speechSynthesis.cancel();
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('level-best-hud').classList.add('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+            
+            renderHomeGrid(); 
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
