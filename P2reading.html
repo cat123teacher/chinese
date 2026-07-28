@@ -294,6 +294,54 @@
         .small-speak-btn:hover { background: #b0e0e6; transform: translateY(-2px) scale(1.1); }
         .small-speak-btn:active { transform: translateY(0) scale(0.95); }
         
+        /* === 互動字典：生字按鈕樣式 === */
+        .vocab-word {
+            background-color: #fffacd; 
+            border-bottom: 2px dashed #ff8c00;
+            color: #d2691e;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .vocab-word:hover {
+            background-color: #ffe4b5;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* === 互動字典：彈出解說小卡樣式 === */
+        #vocab-tooltip {
+            position: absolute;
+            background: #fff;
+            border: 3px solid #ff69b4;
+            border-radius: 15px;
+            padding: 10px 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            z-index: 1000;
+            display: none;
+            pointer-events: none; 
+            transform: translate(-50%, -100%);
+            margin-top: -12px;
+            text-align: center;
+            min-width: 100px;
+        }
+        #vocab-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            margin-left: -10px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #ff69b4 transparent transparent transparent;
+        }
+
         .quiz-section { padding-top: 15px; }
         .quiz-title {
             color: #483d8b;
@@ -415,6 +463,7 @@
             .speak-btn { min-width: 38px; height: 38px; font-size: 1.2em; }
             .option-btn { padding: 12px; font-size: 0.95em; }
             .nav-btn { padding: 10px 15px; font-size: 1em; }
+            #vocab-tooltip { font-size: 1em; padding: 8px 15px; }
         }
     </style>
 </head>
@@ -432,7 +481,7 @@
         <div id="home-screen">
             <div class="main-title-box">
                 <h1>📚 P2 English Reading Fun! 📚</h1>
-                <p class="subtitle">聽一聽，讀一讀，選出正確的完整句子！<br>(點擊書本開始，點擊 🔊 按鈕聽發音)</p>
+                <p class="subtitle">聽一聽，讀一讀，選出正確的完整句子！<br>(點擊書本開始，故事中有<span class="vocab-word">黃色生字</span>可以點擊查看解釋喔！)</p>
             </div>
             
             <div class="grid" id="book-grid"></div>
@@ -476,6 +525,9 @@
         <img id="modal-img" src="">
         <button class="modal-close-btn" onclick="closeModal()">關閉 ❌</button>
     </div>
+
+    <!-- 互動字典：生字解說彈出框 -->
+    <div id="vocab-tooltip"></div>
 
     <div class="site-footer">
         <h3>✨ Teacher Cat 的快樂AI教室 ✨</h3>
@@ -538,7 +590,7 @@
             "p2015": "<p><strong>Wacky News: Monkey Driver Causes Traffic Jam in London!</strong></p><p>A very cheeky monkey caused a big surprise in London this week! The monkey, who is famous at the local zoo for being clever, somehow unlocked the zookeeper's golf buggy. Not just that, but it started the engine and drove it right out of the zoo!</p><p>People driving their cars could not believe their eyes. 'I saw a monkey driving a car, and it was using the turn signal!' laughed Mr. Brown, a surprised taxi driver. In the end, the monkey parked the buggy perfectly outside a banana shop.</p>",
             "p2016": "<p><strong>WACKY WORLD NEWS: THE COW WHO THOUGHT SHE WAS A HORSE!</strong></p><p>In a small town in New Zealand, a very funny cow named 'Moo-ana' became a world-famous superstar! She loves to watch the neighbor's beautiful horses run and jump over tall fences.</p><p>One day, Moo-ana saw an old, dusty obstacle course. Instead of being scared, she waddled over, tucked her legs, and... hop! She tried to jump over the first hurdle! The farmer was so surprised, he built her a special, low cow-sized jumping course. Now, Moo-ana is a pro!</p>",
             "p2017": "<p><strong>WACKY WORLD NEWS: THE SHEEP WHO BECAME A DOGGY HERO!</strong></p><p>This week, in a small green town in Wales, a cheeky sheep named 'Baa-bara' did something amazing! Baa-bara was raised on a farm with a family of Golden Retriever puppies.</p><p>One morning, when the farmer took the dogs for a walk, Baa-bara decided to join the pack! When the farmer threw a tennis ball, Baa-bara didn't eat the grass; she grabbed the ball with her teeth and brought it right back! Now, Baa-bara plays a perfect game of fetch, and even gives a little 'Baa!' instead of a bark.</p>",
-            "p2018": "<p><strong>Wacky News: A Bear-y Big Ice Cream Thief!</strong></p><p>This week in a quiet town in Canada, a very clever brown bear cub named 'Barnaby' caused a big stir! He loves sweet treats. He managed to open the back door of Barnaby's Ice Cream Shop while the owner was busy.</p><p>Sneaking in, he went straight for the freezer, which was full of yummy 'Salmon Surprise' flavor and 'Honey Berry' flavor. People walking past were shocked to see a big bear waddling down the street with a giant pint of ice cream in his paws! Police used a trail of honey to guide him back to the forest.</p>",
+            "p2018": "<p><strong>Wacky News: A Bear-y Big Ice Cream Thief!</strong></p><p>This week in a quiet town in Canada, a very clever brown bear cub named 'Barnaby' caused a big stir! He loves sweet treats. He managed to open the back door of Barnaby's Ice Cream Shop while the owner was busy. Sneaking in, he went straight for the freezer, which was full of yummy 'Salmon Surprise' flavor and 'Honey Berry' flavor.</p><p>People walking past were shocked to see a big bear waddling down the street with a giant pint of ice cream in his paws! Police used a trail of honey to guide him back to the forest.</p>",
             "p2019": "<p><strong>ELEPHANT PAINTER STAMPS HIS WAY TO ART FAME!</strong></p><p>Meet 'Jumbo', the world's most colourful elephant artist! Jumbo lives in a sunny animal sanctuary in Thailand. He loves to paint, but he doesn't use small brushes. No, Jumbo uses his BIG, round feet!</p><p>His human friends set up a HUGE canvas. They gave Jumbo giant foot-pads dipped in safe, non-toxic paints. Jumbo stepped onto the canvas. He stomped, he danced, and he wiggled his toes! Splat! Squish! The art judges were so impressed! Jumbo won the 'Trunk-tastic Art Prize.'</p>",
             "p2020": "<p><strong>SURF'S UP, GOAT! MOUNTAIN GOAT CATCHES WAVES IN SCOTLAND!</strong></p><p>Meet 'Barnaby', the most adventurous goat in all of Scotland! Last week, Barnaby was taking a walk near the ocean when he saw something new. A group of people were learning to surf!</p><p>When no one was looking, Barnaby trotted over to an extra surfboard left on the sand. He stepped onto it with his sturdy little hooves. A friendly wave rolled in, and just like that - Barnaby was surfing! He balanced perfectly! Up and down, side to side. He even got his very own tiny, goat-sized wetsuit!</p>",
             "p2021": "<p><strong>Wacky News: Super-Sniffer! A Very Clever Cow Becomes a Police Officer!</strong></p><p>This week, a very unusual new police officer started work in Chur, Switzerland. The police chief swore in a very clever cow named 'Daisy'! Daisy has a super-sniffer nose, just like a police dog.</p><p>One day, a little boy lost his favorite toy bear in the big forest. Daisy nodded, put her nose to the ground, and walked right into the forest. After sniffing around some trees, she pulled a shiny red toy bear from some bushes with her mouth! She is now the official 'Lost Toy Detective'!</p>",
@@ -734,21 +786,505 @@
             ]
         };
 
-        var spineColors = ['#ff6347', '#1e90ff', '#32cd32', '#ff69b4', '#ffa500', '#9370db', '#20b2aa'];
+        // === 互動字典：生字庫 ===
+        var vocabDict = {
+            // 共用與基礎生字
+            "amazing": "驚人的",
+            "beautiful": "美麗的",
+            "clever": "聰明的",
+            "famous": "著名的",
+            "funny": "有趣的",
+            "smart": "聰明的",
+            "special": "特別的",
+            "surprised": "驚訝的",
+            "yummy": "美味的",
+            "grabbed": "抓住",
+            "jumped": "跳躍",
+            "laughed": "大笑",
+            "waddled": "搖搖晃晃地走",
+            "walked": "走路",
+            "watch": "觀看",
 
+            // Level 1: Cassie the Cat
+            "brave": "勇敢的",
+            "ginger": "橘黃色的",
+            "town": "市鎮",
+            "england": "英國",
+            "rides": "乘坐",
+            "jumps": "跳躍",
+            "morning": "早晨",
+            "favorite": "最喜愛的",
+            "seat": "座位",
+            "enjoys": "享受",
+            "view": "風景",
+            "travels": "旅行",
+            "countryside": "鄉村",
+            "friendly": "友善的",
+            "drivers": "司機",
+            "passengers": "乘客",
+            "safely": "安全地",
+            "collar": "項圈",
+            "traveler": "旅行者",
+            "celebrity": "名人",
+            "incredible": "難以置信的",
+            "adventures": "冒險",
+
+            // Level 2: Nutty the Bakery Squirrel
+            "sweet": "甜的",
+            "tooth": "牙齒(嗜甜)",
+            "cheeky": "調皮的",
+            "squirrel": "松鼠",
+            "assistant": "助手",
+            "bakery": "麵包店",
+            "sneaked": "偷偷溜進",
+            "past": "經過",
+            "baker": "麵包師",
+            "hopped": "跳躍",
+            "counter": "櫃檯",
+            "chaos": "混亂",
+            "knead": "揉(麵團)",
+            "dough": "麵團",
+            "decorates": "裝飾",
+            "cupcakes": "杯子蛋糕",
+            "sprinkling": "撒",
+            "sugar": "糖",
+            "frosting": "糖霜",
+
+            // Level 3: Nutty's Park Library
+            "genius": "天才",
+            "librarian": "圖書館員",
+            "project": "計畫",
+            "noticed": "注意到",
+            "children": "孩子們",
+            "dropping": "掉落",
+            "waterproof": "防水的",
+            "picture": "圖片",
+            "comics": "漫畫",
+            "borrow": "借",
+            "sharp": "銳利的",
+            "teeth": "牙齒",
+            "carefully": "小心地",
+            "carry": "攜帶",
+            "hollow": "空心的",
+            "bark": "樹皮/吠叫",
+            "berries": "莓果",
+            "share": "分享",
+            "treat": "點心/獎勵",
+
+            // Level 4: Pip Goes Shopping
+            "aquarium": "水族館",
+            "flippers": "鰭狀肢",
+            "unlock": "解鎖",
+            "enclosure": "圍欄",
+            "dawn": "黎明",
+            "shoppers": "購物者",
+            "shocked": "震驚的",
+            "serious": "嚴肅的",
+            "beak": "鳥喙",
+            "shiny": "閃亮的",
+            "silver": "銀色的",
+            "freezer": "冷凍庫",
+            "pushed": "推",
+            "miniature": "微型的",
+            "shopping": "購物",
+            "checkout": "結帳櫃檯",
+            "police": "警察",
+            "net": "網子",
+
+            // Level 5: Pip Wins Art Prize
+            "smallest": "最小的",
+            "penguin": "企鵝",
+            "sunny": "陽光明媚的",
+            "contest": "比賽",
+            "animals": "動物",
+            "paintbrushes": "畫筆",
+            "round": "圓的",
+            "patch": "一小塊地",
+            "colourful": "色彩繽紛的",
+            "safe": "安全的",
+            "juice": "果汁",
+            "stepped": "踩踏",
+            "giant": "巨大的",
+            "spun": "旋轉",
+            "creating": "創造",
+            "splashy": "惹人注目的",
+            "rainbow": "彩虹",
+            "judges": "評判",
+            "prize": "獎品",
+            "non-toxic": "無毒的",
+
+            // Level 6: Inky the Octopus
+            "coral": "珊瑚",
+            "reef": "礁石",
+            "faraway": "遙遠的",
+            "octopus": "章魚",
+            "superstar": "超級巨星",
+            "scuba": "水肺潛水",
+            "diver": "潛水員",
+            "pictures": "照片",
+            "busy": "忙碌的",
+            "turtle": "海龜",
+            "arms": "觸手/手臂",
+            "gently": "溫柔地",
+            "reached": "伸出",
+            "underwater": "水下的",
+            "camera": "相機",
+            "selfie": "自拍",
+            "pointing": "指著",
+            "tasty": "美味的",
+            "snack": "零食",
+
+            // Level 7 & 18: Barnaby the Bear Thief
+            "brown": "棕色的",
+            "bear": "熊",
+            "cub": "幼獸",
+            "treats": "點心",
+            "managed": "設法做到",
+            "sneaking": "偷偷摸摸",
+            "straight": "直接地",
+            "flavor": "口味",
+            "fluffy": "毛茸茸的",
+            "street": "街道",
+            "pint": "品脫 (大杯)",
+            "paws": "爪子",
+            "gentle": "溫柔的",
+            "trail": "痕跡/路線",
+            "honey": "蜂蜜",
+            "ice": "冰",
+            "cream": "雪糕/奶油",
+            "shop": "商店",
+            "quiet": "安靜的",
+            "canada": "加拿大",
+
+            // Level 8: Barnaby the Puppy Library
+            "retriever": "尋回犬",
+            "owner": "主人",
+            "mouth": "嘴巴",
+            "trotted": "小步跑",
+            "bench": "長椅",
+            "placed": "放置",
+            "elderly": "年長的",
+            "newspaper": "報紙",
+            "decorated": "裝飾過的",
+            "cart": "推車",
+            "offers": "提供",
+            "howls": "嚎叫",
+            "softly": "輕柔地",
+            "park": "公園",
+            "read": "閱讀",
+            "library": "圖書館",
+            "book": "書本",
+            "wagged": "搖擺",
+            "tail": "尾巴",
+
+            // Level 9: Ziggy the Rockstar Lizard
+            "lizard": "蜥蜴",
+            "international": "國際的",
+            "music": "音樂",
+            "sensation": "引起轟動的人/事",
+            "listen": "聆聽",
+            "practice": "練習",
+            "electric": "電子的",
+            "guitar": "吉他",
+            "patio": "露台",
+            "felt": "毛氈/感覺",
+            "pick": "撥片/撿起",
+            "strums": "彈奏",
+            "pro": "專家",
+            "nose": "鼻子",
+            "tune": "曲調",
+            "bobs": "上下擺動",
+            "beat": "節拍",
+            "rockstar": "搖滾巨星",
+            "strings": "琴弦",
+
+            // Level 10: Billy the Skateboard Goat
+            "viral": "爆紅的",
+            "wandered": "漫步",
+            "farmer": "農夫",
+            "garage": "車庫",
+            "brightly": "明亮地",
+            "colored": "彩色的",
+            "skateboard": "滑板",
+            "scared": "害怕的",
+            "nudged": "輕推",
+            "amazement": "驚訝",
+            "hooves": "蹄",
+            "slope": "斜坡",
+            "driveway": "車道",
+            "trick": "特技",
+            "ramp": "斜坡/跳台",
+            "haystack": "乾草堆",
+            "board": "滑板/板子",
+            "balance": "平衡",
+
+            // Level 11: Picasso the Pig Painter
+            "pig": "豬",
+            "art": "藝術",
+            "loved": "喜愛",
+            "swirl": "漩渦/打圈",
+            "canvas": "畫布",
+            "paints": "顏料",
+            "brushes": "畫筆",
+            "snout": "口鼻部",
+            "blobs": "顏料滴",
+            "signs": "簽名",
+            "hoof": "蹄",
+            "print": "印記",
+            "painter": "畫家",
+            "artist": "藝術家",
+            "color": "顏色",
+
+            // Level 12: Peanut the Tiny Detective
+            "tiny": "微小的",
+            "apartment": "公寓",
+            "city": "城市",
+            "sleuth": "偵探",
+            "cozy": "舒適的",
+            "sock": "襪子",
+            "disappeared": "消失",
+            "sniffed": "嗅聞",
+            "marched": "走進",
+            "kitchen": "廚房",
+            "cabinet": "櫥櫃",
+            "barking": "吠叫",
+            "hidden": "隱藏的",
+            "dark": "黑暗的",
+            "corner": "角落",
+            "potatoes": "馬鈴薯",
+            "detective": "偵探",
+            "shoe": "鞋子",
+            "floor": "地板",
+            "missing": "不見的",
+
+            // Level 13: Penny the Sneaker Penguin
+            "zoo": "動物園",
+            "internet": "網路",
+            "zookeepers": "動物園管理員",
+            "sneakers": "運動鞋",
+            "office": "辦公室",
+            "bright": "明亮的",
+            "hiding": "躲藏",
+            "tried": "嘗試",
+            "teeny": "極小的",
+            "pair": "一雙",
+            "shoes": "鞋子",
+            "wears": "穿著",
+            "crowd": "人群",
+            "red": "紅色的",
+            "show": "表演/展示",
+            "fashion": "時尚",
+            "star": "明星",
+
+            // Level 14: Houdini the Escape Hamster
+            "hamster": "倉鼠",
+            "caused": "引起",
+            "stir": "騷動",
+            "empty": "空的",
+            "locked": "上鎖的",
+            "tight": "緊緊地",
+            "learned": "學習",
+            "inside": "內部",
+            "crackers": "餅乾",
+            "asleep": "睡著的",
+            "escape": "逃脫",
+            "jailbreak": "越獄",
+            "cage": "籠子",
+            "door": "門",
+            "box": "盒子",
+            "night": "夜晚",
+
+            // Level 15: Monkey Driver
+            "buggy": "越野小車",
+            "engine": "引擎",
+            "drove": "駕駛",
+            "driving": "駕駛",
+            "signal": "信號/方向燈",
+            "taxi": "計程車",
+            "parked": "停放",
+            "perfectly": "完美地",
+            "outside": "外面",
+            "banana": "香蕉",
+            "monkey": "猴子",
+            "traffic": "交通",
+            "jam": "堵塞",
+            "turn": "轉彎",
+            "horn": "喇叭",
+            "beeped": "響喇叭",
+            "zoom": "快速移動",
+            "driver": "司機",
+
+            // Level 16: Moo-ana the Cow
+            "cow": "牛",
+            "neighbor": "鄰居",
+            "horses": "馬",
+            "fences": "柵欄",
+            "dusty": "佈滿灰塵的",
+            "obstacle": "障礙",
+            "course": "路線/場地",
+            "tucked": "收起",
+            "hurdle": "跨欄",
+            "built": "建造",
+            "jumping": "跳躍",
+            "green": "綠色的",
+            "legs": "腿",
+            "hop": "跳",
+            "low": "低的",
+
+            // Level 17: Baa-bara the Sheep
+            "sheep": "綿羊",
+            "raised": "被撫養",
+            "family": "家庭",
+            "puppies": "小狗",
+            "walk": "散步",
+            "decided": "決定",
+            "join": "加入",
+            "pack": "群體",
+            "threw": "丟",
+            "tennis": "網球",
+            "grass": "草地",
+            "brought": "帶來",
+            "perfect": "完美的",
+            "fetch": "接物遊戲",
+            "instead": "代替",
+            "hero": "英雄",
+            "ball": "球",
+
+            // Level 19: Jumbo the Elephant Painter
+            "elephant": "大象",
+            "sanctuary": "庇護所",
+            "dipped": "浸入",
+            "stomped": "重踩",
+            "danced": "跳舞",
+            "wiggled": "扭動",
+            "toes": "腳趾",
+            "impressed": "印象深刻的",
+            "splat": "啪嗒聲",
+            "squish": "壓扁聲",
+
+            // Level 20: Barnaby the Goat Surfer
+            "adventurous": "愛冒險的",
+            "ocean": "海洋",
+            "learning": "學習",
+            "surf": "衝浪",
+            "extra": "額外的",
+            "surfboard": "衝浪板",
+            "sand": "沙子",
+            "sturdy": "堅固的",
+            "wave": "波浪",
+            "rolled": "捲起",
+            "balanced": "保持平衡",
+            "wetsuit": "潛水衣",
+            "mountain": "高山",
+            "goat": "山羊",
+            "catches": "捕捉",
+            "waves": "波浪",
+
+            // Level 21: Daisy the Police Cow
+            "unusual": "不尋常的",
+            "officer": "警官",
+            "chief": "局長",
+            "swore": "宣誓",
+            "sniffer": "嗅探犬/嗅覺靈敏",
+            "lost": "遺失的",
+            "toy": "玩具",
+            "forest": "森林",
+            "nodded": "點頭",
+            "ground": "地面",
+            "trees": "樹木",
+            "pulled": "拉出",
+            "bushes": "灌木叢",
+            "dog": "狗",
+            "official": "正式的",
+
+            // Level 22 & 25: Dancing Penguin
+            "silly": "好笑的",
+            "chubby": "胖嘟嘟的",
+            "delivery": "送貨",
+            "truck": "卡車",
+            "puddle": "水坑",
+            "twist": "扭扭舞",
+            "moonwalk": "月球漫步",
+            "videos": "影片",
+            "finally": "最後",
+            "balloon": "氣球",
+            "string": "細繩",
+            "slid": "滑行",
+            "grassy": "長滿草的",
+            "hill": "山丘",
+            "weird": "奇怪的",
+            "button": "按鈕",
+            "loud": "大聲的",
+            "disco": "迪斯可",
+            "waved": "揮舞",
+            "belly": "肚子",
+            "across": "穿過",
+            "visitors": "訪客",
+            "clapped": "拍手",
+            "tapped": "輕拍",
+            "stopped": "停止",
+            "steals": "偷竊/搶盡風頭",
+
+            // Level 23: Baby Elephant Steals Bus
+            "jungle": "叢林",
+            "cute": "可愛的",
+            "baby": "幼小的/嬰兒",
+            "schoolyard": "校園",
+            "thought": "以為",
+            "yellow": "黃色的",
+            "school": "學校",
+            "bus": "巴士",
+            "picked": "撿起",
+            "trunk": "象鼻",
+            "broken": "壞掉的",
+            "sticky": "黏黏的",
+
+            // Level 24: Talking Dolphin
+            "dolphin": "海豚",
+            "swam": "游泳",
+            "boat": "船",
+            "talk": "說話",
+            "popped": "探出",
+            "head": "頭部",
+            "water": "水",
+            "blue": "藍色的",
+            "splashing": "濺水",
+            "everywhere": "到處",
+            "dock": "碼頭",
+            "talking": "說話",
+            "fishermen": "漁夫",
+
+            // Level 26: Monkey Stole a Police Hat
+            "hat": "帽子",
+            "resting": "休息",
+            "tree": "樹木",
+            "stone": "石頭",
+            "wall": "牆壁",
+            "wore": "穿戴",
+            "smiled": "微笑",
+            "happily": "快樂地",
+            "stole": "偷竊",
+            "tall": "高的"
+        };
+
+        var spineColors = ['#ff6347', '#1e90ff', '#32cd32', '#ff69b4', '#ffa500', '#9370db', '#20b2aa'];
         var levelScores = JSON.parse(localStorage.getItem('teacherCatLevelScores')) || {};
-        
         var currentQuestions = [];
         var currentQIndex = 0;
         var currentLevelId = "";
         var currentRoundStars = 0; 
-        
         var qScored = {}; 
         var autoAdvanceTimer = null; 
 
         window.onload = function() {
             updateTotalStarsDisplay();
             renderHomeGrid();
+            
+            document.addEventListener('click', function(e) {
+                if(!e.target.classList.contains('vocab-word')) {
+                    document.getElementById('vocab-tooltip').style.display = 'none';
+                }
+            });
         };
         
         function renderHomeGrid() {
@@ -856,6 +1392,44 @@
             }
         }
 
+        // === 互動字典：比對生字並自動加上點擊標記 ===
+        function highlightVocab(text) {
+            var parts = text.split(/([a-zA-Z]+)/);
+            var html = "";
+            for (var i = 0; i < parts.length; i++) {
+                var w = parts[i];
+                var lowerW = w.toLowerCase();
+                if (vocabDict[lowerW]) {
+                    html += '<span class="vocab-word" onclick="showVocab(event, \'' + lowerW + '\')">' + w + '</span>';
+                } else {
+                    html += w;
+                }
+            }
+            return html;
+        }
+
+        // === 互動字典：顯示解說小卡與雙語發音 ===
+        function showVocab(event, wordKey) {
+            event.stopPropagation(); 
+            var tooltip = document.getElementById('vocab-tooltip');
+            var meaning = vocabDict[wordKey];
+            
+            if (meaning) {
+                tooltip.innerHTML = "<span style='color:#ff69b4'>" + wordKey + "</span><br><span style='color:#ff8c00; font-size:1.1em'>" + meaning + "</span>";
+                tooltip.style.display = 'block';
+                
+                var rect = event.target.getBoundingClientRect();
+                var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                tooltip.style.left = (rect.left + scrollLeft + (rect.width / 2)) + 'px';
+                tooltip.style.top = (rect.top + scrollTop - 8) + 'px';
+                
+                // 【修改這裡】呼叫雙語發音，同時讀出英文生字與中文解釋
+                speakBilingual(wordKey, meaning, event);
+            }
+        }
+
         function formatStoryWithAudio(htmlString) {
             var tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlString;
@@ -877,10 +1451,11 @@
                         
                         if (match.index > lastIndex) {
                             var uncaptured = safeText.substring(lastIndex, match.index).replace(/@@/g, '.');
-                            fragment.appendChild(document.createTextNode(uncaptured));
+                            var spanUncaptured = document.createElement('span');
+                            spanUncaptured.innerHTML = highlightVocab(uncaptured);
+                            fragment.appendChild(spanUncaptured);
                         }
                         
-                        // 【關鍵修復 1】原本寫錯成 match.replace，這裡必須使用 match[1] 來處理
                         var sentence = match[1].replace(/@@/g, '.');
                         var trailingSpace = match[2] || "";
                         
@@ -895,7 +1470,10 @@
                         btn.setAttribute('onclick', "speakText('" + safeClickText + "', event)");
                         
                         span.appendChild(btn);
-                        span.appendChild(document.createTextNode(sentence));
+                        
+                        var sentenceContent = document.createElement('span');
+                        sentenceContent.innerHTML = highlightVocab(sentence);
+                        span.appendChild(sentenceContent);
                         
                         fragment.appendChild(span);
                         if (trailingSpace) {
@@ -907,12 +1485,19 @@
                     
                     if (hasSentences) {
                         if (lastIndex < safeText.length) {
-                            fragment.appendChild(document.createTextNode(safeText.substring(lastIndex).replace(/@@/g, '.')));
+                            var leftover = safeText.substring(lastIndex).replace(/@@/g, '.');
+                            var spanLeftover = document.createElement('span');
+                            spanLeftover.innerHTML = highlightVocab(leftover);
+                            fragment.appendChild(spanLeftover);
                         }
                         node.parentNode.replaceChild(fragment, node);
+                    } else {
+                        var spanAll = document.createElement('span');
+                        spanAll.innerHTML = highlightVocab(text);
+                        node.parentNode.replaceChild(spanAll, node);
                     }
                 } else if (node.nodeType === 1) {
-                    if (node.nodeName !== 'BUTTON') {
+                    if (node.nodeName !== 'BUTTON' && !node.classList.contains('vocab-word')) {
                         var children = Array.prototype.slice.call(node.childNodes);
                         for (var i = 0; i < children.length; i++) {
                             processNode(children[i]);
@@ -965,7 +1550,6 @@
             document.getElementById('story-image').src = imgId + ".jpg";
             
             var extractedText = storyTexts[imgId] || "<p>Story text not found.</p>";
-            // 如果 formatStoryWithAudio 在處理文字崩潰，就會停在這裡，導致題目和文字都空掉。現在已經修好了！
             document.getElementById('story-text-container').innerHTML = formatStoryWithAudio(extractedText);
             
             var allQ = db[imgId];
@@ -1007,7 +1591,7 @@
                     nextBtn.innerText = "下一題 ➡️";
                 }
 
-                // 【關鍵修復 2】這裡必須加上 , [1] 等陣列索引，否則題目選項會讀不到字串而變成亂碼！
+                // 確保選項可以正確讀取
                 var qText = qData;
                 var correctAns = qData[1];
                 var wrong1 = qData[2];
