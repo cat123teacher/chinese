@@ -1,0 +1,4016 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小一英文聆聽冒險島</title>
+    <!-- Google Font for child-friendly design -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #E0F2FE 0%, #F0FDFA 100%);
+            --navy-dark: #1E293B;
+            --coral-orange: #FF6B6B;
+            --sunny-yellow: #FFD93D;
+            --grass-green: #6BCB77;
+            --sky-blue: #4D96FF;
+            --bubble-gum: #FF8AAE;
+            --lavender-purple: #9E78F5;
+            --teal-cyan: #3EC1D3;
+            --cream-white: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Fredoka', 'Comic Neue', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--primary-bg);
+            color: var(--navy-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Container & Card Base */
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+            border: 6px solid #FFF;
+            padding: 25px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        /* Header Animation */
+        .main-header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .main-header h1 {
+            font-size: 2.3rem;
+            color: var(--navy-dark);
+            text-shadow: 2px 2px 0px var(--sunny-yellow);
+            display: inline-block;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .mascot-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .mascot-bubble {
+            background: var(--cream-white);
+            border: 3px solid var(--sky-blue);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            position: relative;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            max-width: 300px;
+        }
+
+        .mascot-bubble::after {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent var(--sky-blue) transparent transparent;
+        }
+
+        /* 8 Dashboard Clickable Rows on Homepage */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .row-mission-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--cream-white);
+            border: 4px solid var(--navy-dark);
+            border-radius: 20px;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0 var(--navy-dark);
+            position: relative;
+        }
+
+        .row-mission-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 0 var(--navy-dark);
+        }
+
+        .row-mission-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+
+        .mission-info-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mission-badge {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .mission-title-area {
+            text-align: left;
+        }
+
+        .mission-num {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .mission-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .mission-arrow {
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .row-mission-btn:hover .mission-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Active Stars indicators on Dashboard */
+        .stars-earned {
+            display: flex;
+            gap: 4px;
+        }
+
+        .star-mini {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .star-mini.filled {
+            color: var(--sunny-yellow);
+            text-shadow: 1px 1px 0px #C29B00;
+        }
+
+        /* Views management */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        /* Intro View styling */
+        .intro-card {
+            background: #FFF;
+            border-radius: 24px;
+            border: 4px solid var(--sky-blue);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .intro-title {
+            font-size: 1.8rem;
+            color: var(--sky-blue);
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .intro-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #E2E8F0;
+        }
+
+        .intro-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .strategy-box {
+            background: #EFF6FF;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            border-left: 6px solid var(--sky-blue);
+        }
+
+        .writing-tip-box {
+            background: #FFF5F5;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            border-left: 6px solid var(--coral-orange);
+        }
+
+        .example-box {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            border-left: 6px solid var(--grass-green);
+        }
+
+        .play-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: var(--coral-orange);
+            color: white;
+            border: 4px solid var(--navy-dark);
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--navy-dark);
+            transition: all 0.2s;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 var(--navy-dark);
+        }
+
+        .back-btn {
+            background: #E2E8F0;
+            color: #475569;
+            border: 3px solid #94A3B8;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Game Board Area */
+        .game-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .progress-outer {
+            flex-grow: 1;
+            height: 20px;
+            background: #E2E8F0;
+            border-radius: 10px;
+            margin: 0 15px;
+            overflow: hidden;
+            border: 2px solid var(--navy-dark);
+        }
+
+        .progress-inner {
+            height: 100%;
+            background: var(--grass-green);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .status-badge {
+            background: var(--navy-dark);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Question & Dialog Audio Box */
+        .audio-dialog-card {
+            background: #FFFBEB;
+            border: 4px dashed var(--sunny-yellow);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .sound-wave-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        .audio-hint-text {
+            color: #9A3412;
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .audio-speak-btn {
+            background: var(--sunny-yellow);
+            color: var(--navy-dark);
+            border: 3px solid var(--navy-dark);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+        }
+
+        .audio-speak-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--navy-dark);
+        }
+
+        .audio-speak-btn.speaking {
+            animation: speakBlink 1s infinite alternate;
+            background: var(--coral-orange);
+            color: white;
+        }
+
+        .question-text-box {
+            font-size: 1.35rem;
+            font-weight: bold;
+            line-height: 1.5;
+            margin: 20px 0;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .option-button-tts {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .option-button-tts:hover {
+            transform: scale(1.2);
+        }
+
+        /* Answers options */
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            background: white;
+            border: 3px solid #CBD5E1;
+            border-radius: 20px;
+            padding: 18px 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option-card:hover {
+            border-color: var(--sky-blue);
+            background: #F0F9FF;
+            transform: translateX(5px);
+        }
+
+        .option-prefix {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .option-card.correct {
+            border-color: var(--grass-green) !important;
+            background-color: #ECFDF5 !important;
+            color: #065F46;
+        }
+
+        .option-card.correct .option-prefix {
+            background-color: var(--grass-green);
+            color: white;
+        }
+
+        .option-card.wrong {
+            border-color: var(--coral-orange) !important;
+            background-color: #FEF2F2 !important;
+            color: #991B1B;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .option-card.wrong .option-prefix {
+            background-color: var(--coral-orange);
+            color: white;
+        }
+
+        /* Dictation Arena View */
+        .dictation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .spelling-box {
+            display: flex;
+            gap: 10px;
+            min-height: 60px;
+            border-bottom: 4px solid var(--navy-dark);
+            width: 80%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .letter-slot {
+            width: 45px;
+            height: 45px;
+            border: 3px dashed #94A3B8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--navy-dark);
+            background: #F8FAFC;
+        }
+
+        .letter-bubble-pool {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .letter-bubble {
+            background: var(--cream-white);
+            border: 3px solid var(--navy-dark);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+        }
+
+        .letter-bubble:hover {
+            transform: translateY(-3px);
+            background: var(--sunny-yellow);
+        }
+
+        .letter-bubble:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 var(--navy-dark);
+        }
+
+        .letter-bubble.selected {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .dictation-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .dictation-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: 3px solid var(--navy-dark);
+        }
+
+        .dictation-clear {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .dictation-submit {
+            background: var(--grass-green);
+            color: white;
+            box-shadow: 0 4px 0 var(--navy-dark);
+        }
+
+        /* Result View Screen */
+        .result-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .result-mascot-img {
+            font-size: 5rem;
+            animation: bounce 1.5s infinite;
+        }
+
+        .star-rating-big {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .star-big {
+            font-size: 3.5rem;
+            color: #E2E8F0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .star-big.active {
+            color: var(--sunny-yellow);
+            text-shadow: 2px 2px 0px #C29B00;
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .score-headline {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-subtext {
+            font-size: 1.2rem;
+            color: #475569;
+            margin-bottom: 25px;
+        }
+
+        .review-panel {
+            background: #F8FAFC;
+            border: 2px dashed #CBD5E1;
+            border-radius: 18px;
+            padding: 15px;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .review-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #64748B;
+            margin-bottom: 10px;
+        }
+
+        .wrong-q-item {
+            font-size: 0.95rem;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 8px 0;
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.85; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        @keyframes speakBlink {
+            from { opacity: 1; }
+            to { opacity: 0.7; }
+        }
+
+        /* Confetti Overlay */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 30px;
+            z-index: 100;
+        }
+
+        /* Responsive Design & Mobile Space Optimization (Requirement 5 & iPad optimizations) */
+        @media (max-width: 600px) {
+            body { padding: 6px; }
+            .game-container { padding: 12px; border-radius: 20px; border-width: 4px; }
+            .main-header h1 { font-size: 1.5rem; }
+            .back-btn { margin-left: 0 !important; padding: 8px 14px; font-size: 0.95rem; }
+            .game-bar { flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+            .progress-outer { margin: 0 8px; height: 16px; }
+            .status-badge { padding: 4px 8px; font-size: 0.8rem; }
+            .audio-dialog-card { padding: 12px; border-radius: 16px; margin-bottom: 15px; }
+            .question-text-box { font-size: 1.15rem; margin: 12px 0; }
+            .option-card { font-size: 1rem; padding: 10px 15px; border-radius: 14px; }
+            .quiz-nav-row { margin-top: 15px; padding-top: 12px; gap: 8px; }
+            .nav-btn { padding: 10px 12px; font-size: 0.95rem; border-radius: 12px; }
+            .teacher-cat-footer { padding: 15px; margin-top: 25px; border-radius: 16px; }
+            .footer-title { font-size: 1.2rem; }
+            .social-links-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .social-link { padding: 8px; font-size: 0.8rem; }
+            
+            /* Remove absolute shifts on back button */
+            .back-btn { margin-left: 0 !important; }
+            .cat-logo-top-left { width: 35px; height: 35px; top: 10px; left: 10px; }
+        }
+        
+        /* General styling touch-up for back-btn when not on mobile */
+        .back-btn {
+            margin-left: 0 !important; /* No absolute offset needed anymore, logo is only on homepage! */
+        }
+
+
+        
+        /* --- NEW: iPad & Mobile Optimization + Vocabulary System --- */
+        button, .option-card, .row-mission-btn {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Responsive spacing & font-sizes */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 15px !important;
+                border-radius: 20px !important;
+            }
+            .option-card {
+                padding: 16px 20px !important;
+                font-size: 1.15rem !important;
+                min-height: 60px;
+            }
+            .intro-vocab-btn, .intro-play-btn {
+                font-size: 1.1rem !important;
+                padding: 12px 16px !important;
+            }
+            .quiz-nav-row {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+            }
+            .nav-btn {
+                padding: 10px 12px !important;
+                font-size: 0.95rem !important;
+            }
+        }
+
+        /* Vocabulary dashed underlines in dialogues */
+        .vocab-inline-link {
+            border-bottom: 2.5px dashed #4D96FF;
+            cursor: help;
+            color: #1E3A8A;
+            font-weight: 800;
+            padding: 0 3px;
+            margin: 0 1px;
+            border-radius: 6px;
+            background-color: rgba(77, 150, 255, 0.08);
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        .vocab-inline-link:hover, .vocab-inline-link:active {
+            background-color: #FFD93D;
+            color: #000000;
+            border-bottom-color: var(--coral-orange);
+            transform: scale(1.05);
+        }
+
+        /* Study guide Vocab Bank button and cards */
+        .intro-vocab-btn {
+            flex: 1;
+            background: var(--sunny-yellow);
+            color: var(--navy-dark);
+            border: 3px solid var(--navy-dark);
+            padding: 14px 20px;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .intro-vocab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--navy-dark);
+        }
+        .intro-vocab-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+        .intro-play-btn {
+            flex: 1.5;
+            background: var(--grass-green);
+            color: white;
+            border: 3px solid var(--navy-dark);
+            padding: 14px 20px;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+        }
+        .intro-play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--navy-dark);
+        }
+        .intro-play-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+
+        .vocab-bank-card {
+            display: flex;
+            align-items: center;
+            background: #F8FAFC;
+            border: 3px solid var(--navy-dark);
+            border-radius: 18px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            gap: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(30, 41, 59, 0.1);
+        }
+        .vocab-bank-card:hover {
+            background: #F0F9FF;
+            border-color: var(--sky-blue);
+            transform: translateX(3px);
+            box-shadow: 0 4px 8px rgba(77, 150, 255, 0.15);
+        }
+        .vocab-bank-word {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--navy-dark);
+        }
+        .vocab-bank-phonetic {
+            font-size: 0.95rem;
+            color: #64748B;
+            font-style: italic;
+            margin: 2px 0;
+        }
+        .vocab-bank-cn {
+            font-size: 1.1rem;
+            color: #1E40AF;
+            font-weight: bold;
+        }
+        .vocab-bank-play-btn {
+            background: var(--sky-blue);
+            color: white;
+            border: 2px solid var(--navy-dark);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 0 var(--navy-dark);
+            transition: all 0.1s;
+        }
+        .vocab-bank-play-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--navy-dark);
+        }
+
+        /* Higher z-index overlay for vocab popups */
+        #vocab-modal {
+            z-index: 2000 !important;
+        }
+
+        /* --- NEW: Modal Dialogue Styles --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(15, 23, 42, 0.45); /* Dark semi-transparent background */
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeInModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: auto;
+            padding: 24px;
+            border: 4px solid var(--navy-dark);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 28px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
+            text-align: left;
+            animation: slideUpModal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            box-sizing: border-box;
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal-btn {
+            color: #94A3B8;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .close-modal-btn:hover {
+            color: var(--coral-orange);
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            color: var(--navy-dark);
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-desc {
+            font-size: 0.9rem;
+            color: #64748B;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        #transcript-sentences-container {
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 15px;
+        }
+
+        .sentence-item {
+            display: flex;
+            align-items: center;
+            background: #F8FAFC;
+            border: 2px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .sentence-item:hover {
+            background: #F0F9FF;
+            border-color: var(--sky-blue);
+            transform: translateX(3px);
+        }
+
+        .sentence-text {
+            flex-grow: 1;
+            font-size: 1rem;
+            color: var(--navy-dark);
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .sentence-play-btn {
+            background: var(--sky-blue);
+            color: white;
+            border: 2px solid var(--navy-dark);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 0 var(--navy-dark);
+            transition: all 0.1s;
+        }
+
+        .sentence-play-btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        .modal-done-btn {
+            background: var(--grass-green);
+            color: white;
+            border: 3px solid var(--navy-dark);
+            width: 100%;
+            padding: 10px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 3px 0 var(--navy-dark);
+            transition: all 0.1s;
+        }
+
+        .modal-done-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--navy-dark);
+        }
+
+        /* Helper Toggle Button */
+        .helper-toggle-btn {
+            background: #E0F2FE;
+            color: #0369A1;
+            border: 2px solid #38BDF8;
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .helper-toggle-btn:hover {
+            background: #bae6fd;
+            border-color: #0284c7;
+            transform: scale(1.03);
+        }
+
+        /* Top speaking instruction card layouts */
+        .top-audio-container {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            justify-content: space-between;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 550px) {
+            .top-audio-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+            }
+        }
+
+        /* --- Teacher Cat Custom Styles --- */
+        .cat-logo-top-left {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid var(--navy-dark);
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: white;
+            object-fit: cover;
+        }
+        .back-btn {
+            background: var(--sky-blue);
+            color: white;
+            border: 3px solid var(--navy-dark);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Navigation Row - 2x2 Grid Layout for iPad/Mobile */
+        .quiz-nav-row {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 15px !important;
+            margin-top: 25px;
+            border-top: 2px dashed #E2E8F0;
+            padding-top: 20px;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 3px solid var(--navy-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--navy-dark);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--navy-dark);
+        }
+
+        .nav-btn.finish-btn {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8AAE 100%) !important;
+            color: white !important;
+            border: 3px solid var(--navy-dark) !important;
+        }
+        .nav-btn.finish-btn:hover {
+            background: linear-gradient(135deg, #FF8AAE 0%, #FF6B6B 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--navy-dark) !important;
+        }
+        .nav-btn.finish-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 var(--navy-dark) !important;
+        }
+
+        .nav-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+        .prev-btn {
+            background: #F1F5F9;
+            color: #475569;
+        }
+        .home-btn {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .next-btn {
+            background: #D8B4FE;
+            color: #6B21A8;
+        }
+        
+        /* Correct Pop Visual Effect */
+        .correct-pop-effect {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: rgba(255, 255, 255, 0.95);
+            border: 8px solid var(--grass-green);
+            border-radius: 40px;
+            padding: 30px 50px;
+            text-align: center;
+            z-index: 2000;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .correct-pop-effect.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .correct-pop-emoji {
+            font-size: 5rem;
+            animation: bounce 1s infinite alternate;
+        }
+        .correct-pop-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--grass-green);
+            margin-top: 15px;
+            text-shadow: 2px 2px 0px #F0FDF4;
+        }
+
+        /* Teacher Cat Contact Footer Style */
+        .teacher-cat-footer {
+            background: white;
+            border: 4px solid var(--navy-dark);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 850px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+        .footer-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--coral-orange);
+            margin-bottom: 10px;
+        }
+        .footer-subtitle {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 2px solid var(--navy-dark);
+            transition: all 0.2s;
+            background: #F8FAFC;
+            color: var(--navy-dark);
+        }
+        .social-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 var(--navy-dark);
+        }
+        .social-link.youtube { background: #FEE2E2; color: #DC2626; }
+        .social-link.instagram { background: #FCE7F3; color: #DB2777; }
+        .social-link.facebook { background: #DBEAFE; color: #2563EB; }
+        .social-link.threads { background: #F1F5F9; color: #0F172A; }
+        .social-link.xhs { background: #FEF2F2; color: #EF4444; }
+        .social-link.whatsapp { background: #DCFCE7; color: #16A34A; }
+        .social-link.douyin { background: #F3E8FF; color: #7C3AED; }
+
+        /* --- Teacher Cat v4 Additions --- */
+        .welcome-banner-box {
+            background: #FEF3C7; 
+            border: 4px solid var(--navy-dark); 
+            border-radius: 24px; 
+            padding: 20px; 
+            margin-top: 10px;
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            box-shadow: 0 6px 0 var(--navy-dark);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .back-to-main-adventure-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8AAE 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 15px 32px;
+            border-radius: 50px;
+            border: 4px solid var(--navy-dark);
+            box-shadow: 0 6px 0 var(--navy-dark);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            margin: 20px auto;
+        }
+        .back-to-main-adventure-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 0 var(--navy-dark);
+            background: linear-gradient(135deg, #FF8AAE 0%, #FF6B6B 100%);
+        }
+        .back-to-main-adventure-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+
+        .speech-intro-btn {
+            background: var(--sunny-yellow);
+            color: var(--navy-dark);
+            border: 2px solid var(--navy-dark);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+            box-shadow: 0 3px 0 var(--navy-dark);
+            transition: all 0.1s;
+        }
+        .speech-intro-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 var(--navy-dark);
+        }
+        .speech-intro-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 var(--navy-dark);
+        }
+
+        /* Beautifying buttons & option cards for extra vibrance */
+        .option-card {
+            box-shadow: 0 4px 0 #CBD5E1;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .option-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 0 var(--sky-blue);
+            border-color: var(--sky-blue);
+        }
+        .play-btn, .helper-toggle-btn, .dictation-btn {
+            border: 3px solid var(--navy-dark) !important;
+            box-shadow: 0 4px 0 var(--navy-dark) !important;
+            transition: all 0.2s !important;
+        }
+        .play-btn:hover, .helper-toggle-btn:hover, .dictation-btn:hover {
+            transform: translateY(-3px) scale(1.03) !important;
+            box-shadow: 0 7px 0 var(--navy-dark) !important;
+        }
+        .play-btn:active, .helper-toggle-btn:active, .dictation-btn:active {
+            transform: translateY(1px) !important;
+            box-shadow: 0 2px 0 var(--navy-dark) !important;
+        }
+
+
+        /* Reset Scores button matching style */
+        .reset-scores-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 50px;
+            border: 4px solid var(--navy-dark);
+            box-shadow: 0 6px 0 var(--navy-dark);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            margin: 5px auto;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+        }
+        .reset-scores-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 0 var(--navy-dark);
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        }
+        .reset-scores-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-dark);
+        }
+
+    </style>
+
+</head>
+<body>
+
+
+    <div class="game-container">
+
+        <!-- Canvas for victory confetti effect -->
+        <canvas id="confetti-canvas"></canvas>
+
+        <!-- HOMEPAGE VIEW -->
+        <div id="homepage-view" class="view active">
+            <!-- Top Left Cat Logo Image (Only loaded in Homepage) -->
+            <img src="cat.jpeg" class="cat-logo-top-left" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'80\'>🐱</text></svg>'" alt="🐱">
+            <div class="main-header">
+                <h1>🇬🇧 小一英文聆聽冒險島 🚀</h1>
+            </div>
+
+            <!-- Welcome Strategy Banner (Requirement 4) -->
+            <div class="welcome-banner-box">
+                <span style="font-size: 2.8rem;">🎮</span>
+                <div style="font-size: 1.05rem; line-height: 1.5; color: #78350F; font-weight: bold; text-align: left;">
+                    <strong>冒險家秘籍：</strong> 每一關都藏有 <span style="color: var(--coral-orange); font-size: 1.25rem;">10 題</span> 不同的英語題目！
+                    每次進入，系統都會隨機抽出 <span style="color: var(--sky-blue); font-size: 1.25rem;">5 條</span> 挑戰。
+                    保證你每次玩都有新驚喜、內容每次都不同喔！趕快點擊下方島嶼，開啟你的聆聽策略大冒險吧！🌟✨
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- 8 Interactive Clickable Rows mapped directly from Athens Syllabus -->
+                <!-- Unit 1 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(1)" style="border-color: var(--sky-blue);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--sky-blue);">1</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--sky-blue);">島嶼一 • Greetings</div>
+                            <div class="mission-name">Hello! 問候與自我介紹 🤝</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-1">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Unit 2 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(2)" style="border-color: var(--coral-orange);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--coral-orange);">2</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--coral-orange);">島嶼二 • Similar Sounds</div>
+                            <div class="mission-name">My Classmates 同學與拼音辨音 🏫</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-2">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Unit 3 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(3)" style="border-color: var(--grass-green);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--grass-green);">3</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--grass-green);">島嶼三 • Instructions</div>
+                            <div class="mission-name">Good Students 課堂動作與指令 🤫</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-3">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Unit 4 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(4)" style="border-color: var(--sunny-yellow);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--sunny-yellow); color: var(--navy-dark);">4</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: #A16207;">島嶼四 • Numbers 1-10</div>
+                            <div class="mission-name">In My School Bag 書包文具大清點 🎒</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-4">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Phonics Time (Special Training Row) -->
+                <div class="row-mission-btn" onclick="openLevelIntro('phonics')" style="border-color: var(--bubble-gum); background-color: #FFFDFD;">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--bubble-gum);">🗣️</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--bubble-gum);">特訓區 A • Consonants</div>
+                            <div class="mission-name">Phonics Time 輔音拼讀特訓班 🦁</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-phonics">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Dictation (Special Training Row) -->
+                <div class="row-mission-btn" onclick="openLevelIntro('dictation')" style="border-color: var(--lavender-purple); background-color: #FAF8FF;">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--lavender-purple);">✍️</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--lavender-purple);">特訓區 B • Spelling</div>
+                            <div class="mission-name">Dictation Master 單字聽寫大挑戰 📝</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-dictation">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Unit 5 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(5)" style="border-color: var(--teal-cyan);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--teal-cyan);">5</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--teal-cyan);">島嶼五 • Correct Pictures</div>
+                            <div class="mission-name">On the Farm 農場動物與形容詞 🚜</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-5">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+
+                <!-- Unit 6 -->
+                <div class="row-mission-btn" onclick="openLevelIntro(6)" style="border-color: var(--navy-dark);">
+                    <div class="mission-info-left">
+                        <div class="mission-badge" style="background: var(--navy-dark);">6</div>
+                        <div class="mission-title-area">
+                            <div class="mission-num" style="color: var(--navy-dark);">島嶼六 • Body Parts</div>
+                            <div class="mission-name">My Lovely Pet 寵物特徵與身體部位 🐶</div>
+                        </div>
+                    </div>
+                    <div class="stars-earned" id="stars-level-6">
+                        <span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span><span class="star-mini">★</span>
+                    </div>
+                    <span class="mission-arrow">👉</span>
+                </div>
+            </div>
+
+            <!-- Return to Chinese Adventure Link (Requirement 6) & Reset Scores button (Requirement 14) -->
+            <div style="text-align: center; margin-top: 35px; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <a href="https://cat123teacher.github.io/chinese/main.html" class="back-to-main-adventure-btn">
+                    🚩 返回小朋友學習大冒險 (Back to Study Adventure)
+                </a>
+                <button class="reset-scores-btn" onclick="confirmResetAllProgress()">
+                    🧹 清除所有星星與紀錄 (Reset All Progress)
+                </button>
+            </div>
+        </div>
+
+        <!-- LEVEL INTRO VIEW (PRE-TEACHING & EXAMPLES) -->
+        <div id="intro-view" class="view">
+            <button class="back-btn" onclick="goHome()">🏠 返回首頁</button>
+            
+            <div class="intro-card" id="intro-content-area">
+                <!-- Filled dynamically by JavaScript -->
+            </div>
+
+            <div class="intro-actions-row" id="intro-buttons-row">
+                <button class="play-btn" onclick="startActiveLevel()">🚀 開始挑戰此關卡</button>
+            </div>
+        </div>
+
+        <!-- QUIZ GAME PLAY VIEW -->
+        <div id="game-view" class="view">
+            <div class="game-bar">
+                <button class="back-btn" onclick="goHome()" style="margin-bottom:0;">🏠 退出</button>
+                <div class="progress-outer">
+                    <div class="progress-inner" id="quiz-progress"></div>
+                </div>
+                <div class="status-badge" id="question-tracker">題目 1 / 5</div>
+            </div>
+
+            <!-- Audio listening materials box (Redesigned for children) -->
+            <div class="audio-dialog-card" style="padding: 20px; border-radius: 24px; border: 4px dashed var(--sunny-yellow); background: #FFFBEB;">
+                <div class="top-audio-container">
+                    <!-- Large audio play and pause buttons (Requirement 2 & 6) -->
+                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; min-width: 220px;">
+                        <button class="audio-speak-btn animate-pulse" id="audio-speak-trigger" onclick="speakCurrentDialogue()" style="font-size: 1.25rem; padding: 14px 28px; background: #FFD93D; border-radius: 50px; width: 100%;">
+                            🔊 播放對話錄音 (Listen)
+                        </button>
+                        <button class="audio-pause-btn" id="audio-pause-trigger" onclick="toggleSpeechPause('audio-pause-trigger')" style="background: #FEF3C7; color: var(--navy-dark); border: 3px solid var(--navy-dark); padding: 12px 24px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 0 var(--navy-dark); width: 100%; transition: all 0.2s;">
+                            ⏸️ 暫停 (Pause)
+                        </button>
+                    </div>
+                    
+                    <!-- Guidance instruction text -->
+                    <div style="flex-grow: 1; color: #9A3412; text-align: left;">
+                        <div style="font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                            <span>👈 點我聽聽看！</span>
+                        </div>
+                        <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; font-weight: bold; color: #9A3412;">
+                            小朋友，請先按下黃色發音按鈕，然後要<strong>閉上眼睛細心聆聽</strong>喔！👂🤫
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Show transcript button (hidden by default, can be toggled) -->
+                <div style="margin-top: 15px; border-top: 2px dashed #FDE047; padding-top: 12px; display: flex; justify-content: center;">
+                    <button class="helper-toggle-btn" onclick="openTranscriptModal()">
+                        📖 想看看對話內容嗎？(Show Text)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question area -->
+            <div class="question-text-box">
+                <span id="question-text">Question content goes here?</span>
+                <button class="option-button-tts" title="讀題音頻" onclick="speakCurrentQuestion()">🔊</button>
+            </div>
+
+
+            <!-- Options list -->
+            <div class="options-list" id="options-container">
+                <!-- 3 Options (A, B, C) added dynamically -->
+            </div>
+
+            <!-- Quiz Navigation Row (2x2 Grid) -->
+            <div class="quiz-nav-row">
+                <button class="nav-btn prev-btn" id="quiz-prev-btn" onclick="goToPrevQuestion()">⬅️ 上一頁 (Back)</button>
+                <button class="nav-btn next-btn" id="quiz-next-btn" onclick="goToNextQuestion()">下一頁 (Next) ➡️</button>
+                <button class="nav-btn home-btn" onclick="goHome()">🏠 回主頁 (Home)</button>
+                
+            </div>
+
+        </div>
+
+        <!-- DICTATION MASTER SPECIAL VIEW -->
+        <div id="dictation-view" class="view">
+            <div class="game-bar">
+                <button class="back-btn" onclick="goHome()" style="margin-bottom:0;">🏠 退出</button>
+                <div class="progress-outer">
+                    <div class="progress-inner" id="dictation-progress"></div>
+                </div>
+                <div class="status-badge" id="dictation-tracker">第 1 / 5 詞</div>
+            </div>
+
+            
+            <div class="audio-dialog-card">
+                <span class="sound-wave-icon">✏️</span>
+                <div class="audio-hint-text">請聽讀音，點選下方泡泡拼出正確單字：</div>
+                
+                <div class="audio-controls-group" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                    <button class="audio-speak-btn" id="dictation-audio-trigger" onclick="speakCurrentDictationWord()">
+                        🔊 播放聽寫單字 (Play Word)
+                    </button>
+                    <button class="audio-pause-btn" id="dictation-pause-trigger" onclick="toggleSpeechPause('dictation-pause-trigger')" style="background: #FEF3C7; color: var(--navy-dark); border: 3px solid var(--navy-dark); padding: 12px 20px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 0 var(--navy-dark);">
+                        ⏸️ 暫停 (Pause)
+                    </button>
+                </div>
+                <div style="margin-top: 10px; font-weight: bold; color: var(--lavender-purple);" id="dictation-difficulty-label">
+                    [難度級別]
+                </div>
+            </div>
+
+
+            <div class="dictation-container">
+                <!-- Spelling boxes slots -->
+                <div class="spelling-box" id="spelling-slots-pool">
+                    <!-- Letter slots go here -->
+                </div>
+
+                <!-- Interactive Bubble Letters -->
+                <div class="letter-bubble-pool" id="letter-bubbles-pool">
+                    <!-- Clickable letter bubbles -->
+                </div>
+
+                <div class="dictation-controls">
+                    <button class="dictation-btn dictation-clear" onclick="clearActiveSpelling()">🧹 重選字母</button>
+                    <button class="dictation-btn dictation-submit" onclick="submitSpellingAnswer()">👍 提交拼寫</button>
+                </div>
+            </div>
+
+            <!-- Dictation Navigation Row (2x2 Grid) -->
+            <div class="quiz-nav-row" style="margin-top: 25px;">
+                <button class="nav-btn prev-btn" id="dict-prev-btn" onclick="goToPrevQuestion()">⬅️ 上一頁 (Back)</button>
+                <button class="nav-btn next-btn" id="dict-next-btn" onclick="goToNextQuestion()">下一頁 (Next) ➡️</button>
+                <button class="nav-btn home-btn" onclick="goHome()">🏠 回主頁 (Home)</button>
+                
+            </div>
+        </div>
+
+        <!-- RESULT VIEW SCREEN -->
+        <div id="result-view" class="view">
+            <div class="result-card">
+                <div class="result-mascot-img" id="result-emoji">🎉</div>
+                <h2 class="score-headline" id="score-message">非常好！挑戰成功！</h2>
+                
+                <div class="star-rating-big" id="result-stars-box">
+                    <span class="star-big">★</span>
+                    <span class="star-big">★</span>
+                    <span class="star-big">★</span>
+                    <span class="star-big">★</span>
+                    <span class="star-big">★</span>
+                </div>
+
+                <p class="score-subtext" id="score-fraction">答對了 5 / 5 題</p>
+
+                <button class="play-btn" onclick="goHome()" style="background: var(--sky-blue); font-size: 1.3rem;">
+                    🎮 回到冒險首頁
+                </button>
+
+                <!-- Wrong questions review panel (if any) -->
+                <div class="review-panel" id="review-wrong-panel" style="display: none;">
+                    <div class="review-title">🔍 錯題小筆記 (幫助寫作積累)：</div>
+                    <div id="wrong-questions-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Modal for Vocabulary Detail Popup -->
+    <div id="vocab-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; border-color: var(--sky-blue); text-align: center; padding: 25px;">
+            <span class="close-modal-btn" onclick="closeVocabModal()">&times;</span>
+            <div style="font-size: 3.5rem; margin-bottom: 10px; animation: bounce 1s infinite alternate;">📖</div>
+            <h2 id="vocab-word-title" style="font-size: 2.2rem; color: var(--navy-dark); margin-bottom: 5px;">Word</h2>
+            <p id="vocab-phonetic" style="font-size: 1.15rem; color: #64748B; margin-bottom: 15px; font-style: italic;">/phonetic/</p>
+            
+            <div style="background: #EFF6FF; border: 3px solid #BFDBFE; border-radius: 20px; padding: 15px; margin-bottom: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <p id="vocab-cn-meaning" style="font-size: 1.45rem; font-weight: bold; color: #1E40AF; margin: 0;">中文解釋</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="audio-speak-btn" onclick="speakVocabWord()" style="background: var(--sunny-yellow); padding: 12px 22px; font-size: 1.1rem; box-shadow: 0 4px 0 var(--navy-dark); border-radius: 50px;">
+                    🔊 讀音 (Speak)
+                </button>
+                <button class="modal-done-btn" onclick="closeVocabModal()" style="margin: 0; background: var(--sky-blue); padding: 12px 22px; font-size: 1.1rem; border-radius: 50px;">
+                    關閉 (Close)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Level Vocabulary Bank List -->
+    <div id="level-vocab-list-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px; border-color: var(--sky-blue); padding: 25px; border-radius: 28px;">
+            <span class="close-modal-btn" onclick="closeLevelVocabListModal()">&times;</span>
+            <h3 class="modal-title" style="margin-top:0; font-size:1.5rem; color:var(--navy-dark); display:flex; align-items:center; gap:10px;">
+                <span>📖</span> <span id="vocab-bank-modal-title">快樂生字庫</span>
+            </h3>
+            <p class="modal-desc" style="color:#64748B; font-size:0.95rem; margin-top:4px; margin-bottom:20px; line-height:1.4;">
+                小朋友，在開始挑戰前，可以先在這裡學習本關的重點單字喔！點擊 🔊 可以聽發音！
+            </p>
+            
+            <div id="vocab-bank-items-container" style="max-height: 380px; overflow-y: auto; padding-right: 5px;">
+                <!-- Dynamically populated vocab bank items -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="modal-done-btn" onclick="closeLevelVocabListModal()" style="margin: 0; background: var(--grass-green); font-size: 1.25rem; padding: 12px 35px; border-radius: 50px;">
+                    我學會了！👌
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Popup for Listening Transcript -->
+    <div id="transcript-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" onclick="closeTranscriptModal()">&times;</span>
+            <h3 class="modal-title" style="margin-top:0; font-size:1.35rem; color:var(--navy-dark); display:flex; align-items:center; gap:8px;">
+                <span>📖</span> 聽力對話內容對照
+            </h3>
+            <p class="modal-desc" style="color:#64748B; font-size:0.9rem; margin-top:4px; margin-bottom:15px; line-height:1.4;">
+                你可以看著英文句子，點擊旁邊的 🔊 按鈕聽聽看那一句話怎麼讀喔！
+            </p>
+            
+            <!-- Target sentences container -->
+            <div id="transcript-sentences-container">
+                <!-- Dynamically populated sentence items -->
+            </div>
+            
+            <button class="modal-done-btn" onclick="closeTranscriptModal()">
+                我明白了！👌
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Game Sound Engine using Web Audio API (so no external files are required!)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playEffectSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'correct') {
+                    // Delightful upward ding!
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.45);
+                } else if (type === 'wrong') {
+                    // Sad boing sound
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'victory') {
+                    // Celebratory major fanfare!
+                    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const noteOsc = audioCtx.createOscillator();
+                        const noteGain = audioCtx.createGain();
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(audioCtx.destination);
+                        noteOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+                        noteGain.gain.setValueAtTime(0.08, audioCtx.currentTime + idx * 0.08);
+                        noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.28);
+                        noteOsc.start(audioCtx.currentTime + idx * 0.08);
+                        noteOsc.stop(audioCtx.currentTime + idx * 0.08 + 0.28);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio contexts not activated yet or unsupported: ", e);
+            }
+        }
+
+        // Robust Voice Synthesis State Controller (Requirement 2)
+        let isGlobalSpeechPaused = false;
+
+        function speakText(text, isWord = false) {
+            try {
+                safeSpeechCancel();
+            } catch (e) {
+                console.error("Voice controller error:", e);
+            }
+            isGlobalSpeechPaused = false;
+            isCurrentlySpeaking = false;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = isWord ? 0.75 : 0.85; // Slow down for children
+            utterance.pitch = 1.15; // Child-friendly voice pitch
+            
+            // Highlight buttons
+            const gameTrigger = document.getElementById('audio-speak-trigger');
+            const dictationTrigger = document.getElementById('dictation-audio-trigger');
+            
+            if (gameTrigger) gameTrigger.classList.add('speaking');
+            if (dictationTrigger) dictationTrigger.classList.add('speaking');
+            
+            // Handle display of Pause button
+            const pauseBtn = isDictation ? document.getElementById('dictation-pause-trigger') : document.getElementById('audio-pause-trigger');
+            if (pauseBtn) {
+                pauseBtn.style.display = 'inline-flex';
+                pauseBtn.innerHTML = "⏸️ 暫停 (Pause)";
+                pauseBtn.style.background = "#FEF3C7";
+            }
+
+            utterance.onstart = () => {
+                isCurrentlySpeaking = true;
+            };
+
+            utterance.onend = () => {
+                if (gameTrigger) gameTrigger.classList.remove('speaking');
+                if (dictationTrigger) dictationTrigger.classList.remove('speaking');
+                if (pauseBtn) pauseBtn.style.display = 'none';
+                isGlobalSpeechPaused = false;
+                isCurrentlySpeaking = false;
+            };
+
+            utterance.onerror = () => {
+                if (gameTrigger) gameTrigger.classList.remove('speaking');
+                if (dictationTrigger) dictationTrigger.classList.remove('speaking');
+                if (pauseBtn) pauseBtn.style.display = 'none';
+                isGlobalSpeechPaused = false;
+                isCurrentlySpeaking = false;
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Beautiful Cantonese TTS for strategic advice (Requirement 1)
+        function speakChineseAndEnglish(textHtml) {
+            try {
+                safeSpeechCancel();
+            } catch (e) {
+                console.error(e);
+            }
+            isGlobalSpeechPaused = false;
+            isCurrentlySpeaking = false;
+
+            // Strip HTML tags for reading
+            let cleanText = textHtml.replace(/<[^>]*>/g, "");
+            cleanText = cleanText.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"');
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'zh-HK'; // natural Cantonese
+            utterance.rate = 0.85;
+            utterance.pitch = 1.1;
+
+            utterance.onstart = () => {
+                isCurrentlySpeaking = true;
+            };
+            utterance.onend = () => {
+                isCurrentlySpeaking = false;
+            };
+            utterance.onerror = () => {
+                isCurrentlySpeaking = false;
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Unified toggle function for pausing voice safely
+        function toggleSpeechPause(btnId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            if (isGlobalSpeechPaused) {
+                window.speechSynthesis.resume();
+                isGlobalSpeechPaused = false;
+                btn.innerHTML = "⏸️ 暫停 (Pause)";
+                btn.style.background = "#FEF3C7";
+                btn.style.transform = "scale(1)";
+            } else {
+                if (isCurrentlySpeaking) {
+                    window.speechSynthesis.pause();
+                    isGlobalSpeechPaused = true;
+                    btn.innerHTML = "▶️ 繼續 (Resume)";
+                    btn.style.background = "#D9F99D";
+                    btn.style.transform = "scale(1.05)";
+                }
+            }
+        }
+
+        // LEVEL META & ITEM DATABASE (Incorporating 6 main levels & 2 practice zones)
+        const levelsData = {
+            1: {
+                title: "Hello! 問候與自我介紹 🤝",
+                    vocab: {
+                    "morning": {
+                                        "cn": "早上 / 上午",
+                                        "phonetic": "/ˈmɔːnɪŋ/"
+                    },
+                    "afternoon": {
+                                        "cn": "下午",
+                                        "phonetic": "/ˌɑːftəˈnuːn/"
+                    },
+                    "evening": {
+                                        "cn": "晚上 / 傍晚",
+                                        "phonetic": "/ˈiːvnɪŋ/"
+                    },
+                    "goodbye": {
+                                        "cn": "再見",
+                                        "phonetic": "/ˌɡʊdˈbaɪ/"
+                    },
+                    "hello": {
+                                        "cn": "你好",
+                                        "phonetic": "/həˈləʊ/"
+                    },
+                    "meet": {
+                                        "cn": "見面 / 認識",
+                                        "phonetic": "/miːt/"
+                    },
+                    "nice": {
+                                        "cn": "美好的 / 高興的",
+                                        "phonetic": "/naɪs/"
+                    },
+                    "name": {
+                                        "cn": "名字",
+                                        "phonetic": "/neɪm/"
+                    },
+                    "classmate": {
+                                        "cn": "同學",
+                                        "phonetic": "/ˈklɑːsmeɪt/"
+                    },
+                    "brother": {
+                                        "cn": "兄弟",
+                                        "phonetic": "/ˈbrʌðə/"
+                    },
+                    "sister": {
+                                        "cn": "姊妹",
+                                        "phonetic": "/ˈsɪstə/"
+                    },
+                    "years": {
+                                        "cn": "歲數 / 年",
+                                        "phonetic": "/jɪəz/"
+                    },
+                    "old": {
+                                        "cn": "老的 / 歲數的",
+                                        "phonetic": "/əʊld/"
+                    },
+                    "tall": {
+                                        "cn": "高的",
+                                        "phonetic": "/tɔːl/"
+                    },
+                    "short": {
+                                        "cn": "矮的 / 短的",
+                                        "phonetic": "/ʃɔːt/"
+                    },
+                    "small": {
+                                        "cn": "小的",
+                                        "phonetic": "/smɔːl/"
+                    },
+                    "big": {
+                                        "cn": "大的",
+                                        "phonetic": "/bɪɡ/"
+                    },
+                    "eyes": {
+                                        "cn": "眼睛",
+                                        "phonetic": "/aɪz/"
+                    },
+                    "boy": {
+                                        "cn": "男孩",
+                                        "phonetic": "/bɔɪ/"
+                    },
+                    "girl": {
+                                        "cn": "女孩",
+                                        "phonetic": "/ɡɜːl/"
+                    },
+                    "friend": {
+                                        "cn": "朋友",
+                                        "phonetic": "/frend/"
+                    },
+                    "school": {
+                                        "cn": "學校",
+                                        "phonetic": "/skuːl/"
+                    }
+                    },
+                subtitle: "第一關 (最基本)",
+                color: "var(--sky-blue)",
+                strategy: "聽清楚別人打招呼的用語（如 Good morning、Nice to meet you）和回答名字、年齡的語調。",
+                writingTip: "<strong>作文寫作重點：自我介紹起手式</strong><br>寫自我介紹文章時，開頭一定要用打招呼（Greetings）暖場，隨後寫出名字與年齡，例如：<i>'Good morning, everyone. My name is Leo. I am seven years old.'</i>。最後可以用 <i>'Nice to meet you'</i> 作為溫馨結尾喔！",
+                exampleText: "<strong>問候範例：</strong><br>Dora: Good morning, Miss Lee. My name is Dora.<br>Miss Lee: Good morning, Dora. Nice to meet you.",
+                exampleQuestion: "Dora 說了什麼問候語？<br>A. Good morning (正確) &nbsp; B. Good afternoon &nbsp; C. Goodbye",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Hi! My name is Leo. I am seven years old. Nice to meet you all.",
+                            question: "How old is Leo?",
+                            options: ["six", "seven", "eight"],
+                            answer: "seven"
+                        },
+                        {
+                            dialogue: "Good afternoon, children! I am your new teacher, Mr. Wong.",
+                            question: "What is the teacher's name?",
+                            options: ["Mr. Wong", "Mr. Wu", "Mr. Ward"],
+                            answer: "Mr. Wong"
+                        },
+                        {
+                            dialogue: "Goodbye, Mandy! See you at school tomorrow.",
+                            question: "What is Mandy's friend saying to her?",
+                            options: ["Hello", "Good morning", "Goodbye"],
+                            answer: "Goodbye"
+                        },
+                        {
+                            dialogue: "Nice to meet you, Tim! I am Amy, and I am in Class 2A.",
+                            question: "What is the girl's name?",
+                            options: ["Amy", "Mandy", "Polly"],
+                            answer: "Amy"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "My name is Sarah. I am a tall girl. I have big eyes. This is my brother, Jack. He is a short boy with small eyes.",
+                            question: "Which sentence is true about Sarah?",
+                            options: ["She is a short girl.", "She is a tall girl with big eyes.", "She has a tall brother."],
+                            answer: "She is a tall girl with big eyes."
+                        },
+                        {
+                            dialogue: "Hi! I am Bobby. I am eight years old. My class mate Kenny is seven years old, and Jenny is only six.",
+                            question: "Who is eight years old?",
+                            options: ["Kenny", "Jenny", "Bobby"],
+                            answer: "Bobby"
+                        },
+                        {
+                            dialogue: "Hello, dad! I meet two new friends, Sam and Pam. Sam is a very tall boy and Pam is a short girl.",
+                            question: "Who is Sam?",
+                            options: ["A tall teacher.", "A short girl.", "A tall boy."],
+                            answer: "A tall boy."
+                        },
+                        {
+                            dialogue: "Dad: Is your new teacher tall, Lily? / Lily: No, dad. She is short, but she is very nice. Her name is Mary.",
+                            question: "What does Mary look like?",
+                            options: ["She is tall and kind.", "She is short and nice.", "She is short with small eyes."],
+                            answer: "She is short and nice."
+                        },
+                        {
+                            dialogue: "Ms. Lee: What is your name, little boy? / Student: My name is Toby, T-O-B-Y. I am seven.",
+                            question: "How do you spell the student's name?",
+                            options: ["T-O-B-Y", "T-O-N-Y", "T-O-M-Y"],
+                            answer: "T-O-B-Y"
+                        },
+                        {
+                            dialogue: "Hello! I am Kelly's dad. Kelly has two friends at school. Zoe is seven and Tony is eight. Tony is a tall boy.",
+                            question: "How old is Tony?",
+                            options: ["six", "seven", "eight"],
+                            answer: "eight"
+                        }
+                    ]
+                }
+            },
+            2: {
+                title: "My Classmates 同學與拼音辨音 🏫",
+                    vocab: {
+                    "photo": {
+                                        "cn": "照片",
+                                        "phonetic": "/ˈfəʊtəʊ/"
+                    },
+                    "best": {
+                                        "cn": "最好的",
+                                        "phonetic": "/best/"
+                    },
+                    "classmate": {
+                                        "cn": "同學",
+                                        "phonetic": "/ˈklɑːsmeɪt/"
+                    },
+                    "class": {
+                                        "cn": "班級",
+                                        "phonetic": "/klɑːs/"
+                    },
+                    "teacher": {
+                                        "cn": "教師 / 老師",
+                                        "phonetic": "/ˈtiːtʃə/"
+                    },
+                    "English": {
+                                        "cn": "英文",
+                                        "phonetic": "/ˈɪŋɡlɪʃ/"
+                    },
+                    "Chinese": {
+                                        "cn": "中文 / 漢語",
+                                        "phonetic": "/ˌtʃaɪˈniːz/"
+                    },
+                    "Maths": {
+                                        "cn": "數學",
+                                        "phonetic": "/mæθs/"
+                    },
+                    "kind": {
+                                        "cn": "和藹的 / 善良的",
+                                        "phonetic": "/kaɪnd/"
+                    },
+                    "desk": {
+                                        "cn": "課桌",
+                                        "phonetic": "/desk/"
+                    },
+                    "sit": {
+                                        "cn": "坐",
+                                        "phonetic": "/sɪt/"
+                    },
+                    "monitor": {
+                                        "cn": "男班長",
+                                        "phonetic": "/ˈmɒnɪtə/"
+                    },
+                    "monitress": {
+                                        "cn": "女班長",
+                                        "phonetic": "/ˈmɒnɪtrəs/"
+                    },
+                    "leader": {
+                                        "cn": "領袖 / 組長",
+                                        "phonetic": "/ˈliːdə/"
+                    },
+                    "look": {
+                                        "cn": "看",
+                                        "phonetic": "/lʊk/"
+                    },
+                    "subject": {
+                                        "cn": "學科 / 科目",
+                                        "phonetic": "/ˈsʌbdʒɪkt/"
+                    },
+                    "friend": {
+                                        "cn": "朋友",
+                                        "phonetic": "/frend/"
+                    },
+                    "nice": {
+                                        "cn": "友善的 / 美好的",
+                                        "phonetic": "/naɪs/"
+                    },
+                    "tall": {
+                                        "cn": "高的",
+                                        "phonetic": "/tɔːl/"
+                    },
+                    "short": {
+                                        "cn": "矮的",
+                                        "phonetic": "/ʃɔːt/"
+                    },
+                    "people": {
+                                        "cn": "人們",
+                                        "phonetic": "/ˈpiːpl/"
+                    },
+                    "first": {
+                                        "cn": "第一的 / 首先",
+                                        "phonetic": "/fɜːst/"
+                    }
+                    },
+                subtitle: "第二關 (拼音名字)",
+                color: "var(--coral-orange)",
+                strategy: "辨識發音極其相近的名字（例如 Pam / Tam / Sam）並專注聽取名字的英文字母拼讀（Spelling）。",
+                writingTip: "<strong>作文寫作重點：外貌與拼寫特徵</strong><br>介紹班上新同學時，文章中若加入名字的拼寫或拼音，會讓作文讀起來極具特色。例如：<i>'This is my friend, Lara, L-A-R-A. She has long hair.'</i>。可以善用關係代名詞或字母拼讀來加深印象！",
+                exampleText: "<strong>辨音範例：</strong><br>Mum: Who is the person in this photo?<br>Nancy: She is Yoyo. She is my best friend. We are in Class 1D.",
+                exampleQuestion: "Nancy 的好朋友是誰？<br>A. Bobo &nbsp; B. Momo &nbsp; C. Yoyo (正確)",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "My best classmate is Connie, C-O-N-N-I-E. She has big eyes.",
+                            question: "What is her name?",
+                            options: ["Ronnie", "Connie", "Bonnie"],
+                            answer: "Connie"
+                        },
+                        {
+                            dialogue: "This is our class monitress, Lara. L-A-R-A. She is tall.",
+                            question: "How do you spell her name?",
+                            options: ["S-A-R-A", "T-A-R-A", "L-A-R-A"],
+                            answer: "L-A-R-A"
+                        },
+                        {
+                            dialogue: "Nancy is talking to Mr. Chan, C-H-A-N. He is our English teacher.",
+                            question: "Who is Nancy talking to?",
+                            options: ["Mr. Chan", "Mr. Fan", "Mr. Tan"],
+                            answer: "Mr. Chan"
+                        },
+                        {
+                            dialogue: "This is my classmate Polly, P-O-L-L-Y. She is nice and kind.",
+                            question: "Who is the classmate?",
+                            options: ["Sally", "Polly", "Molly"],
+                            answer: "Polly"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "Our Chinese teacher is Miss Park. She is very kind. Mr. Green is our Maths teacher.",
+                            question: "What subject does Miss Park teach?",
+                            options: ["Maths", "English", "Chinese"],
+                            answer: "Chinese"
+                        },
+                        {
+                            dialogue: "Hi! My name is Sam, S-A-M. My desk mate is Pam, P-A-M. We love our classroom.",
+                            question: "What is the speaker's name?",
+                            options: ["Sam", "Pam", "Tam"],
+                            answer: "Sam"
+                        },
+                        {
+                            dialogue: "This is Gordon Yip. He is in Class 1C. He is a very good boy and he is very tall.",
+                            question: "What class is Gordon in?",
+                            options: ["Class 1A", "Class 1B", "Class 1C"],
+                            answer: "Class 1C"
+                        },
+                        {
+                            dialogue: "Ken: Is Rita your Chinese teacher? / Rita: No, Rita is my classmate! Miss Wong, W-O-N-G, is our Chinese teacher.",
+                            question: "Who is Miss Wong?",
+                            options: ["Rita's classmate", "The Chinese teacher", "The English teacher"],
+                            answer: "The Chinese teacher"
+                        },
+                        {
+                            dialogue: "Mum: Is your class leader Bobo? / Ken: No, Bobo is my best friend. Marco is our class monitor.",
+                            question: "Who is Marco?",
+                            options: ["Best friend", "Class monitor", "Class leader"],
+                            answer: "Class monitor"
+                        },
+                        {
+                            dialogue: "Hello, I am Sandy, S-A-N-D-Y. My best classmate is Mandy, M-A-N-D-Y. We sit together.",
+                            question: "How do you spell Sandy's classmate's name?",
+                            options: ["S-A-N-D-Y", "M-A-N-D-Y", "C-A-N-D-Y"],
+                            answer: "M-A-N-D-Y"
+                        }
+                    ]
+                }
+            },
+            3: {
+                title: "Good Students 課堂動作與指令 🤫",
+                    vocab: {
+                    "stand up": {
+                                        "cn": "站立 / 起立",
+                                        "phonetic": "/stænd ʌp/"
+                    },
+                    "sit down": {
+                                        "cn": "坐下",
+                                        "phonetic": "/sɪt daʊn/"
+                    },
+                    "close": {
+                                        "cn": "關閉 / 合上",
+                                        "phonetic": "/kləʊz/"
+                    },
+                    "open": {
+                                        "cn": "打開 / 翻開",
+                                        "phonetic": "/ˈəʊpən/"
+                    },
+                    "window": {
+                                        "cn": "窗戶",
+                                        "phonetic": "/ˈwɪndəʊ/"
+                    },
+                    "door": {
+                                        "cn": "門",
+                                        "phonetic": "/dɔː/"
+                    },
+                    "light": {
+                                        "cn": "燈 / 光線",
+                                        "phonetic": "/laɪt/"
+                    },
+                    "computer": {
+                                        "cn": "電腦",
+                                        "phonetic": "/kəmˈpjuːtə/"
+                    },
+                    "air conditioner": {
+                                        "cn": "冷氣機 / 空調",
+                                        "phonetic": "/ˈeə kənˌdɪʃənə/"
+                    },
+                    "projector": {
+                                        "cn": "投影機",
+                                        "phonetic": "/prəˈdʒektə/"
+                    },
+                    "blackboard": {
+                                        "cn": "黑板",
+                                        "phonetic": "/ˈblækbɔːd/"
+                    },
+                    "book": {
+                                        "cn": "書本",
+                                        "phonetic": "/bʊk/"
+                    },
+                    "page": {
+                                        "cn": "頁碼",
+                                        "phonetic": "/peɪdʒ/"
+                    },
+                    "shout": {
+                                        "cn": "大喊 / 叫嚷",
+                                        "phonetic": "/ʃaʊt/"
+                    },
+                    "angry": {
+                                        "cn": "憤怒的",
+                                        "phonetic": "/ˈæŋɡri/"
+                    },
+                    "naughty": {
+                                        "cn": "調皮的 / 頑皮的",
+                                        "phonetic": "/ˈnɔːti/"
+                    },
+                    "noise": {
+                                        "cn": "噪音 / 雜音",
+                                        "phonetic": "/nɔɪz/"
+                    },
+                    "desk": {
+                                        "cn": "書桌",
+                                        "phonetic": "/desk/"
+                    },
+                    "classroom": {
+                                        "cn": "教室",
+                                        "phonetic": "/ˈklɑːsruːm/"
+                    },
+                    "instruction": {
+                                        "cn": "指令 / 指示",
+                                        "phonetic": "/ɪnˈstrʌkʃn/"
+                    },
+                    "song": {
+                                        "cn": "歌曲",
+                                        "phonetic": "/sɒŋ/"
+                    },
+                    "sing": {
+                                        "cn": "唱歌",
+                                        "phonetic": "/sɪŋ/"
+                    }
+                    },
+                subtitle: "第三關 (課堂動詞)",
+                color: "var(--grass-green)",
+                strategy: "專注聽取課堂動詞（如 Close, Open, Turn on, Stand up）來判斷老師或同學的動作指示。",
+                writingTip: "<strong>作文寫作重點：動作與時間順序詞</strong><br>在敘述校園生活或日記作文時，使用 <i>'First' (首先)、'Next' (接著)、'Then' (然後)</i> 等時間順序詞，能把凌亂的動作組織得井井有條。例如：<i>'First, sit down. Next, open your books.'</i>。",
+                exampleText: "<strong>指令範例：</strong><br>Class: Good morning, Miss Ho.<br>Miss Ho: Good morning, class. Sit down, please.",
+                exampleQuestion: "Miss Ho 請大家做什麼？<br>A. Sit down (正確) &nbsp; B. Stand up &nbsp; C. Come in",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Teacher: Henry, close the window, please. It is cold outside.",
+                            question: "What should Henry do?",
+                            options: ["Open the window", "Close the window", "Stand up"],
+                            answer: "Close the window"
+                        },
+                        {
+                            dialogue: "Teacher: Turn on the light, please. It is dark in the classroom.",
+                            question: "What should the student turn on?",
+                            options: ["The light", "The computer", "The air conditioner"],
+                            answer: "The light"
+                        },
+                        {
+                            dialogue: "Teacher: Class, open your English books and read page eight together.",
+                            question: "What page should the students read?",
+                            options: ["page six", "page eight", "page nine"],
+                            answer: "page eight"
+                        },
+                        {
+                            dialogue: "Teacher: John, stand up and look at the blackboard, please.",
+                            question: "What should John do?",
+                            options: ["Sit down on the chair", "Open his book", "Stand up and look at the blackboard"],
+                            answer: "Stand up and look at the blackboard"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "Robert: Today Miss Cheung told us to open our books. Next, we read page nine. Then she told Justin to close the door.",
+                            question: "What page did Robert and his classmates read?",
+                            options: ["page six", "page eight", "page nine"],
+                            answer: "page nine"
+                        },
+                        {
+                            dialogue: "Teacher: Girls, stand up please. Boys, turn on the air conditioner because it is very hot. Then sit down.",
+                            question: "Why should the boys turn on the air conditioner?",
+                            options: ["Because it is cold.", "Because it is noisy.", "Because it is very hot."],
+                            answer: "Because it is very hot."
+                        },
+                        {
+                            dialogue: "Miss Cheung: Billy, look at the desk. Do not shout in class. Close your book now.",
+                            question: "What did Miss Cheung tell Billy to do?",
+                            options: ["Stand up and shout.", "Do not shout and close his book.", "Look out of the window."],
+                            answer: "Do not shout and close his book."
+                        },
+                        {
+                            dialogue: "Robert: Miss Cheung was angry with John. First, John talked to Mandy. Next, he did not look at the blackboard. Then, he opened his desk and made noise.",
+                            question: "Why was the teacher angry with John?",
+                            options: ["John slept.", "John talked and made noise.", "John closed the door."],
+                            answer: "John talked and made noise."
+                        },
+                        {
+                            dialogue: "Teacher: Please turn off the computer now, and turn on the projector. Let's start the video.",
+                            question: "What should the student turn off?",
+                            options: ["The projector", "The computer", "The light"],
+                            answer: "The computer"
+                        },
+                        {
+                            dialogue: "Teacher: Everyone stand up! Let's sing a song together. Now, sit down and open your notebooks.",
+                            question: "What is the correct order of instructions?",
+                            options: ["Stand up, sing, sit down, open notebooks", "Sit down, open notebooks, stand up", "Sing, open notebooks, stand up"],
+                            answer: "Stand up, sing, sit down, open notebooks"
+                        }
+                    ]
+                }
+            },
+            4: {
+                title: "In My School Bag 書包文具大清點 🎒",
+                    vocab: {
+                    "school bag": {
+                                        "cn": "書包",
+                                        "phonetic": "/skuːl bæɡ/"
+                    },
+                    "pencil": {
+                                        "cn": "鉛筆",
+                                        "phonetic": "/ˈpensl/"
+                    },
+                    "pencil case": {
+                                        "cn": "筆袋 / 筆盒",
+                                        "phonetic": "/ˈpensl keɪs/"
+                    },
+                    "ruler": {
+                                        "cn": "直尺",
+                                        "phonetic": "/ˈruːlə/"
+                    },
+                    "eraser": {
+                                        "cn": "橡皮擦",
+                                        "phonetic": "/ɪˈreɪzə/"
+                    },
+                    "book": {
+                                        "cn": "書本",
+                                        "phonetic": "/bʊk/"
+                    },
+                    "pen": {
+                                        "cn": "鋼筆 / 原子筆",
+                                        "phonetic": "/pen/"
+                    },
+                    "crayon": {
+                                        "cn": "蠟筆",
+                                        "phonetic": "/ˈkreɪən/"
+                    },
+                    "colour pencil": {
+                                        "cn": "彩色筆 / 色鉛筆",
+                                        "phonetic": "/ˈkʌlə ˈpensl/"
+                    },
+                    "notebook": {
+                                        "cn": "筆記本",
+                                        "phonetic": "/ˈnəʊtbʊk/"
+                    },
+                    "yellow": {
+                                        "cn": "黃色的",
+                                        "phonetic": "/ˈjeləʊ/"
+                    },
+                    "blue": {
+                                        "cn": "藍色的",
+                                        "phonetic": "/bluː/"
+                    },
+                    "red": {
+                                        "cn": "紅色的",
+                                        "phonetic": "/red/"
+                    },
+                    "green": {
+                                        "cn": "綠色的",
+                                        "phonetic": "/ɡriːn/"
+                    },
+                    "white": {
+                                        "cn": "白色的",
+                                        "phonetic": "/waɪt/"
+                    },
+                    "stationery": {
+                                        "cn": "文具",
+                                        "phonetic": "/ˈsteɪʃnri/"
+                    },
+                    "buy": {
+                                        "cn": "購買",
+                                        "phonetic": "/baɪ/"
+                    },
+                    "shop": {
+                                        "cn": "商店",
+                                        "phonetic": "/ʃɒp/"
+                    },
+                    "count": {
+                                        "cn": "數數 / 計算",
+                                        "phonetic": "/kaʊnt/"
+                    },
+                    "many": {
+                                        "cn": "許多的",
+                                        "phonetic": "/ˈmeni/"
+                    },
+                    "need": {
+                                        "cn": "需要",
+                                        "phonetic": "/niːd/"
+                    },
+                    "ten": {
+                                        "cn": "十",
+                                        "phonetic": "/ten/"
+                    }
+                    },
+                subtitle: "第四關 (文具數量)",
+                color: "var(--sunny-yellow)",
+                strategy: "聽準 1 到 10 的數字拼音與數量詞（如 rulers, erasers, books），注意名詞複數發音。",
+                writingTip: "<strong>作文寫作重點：文具列表與清單寫作</strong><br>在寫『我的書包』或『我的文具盒』作文時，我們要學會準確列出物品名稱和數量。使用 <i>'I have [數量] [複數名詞]'</i> 結構，例如：<i>'I have three pens and two rubbers in my school bag.'</i>。這能使描述非常具體！",
+                exampleText: "<strong>數量範例：</strong><br>Jason: I have five pencils in my pencil case.",
+                exampleQuestion: "Jason 鉛筆盒裡有幾支鉛筆？<br>A. 3支 &nbsp; B. 5支 (正確) &nbsp; C. 9支",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Jane: Mum, can we buy three yellow rulers and one white eraser?",
+                            question: "How many rulers does Jane want to buy?",
+                            options: ["one", "two", "three"],
+                            answer: "three"
+                        },
+                        {
+                            dialogue: "Jimmy: I have six books and one blue pencil case in my school bag.",
+                            question: "How many books does Jimmy have?",
+                            options: ["five", "six", "seven"],
+                            answer: "six"
+                        },
+                        {
+                            dialogue: "Helen: Look! I have nine colour pencils in my green desk.",
+                            question: "What does Helen have nine of?",
+                            options: ["pens", "colour pencils", "crayons"],
+                            answer: "colour pencils"
+                        },
+                        {
+                            dialogue: "Gigi: In my school bag, I have eight pencils, three rulers, and seven blue pens.",
+                            question: "How many pens does Gigi have?",
+                            options: ["three", "seven", "eight"],
+                            answer: "seven"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "Helen: I have one green pencil case. In my pencil case, I have four pencils and two erasers. I also have six books.",
+                            question: "How many erasers does Helen have?",
+                            options: ["one", "two", "four"],
+                            answer: "two"
+                        },
+                        {
+                            dialogue: "Jimmy: My sister Gigi has a huge school bag. She has three pencil cases, eight pencils, and ten erasers!",
+                            question: "How many erasers does Gigi have?",
+                            options: ["three", "eight", "ten"],
+                            answer: "ten"
+                        },
+                        {
+                            dialogue: "Bobby: Mum, I need some stationery. I have two notebooks, but I need four more. I also need five pens.",
+                            question: "How many pens does Bobby need?",
+                            options: ["two", "four", "five"],
+                            answer: "five"
+                        },
+                        {
+                            dialogue: "Teacher: Let's count your crayons, kids! Tim has seven crayons, Amy has nine, and Leo has five.",
+                            question: "Who has the most crayons?",
+                            options: ["Tim", "Amy", "Leo"],
+                            answer: "Amy"
+                        },
+                        {
+                            dialogue: "Gigi: Jimmy, do you have any rulers? / Jimmy: Yes, I have four yellow rulers and three red rulers in my desk.",
+                            question: "How many rulers does Jimmy have in total?",
+                            options: ["three", "four", "seven"],
+                            answer: "seven"
+                        },
+                        {
+                            dialogue: "Helen: Mum, I have three books, one eraser, and four pencils. / Mum: Let's buy two more erasers and one pencil case.",
+                            question: "How many erasers will Helen have in total after buying?",
+                            options: ["one", "two", "three"],
+                            answer: "three"
+                        }
+                    ]
+                }
+            },
+            'phonics': {
+                title: "Phonics Time 輔音拼讀特訓班 🗣️",
+                subtitle: "特訓區 A (自然拼讀)",
+                color: "var(--bubble-gum)",
+                strategy: "分辨英文字母 b, p, g, k 作為首部輔音（Beginning Sounds）的發音，這對拼讀和寫作單字至關重要！",
+                writingTip: "<strong>作文寫作重點：Phonics 與單字記憶拼寫</strong><br>掌握自然拼讀（Phonics）能幫助你在寫作文時，『聽音寫字』。當你想寫『小熊』(bear) 但忘記拼法時，腦中默念 /b/ /b/ /eə/，就能順利寫出 <i>b-e-a-r</i>，大幅減少錯別字！",
+                exampleText: "<strong>輔音範例：</strong><br>/b/ - baby, bear, bee, boat<br>/p/ - panda, pea, pear, pencil<br>/g/ - get, girl, goat, gun<br>/k/ - key, kick, king, kite",
+                exampleQuestion: "哪一個單字的首音是 /b/？<br>A. bear (正確) &nbsp; B. pear &nbsp; C. wear",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Listen carefully: b - b - bear. Which word starts with the sound /b/?",
+                            question: "Which word starts with the /b/ sound?",
+                            options: ["bear", "pear", "wear"],
+                            answer: "bear"
+                        },
+                        {
+                            dialogue: "Listen carefully: p - p - panda. Which word starts with the sound /p/?",
+                            question: "Which word starts with the /p/ sound?",
+                            options: ["band", "panda", "hand"],
+                            answer: "panda"
+                        },
+                        {
+                            dialogue: "Listen carefully: g - g - goat. Which word starts with the sound /g/?",
+                            question: "Which word starts with the /g/ sound?",
+                            options: ["boat", "coat", "goat"],
+                            answer: "goat"
+                        },
+                        {
+                            dialogue: "Listen carefully: k - k - king. Which word starts with the sound /k/?",
+                            question: "Which word starts with the /k/ sound?",
+                            options: ["king", "ring", "wing"],
+                            answer: "king"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "Listen carefully: b - b - boat. Which word starts with the sound /b/?",
+                            question: "Which word starts with the /b/ sound?",
+                            options: ["goat", "boat", "coat"],
+                            answer: "boat"
+                        },
+                        {
+                            dialogue: "Listen carefully: p - p - pencil. Which word starts with the sound /p/?",
+                            question: "Which word starts with the /p/ sound?",
+                            options: ["pencil", "stencil", "metal"],
+                            answer: "pencil"
+                        },
+                        {
+                            dialogue: "Listen carefully: k - k - kite. Which word starts with the sound /k/?",
+                            question: "Which word starts with the /k/ sound?",
+                            options: ["bite", "white", "kite"],
+                            answer: "kite"
+                        },
+                        {
+                            dialogue: "Listen carefully: g - g - girl. Which word starts with the sound /g/?",
+                            question: "Which word starts with the /g/ sound?",
+                            options: ["girl", "curl", "pearl"],
+                            answer: "girl"
+                        },
+                        {
+                            dialogue: "Listen carefully: b - b - baby. Which word starts with the sound /b/?",
+                            question: "Which word starts with the /b/ sound?",
+                            options: ["baby", "paper", "table"],
+                            answer: "baby"
+                        },
+                        {
+                            dialogue: "Listen carefully: k - k - key. Which word starts with the sound /k/?",
+                            question: "Which word starts with the /k/ sound?",
+                            options: ["bee", "key", "tea"],
+                            answer: "key"
+                        }
+                    ]
+                }
+            },
+            'dictation': {
+                title: "Dictation Master 單字聽寫大挑戰 📝",
+                subtitle: "特訓區 B (互動單字聽寫)",
+                color: "var(--lavender-purple)",
+                strategy: "考驗你對課堂、文具與動物單字的聽音與拼寫能力。聽取讀音，在下方依序點擊字母，拼寫出完整的單字！",
+                writingTip: "<strong>作文寫作重點：寫作詞彙庫累積</strong><br>聽寫不只是為了應付考試，更是為了積累寫作時的『彈藥』。把文具（eraser, school bag）和動作（angry, morning）等核心單字拼對，作文分數就會突飛猛進喔！",
+                exampleText: "<strong>聽寫範例：</strong><br>聽見：'window' -> 依序點選 W - I - N - D - O - W 拼成單字！",
+                exampleQuestion: "如何拼寫 /'wɪndəʊ/？<br>正確答案：w-i-n-d-o-w",
+                // Special dictation pool (10 words)
+                words: [
+                    { word: "window", level: "Elementary (初級課堂)" },
+                    { word: "school", level: "Elementary (初級學校)" },
+                    { word: "mouth", level: "Elementary (初級身體)" },
+                    { word: "morning", level: "Elementary (初級時間)" },
+                    { word: "eraser", level: "Advanced (高級文具)" },
+                    { word: "horse", level: "Advanced (高級動物)" },
+                    { word: "classmate", level: "Advanced (高級同學)" },
+                    { word: "monitor", level: "Advanced (高級班長)" },
+                    { word: "animal", level: "Advanced (高級主題)" },
+                    { word: "angry", level: "Elementary (初級情緒)" }
+                ]
+            },
+            5: {
+                title: "On the Farm 農場動物與形容詞 🚜",
+                    vocab: {
+                    "farm": {
+                                        "cn": "農場",
+                                        "phonetic": "/fɑːm/"
+                    },
+                    "animal": {
+                                        "cn": "動物",
+                                        "phonetic": "/ˈænɪml/"
+                    },
+                    "horse": {
+                                        "cn": "馬",
+                                        "phonetic": "/hɔːs/"
+                    },
+                    "rabbit": {
+                                        "cn": "兔子",
+                                        "phonetic": "/ˈræbɪt/"
+                    },
+                    "duck": {
+                                        "cn": "鴨子",
+                                        "phonetic": "/dʌk/"
+                    },
+                    "dog": {
+                                        "cn": "狗",
+                                        "phonetic": "/dɒɡ/"
+                    },
+                    "cow": {
+                                        "cn": "母牛 / 乳牛",
+                                        "phonetic": "/kaʊ/"
+                    },
+                    "cat": {
+                                        "cn": "貓",
+                                        "phonetic": "/kæt/"
+                    },
+                    "fish": {
+                                        "cn": "魚",
+                                        "phonetic": "/fɪʃ/"
+                    },
+                    "pig": {
+                                        "cn": "豬",
+                                        "phonetic": "/pɪɡ/"
+                    },
+                    "chicken": {
+                                        "cn": "雞 / 雞肉",
+                                        "phonetic": "/ˈtʃɪkɪn/"
+                    },
+                    "big": {
+                                        "cn": "大的",
+                                        "phonetic": "/bɪɡ/"
+                    },
+                    "small": {
+                                        "cn": "小的",
+                                        "phonetic": "/smɔːl/"
+                    },
+                    "fat": {
+                                        "cn": "胖的",
+                                        "phonetic": "/fæt/"
+                    },
+                    "thin": {
+                                        "cn": "瘦的",
+                                        "phonetic": "/θɪn/"
+                    },
+                    "strong": {
+                                        "cn": "強壯的",
+                                        "phonetic": "/strɒŋ/"
+                    },
+                    "run": {
+                                        "cn": "跑",
+                                        "phonetic": "/rʌn/"
+                    },
+                    "swim": {
+                                        "cn": "游泳",
+                                        "phonetic": "/swɪm/"
+                    },
+                    "bark": {
+                                        "cn": "（狗）吠叫",
+                                        "phonetic": "/bɑːk/"
+                    },
+                    "grass": {
+                                        "cn": "草地 / 牧草",
+                                        "phonetic": "/ɡrɑːs/"
+                    },
+                    "pond": {
+                                        "cn": "池塘",
+                                        "phonetic": "/pond/"
+                    },
+                    "poster": {
+                                        "cn": "海報",
+                                        "phonetic": "/ˈpəʊstə/"
+                    }
+                    },
+                subtitle: "第五關 (動物特徵)",
+                color: "var(--teal-cyan)",
+                strategy: "根據形容詞（big/small, fat/thin）和特徵動作（run, swim）在腦中描繪畫面，進而選擇正確的動物特徵圖片。",
+                writingTip: "<strong>作文寫作重點：生動的形容詞描寫</strong><br>寫作時，不要只寫 <i>'I see a pig.'</i>。如果加上形容詞 <i>'I see a fat and pink pig.'</i>，畫面立刻變得鮮活！要學會使用 <i>'Subject + is/are + Adjective'</i> 的經典句型！",
+                exampleText: "<strong>動物特徵範例：</strong><br>Amy: I like this rabbit. It is fat.<br>Tim: Look at those hamsters. They are thin.",
+                exampleQuestion: "Amy 喜歡的兔子有什麼特徵？<br>A. fat (正確) &nbsp; B. small &nbsp; C. big",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Oliver: Look, Wendy! This horse is very big and strong. It likes to run very fast.",
+                            question: "What is the horse like?",
+                            options: ["small and thin", "big and strong", "fat and lazy"],
+                            answer: "big and strong"
+                        },
+                        {
+                            dialogue: "Wendy: Look at those cute rabbits in the grass. They are very small!",
+                            question: "What are the rabbits like?",
+                            options: ["big", "small", "fat"],
+                            answer: "small"
+                        },
+                        {
+                            dialogue: "Mum: This is a duck. It is very fat and it likes to swim in the clean pond.",
+                            question: "What does the duck like to do?",
+                            options: ["run fast", "bark loudly", "swim in the pond"],
+                            answer: "swim in the pond"
+                        },
+                        {
+                            dialogue: "Oliver: I like that farm animal over there! It is thin and eats grass. It is a brown cow.",
+                            question: "What animal is Oliver describing?",
+                            options: ["A fat pig", "A thin cow", "A big horse"],
+                            answer: "A thin cow"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "Ben: Look at this poster. The horse is big and likes to run. The ducks are fat and like to swim. And look at those little dogs, they bark all the time!",
+                            question: "Which animals bark all the time?",
+                            options: ["The horses", "The ducks", "The dogs"],
+                            answer: "The dogs"
+                        },
+                        {
+                            dialogue: "Dad: Do you like these cats, Ben? / Ben: No, they are very thin. I like those fat cats in the farmhouse.",
+                            question: "Which cats does Ben like?",
+                            options: ["The thin cats", "The fat cats", "All of the cats"],
+                            answer: "The fat cats"
+                        },
+                        {
+                            dialogue: "Mum: Ben, look at the big pond! I see a small orange fish. / Ben: Yes, and I see a big blue and yellow fish next to it.",
+                            question: "What kind of fish does Ben see?",
+                            options: ["A small orange fish", "A big blue and yellow fish", "A thin cat"],
+                            answer: "A big blue and yellow fish"
+                        },
+                        {
+                            dialogue: "Farmer: Welcome! We have three pigs. The pink pig is fat, the brown pig is thin, and the white pig is very small.",
+                            question: "Which pig is thin?",
+                            options: ["The pink pig", "The brown pig", "The white pig"],
+                            answer: "The brown pig"
+                        },
+                        {
+                            dialogue: "May: I like that white rabbit. It has long ears and a short tail. It is hopping happily.",
+                            question: "What are the rabbit's physical features?",
+                            options: ["short ears and a long tail", "long ears and a short tail", "big and fat"],
+                            answer: "long ears and a short tail"
+                        },
+                        {
+                            dialogue: "Sam: My favourite farm animal is the horse. It is big and runs fast. My brother likes the duck because it is small.",
+                            question: "Why does Sam's brother like the duck?",
+                            options: ["Because it is big.", "Because it runs fast.", "Because it is small."],
+                            answer: "Because it is small."
+                        }
+                    ]
+                }
+            },
+            6: {
+                title: "My Lovely Pet 寵物特徵與身體部位 🐶",
+                    vocab: {
+                    "pet": {
+                                        "cn": "寵物",
+                                        "phonetic": "/pet/"
+                    },
+                    "lovely": {
+                                        "cn": "可愛的 / 討人喜歡的",
+                                        "phonetic": "/ˈlʌvli/"
+                    },
+                    "ear": {
+                                        "cn": "耳朵",
+                                        "phonetic": "/ɪə/"
+                    },
+                    "eye": {
+                                        "cn": "眼睛",
+                                        "phonetic": "/aɪ/"
+                    },
+                    "hair": {
+                                        "cn": "毛髮 / 頭髮",
+                                        "phonetic": "/heə/"
+                    },
+                    "leg": {
+                                        "cn": "腿",
+                                        "phonetic": "/leɡ/"
+                    },
+                    "mouth": {
+                                        "cn": "嘴巴",
+                                        "phonetic": "/maʊθ/"
+                    },
+                    "nose": {
+                                        "cn": "鼻子",
+                                        "phonetic": "/nəʊz/"
+                    },
+                    "tail": {
+                                        "cn": "尾巴",
+                                        "phonetic": "/teɪl/"
+                    },
+                    "turtle": {
+                                        "cn": "烏龜",
+                                        "phonetic": "/ˈtɜːtl/"
+                    },
+                    "hamster": {
+                                        "cn": "倉鼠",
+                                        "phonetic": "/ˈhæmstə/"
+                    },
+                    "puppy": {
+                                        "cn": "小狗",
+                                        "phonetic": "/ˈpʌpi/"
+                    },
+                    "kitten": {
+                                        "cn": "小貓",
+                                        "phonetic": "/ˈkɪtn/"
+                    },
+                    "parrot": {
+                                        "cn": "鸚鵡",
+                                        "phonetic": "/ˈpærət/"
+                    },
+                    "beak": {
+                                        "cn": "鳥嘴",
+                                        "phonetic": "/biːk/"
+                    },
+                    "wing": {
+                                        "cn": "翅膀",
+                                        "phonetic": "/wɪŋ/"
+                    },
+                    "feather": {
+                                        "cn": "羽毛",
+                                        "phonetic": "/ˈfeðə/"
+                    },
+                    "black": {
+                                        "cn": "黑色的",
+                                        "phonetic": "/blæk/"
+                    },
+                    "brown": {
+                                        "cn": "褐色的",
+                                        "phonetic": "/braʊn/"
+                    },
+                    "white": {
+                                        "cn": "白色的",
+                                        "phonetic": "/waɪt/"
+                    },
+                    "carrot": {
+                                        "cn": "胡蘿蔔",
+                                        "phonetic": "/ˈkærət/"
+                    },
+                    "cute": {
+                                        "cn": "可愛的",
+                                        "phonetic": "/kjuːt/"
+                    }
+                    },
+                subtitle: "第六關 (最難度高)",
+                color: "var(--navy-dark)",
+                strategy: "將身體部位（ears, eyes, tail, legs, nose）與大小長短形容詞（long, short, big, small）緊密結合，進行複雜的特徵定位聽寫。",
+                writingTip: "<strong>作文寫作重點：細緻外貌描寫與修飾語</strong><br>寫作最高難度的就是『細節描寫』。描寫一隻寵物，不能只說牠很可愛，而是要將身體部位和修飾詞精確搭配。例如：<i>'My lovely hamster has tiny black eyes, very small ears, and a short tail.'</i>。這樣能讓你的作文拿滿分！",
+                exampleText: "<strong>寵物部位範例：</strong><br>Zoe: This is my dog. It has big ears and a black nose.<br>Lucas: My bird has small eyes and long feathers.",
+                exampleQuestion: "Zoe 的狗長什麼樣子？<br>A. It has big ears (正確) &nbsp; B. It has a long tail &nbsp; C. It has small ears",
+                questions: {
+                    easy: [
+                        {
+                            dialogue: "Lucas: This is my pet bird. It has small eyes, a yellow head, and green wings. It is very cute.",
+                            question: "What is Lucas's bird like?",
+                            options: ["It has big eyes.", "It has small eyes.", "It has a long tail."],
+                            answer: "It has small eyes."
+                        },
+                        {
+                            dialogue: "Mason: I have a cute dog named Toby. It is fat and has a very short tail.",
+                            question: "What is Toby the dog's tail like?",
+                            options: ["long and thin", "short", "big"],
+                            answer: "short"
+                        },
+                        {
+                            dialogue: "Sarah: My cats Bobo and Yoyo are very big. They both have long fluffy tails.",
+                            question: "What do Sarah's cats have?",
+                            options: ["short tails", "long tails", "small eyes"],
+                            answer: "long tails"
+                        },
+                        {
+                            dialogue: "Betty: Look at my turtle Jim. It is small and green. It has a tiny head and short legs.",
+                            question: "What is Jim the turtle like?",
+                            options: ["big and fast", "small with a tiny head", "It has long ears"],
+                            answer: "small with a tiny head"
+                        }
+                    ],
+                    hard: [
+                        {
+                            dialogue: "John: This is my pet hamster Lucy. She has a big mouth, small black eyes, and small ears. She is lovely.",
+                            question: "Which description is true about Lucy the hamster?",
+                            options: ["She has big eyes and big ears.", "She has a big mouth and small eyes.", "She has a long tail."],
+                            answer: "She has a big mouth and small eyes."
+                        },
+                        {
+                            dialogue: "Betty: John, is this your dog Charlie? / John: Yes, Charlie has a big black nose and a short tail. Coco has a small nose.",
+                            question: "What does Charlie the dog look like?",
+                            options: ["big nose and short tail", "small nose and long tail", "long legs and big eyes"],
+                            answer: "big nose and short tail"
+                        },
+                        {
+                            dialogue: "Danny: My sister has a cat named Rosie. Rosie is fat and has very short legs. She cannot jump high.",
+                            question: "Why can't Rosie the cat jump high?",
+                            options: ["She has long legs.", "She is thin and fast.", "She is fat and has short legs."],
+                            answer: "She is fat and has short legs."
+                        },
+                        {
+                            dialogue: "Tina: Listen to my riddle! My pet is white. It has long ears, red eyes, and a very short tail. It loves carrots.",
+                            question: "What is Tina's pet?",
+                            options: ["A friendly dog", "A hamster", "A cute rabbit"],
+                            answer: "A cute rabbit"
+                        },
+                        {
+                            dialogue: "Leo: I have a pet parrot. It is green and red. It has a curved beak, big black eyes, and long beautiful feathers.",
+                            question: "What are the parrot's features?",
+                            options: ["small black eyes", "big black eyes and long feathers", "short legs and big ears"],
+                            answer: "big black eyes and long feathers"
+                        },
+                        {
+                            dialogue: "Amy: This is my puppy Sparky. Sparky has big floppy brown ears, a tiny black nose, and short white legs.",
+                            question: "What colour are Sparky's ears?",
+                            options: ["white", "black", "brown"],
+                            answer: "brown"
+                        }
+                    ]
+                }
+            }
+        };
+
+        
+        // Persistent State
+        let currentLevel = null;
+        let isDictation = false;
+        let activeQuestionSet = [];
+        let currentQuestionIdx = 0;
+        let correctAnswersCount = 0;
+        let wrongQuestionsSelected = [];
+
+        // Vocabulary Bank Global States
+        let currentSpeakingVocab = "";
+        let isCurrentlySpeaking = false; // Tracks speaking status reliably for phone/iPad controls
+
+        // Robust Speech Cancel to clear frozen Synthesis Queue on iPads
+        function safeSpeechCancel() {
+            try {
+                window.speechSynthesis.resume();
+                window.speechSynthesis.cancel();
+            } catch (e) {
+                console.error("Speech cancellation error:", e);
+            }
+        }
+
+        // Auto-highlighter that wraps vocabulary words in dialogue with dashed underlines
+        function highlightDialogueText(sentence, levelId) {
+            if (!levelsData[levelId] || !levelsData[levelId].vocab) return sentence;
+            const vocabMap = levelsData[levelId].vocab;
+            let words = Object.keys(vocabMap).sort((a, b) => b.length - a.length);
+            
+            let tempText = sentence;
+            const tokens = [];
+            
+            words.forEach((word) => {
+                // Escape special regex characters in the word
+                const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                
+                // Construct regex with word boundary matching and optional plural suffix (s, es, ies)
+                let regexStr = '\\b' + escapedWord + '(s|es|ies)?\\b';
+                if (word.endsWith('s')) {
+                    regexStr = '\\b' + escapedWord + '\\b';
+                }
+                const regex = new RegExp(regexStr, 'gi');
+                
+                tempText = tempText.replace(regex, (match) => {
+                    const token = `__VOCAB_TOKEN_${tokens.length}__`;
+                    tokens.push({
+                        token: token,
+                        original: match,
+                        dictWord: word
+                    });
+                    return token;
+                });
+            });
+            
+            // Re-substitute tokens back with beautiful dashed links
+            tokens.forEach((t) => {
+                const html = `<span class="vocab-inline-link" onclick="openVocabDetail('${t.dictWord.replace(/'/g, "\\'")}', event)">${t.original}</span>`;
+                tempText = tempText.replace(t.token, html);
+            });
+            
+            return tempText;
+        }
+
+        // Open detailed explanation card of a vocabulary word
+        function openVocabDetail(wordKey, event) {
+            if (event) event.stopPropagation(); // Avoid triggering parent clicks
+            
+            const vocabMap = levelsData[currentLevel].vocab;
+            if (!vocabMap || !vocabMap[wordKey]) return;
+            
+            const detail = vocabMap[wordKey];
+            currentSpeakingVocab = wordKey;
+            
+            document.getElementById('vocab-word-title').innerText = wordKey.charAt(0).toUpperCase() + wordKey.slice(1);
+            document.getElementById('vocab-phonetic').innerText = detail.phonetic || "";
+            document.getElementById('vocab-cn-meaning').innerText = detail.cn;
+            
+            const modal = document.getElementById('vocab-modal');
+            modal.classList.add('active');
+            
+            // Speak pronunciation automatically
+            speakVocabWord();
+        }
+
+        function closeVocabModal() {
+            const modal = document.getElementById('vocab-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            safeSpeechCancel();
+        }
+
+        function speakVocabWord() {
+            if (!currentSpeakingVocab) return;
+            speakText(currentSpeakingVocab, true);
+        }
+
+        // Open full level Vocabulary Study Guide list modal
+        function openLevelVocabModal() {
+            const data = levelsData[currentLevel];
+            if (!data || !data.vocab) return;
+            
+            document.getElementById('vocab-bank-modal-title').innerText = `${data.title} • 快樂生字庫`;
+            const container = document.getElementById('vocab-bank-items-container');
+            container.innerHTML = "";
+            
+            Object.keys(data.vocab).forEach((word) => {
+                const detail = data.vocab[word];
+                const itemCard = document.createElement('div');
+                itemCard.className = "vocab-bank-card";
+                itemCard.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <div class="vocab-bank-word">${word.charAt(0).toUpperCase() + word.slice(1)}</div>
+                        <div class="vocab-bank-phonetic">${detail.phonetic || ""}</div>
+                        <div style="margin-top: 4px;"><span class="vocab-bank-cn">${detail.cn}</span></div>
+                    </div>
+                    <button class="vocab-bank-play-btn" onclick="speakText('${word.replace(/'/g, "\\'")}', true); event.stopPropagation();">🔊</button>
+                `;
+                container.appendChild(itemCard);
+            });
+            
+            const modal = document.getElementById('level-vocab-list-modal');
+            modal.classList.add('active');
+        }
+
+        function closeLevelVocabListModal() {
+            const modal = document.getElementById('level-vocab-list-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            safeSpeechCancel();
+        }
+
+        
+        // Safe levelStarsMemory initialization that works even in iOS/Safari Private Browsing (no-local-storage) mode!
+        let levelStarsMemory = {
+            1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 'phonics': 0, 'dictation': 0
+        };
+        try {
+            const cachedStars = localStorage.getItem('athens_listening_stars');
+            if (cachedStars) {
+                levelStarsMemory = JSON.parse(cachedStars);
+            }
+        } catch (e) {
+            console.warn("Storage is disabled or private mode is active. Star achievements will be memory-only:", e);
+        }
+
+        // Answer caching for free navigation
+        let userQuizAnswers = [null, null, null, null, null];
+        let userDictationAnswers = [null, null, null, null, null];
+        let autoAdvanceTimeout = null;
+
+        let dictationActiveWord = "";
+        let dictationUserWord = [];
+
+        window.onload = function() {
+            updateDashboardStars();
+        };
+
+        function updateDashboardStars() {
+            for (let lvl in levelStarsMemory) {
+                const container = document.getElementById(`stars-level-${lvl}`);
+                if (container) {
+                    const stars = container.querySelectorAll('.star-mini');
+                    const earned = levelStarsMemory[lvl];
+                    stars.forEach((star, index) => {
+                        if (index < earned) {
+                            star.classList.add('filled');
+                        } else {
+                            star.classList.remove('filled');
+                        }
+                    });
+                }
+            }
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            safeSpeechCancel(); // Stop any audio during view transition
+        }
+
+        function goHome() {
+            closeTranscriptModal();
+            showView('homepage-view');
+            updateDashboardStars();
+        }
+
+        // --- NEW: Helper Functions for Modal Transcript and Individual Sentence Pronunciation ---
+        function splitDialogueIntoSentences(dialogue) {
+            let segments = [];
+            if (!dialogue) return segments;
+            const parts = dialogue.split('/');
+            parts.forEach(part => {
+                const trimmedPart = part.trim();
+                if (trimmedPart) {
+                    const sentences = trimmedPart.match(/[^.?!]+[.?!]?/g) || [trimmedPart];
+                    sentences.forEach(s => {
+                        const cleanS = s.trim();
+                        if (cleanS) {
+                            segments.push(cleanS);
+                        }
+                    });
+                }
+            });
+            return segments;
+        }
+
+        function openTranscriptModal() {
+            const currentQ = activeQuestionSet[currentQuestionIdx];
+            if (!currentQ || !currentQ.dialogue) return;
+
+            const modal = document.getElementById('transcript-modal');
+            const container = document.getElementById('transcript-sentences-container');
+            container.innerHTML = ""; // Clear
+
+            const sentences = splitDialogueIntoSentences(currentQ.dialogue);
+
+            sentences.forEach((sentence) => {
+                const item = document.createElement('div');
+                item.className = "sentence-item";
+
+                let formattedText = sentence;
+                if (sentence.includes(':')) {
+                    const parts = sentence.split(':');
+                    const speaker = parts[0].trim();
+                    const speech = parts.slice(1).join(':').trim();
+                    formattedText = `<span style="color: var(--coral-orange); font-weight: 800;">${speaker}:</span> ${speech}`;
+                }
+
+                // Properly escape single quotes in JS string
+                const escapedSentence = sentence.replace(/'/g, "\\'");
+
+                // Highlight the speech part with dashed underlines of key vocabulary words
+                let sentenceWithVocab = formattedText;
+                if (sentence.includes(':')) {
+                    const parts = sentence.split(':');
+                    const speaker = parts[0].trim();
+                    const speech = parts.slice(1).join(':').trim();
+                    const highlightedSpeech = highlightDialogueText(speech, currentLevel);
+                    sentenceWithVocab = `<span style="color: var(--coral-orange); font-weight: 800;">${speaker}:</span> ${highlightedSpeech}`;
+                } else {
+                    sentenceWithVocab = highlightDialogueText(sentence, currentLevel);
+                }
+
+                item.innerHTML = `
+                    <div class="sentence-text">${sentenceWithVocab}</div>
+                    <button class="sentence-play-btn" onclick="speakSingleSentence('${escapedSentence}', this)">🔊</button>
+                `;
+                container.appendChild(item);
+            });
+
+            modal.classList.add('active');
+        }
+
+        function closeTranscriptModal() {
+            const modal = document.getElementById('transcript-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            safeSpeechCancel();
+        }
+
+        function speakSingleSentence(text, btn) {
+            // Cancel any playing voice
+            safeSpeechCancel();
+            
+            // Highlight this button
+            document.querySelectorAll('.sentence-play-btn').forEach(b => b.style.background = 'var(--sky-blue)');
+            btn.style.background = 'var(--coral-orange)';
+            
+            // Speak standard sentence
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; // Friendly slow rate for P2
+            utterance.pitch = 1.15;
+            
+            utterance.onend = () => {
+                btn.style.background = 'var(--sky-blue)';
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 1. OPEN LEVEL INTRO PAGE (Requirement 1 with Speech Buttons)
+        function openLevelIntro(levelId) {
+            currentLevel = levelId;
+            isDictation = (levelId === 'dictation');
+            
+            const data = levelsData[levelId];
+            const contentArea = document.getElementById('intro-content-area');
+            
+            // Safe escape helper for speech attributes
+            const cleanStrategy = data.strategy.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const cleanWritingTip = data.writingTip.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            
+            let htmlContent = `
+                <div class="intro-title">${data.title}</div>
+                <div style="text-align: center; font-size: 1.1rem; color: #64748B; margin-top: -10px; margin-bottom: 20px; font-weight: bold;">
+                    關卡進度：${data.subtitle}
+                </div>
+                
+                <div class="intro-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <h3 style="margin: 0;">🎯 聽力挑戰攻略 (Listening Strategy)</h3>
+                        <button class="speech-intro-btn" onclick="speakChineseAndEnglish('${cleanStrategy}')">🔊 聽攻略</button>
+                    </div>
+                    <div class="strategy-box">${data.strategy}</div>
+                </div>
+
+                <div class="intro-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <h3 style="margin: 0;">📝 寫作連動重點 (Writing Strategy)</h3>
+                        <button class="speech-intro-btn" onclick="speakChineseAndEnglish('${cleanWritingTip}')">🔊 聽寫作秘籍</button>
+                    </div>
+                    <div class="writing-tip-box">${data.writingTip}</div>
+                </div>
+
+                <div class="intro-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <h3 style="margin: 0;">💡 學習示範 (Example Case)</h3>
+                        <button class="speech-intro-btn" onclick="speakExampleCase('${levelId}')">🔊 聽示範</button>
+                    </div>
+                    <div class="example-box">
+                        ${data.exampleText}
+                        <div style="margin-top: 10px; border-top: 1px dashed #A7F3D0; padding-top: 10px; font-weight: bold; color: #065F46;">
+                            【示範題目】：${data.exampleQuestion}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            contentArea.innerHTML = htmlContent;
+            
+            // Dynamically show play and study vocab bank button if level has vocabulary lists
+            const buttonsRow = document.getElementById('intro-buttons-row');
+            if (buttonsRow) {
+                if (data.vocab) {
+                    buttonsRow.innerHTML = `
+                        <button class="intro-vocab-btn" onclick="openLevelVocabModal()">📖 本關生字庫 (Vocab Bank)</button>
+                        <button class="intro-play-btn" onclick="startActiveLevel()">🚀 開始挑戰此關卡</button>
+                    `;
+                } else {
+                    buttonsRow.innerHTML = `
+                        <button class="intro-play-btn" style="flex: 1; max-width: 400px;" onclick="startActiveLevel()">🚀 開始挑戰此關卡</button>
+                    `;
+                }
+            }
+            showView('intro-view');
+        }
+
+        // 2. START THE GAME
+                function startActiveLevel() {
+            correctAnswersCount = 0;
+            currentQuestionIdx = 0;
+            wrongQuestionsSelected = [];
+            userQuizAnswers = [null, null, null, null, null];
+            userDictationAnswers = [null, null, null, null, null];
+            clearTimeout(autoAdvanceTimeout);
+
+            if (isDictation) {
+                // Setup Dictation Challenge (Randomly pick 5 words out of 10)
+                const allWords = [...levelsData['dictation'].words];
+                activeQuestionSet = shuffleArray(allWords).slice(0, 5);
+                setupDictationTurn();
+                showView('dictation-view');
+            } else {
+                // Setup Standard Level (Missions 1-6 or Phonics Time)
+                const lvlPool = levelsData[currentLevel].questions;
+                // Randomly select 2 easy questions and 3 hard questions as requested:
+                const chosenEasy = getRandomSubset(lvlPool.easy, 2);
+                const chosenHard = getRandomSubset(lvlPool.hard, 3);
+                
+                // Merge them: 2 easy first, followed by 3 hard (progressive difficulty)
+                activeQuestionSet = [...chosenEasy, ...chosenHard];
+                
+                setupQuizTurn();
+                showView('game-view');
+            }
+        }
+
+        // Shuffling and randomizing helpers
+        function shuffleArray(arr) {
+            let temp = [...arr];
+            for (let i = temp.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [temp[i], temp[j]] = [temp[j], temp[i]];
+            }
+            return temp;
+        }
+
+        function getRandomSubset(arr, n) {
+            return shuffleArray(arr).slice(0, n);
+        }
+
+        // 3. SET UP QUIZ PLAY ROUND (Missions 1-6 & Phonics)
+                function setupQuizTurn() {
+            closeTranscriptModal();
+            clearTimeout(autoAdvanceTimeout);
+            // Hide pause button on start of turn
+            const pauseBtn = document.getElementById('audio-pause-trigger');
+            if (pauseBtn) pauseBtn.style.display = 'none';
+
+            // Progress Bar Update
+            const progressPct = (currentQuestionIdx / 5) * 100;
+            document.getElementById('quiz-progress').style.width = `${progressPct}%`;
+            document.getElementById('question-tracker').innerText = `題目 ${currentQuestionIdx + 1} / 5`;
+            
+            const currentQ = activeQuestionSet[currentQuestionIdx];
+            document.getElementById('question-text').innerText = currentQ.question;
+            
+            // Build options list cards
+            const optionsBox = document.getElementById('options-container');
+            optionsBox.innerHTML = "";
+            
+            const answeredObj = userQuizAnswers[currentQuestionIdx];
+
+            // Render A, B, C cards
+            const prefixes = ["A", "B", "C"];
+            currentQ.options.forEach((opt, idx) => {
+                const card = document.createElement('div');
+                card.className = "option-card";
+                
+                if (answeredObj) {
+                    // Already answered this question! Disable click.
+                    card.onclick = null;
+                    if (opt === answeredObj.chosen) {
+                        card.classList.add(opt === currentQ.answer ? 'correct' : 'wrong');
+                    } else if (opt === currentQ.answer) {
+                        card.classList.add('correct');
+                    }
+                } else {
+                    // Normal state: not answered yet
+                    card.onclick = () => handleOptionSelection(card, opt, currentQ.answer);
+                }
+
+                card.innerHTML = `
+                    <div class="option-prefix">${prefixes[idx]}</div>
+                    <div class="option-text">${opt}</div>
+                `;
+                optionsBox.appendChild(card);
+            });
+
+            updateNavButtons();
+
+            // Automatically read out of audio disabled by user request to let children trigger it when ready
+            // (Auto-play commented out)
+        }
+
+        function speakCurrentDialogue() {
+            const currentQ = activeQuestionSet[currentQuestionIdx];
+            speakText(currentQ.dialogue, false);
+        }
+
+        function speakCurrentQuestion() {
+            const currentQ = activeQuestionSet[currentQuestionIdx];
+            speakText(currentQ.question, false);
+        }
+
+                function handleOptionSelection(selectedCard, chosenVal, correctVal) {
+            // Block multiple clicks
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(c => c.onclick = null);
+
+            const currentQ = activeQuestionSet[currentQuestionIdx];
+            const isCorrect = (chosenVal === correctVal);
+
+            userQuizAnswers[currentQuestionIdx] = { chosen: chosenVal, correct: correctVal };
+
+            if (isCorrect) {
+                selectedCard.classList.add('correct');
+                playEffectSound('correct');
+                correctAnswersCount++;
+                triggerCorrectVisualEffect(); // Trigger beautiful big celebration popup
+            } else {
+                selectedCard.classList.add('wrong');
+                playEffectSound('wrong');
+                
+                // Highlight correct card for learning assist
+                cards.forEach(c => {
+                    const optText = c.querySelector('.option-text').innerText;
+                    if (optText === correctVal) {
+                        c.classList.add('correct');
+                    }
+                });
+
+                // Record wrong question for composition study notes later
+                wrongQuestionsSelected.push({
+                    q: currentQ.question,
+                    correct: correctVal,
+                    dialogue: currentQ.dialogue
+                });
+            }
+
+            updateNavButtons();
+
+            // Go to next question after short delay automatically
+            autoAdvanceTimeout = setTimeout(() => {
+                goToNextQuestion();
+            }, 3000);
+        }
+
+        // 4. DICTATION MASTER PLAY ROUND
+                function setupDictationTurn() {
+            closeTranscriptModal();
+            clearTimeout(autoAdvanceTimeout);
+            const pauseBtn = document.getElementById('dictation-pause-trigger');
+            if (pauseBtn) pauseBtn.style.display = 'none';
+
+            const progressPct = (currentQuestionIdx / 5) * 100;
+            document.getElementById('dictation-progress').style.width = `${progressPct}%`;
+            document.getElementById('dictation-tracker').innerText = `第 ${currentQuestionIdx + 1} / 5 詞`;
+
+            const currentWordObj = activeQuestionSet[currentQuestionIdx];
+            dictationActiveWord = currentWordObj.word.toLowerCase();
+            dictationUserWord = [];
+
+            document.getElementById('dictation-difficulty-label').innerText = `【${currentWordObj.level}】`;
+
+            // Setup empty slots for spelling
+            const slotPool = document.getElementById('spelling-slots-pool');
+            slotPool.innerHTML = "";
+
+            const answeredObj = userDictationAnswers[currentQuestionIdx];
+
+            if (answeredObj) {
+                // Already answered this dictation word
+                for (let i = 0; i < dictationActiveWord.length; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = "letter-slot";
+                    slot.innerText = dictationActiveWord[i].toUpperCase();
+                    if (answeredObj.isCorrect) {
+                        slot.style.background = "#ECFDF5";
+                        slot.style.borderColor = "var(--grass-green)";
+                        slot.style.color = "#065F46";
+                    } else {
+                        slot.style.background = "#FEF2F2";
+                        slot.style.borderColor = "var(--coral-orange)";
+                        slot.style.color = "#991B1B";
+                    }
+                    slotPool.appendChild(slot);
+                }
+
+                // Render simple status message in bubble pool
+                const bubblePool = document.getElementById('letter-bubbles-pool');
+                bubblePool.innerHTML = `<div style="color: #64748B; font-weight: bold; font-size: 1.1rem; padding: 15px; text-align:center;">已回答：拼寫是 ${dictationActiveWord.toUpperCase()}</div>`;
+                
+                // Hide submit/clear buttons
+                const actRow = document.getElementById('dictation-actions-row');
+                if (actRow) actRow.style.visibility = 'hidden';
+            } else {
+                // Not answered yet! Show standard interactive slots & scrambled letters
+                const actRow = document.getElementById('dictation-actions-row');
+                if (actRow) actRow.style.visibility = 'visible';
+
+                for (let i = 0; i < dictationActiveWord.length; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = "letter-slot";
+                    slot.id = `slot-${i}`;
+                    slot.innerText = "_";
+                    slotPool.appendChild(slot);
+                }
+
+                // Scramble letters for bubble pool
+                const scrambledLetters = shuffleArray(dictationActiveWord.split(""));
+                const bubblePool = document.getElementById('letter-bubbles-pool');
+                bubblePool.innerHTML = "";
+                
+                scrambledLetters.forEach((char, idx) => {
+                    const bubble = document.createElement('div');
+                    bubble.className = "letter-bubble";
+                    bubble.innerText = char.toUpperCase();
+                    bubble.onclick = () => addLetterToSpelling(bubble, char);
+                    bubblePool.appendChild(bubble);
+                });
+
+                setTimeout(() => {
+                    speakCurrentDictationWord();
+                }, 500);
+            }
+
+            updateNavButtons();
+        }
+
+        function speakCurrentDictationWord() {
+            speakText(dictationActiveWord, true);
+        }
+
+        function addLetterToSpelling(bubbleElem, char) {
+            if (dictationUserWord.length < dictationActiveWord.length) {
+                // Find next empty slot
+                const slotIndex = dictationUserWord.length;
+                const targetSlot = document.getElementById(`slot-${slotIndex}`);
+                if (targetSlot) {
+                    targetSlot.innerText = char.toUpperCase();
+                    targetSlot.style.borderColor = "var(--sky-blue)";
+                    targetSlot.style.background = "#EFF6FF";
+                }
+                
+                dictationUserWord.push({ char: char, element: bubbleElem });
+                bubbleElem.classList.add('selected');
+            }
+        }
+
+        function clearActiveSpelling() {
+            // Restore bubble pools and clear targets
+            dictationUserWord.forEach(item => {
+                item.element.classList.remove('selected');
+            });
+            dictationUserWord = [];
+
+            // Reset slots
+            for (let i = 0; i < dictationActiveWord.length; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                if (slot) {
+                    slot.innerText = "_";
+                    slot.style.borderColor = "#94A3B8";
+                    slot.style.background = "#F8FAFC";
+                }
+            }
+        }
+
+                function submitSpellingAnswer() {
+            const typedWordString = dictationUserWord.map(item => item.char).join("");
+            if (typedWordString.length < dictationActiveWord.length) return; // incomplete
+
+            // Disable bubble clicks
+            document.querySelectorAll('.letter-bubble').forEach(b => b.onclick = null);
+
+            const isCorrect = (typedWordString === dictationActiveWord);
+            const slotPool = document.getElementById('spelling-slots-pool');
+
+            userDictationAnswers[currentQuestionIdx] = { typed: typedWordString, correct: dictationActiveWord, isCorrect: isCorrect };
+
+            if (isCorrect) {
+                playEffectSound('correct');
+                correctAnswersCount++;
+                triggerCorrectVisualEffect(); // Trigger beautiful celebration pop
+                
+                // Bright green slots
+                for (let i = 0; i < dictationActiveWord.length; i++) {
+                    const slot = document.getElementById(`slot-${i}`);
+                    slot.style.background = "#ECFDF5";
+                    slot.style.borderColor = "var(--grass-green)";
+                    slot.style.color = "#065F46";
+                }
+            } else {
+                playEffectSound('wrong');
+                // Red shake slots and reveal correct answer
+                for (let i = 0; i < dictationActiveWord.length; i++) {
+                    const slot = document.getElementById(`slot-${i}`);
+                    slot.style.background = "#FEF2F2";
+                    slot.style.borderColor = "var(--coral-orange)";
+                    slot.style.color = "#991B1B";
+                    // Reveal correct letter in slots after 1s
+                    setTimeout(() => {
+                        slot.innerText = dictationActiveWord[i].toUpperCase();
+                        slot.style.background = "#EFF6FF";
+                        slot.style.borderColor = "var(--sky-blue)";
+                        slot.style.color = "var(--navy-dark)";
+                    }, 1000);
+                }
+
+                // Add to review wrong questions notes
+                wrongQuestionsSelected.push({
+                    q: `單字拼寫聽寫挑戰 (Word Spelling)`,
+                    correct: dictationActiveWord.toUpperCase(),
+                    dialogue: `聽音拼詞: ${dictationActiveWord.toUpperCase()}`
+                });
+            }
+
+            updateNavButtons();
+
+            // Go to next turn after delay
+            autoAdvanceTimeout = setTimeout(() => {
+                goToNextQuestion();
+            }, 3000);
+        }
+
+        // 5. FINISH CURRENT LEVEL & CALCULATE STARS (Requirement 7 with Skip-Proof Dynamic Scoring)
+        function finishActiveLevel() {
+            // Cancel voice
+            safeSpeechCancel();
+
+            // Calculate final correct score dynamically based on user selections
+            let finalScore = 0;
+            if (isDictation) {
+                for (let i = 0; i < 5; i++) {
+                    if (userDictationAnswers[i] && userDictationAnswers[i].isCorrect) {
+                        finalScore++;
+                    }
+                }
+            } else {
+                for (let i = 0; i < 5; i++) {
+                    if (userQuizAnswers[i] && userQuizAnswers[i].chosen === userQuizAnswers[i].correct) {
+                        finalScore++;
+                    }
+                }
+            }
+
+            const earnedStars = finalScore;
+            
+            // Keep the highest stars score achieved (strictly overwrite if higher than original high score)
+            if (earnedStars > levelStarsMemory[currentLevel]) {
+                levelStarsMemory[currentLevel] = earnedStars;
+                try {
+                    localStorage.setItem('athens_listening_stars', JSON.stringify(levelStarsMemory));
+                } catch (e) {
+                    console.warn("Storage failed (likely private browsing mode):", e);
+                }
+            }
+
+            // Display elements based on performance
+            const resultEmoji = document.getElementById('result-emoji');
+            const scoreMsg = document.getElementById('score-message');
+            const scoreFrac = document.getElementById('score-fraction');
+
+            scoreFrac.innerText = `你在 5 題中答對了 ${finalScore} 題！`;
+
+            if (finalScore === 5) {
+                resultEmoji.innerText = "🏆";
+                scoreMsg.innerText = "完美無瑕！你是英語聽力大師！";
+                playEffectSound('victory');
+                startConfettiEffect();
+            } else if (finalScore >= 3) {
+                resultEmoji.innerText = "🌟";
+                scoreMsg.innerText = "非常棒！繼續努力拿 5 顆星吧！";
+                playEffectSound('victory');
+            } else {
+                resultEmoji.innerText = "💪";
+                scoreMsg.innerText = "再接再厲！加油，你一定可以做到的！";
+            }
+
+            // Set stars active states visually
+            const starBoxes = document.getElementById('result-stars-box').querySelectorAll('.star-big');
+            starBoxes.forEach((star, idx) => {
+                if (idx < earnedStars) {
+                    setTimeout(() => {
+                        star.classList.add('active');
+                    }, idx * 150);
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+
+            // Populate Wrong Questions Review Panel if there are any
+            const reviewPanel = document.getElementById('review-wrong-panel');
+            const reviewList = document.getElementById('wrong-questions-list');
+            
+            if (wrongQuestionsSelected.length > 0) {
+                reviewPanel.style.display = 'block';
+                reviewList.innerHTML = "";
+                wrongQuestionsSelected.forEach(item => {
+                    const qItem = document.createElement('div');
+                    qItem.className = "wrong-q-item";
+                    qItem.innerHTML = `
+                        <strong>題目：</strong> ${item.q}<br>
+                        <strong>正確答案：</strong> <span style="color:var(--grass-green); font-weight:bold;">${item.correct}</span><br>
+                        <small style="color:#64748B;">聽力文本："${item.dialogue}"</small>
+                    `;
+                    reviewList.appendChild(qItem);
+                });
+            } else {
+                reviewPanel.style.display = 'none';
+            }
+
+            showView('result-view');
+        }
+
+        // CANVAS CONFETTI CELEBRATORY EFFECT
+        let confettiInterval = null;
+        function startConfettiEffect() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust canvas sizing
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            
+            const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF8AAE', '#9E78F5'];
+            const particles = [];
+
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+                    tiltAngle: 0
+                });
+            }
+
+            let angle = 0;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach((p, idx) => {
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(angle + p.d) + 3 + p.r / 2) / 2;
+                    p.x += Math.sin(angle);
+                    p.tilt = Math.sin(p.tiltAngle - idx/3) * 15;
+
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    ctx.stroke();
+                });
+
+                update();
+            }
+
+            function update() {
+                angle += 0.01;
+                particles.forEach(p => {
+                    if (p.y > canvas.height) {
+                        p.x = Math.random() * canvas.width;
+                        p.y = -20;
+                    }
+                });
+            }
+
+            let animationFrameId;
+            function animate() {
+                draw();
+                animationFrameId = requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Clear confetti animation after 6 seconds
+            setTimeout(() => {
+                cancelAnimationFrame(animationFrameId);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 6000);
+        }
+
+        // --- Teacher Cat 3.0 Addition Functions ---
+        // --- Speak Example Case Function (Requirement 3) ---
+        function speakExampleCase(levelId) {
+            safeSpeechCancel();
+            const data = levelsData[levelId];
+            if (!data) return;
+
+            // Clean up text and split by <br>
+            const parts = data.exampleText.split('<br>');
+            const chineseLabel = parts[0].replace(/<[^>]*>/g, "").trim();
+            const englishParts = parts.slice(1).map(p => p.replace(/<[^>]*>/g, "").trim()).filter(p => p);
+            
+            // Clean up the question and options
+            let cleanQuestion = data.exampleQuestion.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
+
+            // Speak Chinese example title in Cantonese
+            const uLabel = new SpeechSynthesisUtterance(chineseLabel);
+            uLabel.lang = 'zh-HK';
+            uLabel.rate = 0.85;
+
+            uLabel.onend = () => {
+                // Speak English example text / dialogue
+                const englishText = englishParts.join('. ');
+                const uEng = new SpeechSynthesisUtterance(englishText);
+                uEng.lang = 'en-US';
+                uEng.rate = 0.80; // Nice child-friendly rate
+                uEng.pitch = 1.15;
+
+                uEng.onend = () => {
+                    // Speak Chinese question in Cantonese
+                    const uQuest = new SpeechSynthesisUtterance(cleanQuestion);
+                    uQuest.lang = 'zh-HK';
+                    uQuest.rate = 0.85;
+                    uQuest.pitch = 1.10;
+                    window.speechSynthesis.speak(uQuest);
+                };
+
+                window.speechSynthesis.speak(uEng);
+            };
+
+            window.speechSynthesis.speak(uLabel);
+        }
+
+        
+
+
+        function triggerCorrectVisualEffect() {
+            const el = document.getElementById('correct-pop-container');
+            el.classList.add('show');
+            startConfettiEffect();
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 1500);
+        }
+
+        function goToPrevQuestion() {
+            clearTimeout(autoAdvanceTimeout);
+            safeSpeechCancel();
+            if (currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+                if (isDictation) {
+                    setupDictationTurn();
+                } else {
+                    setupQuizTurn();
+                }
+            }
+        }
+
+        function goToNextQuestion() {
+            clearTimeout(autoAdvanceTimeout);
+            safeSpeechCancel();
+            if (currentQuestionIdx < 4) {
+                currentQuestionIdx++;
+                if (isDictation) {
+                    setupDictationTurn();
+                } else {
+                    setupQuizTurn();
+                }
+            } else {
+                finishActiveLevel();
+            }
+        }
+
+
+        // Reset All stars and scores dynamically (Requirement 14)
+        function confirmResetAllProgress() {
+            safeSpeechCancel();
+            const message = "⚠️ 小朋友，你確定要清除所有金黃色星星，重新開始冒險嗎？\n(Are you sure you want to reset all your stars and restart your adventure?)";
+            if (confirm(message)) {
+                // reset stars to 0
+                levelStarsMemory = {
+                    1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 'phonics': 0, 'dictation': 0
+                };
+                try {
+                    localStorage.setItem('athens_listening_stars', JSON.stringify(levelStarsMemory));
+                } catch (e) {
+                    console.warn("Storage failed (likely private browsing mode):", e);
+                }
+                updateDashboardStars();
+                
+                // Play correct sound
+                playEffectSound('victory');
+                
+                // speak Cantonese confirmation
+                const utter = new SpeechSynthesisUtterance("已為您清除所有紀錄！讓我們重新開始冒險吧！");
+                utter.lang = 'zh-HK';
+                utter.rate = 0.9;
+                window.speechSynthesis.speak(utter);
+
+                alert("✨ 所有島嶼的星星與紀錄已清除成功！讓我們重新出發吧！");
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = isDictation ? document.getElementById('dict-prev-btn') : document.getElementById('quiz-prev-btn');
+            const nextBtn = isDictation ? document.getElementById('dict-next-btn') : document.getElementById('quiz-next-btn');
+            
+            if (prevBtn) {
+                prevBtn.style.visibility = (currentQuestionIdx === 0) ? 'hidden' : 'visible';
+            }
+            
+            if (nextBtn) {
+                nextBtn.style.display = ""; // Always keep nextBtn visible so kids can skip or complete on Question 5!
+                if (currentQuestionIdx === 4) {
+                    nextBtn.innerHTML = "🏁 看結果 (Finish)";
+                    nextBtn.style.background = "var(--grass-green)";
+                    nextBtn.style.color = "white";
+                } else {
+                    nextBtn.innerHTML = "下一頁 (Next) ➡️";
+                    nextBtn.style.background = "#D8B4FE";
+                    nextBtn.style.color = "#6B21A8";
+                }
+            }
+        }
+
+    </script>
+
+    <div id="correct-pop-container" class="correct-pop-effect">
+        <div class="correct-pop-emoji">🌟🏆🎉</div>
+        <div class="correct-pop-text">答對了！Excellent!</div>
+    </div>
+
+    <!-- Teacher Cat Contact Footer -->
+    <footer class="teacher-cat-footer">
+        <div class="footer-title">🐾 Teacher Cat 的快樂 AI 教室 🐾</div>
+        <p class="footer-subtitle">和貓咪老師一起學英語，探索 AI 學習新樂趣！歡迎關注我們：</p>
+        <div class="social-links-grid">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-link youtube">🎥 YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-link instagram">📸 Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-link facebook">👥 Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-link threads">🧵 Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-link xhs">📕 小紅書</a>
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-link whatsapp">💬 WhatsApp 分享群</a>
+            <span class="social-link douyin">🎵 抖音號: 74254902683</span>
+        </div>
+    </footer>
+
+</body>
+</html>
