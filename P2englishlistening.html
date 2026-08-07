@@ -1981,7 +1981,7 @@
         // Function to split words and inject underlines for vocab library
         function highlightVocab(sentence, vocabList) {
             var temp = sentence;
-            var keys = Object.keys(vocabList).sort((a,b) => b.length - a.length);
+            var keys = Object.keys(vocabList).sort(function(a, b) { return b.length - a.length; });
             
             // Split sentence by HTML tags to prevent matching inside classes
             var tokens = temp.split(/(<[^>]+>)/g);
@@ -2014,7 +2014,7 @@
             document.getElementById("vocab-popup-modal").classList.add("active");
             
             // Auto voice out word
-            setTimeout(() => {
+            setTimeout(function() {
                 speakText(word, 'en-US');
             }, 150);
         }
@@ -2162,10 +2162,17 @@
 
         // Switch Screen Helper
         function switchScreen(screenId) {
-            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            var screens = document.querySelectorAll(".screen");
+            for (var i = 0; i < screens.length; i++) {
+                screens[i].classList.remove("active");
+            }
             document.getElementById(screenId).classList.add("active");
-            // Scroll to the top of the window when switching screens
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Scroll to the top of the window when switching screens safely
+            try {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, 0);
+            }
         }
 
         // Start Game
@@ -2221,8 +2228,8 @@
             document.getElementById("question-text").innerText = (currentQuestionIdx + 1) + '. ' + (q.question);
 
             // Configure speech buttons
-            document.getElementById("btn-play-clip").onclick = () => playCurrentClip(q.clip);
-            document.getElementById("btn-pause-clip").onclick = () => pauseCurrentClip();
+            document.getElementById("btn-play-clip").onclick = function() { playCurrentClip(q.clip); };
+            document.getElementById("btn-pause-clip").onclick = function() { pauseCurrentClip(); };
             document.getElementById("btn-speak-question").onclick = function() { speakText(q.question, 'en-US'); };
 
             var answered = (userAnswers[currentQuestionIdx] !== null);
@@ -2325,8 +2332,12 @@
             loadQuestion();
 
             // Scroll feedback into view smoothly
-            setTimeout(() => {
-                document.getElementById("inline-feedback-box").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(function() {
+                try {
+                    document.getElementById("inline-feedback-box").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } catch (e) {
+                    document.getElementById("inline-feedback-box").scrollIntoView();
+                }
             }, 100);
         }
 
@@ -2536,7 +2547,7 @@
                 container.appendChild(particle);
                 
                 // Cleanup
-                setTimeout(() => {
+                setTimeout(function() {
                     particle.remove();
                 }, (delay + duration) * 1000);
             }
