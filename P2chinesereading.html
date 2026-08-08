@@ -5485,6 +5485,93 @@
         });
     }
 
+    
+    // Render passage with sentence-by-sentence TTS buttons
+    function renderPassageWithSentenceTTS(text, elementId) {
+        const container = document.getElementById(elementId);
+        container.innerHTML = '';
+        if (!text) {
+            container.innerText = '閱讀文章加載中...';
+            return;
+        }
+
+        const paragraphs = text.split('\n');
+        paragraphs.forEach(para => {
+            if (para.trim() === '') return;
+
+            const paraDiv = document.createElement('div');
+            paraDiv.className = 'passage-paragraph';
+            paraDiv.style.marginBottom = '14px';
+            paraDiv.style.lineHeight = '1.8';
+
+            // Split paragraph into sentences including their punctuation and ending quotes
+            const sentences = para.match(/[^。！？；\n\r]+(?:[。！？；]+」?|(?=$))/g) || [para];
+
+            sentences.forEach(sentence => {
+                if (sentence.trim() === '') return;
+
+                const sentenceSpan = document.createElement('span');
+                sentenceSpan.className = 'passage-sentence-unit';
+                sentenceSpan.style.display = 'inline';
+                sentenceSpan.style.marginRight = '6px';
+                sentenceSpan.style.padding = '2px 4px';
+                sentenceSpan.style.borderRadius = '8px';
+                sentenceSpan.style.transition = 'background-color 0.2s';
+
+                // Hover highlight
+                sentenceSpan.onmouseenter = () => {
+                    sentenceSpan.style.backgroundColor = 'rgba(78, 205, 196, 0.15)';
+                };
+                sentenceSpan.onmouseleave = () => {
+                    sentenceSpan.style.backgroundColor = 'transparent';
+                };
+
+                const textSpan = document.createElement('span');
+                textSpan.innerText = sentence;
+                textSpan.style.cursor = 'pointer';
+                textSpan.style.fontWeight = '500';
+                textSpan.onclick = (e) => {
+                    e.stopPropagation();
+                    speakText(sentence);
+                };
+
+                // Cute round mini speaker
+                const ttsBtn = document.createElement('button');
+                ttsBtn.className = 'sentence-speech-btn';
+                ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                ttsBtn.style.background = 'var(--secondary-color)';
+                ttsBtn.style.color = 'white';
+                ttsBtn.style.border = 'none';
+                ttsBtn.style.borderRadius = '50%';
+                ttsBtn.style.width = '24px';
+                ttsBtn.style.height = '24px';
+                ttsBtn.style.fontSize = '0.7rem';
+                ttsBtn.style.cursor = 'pointer';
+                ttsBtn.style.marginLeft = '4px';
+                ttsBtn.style.marginRight = '4px';
+                ttsBtn.style.display = 'inline-flex';
+                ttsBtn.style.alignItems = 'center';
+                ttsBtn.style.justifyContent = 'center';
+                ttsBtn.style.verticalAlign = 'middle';
+                ttsBtn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                ttsBtn.style.transition = 'transform 0.1s';
+
+                ttsBtn.onmousedown = () => { ttsBtn.style.transform = 'scale(0.85)'; };
+                ttsBtn.onmouseup = () => { ttsBtn.style.transform = 'scale(1)'; };
+                ttsBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    speakText(sentence);
+                };
+
+                sentenceSpan.appendChild(textSpan);
+                sentenceSpan.appendChild(ttsBtn);
+                paraDiv.appendChild(sentenceSpan);
+            });
+
+            container.appendChild(paraDiv);
+        });
+    }
+
     // Text to Speech using Web Speech synthesis API
     function speakText(text) {
         window.speechSynthesis.cancel();
@@ -5557,7 +5644,7 @@
         
         // Render reading passage
         document.getElementById('gameCategory').innerText = currentLevel.category;
-        document.getElementById('gamePassage').innerText = currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！";
+        renderPassageWithSentenceTTS(currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！", 'gamePassage');
         
         // Hook up passage speech button
         document.getElementById('ttsPassageBtn').onclick = () => {
@@ -5803,23 +5890,24 @@
             starsStr = '⭐ 合格小星星 ⭐';
             document.getElementById('resultMsg').innerHTML = '🎉 恭喜通關！你真棒！🎉';
         } else {
-            starsStr = '💪 再接再厲！加油！💪';
+            starsStr = '☆ 再挑戰一次吧！';
+            document.getElementById('resultMsg').innerHTML = '💪 再接再厲！加油！💪';
         }
 
         document.getElementById('resultStars').innerHTML = `<span style="font-size:3rem; color:var(--accent-color);">${starsStr}</span>`;
-        document.getElementById('resultDetails').innerText = `你在這關目前獲得: ${scoreObtained} / 20 分 (答對了 ${correctCount} / 5 題 !)`;
+        document.getElementById('resultDetails').innerText = `你在這關目前獲得: ${scoreObtained} / 20 分 (答對了 ${correctCount} / 5 題！)`;
 
         // Render Record Feedback (每次重玩，高過原本分數才覆蓋)
         const feedbackEl = document.getElementById('recordFeedback');
         if (feedbackEl) {
             if (isNewRecord) {
                 if (prevMax === 0) {
-                    feedbackEl.innerHTML = `✨ <span style="color:#28A745; font-weight:900;">新紀錄誕生！</span> 這是你第一次挑戰這關，成功獲得 <b>${scoreObtained} 分</b>！紀錄已妥善保存！🎉`;
+                    feedbackEl.innerHTML = `✨ <span style="color:#28A745; font-weight:900;">新紀錄誕生！</span> 這是你第一次挑戰這關，成功獲得 <b>\${scoreObtained} 分</b>！紀錄已妥善保存！🎉`;
                 } else {
-                    feedbackEl.innerHTML = `🎉 <span style="color:#28A745; font-weight:900;">恭喜你創下新紀錄！</span> 成功超越舊紀錄 <b>${prevMax} 分</b>，覆蓋更新為 <b>${scoreObtained} 分</b>！🏆`;
+                    feedbackEl.innerHTML = `🎉 <span style="color:#28A745; font-weight:900;">恭喜你創下新紀錄！</span> 成功超越舊紀錄 <b>\${prevMax} 分</b>，覆蓋更新為 <b>\${scoreObtained} 分</b>！🏆`;
                 }
             } else {
-                feedbackEl.innerHTML = `💪 <span style="color:#E0A900; font-weight:900;">最高紀錄保持：</span> 你的歷史最高紀錄依然是 <b>${prevMax} 分</b>！本次獲得 <b>${scoreObtained} 分</b>。繼續努力！🔥`;
+                feedbackEl.innerHTML = `💪 <span style="color:#E0A900; font-weight:900;">最高紀錄保持：</span> 你的歷史最高紀錄依然是 <b>\${prevMax} 分</b>！本次獲得 <b>\${scoreObtained} 分</b>。繼續努力！🔥`;
             }
         }
 
@@ -5830,23 +5918,23 @@
         selectedQuestions.forEach((q, idx) => {
             const item = document.createElement('div');
             const isCorrectNow = (userAnswers[idx] === q.answer);
-            item.className = `summary-item ${isCorrectNow ? 'correct' : 'wrong'}`;
+            item.className = `summary-item \${isCorrectNow ? 'correct' : 'wrong'}`;
 
             let statusHtml = '';
             let actionBtnHtml = '';
 
             if (isCorrectNow) {
                 const wasRedone = (originalResults[idx] === false);
-                statusHtml = `<span class="summary-status correct-text">第 ${idx + 1} 題：✅ 答對了！${wasRedone ? '（✨已在特訓房成功修正）' : ''}</span>`;
+                statusHtml = `<span class="summary-status correct-text">第 \${idx + 1} 題：✅ 答對了！\${wasRedone ? '（✨已在特訓房成功修正）' : ''}</span>`;
             } else {
-                statusHtml = `<span class="summary-status wrong-text">第 ${idx + 1} 題：❌ 答錯了</span>`;
-                actionBtnHtml = `<button class="btn-redo" onclick="redoQuestion(${idx})"><i class="fa-solid fa-graduation-cap"></i> 🔄 重新挑戰這一題</button>`;
+                statusHtml = `<span class="summary-status wrong-text">第 \${idx + 1} 題：❌ 答錯了</span>`;
+                actionBtnHtml = `<button class="btn-redo" onclick="redoQuestion(\${idx})"><i class="fa-solid fa-graduation-cap"></i> 🔄 重新挑戰這一題</button>`;
             }
 
             item.innerHTML = `
-                ${statusHtml}
-                <div class="summary-q">${q.text}</div>
-                ${actionBtnHtml}
+                \${statusHtml}
+                <div class="summary-q">\${q.text}</div>
+                \${actionBtnHtml}
             `;
             summaryList.appendChild(item);
         });
@@ -5869,7 +5957,7 @@
 
         // Render passage for redo
         document.getElementById('redoCategory').innerText = currentLevel.category;
-        document.getElementById('redoPassage').innerText = currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！";
+        renderPassageWithSentenceTTS(currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！", 'redoPassage');
         
         document.getElementById('ttsRedoPassageBtn').onclick = () => {
             speakText(currentLevel.passage || "請閱讀右側魔法小例子，掌握今日的學習技巧！");
