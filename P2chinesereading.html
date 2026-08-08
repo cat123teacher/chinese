@@ -5902,12 +5902,12 @@
         if (feedbackEl) {
             if (isNewRecord) {
                 if (prevMax === 0) {
-                    feedbackEl.innerHTML = `✨ <span style="color:#28A745; font-weight:900;">新紀錄誕生！</span> 這是你第一次挑戰這關，成功獲得 <b>\${scoreObtained} 分</b>！紀錄已妥善保存！🎉`;
+                    feedbackEl.innerHTML = `✨ <span style="color:#28A745; font-weight:900;">新紀錄誕生！</span> 這是你第一次挑戰這關，成功獲得 <b>${scoreObtained} 分</b>！紀錄已妥善保存！🎉`;
                 } else {
-                    feedbackEl.innerHTML = `🎉 <span style="color:#28A745; font-weight:900;">恭喜你創下新紀錄！</span> 成功超越舊紀錄 <b>\${prevMax} 分</b>，覆蓋更新為 <b>\${scoreObtained} 分</b>！🏆`;
+                    feedbackEl.innerHTML = `🎉 <span style="color:#28A745; font-weight:900;">恭喜你創下新紀錄！</span> 成功超越舊紀錄 <b>${prevMax} 分</b>，覆蓋更新為 <b>${scoreObtained} 分</b>！🏆`;
                 }
             } else {
-                feedbackEl.innerHTML = `💪 <span style="color:#E0A900; font-weight:900;">最高紀錄保持：</span> 你的歷史最高紀錄依然是 <b>\${prevMax} 分</b>！本次獲得 <b>\${scoreObtained} 分</b>。繼續努力！🔥`;
+                feedbackEl.innerHTML = `💪 <span style="color:#E0A900; font-weight:900;">最高紀錄保持：</span> 你的歷史最高紀錄依然是 <b>${prevMax} 分</b>！本次獲得 <b>${scoreObtained} 分</b>。繼續努力！🔥`;
             }
         }
 
@@ -5918,23 +5918,23 @@
         selectedQuestions.forEach((q, idx) => {
             const item = document.createElement('div');
             const isCorrectNow = (userAnswers[idx] === q.answer);
-            item.className = `summary-item \${isCorrectNow ? 'correct' : 'wrong'}`;
+            item.className = `summary-item ${isCorrectNow ? 'correct' : 'wrong'}`;
 
             let statusHtml = '';
             let actionBtnHtml = '';
 
             if (isCorrectNow) {
                 const wasRedone = (originalResults[idx] === false);
-                statusHtml = `<span class="summary-status correct-text">第 \${idx + 1} 題：✅ 答對了！\${wasRedone ? '（✨已在特訓房成功修正）' : ''}</span>`;
+                statusHtml = `<span class="summary-status correct-text">第 ${idx + 1} 題：✅ 答對了！${wasRedone ? '（✨已在特訓房成功修正）' : ''}</span>`;
             } else {
-                statusHtml = `<span class="summary-status wrong-text">第 \${idx + 1} 題：❌ 答錯了</span>`;
-                actionBtnHtml = `<button class="btn-redo" onclick="redoQuestion(\${idx})"><i class="fa-solid fa-graduation-cap"></i> 🔄 重新挑戰這一題</button>`;
+                statusHtml = `<span class="summary-status wrong-text">第 ${idx + 1} 題：❌ 答錯了</span>`;
+                actionBtnHtml = `<button class="btn-redo" onclick="redoQuestion(${idx})"><i class="fa-solid fa-graduation-cap"></i> 🔄 重新挑戰這一題</button>`;
             }
 
             item.innerHTML = `
-                \${statusHtml}
-                <div class="summary-q">\${q.text}</div>
-                \${actionBtnHtml}
+                ${statusHtml}
+                <div class="summary-q">${q.text}</div>
+                ${actionBtnHtml}
             `;
             summaryList.appendChild(item);
         });
