@@ -1,0 +1,5974 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小二中文閱讀大冒險 🌟</title>
+    
+    <!-- External Kid-friendly Fonts and Beautiful Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+        :root {
+            --primary-color: #FF5A79;      /* Strawberry pink */
+            --primary-light: #FF8EA3;
+            --primary-dark: #D63351;
+            --secondary-color: #38A3A5;    /* Fresh mint teal */
+            --secondary-light: #52B788;
+            --accent-color: #FFE15D;       /* Sunny yellow */
+            --accent-dark: #E0A900;
+            --bg-pastel-blue: #E8F9FD;
+            --bg-pastel-pink: #FFF5F5;
+            --text-color: #2D3748;
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kiwi Maru', 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-pastel-pink) 0%, var(--bg-pastel-blue) 100%);
+            background-attachment: fixed;
+            background-image: 
+                radial-gradient(#FFC6D9 12%, transparent 12%),
+                radial-gradient(#B8F2E6 12%, transparent 12%),
+                linear-gradient(135deg, var(--bg-pastel-pink) 0%, var(--bg-pastel-blue) 100%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
+            background-position: 0 0, 20px 20px, 0 0;
+            color: var(--text-color);
+            padding: 15px;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* App Container and Headers */
+        .app-container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        /* Top Left Interactive Logo & Avatar */
+        .top-left-logo-container {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-left-logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 6px 12px rgba(255, 90, 121, 0.25);
+            background: white;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .top-left-logo:hover {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        /* Main Header Box with Bubbly Effect */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 20px;
+            animation: bounceIn 1s ease;
+        }
+
+        .logo-container {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 35px;
+            border-radius: 35px;
+            box-shadow: var(--card-shadow);
+            border: 4px solid var(--primary-color);
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .logo-container::before {
+            content: '🐱';
+            position: absolute;
+            top: -22px;
+            right: -22px;
+            font-size: 2.5rem;
+            animation: floatUpDown 2.5s infinite ease-in-out;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(255, 90, 121, 0.15);
+            font-weight: 900;
+            letter-spacing: 1.5px;
+        }
+
+        .sub-title {
+            font-size: 1rem;
+            color: #4A5568;
+            margin-top: 5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Progress Dashboard & Reset Stats Buttons */
+        .progress-dashboard {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 18px 25px;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: var(--card-shadow);
+            border: 3px solid #FFF;
+            backdrop-filter: blur(5px);
+        }
+
+        .dashboard-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Fun Island Level Map Grid */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 35px;
+            backdrop-filter: blur(10px);
+            border: 4px dashed rgba(255, 255, 255, 0.85);
+            margin-bottom: 30px;
+        }
+
+        /* Bouncy Level Cards (Adventure Islands) */
+        .level-node {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 15px 12px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+            border: 3px solid #FFF;
+            border-bottom: 8px solid #E2E8F0; /* 3D effect */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 175px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .level-node:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 15px 25px rgba(255,90,121,0.15);
+            border-color: var(--primary-color);
+            border-bottom-color: var(--primary-dark);
+        }
+
+        .level-node:active {
+            transform: translateY(3px);
+            border-bottom-width: 3px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Color palettes depending on level category to make it colorful */
+        .level-strategy {
+            background: #FFF5F5;
+            border-color: #FFE3E3;
+            border-bottom-color: #FFC9C9;
+        }
+        .level-strategy .level-num { background: var(--primary-color); }
+
+        .level-narrative {
+            background: #FFFBEB;
+            border-color: #FEF3C7;
+            border-bottom-color: #FDE68A;
+        }
+        .level-narrative .level-num { background: #D97706; }
+
+        .level-fable {
+            background: #FAF5FF;
+            border-color: #F3E8FF;
+            border-bottom-color: #E9D5FF;
+        }
+        .level-fable .level-num { background: #7C3AED; }
+
+        .level-practical {
+            background: #ECFDF5;
+            border-color: #D1FAE5;
+            border-bottom-color: #A7F3D0;
+        }
+        .level-practical .level-num { background: var(--secondary-color); }
+
+        .level-classical {
+            background: #EFF6FF;
+            border-color: #DBEAFE;
+            border-bottom-color: #BFDBFE;
+        }
+        .level-classical .level-num { background: #2563EB; }
+
+        .level-num {
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.15rem;
+            border: 2px solid white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .level-category-icon {
+            font-size: 1.6rem;
+            margin-top: 6px;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+            animation: wiggle 3s infinite ease-in-out;
+        }
+
+        .level-title {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: #2D3748;
+            margin: 6px 0;
+            line-height: 1.35;
+            word-break: break-all;
+        }
+
+        /* Dynamic Star Display inside maps */
+        .level-stars {
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .star-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 12px;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+        }
+        .star-large {
+            background: var(--accent-color);
+            color: #856404;
+            border: 1px solid #FFEBA8;
+            font-size: 0.9rem;
+            animation: pulse 1.5s infinite;
+        }
+        .star-small {
+            background: #EBF8FF;
+            color: #2B6CB0;
+            border: 1px solid #BEE3F8;
+        }
+        .star-none {
+            background: #F7FAFC;
+            color: #A0AEC0;
+            border: 1px solid #E2E8F0;
+        }
+
+        .level-score-text {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* Beautiful interactive 3D buttons */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 900;
+            font-size: 1.1rem;
+            padding: 10px 24px;
+            border: none;
+            border-bottom: 5px solid rgba(0,0,0,0.18);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 10px rgba(255, 90, 121, 0.2);
+            transition: all 0.15s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+            box-shadow: 0 2px 5px rgba(255, 90, 121, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            box-shadow: 0 4px 10px rgba(56, 163, 165, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background-color: #4CBAB9;
+        }
+
+        .btn-secondary:active {
+            box-shadow: 0 2px 5px rgba(56, 163, 165, 0.15);
+        }
+
+        .btn-clear {
+            background-color: #ED8936;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-bottom-width: 4px;
+        }
+        .btn-clear:hover { background-color: #F6AD55; }
+
+        .btn-redo {
+            background: #ED8936;
+            color: white;
+            border: none;
+            border-bottom: 4px solid #C05621;
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.1s;
+        }
+        .btn-redo:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        /* Dynamic Grid Layout for Desktop and iPad */
+        .playground-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 25px;
+            margin-top: 15px;
+            align-items: start;
+        }
+
+        /* Responsive stack for mobile */
+        @media (max-width: 991px) {
+            .playground-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .passage-card {
+                max-height: 250px;
+                overflow-y: auto;
+                position: relative;
+            }
+            .passage-scroll-tip {
+                display: block !important;
+            }
+        }
+
+        /* Scroll Tip for small screens */
+        .passage-scroll-tip {
+            display: none;
+            background: #FEFCBF;
+            color: #744210;
+            text-align: center;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border-bottom: 2px solid #F6E05E;
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+
+        /* Passage card looks like a beautiful classic book page */
+        .passage-card {
+            background: #FFFDF5;
+            border: 4px solid var(--secondary-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .passage-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid rgba(0,0,0,0.1);
+        }
+
+        .passage-tag {
+            font-weight: 900;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .passage-body {
+            padding: 25px;
+            font-size: 1.2rem;
+            line-height: 1.75;
+            color: #2D3748;
+            font-weight: 500;
+            white-space: pre-line;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        /* Question and Options pane */
+        .question-card {
+            background: white;
+            border: 4px solid var(--primary-color);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 15px;
+        }
+
+        .progress-bar-bg {
+            background: #EDF2F7;
+            height: 18px;
+            border-radius: 9px;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #E2E8F0;
+        }
+
+        .progress-bar-fill {
+            background: var(--secondary-color);
+            height: 100%;
+            width: 0%;
+            border-radius: 9px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* Cute sliding cartoon cursor along the progress bar */
+        .progress-bar-fill::after {
+            content: '🐱';
+            position: absolute;
+            right: -8px;
+            top: -6px;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 900;
+            line-height: 1.5;
+            color: #1A202C;
+            margin-bottom: 18px;
+            background: #FFF5F5;
+            padding: 15px;
+            border-radius: var(--border-radius-md);
+            border-left: 6px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Super polished option items */
+        .option-item {
+            background: white;
+            border: 3px solid #E2E8F0;
+            border-bottom: 6px solid #CBD5E1; /* 3D bouncy option button */
+            border-radius: var(--border-radius-md);
+            padding: 12px 18px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .option-item:hover {
+            border-color: var(--secondary-color);
+            background: #F0FCFB;
+        }
+
+        .option-item:active {
+            transform: translateY(3px);
+            border-bottom-width: 3px;
+        }
+
+        .option-item.correct {
+            background: #C6F6D5 !important;
+            border-color: #38A169 !important;
+            border-bottom-color: #276749 !important;
+            color: #22543D !important;
+        }
+
+        .option-item.wrong {
+            background: #FED7D7 !important;
+            border-color: #E53E3E !important;
+            border-bottom-color: #9B2C2C !important;
+            color: #742A2A !important;
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* TTS Audio Buttons with bouncy wave effect */
+        .audio-btn {
+            background: var(--accent-color);
+            color: #856404;
+            border: none;
+            border-bottom: 3px solid var(--accent-dark);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: all 0.1s;
+        }
+
+        .audio-btn:active {
+            transform: scale(0.9) translateY(2px);
+            border-bottom-width: 1px;
+        }
+
+        .tts-opt-btn {
+            background: #EDF2F7;
+            color: #4A5568;
+            border: 2px solid #CBD5E1;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            transition: all 0.1s;
+        }
+
+        .tts-opt-btn:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-dark);
+            color: #856404;
+        }
+
+        /* Navigation elements inside level play */
+        .nav-btn-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            border-bottom-width: 4px;
+        }
+
+        /* Fullscreen Reading Zoom Mode Modal */
+        .zoom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            z-index: 10500;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .zoom-modal-content {
+            background: #FFFDF5;
+            border: 6px solid var(--secondary-color);
+            border-radius: 30px;
+            width: 100%;
+            max-width: 700px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+
+        .zoom-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 900;
+            font-size: 1.3rem;
+            border-bottom: 4px solid rgba(0,0,0,0.1);
+        }
+
+        .zoom-body {
+            padding: 30px;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            color: #2D3748;
+            font-weight: 600;
+            overflow-y: auto;
+            white-space: pre-line;
+            flex-grow: 1;
+        }
+
+        /* Standard Strategy/Intro Modals styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 35px;
+            border: 6px solid var(--primary-color);
+            padding: 25px;
+            max-width: 550px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            text-align: center;
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            font-weight: 900;
+            cursor: pointer;
+            color: #A0AEC0;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Redo Speech Bubble Toast */
+        .redo-toast {
+            background: #EBF8FF;
+            border: 3px solid #3182CE;
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            animation: slideDown 0.4s ease;
+        }
+
+        .redo-toast::before {
+            content: '🧙‍♂️';
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .redo-toast-text {
+            color: #2B6CB0;
+            font-weight: 800;
+            font-size: 1.05rem;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        /* Results Screen Panels */
+        .result-panel {
+            background: white;
+            border-radius: 35px;
+            border: 6px solid var(--primary-color);
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .result-stars {
+            font-size: 4.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 4px 10px rgba(224, 169, 0, 0.3);
+            margin: 15px 0;
+            animation: starBounce 1.2s infinite alternate;
+        }
+
+        /* Summary List report */
+        .summary-container {
+            margin-top: 30px;
+            background: #F7FAFC;
+            border-radius: 25px;
+            border: 3px dashed #CBD5E1;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .summary-header {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-item {
+            background: white;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 2px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .summary-item.correct {
+            border-left: 6px solid #48BB78;
+            background: #F0FFF4;
+        }
+
+        .summary-item.wrong {
+            border-left: 6px solid #F56565;
+            background: #FFF5F5;
+        }
+
+        .summary-status {
+            font-weight: 900;
+            font-size: 1.05rem;
+        }
+
+        .correct-text { color: #2F855A; }
+        .wrong-text { color: #C53030; }
+
+        .summary-q {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4A5568;
+            line-height: 1.4;
+        }
+
+        /* Confetti elements and badges */
+        .confetti {
+            position: fixed;
+            z-index: 10100;
+            user-select: none;
+            pointer-events: none;
+            animation: confettiFall linear forwards;
+        }
+
+        .correct-badge-pop {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: rgba(255,255,255,0.95);
+            border: 6px solid var(--secondary-color);
+            border-radius: 30px;
+            padding: 20px 40px;
+            z-index: 10200;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--secondary-color);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: badgePop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: none;
+        }
+
+        /* Bubbly Global Footer (No screen blocking, naturally scrolled to) */
+        .game-footer {
+            text-align: center;
+            padding: 30px 15px;
+            margin-top: 45px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 30px;
+            box-shadow: var(--card-shadow);
+            border: 3px solid #FFF;
+        }
+
+        .footer-title {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 18px;
+            text-shadow: 1px 1px 0px #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .social-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 18px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            border-bottom: 4px solid rgba(0,0,0,0.18);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .social-link:active {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+
+        .social-yt { background-color: #FF0000; }
+        .social-yt:hover { background-color: #E60000; }
+
+        .social-ig { background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #F77737); }
+        .social-ig:hover { filter: brightness(1.1); }
+
+        .social-fb { background-color: #1877F2; }
+        .social-fb:hover { background-color: #166FE5; }
+
+        .social-th { background-color: #000000; }
+        .social-th:hover { background-color: #1A1A1A; }
+
+        .social-xhs { background-color: #FF2442; }
+        .social-xhs:hover { background-color: #E6203B; }
+
+        .social-wa { background-color: #25D366; }
+        .social-wa:hover { background-color: #20BA5A; }
+
+        .social-dy { background-color: #010101; }
+        .social-dy:hover { background-color: #1A1A1A; }
+
+        /* Animations */
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            70% { transform: scale(0.9); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes starBounce {
+            0% { transform: scale(1); rotate(-5deg); }
+            100% { transform: scale(1.15); rotate(5deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes badgePop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            40% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top-Left Logo with Fallback to Emoji SVG -->
+    <div class="top-left-logo-container">
+        <img src="cat.jpeg" class="top-left-logo" alt="Teacher Cat" onclick="exitToMap()" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'80\'>🐱</text></svg>'">
+    </div>
+
+    <div class="app-container">
+
+        <!-- Header Design -->
+        <header>
+            <div class="logo-container">
+                <h1>小二中文閱讀大冒險 🌟</h1>
+                <div class="sub-title"><i class="fa-solid fa-graduation-cap"></i> Teacher Cat 的快樂AI教室 — 二年級必做30關</div>
+            </div>
+        </header>
+
+        <!-- Main Map (Level Select) -->
+        <main id="map-scene">
+            <!-- Progress Dashboard panel with Clear Record button -->
+            <div class="progress-dashboard">
+                <span class="dashboard-title"><i class="fa-solid fa-chart-line"></i> 學習歷程進度表 (Progress Record)</span>
+                <button class="btn btn-clear" onclick="clearAllRecords()"><i class="fa-solid fa-trash-can"></i> 清除記錄</button>
+            </div>
+            <div class="map-grid" id="mapGrid"></div>
+        </main>
+
+        <!-- Level Strategy Modal -->
+        <div class="modal" id="introModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeIntro()">&times;</span>
+                <h2 id="modalTitle" style="color: var(--primary-color); margin-bottom: 10px; font-weight:900;">關卡名稱</h2>
+                <div id="modalCategory" style="color: #666; font-weight:700; font-size:0.95rem; margin-bottom: 15px;"></div>
+                
+                <div style="background: #FFFBF0; padding: 20px; border-radius: 20px; border: 3px solid var(--accent-color); margin-bottom: 20px; text-align: left; line-height: 1.6; box-shadow: inset 0 3px 6px rgba(0,0,0,0.03);">
+                    <h4 style="color: var(--primary-color); margin-bottom: 8px; font-size: 1.15rem; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 本關大魔法（策略要點）
+                        <button class="audio-btn" id="ttsStrategyBtn" style="width:30px; height:30px; font-size:0.85rem;"><i class="fa-solid fa-volume-high"></i></button>
+                    </h4>
+                    <p id="modalFocus" style="font-size: 1.1rem; font-weight: 700; color: #4A5568;"></p>
+                    <hr style="border: 0; border-top: 2px dashed #FDE68A; margin: 15px 0;">
+                    <h4 style="color: #D3A200; margin-bottom: 8px; font-size:1.15rem; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-lightbulb"></i> 魔法小例子
+                    </h4>
+                    <p id="modalExample" style="white-space: pre-line; font-size: 1.05rem; font-weight: 700; color: #555; background: white; padding: 12px; border-radius: 12px; border: 2px solid #FEF3C7;"></p>
+                </div>
+                
+                <button class="btn" onclick="startGame()" style="font-size:1.25rem; padding: 12px 35px;"><i class="fa-solid fa-circle-play"></i> 出發挑戰！🚀</button>
+            </div>
+        </div>
+
+        <!-- Fullscreen Zoom Reading Modal -->
+        <div class="zoom-modal" id="zoomReadingModal">
+            <div class="zoom-modal-content">
+                <div class="zoom-header">
+                    <span><i class="fa-solid fa-book-open-reader"></i> 🔎 放大閱讀小天地</span>
+                    <button class="btn btn-secondary" onclick="closeZoomReading()" style="padding: 6px 15px; font-size: 0.95rem; border-bottom-width: 3px;"><i class="fa-solid fa-circle-xmark"></i> 關閉</button>
+                </div>
+                <div class="zoom-body" id="zoomReadingBody">
+                    文章加載中...
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Playground -->
+        <div id="game-scene" style="display: none;">
+            <div class="playground-grid">
+                <!-- Left Pane: Passage Reading -->
+                <div class="passage-card">
+                    <div class="passage-header">
+                        <span class="passage-tag" id="gameCategory"><i class="fa-solid fa-bookmark"></i> 文體類別</span>
+                        <div style="display:flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="openZoomReading()" style="padding: 6px 12px; font-size: 0.85rem; border-bottom-width:3px;"><i class="fa-solid fa-magnifying-glass-plus"></i> 🔎 放大閱讀</button>
+                            <button class="btn btn-secondary" id="ttsPassageBtn" style="padding: 6px 12px; font-size: 0.85rem; border-bottom-width:3px;"><i class="fa-solid fa-volume-high"></i> 🔊 聽全文</button>
+                        </div>
+                    </div>
+                    <div class="passage-body" id="gamePassage">
+                        閱讀文章加載中...
+                    </div>
+                    <!-- Scroll tip for mobile devices -->
+                    <div class="passage-scroll-tip">
+                        <i class="fa-solid fa-angles-down animate-bounce"></i> 📜 向上滑動閱讀完整故事 📜
+                    </div>
+                </div>
+
+                <!-- Right Pane: Questions Box -->
+                <div class="question-card">
+                    <div class="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progressBar"></div>
+                        </div>
+                        <span id="questionNumText" style="font-weight: 900; font-size: 1.1rem; color: var(--primary-color); margin-left: 10px;">1/5</span>
+                    </div>
+
+                    <div class="question-text">
+                        <span id="questionContent">題目內容載入中...</span>
+                        <button class="audio-btn" id="ttsQuestionBtn"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    
+                    <div class="options-list" id="optionsBox"></div>
+
+                    <!-- Correction popup for wrong answers during normal play -->
+                    <div id="wrongFeedbackBox" style="display: none; background: #FEFCBF; border: 3px solid #F6E05E; border-radius: 20px; padding: 15px; margin-top: 15px; text-align: left; box-shadow: var(--card-shadow);">
+                        <div style="font-weight: 900; color: #744210; margin-bottom: 8px; font-size: 1.15rem; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-face-smile-wink" style="color:#D69E2E;"></i> 💡 魔法解讀（為什麼呢？）：
+                        </div>
+                        <p id="wrongExplanationText" style="color: #744210; font-size: 1.05rem; margin-bottom: 12px; font-weight: 700; line-height: 1.4;"></p>
+                        <button class="btn btn-secondary" style="font-size: 1.1rem; padding: 10px 20px; width: 100%;" onclick="nextQuestion()">下一題 <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+
+                    <!-- Inner-level navigation buttons (Required to be on all questions) -->
+                    <div class="nav-btn-group">
+                        <button class="btn btn-secondary nav-btn" id="prevBtn" onclick="prevQuestion()"><i class="fa-solid fa-arrow-left"></i> 上一頁</button>
+                        <button class="btn btn-secondary nav-btn" id="homeBtn" onclick="exitToMap()"><i class="fa-solid fa-house"></i> 回到主頁</button>
+                        <button class="btn btn-secondary nav-btn" id="nextBtn" onclick="nextQuestion()">下一頁 <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Redo Screen (Retry Mode for Mistakes) -->
+        <div id="redo-scene" style="display: none;">
+            <div id="redoToast" class="redo-toast">
+                <span class="redo-toast-text">🧙‍♂️ 糾錯魔法提示：我們已進入「糾錯特訓房」，請看左邊故事，在右邊點選正確答案，可以一直試到答對為止！加油！</span>
+                <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+                    <button class="btn btn-secondary" onclick="speakText('我們已進入「糾錯特訓房」，請看左邊故事，在右邊點選正確答案，可以一直試到答對為止！加油！')" style="padding: 5px 12px; font-size: 0.85rem; border-bottom-width: 2px; background: #FFD2FC; color: #333;"><i class="fa-solid fa-volume-high"></i> 🔊 聽提示</button>
+                    <button class="btn btn-secondary" onclick="closeRedoToast()" style="padding: 5px 12px; font-size: 0.85rem; border-bottom-width: 2px;">知道啦</button>
+                </div>
+            </div>
+            
+            <div class="playground-grid">
+                <!-- Left Pane: Passage Reading -->
+                <div class="passage-card">
+                    <div class="passage-header">
+                        <span class="passage-tag" id="redoCategory"><i class="fa-solid fa-bookmark"></i> 文體類別</span>
+                        <div style="display:flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="openZoomReading()" style="padding: 6px 12px; font-size: 0.85rem; border-bottom-width:3px;"><i class="fa-solid fa-magnifying-glass-plus"></i> 🔎 放大閱讀</button>
+                            <button class="btn btn-secondary" id="ttsRedoPassageBtn" style="padding: 5px 12px; font-size: 0.85rem; border-bottom-width:3px;"><i class="fa-solid fa-volume-high"></i> 🔊 聽全文</button>
+                        </div>
+                    </div>
+                    <div class="passage-body" id="redoPassage">
+                        閱讀文章加載中...
+                    </div>
+                    <!-- Scroll tip for mobile devices -->
+                    <div class="passage-scroll-tip">
+                        <i class="fa-solid fa-angles-down animate-bounce"></i> 📜 向上滑動閱讀完整故事 📜
+                    </div>
+                </div>
+
+                <!-- Right Pane: Redo Questions Box -->
+                <div class="question-card" style="border-color: #ED8936;">
+                    <div style="font-weight: 900; color: #ED8936; margin-bottom: 15px; font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="animation: pulse 1s infinite;"></i>
+                        <span>🔄 糾錯魔法修正中...</span>
+                    </div>
+
+                    <div class="question-text" style="background:#FFFAF0; border-left-color: #ED8936;">
+                        <span id="redoQuestionContent">題目內容載入中...</span>
+                        <button class="audio-btn" id="ttsRedoQuestionBtn" style="background:#ED8936; border-bottom-color:#C05621; color:white;"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    
+                    <div class="options-list" id="redoOptionsBox"></div>
+
+                    <!-- Exit to summary button -->
+                    <button class="btn btn-secondary" onclick="exitRedoToSummary()" style="width:100%; margin-top:15px;"><i class="fa-solid fa-reply"></i> 放棄修正，返回總結</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Result Scene -->
+        <div id="result-scene" style="display: none;">
+            <div class="result-panel">
+                <h2 id="resultMsg" style="color: var(--primary-color); font-size: 2.2rem; font-weight: 900;">挑戰成功！🎉</h2>
+                <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+                <p id="resultDetails" style="font-size: 1.3rem; font-weight: 900; margin-bottom: 20px; color: #555;">你在本關目前答對了 5 題！</p>
+                <p id="recordFeedback" style="font-size: 1.15rem; font-weight: 700; color: #D3A200; margin-bottom: 20px; line-height:1.5;"></p>
+                
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+                    <button class="btn btn-secondary" onclick="exitToMap()" style="padding: 12px 30px; font-size: 1.15rem;"><i class="fa-solid fa-house"></i> 返回大冒險地圖</button>
+                    <button class="btn" onclick="retryCurrentLevel()" style="background: var(--primary-color); padding: 12px 30px; font-size: 1.15rem;"><i class="fa-solid fa-rotate-right"></i> 重新挑戰這一關</button>
+                </div>
+
+                <!-- Dynamic Summary Report -->
+                <div class="summary-container">
+                    <div class="summary-header"><i class="fa-solid fa-chart-pie"></i> 📊 關卡答題報告與錯誤修正</div>
+                    <div class="summary-list" id="summaryList">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Footer on Every Page (Natural flow, not fixed) -->
+        <footer class="game-footer">
+            <div class="footer-title"><i class="fa-solid fa-paw"></i> Teacher Cat 的快樂AI教室</div>
+            <div class="social-grid">
+                <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-link social-yt"><i class="fa-brands fa-youtube"></i> YouTube</a>
+                <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-link social-ig"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-link social-fb"><i class="fa-brands fa-facebook"></i> Facebook</a>
+                <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-link social-th"><i class="fa-brands fa-at"></i> Threads</a>
+                <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-link social-xhs"><i class="fa-solid fa-book-open"></i> 小紅書</a>
+                <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-link social-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp 分享群</a>
+                <a onclick="copyDouyinID()" class="social-link social-dy"><i class="fa-brands fa-tiktok"></i> 抖音 (74254902683)</a>
+            </div>
+        </footer>
+
+    </div>
+
+<script>
+    // Embedded massive levels and questions database
+    const levelsData =  [
+  {
+    "id": 1,
+    "title": "神奇排隊大作戰",
+    "category": "解題策略：排序法",
+    "focus": "學習找出時間關鍵詞或事情邏輯，把事情按先後次序排好。",
+    "example": "例題：把句子排排隊：\nA. 小狗吃晚餐  B. 小狗去公園玩  C. 小狗睡覺了\n\n💡解題魔法：先去公園玩 ➔ 再吃晚餐 ➔ 最後睡覺。所以正確順序是 B ➔ A ➔ C！",
+    "passage": "排隊魔法屋：\n小朋友，在做「排序題」時，最重要是找出「時間詞」（例如：早上、中午、晚上）或「動作先後」（例如：先……接著……最後……）。\n讓我們在這個關卡中，一起練習把散亂的句子排好順序吧！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "請排列媽媽做蛋糕的順序：①烤箱烤蛋糕 ②準備材料 ③攪拌麵糊",
+        "options": [
+          "②➔③➔①",
+          "①➔②➔③",
+          "③➔①➔②",
+          "②➔①➔③"
+        ],
+        "answer": 0,
+        "exp": "媽媽做蛋糕必須先準備材料（②），然後攪拌成麵糊（③），最後送進烤箱烤（①）。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "請排列刷牙的步驟：①擠牙膏 ②漱口乾淨 ③刷刷牙齒",
+        "options": [
+          "①➔③➔②",
+          "②➔③➔①",
+          "③➔①➔②",
+          "①➔②➔③"
+        ],
+        "answer": 0,
+        "exp": "刷牙時，要先在牙刷上擠好牙膏（①），然後認真刷刷牙齒（③），最後用清水漱口乾淨（②）。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "請排列上課的順序：①向老師問好 ②聽到上課鐘聲 ③回到座位坐好",
+        "options": [
+          "②➔③➔①",
+          "①➔②➔③",
+          "③➔①➔②",
+          "②➔①➔③"
+        ],
+        "answer": 0,
+        "exp": "上課時，要先聽到鐘聲響起（②），然後趕快回到座位坐好（③），等老師進來向老師問好（①）。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "請排列四季的自然順序：①炎熱的夏天 ②溫暖的春天 ③寒冷的冬天 ④涼爽的秋天",
+        "options": [
+          "②➔①➔④➔③",
+          "①➔②➔③➔④",
+          "③➔②➔①➔④",
+          "②➔④➔①➔③"
+        ],
+        "answer": 0,
+        "exp": "一年四季的正常輪迴順序是：春天（②）➔ 夏天（①）➔ 秋天（④）➔ 冬天（③）。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "請排列植物成長的步驟：①種子發芽 ②開出小花 ③結出果實 ④播下種子",
+        "options": [
+          "④➔①➔②➔③",
+          "①➔④➔②➔③",
+          "④➔②➔①➔③",
+          "③➔④➔①➔②"
+        ],
+        "answer": 0,
+        "exp": "植物的生長順序是：先播下種子（④），種子發芽（①），然後開出小花（②），最後結出果實（③）。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "閱讀：『下午，天空中突然烏雲密佈，不一會兒就下起了大雨。雨停後，天上出現了一道美麗的彩虹。』請排序：①雨停了 ②下大雨 ③天陰了 ④出現彩虹",
+        "options": [
+          "③➔②➔①➔④",
+          "②➔③➔①➔④",
+          "③➔①➔②➔④",
+          "①➔②➔③➔④"
+        ],
+        "answer": 0,
+        "exp": "「烏雲密佈」代表天陰了（③）➔ 接著下大雨（②）➔ 然後雨停了（①）➔ 最後出現彩虹（④）。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "閱讀：『小熊今天起得很晚。他急急忙忙跑去巴士站，結果巴士剛好開走了。他只好走路回校，最後還是遲到了。』請排序：①巴士開走 ②起床晚了 ③上學遲到 ④走路回校",
+        "options": [
+          "②➔①➔④➔③",
+          "①➔②➔④➔③",
+          "②➔④➔①➔③",
+          "④➔①➔②➔③"
+        ],
+        "answer": 0,
+        "exp": "起得太晚（②）➔ 導致趕不上巴士而巴士開走（①）➔ 無奈之下走路回校（④）➔ 最終導致遲到（③）。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "閱讀：『小明想畫一隻小貓。他先用鉛筆畫草稿，然後用黑筆描邊，接著用彩色筆塗上顏色，最後把它剪下來。』請排序：①彩色筆塗色 ②鉛筆畫草稿 ③黑筆描邊 ④剪下小貓",
+        "options": [
+          "②➔③➔①➔④",
+          "②➔①➔③➔④",
+          "③➔②➔①➔④",
+          "①➔②➔③➔④"
+        ],
+        "answer": 0,
+        "exp": "畫圖和做手工的順序是：先畫草稿（②）➔ 用黑筆描邊（③）➔ 塗上顏色（①）➔ 最後剪下圖案（④）。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "閱讀：『蠶寶寶先吃桑葉長大，接著吐絲結繭，在繭裡睡一覺後，最後變成美麗的飛蛾飛出來。』請排序：①吐絲結繭 ②吃桑葉長大 ③變成飛蛾 ④在繭裡睡覺",
+        "options": [
+          "②➔①➔④➔③",
+          "①➔②➔④➔③",
+          "②➔④➔①➔③",
+          "④➔①➔②➔③"
+        ],
+        "answer": 0,
+        "exp": "蠶寶寶先吃桑葉長大（②）➔ 吐絲結繭（①）➔ 待在繭裡睡覺化蛹（④）➔ 破繭而出變成飛蛾（③）。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "閱讀：『早上，太陽從東方升起。中午，太陽在我們頭頂上。傍晚，太陽慢慢落山，月亮便出來了。』請排序：①太陽落山 ②太陽升起 ③月亮出來 ④太陽在頭頂",
+        "options": [
+          "②➔④➔①➔③",
+          "①➔②➔④➔③",
+          "②➔①➔④➔③",
+          "④➔②➔①➔③"
+        ],
+        "answer": 0,
+        "exp": "時間順序為：早上太陽升起（②）➔ 中午太陽在頭頂（④）➔ 傍晚太陽落山（①）➔ 最後月亮出來（③）。"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "時空小司儀",
+    "category": "解題策略：時序排序",
+    "focus": "精準捕捉時間副詞與承接連詞，理清長句子中的時間順序。",
+    "example": "例題：排好先後次序：\n① 昨晚我做了個美夢。 \n② 上星期我們去了旅行。\n③ 明天我會跟媽媽去買鞋。\n\n💡解題魔法：上星期（過去）➔ 昨晚（較近的過去）➔ 明天（未來）。所以順序是 ② ➔ ① ➔ ③！",
+    "passage": "時間魔法屋：\n小朋友，在閱讀故事或文章時，常常會遇到表示過去、現在、未來的時間詞語。\n我們要學會像「時空小司儀」一樣，理清事情是「先」發生，還是「後」發生！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "『早上，我和爸爸去跑步。中午，我們去吃餃子。』哪一件事先發生？",
+        "options": [
+          "去跑步",
+          "吃餃子",
+          "兩件同時發生",
+          "無法判斷"
+        ],
+        "answer": 0,
+        "exp": "因為「早上」在「中午」之前，所以去跑步先發生。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "下列哪一組詞語是按『過去到未來』的時間順序排列？",
+        "options": [
+          "昨天 ➔ 今天 ➔ 明天",
+          "明天 ➔ 今天 ➔ 昨天",
+          "今天 ➔ 明天 ➔ 昨天",
+          "昨天 ➔ 明天 ➔ 今天"
+        ],
+        "answer": 0,
+        "exp": "「昨天」是過去，「今天」是現在，「明天」是未來，這是正確的時序。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "『下星期我會過生日。』這句話表示事情是在甚麼時候發生？",
+        "options": [
+          "已經發生了",
+          "正在發生",
+          "還沒有發生（未來）",
+          "很久以前發生的"
+        ],
+        "answer": 2,
+        "exp": "「下星期」代表未來，所以是還沒有發生。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "『剛才我吃了一個蘋果。』中的『剛才』代表：",
+        "options": [
+          "不久之前",
+          "明天",
+          "下個月",
+          "正在進行"
+        ],
+        "answer": 0,
+        "exp": "「剛才」表示剛剛過去不久的時間。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "排序：①明年我讀三年級 ②前年我讀幼稚園 ③今年我讀二年級",
+        "options": [
+          "②➔③➔①",
+          "①➔②➔③",
+          "③➔②➔①",
+          "②➔①➔③"
+        ],
+        "answer": 0,
+        "exp": "按時間先後：前年（②）➔ 今年（③）➔ 明年（①）。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『我吃完午飯後，先做功課，接著看電視，最後去洗澡。』請問我做功課前做了甚麼？",
+        "options": [
+          "吃午飯",
+          "看電視",
+          "去洗澡",
+          "甚麼都沒做"
+        ],
+        "answer": 0,
+        "exp": "句子開頭寫「我吃完午飯後，先做功課」，所以做功課之前是吃午飯。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "『小明在游泳比賽中得到了第一名，在此之前，他每天都辛苦練習。』這句話告訴我們：",
+        "options": [
+          "小明先辛苦練習，再得到第一名",
+          "小明先得到第一名，再辛苦練習",
+          "小明不練習就拿到第一名",
+          "小明拿到第一名後就不練習了"
+        ],
+        "answer": 0,
+        "exp": "「在此之前」表示在得第一名之前發生的事，所以他先練習，後得獎。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "排序：①我們在長椅上休息 ②我們在草地上野餐 ③我們在公園散步",
+        "options": [
+          "③➔②➔①",
+          "①➔②➔③",
+          "②➔③➔①",
+          "①➔③➔②"
+        ],
+        "answer": 0,
+        "exp": "根據遊玩規律，一般是先在公園散步（③），然後在草地上野餐（②），最後累了在長椅上休息（①）。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "『在放學鐘聲響起之前，大家都安靜地下課準備。』哪件事先發生？",
+        "options": [
+          "大家都安靜地準備",
+          "放學鐘聲響起",
+          "兩件事同時發生",
+          "無法確定"
+        ],
+        "answer": 0,
+        "exp": "「在……之前」表示前面的事件是後發生的，後面「安靜地下課準備」是先發生的。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "排序：①秋天落葉 ②春天開花 ③冬天光禿禿 ④夏天長滿綠葉",
+        "options": [
+          "②➔④➔①➔③",
+          "①➔②➔③➔④",
+          "③➔②➔④➔①",
+          "②➔①➔④➔③"
+        ],
+        "answer": 0,
+        "exp": "植物跟隨四季變化的順序：春天開花（②）➔ 夏天長滿綠葉（④）➔ 秋天落葉（①）➔ 冬天光禿禿（③）。"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "詞語大連線",
+    "category": "解題策略：填詞成句",
+    "focus": "學會分析生字詞的詞性（如形容詞、動詞），從文章中找對應詞填空。",
+    "example": "例題：從文中找出適當詞語填空，使句子完整：\n「妹妹在草地上（     ）地跳舞。」\n\n💡解題魔法：地字前面通常要填一個「形容詞」或「副詞」（如：快活地、輕輕地）。回文中尋找帶「地」的詞語就對了！",
+    "passage": "春天來了，花園裡開滿了色彩鮮艷的花朵。紅色的玫瑰花在微風中輕輕搖擺，好像在向我們點頭微笑。綠油油的小草也探出頭來，給大地鋪上了一張軟綿綿的地毯。小鳥在枝頭快活地歌唱，慶祝新一年的開始。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "根據上面的「閱讀小天地」，文中用甚麼詞語來形容「花朵」？",
+        "options": [
+          "色彩鮮艷",
+          "綠油油",
+          "軟綿綿",
+          "快活"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「花園裡開滿了色彩鮮艷的花朵。」"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "紅色的玫瑰花是怎樣搖擺的？",
+        "options": [
+          "輕輕搖擺",
+          "大聲搖擺",
+          "快活地搖擺",
+          "慢慢地搖擺"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「紅色的玫瑰花在微風中輕輕搖擺」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "文中形容小草是甚麼顏色的？",
+        "options": [
+          "綠油油",
+          "紅彤彤",
+          "金燦燦",
+          "黃澄澄"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「綠油油的小草也探出頭來」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小草給大地鋪上了甚麼樣的地毯？",
+        "options": [
+          "軟綿綿",
+          "硬邦邦",
+          "色彩鮮艷",
+          "快活"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「給大地鋪上了一張軟綿綿的地毯」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "小鳥在枝頭怎樣地歌唱？",
+        "options": [
+          "快活地",
+          "輕輕地",
+          "溫柔地",
+          "難過地"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小鳥在枝頭快活地歌唱」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『媽媽在沙發上睡著了，身上蓋著一張（  ）的被子。』括號裡填寫本課哪個詞語最合適？",
+        "options": [
+          "軟綿綿",
+          "色彩鮮艷",
+          "綠油油",
+          "輕輕"
+        ],
+        "answer": 0,
+        "exp": "被子是柔軟的，「軟綿綿」用來形容被子最貼切。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "『妹妹拿著新玩具，（  ）地跳起舞來。』填寫本課哪一個詞語最合適？",
+        "options": [
+          "快活地",
+          "色彩鮮艷",
+          "綠油油",
+          "輕輕"
+        ],
+        "answer": 0,
+        "exp": "跳舞表達高興的心情，用「快活地」最符合語境。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "『姐姐畫了一幅（  ）的圖畫，上面有好多種顏色。』填寫本課哪一個詞語最合適？",
+        "options": [
+          "色彩鮮艷",
+          "綠油油",
+          "軟綿綿",
+          "快活地"
+        ],
+        "answer": 0,
+        "exp": "「好多種顏色」代表「色彩鮮艷」。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "『落葉像一隻隻金色的蝴蝶，（  ）地飄落到地。』填寫本課哪一個詞語最合適？",
+        "options": [
+          "輕輕",
+          "綠油油",
+          "軟綿綿",
+          "色彩鮮艷"
+        ],
+        "answer": 0,
+        "exp": "落葉飄落非常安靜和緩慢，用「輕輕」最合適。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "在「填詞成句」題中，如果題目句子與文章內容完全不相干，我們尋找答案的方法是：",
+        "options": [
+          "根據句子意思，去原文對應位置找相同詞性的詞填空",
+          "隨便編一個詞語",
+          "把文章裡的整句話抄寫下來",
+          "去字典裡查生字"
+        ],
+        "answer": 0,
+        "exp": "必須根據題意判定生字词性，並回到原文指定段落中，找出意思、詞性相符的詞語。"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "魔法填詞官",
+    "category": "解題策略：詞意填空",
+    "focus": "通過近義詞和句子上下文關係，精準篩選、代入合適的詞語。",
+    "example": "例題：請幫句子選最合適的詞：\n「天空中突然飄起了（     ），天氣變冷了。」\nA. 雪花  B. 石頭  C. 蘋果\n\n💡解題魔法：天氣變冷且會「飄起」，肯定是「雪花」！這就是上下文推理！",
+    "passage": "星期六，我和小麗去沙灘玩耍。我們用沙子蓋了一座高高的小城堡。突然，一陣大浪沖過來，城堡被沖垮了。小麗感到非常可惜，但我安慰她說：『沒關係，我們可以再蓋一座更大的！』於是，我們又開心地笑了。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "我和小麗星期六去了哪裡？",
+        "options": [
+          "沙灘",
+          "學校",
+          "圖書館",
+          "遊樂場"
+        ],
+        "answer": 0,
+        "exp": "原文開頭寫到：「我和小麗去沙灘玩耍」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "我們用甚麼蓋了小城堡？",
+        "options": [
+          "沙子",
+          "木頭",
+          "積木",
+          "石頭"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「我們用沙子蓋了一座高高的小城堡」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "城堡最後被甚麼沖垮了？",
+        "options": [
+          "一陣大浪",
+          "大風",
+          "小狗",
+          "小朋友腳踩"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「突然，一陣大浪沖過來，城堡被沖垮了」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "城堡被沖垮後，小麗的心情是怎樣的？",
+        "options": [
+          "感到非常可惜",
+          "感到非常生氣",
+          "大聲哭泣",
+          "哈哈大笑"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小麗感到非常可惜」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "看到小麗難過，我做了甚麼？",
+        "options": [
+          "安慰她",
+          "嘲笑她",
+          "自己跑回家",
+          "大聲責備她"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「但我安慰她說……」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『老師（  ）著流淚的小華說：別難過，下次再加油！』填寫文中哪一個詞最適當？",
+        "options": [
+          "安慰",
+          "可惜",
+          "沖垮",
+          "玩耍"
+        ],
+        "answer": 0,
+        "exp": "對流淚難過的人說好話，用「安慰」最適當。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "『這本漂亮的新書不小心被水淋濕了，真是（  ）啊！』填寫文中哪一個詞最適當？",
+        "options": [
+          "可惜",
+          "安慰",
+          "沖垮",
+          "玩耍"
+        ],
+        "answer": 0,
+        "exp": "美好、珍貴的東西遭到損壞或失去，讓人感到「可惜」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "『暴風雨沖毀了小橋。』句子中的『沖毀』跟文中的哪一個詞意思最相近？",
+        "options": [
+          "沖垮",
+          "安慰",
+          "可惜",
+          "玩耍"
+        ],
+        "answer": 0,
+        "exp": "「沖毀」和「沖垮」都是指被水流破壞毀掉的意思，為近義詞。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "『我和弟弟在公園（  ）了一下午。』填寫文中哪一個詞最適當？",
+        "options": [
+          "玩耍",
+          "安慰",
+          "可惜",
+          "沖垮"
+        ],
+        "answer": 0,
+        "exp": "在公園度過一下午，用「玩耍」最合適。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "如果想快速做好『填詞成句』，最好的做題順序是：",
+        "options": [
+          "先想句子裡需要甚麼意思的詞，再回原文尋找意思相同的詞",
+          "隨便亂猜",
+          "把空格留著不寫",
+          "隨便挑一個筆畫最少的字填寫"
+        ],
+        "answer": 0,
+        "exp": "先判斷題目的句意，再回到原文中對比和挑選，最為精準。"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "段段精準",
+    "category": "解題策略：段旨題（摘句法）",
+    "focus": "學習在段落開頭、結尾或中間，找出能代表整段大意的「中心句」。",
+    "example": "例題：找出這段話的中心句：\n「小蜜蜂非常勤勞。牠們每天早早就飛出去採蜜，飛過千山萬水，從不叫苦，把甜甜的蜜帶給大家。」\n\n💡解題魔法：第一句「小蜜蜂非常勤勞」就是整段的核心！後面的話都是在解釋這句話。這叫「首句法」！",
+    "passage": "大熊貓是我們國家的國寶。牠們圓滾滾的身體非常可愛，身上只有黑白兩種顏色。牠們最喜歡吃新鮮的竹子，每天能吃好幾公斤呢！因為大熊貓的數量非常稀少，所以我們一定要好好保護牠們，不要破壞牠們的家園。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這段話的第一句說大熊貓是甚麼？",
+        "options": [
+          "國寶",
+          "大狗",
+          "玩具",
+          "普通熊"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「大熊貓是我們國家的國寶」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "大熊貓最喜歡吃甚麼？",
+        "options": [
+          "新鮮的竹子",
+          "蘋果",
+          "小魚",
+          "香蕉"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「牠們最喜歡吃新鮮的竹子」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "大熊貓的身體長得怎麼樣？",
+        "options": [
+          "圓滾滾",
+          "扁扁的",
+          "長長的",
+          "方方的"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「牠們圓滾滾的身體非常可愛」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "為什麼我們要保護大熊貓？",
+        "options": [
+          "因為數量非常稀少",
+          "因為牠們會抓老鼠",
+          "因為牠們會唱歌",
+          "因為牠們長得最高"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「因為大熊貓的數量非常稀少，所以我們一定要好好保護牠們」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "大熊貓身上有甚麼顏色？",
+        "options": [
+          "黑白兩種顏色",
+          "五彩繽紛的顏色",
+          "只有綠色",
+          "黃藍相間"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「身上只有黑白兩種顏色」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "這段話的「中心句（最能概括大意的一句）」是哪一句？",
+        "options": [
+          "大熊貓是我們國家的國寶。",
+          "牠們最喜歡吃新鮮的竹子。",
+          "因為大熊貓的數量非常稀少。",
+          "身上只有黑白兩種顏色。"
+        ],
+        "answer": 0,
+        "exp": "第一句「大熊貓是我們國家的國寶」是全段的核心，後面都在具體介紹牠。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "除了「開頭」，文章的中心句通常還可能出現在哪裡？",
+        "options": [
+          "結尾或中間",
+          "只有標題",
+          "插圖裡",
+          "根本不會出現"
+        ],
+        "answer": 0,
+        "exp": "中心句通常在段落的「開頭」、「結尾」或「中間」出現，用來總結大意。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "『摘句法』這種解題方法，主要是指：",
+        "options": [
+          "直接從段落中找出最重要的一句話來當作大意",
+          "自己隨便寫一句話",
+          "把整段話全部抄下來",
+          "從別的文章裡抄一句話"
+        ],
+        "answer": 0,
+        "exp": "「摘句法」即直接摘錄或提煉文中的核心中心句來概括段落大意。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "大熊貓每天能吃多少新鮮的竹子？",
+        "options": [
+          "好幾公斤",
+          "好幾克",
+          "一整棵大樹",
+          "不吃竹子"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「每天能吃好幾公斤呢！」"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "下列哪一種行為會破壞大熊貓的家園？",
+        "options": [
+          "亂砍伐大片竹林",
+          "種植更多翠綠的竹子",
+          "好好保護森林環境",
+          "建立野生動物保護區"
+        ],
+        "answer": 0,
+        "exp": "大熊貓依靠竹林生活，亂砍伐竹林會嚴重破壞牠們的家園。"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "歸納小能手",
+    "category": "解題策略：段旨題（歸納法）",
+    "focus": "學習把段落分成幾層意思，提取重點詞，合起來寫出段落大意。",
+    "example": "例題：歸納這段的大意：\n「小狗守在門口等我回家，看見我時高興地搖尾巴。小貓跳上沙發，依偎在媽媽懷裡睡著了。」\n\n💡解題魔法：這段話寫了小狗和小貓。歸納起來就是：「家裡的寵物都非常溫柔可愛。」",
+    "passage": "我們的學校真美麗！一進校門，就能看見兩排高大的紅棉樹，像威風的士兵。操場上，小朋友們正在快活地奔跑玩耍，笑聲不斷。教室裡，老師正用溫和的聲音給我們講課，大家都聽得津津有味。我非常熱愛我的學校！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這篇文章的開頭第一句說甚麼？",
+        "options": [
+          "我們的學校真美麗！",
+          "我們的學校真大！",
+          "我們不喜歡上學。",
+          "學校裡有很多垃圾。"
+        ],
+        "answer": 0,
+        "exp": "原文第一句是：「我們的學校真美麗！」"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "一進校門能看見甚麼樹？",
+        "options": [
+          "紅棉樹",
+          "芒果樹",
+          "柳樹",
+          "椰子樹"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「看見兩排高大的紅棉樹」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "文中把高大的紅棉樹比作甚麼？",
+        "options": [
+          "威風的士兵",
+          "漂亮的雨傘",
+          "巨大的蘑菇",
+          "美麗的花朵"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「像威風的士兵」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小朋友在操場上做甚麼？",
+        "options": [
+          "快活地奔跑玩耍",
+          "安靜地寫字",
+          "打掃衛生",
+          "排隊回家"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「操場上，小朋友們正在快活地奔跑玩耍」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "教室裡的老師正用甚麼樣的聲音給我們講課？",
+        "options": [
+          "溫和的聲音",
+          "生氣的聲音",
+          "嚴厲的聲音",
+          "很小的聲音"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「老師正用溫和的聲音給我們講課」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "這段話主要從哪些方面來描寫學校？",
+        "options": [
+          "校門口的樹、操場上的笑聲、教室裡的課堂",
+          "學校的收費、校車的顏色、功課的多少",
+          "飯堂的食物、校長的姓名、學生的衣服",
+          "只寫了校門口的紅棉樹"
+        ],
+        "answer": 0,
+        "exp": "段落分別描寫了校門口、操場和教室三個場景，非常全面。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "這段話中『聽得津津有味』是指學生聽課時表現得：",
+        "options": [
+          "非常專注、有興趣",
+          "昏昏欲睡",
+          "覺得肚子餓了",
+          "覺得課堂很無聊"
+        ],
+        "answer": 0,
+        "exp": "「津津有味」在此形容聽得很有興味、非常專心。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "歸納這段話的最佳段意是：",
+        "options": [
+          "學校環境美麗，校園生活充滿了歡樂和活力。",
+          "學校裡只有紅棉樹最好看。",
+          "老師上課很好聽，但操場太吵了。",
+          "放學回家是一件快樂的事。"
+        ],
+        "answer": 0,
+        "exp": "這段話通過景物、學生和課堂的描寫，展示了學校的美麗與校園生活的快樂，這是最完整的歸納。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "『我非常熱愛我的學校！』表達了作者甚麼樣的感情？",
+        "options": [
+          "對學校深厚的喜愛與讚美之情",
+          "想快點放學的心情",
+          "對老師的害怕",
+          "對上學的無奈"
+        ],
+        "answer": 0,
+        "exp": "「熱愛」一詞直接抒發了作者對學校的深切喜愛。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "『歸納法』與『摘句法』的最大區別是：",
+        "options": [
+          "歸納法需要自己總結段落中的多層意思，而摘句法是直接抄文中一句話",
+          "歸納法不需要看文章",
+          "摘句法要寫很多字",
+          "兩者沒有任何區別"
+        ],
+        "answer": 0,
+        "exp": "「歸納法」需要提煉並合併多層意思，而「摘句法」則是直接找出文中現成的中心句。"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "小狗守護者小白",
+    "category": "記敘文：導盲犬",
+    "focus": "理解導盲犬的工作及其無私奉獻，體會人與動物的信任。",
+    "example": "例題：導盲犬小白在巴士上的表現說明了牠（    ）。\nA. 很調皮  B. 接受過嚴格訓練，很聽話  C. 肚子餓了\n\n💡解題魔法：小白安靜坐在地上不吵不鬧，代表牠「非常聽話且專業」！",
+    "passage": "今天，我和媽媽在巴士站看見一隻可愛的小狗。牠安靜地坐在戴著黑墨鏡的叔叔身旁，不慌不忙。叔叔微笑著說：『牠叫小白，是一隻導盲犬，專門為我引路和避開危險。』原來，導盲犬是盲人的眼睛，是人類最忠實、最聰明的好朋友！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "導盲犬小白在巴士上表現得怎麼樣？",
+        "options": [
+          "安靜地坐在地上",
+          "興奮地大叫",
+          "到處亂跑",
+          "睡在座位上"
+        ],
+        "answer": 0,
+        "exp": "原文提到：牠安靜地坐在戴著黑墨鏡的叔叔身旁，不慌不忙。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "戴著黑墨鏡的叔叔是小白的甚麼人？",
+        "options": [
+          "主人",
+          "路人",
+          "巴士司機",
+          "醫生"
+        ],
+        "answer": 0,
+        "exp": "叔叔帶領小白並向作者介紹小白，可推斷他是小白的主人。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "導盲犬的主要工作是甚麼？",
+        "options": [
+          "為盲人引路和避開危險",
+          "看門口",
+          "捉老鼠",
+          "表演雜技"
+        ],
+        "answer": 0,
+        "exp": "原文中叔叔說：是一隻導盲犬，專門為我引路和避開危險。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "文中用甚麼來比喻「導盲犬」？",
+        "options": [
+          "盲人的眼睛",
+          "飛快的汽車",
+          "明亮的太陽",
+          "堅固的盾牌"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「原來，導盲犬是盲人的眼睛」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "文中說導盲犬是人類最忠實、最甚麼的好朋友？",
+        "options": [
+          "聰明",
+          "調皮",
+          "高大",
+          "美麗"
+        ],
+        "answer": 0,
+        "exp": "原文最後寫到：「是人類最忠實、最聰明的好朋友」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "為什麼文中要寫小白『不慌不忙』？",
+        "options": [
+          "為了表現牠非常沉穩、專業，不受周圍環境干擾",
+          "因為牠走得很慢",
+          "因為牠睡著了",
+          "因為牠不喜歡巴士"
+        ],
+        "answer": 0,
+        "exp": "「不慌不忙」體現了導盲犬優良的工作素質，沉著冷靜。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "根據文章內容，下列哪一項對導盲犬的描述是正確的？",
+        "options": [
+          "牠們是盲人的好幫手，在公共場所不會隨便吵鬧",
+          "牠們像普通寵物狗一樣可以隨便逗弄",
+          "牠們隨時都會咬人",
+          "牠們不喜歡坐巴士"
+        ],
+        "answer": 0,
+        "exp": "導盲犬工作時安靜專業，不隨便吵鬧，是盲人不可或缺的幫手。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "『戴著黑墨鏡的叔叔』這句話暗示了：",
+        "options": [
+          "叔叔是一位盲人（視障人士）",
+          "叔叔覺得陽光太刺眼了",
+          "叔叔很喜歡扮酷",
+          "叔叔在跟小狗玩遊戲"
+        ],
+        "answer": 0,
+        "exp": "盲人（視障人士）常戴墨鏡，且需要導盲犬引路，這是一種隱喻暗示。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "如果我們在街上遇到正在工作的導盲犬，最正確的做法是：",
+        "options": [
+          "不撫摸、不餵食、不干擾牠工作",
+          "大聲叫喚牠的名字",
+          "拿食物去餵牠",
+          "上前跟牠抱抱玩耍"
+        ],
+        "answer": 0,
+        "exp": "遇到工作中的導盲犬，應遵守「不干擾、不餵食、不撫摸」的原則，以免讓主人遇到危險。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇短文的主要目的是：",
+        "options": [
+          "讓讀者認識導盲犬的作用，並學會關愛和尊重牠們",
+          "教讀者怎麼養狗",
+          "介紹大埔的巴士路線",
+          "介紹墨鏡的牌子"
+        ],
+        "answer": 0,
+        "exp": "短文旨在推廣對導盲犬的正確認知，呼籲大家尊重、關愛這些無私的動物夥伴。"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "廚房的小萌貓",
+    "category": "記敘文：愛廚房的貓",
+    "focus": "體會故事中幽默風趣的表達，理解貓咪行為轉變的深層原因。",
+    "example": "例題：貓咪最後為什麼決定跟著獵人的太太？\n\n💡解題魔法：回文尋找原因，因為貓咪發現獵人聽太太的話，太太才是真正最強大的！",
+    "passage": "小貓咪咪以前總是被大狗欺負，非常苦惱。有一天，牠跟老虎散步，大狗嚇得逃跑了。貓咪心想：『老虎真威風！』後來老虎遇到獅子，獅子大吼一聲，老虎也逃跑了。貓咪便決定跟著獅子。最後，牠發現獵人的太太拍拍手，獵人就乖乖去洗澡，貓咪恍然大悟：『原來獵人太太才是最強大的！』因為太太常在廚房，所以貓咪從此愛上了廚房。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小貓咪咪一開始被甚麼動物欺負？",
+        "options": [
+          "大狗",
+          "老虎",
+          "小雞",
+          "大獅子"
+        ],
+        "answer": 0,
+        "exp": "原文第一句說：「小貓咪咪以前總是被大狗欺負」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "誰一聲大吼把老虎嚇跑了？",
+        "options": [
+          "獅子",
+          "大狗",
+          "獵人",
+          "獵人太太"
+        ],
+        "answer": 0,
+        "exp": "原文說：「獅子大吼一聲，老虎也逃跑了」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "獵人聽到太太拍拍手後，乖乖去做了甚麼？",
+        "options": [
+          "去洗澡",
+          "去煮飯",
+          "去打獵",
+          "去睡覺"
+        ],
+        "answer": 0,
+        "exp": "原文提到：「獵人的太太拍拍手，獵人就乖乖去洗澡」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "貓咪最後決定跟隨誰生活？",
+        "options": [
+          "獵人太太",
+          "老虎",
+          "獅子",
+          "大狗"
+        ],
+        "answer": 0,
+        "exp": "貓咪覺得太太最強，所以留在廚房陪太太生活。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "這隻小貓的名字叫甚麼？",
+        "options": [
+          "咪咪",
+          "小白",
+          "小黑",
+          "花花"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小貓咪咪以前總是被大狗欺負」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "貓咪決定陪伴對象的標準是：",
+        "options": [
+          "誰看起來最強大就跟著誰",
+          "誰長得最漂亮就跟著誰",
+          "誰最溫柔就跟著誰",
+          "誰給牠魚吃就跟著誰"
+        ],
+        "answer": 0,
+        "exp": "貓咪從老虎➔獅子➔獵人➔獵人太太，一直在尋找最強的力量來保護自己，不再受狗欺負。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中貓咪『恍然大悟』是指：",
+        "options": [
+          "突然明白了一個道理",
+          "高興得大叫起來",
+          "突然睡醒了",
+          "覺得肚子很餓"
+        ],
+        "answer": 0,
+        "exp": "「恍然大悟」形容一下子完全明白過來。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "貓咪最後為什麼留在廚房不願意離開？",
+        "options": [
+          "因為最強大的女主人（獵人太太）經常在廚房做家務",
+          "因為廚房有很多小老鼠",
+          "因為廚房很溫暖",
+          "因為牠不喜歡臥室"
+        ],
+        "answer": 0,
+        "exp": "因為獵人太太常在廚房，貓咪認定太太最強，因此決定留在太太身邊。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇童話故事顯得：",
+        "options": [
+          "幽默風趣，富有童真幻想",
+          "非常悲傷",
+          "枯燥乏味",
+          "深奧難懂"
+        ],
+        "answer": 0,
+        "exp": "通過一隻貓尋找最強依靠的有趣心理，寫出溫馨幽默的結局。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這故事給我們的一點點生活啟示是：",
+        "options": [
+          "真正強大的人不一定要靠武力或大吼大叫，愛與家庭的力量最偉大",
+          "我們要去森林抓老虎",
+          "洗澡是一件可怕的事",
+          "大狗永遠是壞蛋"
+        ],
+        "answer": 0,
+        "exp": "獵人太太雖然不吼叫打鬥，但能管好家務，充滿愛的力量最溫暖。"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "站著寫作的作家",
+    "category": "記敘文：海明威",
+    "focus": "了解名人的獨特寫作方法，學習簡潔、不說廢話的寫作理念。",
+    "example": "例題：海明威認為單腳站著寫作可以（    ）。\nA. 鍛煉身體  B. 讓他集中精力寫得更簡潔  C. 逗朋友開心\n\n💡解題魔法：回到文中，海明威親口說這能讓他「集中精神，寫得簡短」，所以選 B！",
+    "passage": "海明威是著名的作家。他有一個非常奇特的習慣：喜歡單腳站著寫作。朋友很好奇，問他這樣站著寫字不累嗎？海明威笑著回答：『站著寫作能讓我保持高度集中，寫出來的文章更簡潔，不會說廢話。寫完後，我再坐下來把多餘的字刪掉。』這就是他寫作的獨特魔法！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "海明威是一位甚麼樣的人？",
+        "options": [
+          "著名作家",
+          "體育運動員",
+          "畫家",
+          "音樂家"
+        ],
+        "answer": 0,
+        "exp": "原文第一句：「海明威是著名的作家」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "海明威寫作時有一個甚麼奇特的習慣？",
+        "options": [
+          "喜歡單腳站著寫作",
+          "躺在床上寫作",
+          "一邊唱歌一邊寫作",
+          "在黑暗中寫作"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「他有一個非常奇特的習慣：喜歡單腳站著寫作」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "誰對海明威單腳站著寫作感到很好奇？",
+        "options": [
+          "他的朋友",
+          "他的老師",
+          "他的讀者",
+          "他的媽媽"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「朋友很好奇，問他這樣站著寫字不累嗎？」"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "海明威說單腳站著寫作能讓他保持甚麼？",
+        "options": [
+          "高度集中",
+          "身體平衡",
+          "好心情",
+          "大聲笑"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「站著寫作能讓我保持高度集中」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "海明威在寫完文章後，會坐下來做甚麼？",
+        "options": [
+          "把多餘的字刪掉",
+          "吃午飯",
+          "大聲朗讀",
+          "把稿子燒掉"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「寫完後，我再坐下來把多餘的字刪掉」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "海明威口中的『簡潔』文章，是指：",
+        "options": [
+          "用字精煉，沒有廢話的文章",
+          "字數越少越好的文章",
+          "完全沒有標點符號的文章",
+          "隨便亂寫的文章"
+        ],
+        "answer": 0,
+        "exp": "簡潔指文章乾淨俐落，表達清楚且無冗詞贅字。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "為什麼單腳站著寫作會不容易說廢話？",
+        "options": [
+          "因為站久了腿會累，逼自己快點把重點寫完",
+          "因為站著不能寫長句子",
+          "因為站著寫字會手發抖",
+          "因為站著的時候腦袋轉得慢"
+        ],
+        "answer": 0,
+        "exp": "站著寫作時體力消耗較大，這會促使作家專注重點，迅速高效地表達。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "朋友聽完海明威的解釋後『恍然大悟』，代表朋友：",
+        "options": [
+          "一下子明白並理解了海明威的做法",
+          "覺得海明威在騙他",
+          "也想立刻單腳站起來",
+          "覺得非常生氣"
+        ],
+        "answer": 0,
+        "exp": "恍然大悟代表困惑消除，突然明白過來。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "海明威寫作的『獨特魔法』其實就是：",
+        "options": [
+          "利用特定的習慣強迫自己保持極致的專注與文章的洗鍊",
+          "他真的會變魔術",
+          "他的筆會自己寫字",
+          "他從來不需要修改文章"
+        ],
+        "answer": 0,
+        "exp": "海明威的習慣是為了提升寫作專注力，屬於高效的工作技巧。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇故事對小朋友寫作文最大的啟發是：",
+        "options": [
+          "寫完作文後要認真檢查，刪去多餘不通順的廢話",
+          "寫字一定要單腳站著",
+          "字數寫得越多越好",
+          "不要聽別人的意見"
+        ],
+        "answer": 0,
+        "exp": "海明威「寫完後刪除多餘字句」的習慣，啟發我們寫作要精雕細琢、注重修改。"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "小貓和兔子的釣魚比賽",
+    "category": "記敘文：釣魚記",
+    "focus": "理解因果關係，明白處事不能盲目，要從別人的角度和需求出發。",
+    "example": "例題：兔子一開始為什麼釣不到魚？\n\n💡解題魔法：因為牠用胡蘿蔔當魚餌，但魚兒不喜歡吃胡蘿蔔！這叫對症下藥！",
+    "passage": "星期天，小貓和兔子去河邊釣魚比賽。兔子拿出了胡蘿蔔做魚餌，得意地說：『這是我的秘密武器！』可是等了很久，兔子連一隻魚也沒釣到。小貓熟練地用蚯蚓做魚餌，很快就釣到了一條大魚。小貓笑著說：『你喜歡的胡蘿蔔，魚兒可不一定喜歡喔！快換上蚯蚓試試吧！』兔子換了魚餌，果然也釣到大魚了。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小貓和兔子星期天去哪裡比賽？",
+        "options": [
+          "河邊釣魚",
+          "操場跑步",
+          "山上爬樹",
+          "草地跳舞"
+        ],
+        "answer": 0,
+        "exp": "原文開頭寫到：「小貓和兔子去河邊釣魚比賽」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "兔子一開始拿甚麼當作魚餌？",
+        "options": [
+          "胡蘿蔔",
+          "小蟲",
+          "蚯蚓",
+          "麵包屑"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「兔子拿出了胡蘿蔔做魚餌」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "兔子得意地把胡蘿蔔稱作甚麼？",
+        "options": [
+          "秘密武器",
+          "魔法法寶",
+          "超級棒棒糖",
+          "幸運星"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，兔子得意地說：「這是我的秘密武器！」"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小貓是用甚麼做魚餌的？",
+        "options": [
+          "蚯蚓",
+          "小草",
+          "小魚",
+          "胡蘿蔔"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小貓熟練地用蚯蚓做魚餌」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "是誰最先釣到了大魚？",
+        "options": [
+          "小貓",
+          "兔子",
+          "兩隻同時釣到",
+          "一隻大灰狼"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小貓熟練地用蚯蚓做魚餌，很快就釣到了一條大魚」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "為什麼兔子一開始連一條魚都釣不到？",
+        "options": [
+          "因為魚兒不吃胡蘿蔔，兔子沒有考慮到魚兒的需求",
+          "因為河裡根本沒有魚",
+          "因為兔子在岸上太吵了",
+          "因為小貓把魚都嚇跑了"
+        ],
+        "answer": 0,
+        "exp": "兔子用自己最愛吃的胡蘿蔔去釣魚，卻忽略了魚愛吃的是小蟲蚯蚓。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "小貓勸告兔子『你喜歡的，別人不一定喜歡』，意思是：",
+        "options": [
+          "每個人或動物都有不同的喜好，要學會站在對方的立場想問題",
+          "兔子喜歡的東西都很差勁",
+          "魚兒非常討厭兔子",
+          "小貓不想跟兔子分享胡蘿蔔"
+        ],
+        "answer": 0,
+        "exp": "這話蘊含了同理心與換位思考的哲理。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "兔子換了蚯蚓做魚餌後，『果然』也釣到了大魚，這說明：",
+        "options": [
+          "小貓說的話非常正確，換了合適的魚餌就成功了",
+          "兔子運氣太好",
+          "河裡的魚突然變傻了",
+          "兔子釣魚技術比小貓好"
+        ],
+        "answer": 0,
+        "exp": "「果然」表示事實與預料中或小貓說的相符。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇小故事主要想告訴我們甚麼道理？",
+        "options": [
+          "做事情要因地制宜，滿足對方的需要，而不能一廂情願",
+          "兔子一定要和貓咪做朋友",
+          "釣魚必須去大河邊",
+          "胡蘿蔔是世界上最好吃的東西"
+        ],
+        "answer": 0,
+        "exp": "故事告訴我們做事要從客觀實際和對方的需求出發，才能成功。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "下列哪一個詞語最適合用來形容小貓釣魚時的表現？",
+        "options": [
+          "經驗豐富 / 聰明善解",
+          "粗心大意",
+          "驕傲自滿",
+          "糊裡糊塗"
+        ],
+        "answer": 0,
+        "exp": "小貓用適合的魚餌並熱心指導兔子，既專業又友善。"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "小雨滴的奇幻旅行",
+    "category": "記敘文：水的旅程",
+    "focus": "理清科學現象擬人化表達的時間線，理解「水循環」的奇妙過程。",
+    "example": "例題：小雨滴是由甚麼變成，然後落到地面的？\n\n💡解題魔法：文中提到「小水滴受熱變成水蒸氣升空 ➔ 聚集成白雲 ➔ 最後變成雨水落下來」。這就是大自然的循環！",
+    "passage": "我是一顆小水滴。太陽曬在我身上，我覺得身體輕飄飄的，變成了水蒸氣升上天空。在空中，我和夥伴們擠在一起，在風先生吹拂下重組，變成了白雲。突然，雷聲大作，我們變重了，嘩啦嘩啦地變成雨水落到地面。我們流進小溪，奔向大海，準備開始下一次的奇妙旅行！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這篇故事是以誰的口吻（第一人稱）寫的？",
+        "options": [
+          "小水滴",
+          "風先生",
+          "太陽公公",
+          "大海"
+        ],
+        "answer": 0,
+        "exp": "開頭寫：「我是一顆小水滴」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "小水滴被太陽曬了以後，身體感覺怎麼樣？",
+        "options": [
+          "輕飄飄的",
+          "重冰冰的",
+          "火辣辣的",
+          "軟綿綿的"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「我覺得身體輕飄飄的，變成了水蒸氣」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "在風先生的吹拂和重組下，小水滴們變成了甚麼？",
+        "options": [
+          "白雲",
+          "彩虹",
+          "冰雹",
+          "雪花"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「在風先生吹拂下重組，變成了白雲」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小雨滴落回地面後，最後奔向了哪裡？",
+        "options": [
+          "大海",
+          "水槽",
+          "水杯",
+          "樹頂"
+        ],
+        "answer": 0,
+        "exp": "原文最後說：「我們流進小溪，奔向大海」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "下大雨時，天空中發出了甚麼聲音？",
+        "options": [
+          "雷聲大作",
+          "小鳥唱歌",
+          "大風呼呼",
+          "安安靜靜"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「突然，雷聲大作……」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "這篇小短文實際上是用擬人的手法介紹了科學中的甚麼現象？",
+        "options": [
+          "大自然的水循環過程",
+          "風的形成原理",
+          "彩虹的顏色分類",
+          "太陽光能的反射"
+        ],
+        "answer": 0,
+        "exp": "小水滴升空、聚集成雲、降雨落回地面再到大海，完美詮釋了「水循環」。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "下列哪一組是小水滴在旅行中的『狀態變化』順序？",
+        "options": [
+          "液態水滴 ➔ 氣態水蒸氣 ➔ 雲朵 ➔ 雨水液態",
+          "雲朵 ➔ 雨水 ➔ 太陽 ➔ 大海",
+          "雨水 ➔ 冰雹 ➔ 水蒸氣 ➔ 白雲",
+          "大海 ➔ 小溪 ➔ 太陽 ➔ 雨滴"
+        ],
+        "answer": 0,
+        "exp": "水滴（液態）➔ 蒸發成蒸氣（氣態）➔ 凝結成雲（微小水滴）➔ 降雨（液態）。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "文中說『準備開始下一次的奇妙旅行』，暗示了：",
+        "options": [
+          "水循環是不停重演、永無止境的自然過程",
+          "小水滴想去別的國家旅行",
+          "小水滴要坐飛機出門",
+          "小水滴再也不會變成雨了"
+        ],
+        "answer": 0,
+        "exp": "雨水落入大海後，會再次被太陽曬熱蒸發，開始新的循環。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "『嘩啦嘩啦』是一個擬聲詞，在文中用來形容：",
+        "options": [
+          "大雨落下來的巨大聲音",
+          "雷公公發出的吼聲",
+          "風吹過綠葉的沙沙聲",
+          "小狗在水裡游泳的聲音"
+        ],
+        "answer": 0,
+        "exp": "「嘩啦嘩啦」通常用來形容大雨傾盆或水流湍急的聲響。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "通過小雨滴的旅行，我們可以體會到：",
+        "options": [
+          "大自然萬物都有規律，非常奇妙且充滿活力",
+          "小雨滴非常可憐",
+          "太陽公公是個壞蛋",
+          "我們不需要保護水資源"
+        ],
+        "answer": 0,
+        "exp": "奇妙的自然規律讓我們體會到大自然的生命力與科學的樂趣。"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "懂事的小熊與小豬",
+    "category": "記敘文：愛投訴的小豬",
+    "focus": "培養同理心和寬容大度的優良品格，懂得得饒人處且饒人的道理。",
+    "example": "例題：小豬推倒雕像後非常害怕，是誰主動幫牠說好話的？\n\n💡解題魔法：是平日經常被小豬「投訴、打小報告」的小熊！這展現了小熊的寬容！",
+    "passage": "小豬喜歡到處向獅子大王打小報告，投訴其他動物，這讓大家都很討厭牠。有一天，小豬不小心把獅子大王的石雕像推倒了，牠害怕極了。這時，被牠投訴過的小熊主動走過來幫牠說好話。小豬感動得哭了，從此牠明白了自己也會犯錯，不再隨便投訴別人，而是學會了體諒和友愛。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小豬平時喜歡做甚麼事，讓大家都很討厭牠？",
+        "options": [
+          "打小報告、投訴其他動物",
+          "搶大家的食物",
+          "不洗澡發出臭味",
+          "每天睡大覺"
+        ],
+        "answer": 0,
+        "exp": "原文第一句說：「小豬喜歡到處向獅子大王打小報告，投訴其他動物」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "小豬不小心把甚麼東西推倒了？",
+        "options": [
+          "獅子大王的石雕像",
+          "大樹",
+          "圍欄",
+          "小熊的房子"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「不小心把獅子大王的石雕像推倒了」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "當小豬犯錯感到害怕時，誰走過來幫牠？",
+        "options": [
+          "小熊",
+          "老虎",
+          "大狗",
+          "狐狸"
+        ],
+        "answer": 0,
+        "exp": "原文提到：「被牠投訴過的小熊主動走過來幫牠說好話」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小豬看到小熊幫自己，牠的心情和反應是：",
+        "options": [
+          "感動得哭了",
+          "哈哈大笑",
+          "對小熊吐舌頭",
+          "轉身跑掉了"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「小豬感動得哭了」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "動物們在森林裡向誰投訴或報告？",
+        "options": [
+          "獅子大王",
+          "小熊",
+          "大象伯伯",
+          "小豬"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，小豬喜歡「向獅子大王打小報告」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "為什麼小熊幫小豬說好話這件事非常難得？",
+        "options": [
+          "因為小熊以前也被小豬投訴過，但小熊選擇了寬恕",
+          "因為小熊是森林裡最高大的動物",
+          "因為小熊想讓小豬分牠零食",
+          "因為小熊也討厭獅子大王"
+        ],
+        "answer": 0,
+        "exp": "小熊不計前嫌，在小豬危難時伸出援手，展現了寬容大度的優良品格。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "小豬從這件事中『明白自己也會犯錯』，帶來的轉變是：",
+        "options": [
+          "不再隨便投訴別人，學會體諒和友愛",
+          "牠決定再也不跟任何動物說話了",
+          "牠以後只投訴小熊一個人",
+          "牠決定搬出森林"
+        ],
+        "answer": 0,
+        "exp": "原文最後說：從此牠「不再隨便投訴別人，學會了體諒和友愛」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這篇童話故事教育小朋友在日常生活中應該：",
+        "options": [
+          "學會寬以待人，不要隨意挑別人的毛病打小報告",
+          "遇到任何小事都要立刻找老師打小報告",
+          "做錯事要藏起來不讓別人知道",
+          "不要跟比自己厲害的人做朋友"
+        ],
+        "answer": 0,
+        "exp": "故事教育我們多一些體諒和包容，少一些無謂的指責與告狀。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "下列哪一個詞語最適合用來形容「小熊」的品德？",
+        "options": [
+          "寬容大度",
+          "膽小怕事",
+          "自私自利",
+          "糊裡糊塗"
+        ],
+        "answer": 0,
+        "exp": "小熊不計較過去小豬對牠的傷害，主動幫忙，十分「寬容大度」。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "如果小熊也像小豬以前那樣落井下石，故事的結局可能會：",
+        "options": [
+          "小豬受到嚴厲懲罰，森林裡充满了怨恨和不和諧",
+          "大家開心地慶祝",
+          "小熊變成國王",
+          "沒有任何變化"
+        ],
+        "answer": 0,
+        "exp": "互相指責只會帶來不和，寬恕與互助才能使集體更溫暖。"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "title": "不擔心天空掉下來",
+    "category": "寓言：杞人憂天",
+    "focus": "理解成語寓意，明白不要為毫無根據的事情過度擔憂、自尋煩惱。",
+    "example": "例題：杞國那個人整天擔心甚麼？\n\n💡解題魔法：回文尋找，他擔心「天空會掉下來把自己壓死」。這就是成語『杞人憂天』的由來！",
+    "passage": "古時候，杞國有一個人整天擔心天空會突然掉下來，把自己壓死。他為此整天吃不下飯、睡不著覺，身體越來越差。鄰居安慰他說：『天空是廣闊的氣體，怎麼會掉下來呢？』但他又擔心太陽、月亮和星星會掉下來。鄰居無奈地搖頭說：『你真是自尋煩惱呀！』",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這個整天擔心天空掉下來的人是哪國人？",
+        "options": [
+          "杞國人",
+          "秦國人",
+          "趙國人",
+          "楚國人"
+        ],
+        "answer": 0,
+        "exp": "原文開頭說：「古時候，杞國有一個人……」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "那個人擔心天空掉下來會怎麼樣？",
+        "options": [
+          "把自己壓死",
+          "砸壞大樹",
+          "把河水堵住",
+          "天空變顏色"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，他擔心「天空會突然掉下來，把自己壓死」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "因為這種擔憂，他的生活變成了甚麼樣？",
+        "options": [
+          "吃不下飯、睡不著覺，身體變差",
+          "天天高興地唱歌",
+          "每天努力跑步鍛煉",
+          "買了好多雨傘"
+        ],
+        "answer": 0,
+        "exp": "原文說他「為此整天吃不下飯、睡不著覺，身體越來越差」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "鄰居說天空是由甚麼組成的，所以不會掉下來？",
+        "options": [
+          "廣闊的氣體",
+          "堅硬的石頭",
+          "軟軟的棉花",
+          "甜甜的冰淇淋"
+        ],
+        "answer": 0,
+        "exp": "鄰居安慰他說：「天空是廣闊的氣體，怎麼會掉下來呢？」"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "聽了鄰居的解釋後，那個人接著又開始擔心甚麼？",
+        "options": [
+          "太陽、月亮和星星會掉下來",
+          "地上會發大水",
+          "鄰居會偷走他的飯",
+          "房子會倒塌"
+        ],
+        "answer": 0,
+        "exp": "原文中說：「但他又擔心太陽、月亮和星星會掉下來」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『自尋煩惱』這個詞語在文中的意思是：",
+        "options": [
+          "為不必要、毫無根據的事物去焦慮、愁悶",
+          "努力為大家解決困難",
+          "主動做家務賺零用錢",
+          "在地上找丟失的寶物"
+        ],
+        "answer": 0,
+        "exp": "自己給自己找來沒有意義的煩惱，形容不必要的焦慮。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "鄰居對那個人的態度變化是：",
+        "options": [
+          "熱心開導 ➔ 無奈搖頭",
+          "哈哈大笑 ➔ 非常生氣",
+          "一起哭泣 ➔ 搬家離開",
+          "不理不睬 ➔ 大聲責備"
+        ],
+        "answer": 0,
+        "exp": "鄰居先是熱心用科學道理安慰他，但他又胡思亂想，鄰居只好「無奈搖頭」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "成語『杞人憂天』現在用來形容：",
+        "options": [
+          "為完全沒必要、毫无根據的事情瞎擔心、瞎操心",
+          "有很長遠的眼光和抱負",
+          "非常關心大自然的變化",
+          "喜歡看星空的人"
+        ],
+        "answer": 0,
+        "exp": "「杞人憂天」是個著名貶義成語，比喻不必要的、毫無根據的憂慮。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇寓言故事最深刻的道理是：",
+        "options": [
+          "心胸要開闊，不要用沒根據的幻想折磨自己，健康樂觀最重要",
+          "星空非常危險，不要看天空",
+          "多聽鄰居的話就能發財",
+          "要隨時戴安全帽防止東西掉落"
+        ],
+        "answer": 0,
+        "exp": "寓言揭示了過度焦慮對身心無益，應以科學、樂觀的態度面對生活。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "如果你是杞人的鄰居，看見他這樣，你會怎麼勸他？",
+        "options": [
+          "帶他去多做戶外運動，分散注意力，用樂觀的心情生活",
+          "幫他做一個大盾牌擋住頭頂",
+          "勸他天天關在屋子裡不要出門",
+          "陪他一起整天哭泣擔憂"
+        ],
+        "answer": 0,
+        "exp": "樂觀的心態和健康的社交與鍛煉是克服不必要焦慮的最好良藥。"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "title": "聰明的沙灘狐狸",
+    "category": "寓言：愚蠢的狼",
+    "focus": "體會寓言故事的擬人化讽刺，明白不假思索盲信盲從的危害。",
+    "example": "例題：狼為什麼會相信狐狸能「控制海浪」？\n\n💡解題魔法：因為狐狸喊口號的時間和海浪自然漲退的時間一模一樣！這是狐狸在耍小聰明！",
+    "passage": "有一隻聰明的狐狸住在海邊，非常了解海浪起伏的規律。有一天，一隻狼來到海邊，問狐狸：『這大海是由你管理的嗎？』狐狸得意地說：『當然！』狐狸對著海浪喊：『湧上來吧！』海浪果然湧上來；狐狸又喊：『退下去吧！』海浪果然退去。狼深信不疑，興奮地跳進海裡玩耍，結果因為不識水性被海浪淹死了。狐狸看著嘆氣說：『真是一隻愚蠢的狼啊！』",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "聰明的狐狸住在甚麼地方？",
+        "options": [
+          "海邊",
+          "森林深處",
+          "高山上",
+          "動物園裡"
+        ],
+        "answer": 0,
+        "exp": "原文第一句說：「有一隻聰明的狐狸住在海邊」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "狐狸非常了解海浪起伏的甚麼？",
+        "options": [
+          "規律",
+          "顏色",
+          "溫度",
+          "味道"
+        ],
+        "answer": 0,
+        "exp": "原文說：狐狸「非常了解海浪起伏的規律」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "誰來到海邊問狐狸是不是在管理大海？",
+        "options": [
+          "一隻狼",
+          "一隻獅子",
+          "一隻小狗",
+          "一隻兔子"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「有一天，一隻狼來到海邊……」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "狼對狐狸的話抱持甚麼態度？",
+        "options": [
+          "深信不疑",
+          "完全不相信",
+          "半信半疑",
+          "大聲反駁"
+        ],
+        "answer": 0,
+        "exp": "原文提到，面對狐狸的表演，狼「深信不疑」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "狼最後跳進海裡，結果怎麼了？",
+        "options": [
+          "因為不識水性被海浪淹死了",
+          "學會了游泳",
+          "抓到好多大魚",
+          "高興地回家了"
+        ],
+        "answer": 0,
+        "exp": "原文中說：「結果因為不識水性被海浪淹死了」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "狐狸真的能管理大海嗎？牠是怎麼做到讓海浪聽話的？",
+        "options": [
+          "牠不能。牠只是利用了海浪自然漲退的規律，趁海浪要漲退時大喊，騙了狼",
+          "牠真的會魔法",
+          "大海是牠的寵物",
+          "海浪在跟狐狸玩對講機"
+        ],
+        "answer": 0,
+        "exp": "狐狸只是利用了自然科學常識（潮汐規律）來假裝自己有權力，狼卻信以為真。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中狼『深信不疑』的意思是：",
+        "options": [
+          "非常相信，一點點懷疑都沒有",
+          "心裡覺得非常奇怪",
+          "完全不當一回事",
+          "覺得狐狸在胡說八道"
+        ],
+        "answer": 0,
+        "exp": "深信不疑代表極度信任，不作任何質疑或思考。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "狐狸最後說狼『愚蠢』，是因為狼：",
+        "options": [
+          "不肯動腦筋思考，盲目相信別人的謊言，連自己不識水性都忘了",
+          "跑得太慢了",
+          "不分給狐狸食物",
+          "不會唱歌"
+        ],
+        "answer": 0,
+        "exp": "狼最大的愚蠢在於盲信盲從，沒有獨立思考，甚至連自己不會游泳就跳海的安全常識都忘光了。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇寓言主要是想諷刺日常生活中哪一種人？",
+        "options": [
+          "不愛思考、盲目相信別人吹噓和謊言的糊塗人",
+          "喜歡在海邊散步的人",
+          "不愛洗澡、不愛運動的人",
+          "說實話卻被欺負的誠實人"
+        ],
+        "answer": 0,
+        "exp": "故事通過狼的悲慘結局，警示人們要凡事多動腦筋，切忌盲目相信片面之詞。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "如果你是那隻狼，聽了狐狸吹噓後，最聰明的做法是：",
+        "options": [
+          "多观察幾次，並想想海浪是否本來就有漲退規律，同時保護好自身安全",
+          "立刻跳下去證明自己很勇敢",
+          "打電話叫別的野獸一起跳海",
+          "拜狐狸為國王"
+        ],
+        "answer": 0,
+        "exp": "理性觀察、實地驗證並時刻牢記安全常識，才是智慧的做法。"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "森林和事佬蝙蝠",
+    "category": "寓言：蝙蝠的故事",
+    "focus": "理解寓言中的比喻，懂得做人要誠實正直，不能投機取巧、兩面討好。",
+    "example": "例題：戰爭結束後，鳥類和野獸為什麼把蝙蝠趕走了？\n\n💡解題魔法：因為大家和解後發現了蝙蝠「雙面討好、欺騙大家」的行為！",
+    "passage": "很久以前，森林裡的鳥類和野獸發生了戰爭。狡猾的蝙蝠總是躲在後方。鳥類打勝仗時，牠就飛過去說：『我有翅膀會飛，我是鳥類的夥伴！』野獸打勝仗時，牠又藏起翅膀說：『我跟老鼠長得一樣，我是野獸的夥伴！』後來戰爭結束，雙方和解，發現了蝙蝠的欺騙行為，把牠趕出了森林。從此，蝙蝠只能躲在黑暗的洞穴裡，夜裡才敢出來找食物。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "很久以前，森林裡的哪兩個群體發生了戰爭？",
+        "options": [
+          "鳥類和野獸",
+          "小貓和小狗",
+          "大魚和小魚",
+          "昆蟲和植物"
+        ],
+        "answer": 0,
+        "exp": "原文第一句：「森林裡的鳥類和野獸發生了戰爭」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "戰爭期間，狡猾的蝙蝠躲在甚麼地方？",
+        "options": [
+          "後方",
+          "戰場最前線",
+          "大樹頂上",
+          "河水底"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「狡猾的蝙蝠總是躲在後方」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "當鳥類打勝仗時，蝙蝠拿甚麼當理由說自己是鳥類的夥伴？",
+        "options": [
+          "自己有翅膀會飛",
+          "自己會生蛋",
+          "自己有美麗羽毛",
+          "自己叫聲好聽"
+        ],
+        "answer": 0,
+        "exp": "原文中說，蝙蝠對鳥類說：「我有翅膀會飛，我是鳥類的夥伴！」"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "野獸打勝仗時，蝙蝠把自己比作甚麼來討好野獸？",
+        "options": [
+          "老鼠",
+          "大老虎",
+          "獅子",
+          "小松鼠"
+        ],
+        "answer": 0,
+        "exp": "原文中說，蝙蝠藏起翅膀說：「我跟老鼠長得一樣，我是野獸的夥伴！」"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "戰爭結束後，被趕出森林的蝙蝠最後只能躲在哪裡？",
+        "options": [
+          "黑暗的洞穴裡",
+          "溫暖的鳥巢裡",
+          "高大的宮殿裡",
+          "河邊的沙灘上"
+        ],
+        "answer": 0,
+        "exp": "原文最後說：「從此，蝙蝠只能躲在黑暗的洞穴裡」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "蝙蝠在戰爭中的做法，可以用以下哪一個詞來形容？",
+        "options": [
+          "投機取巧、兩面三刀",
+          "勇敢無畏、衝鋒陷陣",
+          "大公無私、熱心助人",
+          "糊裡糊塗、不省人事"
+        ],
+        "answer": 0,
+        "exp": "蝙蝠哪邊勝出就歸順哪邊，典型的投機、不真誠的行為。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "鳥類和野獸和解後，是怎麼對待蝙蝠的？",
+        "options": [
+          "看穿了牠的欺騙，合力把牠趕出了森林",
+          "選牠當森林之王",
+          "分給牠好多好吃的食物",
+          "不和牠玩遊戲但讓牠留下"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：大家「發現了蝙蝠的欺騙行為，把牠趕出了森林」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這篇故事對我們做人有甚麼重要的啟示？",
+        "options": [
+          "做人要誠實正直，不能像蝙蝠那樣兩面討好、欺騙他人，否則會失去朋友",
+          "會飛是一件很厲害的事",
+          "戰爭中一定要躲在最安全的地方",
+          "老鼠和蝙蝠是親戚"
+        ],
+        "answer": 0,
+        "exp": "誠實正直是立身之本，投機取巧的人最終會被集體唾棄和孤立。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "為什麼蝙蝠現在只在『夜裡才敢出來找食物』？",
+        "options": [
+          "因為牠害怕見到白天活動的鳥類和野獸，感到羞愧和無臉見人",
+          "因為晚上的食物特別美味",
+          "因為牠的眼睛白天看不清",
+          "因為夜裡的風比較涼快"
+        ],
+        "answer": 0,
+        "exp": "故事用這個特點作寓言的懲罰結局，說明不真誠、背叛信任的下場。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "如果蝙蝠在一開始就選擇誠實正直地表明立場或熱心當和事佬，結局會怎樣？",
+        "options": [
+          "大家在戰爭結束後依然會把牠當作真誠的朋友對待",
+          "大家還是會討厭牠",
+          "牠會被老虎吃掉",
+          "戰爭永遠不會結束"
+        ],
+        "answer": 0,
+        "exp": "真誠待人，即使能力有限，也能贏得尊重與長久的友誼。"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "title": "七彩石頭補天空",
+    "category": "神話：女媧補天",
+    "focus": "感受中國傳統神話的奇妙幻想，學習女媧不怕困難、捨己為人的大愛精神。",
+    "example": "例題：女媧是怎樣把天空中的大洞補好的？\n\n💡解題魔法：回文尋找，她用「神火把五彩石煉成石漿」來填補裂縫。這就是神話的精彩想像！",
+    "passage": "相傳古代女媧創造了人類。有一天，水神和火神大戰，撞斷了撐天的大柱子不周山，天空塌了一個大洞，洪水野獸到處傷害人類。女媧難過極了，決定拯救人類。她跑到高山上，好不容易找到了紅、黃、藍、綠、青色的五彩石，用神火煉成石漿，把天上的大洞補好。從此，世界恢復了和平，天邊美麗的五彩雲霞，傳說就是女媧補天的地方。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "相傳古代是誰創造了人類？",
+        "options": [
+          "女媧",
+          "水神共工",
+          "火神祝融",
+          "盤古公公"
+        ],
+        "answer": 0,
+        "exp": "原文第一句寫到：「相傳古代女媧創造了人類」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "哪兩位神仙大戰撞斷了撐天的柱子不周山？",
+        "options": [
+          "水神和火神",
+          "太陽神和月亮神",
+          "雷公和電母",
+          "土地公和財神爺"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「水神和火神大戰，撞斷了撐天的大柱子不周山」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "天空塌了大洞後，甚麼東西到處傷害人類？",
+        "options": [
+          "洪水和野獸",
+          "天上掉下的流星",
+          "冰雹和大風",
+          "外星人"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「天空塌了一個大洞，洪水野獸到處傷害人類」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "女媧去高山上尋找甚麼來補天？",
+        "options": [
+          "五彩石",
+          "神奇草藥",
+          "黃金和銀子",
+          "大木頭"
+        ],
+        "answer": 0,
+        "exp": "原文提到：她「好不容易找到了紅、黃、藍、綠、青色的五彩石」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "女媧用甚麼把五彩石煉成了石漿？",
+        "options": [
+          "神火",
+          "溫水",
+          "雷電",
+          "狂風"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，女媧「用神火煉成石漿，把天上的大洞補好」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "文中說女媧『難過極了，決定拯救人類』，這展現了女媧：",
+        "options": [
+          "對人類深厚的愛與無私奉獻的善良品格",
+          "非常有錢",
+          "喜歡冒險挑戰",
+          "不喜歡水神和火神"
+        ],
+        "answer": 0,
+        "exp": "女媧看到人類受難，挺身而出，體現了神話母親的大愛與無私。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "傳說天邊美麗的『五彩雲霞』是甚麼？",
+        "options": [
+          "女媧用五彩石補天的地方",
+          "神仙衣服的顏色",
+          "大火燃燒的煙霧",
+          "直升機飛過的痕跡"
+        ],
+        "answer": 0,
+        "exp": "原文最後一句說：「天邊美麗的五彩雲霞，傳說就是女媧補天的地方」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這篇故事屬於甚麼文體（體裁）？",
+        "options": [
+          "古代神話傳說",
+          "實用文通告",
+          "現代生活記敘文",
+          "科普說明文"
+        ],
+        "answer": 0,
+        "exp": "故事充滿了豐富的神奇幻想（如女媧造人、神火煉石補天），屬於神話體裁。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "女媧補天的過程非常不容易，這教導我們：",
+        "options": [
+          "面對困難和巨大的挑戰時，要堅持不懈，勇敢去解決",
+          "神仙才能做大事",
+          "遇到自然災害只能躲著哭",
+          "多去山上撿好看的石頭"
+        ],
+        "answer": 0,
+        "exp": "女媧歷經千辛萬苦尋石補天，啟示我們要迎難而上、充滿擔當。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "下列哪一個成語的含義，與『女媧補天』中不怕辛苦拯救大眾的精神最相近？",
+        "options": [
+          "精衛填海 / 捨己救人",
+          "自相矛盾",
+          "井底之蛙",
+          "畫蛇添足"
+        ],
+        "answer": 0,
+        "exp": "「精衛填海」和「捨己救人」都是中國傳統文化中不畏艱辛、無私奉獻的代表。"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "title": "我的小狗芝芝",
+    "category": "記敘文：我的寵物",
+    "focus": "學會細緻觀察動物的外形與行為特徵，體會真摯的愛寵情感。",
+    "example": "例題：芝芝剛來我家時為什麼一直發抖？\n\n💡解題魔法：因為牠「對陌生環境感到不安和害怕」，這是小動物的本能反應！",
+    "passage": "前幾天，我家來了一個新成員。別以為我多了個弟弟或妹妹，其實是隻娃娃狗。牠四肢短短的，長著黑白相間的毛，我幫牠取名叫芝芝。\n芝芝剛到我家的時候，因為對周圍的環境感到陌生，所以看起來很不妥，一直發抖。看著牠那大大的眼睛和楚楚可憐的模樣，我忍不住走過去摸牠的頭。一開始牠還是有點退縮，但很快便露出享受的表情，還用鼻子不停嗅我的手，可能是想記住我的氣味吧！牠還舔了舔我的手，嘻，好像在親吻我呢！\n芝芝很快便融入家中，現在我每天都會抽時間和牠玩耍。看到芝芝躺在硬梆梆的地板上，我會把自己的墊子拿給牠，牠一看到便立刻搖著尾巴跑到墊子上。看到芝芝怡然自得地趴著，我會拿心愛的布偶給牠玩。媽媽稱讚我學會了分享，那是當然的，因為牠是我的好朋友，而且分享是一種美德呢！我一放學回家，牠都會跑到門口迎接我，還會興奮得不停跑來跑去，為疲累的我帶來歡樂。\n聽說狗的壽命只有短短的十多年，我會好好照顧芝芝，讓牠知道我也很愛牠。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "新成員「芝芝」是一隻甚麼品種的小狗？",
+        "options": [
+          "娃娃狗",
+          "斑點狗",
+          "金毛犬",
+          "牧羊犬"
+        ],
+        "answer": 0,
+        "exp": "原文說：其實是隻「娃娃狗」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "小狗「芝芝」身上的毛是什麼顏色的？",
+        "options": [
+          "黑白相間",
+          "全黃色",
+          "棕色帶金點",
+          "雪白色"
+        ],
+        "answer": 0,
+        "exp": "原文第二句說：牠「長著黑白相間的毛」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "芝芝剛來我家時，為什麼一直發抖？",
+        "options": [
+          "因為對周圍環境感到陌生和不安",
+          "因為天氣太冷了",
+          "因為生病了",
+          "因為害怕洗澡"
+        ],
+        "answer": 0,
+        "exp": "原文提到：芝芝「因為對周圍的環境感到陌生，所以……一直發抖」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "看見芝芝睡在硬梆梆的地板上，「我」拿了什麼給牠？",
+        "options": [
+          "「我」自己的坐墊",
+          "一件舊衣服",
+          "一個大紙箱",
+          "一條厚毛毯"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「我會把自己的墊子拿給牠」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "媽媽稱讚「我」學會了什麼美德？",
+        "options": [
+          "分享",
+          "誠實",
+          "守信",
+          "勇敢"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「媽媽稱讚我學會了分享」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "文中說芝芝用鼻子嗅「我」的手並舔「我」，目的是為了：",
+        "options": [
+          "想記住「我」的氣味，並向「我」示好、親近",
+          "因為「我」的手上有食物的味道",
+          "因為牠牙齒癢想咬人",
+          "因為牠不喜歡我觸摸牠"
+        ],
+        "answer": 0,
+        "exp": "嗅聞和輕舔是狗熟悉新主人和表達喜愛、親密的方式。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中「怡然自得」形容芝芝：",
+        "options": [
+          "高興、舒適、非常自在的樣子",
+          "非常難過和害怕",
+          "身體很冷不停發抖",
+          "調皮搗蛋被媽媽罵"
+        ],
+        "answer": 0,
+        "exp": "「怡然自得」形容心情舒暢、高興滿足、自由自在的模樣。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "每天放學回家，芝芝是怎樣迎接「我」的？",
+        "options": [
+          "跑到門口迎接「我」，興奮得不停跑來跑去",
+          "躲在沙發底下不出來",
+          "對著我大聲叫喊並咬我",
+          "在廚房裡睡大覺"
+        ],
+        "answer": 0,
+        "exp": "原文說：放學回家「牠都會跑到門口迎接我，還會興奮得不停跑來跑去」。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "知道狗的壽命只有短短十多年後，「我」決定：",
+        "options": [
+          "好好照顧芝芝，用愛陪伴牠度過一生",
+          "不理睬芝芝了",
+          "把芝芝送給別人家養",
+          "每天只讓芝芝在門外睡覺"
+        ],
+        "answer": 0,
+        "exp": "原文最後說：「我會好好照顧芝芝，讓牠知道我也很愛牠」。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇文章的主要大意和中心思想是：",
+        "options": [
+          "記述「我」與寵物小狗芝芝相處的點滴與轉變，表達了對寵物的喜愛和承諾",
+          "介紹娃娃狗的外形特點和生活習性",
+          "說明分享對小學生的重要性",
+          "抱怨養小狗非常辛苦和疲累"
+        ],
+        "answer": 0,
+        "exp": "文章通篇圍繞寵物狗展開，字裡行間洋溢著滿滿的關愛和長久陪伴的責任感。"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "title": "神奇的金錢樹",
+    "category": "記敘文：不會結果的樹",
+    "focus": "理解孩子的童真幻想與自然規律的碰撞，學習科學常識。",
+    "example": "例題：為什麼主角種在泥土裡的壓歲錢沒有長出來？\n\n💡解題魔法：爺爺說得好：「只有植物種在地上才會開花結果，錢是不會發芽的！」",
+    "passage": "小時候，我每當拿到壓歲錢都會存起來。後來，我想買的玩具太多，可是壓歲錢有限，於是便開始想些賺錢的辦法。我看到院子裡的一棵芒果樹，突然靈機一動：『如果我把壓歲錢種在地上，不就能長出金錢樹，結出好多錢了嗎？』\n我連忙跑到房間打開錢箱，拿出一張五十元紙幣，然後跑到院子，把紙幣埋在泥土裡。日子一天天過去，我每天都堅持給它澆水，盼望它快快發芽長大，結出許許多多的金錢，想像收穫那一天的喜悅。\n一星期過去了，可是金錢樹連芽都沒有長出來。我向爺爺求助，問他：『為什麼我天天澆水，金錢樹還不發芽呢？』爺爺聽後開懷大笑，一邊摸著我的頭，一邊說：『傻孩子，只有植物種在地上才會開花結果，種錢是不會發芽的。』我聽後難過得低下頭，我的發財夢就此破滅了。\n每當想起那棵不會結果的樹，我都忍不住取笑自己太天真。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "主角小時候把什麼東西種在了院子裡的泥土裡？",
+        "options": [
+          "一張五十元紙幣",
+          "一粒芒果種子",
+          "一個漂亮的儲錢罐",
+          "一輛玩具小汽車"
+        ],
+        "answer": 0,
+        "exp": "原文提到：主角「拿出一張五十元紙幣……把紙幣埋在泥土裡」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "主角種下紙幣後，每天堅持為它做什麼事？",
+        "options": [
+          "澆水",
+          "施肥",
+          "除草",
+          "唱歌"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「我每天都堅持給它澆水」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "主角等了多久，發現連芽都沒有長出來？",
+        "options": [
+          "一個星期",
+          "一個月",
+          "三天",
+          "一年"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「一星期過去了，可是金錢樹連芽都沒有長出來」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "爺爺聽到主角的提問後有什麼反應？",
+        "options": [
+          "開懷大笑，摸摸主角的頭",
+          "非常生氣地大罵主角",
+          "哭了起來",
+          "不理不睬轉身走開"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「爺爺聽後開懷大笑，一邊摸著我的頭……」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "看到甚麼樹讓主角產生了種錢的靈感？",
+        "options": [
+          "一棵芒果樹",
+          "一棵蘋果樹",
+          "一棵榕樹",
+          "一棵椰子樹"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「我看到院子裡的一棵芒果樹，突然靈機一動」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "為什麼主角種的「金錢樹」最後沒有發芽結果？",
+        "options": [
+          "因為紙幣不是植物的種子，不符合自然科學規律，是不可能生長發芽的",
+          "因為鄰居把錢偷偷挖走了",
+          "因為主角水澆得不夠多",
+          "因為院子的土不夠肥沃"
+        ],
+        "answer": 0,
+        "exp": "紙幣是非生物，只有具備生命特徵的植物種子才能在合適環境中生長結果。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中「靈機一動」的意思是：",
+        "options": [
+          "腦袋裡突然閃現出一個好主意、好辦法",
+          "身體突然動了一下",
+          "眼睛看見一個神奇的東西",
+          "心裡覺得非常害怕"
+        ],
+        "answer": 0,
+        "exp": "「靈機一動」常用來形容靈感突現，突然想到了應對之策。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "主角「發財夢破滅」後的表現是：",
+        "options": [
+          "難過得低下了頭",
+          "大聲和爺爺吵架",
+          "把芒果樹砍掉了",
+          "高興得跳了起來"
+        ],
+        "answer": 0,
+        "exp": "原文提到：「我聽後難過得低下了頭，我的發財夢就此破滅了」。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "長大後主角想起這件事，『取笑自己太天真』，說明主角：",
+        "options": [
+          "長大懂得了自然常識，帶著幽默和懷念的心情看待小時候的童真傻事",
+          "依然非常後悔種了五十元",
+          "覺得爺爺在騙他",
+          "覺得非常生氣"
+        ],
+        "answer": 0,
+        "exp": "取笑自己天真，是長大後擁有理性常識後對美好童心的一種溫馨自省。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇故事主要告訴我們：",
+        "options": [
+          "凡事要符合科學常識和自然規律，不能光靠主觀幻想，同時這也展現了珍貴的童真",
+          "不能買太多玩具",
+          "要多向爺爺要零花錢",
+          "種芒果樹賺錢最快"
+        ],
+        "answer": 0,
+        "exp": "故事寓教於樂，既科普了植物生長的常識，也記錄了童年天真爛漫的可愛幻想。"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "title": "孝順的小禿鷹",
+    "category": "記敘文：禿鷹和獵人",
+    "focus": "體會故事人物的情感變化，學習百善孝為先的中華傳統美德。",
+    "example": "例題：獵人最後為什麼決定放走小禿鷹？\n\n💡解題魔法：因為獵人被小禿鷹「捨身忘死、只擔心父母餓死」的孝心給感動了！",
+    "passage": "從前有一隻年輕的禿鷹，牠的父母逐漸衰老，視力愈來愈差，不能自己找食物，於是年輕的禿鷹決定照顧父母，每天找食物給牠們吃。\n有一天，一個獵人在墓地的四周佈置了捕捉禿鷹的陷阱。因為禿鷹最愛吃腐肉，所以年輕的禿鷹經常到這個墓地找食物。果然，牠很快便中了獵人的圈套，其中一隻腳被堅實的繩索纏住了。\n年輕的禿鷹心想：現在我被抓了，父母要怎麼生活呢？牠們不知道我無法再回去，又沒有人餵養牠們，大概只能無助地、絕望地死去吧！一想到年老的雙親孤苦無依，年輕的禿鷹便大哭起來。牠哀求獵人說：『獵人先生，我一直跟年老的父母生活，並照料牠們，現在你把我抓了，牠們要怎麼活下去呢？』\n獵人先是吃了一驚，說：『想不到你居然是隻會說話的鳥呀！』然後好奇地問：『你能在遠處看到腐肉，怎麼就沒發現眼前的圈套呢？』接著說：『你走吧，去照顧年老的父母吧！』說完，便解開了繩索，讓年輕的禿鷹自由離去。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小禿鷹的父母因為什麼原因無法自己尋找食物？",
+        "options": [
+          "逐漸衰老，視力愈來愈差",
+          "翅膀受傷折斷了",
+          "被大風吹走了",
+          "不喜歡出門"
+        ],
+        "answer": 0,
+        "exp": "原文第一句提到：牠的父母「逐漸衰老，視力愈來愈差，不能自己找食物」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "獵人在墓地四周佈置了什麼來捕捉禿鷹？",
+        "options": [
+          "捕捉禿鷹的陷阱（圈套）",
+          "巨大的網",
+          "毒藥食物",
+          "大鐵籠"
+        ],
+        "answer": 0,
+        "exp": "原文說：獵人在墓地的四周「佈置了捕捉禿鷹的陷阱」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "年輕的禿鷹哪一個部位被獵人的繩索纏住了？",
+        "options": [
+          "其中一隻腳",
+          "牠的脖子",
+          "牠的右邊翅膀",
+          "牠的尖嘴巴"
+        ],
+        "answer": 0,
+        "exp": "原文提到：牠「其中一隻腳被堅實的繩索纏住了」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小禿鷹被抓後，為什麼突然大哭起來？",
+        "options": [
+          "擔心自己回去不了，年老的父母會無依無靠、絕望餓死",
+          "因為牠的腳非常痛",
+          "因為牠害怕獵人吃掉牠",
+          "因為牠沒有找到腐肉"
+        ],
+        "answer": 0,
+        "exp": "原文說：一想到年老的雙親孤苦無依，小禿鷹便大哭起來。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "獵人聽完禿鷹的話後，先是感到：",
+        "options": [
+          "吃了一驚",
+          "非常生氣",
+          "哈哈大笑",
+          "無動於衷"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「獵人先是吃了一驚，說：『想不到你居然是隻會說話的鳥呀！』」"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "獵人好奇地問禿鷹：『你能在遠處看到腐肉，怎麼就沒發現眼前的圈套呢？』這話的意思是：",
+        "options": [
+          "諷刺或驚訝禿鷹雖然眼力極好，卻因為一心想著食物而大意落入陷阱",
+          "獵人覺得禿鷹是個瞎子",
+          "獵人在誇獎禿鷹很聰明",
+          "獵人在抱怨自己的陷阱不夠隱蔽"
+        ],
+        "answer": 0,
+        "exp": "這是一個反問或疑惑，說明禿鷹因為急著找食物孝敬父母而大意了。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "小禿鷹在面對危險時，心中最記掛、最擔憂的是什麼？",
+        "options": [
+          "自己父母的生活和生存安全",
+          "自己的性命安全",
+          "怎樣向獵人報仇",
+          "墓地裡還有沒有別的腐肉"
+        ],
+        "answer": 0,
+        "exp": "牠大哭和求情都是為了雙親的活路，這體現了崇高的孝道。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "獵人最後決定放走禿鷹，主要是因為：",
+        "options": [
+          "被小禿鷹對父母的深切孝心和責任感深深打動了",
+          "他覺得禿鷹不好吃",
+          "他害怕會說話的鳥會帶來詛咒",
+          "他自己要趕著回家吃飯"
+        ],
+        "answer": 0,
+        "exp": "獵人聽了禿鷹懇切的求情，理解了牠的孝心，大發慈悲放了牠。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇童話式記敘文蘊含的主要美德是：",
+        "options": [
+          "百善孝為先，感恩並細心照顧年老的父母",
+          "在野外要小心獵人的陷阱",
+          "不要隨便跟陌生人說話",
+          "禿鷹是一種喜歡在墓地生活的鳥"
+        ],
+        "answer": 0,
+        "exp": "小禿鷹孝順父母的行為是全篇的核心靈魂，旨在教育孝道與同理心。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "下列哪一個詞語可以用來形容「獵人」最後的行為？",
+        "options": [
+          "善良仁慈 / 寬厚大度",
+          "自私自利",
+          "陰險狡詐",
+          "膽小如鼠"
+        ],
+        "answer": 0,
+        "exp": "獵人能被孝心打動並釋放獵物，展現了他人性中善良、仁慈的一面。"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "title": "百歲榕樹爺爺",
+    "category": "記敘文：榕樹爺爺",
+    "focus": "學習抓住自然植物特徵的描寫，感受大樹給人們帶來的歡樂與安全感。",
+    "example": "例題：榕樹爺爺身上的「鬍鬚」是指什麼？\n\n💡解題魔法：植物科普常識，大榕樹垂下來細細長長的東西，就是吸取水分的「氣根」！",
+    "passage": "學校空地有一棵大榕樹，因為牠有許多氣根，像一根根細長的鬍鬚，所以我們都叫牠做『榕樹爺爺』。\n小息和午飯後，我們最喜歡在榕樹爺爺下面玩耍、乘涼、看書。有時候，我們還會圍著牠跑跑跳跳，玩到滿身大汗。榕樹爺爺的手臂很長，為我們遮擋了大部分陽光。只要風吹來，榕樹爺爺更會發出沙沙的聲音，讓人感到很清涼，大家都玩得非常盡興。\n榕樹爺爺的鬍鬚很長，老師告訴我們那是氣根，作用是吸收空氣中的水分。當氣根觸碰到泥土，會鑽進地下長粗，成為支柱根，久而久之，會形成小樹林。難怪榕樹爺爺的腰如此粗壯，要十多個人才抱得住。牠還長得很高，葉子非常茂盛，密密麻麻的，只要抬頭看，彷彿整個世界只有綠色一樣。我一直想爬到榕樹爺爺身上，看看它到底有多高，但是老師看到後，總是阻止我們說：『爬樹很危險，不行！』\n到底榕樹爺爺的年紀有多大呢？校工伯伯說他來學校的時候，它已經長得高高的了，估計至少數十年。沒有人知道榕樹爺爺到底多少歲，但我知道它會一直陪伴我們，見證我們成長。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "「我們」為什麼親切地叫這棵大樹為「榕樹爺爺」？",
+        "options": [
+          "因為它長著許多像長鬍鬚一樣的氣根",
+          "因為它會開口說話",
+          "因為它的年紀比校長還要大",
+          "因為它的葉子是黃色的"
+        ],
+        "answer": 0,
+        "exp": "原文第一段：因為牠有許多氣根，像一根根細長的鬍鬚，所以我們都叫牠做『榕樹爺爺』。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "大榕樹垂下來的「鬍鬚」在科學上叫什麼？有什麼作用？",
+        "options": [
+          "氣根，用來吸收空氣中的水分",
+          "綠葉，用來曬太陽",
+          "樹皮，用來保護大樹",
+          "花蕊，用來散發香味"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：那是氣根，作用是吸收空氣中的水分。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "風吹過榕樹爺爺時，會發出什麼樣的聲音？",
+        "options": [
+          "沙沙的聲音",
+          "呼呼的聲音",
+          "嘩啦嘩啦的聲音",
+          "咚咚的聲音"
+        ],
+        "answer": 0,
+        "exp": "原文第二段寫到：風吹來，榕樹爺爺「會發出沙沙的聲音」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "大榕樹的腰有多粗？文中用了哪句話來描寫？",
+        "options": [
+          "要十多個人才抱得住",
+          "只要兩個人就能抱住",
+          "比大象還要細一點",
+          "像竹竿一樣細長"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：「難怪榕樹爺爺的腰如此粗壯，要十多個人才抱得住」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "老師看到「我」想爬樹時，對「我」說了什麼？",
+        "options": [
+          "『爬樹很危險，不行！』",
+          "『你真勇敢，上去吧！』",
+          "『小心不要弄髒衣服。』",
+          "『大樹不喜歡別人踩牠。』"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：老師總是阻止我們說：『爬樹很危險，不行！』"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "文中說榕樹爺爺的氣根觸碰泥土後，會變成：",
+        "options": [
+          "鑽進地下長粗，成為支柱根，久而久之形成小樹林",
+          "腐爛掉消失不見",
+          "變成甜甜的芒果",
+          "開出五彩的花朵"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：氣根碰到土「會鑽進地下長粗，成為支柱根，久而久之，會形成小樹林」。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中說『抬頭看，彷彿整個世界只有綠色一樣』，是形容榕樹：",
+        "options": [
+          "樹冠巨大，枝葉極其繁茂、密密麻麻遮天蔽日",
+          "被刷上了綠色的油漆",
+          "只有兩片葉子是綠色的",
+          "在黑暗中發出綠光"
+        ],
+        "answer": 0,
+        "exp": "這句話用誇張生動的筆觸，描寫了大榕樹枝繁葉茂、生機勃勃的景象。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "根據校工伯伯的估計，這棵榕樹爺爺在學校生活了至少多久？",
+        "options": [
+          "至少數十年",
+          "只有三年",
+          "已經一萬年了",
+          "不到一個月"
+        ],
+        "answer": 0,
+        "exp": "原文第四段提到：校工伯伯「估計至少數十年」。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "主角認為榕樹爺爺在學校扮演的角色是：",
+        "options": [
+          "一直陪伴大家，見證孩子們健康成長的守護者",
+          "一個會結出好吃果實的果樹",
+          "一個阻擋大家玩耍的障礙物",
+          "一個校園裡的清潔工"
+        ],
+        "answer": 0,
+        "exp": "原文末尾提到：「但我知道它會一直陪伴我們，見證我們成長」。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇記敘文表達了作者對榕樹爺爺怎樣的感情？",
+        "options": [
+          "深深的喜愛、依戀與崇敬之情",
+          "覺得大榕樹掉落葉很討厭",
+          "希望學校把大榕樹砍掉建新大樓",
+          "覺得榕樹長鬍鬚很奇怪"
+        ],
+        "answer": 0,
+        "exp": "文章通篇在描寫榕樹爺爺帶來的快樂與科學奧秘，流露出對大樹真摯的熱愛。"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "title": "蘋果的百變想像",
+    "category": "記敘文：蘋果的聯想",
+    "focus": "體會對同一事物，不同人有不同看法的道理，培養多角度思維。",
+    "example": "例題：果農看到蘋果，最先聯想到的是什麼？\n\n💡解題魔法：果農辛勤耕作，所以看到蘋果會聯想到「種植的辛苦與勞作」！",
+    "passage": "有一天，媽媽拿著一個又大又圓的紅蘋果，問我看到了甚麼。我想了一下，回答說：『這個蘋果又圓又大，應該很甜很好吃。』媽媽點了點頭，說：『對你來說，眼前的不過是個水果，但不同的人看著它，想法未必一樣。』\n我明白媽媽的意思，疑惑地望著她。媽媽解釋說：『比方說，我看到這個蘋果，會想起小時候的事。小時候生活環境不好，我們幾個兄弟姐妹每次只能吃一小片或兩三口，現在你們幸福了，能吃上一整個。』\n媽媽接著說：『果農看到蘋果，可能會想起自己種植時的辛勞。作家看到蘋果，可能會聯想到穿紅裙子的小女孩。醫生看到蘋果，可能會聯想到它的營養，鼓勵病人多吃蘋果。你說，誰的想法才是對的呢？』\n我回答說：『大家的想法都沒有錯呢！』媽媽摸了摸我的頭，意味深長地說：『就像不同人看到蘋果有不同想法一樣，你面對同一種事物時，也要學會用不同的眼光去看看它。』我微微點頭，媽媽欣慰地笑了。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "故事開頭，媽媽拿著什麼東西和「我」展開對話？",
+        "options": [
+          "一個又大又圓的紅蘋果",
+          "一本好看的故事書",
+          "一隻可愛的娃娃狗",
+          "一隻紅色的氣球"
+        ],
+        "answer": 0,
+        "exp": "原文第一句寫到：「有一天，媽媽拿著一個又大又圓的紅蘋果」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "「我」看到蘋果的第一反應是想到：",
+        "options": [
+          "又大又甜，很好吃的水果",
+          "辛勤種植的果農",
+          "醫生鼓勵病人多吃",
+          "一個穿紅裙子的小女孩"
+        ],
+        "answer": 0,
+        "exp": "原文中主角回答：「這個蘋果又圓又大，應該很甜很好吃」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "媽媽看到蘋果，最先回憶起什麼事？",
+        "options": [
+          "自己小時候生活清苦，和兄弟姐妹分吃一小片蘋果的往事",
+          "自己在超市買水果的經歷",
+          "在農場摘蘋果的樂趣",
+          "不喜歡吃蘋果的經歷"
+        ],
+        "answer": 0,
+        "exp": "原文第二段中媽媽說，看到蘋果會想起小時候幾兄弟姐妹只能分吃一小片或兩三口的生活。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "根據文意，誰看到蘋果會想到「營養和健康」？",
+        "options": [
+          "醫生",
+          "果農",
+          "作家",
+          "畫家"
+        ],
+        "answer": 0,
+        "exp": "原文第三段提到：「醫生看到蘋果，可能會聯想到它的營養，鼓勵病人多吃蘋果」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "對於媽媽提問「誰的想法才是對的」，「我」是怎麼回答的？",
+        "options": [
+          "『大家的想法都沒有錯呢！』",
+          "『只有我的想法是對的。』",
+          "『只有果農的想法是對的。』",
+          "『媽媽的想法完全錯了。』"
+        ],
+        "answer": 0,
+        "exp": "原文第四段：我回答說：「大家的想法都沒有錯呢！」"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "為什麼不同的人看同一個蘋果，會有完全不同的想法？",
+        "options": [
+          "因為每個人的身份、生活經歷和工作背景都不同，關注的焦點也不同",
+          "因為蘋果會變魔術",
+          "因為大家的視力長得不一樣",
+          "因為蘋果在不同的時間會變色"
+        ],
+        "answer": 0,
+        "exp": "身份、職業、經歷的不同決定了人們思考事物的獨特角度和感受。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "媽媽口中『果農看見蘋果會想到種植的辛勞』是因為：",
+        "options": [
+          "果農親自種樹、澆水施肥，最懂一分耕耘一分收穫的汗水",
+          "果農不喜歡吃蘋果",
+          "果農覺得蘋果太重了",
+          "果農想把蘋果賣出天價"
+        ],
+        "answer": 0,
+        "exp": "勞動者對自己的勞動果實有最直接和深刻的汗水情感，因而聯想到辛勞。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "文中「意味深長」用來形容媽媽：",
+        "options": [
+          "說的話含有深刻的道理，耐人尋味",
+          "肚子餓了想吃飯的樣子",
+          "講話聲音非常大",
+          "在開玩笑逗小孩"
+        ],
+        "answer": 0,
+        "exp": "「意味深長」指含蓄、深刻，有很多值得思考和體會的道理。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "媽媽通過蘋果這件事，想要告訴「我」的最重要的人生大道理是：",
+        "options": [
+          "在日常生活中，我們面對事物也要學會多角度、換位去思考，開拓眼界",
+          "每天必須吃一整個蘋果",
+          "果農是世界上最辛苦的工作",
+          "不要和兄弟姐妹搶水果吃"
+        ],
+        "answer": 0,
+        "exp": "文章的核心哲理在於啟發孩子學會多角度看問題，尊重他人的獨特看法。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "下列哪一個諺語或成語最符合這課所說的道理？",
+        "options": [
+          "仁者見仁，智者見智 / 橫看成嶺側成峰",
+          "畫餅充飢",
+          "自相矛盾",
+          "井底之蛙"
+        ],
+        "answer": 0,
+        "exp": "「仁者見仁，智者見智」和「橫看成嶺側成峰」都形象說明了立足點和視角的不同會帶來不同的認知與見解。"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "title": "遊樂場尋寶記",
+    "category": "記敘文：遊樂場一日遊",
+    "focus": "梳理一日遊記敘文的時間、地點、人物、活動等關鍵信息要素。",
+    "example": "例題：我和同學們是在哪裡集合，開展一日遊的？\n\n💡解題魔法：回文定位「早上，我們在大埔遊樂場門口集合」，這就是集合的地點！",
+    "passage": "暑假終於到了，我和五個同學約好一起到大埔運頭角遊樂場遊玩，放鬆心情。\n早上九時，我們在遊樂場門口集合。由於時間尚早，所以沒有人使用五人足球場。我們很快便做好熱身，分組比賽，一展身手。炎炎夏日，大家都玩得滿頭大汗，不過無損我們的興致，不少人還駐足觀看我們這場激烈的比賽呢！\n比賽完結時已接近中午，天氣變得更悶熱，於是我們坐在附近的長椅上休息，並拿出各自帶來的食物一邊野餐，一邊高談闊論。接著，我們在附近逛逛。這個遊樂場到處充滿綠油油的植物，還有一棵巨大的木棉樹，伴著蟬鳴聲，令人心曠神怡。遊樂場的一個角落佇立著寫有「春暉園」的牌坊，我們七嘴八舌討論是什麼，根據旁邊的小石碑，原來這是大埔官立小學舊址的紀念牌坊，在一九五三年建成，歷史悠久。\n下午時分，我們開始玩捉迷藏，大家跑得氣喘吁吁，非常愉快。在這個充滿大自然感覺的地方遊玩，感覺非常舒暢。\n眨眼間已到黃昏，我們互相道別，還約定好下星期再一起玩呢！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這天「我」一共約了多少個同學去遊樂場遊玩？",
+        "options": [
+          "五個同學",
+          "三個同學",
+          "十個同學",
+          "沒有約同學"
+        ],
+        "answer": 0,
+        "exp": "原文第一段：「我和五個同學約好一起到大埔運頭角遊樂場遊玩」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "早上九時集合後，大家在球場上進行了什麼活動？",
+        "options": [
+          "五人足球比賽",
+          "打籃球",
+          "放風箏",
+          "跳繩"
+        ],
+        "answer": 0,
+        "exp": "原文第二段寫到：大家使用五人足球場，「分組比賽，一展身手」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "中午天氣悶熱時，大家在哪裡一邊野餐一邊聊天？",
+        "options": [
+          "遊樂場附近的長椅上",
+          "大木棉樹的樹頂上",
+          "小食店裡",
+          "巴士站旁"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：「我們坐在附近的長椅上休息，並拿出各自帶來的食物一邊野餐，一邊高談闊論」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "下午時分，大家在充滿自然氣息的地方玩了什麼遊戲？",
+        "options": [
+          "捉迷藏",
+          "老鷹抓小雞",
+          "打排球",
+          "看恐怖故事書"
+        ],
+        "answer": 0,
+        "exp": "原文第四段寫到：「下午時分，我們開始玩捉迷藏」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "「春暉園」牌坊在歷史上其實是甚麼的舊址？",
+        "options": [
+          "大埔官立小學舊址",
+          "一個古代將軍的墓地",
+          "一個大型植物園",
+          "大埔大會堂"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：春暉園牌坊「原來這是大埔官立小學舊址的紀念牌坊」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "文中形容大家說話時用了『高談闊論』和『七嘴八舌』，這體現了：",
+        "options": [
+          "同學們關係親密，聚在一起時非常熱烈、興奮地討論和聊天",
+          "同學們在互相大聲爭吵",
+          "同學們不守規矩、非常沒有禮貌",
+          "大家講話聲音太小聽不清"
+        ],
+        "answer": 0,
+        "exp": "這些詞語在文中生動勾勒出孩子們聚在一起、熱鬧非凡的歡樂聊天氛圍。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "大埔官立小學舊址的紀念牌坊是在哪一年建成的？",
+        "options": [
+          "一九五三年",
+          "一九九三年",
+          "二零二六年",
+          "一九零三年"
+        ],
+        "answer": 0,
+        "exp": "原文第三段明確寫到：紀念牌坊「在一九五三年建成，歷史悠久」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這篇遊記是按什麼「寫作順序」來組織整篇文章的？",
+        "options": [
+          "時間先後順序（早上 ➔ 中午 ➔ 下午 ➔ 黃昏）",
+          "空間位置順序（從大門 ➔ 球場 ➔ 樹林 ➔ 校門外）",
+          "事情起因和結果的順序",
+          "沒有任何順序，隨便寫的"
+        ],
+        "answer": 0,
+        "exp": "文章從早上九時、接近中午、下午時分、眨眼間已到黃昏，是一篇非常典型的时间順序一日遊記。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "「眨眼間」這個詞在文中的作用是：",
+        "options": [
+          "形容時間過得極快，快樂的時間不知不覺就到了黃昏",
+          "表示主角的眼睛不舒服一直在眨眼",
+          "說明太陽光太刺眼",
+          "表示大家都想睡覺了"
+        ],
+        "answer": 0,
+        "exp": "「眨眼間」極言時間短暫，在此形容歡樂時光飛逝。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "根據文章，主角對這次遊樂場一日遊的感受是：",
+        "options": [
+          "雖然天氣炎熱、跑得氣喘吁吁，但心情無比舒暢和快樂，依依不捨",
+          "覺得非常無聊，再也不想和同學一起玩了",
+          "非常生氣，因為輸了足球賽",
+          "覺得非常遺憾，因為沒有買到零食"
+        ],
+        "answer": 0,
+        "exp": "「興致無損」、「非常舒暢」、「約定好下星期再一起玩」都表明主角度過了快樂充實的一天。"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "title": "香噴噴的洋蔥肉丸",
+    "category": "記敘文：吃洋蔥",
+    "focus": "體會母親為了孩子的健康煞費苦心的溫柔愛意，學會體諒和感恩父母。",
+    "example": "例題：媽媽是怎樣讓不愛吃洋蔥的「我」吃下洋蔥的？\n\n💡解題魔法：媽媽發揮智慧，把洋蔥「切得極其細碎」，混進了「我」最愛吃的肉丸裡！",
+    "passage": "我不愛吃洋蔥。雖然洋蔥營養豐富，但我就是受不了那濃烈氣味和刺激的味道，吃一口便會吐出來，好像吃了毒藥似的。媽媽總是想盡辦法讓我吃洋蔥，但我就是不愛吃。\n晚飯開始了，一道道香噴噴、熱騰騰的飯菜被端上桌子，其中還有我最愛吃的肉丸。平時只要媽媽端上這道菜，我便能吃下一整碗白飯，不過這次我吃了一小口，便嘗到一股蔬菜的味道。到底媽媽在肉丸加了什麼材料呢？我努力在腦海中搜索曾經嘗過的各種味道，沒過幾秒鐘就想起來了，那是令我一吃就想吐出來的洋蔥！\n我把肉丸拿開，開始吃飯。不吃肉丸，我只能一口一口地吃著白飯和青菜。媽媽看到我不吃肉丸，詫異地問：『你怎麼今天不吃肉丸了？』我瞪大眼睛，生氣地說：『有洋蔥味！』說來奇怪，平常的洋蔥是一片片的，我一看就認出來了，但今天的肉丸裡卻幾乎看不見洋蔥的蹤影，難道洋蔥會隱身了？\n後來我才知道，切洋蔥會被熏得一把鼻涕，一把眼淚。媽媽為了讓我吃下洋蔥，特意把洋蔥切成細碎，再混進肉丸裡。如此辛苦，只為讓我吃下一點洋蔥，但我這些努力卻被我化為烏有，我覺得有點對不起媽媽呢！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "主角最討厭吃什麼蔬菜？",
+        "options": [
+          "洋蔥",
+          "青菜",
+          "胡蘿蔔",
+          "西蘭花"
+        ],
+        "answer": 0,
+        "exp": "原文開頭第一句寫到：「我不愛吃洋蔥」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "媽媽今天做的晚餐中，有哪一道是主角平時「最愛吃的菜」？",
+        "options": [
+          "肉丸",
+          "白飯",
+          "炒青菜",
+          "洋蔥湯"
+        ],
+        "answer": 0,
+        "exp": "原文第二段寫到，桌上有「我最愛吃的肉丸」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "主角吃了一口最愛的肉丸後，發現裡面加了什麼令他討厭的材料？",
+        "options": [
+          "洋蔥",
+          "大蒜",
+          "生薑",
+          "辣椒"
+        ],
+        "answer": 0,
+        "exp": "主角在腦海中搜索味道，「那是令我一吃就想吐出來的洋蔥！」"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "發現肉丸有洋蔥味後，主角是怎麼抗議的？",
+        "options": [
+          "把肉丸拿開不吃，只一口口吃白飯和青菜，生氣地說有洋蔥味",
+          "把肉丸全部扔到地上",
+          "大聲哭泣跑出客廳",
+          "把肉丸全部塞進嘴巴裡"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：主角「把肉丸拿開，開始吃飯……瞪大眼睛，生氣地說：『有洋蔥味！』」"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "平常的洋蔥是一片片的，但今天的洋蔥在肉丸裡表現得像會什麼一樣？",
+        "options": [
+          "隱身",
+          "飛走",
+          "跳舞",
+          "融化成水"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：「但今天的肉丸裡卻幾乎看不見洋蔥的蹤影，難道洋蔥會隱身了？」"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "媽媽切洋蔥時，生理上會遭遇什麼痛苦的體驗？",
+        "options": [
+          "被熏得一把鼻涕，一把眼淚",
+          "手部發癢紅腫",
+          "頭暈眼花想睡覺",
+          "牙齒發酸"
+        ],
+        "answer": 0,
+        "exp": "原文第四段寫到：「切洋蔥會被熏得一把鼻涕，一把眼淚」。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "媽媽為什麼要費盡心思、一邊流淚一邊把洋蔥切碎混進主角最愛的肉丸裡？",
+        "options": [
+          "因為洋蔥營養豐富，媽媽為了主角的身體健康發揮了無限的溫柔與智慧",
+          "因為媽媽自己喜歡看主角生氣的樣子",
+          "因為廚房裡的洋蔥太多了放不下",
+          "因為肉丸必須配洋蔥才能成型"
+        ],
+        "answer": 0,
+        "exp": "媽媽煞費苦心，都是出於對孩子健康的愛護和關懷。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "文中「化為烏有」是指：",
+        "options": [
+          "媽媽付出的辛苦努力，因為主角生氣不吃肉丸而白白浪費了",
+          "洋蔥在肉丸裡憑空消失了",
+          "主角的發財夢破滅了",
+          "一盤肉丸被全部吃光了"
+        ],
+        "answer": 0,
+        "exp": "「化為烏有」指全部落空或消失，在此指媽媽的心血被浪費。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "主角最後『覺得有點對不起媽媽』的原因是：",
+        "options": [
+          "體諒到媽媽忍受流淚切洋蔥的辛苦，對自己任性的偏食行為感到愧疚",
+          "因為自己把白飯吃光了",
+          "因為自己忘記洗碗了",
+          "因為自己偷偷出去買零食"
+        ],
+        "answer": 0,
+        "exp": "主角理解了切洋蔥的辛苦後，體會到偏食不吃是對母愛的一種辜負，因而心生愧疚，這說明主角長大懂事了。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇貼近生活的記敘文主要想告訴讀者：",
+        "options": [
+          "體會父母為我們付出無私的愛和智慧，我們應學會感恩，改掉偏食的壞習慣",
+          "洋蔥是世界上最難切的蔬菜",
+          "肉丸是小朋友最健康的食物",
+          "不要在吃飯的時候和媽媽瞪大眼睛說話"
+        ],
+        "answer": 0,
+        "exp": "文章用洋蔥肉丸的溫馨故事，教育孩子們理解和感恩父母在日常微小細節中的愛。"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "title": "小演員的大舞台",
+    "category": "記敘文：演話劇",
+    "focus": "體會「舞台上沒有小角色，只有好演員」的理念，學習認真對待每一件小事。",
+    "example": "例題：主角小寶一開始為什麼對演話劇提不起精神？\n\n💡解題魔法：因為他只想當主角，卻被分配去扮演一隻「不會說話、只能汪汪叫的小狗」！",
+    "passage": "校園話劇比賽要開始了，小寶報名參加。但他得知自己要扮演一隻不會說話、只能汪汪叫的小狗時，感到非常失落，提不起精神。爸爸媽媽安慰他說：『小寶，舞台上沒有小角色，只有好演員！只要你用心演，小狗也能成為全場的焦點！』小寶聽了重新振作，每天戴著毛茸茸的狗耳朵認真練習模仿。演出當天，他在台上蹦蹦跳跳、搖尾巴、生動地汪汪叫，贏得了全場觀眾最熱烈的掌聲！",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小寶報名參加了學校舉辦的甚麼活動？",
+        "options": [
+          "校園話劇比賽",
+          "鋼琴大賽",
+          "數學奧林匹克",
+          "百米短跑比賽"
+        ],
+        "answer": 0,
+        "exp": "原文第一句說：「校園話劇比賽要開始了，小寶報名參加」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "小寶被分配扮演什麼樣的角色？",
+        "options": [
+          "一隻不會說話、只能汪汪叫的小狗",
+          "一個神勇無畏的王子",
+          "一棵一動不動的綠樹",
+          "一個聰明的科學家"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，他要扮演「一隻不會說話、只能汪汪叫的小狗」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "剛拿到角色時，小寶的心情是怎麼樣的？",
+        "options": [
+          "非常失落，提不起精神",
+          "高興得又蹦又跳",
+          "生氣地找老師理論",
+          "害怕得哭了起來"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：小寶「感到非常失落，提不起精神」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "是誰溫柔地安慰並開導了失落的小寶？",
+        "options": [
+          "爸爸媽媽",
+          "班主任老師",
+          "台下的觀眾",
+          "他的同桌同學"
+        ],
+        "answer": 0,
+        "exp": "原文提到：「爸爸媽媽安慰他說……」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "重新振作後，小寶練習時頭上戴著甚麼道具？",
+        "options": [
+          "毛茸茸的狗耳朵",
+          "一頂閃亮的金皇冠",
+          "一個紅鼻子",
+          "一對黑墨鏡"
+        ],
+        "answer": 0,
+        "exp": "原文提到，小寶「每天戴著毛茸茸的狗耳朵認真練習模仿」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『舞台上沒有小角色，只有好演員』這句話的深層含意是：",
+        "options": [
+          "不論職位或角色多麼微小，只要認真、用心去做，都能綻放出耀眼的光芒",
+          "小狗在舞台上比王子更難扮演",
+          "舞台上所有演員的衣服都是一樣的",
+          "好演員都不需要說台詞"
+        ],
+        "answer": 0,
+        "exp": "這是一句至理名言，啟迪我們不管身處什麼位置，用心做到極致就是成功。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "在演出當天，小寶在舞台上做了哪些生動的動作？",
+        "options": [
+          "蹦蹦跳跳、搖尾巴、生動地汪汪叫",
+          "站在角落一動也不動",
+          "大聲背誦唐詩",
+          "對觀眾哈哈大笑然後走下台"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「他在台上蹦蹦跳跳、搖尾巴、生動地汪汪叫」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "小寶最終贏得了什麼？",
+        "options": [
+          "全場觀眾最熱烈的掌聲",
+          "一隻真的小狗",
+          "話劇比賽的一等獎金牌",
+          "一整盒甜巧克力"
+        ],
+        "answer": 0,
+        "exp": "原文最後說：「贏得了全場觀眾最熱烈的掌聲！」"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "小寶從失落到成功的過程，證明了：",
+        "options": [
+          "心態轉變和持之以恆的練習，能把平凡的事情做到非凡",
+          "演話劇一定要有爸爸媽媽陪著",
+          "小狗是人類最好的朋友",
+          "小寶天生就是一隻狗"
+        ],
+        "answer": 0,
+        "exp": "從一開始抗拒配角到全情投入大獲成功，充分說明了態度與努力的重要。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇校園生活記敘文最適合給二年級小朋友哪方面的教育？",
+        "options": [
+          "敬業樂群、認真對待手頭上的小任務，不挑肥揀瘦",
+          "如何快速學會狗叫",
+          "演話劇時道具的製作方法",
+          "不要隨便報名參加學校比賽"
+        ],
+        "answer": 0,
+        "exp": "故事具有積極的品德引導意義，教導孩子們不嫌棄小任務，幹一行愛一行，認真負責。"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "title": "咔嚓咔嚓山的教訓",
+    "category": "童話：咔嚓咔嚓山",
+    "focus": "體會經典童話的奇特幻想，懂得做人不可心存惡意、欺負弱小，多行不義必自斃。",
+    "example": "例題：狸貓背柴下山時聽到了什麼怪聲音？\n\n💡解題魔法：兔子悄悄點火，枯柴燃燒發出「咔嚓咔嚓」的聲響，兔子騙牠是大山在唱歌！",
+    "passage": "從前，有一隻調皮且壞心腸的狸貓，經常跑到老爺爺的田裡偷吃芋頭，還捉弄老奶奶。住在山裡的聰明兔子知道了，決定要替老人家教訓這隻壞狸貓。兔子約狸貓一起上山砍柴，在背柴下山時，兔子悄悄用打火石點燃了狸貓背後的柴火，發出『咔嚓咔嚓』的聲音。狸貓好奇地問是甚麼聲音，兔子騙牠說：『這是咔嚓咔嚓山在唱歌呢！』結果狸貓的背部被火燒傷了，痛得大哭，從此再也不敢做壞事了。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "狸貓經常跑到誰的田裡偷吃芋頭？",
+        "options": [
+          "老爺爺",
+          "老奶奶",
+          "聰明兔子",
+          "獅子大王"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：狸貓「經常跑到老爺爺的田裡偷吃芋頭」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "是哪一隻動物決定站出來替兩位老人家教訓狸貓？",
+        "options": [
+          "聰明兔子",
+          "大灰狼",
+          "小熊",
+          "一隻大象"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「住在山裡的聰明兔子知道了，決定要替老人家教訓這隻壞狸貓」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "兔子約狸貓一起去山上做甚麼工作？",
+        "options": [
+          "砍柴",
+          "摘蘋果",
+          "釣魚比賽",
+          "玩捉迷藏"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「兔子約狸貓一起上山砍柴」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "兔子用甚麼東西點燃了狸貓背後的柴火？",
+        "options": [
+          "打火石",
+          "打火機",
+          "蠟燭",
+          "火柴"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「兔子悄悄用打火石點燃了狸貓背後的柴火」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "狸貓的背部被火燒傷後表現得怎麼樣？",
+        "options": [
+          "痛得大哭",
+          "哈哈大笑",
+          "在地上打滾睡覺",
+          "高興地跳舞"
+        ],
+        "answer": 0,
+        "exp": "原文寫到，狸貓「背部被火燒傷了，痛得大哭」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "兔子為什麼要欺騙狸貓說『咔嚓咔嚓山在唱歌』？",
+        "options": [
+          "為了隱瞞自己正在背後放火、教訓狸貓的秘密",
+          "因為兔子真的以為山在唱歌",
+          "因為大山真的會發出這種聲音",
+          "為了逗狸貓開心"
+        ],
+        "answer": 0,
+        "exp": "兔子用機智的藉口掩蓋燃燒的聲音，成功地懲罰了毫無防備的壞狸貓。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "文中狸貓被形容為『調皮且壞心腸』，以下哪一項不是牠的壞行徑？",
+        "options": [
+          "主動幫助老爺爺種田",
+          "偷吃老爺爺的芋頭",
+          "捉弄慈祥的老奶奶",
+          "經常在森林裡搗亂"
+        ],
+        "answer": 0,
+        "exp": "狸貓是不可能主動幫忙幹活的，牠只會調皮搗蛋和偷吃。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "狸貓最後『再也不敢做壞事了』，說明：",
+        "options": [
+          "這次慘痛的教訓讓牠徹底悔改，改掉了欺負人和偷竊的壞習慣",
+          "牠離開了這座大山",
+          "牠被大火燒得不能動了",
+          "牠和兔子成了最好的拍檔"
+        ],
+        "answer": 0,
+        "exp": "痛定思痛，懲罰機制讓壞人吸取了教訓，重回正途。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "這篇童話故事出自日本著名的民間童話，主要想弘揚：",
+        "options": [
+          "懲惡揚善，幫助弱小，做人要善良誠實的傳統美德",
+          "在森林裡放火很安全",
+          "狸貓是一種非常聰明的動物",
+          "種芋頭是一項賺錢的工作"
+        ],
+        "answer": 0,
+        "exp": "童話懲罰了欺負老人的狸貓，彰顯了正義、智慧與維護公理的觀念。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "對於兔子教訓狸貓的方式，我們在日常生活中能直接模仿嗎？",
+        "options": [
+          "不能。因為用火燒人非常危險，我們遇到壞人壞事應該報告老師或警察，用安全合法的方式解決",
+          "可以，誰不聽話就用火燒誰",
+          "可以，這是一件很好玩的遊戲",
+          "不能，因為兔子跑得太快了"
+        ],
+        "answer": 0,
+        "exp": "神話童話的情節具有誇張幻想成分，現實生活中我們必須遵守法治和安全原則。"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "title": "會唱歌的小鳥與樹",
+    "category": "童話：去年的樹",
+    "focus": "體會誠實守信、履行承諾的真摯友情，感受生命轉換的憂傷與崇高。",
+    "example": "例題：小鳥和樹的約定是什麼？\n\n💡解題魔法：約定「明年春天再回來，唱歌給大樹聽」。這就是友情與誠信的承諾！",
+    "passage": "一隻美麗的小鳥和一棵高大的小樹是形影不離的好朋友。每天，小鳥都會站在樹枝上為小樹唱歌，小樹聽得陶醉。冬天來了，小鳥要飛往南方過冬，牠們約定：『明年春天我一定回來，再唱歌給你聽。』\n可是第二年春天小鳥飛回來時，小樹已經不見了。小鳥四處詢問，得知小樹已經被伐木工砍倒，送進工廠用機器切碎，做成了火柴，賣給了村子裡的一個小女孩。小鳥傷心極了。\n牠飛到村子裡，看著小女孩用火柴點燃的、跳動著的微弱燈火。小鳥睜大眼睛，看著燈火，深情地唱起了去年的歌，然後默默地飛走了。牠終於遵守了友誼的承諾。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "小鳥和樹是什麼樣的關係？",
+        "options": [
+          "形影不離的好朋友",
+          "互不相識的陌生人",
+          "互相爭吵的仇人",
+          "小鳥寄生在大樹上"
+        ],
+        "answer": 0,
+        "exp": "原文第一句：「一隻美麗的小鳥和一棵高大的小樹是形影不離的好朋友」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "小鳥每天站在樹枝上為小樹做什麼？",
+        "options": [
+          "唱歌",
+          "跳舞",
+          "築巢",
+          "抓毛毛蟲"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「每天，小鳥都會站在樹枝上為小樹唱歌」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "冬天來了，小鳥必須飛往哪裡過冬？",
+        "options": [
+          "南方",
+          "北方",
+          "西方",
+          "東方"
+        ],
+        "answer": 0,
+        "exp": "原文第二句寫到：「冬天來了，小鳥要飛往南方過冬」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "小樹最後被做成了什麼東西，賣給了小女孩？",
+        "options": [
+          "火柴",
+          "鉛筆",
+          "大木桌",
+          "漂亮的木船"
+        ],
+        "answer": 0,
+        "exp": "原文第二段寫到：小樹被砍倒，「做成了火柴，賣給了村子裡的一個小女孩」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "回到村子後，小鳥對著什麼東西深情地唱歌？",
+        "options": [
+          "用火柴點燃的微弱燈火",
+          "小女孩",
+          "一棵新栽種的小樹苗",
+          "一片荒蕪的泥土"
+        ],
+        "answer": 0,
+        "exp": "原文第三段寫到：小鳥「看著小女孩用火柴點燃的、跳動著的微弱燈火……深情地唱起了去年的歌」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "這篇故事中，最讓人感動、最核心的品德是：",
+        "options": [
+          "小鳥對友誼的無私堅守與『誠實守信』的高尚承諾",
+          "小鳥唱歌聲音好聽",
+          "火柴燃燒得很快",
+          "小女孩很有錢"
+        ],
+        "answer": 0,
+        "exp": "哪怕大樹已經燃燒成火，小鳥依然對著火唱歌，履行去年的諾言，感人至深。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "小鳥對著跳動的燈火『睜大眼睛看著』，這眼神透露出小鳥內心：",
+        "options": [
+          "無比的悲傷、不捨，以及對好朋友最後身影的深情凝望",
+          "非常高興看到了亮光",
+          "眼睛覺得很酸痛",
+          "對火柴感到很好奇"
+        ],
+        "answer": 0,
+        "exp": "大樹不在了，火苗是大樹生命的最後火花，眼神描寫展現了沉重細緻的情感。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這篇童話故事帶有一種什麼樣的情感基調？",
+        "options": [
+          "略帶憂傷卻無比高尚和溫暖的友情美感",
+          "非常恐怖和緊張",
+          "哈哈大笑的喜劇效果",
+          "枯燥乏味的說明性質"
+        ],
+        "answer": 0,
+        "exp": "故事以淡淡的哀傷、悲壯的守信，譜寫了一曲至真至純的友情之歌。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "故事中『去年的歌』代表著：",
+        "options": [
+          "去年和小樹在一起時的美好記憶，以及不變的友情諾言",
+          "一首很老、不好聽的歌",
+          "一首沒有寫完的曲子",
+          "南方流行的音樂"
+        ],
+        "answer": 0,
+        "exp": "去年的歌是承諾的實體，承載著去年和小樹相知相守的深切情誼。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這課教導我們，在對待朋友的約定和承諾時，我們應該：",
+        "options": [
+          "言必信，行必果。答應別人的事，不論遇到多大困難都要努力去實現",
+          "隨便答應，轉身就忘記",
+          "只有當對方給好處時才遵守諾言",
+          "覺得麻煩就中途放棄"
+        ],
+        "answer": 0,
+        "exp": "誠實守信是做人的基本底線，小鳥的堅持樹立了誠信的崇高模範。"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "title": "給遠方親人的信",
+    "category": "實用文：書信格式",
+    "focus": "熟練掌握實用文書信的「上款、下款、祝福語、日期」四要素格式。",
+    "example": "例題：信件末尾的「永晴」和「美妍」誰是收信人，誰是發信人？\n\n💡解題魔法：頂格寫的上款「永晴」是收信人；署名下款「美妍」是發信人！",
+    "passage": "書信範例：\n永晴：\n    對不起！我弄丟了你借給我的《小狗百科全書》。這本書內容十分有趣，我昨天把它帶到公園閱讀，回家後才發現遺留在長椅上。我立刻返回公園尋找，可惜已經不在那兒了。\n    我知道這是你非常珍愛的圖書，我卻把它丟失了，真是非常抱歉！我會請媽媽帶我到書店買一本全新的《小狗百科全書》賠償給你，希望你能接受我誠懇的道歉。\n    祝\n學業進步\n                                                同學 美妍\n                                                九月十日",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這封書信的「收信人（上款）」是誰？",
+        "options": [
+          "永晴",
+          "美妍",
+          "美妍的媽媽",
+          "永晴的媽媽"
+        ],
+        "answer": 0,
+        "exp": "最開頭頂格寫的「永晴」是收信人。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "這封書信的「寫信人（署名下款）」是誰？",
+        "options": [
+          "美妍",
+          "永晴",
+          "圖管理管理員",
+          "班長"
+        ],
+        "answer": 0,
+        "exp": "信末署名「同學 美妍」，說明寫信人是美妍。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "美妍寫這封信給永晴的主要目的是：",
+        "options": [
+          "為弄丟借來的《小狗百科全書》表示誠懇的道歉並說明賠償辦法",
+          "邀請永晴去公園玩耍",
+          "向永晴借另一本新書",
+          "祝永晴生日快樂"
+        ],
+        "answer": 0,
+        "exp": "美妍弄丟了書，寫信誠懇道歉並提出買一本新的賠償。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "美妍是在哪一個日期寫下這封書信的？",
+        "options": [
+          "九月十日",
+          "六月一日",
+          "一九五三年",
+          "二月八日"
+        ],
+        "answer": 0,
+        "exp": "信末右下角的署名下方標有日期：「九月十日」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "這封信中，美妍用來祝福永晴的「祝頌語」是：",
+        "options": [
+          "學業進步",
+          "身體健康",
+          "生活愉快",
+          "早日康復"
+        ],
+        "answer": 0,
+        "exp": "信中祝頌語寫的是：「祝 學業進步」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "美妍是把書遺失在什麼地方了？後來找到了嗎？",
+        "options": [
+          "遺留在公園的長椅上，立刻返回尋找但已經不在那兒了",
+          "遺留在學校巴士上，被司機撿到了",
+          "放在班級抽屜裡被偷了",
+          "放在自己家裡找不到了"
+        ],
+        "answer": 0,
+        "exp": "原文第一段：「回家後才發現遺留在公園的長椅上……可惜已經不在那兒了」。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "美妍和永晴是甚麼樣的關係？我們可以從信中哪個詞推斷出來？",
+        "options": [
+          "同學 / 平輩關係。從署名下款『同學 美妍』以及稱呼『永晴』推斷",
+          "父女關係，從『伯伯』推斷",
+          "師生關係，從『校長』推斷",
+          "陌生人關係"
+        ],
+        "answer": 0,
+        "exp": "書信的上款直接稱呼名字，且下款註明「同學」，說明兩者是平輩、同學關係。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "在中文書信格式中，『祝』字和後面的祝福語『學業進步』排版要求是：",
+        "options": [
+          "『祝』字空兩格寫在正文末尾，祝福語『學業進步』必須另起一行頂格寫",
+          "隨便寫在同一行",
+          "全都在信的最右下角",
+          "都必須用括號括起來"
+        ],
+        "answer": 0,
+        "exp": "這是傳統中文書信格式規範，即「祝」空兩格，祝福語另起一行頂格寫，以示尊重。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "如果美妍是寫信給「生病的伯伯」，以下哪一組祝頌語最合適？",
+        "options": [
+          "祝 身體健康 / 早日康復",
+          "祝 學業進步",
+          "祝 生日快樂",
+          "祝 新年進步"
+        ],
+        "answer": 0,
+        "exp": "寫給生病長輩，應使用問候健康、康復的祈祝語，如「身體健康」或「早日康復」。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這封書信展現了「美妍」怎樣的做人品質？",
+        "options": [
+          "誠實守信、勇於擔當自己犯下的過錯，主動積極賠償",
+          "非常粗心、丟三落四",
+          "小氣、不想自己掏錢賠",
+          "喜歡寫信炫耀"
+        ],
+        "answer": 0,
+        "exp": "做錯事不隱瞞，寫信誠懇認錯並提補救賠償，體現了誠實、負責的擔當精神。"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "title": "布告欄的小秘密",
+    "category": "實用文：通告與啟事格式",
+    "focus": "學會分析與提取通告與啟事的核心要素：發文目的、日期、時間與對象。",
+    "example": "例題：這張大樓暫停供水的通告，主要是發給誰看的？\n\n💡解題魔法：開頭上款寫著「各位業主/住戶」，所以這就是通告的對象！",
+    "passage": "通告範例：\n香城物業管理處：暫停食水供應通告\n各位業主/住戶：\n    茲通知 貴業主，由於需要清洗大廈食水缸，本大廈將於六月十二日（星期五）上午十時至下午三時暫停食水供應，不便之處，敬請原諒。\n    在暫停供水期間，請確保水龍頭關閉，以防復水後出現溢水情況。如有查詢，請致電管理處陳志明先生。\n                                      香城物業管理處\n                                      二零二六年六月一日",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "這張通告是由哪一個單位或機構發出的？",
+        "options": [
+          "香城物業管理處",
+          "學校校長室",
+          "大埔官立小學",
+          "大埔區議會"
+        ],
+        "answer": 0,
+        "exp": "通告標題與下款發文者均標明是「香城物業管理處」。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "這張通告的閱讀對象（通告對象）是誰？",
+        "options": [
+          "大廈的各位業主和住戶",
+          "學校的全體學生",
+          "巴士司機",
+          "大馬路上的路人"
+        ],
+        "answer": 0,
+        "exp": "通告上款稱呼為：「各位業主/住戶：」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "物管處為什麼要暫停食水供應？",
+        "options": [
+          "因為需要清洗大廈的食水缸",
+          "因為水管爆裂了",
+          "因為沒有交水費",
+          "因為要節約用水"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「由於需要清洗大廈食水缸……暫停食水供應」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "食水供應將在六月十二日的什麼時間段內暫停？",
+        "options": [
+          "上午十時至下午三時",
+          "早上六時至晚上十時",
+          "中午十二時整",
+          "整整一天"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：將於六月十二日「上午十時至下午三時暫停食水供應」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "如有任何疑問，住戶可以聯絡物管處的哪一位先生？",
+        "options": [
+          "陳志明先生",
+          "李小寶先生",
+          "校工叔叔",
+          "張校長"
+        ],
+        "answer": 0,
+        "exp": "原文最後提到：「如有查詢，請致電管理處陳志明先生」。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "在停水期間，通告特別要求住戶配合做好甚麼防範工作？",
+        "options": [
+          "確保關閉家中的水龍頭，防止來水時溢水造成水淹損失",
+          "把浴缸放滿水",
+          "去別人家洗澡",
+          "搬去酒店住"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「請確保水龍頭關閉，以防復水後出現溢水情況」。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "這張通告是在哪一天起草並貼出來的？",
+        "options": [
+          "二零二六年六月一日",
+          "二零二六年六月十二日",
+          "二零二六年五月三十日",
+          "九月十日"
+        ],
+        "answer": 0,
+        "exp": "通告末尾的發文日期為：「二零二六年六月一日」。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "通告這種實用文體，與一般故事最大的差別在於：",
+        "options": [
+          "格式嚴謹，語言簡潔明瞭，旨在快速傳遞客觀信息、提出要求",
+          "必須有很多好看的彩色插圖",
+          "全篇都是虛構的情節與幻想",
+          "沒有日期和署名"
+        ],
+        "answer": 0,
+        "exp": "實用文（如通告、信件、啟事）以傳遞特定事務信息為目的，講究格式規範和用語精準。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "如果一個人在街上『遺失了愛犬想尋找』，他應該在公告欄貼：",
+        "options": [
+          "尋狗啟事",
+          "學校暫停上課通告",
+          "給伯伯的問候信",
+          "古代送別古詩"
+        ],
+        "answer": 0,
+        "exp": "個人發布、面向大眾且無特定對象的事務通報、求助，應使用「啟事」格式（如尋人、尋物啟事）。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "讀懂這類通告，對我們小學生日常生活的幫助是：",
+        "options": [
+          "能幫助我們提高獨立生活能力，及時做好生活防範與安排",
+          "不需要讀，這都是大人的事",
+          "用來練習寫毛筆字",
+          "幫物管處洗大樓水缸"
+        ],
+        "answer": 0,
+        "exp": "讀懂公眾通知是基本生存和社交素養，能引導孩子適應社區和校園生活。"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "title": "古代小詩人的送別",
+    "category": "古詩文：送別詩",
+    "focus": "體會中國古典送別詩的純潔意境，理解深厚的友情與真誠情感。",
+    "example": "例題：『桃花潭水深千尺，不及汪倫送我情』運用了什麼修飾手法？\n\n💡解題魔法：用極深千尺的潭水，對比汪倫送行的真摯，更顯情谊深重！這叫誇張和對比！",
+    "passage": "《芙蓉樓送辛漸》（王昌齡）\n寒雨連江夜入吳，平明送客楚山孤。\n洛陽親友如相問，一片冰心在玉壺。\n\n《贈汪倫》（李白）\n李白乘舟將欲行，忽聞岸上踏歌聲。\n桃花潭水深千尺，不及汪倫送我情。",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "《芙蓉樓送辛漸》一詩的作者是唐代的哪位詩人？",
+        "options": [
+          "王昌齡",
+          "李白",
+          "杜甫",
+          "王維"
+        ],
+        "answer": 0,
+        "exp": "原文標明：《芙蓉樓送辛漸》作者是王昌齡。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "《贈汪倫》一詩的作者是唐代著名的「詩仙」：",
+        "options": [
+          "李白",
+          "王昌齡",
+          "白居易",
+          "孟浩然"
+        ],
+        "answer": 0,
+        "exp": "《贈汪倫》的作者是浪漫主義詩人李白。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "王昌齡在詩中用什麼來比喻自己像冰一樣純潔無瑕的心境？",
+        "options": [
+          "一片冰心在玉壺",
+          "平明送客楚山孤",
+          "桃花潭水深千尺",
+          "乘舟將欲行"
+        ],
+        "answer": 0,
+        "exp": "詩句「一片冰心在玉壺」用玉壺盛冰來比喻心境冰清玉潔、不隨俗浮沉。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "李白乘船正準備出發時，突然聽見岸上傳來了什麼聲音？",
+        "options": [
+          "踏歌聲（唱歌送行的聲音）",
+          "大風呼呼聲",
+          "雷聲大作",
+          "小魚吐泡泡的聲音"
+        ],
+        "answer": 0,
+        "exp": "詩句寫到：「李白乘舟將欲行，忽聞岸上踏歌聲」。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "在《贈汪倫》一詩中，是誰趕來送別李白？",
+        "options": [
+          "汪倫",
+          "辛漸",
+          "王昌齡",
+          "小妹妹"
+        ],
+        "answer": 0,
+        "exp": "李白寫這首詩就是為了感謝「汪倫」特地趕來踏歌送行。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "『桃花潭水深千尺，不及汪倫送我情』運用了什麼修飾手法？",
+        "options": [
+          "誇張與對比",
+          "擬人",
+          "排比",
+          "設問"
+        ],
+        "answer": 0,
+        "exp": "用「深千尺」來誇張描寫潭水之深，再將其與汪倫的友情對比，更顯情谊勝過千尺潭水，深刻感人。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "《芙蓉樓送辛漸》中『平明送客楚山孤』中的『平明』是指什麼時候？",
+        "options": [
+          "天剛亮的時候",
+          "半夜三更",
+          "中午十二點",
+          "傍晚太陽下山時"
+        ],
+        "answer": 0,
+        "exp": "「平明」在古漢語中代表清晨、天亮的時候。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "這兩首經典古詩所共同表達的文學主題（題材）是：",
+        "options": [
+          "送別友人，寄託朋友之間依依不捨、真摯純潔的友情",
+          "讚美祖國的自然山水風景",
+          "描寫打仗和冒險的過程",
+          "介紹好吃的食物"
+        ],
+        "answer": 0,
+        "exp": "兩首詩均為唐代經典的「送別詩」，旨在抒發臨別之際對友人的不捨與真誠心志。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "王昌齡交代好友辛漸，如果洛陽親友問起，要傳達他：",
+        "options": [
+          "依然堅守操守、像玉壺藏冰般純潔孤高的心志",
+          "他在吳地賺了好多錢",
+          "他想早點搬回洛陽住",
+          "他身體很不舒服"
+        ],
+        "answer": 0,
+        "exp": "「洛陽親友如相問，一片冰心在玉壺」表明他雖然被貶謫，但心志依然高潔、未受污染。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "讀古典古詩，對我們二年級小學生的好處是：",
+        "options": [
+          "積累優美詞句，培養審美意境，並感受古人真摯的情感世界",
+          "能讓我們飛上天",
+          "可以用來應付老師不寫別的功課",
+          "可以不吃蔬菜"
+        ],
+        "answer": 0,
+        "exp": "古典詩詞有極高的藝術美，能陶冶性情、開闊胸襟並提升語文底蘊。"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "title": "鐵棒也能磨成針",
+    "category": "古詩文：鐵杵磨針",
+    "focus": "理解古代文言故事的大意，明白持之以恆、不畏艱難的治學道理。",
+    "example": "例題：李白受到老婆婆「鐵杵磨針」的啟發後，做出了什麼決定？\n\n💡解題魔法：李白深受感動，立刻「回去完成學業，最終成為一代著名詩人」！這就是毅力！",
+    "passage": "李白讀書未成，棄去。道逢老嫗磨鐵杵，白問故，曰：「欲作針。」白笑其拙，老嫗曰：「功到自然成耳。」白大為感動，遂還讀畢業，卒成名士。\n（註釋：老嫗即老婆婆；鐵杵即鐵棒；棄去即不讀書跑走；畢業即完成學業。）",
+    "questions": [
+      {
+        "id": 1,
+        "difficulty": "easy",
+        "text": "李白小時候讀書態度起初怎麼樣？",
+        "options": [
+          "沒有完成學業，中途放棄跑出去玩（讀書未成，棄去）",
+          "非常勤奮天天得滿分",
+          "不喜歡說話",
+          "不愛和同學玩"
+        ],
+        "answer": 0,
+        "exp": "原文開頭寫到：「李白讀書未成，棄去」，代表他起初學業未成、半途而廢。"
+      },
+      {
+        "id": 2,
+        "difficulty": "easy",
+        "text": "李白在路上遇到一位老婆婆（老嫗）正在做甚麼事？",
+        "options": [
+          "磨一根大鐵棒（鐵杵）",
+          "在河邊洗衣服",
+          "在山上砍柴",
+          "在市場賣蘋果"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「道逢老嫗磨鐵杵」。"
+      },
+      {
+        "id": 3,
+        "difficulty": "easy",
+        "text": "老婆婆說要把大鐵棒磨成什麼東西？",
+        "options": [
+          "一根細小的繡花針",
+          "一把大鐵劍",
+          "一個鐵盆子",
+          "一架鐵飛機"
+        ],
+        "answer": 0,
+        "exp": "李白問原因，老婆婆回答說：「欲作針」。"
+      },
+      {
+        "id": 4,
+        "difficulty": "easy",
+        "text": "李白一開始對老婆婆要把鐵棒磨成針的想法是什麼態度？",
+        "options": [
+          "嘲笑她太愚笨、太幼稚（笑其拙）",
+          "非常支持和讚賞",
+          "幫忙一起磨",
+          "驚訝得說不出話"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「白笑其拙」，拙就是笨拙、不聰明的意思。"
+      },
+      {
+        "id": 5,
+        "difficulty": "easy",
+        "text": "老婆婆是用哪句名言來回答李白的懷疑的？",
+        "options": [
+          "「功到自然成耳。」",
+          "「讀書未成，棄去。」",
+          "「一片冰心在玉壺。」",
+          "「桃花潭水深千尺。」"
+        ],
+        "answer": 0,
+        "exp": "老婆婆自信地回答說：「功到自然成耳」，意思是只要功夫下得深，事情自然會成功。"
+      },
+      {
+        "id": 6,
+        "difficulty": "hard",
+        "text": "老婆婆口中的『功到自然成』在現代漢語中的意思是指：",
+        "options": [
+          "只要肯下足苦功、花夠精力和時間，再困難的事情也一定會成功",
+          "只要買好工具，事情就成功了",
+          "成功是靠運氣的",
+          "事情不需要努力，放著就會自己成功"
+        ],
+        "answer": 0,
+        "exp": "「功到自然成」強調了恆心、耐力與下苦功對成功的決定性作用。"
+      },
+      {
+        "id": 7,
+        "difficulty": "hard",
+        "text": "深受老婆婆感召後，李白做出了甚麼驚人的轉變？",
+        "options": [
+          "立刻轉身回去認真讀書完成學業，最終成為一代著名學者（還讀畢業，卒成名士）",
+          "在路上和老婆婆一起磨針",
+          "把自己的書全部扔掉",
+          "決定當一名出色的鐵匠"
+        ],
+        "answer": 0,
+        "exp": "原文寫到：「白大為感動，遂還讀畢業，卒成名士」。這件事改變了李白的一生。"
+      },
+      {
+        "id": 8,
+        "difficulty": "hard",
+        "text": "『鐵杵磨針』這個成語現在用來比喻：",
+        "options": [
+          "只要有恆心，肯下苦功，再難的事情也能成功",
+          "做事情要挑選最難的工具",
+          "不要讀書，多出去做手工",
+          "老人家的力氣比年輕人還要大"
+        ],
+        "answer": 0,
+        "exp": "成語「鐵杵磨針」（或鐵杵磨成針）比喻只要有毅力，肯下苦功，再難的事情也能成功。"
+      },
+      {
+        "id": 9,
+        "difficulty": "hard",
+        "text": "如果李白當時沒有遇到那位老婆婆，他可能：",
+        "options": [
+          "繼續半途而廢、荒廢學業，可能無法成為歷史上著名的『詩仙』名士",
+          "依然會成為偉大詩人",
+          "會去當一個大將軍",
+          "會買下一家書店"
+        ],
+        "answer": 0,
+        "exp": "偶然的經歷引發了李白心靈的頓悟，毅力重塑了他的命運，這就是好榜樣的力量。"
+      },
+      {
+        "id": 10,
+        "difficulty": "hard",
+        "text": "這篇文言文小故事給二年級同學在學習上最大的啟迪是：",
+        "options": [
+          "學習要有恆心和毅力，遇到難題或挫折時不能半途而廢，要堅持到底",
+          "遇到難題直接不寫跑出去玩",
+          "寫字不好看就重新買一根筆",
+          "多跟老婆婆聊天就能考滿分"
+        ],
+        "answer": 0,
+        "exp": "鐵杵磨針的精神是治學的必備品質，教導我們要有持之以恆、不怕困難的毅力。"
+      }
+    ]
+  }
+];
+
+    let currentLevel = null;
+    let selectedQuestions = [];
+    let currentQuestionIdx = 0;
+    
+    // Track user answers (stores the selected option index, or null if unanswered)
+    let userAnswers = [];
+    
+    // Store original answer correct/wrong state (so we can award stars based on initial run, 
+    // but also allow them to fix everything to get full score)
+    let originalResults = [];
+
+    // Load score state from localstorage
+    const userScores = JSON.parse(localStorage.getItem('p2_comprehension_scores') || '{}');
+
+    // Build the 30-level map with dynamic stars and high scores
+    function initMap() {
+        const mapGrid = document.getElementById('mapGrid');
+        mapGrid.innerHTML = '';
+        
+        levelsData.forEach(level => {
+            const scoreObj = userScores[level.id] || { stars: 0, maxScore: 0 };
+            const node = document.createElement('div');
+            
+            // Assign custom classes depending on category
+            let catClass = 'level-strategy';
+            let catIcon = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            
+            const catStr = level.category || '';
+            if (catStr.includes('策略')) {
+                catClass = 'level-strategy';
+                catIcon = '<i class="fa-solid fa-lightbulb"></i>';
+            } else if (catStr.includes('記敘文')) {
+                catClass = 'level-narrative';
+                catIcon = '<i class="fa-solid fa-book"></i>';
+            } else if (catStr.includes('寓言')) {
+                catClass = 'level-fable';
+                catIcon = '<i class="fa-solid fa-feather-pointed"></i>';
+            } else if (catStr.includes('神話')) {
+                catClass = 'level-fable';
+                catIcon = '<i class="fa-solid fa-dragon"></i>';
+            } else if (catStr.includes('童話')) {
+                catClass = 'level-fable';
+                catIcon = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            } else if (catStr.includes('實用文')) {
+                catClass = 'level-practical';
+                catIcon = '<i class="fa-solid fa-envelope-open-text"></i>';
+            } else if (catStr.includes('古詩文')) {
+                catClass = 'level-classical';
+                catIcon = '<i class="fa-solid fa-scroll"></i>';
+            }
+
+            node.className = `level-node ${catClass}`;
+            node.onclick = () => openIntro(level.id);
+
+            // 20 points (5/5) -> Big Glowing Gold Star (stars = 2)
+            // 10-19 points (3/5 or 4/5, which are 12/16 points) -> Small Passed Star (stars = 1)
+            // Under 10 points (0, 1, 2 correct) -> Outline Gray Star (stars = 0)
+            let starDisplayHtml = '';
+            if (scoreObj.stars === 2) {
+                starDisplayHtml = '<span class="star-badge star-large"><i class="fa-solid fa-star"></i> 滿分 🌟</span>';
+            } else if (scoreObj.stars === 1) {
+                starDisplayHtml = '<span class="star-badge star-small"><i class="fa-solid fa-star-half-stroke"></i> 合格 ⭐</span>';
+            } else {
+                starDisplayHtml = '<span class="star-badge star-none"><i class="fa-regular fa-star"></i> 未合格</span>';
+            }
+
+            node.innerHTML = `
+                <div class="level-num">${level.id}</div>
+                <div class="level-category-icon">${catIcon}</div>
+                <div class="level-title">${level.title}</div>
+                <div class="level-stars">${starDisplayHtml}</div>
+                <div class="level-score-text">最高分: ${scoreObj.maxScore || 0} / 20</div>
+            `;
+            mapGrid.appendChild(node);
+        });
+    }
+
+    // Text to Speech using Web Speech synthesis API
+    function speakText(text) {
+        window.speechSynthesis.cancel();
+        
+        // Clean out emojis or symbols for TTS
+        const cleanText = text.replace(/[🐾🌟⭐💡✉️🎨🔴📸🔵🧵📕💬🎵🔄✅❌🏆🏰🧙‍♂️]/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        
+        // Use localized Cantonese voice if available, fallback to general Chinese
+        utterance.lang = 'zh-HK';
+        utterance.rate = 0.95; // Slightly slower, comfortable rate for grade 2
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // Open Intro Popup
+    function openIntro(levelId) {
+        currentLevel = levelsData.find(l => l.id === levelId);
+        document.getElementById('modalTitle').innerText = `第 ${currentLevel.id} 關：${currentLevel.title}`;
+        document.getElementById('modalCategory').innerText = currentLevel.category;
+        document.getElementById('modalFocus').innerText = currentLevel.focus;
+        document.getElementById('modalExample').innerText = currentLevel.example;
+
+        // Hook up strategy audio button
+        document.getElementById('ttsStrategyBtn').onclick = () => {
+            speakText(`本日策略要點：${currentLevel.focus}`);
+        };
+
+        document.getElementById('introModal').style.display = 'flex';
+    }
+
+    // Close Modal
+    function closeIntro() {
+        document.getElementById('introModal').style.display = 'none';
+    }
+
+    // Fullscreen zoom-in reading card toggle
+    function openZoomReading() {
+        const zoomBody = document.getElementById('zoomReadingBody');
+        zoomBody.innerText = currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右邊卡片中的例子，學習核心的中文閱讀技巧！";
+        document.getElementById('zoomReadingModal').style.display = 'flex';
+    }
+
+    function closeZoomReading() {
+        document.getElementById('zoomReadingModal').style.display = 'none';
+    }
+
+    // Start Game logic (randomly draw 5 questions: 2 easy, 3 hard)
+    function startGame() {
+        closeIntro();
+        document.getElementById('map-scene').style.display = 'none';
+        document.getElementById('game-scene').style.display = 'block';
+        document.getElementById('result-scene').style.display = 'none';
+        document.getElementById('redo-scene').style.display = 'none';
+
+        // Split questions by difficulty
+        const easyPool = currentLevel.questions.filter(q => q.difficulty === 'easy');
+        const hardPool = currentLevel.questions.filter(q => q.difficulty === 'hard');
+
+        // Draw 2 easy
+        const shuffledEasy = easyPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+        // Draw 3 hard
+        const shuffledHard = hardPool.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        selectedQuestions = [...shuffledEasy, ...shuffledHard];
+        currentQuestionIdx = 0;
+        
+        // Reset states
+        userAnswers = [null, null, null, null, null];
+        originalResults = [null, null, null, null, null];
+        
+        // Render reading passage
+        document.getElementById('gameCategory').innerText = currentLevel.category;
+        document.getElementById('gamePassage').innerText = currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！";
+        
+        // Hook up passage speech button
+        document.getElementById('ttsPassageBtn').onclick = () => {
+            speakText(currentLevel.passage || "請閱讀右側魔法小例子，掌握今日的學習技巧！");
+        };
+
+        loadQuestion();
+    }
+
+    // Retry current level
+    function retryCurrentLevel() {
+        window.speechSynthesis.cancel();
+        startGame();
+    }
+
+    // Load active question
+    function loadQuestion() {
+        // Reset explanation popup box
+        document.getElementById('wrongFeedbackBox').style.display = 'none';
+
+        const q = selectedQuestions[currentQuestionIdx];
+
+        // Progress bar update
+        const progressPercent = (currentQuestionIdx / selectedQuestions.length) * 100;
+        document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        document.getElementById('questionNumText').innerText = `${currentQuestionIdx + 1} / 5`;
+
+        document.getElementById('questionContent').innerText = q.text;
+
+        // Sound button for active question
+        document.getElementById('ttsQuestionBtn').onclick = () => {
+            speakText(q.text);
+        };
+
+        // Render options list
+        const optionsBox = document.getElementById('optionsBox');
+        optionsBox.innerHTML = '';
+        
+        const answeredVal = userAnswers[currentQuestionIdx];
+
+        q.options.forEach((opt, idx) => {
+            const optNode = document.createElement('div');
+            optNode.className = 'option-item';
+            
+            // Text on left, speaker on right (using FontAwesome sound icon)
+            optNode.innerHTML = `
+                <span>${opt}</span>
+                <button class="tts-opt-btn" onclick="event.stopPropagation(); speakText('${opt}')"><i class="fa-solid fa-volume-high"></i></button>
+            `;
+            
+            if (answeredVal !== null) {
+                // Already answered state
+                optNode.classList.add('disabled');
+                if (idx === q.answer) {
+                    optNode.classList.add('correct');
+                } else if (idx === answeredVal) {
+                    optNode.classList.add('wrong');
+                }
+            } else {
+                // Interactive state
+                optNode.onclick = () => checkAnswer(idx, optNode);
+            }
+            optionsBox.appendChild(optNode);
+        });
+
+        // Update navigation buttons
+        document.getElementById('prevBtn').disabled = (currentQuestionIdx === 0);
+        document.getElementById('prevBtn').style.opacity = (currentQuestionIdx === 0) ? '0.5' : '1';
+        
+        if (currentQuestionIdx === selectedQuestions.length - 1) {
+            document.getElementById('nextBtn').innerHTML = '完成挑戰 <i class="fa-solid fa-trophy"></i>';
+        } else {
+            document.getElementById('nextBtn').innerHTML = '下一頁 <i class="fa-solid fa-arrow-right"></i>';
+        }
+    }
+
+    // Answer Validation
+    function checkAnswer(selectedIdx, element) {
+        if (userAnswers[currentQuestionIdx] !== null) return; // Prevent double submission
+
+        const q = selectedQuestions[currentQuestionIdx];
+        const optionsBox = document.getElementById('optionsBox');
+
+        // Store selected answer
+        userAnswers[currentQuestionIdx] = selectedIdx;
+        const isCorrect = (selectedIdx === q.answer);
+        originalResults[currentQuestionIdx] = isCorrect; // Save initial record
+
+        // Disable options
+        Array.from(optionsBox.children).forEach(child => {
+            child.classList.add('disabled');
+        });
+
+        if (isCorrect) {
+            element.classList.add('correct');
+            playCorrectSound();
+            spawnConfetti();
+            
+            // Auto jump after 1.5 seconds so child has time to hear sound and see confetti
+            setTimeout(() => {
+                nextQuestion();
+            }, 1500);
+        } else {
+            element.classList.add('wrong');
+            optionsBox.children[q.answer].classList.add('correct');
+            playWrongSound();
+
+            // Populate and show the manual "Next" explanation panel below
+            document.getElementById('wrongExplanationText').innerText = q.exp || "多對照左邊文章中提到的相關內容，能幫你找到正確答案喔！";
+            document.getElementById('wrongFeedbackBox').style.display = 'block';
+        }
+    }
+
+    // Navigation triggers
+    function prevQuestion() {
+        if (currentQuestionIdx > 0) {
+            currentQuestionIdx--;
+            loadQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIdx < selectedQuestions.length - 1) {
+            currentQuestionIdx++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    // Spawn 50 falling colorful sakura/stars shapes
+    function spawnConfetti() {
+        const colors = ['#FF6B8B', '#4ECDC4', '#FFE66D', '#FF8C94', '#A8E6CF', '#FDFFB6', '#FFB5D8', '#B8F2E6'];
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = Math.random() * 10 + 8 + 'px';
+            confetti.style.height = confetti.style.width;
+            
+            // Random cute shapes (stars, rounds, hearts)
+            if (Math.random() > 0.5) {
+                confetti.style.borderRadius = '50%';
+            }
+            
+            confetti.style.animationDelay = Math.random() * 0.3 + 's';
+            confetti.style.animationDuration = Math.random() * 1.5 + 1.0 + 's';
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 2500);
+        }
+
+        const badge = document.createElement('div');
+        badge.className = 'correct-badge-pop';
+        badge.innerHTML = '🌟 答對了！太棒了！ 🌟';
+        document.body.appendChild(badge);
+        setTimeout(() => badge.remove(), 1200);
+    }
+
+    // Synthetic sound effects using built-in Web Audio API
+    function playTone(frequency, type, duration) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        } catch(e) {
+            console.log("Audio not supported or restricted by browser policy");
+        }
+    }
+
+    function playCorrectSound() {
+        playTone(523.25, 'sine', 0.15); // Note C5
+        setTimeout(() => playTone(659.25, 'sine', 0.25), 120); // Note E5
+    }
+
+    function playWrongSound() {
+        playTone(220.00, 'triangle', 0.35); // Low buzzer sound
+    }
+
+    // Show final summary scene
+    function showResults() {
+        document.getElementById('game-scene').style.display = 'none';
+        document.getElementById('redo-scene').style.display = 'none';
+        document.getElementById('result-scene').style.display = 'block';
+
+        // Calculate score based on current userAnswers (which updates on redo!)
+        let correctCount = 0;
+        selectedQuestions.forEach((q, idx) => {
+            if (userAnswers[idx] === q.answer) {
+                correctCount++;
+            }
+        });
+
+        // 5 correct (20 points) -> 2 stars (Big Gold Star)
+        // 3-4 correct (12 or 16 points) -> 1 star (Small Passed Star)
+        // Under 10 points -> 0 stars
+        let finalStars = 0;
+        let scoreObtained = correctCount * 4;
+
+        if (scoreObtained === 20) {
+            finalStars = 2; // Perfect
+        } else if (scoreObtained >= 10) {
+            finalStars = 1; // Passed
+        } else {
+            finalStars = 0; // Failed
+        }
+
+        // Save progress to localstorage (Only overwrite if score obtained is higher than previous max score)
+        const prevScore = userScores[currentLevel.id] || { stars: 0, maxScore: 0 };
+        const prevMax = prevScore.maxScore || 0;
+        
+        let isNewRecord = false;
+        let maxScoreEver = prevMax;
+        let finalStarsToSave = prevScore.stars || 0;
+
+        if (scoreObtained > prevMax) {
+            isNewRecord = true;
+            maxScoreEver = scoreObtained;
+            finalStarsToSave = finalStars;
+            userScores[currentLevel.id] = { stars: finalStarsToSave, maxScore: maxScoreEver };
+            localStorage.setItem('p2_comprehension_scores', JSON.stringify(userScores));
+        }
+
+        // Format final stars description
+        let starsStr = '';
+        if (correctCount === 5) {
+            starsStr = '🌟 滿分大星星 🌟';
+            document.getElementById('resultMsg').innerHTML = '🏆 完美大通關！全對啦！🏆';
+        } else if (correctCount >= 3) {
+            starsStr = '⭐ 合格小星星 ⭐';
+            document.getElementById('resultMsg').innerHTML = '🎉 恭喜通關！你真棒！🎉';
+        } else {
+            starsStr = '💪 再接再厲！加油！💪';
+        }
+
+        document.getElementById('resultStars').innerHTML = `<span style="font-size:3rem; color:var(--accent-color);">${starsStr}</span>`;
+        document.getElementById('resultDetails').innerText = `你在這關目前獲得: ${scoreObtained} / 20 分 (答對了 ${correctCount} / 5 題 !)`;
+
+        // Render Record Feedback (每次重玩，高過原本分數才覆蓋)
+        const feedbackEl = document.getElementById('recordFeedback');
+        if (feedbackEl) {
+            if (isNewRecord) {
+                if (prevMax === 0) {
+                    feedbackEl.innerHTML = `✨ <span style="color:#28A745; font-weight:900;">新紀錄誕生！</span> 這是你第一次挑戰這關，成功獲得 <b>${scoreObtained} 分</b>！紀錄已妥善保存！🎉`;
+                } else {
+                    feedbackEl.innerHTML = `🎉 <span style="color:#28A745; font-weight:900;">恭喜你創下新紀錄！</span> 成功超越舊紀錄 <b>${prevMax} 分</b>，覆蓋更新為 <b>${scoreObtained} 分</b>！🏆`;
+                }
+            } else {
+                feedbackEl.innerHTML = `💪 <span style="color:#E0A900; font-weight:900;">最高紀錄保持：</span> 你的歷史最高紀錄依然是 <b>${prevMax} 分</b>！本次獲得 <b>${scoreObtained} 分</b>。繼續努力！🔥`;
+            }
+        }
+
+        // Render Question Summary List
+        const summaryList = document.getElementById('summaryList');
+        summaryList.innerHTML = '';
+
+        selectedQuestions.forEach((q, idx) => {
+            const item = document.createElement('div');
+            const isCorrectNow = (userAnswers[idx] === q.answer);
+            item.className = `summary-item ${isCorrectNow ? 'correct' : 'wrong'}`;
+
+            let statusHtml = '';
+            let actionBtnHtml = '';
+
+            if (isCorrectNow) {
+                const wasRedone = (originalResults[idx] === false);
+                statusHtml = `<span class="summary-status correct-text">第 ${idx + 1} 題：✅ 答對了！${wasRedone ? '（✨已在特訓房成功修正）' : ''}</span>`;
+            } else {
+                statusHtml = `<span class="summary-status wrong-text">第 ${idx + 1} 題：❌ 答錯了</span>`;
+                actionBtnHtml = `<button class="btn-redo" onclick="redoQuestion(${idx})"><i class="fa-solid fa-graduation-cap"></i> 🔄 重新挑戰這一題</button>`;
+            }
+
+            item.innerHTML = `
+                ${statusHtml}
+                <div class="summary-q">${q.text}</div>
+                ${actionBtnHtml}
+            `;
+            summaryList.appendChild(item);
+        });
+    }
+
+    let activeRedoIdx = null;
+
+    // Trigger Redo screen for mistakes
+    function redoQuestion(qIdx) {
+        activeRedoIdx = qIdx;
+        const q = selectedQuestions[qIdx];
+
+        document.getElementById('result-scene').style.display = 'none';
+        document.getElementById('redo-scene').style.display = 'block';
+
+        // Auto Voice Announcement for Redo Room popup disabled as per user preference (kids can click the speaker button to play)
+
+        // Open custom HTML warning block
+        document.getElementById('redoToast').style.display = 'flex';
+
+        // Render passage for redo
+        document.getElementById('redoCategory').innerText = currentLevel.category;
+        document.getElementById('redoPassage').innerText = currentLevel.passage || "本關為解題策略特訓！請仔細閱讀右側卡片中的魔法例子，學習核心的中文閱讀技巧！";
+        
+        document.getElementById('ttsRedoPassageBtn').onclick = () => {
+            speakText(currentLevel.passage || "請閱讀右側魔法小例子，掌握今日的學習技巧！");
+        };
+
+        // Render redo question
+        document.getElementById('redoQuestionContent').innerText = q.text;
+        document.getElementById('ttsRedoQuestionBtn').onclick = () => {
+            speakText(q.text);
+        };
+
+        // Render redo options
+        const redoOptionsBox = document.getElementById('redoOptionsBox');
+        redoOptionsBox.innerHTML = '';
+
+        q.options.forEach((opt, idx) => {
+            const optNode = document.createElement('div');
+            optNode.className = 'option-item';
+            optNode.innerHTML = `
+                <span>${opt}</span>
+                <button class="tts-opt-btn" onclick="event.stopPropagation(); speakText('${opt}')"><i class="fa-solid fa-volume-high"></i></button>
+            `;
+
+            optNode.onclick = () => checkRedoAnswer(idx, optNode, q.answer);
+            redoOptionsBox.appendChild(optNode);
+        });
+    }
+
+    // Redo validation - try until correct ("一直答到對")
+    function checkRedoAnswer(selectedIdx, element, correctIdx) {
+        if (selectedIdx === correctIdx) {
+            element.className = 'option-item correct';
+            
+            // Lock all other options
+            const redoOptionsBox = document.getElementById('redoOptionsBox');
+            Array.from(redoOptionsBox.children).forEach(child => {
+                child.classList.add('disabled');
+            });
+
+            playCorrectSound();
+            spawnConfetti();
+
+            // Return to results after 1.5 seconds of correction celebration
+            setTimeout(() => {
+                userAnswers[activeRedoIdx] = correctIdx; // Mark corrected state
+                showResults(); // Return and refresh list
+            }, 1500);
+        } else {
+            // Incorrect attempt inside redo room: Mark RED and disable immediately to try other options
+            element.className = 'option-item wrong disabled';
+            playWrongSound();
+        }
+    }
+
+    function closeRedoToast() {
+        document.getElementById('redoToast').style.display = 'none';
+    }
+
+    function exitRedoToSummary() {
+        window.speechSynthesis.cancel();
+        document.getElementById('redo-scene').style.display = 'none';
+        document.getElementById('result-scene').style.display = 'block';
+    }
+
+    // Exit back to main level select map
+    function exitToMap() {
+        document.getElementById('game-scene').style.display = 'none';
+        document.getElementById('redo-scene').style.display = 'none';
+        document.getElementById('result-scene').style.display = 'none';
+        document.getElementById('map-scene').style.display = 'block';
+        window.speechSynthesis.cancel();
+        initMap();
+    }
+
+    // Copy Douyin ID and voice/alert instructions
+    function copyDouyinID() {
+        const douyinID = "74254902683";
+        navigator.clipboard.writeText(douyinID).then(() => {
+            alert("🐱 抖音 ID: 74254902683 已複製到你的剪貼簿！請打開抖音黏貼關注喔！");
+        }).catch(err => {
+            alert("抖音 ID: 74254902683，請手動複製喔！");
+        });
+    }
+
+    // Wipe dynamic highest score history
+    function clearAllRecords() {
+        const confirmClear = confirm("🧹 你確定要清除所有的星星和最高分數，重新開始大冒險嗎？");
+        if (confirmClear) {
+            localStorage.removeItem('p2_comprehension_scores');
+            // Clear current in-memory values
+            for (let key in userScores) {
+                delete userScores[key];
+            }
+            initMap();
+        }
+    }
+
+    // Initialize map on launch
+    initMap();
+</script>
+</body>
+</html>
