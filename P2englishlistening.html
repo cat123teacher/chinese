@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小二英文聆聽策略冒險島 - Teacher Cat 的快樂AI教室</title>
+    <title>小二中文閱讀大冒險 - Teacher Cat 的快樂AI教室</title>
     <style>
         :root {
             --primary: #FF6B6B;
@@ -1049,8 +1049,8 @@
     <div id="confetti-container"></div>
 
     <header>
-        <h1>🏝️ 小二英文聆聽策略冒險島</h1>
-        <div class="subtitle">小學二年級英語聽力智能大闖關 ‧ 貓咪老師快樂AI教室 🐾</div>
+        <h1>🏝️ 小二中文閱讀大冒險</h1>
+        <div class="subtitle">小學二年級中文閱讀智能大闖關 ‧ 貓咪老師快樂AI教室 🐾</div>
     </header>
 
     <div class="game-container">
@@ -1151,6 +1151,15 @@
                         <h3 id="feedback-title-inline" class="feedback-title-text">Excellent! 答對了！</h3>
                     </div>
                     <p id="feedback-desc-inline" class="feedback-desc-text">解釋文字</p>
+                    
+                    <!-- Grammar Hint Box (文法提示框) (Requirement 7) -->
+                    <div id="grammar-hint-box" style="display: none; background: #FFF9E6; border: 3px solid #FFD580; border-radius: 15px; padding: 15px; margin-top: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.03); text-align: left;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: bold; color: #D35400; font-size: 1rem; display: flex; align-items: center; gap: 5px;">📝 貓咪老師的文法與策略提示:</span>
+                            <button class="btn-speak" style="margin: 0; padding: 4px 10px; font-size: 0.8rem; background: #FF9F43; box-shadow: 0 2px 0 #D35400; color: white; border: none; border-radius: 8px; cursor: pointer;" onclick="speakGrammarHint()">🔊 聽提示發音</button>
+                        </div>
+                        <p id="grammar-hint-text" style="margin: 0; font-size: 0.95rem; color: #7E5109; line-height: 1.5;"></p>
+                    </div>
                 </div>
 
                 <!-- Custom Traversal Navigation Bar (Requirement 2) -->
@@ -2032,6 +2041,10 @@
         // Track each question state for traversal (Requirement 2)
         var userAnswers = [null, null, null, null, null];
 
+        // Redo Mode tracking (Requirement 6 & 7)
+        var isRedoMode = false;
+        var redoQuestionIdx = null;
+
         // Populate levels in Lobby on load
         function resetAllScores() {
             if (confirm("🐱 貓咪老師問你：\n確定要清除所有關卡的挑戰成績，重新開始冒險嗎？🧹")) {
@@ -2051,19 +2064,27 @@
                 card.className = 'level-card l' + (stage.id);
                 card.onclick = function() { showIntro(stage.id); };
                 
-                // Read score from localStorage for progress record
+                // Read score from localStorage for progress record (Requirement 8)
                 var savedScore = localStorage.getItem('listening_game_score_stage_' + stage.id);
                 var scoreHTML = '';
                 
                 if (savedScore !== null) {
                     var scoreNum = parseInt(savedScore, 10);
+                    var starHTML = '';
+                    for (var s = 1; s <= 5; s++) {
+                        if (s <= scoreNum) {
+                            starHTML += '⭐';
+                        } else {
+                            starHTML += '🌑';
+                        }
+                    }
                     if (scoreNum === 5) {
-                        scoreHTML = '<div class="score-record-badge perfect">👑 5/5 滿分 🏆</div>';
+                        scoreHTML = '<div class="score-record-badge perfect" style="background: #FFEAA7; border: 2px solid #FFD93D; color: #D35400; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; margin-top: 5px; display: inline-block;">👑 滿分 ' + starHTML + ' 🏆</div>';
                     } else {
-                        scoreHTML = '<div class="score-record-badge passed">⭐ 得分: ' + scoreNum + '/5</div>';
+                        scoreHTML = '<div class="score-record-badge passed" style="background: #E8F8F5; border: 1px solid #2ECC71; color: #16A085; padding: 4px 8px; border-radius: 8px; font-size: 0.85rem; margin-top: 5px; display: inline-block;">得分: ' + scoreNum + '/5 ' + starHTML + '</div>';
                     }
                 } else {
-                    scoreHTML = '<div class="score-record-badge normal">❔ 未挑戰</div>';
+                    scoreHTML = '<div class="score-record-badge normal" style="background: #F4F6F7; border: 1px solid #BDC3C7; color: #7F8C8D; padding: 4px 8px; border-radius: 8px; font-size: 0.85rem; margin-top: 5px; display: inline-block;">❔ 未挑戰 🌑🌑🌑🌑🌑</div>';
                 }
                 
                 card.innerHTML = '\n\
@@ -2079,7 +2100,6 @@
             });
         }
 
-        // Show Intro screen for selected level
         function showIntro(stageId) {
             var foundStage = null;
             for (var i = 0; i < questionBank.length; i++) {
@@ -2266,6 +2286,7 @@
 
             // Handle Inline Feedback Box
             var feedbackBox = document.getElementById("inline-feedback-box");
+            var grammarBox = document.getElementById("grammar-hint-box");
             if (answered) {
                 feedbackBox.style.display = "block";
                 var userChoice = userAnswers[currentQuestionIdx];
@@ -2280,14 +2301,20 @@
                     titleEl.innerText = "Excellent! 答對了！";
                     titleEl.className = "feedback-title-text correct";
                     descEl.innerHTML = '<b>正確答案：' + (String.fromCharCode(65 + q.correct)) + '</b><br>' + (q.explanation);
+                    if (grammarBox) grammarBox.style.display = "none";
                 } else {
                     emojiEl.innerText = "💪";
                     titleEl.innerText = "Keep trying! 再接再厲！";
                     titleEl.className = "feedback-title-text incorrect";
                     descEl.innerHTML = '<b>正確答案應該是：' + (String.fromCharCode(65 + q.correct)) + '</b><br>' + (q.explanation);
+                    if (grammarBox) {
+                        grammarBox.style.display = "block";
+                        document.getElementById("grammar-hint-text").innerText = q.explanation;
+                    }
                 }
             } else {
                 feedbackBox.style.display = "none";
+                if (grammarBox) grammarBox.style.display = "none";
             }
 
             // Update bottom navigation button states
@@ -2307,38 +2334,121 @@
                 nextNavBtn.className = "btn-nav next";
             }
 
+            // Handle middle navigation buttons in Redo mode
+            var homeNavBtn = document.getElementById("btn-nav-home");
+            if (isRedoMode) {
+                homeNavBtn.innerHTML = "🔙 返回成績總結";
+                homeNavBtn.onclick = function() {
+                    isRedoMode = false;
+                    endGame();
+                    switchScreen("screen-end");
+                };
+            } else {
+                homeNavBtn.innerHTML = "🏠 回到主頁";
+                homeNavBtn.onclick = function() { confirmGoHome(); };
+            }
+
             // Auto play on loading question disabled as requested (Requirement 1)
         }
 
         // Option clicked (Requirement 3)
         function selectOption(idx) {
-            if (userAnswers[currentQuestionIdx] !== null) return; // Locked
-
-            userAnswers[currentQuestionIdx] = idx;
-            var q = currentQuestions[currentQuestionIdx];
-            var isCorrect = (idx === q.correct);
-
-            updateScoreDisplay();
-
-            // Play Synth audio feedback and visual effects (Requirement 3)
-            if (isCorrect) {
-                playSynthSound("success");
-                triggerVisualEffects();
-            } else {
-                playSynthSound("failure");
-            }
-
-            // Reload question state to display locked state and inline feedback
-            loadQuestion();
-
-            // Scroll feedback into view smoothly
-            setTimeout(function() {
-                try {
-                    document.getElementById("inline-feedback-box").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                } catch (e) {
-                    document.getElementById("inline-feedback-box").scrollIntoView();
+            if (isRedoMode) {
+                // REDO MODE (Requirement 7): Infinite retry until correct
+                var q = currentQuestions[currentQuestionIdx];
+                var isCorrect = (idx === q.correct);
+                
+                if (isCorrect) {
+                    userAnswers[currentQuestionIdx] = idx; // Lock as correct!
+                    playSynthSound("success");
+                    triggerVisualEffects();
+                    
+                    loadQuestion(); // Reload question to show locked state and explanation
+                    
+                    alert("🎉 太厲害了！你終於答對了！繼續加油！💪");
+                    
+                    // Exit redo mode and go back to summary updated state
+                    isRedoMode = false;
+                    
+                    // Recalculate score and save
+                    var finalScore = 0;
+                    userAnswers.forEach(function(ans, i) {
+                        if (ans !== null && ans === currentQuestions[i].correct) {
+                            finalScore++;
+                        }
+                    });
+                    
+                    var currentHighScore = parseInt(localStorage.getItem('listening_game_score_stage_' + currentStage.id) || '-1', 10);
+                    if (finalScore > currentHighScore) {
+                        localStorage.setItem('listening_game_score_stage_' + currentStage.id, finalScore);
+                    }
+                    initLobby(); // Update lobby cards instantly
+                    endGame(); // Re-render summary and refresh End Screen
+                    switchScreen("screen-end");
+                } else {
+                    playSynthSound("failure");
+                    
+                    // Highlight selected incorrect option immediately
+                    var optionsContainer = document.getElementById("options-container");
+                    var btn = optionsContainer.children[idx];
+                    if (btn) {
+                        btn.classList.add("incorrect-ans");
+                        var textSpan = btn.querySelector("span");
+                        if (textSpan && !textSpan.innerHTML.includes("❌")) {
+                            textSpan.innerHTML += "  ❌";
+                        }
+                    }
+                    
+                    // Show Grammar Hint box inside feedback box immediately
+                    var feedbackBox = document.getElementById("inline-feedback-box");
+                    feedbackBox.style.display = "block";
+                    document.getElementById("feedback-emoji-inline").innerText = "💪";
+                    
+                    var titleEl = document.getElementById("feedback-title-inline");
+                    titleEl.innerText = "Keep trying! 再試一次！";
+                    titleEl.className = "feedback-title-text incorrect";
+                    
+                    var descEl = document.getElementById("feedback-desc-inline");
+                    descEl.innerHTML = "<b>這不是正確答案喔。</b>請再聽聽錄音，換個選項試試看！";
+                    
+                    var grammarBox = document.getElementById("grammar-hint-box");
+                    if (grammarBox) {
+                        grammarBox.style.display = "block";
+                        document.getElementById("grammar-hint-text").innerText = q.explanation;
+                    }
+                    
+                    speakText("Try again!", 'en-US');
                 }
-            }, 100);
+            } else {
+                // NORMAL MODE: Single-shot answer with lock-in feedback
+                if (userAnswers[currentQuestionIdx] !== null) return; // Locked
+
+                userAnswers[currentQuestionIdx] = idx;
+                var q = currentQuestions[currentQuestionIdx];
+                var isCorrect = (idx === q.correct);
+
+                updateScoreDisplay();
+
+                // Play Synth audio feedback and visual effects (Requirement 3)
+                if (isCorrect) {
+                    playSynthSound("success");
+                    triggerVisualEffects();
+                } else {
+                    playSynthSound("failure");
+                }
+
+                // Reload question state to display locked state and inline feedback
+                loadQuestion();
+
+                // Scroll feedback into view smoothly
+                setTimeout(function() {
+                    try {
+                        document.getElementById("inline-feedback-box").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } catch (e) {
+                        document.getElementById("inline-feedback-box").scrollIntoView();
+                    }
+                }, 100);
+            }
         }
 
         // Traversal Logic: Previous Question (Requirement 2)
@@ -2349,7 +2459,13 @@
                 loadQuestion();
             } else {
                 // If on first question, "上一頁" goes to Level Intro!
-                switchScreen("screen-intro");
+                if (isRedoMode) {
+                    isRedoMode = false;
+                    endGame();
+                    switchScreen("screen-end");
+                } else {
+                    switchScreen("screen-intro");
+                }
             }
         }
 
@@ -2360,8 +2476,31 @@
                 currentQuestionIdx++;
                 loadQuestion();
             } else {
-                endGame();
+                if (isRedoMode) {
+                    isRedoMode = false;
+                    endGame();
+                    switchScreen("screen-end");
+                } else {
+                    endGame();
+                }
             }
+        }
+
+        // Speak grammar hint function (Requirement 7)
+        function speakGrammarHint() {
+            var text = document.getElementById("grammar-hint-text").innerText;
+            speakMixedText(text);
+        }
+
+        // Redo a single question from summary page (Requirement 6 & 7)
+        function redoQuestion(idx) {
+            stopSpeech();
+            isRedoMode = true;
+            redoQuestionIdx = idx;
+            currentQuestionIdx = idx;
+            userAnswers[idx] = null; // Reset for re-answering
+            switchScreen("screen-game");
+            loadQuestion();
         }
 
         // End Game Screen Summary Calculation
@@ -2409,10 +2548,58 @@
                 speakText("Nice try! Keep practicing!", 'en-US');
             }
 
+            // Dynamically build Review & Redo Summary list (Requirement 6 & 7)
+            var summaryContainer = document.getElementById("end-summary-container");
+            if (!summaryContainer) {
+                summaryContainer = document.createElement("div");
+                summaryContainer.id = "end-summary-container";
+                summaryContainer.style.margin = "25px auto";
+                summaryContainer.style.maxWidth = "600px";
+                summaryContainer.style.textAlign = "left";
+                summaryContainer.style.background = "#FFF";
+                summaryContainer.style.border = "4px solid #FFEAA7";
+                summaryContainer.style.borderRadius = "20px";
+                summaryContainer.style.padding = "20px";
+                summaryContainer.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)";
+                
+                var endScreen = document.getElementById("screen-end");
+                var returnBtn = endScreen.querySelector("button");
+                endScreen.insertBefore(summaryContainer, returnBtn);
+            }
+
+            var summaryHTML = '<h3 style="text-align: center; color: var(--secondary); margin-bottom: 15px; font-size: 1.3rem; border-bottom: 2px dashed #FFD93D; padding-bottom: 8px;">📋 題目作答總結 (Review & Redo)</h3>';
+            summaryHTML += '<div class="summary-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 5px;">';
+            
+            currentQuestions.forEach(function(q, idx) {
+                var isCorrect = (userAnswers[idx] !== null && userAnswers[idx] === q.correct);
+                var statusLabel = isCorrect ? '✅ 答對了 (Correct)' : '❌ 答錯了 (Incorrect)';
+                var statusStyle = isCorrect ? 'border-left: 6px solid #2ECC71; background: #EAFAF1; padding: 12px;' : 'border-left: 6px solid #E74C3C; background: #FDEDEC; padding: 12px;';
+                
+                summaryHTML += '\n\
+                <div style="border-radius: 12px; ' + statusStyle + '">\n\
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">\n\
+                        <span style="font-weight: bold; color: #2C3E50; font-size: 0.95rem;">第 ' + (idx + 1) + ' 題：' + (isCorrect ? '🟢' : '🔴') + ' ' + statusLabel + '</span>\n\
+                ';
+                
+                if (!isCorrect) {
+                    summaryHTML += '<button class="btn-action warning" style="margin: 0; padding: 5px 10px; font-size: 0.8rem; box-shadow: 0 2px 0 #D5B60A;" onclick="redoQuestion(' + idx + ')">🔄 重新挑戰</button>';
+                } else {
+                    summaryHTML += '<span style="color: #27AE60; font-weight: bold; font-size: 0.85rem;">💯 已完成</span>';
+                }
+                
+                summaryHTML += '\n\
+                    </div>\n\
+                    <p style="margin: 0 0 5px 0; font-size: 0.95rem; color: #34495E; font-weight: bold;"><b>問：</b>' + q.question + '</p>\n\
+                    <p style="margin: 0; font-size: 0.85rem; color: #7F8C8D;"><b>解析與規則：</b>' + q.explanation + '</p>\n\
+                </div>';
+            });
+            
+            summaryHTML += '</div>';
+            summaryContainer.innerHTML = summaryHTML;
+
             switchScreen("screen-end");
         }
 
-        // Pause/Play Speech synthesis mechanics (Requirement 6)
         function playCurrentClip(text) {
             if ('speechSynthesis' in window) {
                 if (window.speechSynthesis.paused) {
