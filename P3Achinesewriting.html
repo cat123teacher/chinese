@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎨 小三上中文寫作大冒險 (440題極致版)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FF5C77;     /* 櫻桃粉紅 */
+            --primary-hover: #FF3B5C;
+            --secondary-color: #FFC324;   /* 向日葵黃 */
+            --secondary-hover: #EAB110;
+            --bg-color: #FFFDF0;          /* 溫和牛奶黃 */
+            --card-color: #FFFFFF;
+            --text-color: #4A3535;        /* 柔和深啡色 */
+            --correct-color: #4ECA64;     /* 蘋果綠 */
+            --wrong-color: #FF4B4B;       /* 草莓紅 */
+            --blue-color: #3AA6FF;        /* 魔法藍 */
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Fredoka', 'Microsoft JhengHei', 'PingFang HK', sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.8) 10%, transparent 10.1%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.7) 15%, transparent 15.1%),
+                linear-gradient(135deg, #FFE9CE 0%, #FFFDF0 100%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            overflow-x: hidden;
+        }
+
+        .app-header {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            margin-top: 5px;
+            padding: 5px 10px;
+        }
+
+        .cat-logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            object-fit: cover;
+            background-color: #FFF;
+            box-shadow: 0 6px 0px rgba(255, 92, 119, 0.2);
+            margin-right: 12px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: clamp(1.4rem, 6vw, 1.9rem);
+            font-weight: 700;
+            text-shadow: 2px 2px 0px #FFF, 4px 4px 0px rgba(255, 92, 119, 0.15);
+            display: inline-block;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-color);
+            border: 5px solid #FFD5B6;
+            border-radius: 28px;
+            box-shadow: 0 12px 0px #FFB885, 0 15px 25px rgba(0,0,0,0.06);
+            padding: 20px 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #FFF0F2;
+            border-radius: 20px;
+            border: 3px solid #FFD3B6;
+            margin-bottom: 15px;
+        }
+
+        .progress-header span {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        @media(min-width: 500px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+        }
+
+        .level-card {
+            background: #FFF;
+            border: 3px solid #EBEFF5;
+            border-radius: 20px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0px #EBEFF5;
+            position: relative;
+        }
+
+        .level-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #EBEFF5;
+        }
+
+        .level-card.active {
+            border-color: #FFBCD3;
+            box-shadow: 0 6px 0px #FF94B4;
+            background: linear-gradient(180deg, #FFF6F8 0%, #FFEBF0 100%);
+        }
+
+        .level-card.active:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #FF94B4;
+        }
+
+        .level-card .icon {
+            font-size: 2.3rem;
+            margin-bottom: 6px;
+            display: block;
+            filter: drop-shadow(0px 3px 0px rgba(0,0,0,0.1));
+        }
+
+        .level-card .num {
+            background: var(--secondary-color);
+            color: #7A5C00;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 6px;
+            box-shadow: 0 2px 0px #D8A010;
+        }
+
+        .level-card .title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #5A4747;
+            line-height: 1.35;
+            min-height: 2.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-card .score-badge {
+            font-size: 0.75rem;
+            color: #8D7676;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px dashed #FFD3B6;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .stars-container {
+            font-weight: bold;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        .star-big {
+            font-size: 1.2rem;
+            color: #FF5C77;
+            text-shadow: 0px 2px 0px #FFF, 0px 0px 6px rgba(255, 92, 119, 0.5);
+            animation: starScale 0.8s infinite alternate;
+            display: inline-block;
+        }
+
+        .star-small {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+            text-shadow: 0px 1px 0px #FFF;
+        }
+
+        .star-empty {
+            font-size: 0.9rem;
+            color: #E2E8F0;
+        }
+
+        @keyframes starScale {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+
+        .intro-box {
+            background: linear-gradient(180deg, #EBFDF0 0%, #DBF9E3 100%);
+            border: 4px solid #A3E9B4;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 0px #A3E9B4;
+        }
+
+        .intro-title {
+            color: #1E6B2A;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intro-text {
+            font-size: 1.05rem;
+            line-height: 1.55;
+            color: #2D5033;
+            margin-bottom: 12px;
+        }
+
+        .example-badge {
+            background: #FFF;
+            border: 2px solid #89DF9F;
+            border-left: 6px solid #4ECA64;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #234E2A;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .btn {
+            background: var(--secondary-color);
+            color: #7A5C00;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border-radius: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #D49B00;
+            transition: all 0.05s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 6px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0px #D49B00;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 5px 0px #C73E58;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 1px 0px #C73E58;
+        }
+
+        .btn-blue {
+            background: var(--blue-color);
+            color: white;
+            box-shadow: 0 5px 0px #1A75C7;
+        }
+
+        .btn-blue:active {
+            box-shadow: 0 1px 0px #1A75C7;
+        }
+
+        .btn-nav {
+            background: #9BB1C2;
+            color: white;
+            box-shadow: 0 5px 0px #637F94;
+        }
+
+        .btn-nav:active {
+            box-shadow: 0 1px 0px #637F94;
+        }
+
+        .btn-danger {
+            background: #FF5252;
+            color: white;
+            box-shadow: 0 4px 0px #D32F2F;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 16px;
+            margin: 0;
+        }
+
+        .btn-danger:active {
+            box-shadow: 0 1px 0px #D32F2F;
+        }
+
+        .nav-control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #FFD3B6;
+        }
+
+        .tts-btn {
+            background: var(--blue-color);
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 3px 0px #146EB4;
+            transition: all 0.05s ease;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .tts-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0px #146EB4;
+        }
+
+        .option-tts-btn {
+            background: #00CBD4;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 0px #008E94;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .option-tts-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0px #008E94;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            background: #FFFCEB;
+            padding: 8px 12px;
+            border-radius: 14px;
+            border: 2px solid #FFE6A8;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 14px;
+            background: #EBEFF5;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+            font-weight: bold;
+            line-height: 1.55;
+            margin-bottom: 15px;
+            background: #FAF8F2;
+            padding: 16px;
+            border-radius: 20px;
+            border: 3px solid #EBE4D5;
+            border-left: 8px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #FFF;
+            border: 3px solid #E2E8F0;
+            border-radius: 18px;
+            padding: 14px 16px;
+            font-size: clamp(0.95rem, 4vw, 1.1rem);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 0px #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--secondary-color);
+            background: #FFFDF8;
+        }
+
+        .option-btn.correct {
+            background: #EDFDF2;
+            border-color: var(--correct-color);
+            box-shadow: 0 4px 0px #3FA752;
+            color: #277C35;
+            font-weight: bold;
+        }
+
+        .option-btn.wrong {
+            background: #FFF0F0;
+            border-color: var(--wrong-color);
+            box-shadow: 0 4px 0px #D83B3B;
+            color: #B22D2D;
+            font-weight: bold;
+        }
+
+        .wrong-action-box {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: #FFF0F2;
+            border: 3px dashed var(--primary-color);
+            border-radius: 20px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .report-card {
+            background: #FAF8F2;
+            border-radius: 20px;
+            padding: 10px;
+            margin-top: 15px;
+            max-height: 280px;
+            overflow-y: auto;
+            text-align: left;
+            border: 3px solid #EBE4D5;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .report-card::-webkit-scrollbar {
+            width: 8px;
+        }
+        .report-card::-webkit-scrollbar-track {
+            background: #F3EFE6;
+            border-radius: 10px;
+        }
+        .report-card::-webkit-scrollbar-thumb {
+            background: #D5CAB5;
+            border-radius: 10px;
+        }
+
+        .report-item {
+            padding: 12px;
+            border-bottom: 2px dashed #EBE4D5;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @media(min-width: 480px) {
+            .report-item {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-status {
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-correct { color: var(--correct-color); }
+        .status-wrong { color: var(--wrong-color); }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(40, 30, 30, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 12px;
+        }
+
+        .modal-content {
+            background: #FFF;
+            padding: 20px;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 550px;
+            border: 6px solid var(--secondary-color);
+            box-shadow: 0 12px 0px #E5AF1C, 0 15px 30px rgba(0,0,0,0.3);
+            position: relative;
+            animation: modalScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalScale {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .writing-hint-banner {
+            background: #FFF7DF;
+            border: 2px solid #FFDFA4;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            color: #7A5100;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .cat-footer {
+            width: 100%;
+            max-width: 680px;
+            margin: 20px 0 30px 0;
+            background: #FFF;
+            border: 4px solid #FFD5B6;
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 0px #FFB885;
+        }
+
+        .cat-footer h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        @media(min-width: 450px) {
+            .social-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #FFFBF0;
+            border: 2px solid #FFE7A8;
+            border-radius: 14px;
+            padding: 8px;
+            text-decoration: none;
+            color: #7A5C00;
+            font-weight: bold;
+            font-size: 0.82rem;
+            box-shadow: 0 3px 0px #FFE7A8;
+            transition: all 0.1s ease;
+        }
+
+        .social-link:hover, .social-link:active {
+            background: var(--secondary-color);
+            border-color: #EAB110;
+            box-shadow: 0 1px 0px #EAB110;
+            transform: translateY(2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;" class="hidden"></canvas>
+
+    <div class="app-header">
+        <img src="cat.jpeg" class="cat-logo" alt="Teacher Cat" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23FF5C77\'/><text y=\'1.2em\' x=\'10\' font-size=\'65\'>🐱</text></svg>'">
+        <h1 id="game-title">小三上中文寫作大冒險</h1>
+    </div>
+
+    <div id="game-container">
+        <!-- ================= 首頁：關卡選擇地圖 ================= -->
+        <div id="lobby-view">
+            <div class="progress-header">
+                <span><i class="fa-solid fa-trophy"></i> 星星成就榜</span>
+                <button class="btn btn-danger" onclick="confirmClearRecords()"><i class="fa-solid fa-trash-can"></i> 清除記錄</button>
+            </div>
+            
+            <p style="text-align: center; font-size: 0.95rem; color: #736161; line-height: 1.4; margin: 8px 0 15px 0; padding: 0 10px;">
+                小朋友！獲得 <b>10分</b> 贏取 <b>⭐小星星</b>，獲得 <b>20分滿分</b> 贏取 🌟 <b>大星星</b>！
+            </p>
+            
+            <div class="grid-container" id="levels-grid">
+                <!-- JS 動態生成 11 大關卡 -->
+            </div>
+
+            <div style="text-align: center; margin-top: 25px; border-top: 3px dashed #FFD5B6; padding-top: 20px;">
+                <a href="https://cat123teacher.github.io/chinese/main.html" class="btn btn-primary" style="text-decoration: none; font-size: 1.15rem; padding: 14px 24px; border-radius: 30px; box-shadow: 0 6px 0px #C73E58;">
+                    <i class="fa-solid fa-house-chimney"></i> 返回小朋友學習大冒險
+                </a>
+            </div>
+        </div>
+
+        <!-- ================= 關卡教學介紹面 ================= -->
+        <div id="intro-view" class="hidden">
+            <div class="intro-box">
+                <div class="intro-title" id="intro-title-text"></div>
+                <div class="intro-text" id="intro-teaching-text"></div>
+                <div class="example-badge" id="intro-example-text"></div>
+            </div>
+            <div style="text-align: center; display: flex; justify-content: center; gap: 10px;">
+                <button class="btn btn-primary" onclick="startGameSession()"><i class="fa-solid fa-rocket"></i> 開始挑戰 (20題)</button>
+                <button class="btn" onclick="showLobby()"><i class="fa-solid fa-angle-left"></i> 返回地圖</button>
+            </div>
+        </div>
+
+        <!-- ================= 答題闖關畫面 ================= -->
+        <div id="quiz-view" class="hidden">
+            <div class="question-header">
+                <span id="level-indicator">關卡</span>
+                <span id="score-counter">得分: 0 / 20 分</span>
+                <span id="question-indicator">第 1 / 20 題</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="game-progress"></div>
+            </div>
+            
+            <div class="question-text">
+                <span id="q-text">加載問題中...</span>
+                <button class="tts-btn" id="tts-q-trigger" onclick="speakCurrentQuestion()"><i class="fa-solid fa-volume-high"></i></button>
+            </div>
+
+            <div class="options-container" id="options-box">
+                <!-- 選項 -->
+            </div>
+
+            <div id="wrong-next-panel" class="wrong-action-box hidden">
+                <div style="font-size: 0.95rem; color: var(--wrong-color); font-weight: bold; margin-bottom: 8px;">
+                    <i class="fa-solid fa-lightbulb"></i> 認清正確答案，準備好再前進：
+                </div>
+                <button class="btn btn-primary" style="margin: 0; width: 100%; max-width: 250px;" onclick="navigateNext()">
+                    下一題 <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="nav-control-bar">
+                <button class="btn btn-nav" id="btn-prev-q" onclick="navigatePrev()"><i class="fa-solid fa-arrow-left"></i> 上一頁</button>
+                <button class="btn btn-nav" onclick="confirmBackToLobby()"><i class="fa-solid fa-map"></i> 返回主頁</button>
+                <button class="btn btn-nav" id="btn-next-q" onclick="navigateNext()">下一題 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- ================= 結算與成績總結畫面 ================= -->
+        <div id="result-view" class="hidden">
+            <div style="text-align: center; background: #FFFDF5; border: 3px solid #FFEDC2; border-radius: 24px; padding: 15px; margin-bottom: 15px;">
+                <div id="result-emoji" style="font-size: 4rem; margin-bottom: 8px; filter: drop-shadow(0px 3px 0px rgba(0,0,0,0.1));">🏆</div>
+                <div id="final-score" style="font-size: 1.8rem; font-weight: bold; color: var(--primary-color);">得分: 20 / 20</div>
+                <p style="font-size: 1.05rem; margin: 8px 0; line-height: 1.4;" id="result-msg">恭喜你！表現得非常好！</p>
+                
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="restartLevel()"><i class="fa-solid fa-rotate-right"></i> 重新挑戰這一關</button>
+                    <button class="btn btn-blue" onclick="showLobby()"><i class="fa-solid fa-earth-asia"></i> 返回大地圖</button>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 15px; border-bottom: 3px dashed #FFD5B6; padding-bottom: 6px; font-size: 1.1rem; color: var(--primary-color);">
+                <i class="fa-solid fa-square-poll-horizontal"></i> 答題報告（挑戰錯題改正吧）
+            </h3>
+            <div class="report-card" id="report-list">
+                <!-- 由 JS 動態生成錯題總結及重做按鈕 -->
+            </div>
+        </div>
+    </div>
+
+    <div id="redo-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color: var(--primary-color); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 1.25rem;">
+                <span><i class="fa-solid fa-fire"></i> 錯題重新挑戰</span>
+                <button style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #AAA;" onclick="closeRedoModal()"><i class="fa-solid fa-circle-xmark"></i></button>
+            </h3>
+
+            <div class="writing-hint-banner" id="redo-hint-box">
+                <span style="font-size: 1.3rem;">💡</span>
+                <div>
+                    <strong>寫作策略提示：</strong> 
+                    <span id="redo-hint-text">正在讀取提示...</span>
+                </div>
+            </div>
+
+            <div class="question-text" id="redo-q-box" style="margin-bottom: 15px;">
+                <span id="redo-q-text">問題題目...</span>
+                <button class="tts-btn" id="redo-speak-q-btn"><i class="fa-solid fa-volume-high"></i></button>
+            </div>
+            
+            <div class="options-container" id="redo-options-box" style="margin-bottom: 15px;">
+                <!-- 選項 -->
+            </div>
+            
+            <p id="redo-feedback" style="font-weight: bold; text-align: center; color: var(--primary-color); min-height: 24px; font-size: 1.05rem;"></p>
+        </div>
+    </div>
+
+    <div class="cat-footer">
+        <h3>🐾 Teacher Cat 的快樂AI教室</h3>
+        <div class="social-grid">
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-link"><i class="fa-brands fa-youtube" style="color: #FF0000;"></i> YouTube</a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-link"><i class="fa-brands fa-instagram" style="color: #E1306C;"></i> Instagram</a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-link"><i class="fa-brands fa-facebook" style="color: #1877F2;"></i> Facebook</a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-link"><i class="fa-brands fa-threads" style="color: #000000;"></i> Threads</a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-link"><i class="fa-solid fa-book-open" style="color: #FF2442;"></i> 小紅書</a>
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-link"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp</a>
+            <a href="https://www.tiktok.com" target="_blank" class="social-link" title="抖音ID: 74254902683"><i class="fa-brands fa-tiktok" style="color: #000000;"></i> 抖音</a>
+        </div>
+    </div>
+
+    <script>
+        const levelWritingHints = {
+            1: "別忘了「四素句」要有時間、人物、地點和事情！六種行為句要配對正確的「看、聽、說、想、感、動」喔！",
+            2: "「擬人法」是把動物或沒有生命的東西，當作人類一樣，讓牠們學會哭泣、歡笑與講話！",
+            3: "「明喻句」一定要包含「好像」、「彷彿」或「猶如」等比喻詞。本體和喻體要形狀或顏色相似！",
+            4: "童詩要分行寫。「暗喻句」常使用「是」、「成了」；「排比句」需要三個或以上結構相似的短句！",
+            5: "注意字詞格式！「AABB」是高高興興，「ABB」是黃澄澄，「ABAC」是不慌不忙。選出最通順的詞彙！",
+            6: "利用「五感」描寫事物：看見色彩（視）、聽見聲音（聽）、聞到香氣（嗅）、嚐到酸甜（味）和摸到冷暖（觸）！",
+            7: "好開頭是文章的大門！試著用說話、奇妙的聲音（擬聲詞）或交代原因的方法直接吸引讀者！",
+            8: "場面描寫要做到「人山人海」！先寫環境佈置，再用「有的……有的……有的……」排比句描寫群體動態！",
+            9: "環境描寫要動靜結合！先寫天空、海風、波光粼粼的自然景物，再寫人在其中的愉快活動！",
+            10: "格式極重要！寫給長輩（如老師、舅父）必須用敬稱「您」，下款稱呼要對應，且務必寫清時間和地點！",
+            11: "日記第一行必須是「日期、星期和天氣」！日記要挑選一天中最特別的一件事，拒絕平淡的流水帳！"
+        };
+
+        const gameLevels = {"1": {"title": "寫作基本要素", "icon": "🧙‍♂️", "introTitle": "第一關：四素句與六大分身", "teaching": "寫作一定要交代清楚「時間、人物、地點、事情」（四素句），並配合「看、聽、說、想、感覺、動作」這六大分身（行為句），句子就會變得超級神奇！", "example": "💡 例：<b>今天早上（時間）</b>，<b>我們（人物）</b>在<b>操場上（地點）</b><b>愉快地跳繩（事情 + 感覺）</b>。", "easy": [{"q": "「中午，我和媽媽在餐廳吃牛肉麵。」這句話缺少了甚麼要素？", "a": ["時間", "地點", "事情", "沒有缺少"], "ans": 3}, {"q": "「在沙灘上開心地堆沙堡。」這句話缺少了甚麼要素？", "a": ["人物和時間", "事情和地點", "只有時間", "沒有缺少"], "ans": 0}, {"q": "「看見樹上有一隻美麗的小鳥。」這是六大分身中的哪一種句子？", "a": ["人聽句", "人看句", "人動句", "人想句"], "ans": 1}, {"q": "「媽媽對我說：『你要乖乖聽話！』」這是甚麼句子？", "a": ["人感句", "人動句", "人說句", "人想句"], "ans": 2}, {"q": "「我聽到樹林裏傳來悅耳的鳥鳴聲。」這是甚麼句子？", "a": ["人看句", "人聽句", "人說句", "人感句"], "ans": 1}, {"q": "「昨天，姐姐開心地笑了。」這句話缺少了哪個四素？", "a": ["地點", "時間", "人物", "事情"], "ans": 0}, {"q": "「小明急急忙忙地跑進課室。」這屬於哪種描寫？", "a": ["人動句", "人想句", "人聽句", "人看句"], "ans": 0}, {"q": "「我想：明天一定會是個大晴天。」這是甚麼句子？", "a": ["人想句", "人感句", "人說句", "人聽句"], "ans": 0}, {"q": "「今天，妹妹在房間裏唱歌。」這句話的人物是誰？", "a": ["今天", "妹妹", "房間", "唱歌"], "ans": 1}, {"q": "「我的肚子吃得飽飽的，感到十分滿足。」這是什麼句子？", "a": ["人聽句", "人感句", "人想句", "人看句"], "ans": 1}, {"q": "「放學後，我們在小食部買零食。」這句話缺少了甚麼？", "a": ["時間", "人物", "地點", "事情"], "ans": 3}, {"q": "「看見樹葉一片片掉下來。」這句少了什麼元素？", "a": ["人物", "時間", "事情", "地點"], "ans": 0}, {"q": "「我聽見風鈴發出清脆的聲音。」這是哪種行為句？", "a": ["人聽句", "人看句", "人動句", "人感句"], "ans": 0}, {"q": "「小狗向我搖尾巴。」這屬於哪種描寫？", "a": ["人看句", "人動句", "人聽句", "人想句"], "ans": 1}, {"q": "「星期天早上，小明在圖書館。」這句話少了什麼？", "a": ["時間", "人物", "地點", "事情"], "ans": 3}, {"q": "「一陣涼風吹來，我打了一個冷顫。」這屬於什麼行為句？", "a": ["人感句", "人說句", "人想句", "人聽句"], "ans": 0}, {"q": "「弟弟對爸爸大喊：『我贏了！』」這是什麼行為句？", "a": ["人說句", "人聽句", "人看句", "人感句"], "ans": 0}, {"q": "「我心想：如果我能飛就好了。」這屬於什麼句子？", "a": ["人想句", "人感句", "人說句", "人動句"], "ans": 0}, {"q": "「在遊樂場裏玩耍。」這句話缺少了：", "a": ["人物和時間", "地點和事情", "只有事情", "沒有缺少"], "ans": 0}, {"q": "「我看見夜空中有閃亮的流星。」這是什麼行為句？", "a": ["人看句", "人聽句", "人動句", "人想句"], "ans": 0}], "hard": [{"q": "哪一個句子同時包含了「四素句」和「人感句」？", "a": ["昨天，小明去公園玩。", "今天下午，我在圖書館看書，覺得無比充實。", "妹妹在房間唱歌。", "老師今天對我笑。"], "ans": 1}, {"q": "「放學後，安靜的圖書館傳來咚咚的鼓聲，我好奇地走過去看。」這句話結合了甚麼？", "a": ["人聽句 + 人動句", "人聽句 + 人說句", "人想句 + 人感句", "人說句 + 人動句"], "ans": 0}, {"q": "「小明在學校。」要怎樣修改才能成為生動的四素句？", "a": ["小明在學校看書。", "小明今天在學校。", "星期一早上，小明在課室裏專心地聽課。", "小明在課室。"], "ans": 2}, {"q": "以下哪句話「沒有」包含任何時間要素？", "a": ["清晨，小鳥在枝頭歌唱。", "我們在海邊撿貝殼。", "上學時，天空下起了大雨。", "除夕夜，一家人開心地吃團年飯。"], "ans": 1}, {"q": "請找出包含「四素、人看、人感」最完整的句子：", "a": ["今天，我看見花兒開了，心情非常愉快。", "今天早上，我在花園看見紅紅的玫瑰，心裏甜滋滋的。", "我看見玫瑰開了。", "妹妹在花園看花，覺得很高興。"], "ans": 1}, {"q": "「小紅一邊流淚，一邊對媽媽道歉。」這是甚麼行為句組合？", "a": ["人動句 + 人說句", "人感句 + 人說句", "人看句 + 人聽句", "人想句 + 人說句"], "ans": 1}, {"q": "「站在高山頂上，看著腳底下的雲海，我驚嘆不已。」這裡包含了：", "a": ["地點、人看、人感", "時間、地點、人動", "人物、人說、人聽", "時間、人看、人想"], "ans": 0}, {"q": "「夜深了，我躺在床上，心想：明天會不會下雨呢？」這句話的地點是：", "a": ["夜深了", "床上", "明天", "下雨"], "ans": 1}, {"q": "「今天早上，小明在操場跑步，他跑得汗流浹背。」這句話屬於：", "a": ["四素句 + 人動句", "四素句 + 人感句", "四素句 + 人想句", "四素句 + 人聽句"], "ans": 0}, {"q": "「我聽見風在呼呼地吹，心裡感到一絲涼意。」這句話結合了：", "a": ["人聽句 + 人感句", "人聽句 + 人說句", "人動句 + 人想句", "人看句 + 人感句"], "ans": 0}, {"q": "「上課鐘聲響了，同學們立刻安靜下來，專心聽老師講解。」這句話包含了：", "a": ["人聽句 + 人動句", "人看句 + 人感句", "人說句 + 人想句", "人聽句 + 人想句"], "ans": 0}, {"q": "以下哪句「四素句」的「事情」描寫得最生動豐富？", "a": ["昨天下午，我們在禮堂看表演。", "昨天下午，我們在禮堂津津有味地欣賞精彩的魔術表演。", "我們昨天看表演。", "在禮堂裡看魔術。"], "ans": 1}, {"q": "「我看著黑板，心想：這題數學題真難，要是能快點放學就好了。」這裡包含：", "a": ["人看句 + 人想句", "人看句 + 人動句", "人聽句 + 人感句", "人說句 + 人想句"], "ans": 0}, {"q": "「今天早上，美美一邊吃著熱騰騰的早餐，一邊高興地哼著歌。」這句話是：", "a": ["四素句 + 人動句 + 人聽句", "四素句 + 人說句 + 人想句", "四素句 + 人感句 + 人說句", "四素句 + 人看句 + 人聽句"], "ans": 0}, {"q": "請找出沒有缺少任何「四素」要素的句子：", "a": ["在草地上愉快地野餐。", "星期天，我們在草地上野餐。", "我們在草地上。", "星期天，我們野餐。"], "ans": 1}, {"q": "「放學時，下雨了，小明沒帶傘，心急如焚地站在校門口。」這句話有：", "a": ["時間、人物、地點、人感句", "時間、人物、人說句", "人物、地點、人想句", "地點、事情、人聽句"], "ans": 0}, {"q": "「我聽見遠處傳來雷聲，心裏一驚，連忙跑回家。」這句話結合了哪些行為分身？", "a": ["人聽 + 人感 + 人動", "人聽 + 人看 + 人說", "人看 + 人想 + 人感", "人說 + 人動 + 人感"], "ans": 0}, {"q": "弟弟看見小蜘蛛，嚇得大哭起來，大聲喊媽媽。」這句話是：", "a": ["人看句 + 人感句 + 人說句", "人聽句 + 人動句 + 人想句", "人看句 + 人動句 + 人想句", "人聽句 + 人感句 + 人說句"], "ans": 0}, {"q": "以下哪句話「不屬於」六種行為句（看聽說想感動）的組合？", "a": ["小狗在門口等主人。", "我看著遠處的小狗，聽見牠汪汪叫。", "我摸摸小狗，心裏覺得很溫暖。", "我對小狗說：『你好乖！』"], "ans": 0}, {"q": "「清晨，微風吹過花園，我聞到淡淡的花香，心情感到十分舒暢。」這句話有：", "a": ["四素 + 人感句", "四素 + 人說句", "四素 + 人聽句", "四素 + 人想句"], "ans": 0}]}, "2": {"title": "寫童話用擬人", "icon": "🐻", "introTitle": "第二關：神奇的擬人魔法", "teaching": "讓小動物和沒生命的東西像人類一樣會說話、會哭、會笑。擬人法能讓你的童話故事瞬間活起來！", "example": "💡 例：溫暖的春風吹過，<b>花兒在風中點點頭</b>，向我們<b>甜甜地微笑</b>。", "easy": [{"q": "哪一個是使用了「擬人法」的句子？", "a": ["小貓在地上玩毛線球。", "小狗一邊跳，一邊高興地唱起歌來。", "蝴蝶飛來飛去。", "蘋果紅紅的，很好吃。"], "ans": 1}, {"q": "「太陽公公露出了燦爛的笑容。」這句話把甚麼擬人化了？", "a": ["笑容", "燦爛", "太陽", "公公"], "ans": 2}, {"q": "「小溪唱著歡快的歌兒奔向大海。」這句話把小溪當作人一樣會：", "a": ["跑步", "唱歌", "游泳", "大喊"], "ans": 1}, {"q": "「玫瑰花害羞地垂下了頭。」這裡形容玫瑰花像人一樣會：", "a": ["害羞", "跑步", "唱歌", "跳舞"], "ans": 0}, {"q": "「天空中，星星頑皮地眨著眼睛。」這句話把星星：", "a": ["擬人化了", "比喻化了", "誇張化了", "擬物化了"], "ans": 0}, {"q": "「書包靜靜地躺在書桌上。」這句話是擬人句嗎？", "a": ["是，因為書包會躺著", "不是，這只是普通的靜態描寫", "是比喻句", "是排比句"], "ans": 1}, {"q": "讓桌椅會「哭訴」是運用了甚麼寫作技巧？", "a": ["擬人法", "比喻法", "排比法", "五感法"], "ans": 0}, {"q": "「小青蛙穿著綠色大衣。」這句話是擬人句嗎？", "a": ["是", "不是", "不確定", "是明喻句"], "ans": 0}, {"q": "「黑板板著臉，一言不發。」這句話中的黑板像人類一樣擁有：", "a": ["表情和言語", "四肢和衣服", "食物", "魔法"], "ans": 0}, {"q": "「小雨點在荷葉上盡情地跳躍、玩耍。」這句話把什麼擬人化了？", "a": ["荷葉", "小雨點", "跳躍", "玩耍"], "ans": 1}, {"q": "「大樹張開綠色的雙臂，迎接著小鳥。」這句話中被擬人化的是：", "a": ["綠色", "小鳥", "大樹", "雙臂"], "ans": 2}, {"q": "「風在耳邊輕輕地說著悄悄話。」這句話把什麼擬人化了？", "a": ["耳邊", "悄悄話", "風", "輕輕"], "ans": 2}, {"q": "以下哪句話「不是」擬人句？", "a": ["白雲在天空中睡懶覺。", "白雲像棉花糖一樣甜。", "白雲在跟風兒捉迷藏。", "白雲露出了笑臉。"], "ans": 1}, {"q": "「花兒在微風中跳起了優雅的華爾茲。」這裡花兒像人類一樣會：", "a": ["唱歌", "跳舞", "畫畫", "寫字"], "ans": 1}, {"q": "「鬧鐘每天早上都大聲地叫我起床。」這裡鬧鐘像人類一樣：", "a": ["會說話/大叫", "會睡覺", "會跑步", "會吃早餐"], "ans": 0}, {"q": "「小草在春雨的滋潤下，探出了小腦袋。」這裡的小草：", "a": ["被擬人化了", "被比喻了", "被誇張了", "被省略了"], "ans": 0}, {"q": "「鋼琴發出美妙的聲音。」這句如何改成擬人句？", "a": ["鋼琴在快樂地歌唱。", "鋼琴像個大盒子。", "鋼琴聲音很好聽。", "鋼琴被擦得亮晶晶。"], "ans": 0}, {"q": "「柳樹姑娘在河邊梳洗長長的秀髮。」這句話把什麼擬人化了？", "a": ["柳樹", "河邊", "秀髮", "姑娘"], "ans": 0}, {"q": "「小鳥在枝頭唱著動聽的歌。」這句話是擬人句嗎？", "a": ["是", "不是", "不確定", "是比喻句"], "ans": 0}, {"q": "「秋天到了，楓葉高興地換上了紅色的新裝。」這句話中楓葉像人一樣：", "a": ["會穿衣服", "會唱歌", "會跑步", "會流淚"], "ans": 0}], "hard": [{"q": "哪一個句子把「沒有生命」的物件擬人化得最自然、生動？", "a": ["鉛筆在紙上唱歌，寫出美麗的文字。", "鉛筆是一根木頭，可以寫字。", "我用鉛筆寫字，鉛筆動了。", "鉛筆長得像一根小棒子。"], "ans": 0}, {"q": "「離群的小雞驚慌失措，急得直跺腳，淚水在眼眶裏打轉。」這句話運用了甚麼擬人描寫？", "a": ["語言描寫", "神態與動作描寫", "只有聲音描寫", "背景描寫"], "ans": 1}, {"q": "「粉筆在黑板上辛勤地耕耘，默默地犧牲自己。」這句話的擬人表達了甚麼情感？", "a": ["粉筆很累", "粉筆很頑皮", "讚美粉筆默默奉獻的精神", "粉筆不喜歡黑板"], "ans": 2}, {"q": "在寫童話《離群的小雞》時，以下哪組詞語最能體現「母雞媽媽」的擬人特徵？", "a": ["氣勢洶洶、溫柔地叮囑、展開雙臂保護", "飛快地奔跑、默默不語、冷酷無情", "張牙舞爪、跳來跳去、呼呼大睡", "五顏六色、香氣撲鼻、亮晶晶"], "ans": 0}, {"q": "「夜深了，街燈亮了。」這句話如何用擬人法修改，最能表達「孤單」的感覺？", "a": ["夜深了，街燈工工整整地站著。", "夜深了，街燈孤零零地站在街頭，嘆息著眨著昏暗的眼。", "夜深了，街燈溫暖地照亮馬路。", "街燈晚上會亮，方便行人。"], "ans": 1}, {"q": "「小草從土裏鑽了出來。」這句話：", "a": ["是普通描寫，因為「鑽」只是植物生長", "是擬人句，因為「鑽」賦予了小草主動探索的生命力", "是明喻句", "是暗喻句"], "ans": 1}, {"q": "要把「雷聲很響，閃電很亮」寫成生動的擬人句，以下哪項最好？", "a": ["雷公公在天上憤怒地擂鼓，電母娘娘也揮舞著閃亮的寶鏡。", "雷聲和閃電一起在天空中出現。", "雷聲像火車經過，閃電像照相機閃光。", "雷聲和閃電非常可怕。"], "ans": 0}, {"q": "「落葉隨風飄落。」如何修改能表達「戀戀不捨」的擬人感？", "a": ["落葉跳著優雅的舞步，依依不捨地告別樹枝媽媽。", "落葉被風吹得滿地都是。", "落葉像一隻黃色的蝴蝶飄下來。", "秋天到了，樹葉都掉光了。"], "ans": 0}, {"q": "「石榴裂開了。」改成擬人句，最生動的是：", "a": ["石榴成熟了，高興地咧開嘴笑了。", "石榴像燈籠一樣裂開了。", "石榴皮破了，露出了籽。", "石榴笑得很開心。"], "ans": 0}, {"q": "「月亮升起來了。」改成擬人句，最美的是：", "a": ["月亮姐姐悄悄地探出頭，向大地灑下溫柔的光。", "月亮亮得像一個銀盤升起來了。", "月亮出來了，天黑了。", "月亮在天空中升得很高。"], "ans": 0}, {"q": "「小溪在山間奔跑。」如何修改最能展現其「活潑」的童話擬人色彩？", "a": ["小溪在山谷裏資源豐富地流動。", "小溪像一條帶子流過山間。", "小溪一邊唱著歡快的歌兒，一邊調皮地拍打著岸邊的小石子，歡快地奔向遠方。", "小溪流得很急。"], "ans": 2}, {"q": "寫童話《粉筆的哭訴》時，以下哪句最能體現「粉筆」的擬人心理活動？", "a": ["粉筆是一根白色的石膏棒。", "粉筆看著自己一天天變矮，傷心地流下了眼淚，心想：主人甚麼時候才能溫柔地對待我呢？", "粉筆斷了，不能再寫字了。", "黑板上寫滿了粉筆字。"], "ans": 1}, {"q": "「春風吹拂著桃花。」要改成符合「害羞」性格的擬人句：", "a": ["春風吹拂，桃花紅了。", "在春風的輕撫下，桃花姑娘羞紅了臉，悄悄地低下了頭。", "桃花像一團火一樣盛開了。", "春風跟桃花在玩耍。"], "ans": 1}, {"q": "「文具盒裏的文具吵架了。」哪一項最能體現「橡皮擦」的特徵和性格？", "a": ["橡皮擦大聲說：『小主人每次寫錯字，都是我挺身而出，默默奉獻自己的身體來擦乾淨！』", "橡皮擦是一個小方塊。", "橡皮擦很不高興，躺在角落。", "橡皮擦說：『我很重要。』"], "ans": 0}, {"q": "以下哪句話「不屬於」擬人法，而是屬於普通的動物行為描寫？", "a": ["小鳥在樹上快樂地交談。", "獅子在森林裏高傲地宣佈：『我是國王！』", "飢餓的狼張大嘴巴，一口吞下了小羊。", "小羊懇求狼說：『請放過我吧！』"], "ans": 2}, {"q": "「秋風吹過，楓林變得一片通紅。」這句改成擬人，最有「盛裝打扮」感覺的是：", "a": ["秋風吹過，楓葉都變紅了。", "秋風一吹，楓葉像火一樣燃燒。", "秋風一吹，楓葉姐姐高興地塗上了鮮艷的胭脂，換上了最美麗的紅裙子。", "秋天的楓林非常美麗。"], "ans": 2}, {"q": "「小雨點落在大街上。」改成「頑皮」的擬人句：", "a": ["小雨點像斷了線的珍珠落下來。", "小雨點啪嗒啪嗒地掉在馬路上。", "頑皮的小雨點把馬路當作了蹦蹦床，在上面歡快地蹦蹦跳跳。", "雨下得很大。"], "ans": 2}, {"q": "「玩具熊靜靜地坐在床頭。」這句話：", "a": ["是擬人句，因為玩具熊會「坐」", "是普通描寫，因為玩具熊是靜態擺放，沒有賦予人類特有的生命行為", "is 比喻句", "is 誇張句"], "ans": 1}, {"q": "在《紙張與鉛筆的對話》中，紙張的哪句擬人台詞最得體流暢？", "a": ["鉛筆，你天天在我身上畫畫，我好痛啊！", "鉛筆，你別在我身上寫字了。", "鉛筆，你那尖銳的筆尖每次劃過我的身體，我都感到無比刺痛，但我仍然願意為你承載美麗的文字。", "我是白色的紙張。"], "ans": 2}, {"q": "「大海在咆哮。」這句話：", "a": ["是比喻句", "是擬人句，將大海波濤洶湧的聲音比作人類發怒咆哮", "是普通描寫", "是排比句"], "ans": 1}]}, "3": {"title": "巧用擬人與明喻", "icon": "🍌", "introTitle": "第三關：香蕉好像金色小橋", "teaching": "明喻句就是打比方！公式：本體 + 比喻詞（好像、彷彿、猶如） + 喻體。本體和喻體必須有相似特徵。", "example": "💡 例：<b>彎彎的香蕉（本體）</b><b>好像（比喻詞）</b><b>一道金色的小橋（喻體）</b>。", "easy": [{"q": "哪一個是「明喻句」的特徵？", "a": ["有「好像」、「彷彿」、「如」等詞語", "把東西當作人來寫", "有「是」、「成了」等詞語", "句子有三個相同結構"], "ans": 0}, {"q": "「妹妹的臉蛋紅通通的，好像一個大蘋果。」這句話的「喻體」是甚麼？", "a": ["妹妹", "臉蛋", "好像", "大蘋果"], "ans": 3}, {"q": "「小青蛙的眼睛圓圓的，好像兩顆玻璃珠。」這句話的「本體」是甚麼？", "a": ["小青蛙", "眼睛", "好像", "玻璃珠"], "ans": 1}, {"q": "「天上的星星像眼睛一樣眨呀眨。」這句話：", "a": ["只是擬人句", "只是明喻句", "同時用了明喻法和擬人法", "都不是"], "ans": 2}, {"q": "「小明長得很像他的爸爸。」這句話是明喻句嗎？", "a": ["是，因為有「像」字", "不是，這只是普通的人與人比較，並非打比方", "是擬人句", "是暗喻句"], "ans": 1}, {"q": "「彎彎的月亮好像什麼？」選出最合適的喻體：", "a": ["一隻金色的小船", "一個圓圓的大玉盤", "一朵白雲", "一個大紅蘋果"], "ans": 0}, {"q": "「紅紅的楓葉好像一團團燃燒的火焰。」這裡把楓葉比作：", "a": ["紅顏色", "小船", "火焰", "手掌"], "ans": 2}, {"q": "「大熊貓胖乎乎的，好像一個大皮球。」這句的比喻詞是：", "a": ["胖乎乎", "好像", "大皮球", "大熊貓"], "ans": 1}, {"q": "「茂密的樹葉像一把綠色的大傘。」這句話的喻體是：", "a": ["綠色的大傘", "茂密的樹葉", "像", "一把"], "ans": 0}, {"q": "「清澈的湖水像一面大鏡子。」這裡把湖水比作：", "a": ["大鏡子", "清澈", "天空", "藍色"], "ans": 0}, {"q": "以下哪一個「不是」比喻詞？", "a": ["好像", "彷彿", "非常", "猶如"], "ans": 2}, {"q": "「彩虹像一座七彩的長橋跨在天空中。」這句話的本體是：", "a": ["彩虹", "七彩的長橋", "跨", "天空"], "ans": 0}, {"q": "「白雪飄飄。」這句改成明喻，哪句最合適？", "a": ["白雪像一朵朵柳絮在空中飛舞。", "白雪很白。", "白雪落下來，很冷。", "白雪是一條白被子。"], "ans": 0}, {"q": "「落葉像枯葉蝶一樣飛舞。」這裡把落葉比作：", "a": ["蝴蝶", "大樹", "秋風", "地面"], "ans": 0}, {"q": "「露珠亮晶晶的，好像一顆顆珍珠。」這裡的比喻詞是：", "a": ["珍珠", "好像", "露珠", "亮晶晶"], "ans": 1}, {"q": "「小姑娘的歌聲甜美得像蜜糖一樣。」這裡的喻體是：", "a": ["歌聲", "小姑娘", "蜜糖", "甜美"], "ans": 2}, {"q": "「太陽像一個紅通通的大火球。」這句話的本體是：", "a": ["太陽", "火球", "大火球", "紅通通"], "ans": 0}, {"q": "「他跑得飛快，像一陣風一樣。」這句話是：", "a": ["明喻句", "擬人句", "排比句", "不是比喻"], "ans": 0}, {"q": "「細細的雨絲像一根根銀針。」這裡把雨絲比作：", "a": ["銀針", "雨傘", "細細", "細絲"], "ans": 0}, {"q": "「小草綠油油的，像一張綠色的大地毯。」這句的喻體是：", "a": ["小草", "綠油油", "地毯", "綠色的大地毯"], "ans": 3}], "hard": [{"q": "哪一個句子「同時」使用了擬人法 和 明喻法？", "a": ["美麗的蝴蝶像仙女一樣，拍打著翅膀在花叢中跳舞。", "美麗的蝴蝶像仙女。", "蝴蝶拍打著翅膀，在花叢中跳舞。", "蝴蝶長得很漂亮。"], "ans": 0}, {"q": "「白老鼠圓圓的眼睛像兩顆小黑豆，牠狡猾地在書櫃上探頭探腦。」這句話：", "a": ["只有明喻法", "只有擬人法", "結合了明喻法與擬人法", "沒有使用任何修辭"], "ans": 2}, {"q": "「小蜜蜂個個像個頂尖的歌唱家，一邊飛一邊哼唱著輕快的曲子。」這句話中：", "a": ["本體是「歌唱家」，喻體是「小蜜蜂」", "本體是「小蜜蜂」，喻體是「歌唱家」", "沒有比喻，只有擬人", "沒有擬人，只有比喻"], "ans": 1}, {"q": "以下哪句話是「明喻句」，而不是「暗喻句」？", "a": ["老師是學生的園丁。", "老師像園丁一樣，用心呵護著我們這群小花朵。", "老師成了我們的媽媽。", "老師，您是明燈。"], "ans": 1}, {"q": "「清澈的海水是一面透明的玻璃。」這句話：", "a": ["是明喻句", "是擬人句", "是暗喻句，因為比喻詞是「是」", "不是比喻句"], "ans": 2}, {"q": "「小河和石頭在玩捉迷藏，嘻嘻哈哈地繞了過去。」這句使用了：", "a": ["擬人法", "比喻法", "排比法", "反復法"], "ans": 0}, {"q": "如何將「白雲在天上飄」改成結合明喻與擬人的精彩句子？", "a": ["白雲在天空中飄來飄去，很好看。", "白雲像一隻隻小羊，在藍天草地上快活地奔跑。", "白雲像小羊一樣在天空中飄動。", "天上的白雲很多。"], "ans": 1}, {"q": "「清晨的露珠晶瑩剔透，像一顆顆耀眼的鑽石，在葉尖上調皮地翻跟頭。」這句話運用了：", "a": ["明喻和擬人", "明喻和排比", "暗喻和擬人", "明喻和誇張"], "ans": 0}, {"q": "「松鼠的尾巴好像一把降落傘，能幫牠安全落地。」這句話的喻體是：", "a": ["一把降落傘", "松鼠的尾巴", "好像", "安全落地"], "ans": 0}, {"q": "「海浪像個頑皮的孩子，一次次衝上沙灘，親吻著我的小腳丫。」這句話包含了：", "a": ["明喻和擬人", "明喻和排比", "暗喻和擬人", "明喻和暗喻"], "ans": 0}, {"q": "請找出本體 and 喻體特徵「不相符」的錯誤明喻句：", "a": ["他的心靈像金子一樣純潔。", "天上的烏雲密佈，像一塊黑色的棉花糖一樣輕快飄逸。", "落葉像一隻隻金黃色的蝴蝶，輕輕落到地上。", "彎彎的拱橋像一條長虹橫跨在河面上。"], "ans": 1}, {"q": "「青蛙大聲叫。」改成「明喻加擬人」的最佳寫作方法是：", "a": ["青蛙像歌唱家一樣大聲唱歌。", "青蛙個個像個專業的鼓手，在荷葉舞台上，一邊瞪大圓圓的眼睛，一邊興奮地敲起綠色的大鼓。", "青蛙在大聲地叫，像雷聲一樣。", "青蛙像個鼓手。"], "ans": 1}, {"q": "「這本書像我的好朋友，陪伴我度過孤單的時光。」這句話是：", "a": ["普通比較句", "明喻句，把「書」比作「好朋友」", "擬人句", "排比句"], "ans": 1}, {"q": "「那隻受驚的小白兔跑得像閃電一樣快。」這句話中的「本體」是：", "a": ["小白兔跑步的速度", "小白兔", "閃電", "受驚"], "ans": 0}, {"q": "以下哪句話「沒有」使用比喻修辭？", "a": ["天上的月亮彷彿一個大玉盤。", "這件毛衣摸起來暖洋洋的，像媽媽的懷抱。", "弟弟看著窗外，好像在想著甚麼心事。", "時間如流水，一去不復返。"], "ans": 2}, {"q": "「遠處的霓虹燈亮了，像五顏六色的花朵在夜空中盛開，悄悄地裝飾著城市的夜景。」這句運用了：", "a": ["明喻與擬人", "暗喻與排比", "擬人與誇張", "只有明喻"], "ans": 0}, {"q": "「他的笑聲像清脆的銀鈴。」這句的本體和喻體分別是：", "a": ["笑聲、銀鈴", "笑聲、清脆", "銀鈴、笑聲", "他、銀鈴"], "ans": 0}, {"q": "「小麥在風中彎下了腰。」改成結合明喻與擬人的精彩詩句：", "a": ["小麥彎腰了，像在鞠躬。", "金黃的小麥好像害羞的小姑娘，在微風的吹拂下，紅著臉，彎下腰向路人深深地鞠躬。", "小麥在風中低頭，像一條金色的毯子。", "小麥很像人。"], "ans": 1}, {"q": "「微風吹過，湖面泛起波紋。」改成明喻句：", "a": ["微風吹過，湖面像一塊被揉皺的藍色綢緞。", "微風像手一樣撫摸湖面。", "湖面泛起波紋，很好看。", "湖面成了一面鏡子。"], "ans": 0}, {"q": "「大熊貓黑白相間，真可愛。」改成明喻句：", "a": ["大熊貓黑白相間，像一隻溫柔的玩具熊。", "大熊貓長得像熊。", "大熊貓穿著一件黑白毛衣，好像一個圓滾滾的大雪球。", "大熊貓真可愛。"], "ans": 2}]}, "4": {"title": "巧用修辭寫童詩", "icon": "🎨", "introTitle": "第四關：童詩小作家", "teaching": "童詩要分行寫，充滿想像力！我們可以巧用「明喻、暗喻、排比和反復」。", "example": "💡 例：<b>我要寫，我要寫（反復）</b>，寫出海風的歌聲，寫出海浪的舞蹈，寫出貝殼的秘密（排比）。", "easy": [{"q": "「小河是透明的玻璃。」這屬於甚麼修辭手法？", "a": ["明喻（有像字）", "暗喻（有是/成了/變成了字）", "排比", "反復"], "ans": 1}, {"q": "「我要飛，我要飛，飛到高高藍天去。」這句話運用了甚麼手法？", "a": ["排比", "反復", "擬人", "暗喻"], "ans": 1}, {"q": "「花兒唱著歌，草兒跳著舞，鳥兒彈著琴。」這組句子是：", "a": ["排比 + 擬人", "明喻 + 擬人", "反復 + 擬人", "只有排比"], "ans": 0}, {"q": "「太陽成了害羞的小姑娘。」這句話是：", "a": ["明喻", "暗喻", "排比", "反復"], "ans": 1}, {"q": "「春風來了，春風來了，大地變綠了。」這句話運用了：", "a": ["反復", "排比", "明喻", "暗喻"], "ans": 0}, {"q": "「有的像羽毛，有的像手掌，有的像扇子。」這句話是：", "a": ["排比句", "反復句", "擬人句", "暗喻句"], "ans": 0}, {"q": "「小草是綠色的地毯。」這句話的本體是：", "a": ["小草", "綠色", "地毯", "是"], "ans": 0}, {"q": "「書籍是人類進步的階梯。」這句話是：", "a": ["暗喻句", "明喻句", "擬人句", "排比句"], "ans": 0}, {"q": "「天空中，有的雲像小狗，有的雲像小貓，有的雲像小兔。」這是：", "a": ["排比和明喻", "排比和暗喻", "反復和明喻", "只有排比"], "ans": 0}, {"q": "「再見，我的朋友！再見，我的故鄉！」這句話運用了：", "a": ["反復", "排比", "暗喻", "擬人"], "ans": 0}, {"q": "童詩寫作格式的主要特點是：", "a": ["必須每一行都押韻", "必須分行書寫，字數不限，充滿想像力", "字數要一樣多", "必須有故事情節"], "ans": 1}, {"q": "「桃花紅了，杏花開了，梨花白了。」這句話運用了什麼修辭？", "a": ["排比", "反復", "擬人", "暗喻"], "ans": 0}, {"q": "「落葉變成了飛舞的黃色蝴蝶。」這句話運用了：", "a": ["暗喻句", "明喻句", "擬人句", "排比句"], "ans": 0}, {"q": "「聽，雨聲；聽，雷聲；聽，風聲。」這句話運用了什麼？", "a": ["排比", "反復", "擬人", "暗喻"], "ans": 0}, {"q": "「小貓成了家裏的霸王。」這句話是：", "a": ["暗喻句", "明喻句", "排比句", "反復句"], "ans": 0}, {"q": "「風在吼，馬在叫，黃河在咆哮。」這組句子是：", "a": ["排比", "反復", "明喻", "暗喻"], "ans": 0}, {"q": "「我很高興，我很興奮，我很期待。」這句話運用了：", "a": ["排比", "反復", "擬人", "暗喻"], "ans": 0}, {"q": "「雪花是冬天的信使。」這句話的比喻詞是：", "a": ["是", "雪花", "信使", "冬天"], "ans": 0}, {"q": "「祖國，我愛您！祖國，我愛您！」這句話運用了：", "a": ["反復", "排比", "擬人", "暗喻"], "ans": 0}, {"q": "「小溪是一條銀色的絲帶。」這裡把小溪比作：", "a": ["絲帶", "小河", "銀色", "玻璃"], "ans": 0}], "hard": [{"q": "以下哪一首童詩的片段「同時」包含了暗喻和擬人？", "a": ["黑夜是一張大被子，/它輕輕蓋在大地上，/讓世界安靜地睡去。", "黑夜像被子，/蓋在大地上，/大家睡覺了。", "黑夜來了，/世界安靜了，/大家睡覺了。", "黑夜是一張大被子。"], "ans": 0}, {"q": "「太陽有時是個熱情的小伙子，/有時是個害羞的小姑娘，/有時是個慈祥的老爺爺。」這首詩主要運用了：", "a": ["排比 + 暗喻 + 擬人", "排比 + 明喻 + 擬人", "反復 + 明喻", "只有排比"], "ans": 0}, {"q": "「小河悠悠地流淌著，流過高山，流過原野，流過小村莊。」這句話：", "a": ["是排比句，因為有三個相似結構的「流過...」", "是反復句", "既是排比又是擬人", "只是普通描寫"], "ans": 0}, {"q": "暗喻與明喻的關鍵區別在於：", "a": ["明喻用「像、好像」，暗喻用「是、成了、變成」", "明喻是人，暗喻是物", "明喻結構複雜，暗喻結構簡單", "沒有區別"], "ans": 0}, {"q": "「愛心是一縷陽光，照亮黑暗；愛心是一股泉水，滋潤乾渴；愛心是一座燈塔，指引方向。」這句話：", "a": ["是排比句，同時也是暗喻句", "是明喻句", "是反復句", "只有排比"], "ans": 0}, {"q": "「風是個大畫家，/畫綠了小草，/畫紅了桃花，/畫藍了天空。」這首詩運用了：", "a": ["暗喻、排比和擬人", "明喻、排比 and 擬人", "只有排比", "只有暗喻"], "ans": 0}, {"q": "「下雨了，下雨了，/小花張開嘴巴喝水了。」這裡運用了：", "a": ["反復和擬人", "排比和擬人", "明喻和擬人", "只有反復"], "ans": 0}, {"q": "「春天是一幅彩色的畫，春天是一首動聽的歌，春天是一首溫暖的詩。」這句話：", "a": ["既是排比，又是暗喻", "既是排比，又是明喻", "只有排比", "只有暗喻"], "ans": 0}, {"q": "「月亮是一隻小船，在深藍的夜空裡航行。」這句話把月亮比作小船，屬於：", "a": ["暗喻", "明喻", "擬人", "排比"], "ans": 0}, {"q": "「大樹伸出雙臂，為小鳥搭建溫暖的家。」這句話運用了：", "a": ["擬人", "明喻", "暗喻", "排比"], "ans": 0}, {"q": "以下哪首童詩「排比句」用得最齊整、最符合寫作策略要求？", "a": ["紅紅的蘋果甜，/綠綠的西瓜大，/香香的香蕉彎彎。", "看！/蘋果在枝頭對我笑，/西瓜在地上睡懶覺，/香蕉在果盤裏彎下了腰。", "風兒吹，/吹紅了桃花的笑臉，/吹綠了小草的衣裳，/吹醒了沉睡的大地。", "春天來了，/花兒開了，/小草綠了。"], "ans": 2}, {"q": "「秋風是個神奇的魔術師，/吹一口氣，/树葉變成了漫天飛舞的蝴蝶；/吹一口氣，/稻田成了一片金色的海洋。」這節詩運用了：", "a": ["暗喻 + 擬人 + 反復 + 排比", "只有明喻", "只有排比", "只有反復"], "ans": 0}, {"q": "「小雨點，沙沙沙，/落在花園裏，花兒笑了；/落在池塘裏，魚兒樂了；/落在田野裏，麥苗高了。」這節童詩：", "a": ["運用了排比和擬人，寫出了雨中的生機", "only 排比", "only 擬人", "是明喻句"], "ans": 0}, {"q": "「小河流淌，/流過高山，/流過草原，/流過我的心田。」這節詩：", "a": ["最後一行「流過我的心田」將自然景象與個人心境結合，屬於精彩的暗喻寫作", "只是排比句", "沒有修辭", "是擬人句"], "ans": 0}, {"q": "「雲是天空的眼淚，/風是天空的嘆息，/雷是天空的憤怒。」這首詩的修辭是：", "a": ["排比和暗喻", "排比和明喻", "排比和擬人", "只有反復"], "ans": 0}, {"q": "「我要寫，我要寫下這美麗的春天，/寫下紅紅的花朵，/寫下綠綠的草地，/寫下藍藍的天空。」這節詩包含了：", "a": ["反復和排比", "明喻和擬人", "暗喻和排比", "只有反復"], "ans": 0}, {"q": "「小星星在夜空裏眨眼睛，/牠們是天上的小燈泡，/為迷路的人們指引方向。」這句話結合了：", "a": ["擬人和暗喻", "明喻和擬人", "排比和擬人", "暗喻和排比"], "ans": 0}, {"q": "以下哪句「排比句」在結構和長度上最不和諧、最不齊整？", "a": ["小鳥在唱歌，小河在奔跑，小草在生長。", "小鳥在綠樹枝頭快樂地唱歌，小河奔跑，小草長得很高興。", "小鳥在枝頭快樂地歌唱，小河在山間歡快地奔跑，小草在地下調皮地探頭。", "小鳥唱歌，小河奔跑，小草長大。"], "ans": 1}, {"q": "「露珠是草地上的淚珠。」這句暗喻的本體、比喻詞、喻體是：", "a": ["露珠、是、淚珠", "草地、的、淚珠", "露珠、草地、淚珠", "淚珠、是、露珠"], "ans": 0}, {"q": "「落葉是秋天寄來的信件，/告訴我們冬天的腳步近了。」這節詩：", "a": ["運用了暗喻和擬人", "只有暗喻", "只有擬人", "是明喻"], "ans": 0}]}, "5": {"title": "巧用疊詞與四字詞", "icon": "🧩", "introTitle": "第五關：豐富的疊詞與詞庫", "teaching": "寫作時適當加入疊詞（如：黃澄澄、高高興興）與四字詞（如：人山人海、美不勝收），能讓你的作文讀起來極有節奏感，還能拿高分！", "example": "💡 例：<b>人山人海（四字詞）</b>的菜市場裏，擺滿了<b>黃澄澄（ABB疊詞）</b>的香蕉和<b>白嫩嫩（ABB疊詞）</b>的豆腐。", "easy": [{"q": "以下哪一個是「AABB」格式的疊詞？", "a": ["紅通通", "高高興興", "津津有味", "一五一十"], "ans": 1}, {"q": "以下哪一個是「ABB」格式的疊詞？", "a": ["急急忙忙", "黃澄澄", "不慌不忙", "不知所措"], "ans": 1}, {"q": "「市場裡的水果琳瑯滿目。」「琳瑯滿目」的意思是：", "a": ["人非常多", "食物很好吃", "精美珍貴的東西非常多，形容商品多樣", "天氣非常好"], "ans": 2}, {"q": "「外婆忙得______。」橫線上填入哪一個疊詞最合適？", "a": ["紅通通", "不可開交", "自告奮勇", "白嫩嫩"], "ans": 1}, {"q": "「香蕉金黃金黃的。」「金黃金黃」屬於甚麼格式的疊詞？", "a": ["ABAB", "AABB", "ABB", "AABC"], "ans": 0}, {"q": "「小紅聽了讚美，心裏______的。」最適合填甚麼？", "a": ["黑沉沉", "美滋滋", "綠油油", "冷冰冰"], "ans": 1}, {"q": "以下哪一個是「ABAC」格式的四字詞語？", "a": ["大大小小", "不慌不忙", "津津有味", "落落大方"], "ans": 1}, {"q": "「天色漸漸暗了，四周變得______。」合適的ABB詞語是：", "a": ["白茫茫", "黑漆漆", "紅豔豔", "金燦燦"], "ans": 1}, {"q": "「人山人海」常用來形容甚麼？", "a": ["商品很多", "人非常多，地方擁擠", "風景非常美麗", "肚子非常餓"], "ans": 1}, {"q": "「弟弟的臉蛋______的，像個大蘋果。」最適合填什麼？", "a": ["紅通通", "綠油油", "黃澄澄", "黑漆漆"], "ans": 0}, {"q": "以下哪一個「不是」疊詞？", "a": ["白雪雪", "高高興興", "自告奮勇", "熱騰騰"], "ans": 2}, {"q": "「操場上頓時變得______。」適合填入哪個ABB疊詞？", "a": ["靜悄悄", "綠油油", "金燦燦", "香噴噴"], "ans": 0}, {"q": "以下哪個是「AABC」格式的詞語？", "a": ["津津有味", "落落大方", "不慌不忙", "急急忙忙"], "ans": 0}, {"q": "「這棵大樹長得______的。」最適合填入：", "a": ["高聳聳", "綠油油", "高大高大", "粗壯粗壯"], "ans": 1}, {"q": "「西瓜______的，水分非常充足。」適合填入：", "a": ["圓滾滾", "紅通通", "黃澄澄", "白嫩嫩"], "ans": 0}, {"q": "「他不聽勸告，結果落得______的下場。」合適的ABB詞語是：", "a": ["慘兮兮", "美滋滋", "樂呵呵", "喜洋洋"], "ans": 0}, {"q": "「秋天的稻田一片______。」合適的ABB是：", "a": ["金燦燦", "紅艷艷", "白茫茫", "黑乎乎"], "ans": 0}, {"q": "以下哪一個是「AABB」格式的疊詞？", "a": ["整整齊齊", "大大小小", "兩者都是", "兩者都不是"], "ans": 2}, {"q": "「天空中飄著______的雪花。」適合填入：", "a": ["白茫茫", "紅艷艷", "金燦燦", "綠油油"], "ans": 0}, {"q": "「雪地裡留下了______的腳印。」適合填入：", "a": ["深一腳淺一腳", "大大小小", "高高低低", "整整齊齊"], "ans": 1}], "hard": [{"q": "請選出四字詞和疊詞運用最得當、最流暢的句子：", "a": ["在人山人海的市場裏，我自告奮勇地幫媽媽拿著沉甸甸的菜籃子。", "在人山人海的市場裏，我紅通通地幫媽媽拿著白嫩嫩的菜籃子。", "我不可開交地幫媽媽拿菜籃子。", "市場琳瑯滿目，我很自告奮勇。"], "ans": 0}, {"q": "「放學了，天空突然下起暴雨。我沒帶傘，急得______。」橫線上填甚麼最能表現慌張？", "a": ["不知所措", "不慌不忙", "美不勝收", "琳瑯滿目"], "ans": 0}, {"q": "「媽媽生病了，我______地說：『媽媽，今天讓我來做家務吧！』」最合適的成語是：", "a": ["自告奮勇", "琳瑯滿目", "不可開交", "落荒而逃"], "ans": 0}, {"q": "「做事不能______，要專心致志。」最適合填什麼四字詞？", "a": ["三心二意", "一心一意", "自告奮勇", "琳瑯滿目"], "ans": 0}, {"q": "「這個風景區的美景真是美不勝收。」「美不勝收」的意思是：", "a": ["風景不漂亮", "美麗的風景太多，看不過來", "風景很快就消失了", "風景很普通"], "ans": 1}, {"q": "「妹妹一邊哭，一邊把事情的經過一五一十地告訴了媽媽。」「一五一十」是指：", "a": ["一邊數數", "數到十五", "完整、沒有遺漏地敘述", "隨便亂說"], "ans": 2}, {"q": "「他做錯了事，面對老師的詢問，顯得十分慌張，說起話來吞吞吐吐。」「吞吞吐吐」是形容：", "a": ["非常大聲", "說話不流利、想說又不敢說的樣子", "一邊吃東西一邊說話", "非常快速"], "ans": 1}, {"q": "「他寫起作業來______，很快就完成了。」最適合填什麼？", "a": ["一氣呵成", "吞吞吐吐", "不知所措", "熙熙攘攘"], "ans": 0}, {"q": "「那隻小貓長著一雙______的大眼睛。」最適合填什麼ABB疊詞？", "a": ["水汪汪", "黃澄澄", "黑乎乎", "白生生"], "ans": 0}, {"q": "「他今天精神飽滿，走起路來______。」最適合填什麼四字詞？", "a": ["精神抖擻", "筋疲力盡", "三心二意", "不知所措"], "ans": 0}, {"q": "「一走進玩具店，櫃檯上擺滿了______的商品，看得我______。」填入最適當的詞語：", "a": ["琳瑯滿目、眼花繚亂", "人山人海、不知所措", "美不勝收、得意洋洋", "整整齊齊、吞吞吐吐"], "ans": 0}, {"q": "「在準備考試的過程中，小明每天都______地複習，真是______。」最合適的詞語組合是：", "a": ["廢寢忘食、孜孜不倦", "三心二意、一氣呵成", "不慌不忙、不知所措", "大大小小、高高興興"], "ans": 0}, {"q": "「媽媽在廚房忙得______，我決定______地幫她洗碗。」最合適的詞語組合是：", "a": ["不可開交、自告奮勇", "紅通通、大大小小", "不慌不忙、吞吞吐吐", "三心二意、興致勃勃"], "ans": 0}, {"q": "「聽到要組隊參加比賽，班長立刻______地報名，大家也______地響應。」最合適填入：", "a": ["自告奮勇、興高采烈", "不知所措、人山人海", "三心二意、不慌不忙", "落荒而逃、吞吞吐吐"], "ans": 0}, {"q": "「這家新開的餐館天天______，門口大排長龍。」適合填入：", "a": ["人山人海", "琳瑯滿目", "美不勝收", "無拘無束"], "ans": 0}, {"q": "「他平時不努力，考試前才臨抱佛腳，結果急得______。」適合填入：", "a": ["手足無措", "慢條斯理", "悠然自得", "一氣呵成"], "ans": 0}, {"q": "「舞台上，演員們跳著______的舞蹈，觀眾看得______。」適合填入：", "a": ["美不勝收、如癡如醉", "整整齊齊、大聲喧嘩", "高高低低、不知所措", "花花綠綠、吞吞吐吐"], "ans": 0}, {"q": "「外婆端出一盤______、______的包子，香氣瞬間飄滿了屋子。」適合填入：", "a": ["熱騰騰、白嫩嫩", "紅艷艷、綠油油", "金燦燦、黑漆漆", "冷冰冰、硬邦邦"], "ans": 0}, {"q": "「爸爸工作非常辛苦，每天都______地工作，回到家已經______了。」適合填入：", "a": ["辛辛苦苦、筋疲力盡", "高高興興、生龍活虎", "不慌不忙、自告奮勇", "吞吞吐吐、不知所措"], "ans": 0}, {"q": "「一氣呵成」是指：", "a": ["寫作過程很累", "文章結構混亂", "形容文章結構緊湊，文氣連貫，寫作過程流暢不間斷", "寫得非常快"], "ans": 2}]}, "6": {"title": "寫物靠五感", "icon": "👁️", "introTitle": "第六關：五感超能偵探", "teaching": "描寫事物或食物時，要當個五感偵探！動用「視覺（看）、聽覺（聽）、嗅覺（聞）、味覺（嚐）、觸覺（摸）」，文章就會超級豐富！", "example": "💡 例：我摸到<b>軟綿綿（觸覺）</b>的麵團，聞到<b>香噴噴（嗅覺）</b>的芝麻，咬一口<b>甜滋滋（味覺）</b>的湯圓，聽見水開時<b>咕嘟咕嘟（聽覺）</b>的聲音。", "easy": [{"q": "以下哪一個詞語屬於「視覺」描寫？", "a": ["香噴噴", "圓滾滾", "酸溜溜", "軟綿綿"], "ans": 1}, {"q": "「剛出爐的麵包香氣撲鼻。」這是運用了甚麼感官？", "a": ["視覺", "嗅覺", "味覺", "觸覺"], "ans": 1}, {"q": "「沙灘上的沙子踩上去軟綿綿、熱乎乎的。」這是運用了：", "a": ["聽覺", "嗅覺", "味覺", "觸覺"], "ans": 3}, {"q": "「叮咚叮咚！門鈴響了。」這是運用了甚麼感官？", "a": ["聽覺", "視覺", "味覺", "嗅覺"], "ans": 0}, {"q": "「青蘋果酸酸甜甜的，非常消暑解渴。」這是運用了：", "a": ["味覺", "聽覺", "觸覺", "嗅覺"], "ans": 0}, {"q": "「芝麻餡甜絲絲的，真好吃！」這句話形容的是：", "a": ["觸覺", "味覺", "聽覺", "視覺"], "ans": 1}, {"q": "「咕嘟咕嘟」是形容湯圓在水裏滾動的甚麼感覺？", "a": ["視覺", "聽覺", "觸覺", "味覺"], "ans": 1}, {"q": "「茉莉花散發出淡淡的清香。」這是：", "a": ["嗅覺", "視覺", "味覺", "聽覺"], "ans": 0}, {"q": "「冰塊摸起來冷冰冰、硬邦邦的。」這是：", "a": ["觸覺", "味覺", "嗅覺", "視覺"], "ans": 0}, {"q": "「風鈴在微風中發出『叮鈴叮鈴』的響聲。」這是：", "a": ["聽覺", "視覺", "味覺", "觸覺"], "ans": 0}, {"q": "「紅彤彤的蘋果真好看。」這是哪種感官描寫？", "a": ["視覺", "觸覺", "聽覺", "味覺"], "ans": 0}, {"q": "「海浪嘩啦嘩啦地拍打沙灘。」這是運用了：", "a": ["聽覺", "嗅覺", "觸覺", "視覺"], "ans": 0}, {"q": "「媽媽擦的香水聞起來香氣濃郁。」這是：", "a": ["嗅覺", "味覺", "觸覺", "視覺"], "ans": 0}, {"q": "「桃子吃起來又甜又多汁。」這是：", "a": ["味覺", "視覺", "聽覺", "嗅覺"], "ans": 0}, {"q": "「貓咪的毛摸起來滑溜溜的。」這是：", "a": ["觸覺", "視覺", "味覺", "聽覺"], "ans": 0}, {"q": "「爆竹發出『啪啪啪』的巨響。」這是：", "a": ["聽覺", "嗅覺", "味覺", "視覺"], "ans": 0}, {"q": "「檸檬酸溜溜的，讓我直流口水。」這包含了：", "a": ["味覺", "觸覺", "聽覺", "視覺"], "ans": 0}, {"q": "「彩燈閃閃發光，五顏六色的。」這是：", "a": ["視覺", "聽覺", "嗅覺", "觸覺"], "ans": 0}, {"q": "「棉花糖軟綿綿、粘糊糊的。」這是：", "a": ["觸覺", "味覺", "聽覺", "嗅覺"], "ans": 0}, {"q": "「烤肉散發出陣陣誘人的香氣。」這是：", "a": ["嗅覺", "視覺", "聽覺", "觸覺"], "ans": 0}], "hard": [{"q": "哪一個句子「同時」包含了視覺、嗅覺和味覺描寫？", "a": ["桌上擺著一盤紅通通的草莓，聞起來香氣撲鼻，咬一口甜絲絲的，真美味！", "草莓是紅色的，很好吃，我想多吃幾顆。", "我聞到草莓的香味，吃了一顆。", "草莓紅通通的，摸起來滑滑的。"], "ans": 0}, {"q": "寫《吃團年飯》時，哪句話把五感運用得最細緻生動？", "a": ["除夕夜，桌上擺滿了熱騰騰、香噴噴的飯菜，耳邊是親人們的歡聲笑語，咬一口軟糯的年糕，心裏甜滋滋的。", "我們一家人一起吃團年飯，大家高高興興地吃了很多好菜。", "團年飯有雞、有魚、有湯圓，很好吃。", "我們一邊吃飯，一邊高興地聊天。"], "ans": 0}, {"q": "「剝開橘子，金黃色的果肉呈現在眼前，同時一股酸甜的香氣迎面撲來。」這句話包含甚麼感官？", "a": ["視覺 + 嗅覺", "味覺 + 聽覺", "觸覺 + 聽覺", "視覺 + 觸覺"], "ans": 0}, {"q": "「外面下著傾盆大雨，雨點劈劈啪啪地打在玻璃窗上，摸上去冰冰涼涼的。」這句話：", "a": ["包含了聽覺和觸覺描寫", "包含了味覺和嗅覺描寫", "只有視覺描寫", "沒有任何五感"], "ans": 0}, {"q": "在描寫「爆米花」時，哪句「聽覺」用得最好？", "a": ["爆米花白白的，像小花。", "鍋裏傳來『啪啪啪』的爆炸聲，不一會兒，香甜的味道就飄了出來。", "爆米花吃起來很脆。", "爆米花聞起來很香。"], "ans": 1}, {"q": "以下哪組詞語最適合用來「從五感描寫香脆的薯片」？", "a": ["金黃色（視）、咔嚓咔嚓（聽）、鹹鹹的（味）、脆脆的（觸）", "香噴噴（嗅）、紅艷艷（視）、軟綿綿（觸）", "甜絲絲（味）、硬邦邦（觸）、咕嘟嘟（聽）", "綠油油（視）、酸溜溜（味）、香氣撲鼻（嗅）"], "ans": 0}, {"q": "「海風迎面吹來，夾雜著鹹鹹的海水味，浪花在腳邊溫柔地撫摸著我。」這句話結合了：", "a": ["觸覺 + 嗅覺 + 味覺", "視覺 + 聽覺", "只有嗅覺", "沒有觸覺"], "ans": 0}, {"q": "「熟透的柿子紅彤彤的，摸起來軟乎乎，吃一口甜得像蜜一樣。」這句話運用了：", "a": ["視覺、觸覺、味覺和明喻", "視覺、聽覺、味覺", "觸覺、嗅覺、味覺", "只有明喻"], "ans": 0}, {"q": "「踩在落葉上，腳下發出沙沙的聲響，像踩在厚厚的地毯上。」這句話結合了：", "a": ["聽覺、觸覺和比喻", "視覺、聽覺和擬人", "嗅覺、味覺和誇張", "只有聽覺"], "ans": 0}, {"q": "「成熟的榴蓮外殼長滿了尖銳的硬刺，聞起來有一股強烈的奇特氣味。」這句話運用了：", "a": ["觸覺和嗅覺", "視覺和味覺", "聽覺和嗅覺", "only 觸覺"], "ans": 0}, {"q": "在描寫「冰淇淋」時，哪句話同時運用了「視覺、觸覺、味覺」？", "a": ["冰淇淋五煙六色的，冰冰涼涼，吃起來甜而不膩，十分消暑。", "冰淇淋很好吃，我很喜歡。", "冰淇淋像個小雪人一樣好看。", "冰淇淋聞起來很香，有很多口味。"], "ans": 0}, {"q": "「一走進校園，一陣淡淡的桂花香迎面撲來，耳邊傳來同學們清脆的讀書聲，眼前是高大挺拔的教學樓。」這句話：", "a": ["運用了嗅覺、聽覺和視覺描寫", "只有視覺和聽覺", "只有嗅覺和觸覺", "沒有運用任何五感"], "ans": 0}, {"q": "「剛出籠的灌湯包白嫩嫩的，摸上去有些燙手，輕咬一口，濃郁的湯汁瞬間充滿口腔，真是鮮美無比！」這段描寫有：", "a": ["視覺、觸覺和味覺", "視覺、聽覺和嗅覺", "聽覺、嗅覺和味覺", "只有味覺和觸覺"], "ans": 0}, {"q": "要寫好「吃火鍋的場景」，最能展現熱鬧與美味五感結合的句子是：", "a": ["火鍋在桌上煮着，有很多肉，很好吃。", "湯底在鍋裏『咕嘟咕嘟』地翻滾，冒出陣陣誘人的香氣，夾起一塊鮮嫩的牛肉，沾上醬汁，吃進嘴裏麻辣鮮香，過癮極了！", "大家高高興興地吃火鍋，聊得很快樂。", "火鍋熱騰騰的，摸起來很燙。"], "ans": 1}, {"q": "「小提琴琴聲悠揚，琴身摸起來十分光滑，散發著松香的味道。」這句話包含：", "a": ["聽覺、觸覺和嗅覺", "視覺、聽覺和味覺", "觸覺、嗅覺和味覺", "視覺、聽覺和觸覺"], "ans": 0}, {"q": "「我摸到一隻毛茸茸的小貓，牠發出『咕嚕咕嚕』的撒嬌聲，一雙綠寶石般的眼睛盯著我。」這段描寫包含：", "a": ["觸覺、聽覺和視覺", "嗅覺、味覺和聽覺", "觸覺、味覺和視覺", "只有聽覺"], "ans": 0}, {"q": "寫《遊元宵燈會》，哪句話把五感運用得最豐富？", "a": ["燈會上有很多漂亮的燈籠，我們一邊走一邊看。", "街上掛滿了五彩繽紛的燈籠（視），傳來『啪啪』的爆竹聲（聽），空氣中飄著香甜的湯圓味（嗅），熱鬧極了！", "燈會真熱鬧，人山人海，我們很高興。", "我們在燈會上吃了很多好吃的湯圓，很好玩。"], "ans": 1}, {"q": "「媽媽剛泡的茉莉花茶，茶杯熱乎乎的，茶水綠油油，聞起來清香怡人。」這句話運用了：", "a": ["觸覺、視覺和嗅覺", "視覺、聽覺和味覺", "聽覺、嗅覺和味覺", "觸覺、聽覺和視覺"], "ans": 0}, {"q": "「海水鹹鹹的，拍在身上涼冰冰，聽見海浪嘩啦啦地叫。」這句話結合了：", "a": ["味覺、觸覺和聽覺", "視覺、嗅覺和聽覺", "味覺、視覺和嗅覺", "只有觸覺"], "ans": 0}, {"q": "在《水果之王——榴蓮》一文中，哪句話寫出了「嗅覺與味覺的強烈衝突」？", "a": ["榴蓮長滿了刺，不好看。", "榴蓮聞起來有一股強烈的奇特氣味，有些人敬而遠之；但吃起來卻香甜軟糯，讓人回味無窮。", "榴蓮金黃色的果肉很好吃。", "榴蓮摸起來很刺手，吃起來很甜。"], "ans": 1}]}, "7": {"title": "引人入勝的作文開頭", "icon": "🎬", "introTitle": "第七關：黃金作文開頭", "teaching": "作文的開頭是一篇文章的「大門」，要寫得吸引人！常用的神奇開頭有：1.四素句 2.語言（說話） 3.擬聲詞（聲音） 4.原因 5.點題式開頭。", "example": "💡 例：<b>「咕嚕咕嚕！」（擬聲詞開頭）</b>我的肚子痛得要命，原來我今天生病了，不能去上學。", "easy": [{"q": "「每個人都曾生病。今天，我生病了。」這是哪一種開頭法？", "a": ["擬聲詞開頭", "言語描寫開頭", "點題式開頭", "交代原因開頭"], "ans": 2}, {"q": "「『媽媽，我的肚子好痛啊！』我躺在床上大喊起來。」這是甚麼開頭法？", "a": ["言語描寫（語言）開頭", "四素句開頭", "擬聲詞開頭", "交代原因開頭"], "ans": 0}, {"q": "「咕嚕咕嚕！我的肚子痛得要命。媽媽非常擔心，立即帶我看醫生。」這是哪種開頭？", "a": ["點題式開頭", "擬聲詞開頭", "原因開頭", "四素句開頭"], "ans": 1}, {"q": "「前幾天，弟弟患了感冒，一直在咳嗽。今天起床時，我感到四肢無力。」這是甚麼開頭？", "a": ["言語開頭", "交代事情的原因開頭", "點題開頭", "擬聲詞開頭"], "ans": 1}, {"q": "「今天早上，我蜷縮在床上，翻來覆去，痛苦極了！」這是：", "a": ["四素句開頭", "語言開頭", "擬聲詞開頭", "原因開頭"], "ans": 0}, {"q": "寫《我生病了》，哪一個是用「擬聲詞」開頭的？", "a": ["「咳咳！」我一邊咳嗽，一邊躺在床上。", "今天，我病倒了。", "媽媽對我說：『你發燒了。』", "因為昨天淋了雨，所以我淋雨感冒了。"], "ans": 0}, {"q": "「『砰』的一聲，小明摔倒在地上。」這句話是：", "a": ["擬聲詞開頭", "言語開頭", "四素句開頭", "原因開頭"], "ans": 0}, {"q": "「因為昨天忘記帶雨傘，所以我淋雨感冒了。」這是：", "a": ["交代原因開頭", "點題開頭", "言語開頭", "四素句開頭"], "ans": 0}, {"q": "「『叮鈴鈴！』下課鈴聲響了，同學們飛奔出去。」這是：", "a": ["擬聲詞開頭", "點題式開頭", "原因開頭", "語言開頭"], "ans": 0}, {"q": "「上星期天，我和家人去海洋公園玩。」這是：", "a": ["四素句開頭", "點題式開頭", "原因開頭", "語言開頭"], "ans": 0}, {"q": "「『快來呀，這裏有好多美麗的貝殼！』妹妹一邊跑一邊對我大喊。」這是什麼開頭？", "a": ["言語描寫開頭", "擬聲詞開頭", "交代原因開頭", "點題式開頭"], "ans": 0}, {"q": "「『嘩啦啦！』海浪一波波湧上沙灘。」這屬於：", "a": ["擬聲詞開頭", "語言開頭", "四素句開頭", "原因開頭"], "ans": 0}, {"q": "「因為這是一年一度的校慶，所以學校舉辦了嘉年華會。」這是：", "a": ["交代原因開頭", "點題開頭", "語言開頭", "四素句開頭"], "ans": 0}, {"q": "「在我們每個人的腦海中，都有很多難忘的經歷。而我最難忘的，是那次去郊遊。」這是：", "a": ["點題式開頭", "語言開頭", "擬聲詞開頭", "四素句開頭"], "ans": 0}, {"q": "「『哎呀！』小強突然在跑道上摔倒了。」這是：", "a": ["擬聲詞開頭", "語言開頭", "原因開頭", "四素句開合"], "ans": 0}, {"q": "「昨天下午，我們全班在禮堂聽演講。」這是：", "a": ["四素句開頭", "點題開頭", "原因開頭", "言語開頭"], "ans": 0}, {"q": "「『下課了！』同學們像放飛的小鳥一樣衝出課室。」這是：", "a": ["言語描寫開頭", "擬聲詞開頭", "點題開頭", "原因開頭"], "ans": 0}, {"q": "「『轟隆隆！』雷聲突然響起，打破了午後的寧靜。」這是：", "a": ["擬聲詞開頭", "點題式開頭", "四素句開頭", "原因開頭"], "ans": 0}, {"q": "「因為今天是媽媽的生日，所以我和爸爸特地準備了驚喜。」這是：", "a": ["交代原因開頭", "四素句開頭", "點題開頭", "言語開頭"], "ans": 0}, {"q": "「助人是快樂之本，今天我就體會到了這句話的含義。」這是：", "a": ["點題式開頭", "原因開頭", "言語開頭", "四素句開頭"], "ans": 0}], "hard": [{"q": "如果要寫《一次幫助同學的經歷》，哪一個開頭最能吸引讀者的注意力和好奇心？", "a": ["「啪！」的一聲，一向身體強壯的子軒突然暈倒在課室地上，同學們都嚇呆了。", "今天在學校，我幫助了一個同學。", "幫助人是快樂之本，今天我就幫助了同學。", "星期二，我和同學在學校。"], "ans": 0}, {"q": "「烈日當空，操場像個大火爐。體育課上，小強突然面色蒼白，『砰』的一聲暈倒在地上。」這個開頭結合了甚麼？", "a": ["環境描寫 + 擬聲詞開頭 + 突發事件", "只有言語開頭", "只有點題式開頭", "四素句 + 語言開頭"], "ans": 0}, {"q": "對於作文題目《一次令人興奮的嘉年華會》，哪一個是「點題式開頭」？", "a": ["每個人都有自己喜歡的活動，而我最難忘的是學校舉辦的嘉年華會。", "「太好玩了！」我進校門就大喊。", "因為今天是校慶，所以學校舉辦了嘉年華會。", "星期六早上，我和媽媽去學校玩。"], "ans": 0}, {"q": "「『流鼻血啦！』美美驚慌地指著小明大叫。」這個開頭的好處是：", "a": ["用緊張的對話直接帶入衝突現場，引人入勝", "字數很多", "介紹了天氣", "告訴大家事情的結局"], "ans": 0}, {"q": "將「我今天很開心」改寫成「擬聲詞開頭」的吸引人句子，哪項最好？", "a": ["「哈哈！」我和弟弟在客廳裏笑得前仰後合，因為爸爸給我們帶回了期盼已久的禮物。", "今天我很開心，哈哈。", "因為爸爸帶回了禮物，所以我開心得大笑。", "「今天真開心！」我對爸爸說。"], "ans": 0}, {"q": "寫《一次難忘的考試》，最能表現緊張氣氛的言語開頭是：", "a": ["「沙沙沙」，考場裡只聽見筆尖在紙上飛馳的聲音，時間一分一秒流逝。", "「還有五分鐘收卷！」老師的話音剛落，我的心便像兔子一樣狂跳起來。", "考試是檢測學習的方法，今天我們考試了。", "因為昨天沒有溫習，所以我今天很緊張。"], "ans": 1}, {"q": "「『轟隆隆！』一聲巨雷劈開了夜空。」這個開頭最適合寫：", "a": ["一個可怕的雷雨夜", "一個陽光燦爛的早晨", "一次快樂的郊遊", "我的媽媽"], "ans": 0}, {"q": "「『救命啊！有人落水了！』湖邊傳來一聲尖叫。」這個開頭：", "a": ["利用緊張的呼喊製造懸念", "介紹了風景", "交代了時間", "寫了天氣"], "ans": 0}, {"q": "「『叮咚！』門鈴響了，原來是快遞員送來了我的生日禮物。」這是結合了：", "a": ["擬聲詞與突發事件", "原因與結果", "語言與動作", "點題與回憶"], "ans": 0}, {"q": "「『太棒了，我們贏了！』操場上爆發出熱烈的歡呼聲。」這個開頭適合寫：", "a": ["一次精彩的比賽", "一堂安靜的自修課", "我的班主任", "一次生病的經歷"], "ans": 0}, {"q": "寫《我做家務被家人稱讚的經歷》，以下哪一個屬於結合了「交代原因與言語描寫」的精彩開頭？", "a": ["今天，我幫媽媽做家務，媽媽稱讚了我。", "「媽媽，今天讓我來洗碗吧！」因為今天是母親節，我想用實際行動表達對媽媽的愛，於是我自告奮勇地走進廚房。", "因為今天是母親節，所以我幫媽媽做家務，我很自豪。", "「母親節快樂！」我對媽媽說，然後開始洗碗。"], "ans": 1}, {"q": "「『沙沙沙……』，春雨細密地落下，像在演奏一首溫柔的鋼琴曲。在這樣一個雨天，我迎來了我的九歲生日。」這個開頭：", "a": ["將環境描寫、擬聲詞與個人事件完美融合，富有詩意", "只有擬聲詞", "只有四素", "只是點題"], "ans": 0}, {"q": "寫《一次難忘的旅行》，最能製造向往往前推進的開頭是：", "a": ["去年暑假，我們一家人去了北京旅行，玩得很開心。", "「飛機即將起飛，請繫好安全帶。」聽著空姐甜美的廣播，看著窗外漸漸變小的樓房，我懷著無比興奮的心情，開啟了這趟夢寐以求的北京之旅！", "因為我放暑假了，所以爸爸帶我去北京玩。", "北京是一個很漂亮的地方，今天我去了那裏。"], "ans": 1}, {"q": "「每個人心底都藏著一個五彩斑斕的夢。而我的夢，就從那次走進魔術大師的表演現場開始……」這個開頭是：", "a": ["利用文雅的點題和設疑，成功吸引讀者往下讀", "是普通四素句", "是言語開頭", "是原因開頭"], "ans": 0}, {"q": "寫《一次激烈的拔河比賽》，最能表現比賽現場一觸即發緊張氣氛的開頭是：", "a": ["「嗶——！」隨著裁判清脆的哨聲響起，一條粗壯的麻繩瞬間繃得筆直，操場上頓時爆發出震天動地的吶喊聲！", "今天在學校，我們舉行了拔河比賽。", "因為今天要比賽，所以我們在操場集合，大家都準備好了。", "我們班和二班拔河，我們用力拉。"], "ans": 0}, {"q": "「『哎呀，不好啦！』剛走進課室，就看見窗台上小李精心護養的番茄盆栽被打碎在地上。」這個言語開頭的作用是：", "a": ["一開篇就製造衝突和懸念，立刻抓住讀者的注意力", "交代了天氣", "寫明了時間和日期", "告訴了大家打碎盆栽的人是誰"], "ans": 0}, {"q": "「因為天空突然下起了傾盆大雨，本來熱鬧的公園瞬間變得空無一人，這也讓我體驗了一次特別的雨中冒險。」這個開頭是：", "a": ["交代原因與環境烘托開頭", "言語描寫開頭", "擬聲詞開頭", "點題式開頭"], "ans": 0}, {"q": "寫《一次幫助同學的經歷》，如果是用普通的四素句開頭，可以怎樣修改成更精彩的「突發事件開頭」？", "a": ["「啪！」的一聲，一隻裝滿水的保溫杯重重地手腳不穩地摔在地上，水花濺了一地，接著傳來了小強痛苦的呻吟聲……", "今天在學校，我幫同學撿了水杯。", "因為小強的水杯掉了，所以我幫他撿起來。", "在學校裏，同學需要幫助。"], "ans": 0}, {"q": "「『卡嚓！』隨着一聲清脆的快門聲，我們全家的笑容永遠定格在這張珍貴的相片裏。」這個開頭最適合寫：", "a": ["一張珍貴的相片 / 全家福的故事", "一次生病的經歷", "我的學校", "一堂數學課"], "ans": 0}, {"q": "「您是辛勤的園丁，用心血澆灌着我們這些稚嫩的花朵。林老師，在我的心裏，最敬佩的人就是您。」這句開頭：", "a": ["運用了暗喻和敬稱，深情點題", "是擬聲開頭", "是原因開頭", "是四素句開頭"], "ans": 0}]}, "8": {"title": "熱鬧的場面", "icon": "🎪", "introTitle": "第八關：熱鬧場面動態描寫", "teaching": "描寫人山人海、熱鬧的場面（如嘉年華會、運動會），要先交代背景，再用排比句「有的……有的……有的……」來描寫人群的各種動態，讓畫面豐富起來！", "example": "💡 例：嘉年華現場人山人海，同學們<b>有的在玩套圈圈</b>，<b>有的在看小丑表演</b>，<b>有的在品嚐美味小吃</b>（排比句描寫場面）。", "easy": [{"q": "描寫「熱鬧的場面」時，最常用、也最整齊的排比句式是：", "a": ["一邊……一邊……", "有的……有的……有的……", "一會兒……一會兒……", "雖然……但是……"], "ans": 1}, {"q": "以下哪一個成語「最適合」用來形容熱鬧的場面？", "a": ["人山人海", "不知所措", "默默不語", "冷冰冰"], "ans": 0}, {"q": "「一走進校門，首先映入眼簾的是五顏六色的彩旗在飄揚。」這是描寫甚麼？", "a": ["個人動態", "校園的佈置和環境", "人物的說話", "事情的結局"], "ans": 1}, {"q": "「觀眾爆發出熱烈的掌聲，聲音像雷鳴一樣。」這句話用了甚麼修辭？", "a": ["排比", "反復", "明喻", "暗喻"], "ans": 2}, {"q": "「攤位遊戲前大排長龍，大家都急不及待地想參與。」「急不及待」的意思是：", "a": ["不想等待，立刻要玩", "不願意排隊", "非常無聊", "不喜歡這個遊戲"], "ans": 0}, {"q": "「小食攤位傳來香氣撲鼻的魚蛋味。」這是運用了甚麼感官描寫？", "a": ["視覺", "聽覺", "嗅覺", "觸覺"], "ans": 2}, {"q": "「同學們像一隻隻快樂的小鳥一樣雀躍。」這是甚麼句子？", "a": ["明喻句", "暗喻句", "排比句", "反復句"], "ans": 0}, {"q": "「體育館裡人山人海，同學們有的打羽毛球，有的打籃球，有的跳繩。」這句話是：", "a": ["場面排比句", "明喻句", "擬人句", "反復句"], "ans": 0}, {"q": "「大家高興得像過節一樣。」這句話用了：", "a": ["明喻", "暗喻", "排比", "擬人"], "ans": 0}, {"q": "「熱鬧的市集裡，到處都是叫賣聲。」這運用了：", "a": ["聽覺描寫", "視覺描寫", "味覺描寫", "觸覺描寫"], "ans": 0}, {"q": "以下哪組詞語適合形容「運動會熱鬧的看台」？", "a": ["人頭湧湧、掌聲雷動、吶喊助威", "冷冷清清、鴉雀無聲、面面相覷", "琳瑯滿目、香氣四溢、不慌不忙", "整整齊齊、悄悄說話、不知所措"], "ans": 0}, {"q": "「操場上，彩旗迎風飄揚，五彩斑斕。」這是在進行：", "a": ["環境/場面佈置描寫", "人物動態描寫", "聲音描寫", "感受描寫"], "ans": 0}, {"q": "「舞台上的小丑一會兒拋球，一會兒變魔術，逗得大家哈哈大笑。」這裡主要是：", "a": ["焦點人物（小丑）的動態描寫", "整體背景描寫", "環境描寫", "實用文格式"], "ans": 0}, {"q": "「加油！加油！吶喊聲震天。」這是場面描寫中的：", "a": ["聲音描寫", "靜態描寫", "嗅覺描寫", "下款"], "ans": 0}, {"q": "「市集裏大排長龍，擠得水泄不通。」這句話形容：", "a": ["人非常多、擁擠", "商品很便宜", "地方很冷清", "天氣很熱"], "ans": 0}, {"q": "「美食區裡，有的同學在吃爆米花，有的同學在喝凍檸茶，有的同學在品嚐雞蛋仔。」這是什麼描寫？", "a": ["排比句描寫群體活動", "明喻句", "擬人句", "反復句"], "ans": 0}, {"q": "「走進遊樂場，歡聲笑語此起彼伏。」中的「此起彼伏」形容：", "a": ["聲音連續不斷，一邊落下一邊響起", "聲音非常小", "沒有聲音", "哭聲"], "ans": 0}, {"q": "「觀眾席上的同學們揮舞著彩色的充氣棒。」這屬於什麼描寫？", "a": ["群體動態描寫", "環境佈置", "心情感受", "原因交代"], "ans": 0}, {"q": "以下哪句話「不適合」用來形容熱鬧的氣氛？", "a": ["現場的氣氛十分高漲！", "到處都是歡聲笑語。", "整間課室安靜得連粉筆掉在地上都聽得見。", "熱鬧的歡呼聲響徹雲霄！"], "ans": 2}, {"q": "「攤位遊戲五花八門，吸引了無數同學前來排隊。」這句的「五花八門」是指：", "a": ["種類繁多，各式各樣", "門有很多顏色", "遊戲很難", "門壞了"], "ans": 0}], "hard": [{"q": "要寫好一個「熱鬧的嘉年華會」段落，最完美的寫作順序應該是：", "a": ["先寫整體環境佈置和熱鬧氣氛 -> 再用排比句描寫攤位前人群的動態 -> 最後寫自己的具體活動與感受", "直接寫自己玩了甚麼遊戲 -> 寫市場有甚麼吃的 -> 寫回家了", "先寫自己的感受 -> 再寫天氣 -> 再寫同學們", "寫同學做甚麼 -> 寫環境 -> 寫自己"], "ans": 0}, {"q": "「舞台表演目不暇給，精彩萬分。觀眾們看得津津有味，掌聲雷動。」這段話中「目不暇給」的意思是：", "a": ["表演很無聊，大家都想睡覺", "東西太多、太美，眼睛看不過來", "觀眾不喜歡看", "天色太暗，看不清舞台"], "ans": 1}, {"q": "以下哪一個句子將「場面描寫」與「擬人修辭」結合得最好？", "a": ["攤位上的布偶們胖乎乎的，好像在向走過的小朋友招手、微笑，吸引著大家前來挑戰。", "攤位上有好多的布偶，同學們都很想拿。", "布偶長得像小熊一樣可愛。", "大家都在玩遊戲拿布偶。"], "ans": 0}, {"q": "在寫《熱鬧的場面》時，如果只寫「小明玩遊戲、小明吃東西、小明回家」，會犯了甚麼寫作缺點？", "a": ["沒有進行群體場面描寫，把「場面寫作」寫成了「個人的流水帳」", "字數不夠", "沒有寫時間", "沒有寫天氣"], "ans": 0}, {"q": "「小丑的雜耍表演精彩絕倫，觀眾們看得如痴如醉，不時發出陣陣驚嘆聲。」這句話運用了甚麼感官？", "a": ["視覺 + 聽覺", "嗅覺 + 味覺", "觸覺 + 聽覺", "只有觸覺"], "ans": 0}, {"q": "哪一組四字詞「最不適合」用來形容學校嘉年華的歡樂場面？", "a": ["熱鬧非凡、人山人海、其樂融融", "烏雲密佈、冷冷清清、面如土色", "生機勃勃、歡聲笑語、美不勝收", "琳瑯滿目、目不暇給、興高采烈"], "ans": 1}, {"q": "「運動會開幕了，操場上熱鬧非凡。看，運動員們有的在跑道上熱身，有的在沙坑旁起跳，有的在觀眾席上加油。」這段場面描寫：", "a": ["條理分明，成功運用了排比", "字數不夠", "沒有寫個人感受", "沒有寫老師"], "ans": 0}, {"q": "「舞台上，舞蹈隊的同學們翩翩起舞，像一隻隻美麗的蝴蝶。」這句話運用了：", "a": ["場面描寫與明喻", "場面描寫與擬人", "場面描寫與暗喻", "只有排比"], "ans": 0}, {"q": "以下哪句話最能表現「人山人海」的擠迫感？", "a": ["街上的人很多，大家都走來走去。", "元宵燈會上人頭攢動，大家摩肩接踵，擠得水泄不通。", "燈會真熱鬧，有很多人看燈。", "人很多，大家都很高興。"], "ans": 1}, {"q": "「小食攤上，油炸的滋滋聲和人們的讚嘆聲此起彼伏，香氣飄散在整個校園。」這句話運用了：", "a": ["聽覺和嗅覺描寫", "視覺和味覺描寫", "觸覺和聽覺描寫", "視覺和觸覺描寫"], "ans": 0}, {"q": "寫《熱鬧的年宵市場》，哪一段的細節描寫得最到位、最有氣氛？", "a": ["年宵市場人很多，有很多攤位，賣花和公仔。我和爸爸買了桃花就回家了，今天真熱鬧。", "年宵市場裏燈火通明，人流如潮。兩旁的攤位擺滿了寓意吉祥的年花和各式各樣的賀年商品，令人目不暇給。人們個個喜氣洋洋，有的在挑選芬芳撲鼻的年橘，有的在跟商販討價還價，有的在舉著風車拍照，到處洋溢着濃濃的年味！", "市場裏有很多人，大家都在買東西。買了年橘，吃了一些小吃，很熱鬧。", "因為快過年了，年宵市場大排長龍，大家都在買花。"], "ans": 1}, {"q": "「發令槍『砰』的一聲響起，運動員們像離弦的箭一樣飛奔出去，看台上的啦啦隊頓時爆發出海嘯般的歡呼聲！」這段描寫結合了：", "a": ["擬聲詞 + 比喻 + 場面動態描寫", "只有擬聲詞", "四素句 + 擬人", "交代原因 + 點題"], "ans": 0}, {"q": "在《嘉年華會》寫到「個人動態」時，以下哪項能展現出「細緻的過程和心情」？", "a": ["我玩了套圈圈遊戲，拿到一隻小熊玩具，我很開心。", "我自告奮勇地走到『投籃大賽』攤位前，深吸一口氣，瞄準籃筐用力一投——球進了！我高興地跳了起來，心裏美滋滋的！", "我吃了一串魚蛋和一包薯片，味道很好吃，今天真快樂。", "我和同學一起玩了好多遊戲。"], "ans": 1}, {"q": "以下哪句話運用了「比喻」和「誇張」來形容場面聲音的熱鬧？", "a": ["現場非常吵鬧，大家都很大聲。", "現場歡呼聲雷動，那排山倒海般的吶喊聲幾乎要把體育館的屋頂掀翻了！", "大家有的鼓掌，有的叫好，聲音傳得很遠。", "同學們的掌聲非常好聽。"], "ans": 1}, {"q": "在場面描寫中，我們為甚麼要先進行「環境/背景描寫」？", "a": ["為了交代事件的舞台，渲染好氣氛，為後續人物的出場 and 活動做鋪墊", "為了湊夠字數", "因為課本要求，不寫會扣分", "可以不用寫具體的人物了"], "ans": 0}, {"q": "「美食街上，熱氣騰騰的白煙裊裊升起，與煎炸的『滋滋』聲交織在一起。食客們捧著美味，顧不得燙，吹著氣吃得津津有味。」這段話：", "a": ["結合了視覺、聽覺、味覺，極富生活氣息，立體呈現了場面熱鬧", "只有聽覺描寫", "只是普通流水帳", "是實用文格式"], "ans": 0}, {"q": "「學校的遊藝會熱鬧非凡。走廊裏張燈結綵，五顏六色的氣球好像一串串可愛的葡萄。教室裏，同學們有的在絞盡腦汁猜燈謎，有的在小心翼翼夾乒乓球，有的在滿心期待地等待抽獎。」這段話：", "a": ["結構工整，將場面佈置與群體排比完美結合", "沒有寫好環境", "缺少了人物", "沒有任何修辭"], "ans": 0}, {"q": "「看台上人聲鼎沸。」「人聲鼎沸」這詞語形容：", "a": ["人聲嘈雜，像開水在鍋裏沸騰一樣，形容現場極其熱鬧", "大家都在小聲說話", "現場很安靜", "有人在吵架"], "ans": 0}, {"q": "在《看馬戲表演》中，哪句最能表現出「全場觀眾同步的動態」？", "a": ["小丑一出場，全場頓時爆發出一陣陣雷鳴般的掌聲和歡笑聲，大家都伸長了脖子，生怕錯過任何精彩的細節。", "大家都在看表演，小丑很好笑。", "馬戲表演有很多精彩的節目，大家都很喜歡看。", "觀眾有的坐著，有的站著看。"], "ans": 0}, {"q": "以下哪組詞語「不適合」用來形容嘉年華會的群體動態？", "a": ["興致勃勃、喜笑顏開、其樂融融", "大排長龍、接踵而至、熙熙攘攘", "默默不語、垂頭喪氣、面面相覷", "歡聲雷動、氣勢高昂、熱氣騰騰"], "ans": 2}]}, "9": {"title": "眼觀四周環境描寫", "icon": "🏖️", "introTitle": "第九關：大自然環境描寫", "teaching": "環境描寫要動靜結合！先寫天空、海風、波光粼粼等自然環境，然後再寫人們在其中的活動！", "example": "💡 例：<b>碧海藍天</b>之下，<b>金黃色的沙灘</b>在陽光下閃閃發光。<b>浪花嘩啦嘩啦地（聽覺）</b>拍打著岸邊。", "easy": [{"q": "「海灘上，金黃色的沙子軟綿綿的。」這是運用了甚麼感官？", "a": ["視覺", "聽覺", "嗅覺", "觸覺"], "ans": 3}, {"q": "以下哪一組詞語常用來描寫「美麗的大海」？", "a": ["碧海藍天、一望無際、水平如鏡", "烏雲密佈、人山人海、不知所措", "香噴噴、酸溜溜、硬邦邦", "大大小小、高高興興"], "ans": 0}, {"q": "「海風迎面吹來，徐徐吹拂，令人心曠神怡。」「心曠神怡」的意思是：", "a": ["心情非常舒暢愉快", "感到非常害怕", "肚子很餓", "想要睡覺"], "ans": 0}, {"q": "「浪花像在彈奏樂曲，嘩啦嘩啦地響。」這句話運用了：", "a": ["明喻句", "擬人 + 聽覺（嘩啦嘩啦）", "暗喻句", "排比句"], "ans": 1}, {"q": "「蔚藍的天空中飄著白雲。」這屬於甚麼描寫？", "a": ["環境描寫（自然景物）", "人物說話", "個人動態", "日記格式"], "ans": 0}, {"q": "「陽光灑在海面上，波光粼粼。」這裡的「波光粼粼」形容：", "a": ["水面閃閃發光的樣子", "水流得很急", "水裡有很多魚", "海浪大"], "ans": 0}, {"q": "「海風徐徐」中的「徐徐」意思是：", "a": ["非常快速", "冷冰冰", "緩慢、溫和地", "突然"], "ans": 2}, {"q": "「沙灘上散落著形狀各異的貝殼。」「形狀各異」的意思是：", "a": ["形狀都一模一樣", "形狀各種各樣，互不相同", "貝殼大", "貝殼美"], "ans": 1}, {"q": "環境描寫在文章中的主要作用是：", "a": ["交代人物活動的背景、季節或氣候，烘托心情", "增加字數", "代替人物寫作", "不用寫結尾"], "ans": 0}, {"q": "「金黃色的陽光灑滿大地。」這屬於什麼描寫？", "a": ["環境描寫", "語言描寫", "心理描寫", "動作描寫"], "ans": 0}, {"q": "以下哪組詞語適合形容「雨天的景物」？", "a": ["細雨綿綿、烏雲密佈、白茫茫", "烈日當空、風和日麗、萬里無雲", "碧海藍天、水平如鏡、波光粼粼", "人山人海、彩旗飄揚、熱鬧非凡"], "ans": 0}, {"q": "「夕陽西下，紅紅的晚霞染紅了半邊天。」這是描寫什麼？", "a": ["黃昏時的天空環境", "清晨的景色", "大海的波浪", "人們的活動"], "ans": 0}, {"q": "「海浪像一個調皮的孩子，悄悄地跑上來。」這句話運用了：", "a": ["擬人法", "排比法", "反復法", "暗喻句"], "ans": 0}, {"q": "以下哪個成語形容「水面非常平靜，像鏡子一樣」？", "a": ["水平如鏡", "波光粼粼", "一望無際", "驚濤駭浪"], "ans": 0}, {"q": "「高大挺拔的青山聳立在遠方。」這屬於什麼描寫？", "a": ["景物/環境描寫", "動作描寫", "心理描寫", "言語描寫"], "ans": 0}, {"q": "「樹葉沙沙作響，像在唱一首美妙的歌。」這結合了：", "a": ["聽覺與擬人", "味覺與比喻", "嗅覺與排比", "觸覺與暗喻"], "ans": 0}, {"q": "「一望無際的大海展現在我們眼前。」「一望無際」形容：", "a": ["大海非常廣闊，看不到邊際", "大海水很清", "大海裡有海豚", "大海很大浪"], "ans": 0}, {"q": "「秋風送爽，落葉紛飛。」這描寫的是哪個季節？", "a": ["秋天", "春天", "夏天", "冬天"], "ans": 0}, {"q": "「耀眼的陽光照在大地上。」這屬於：", "a": ["視覺描寫環境", "聽覺描寫環境", "味覺描寫環境", "觸覺描寫環境"], "ans": 0}, {"q": "「山間的小路彎彎曲曲，兩旁開滿了野花。」這屬於：", "a": ["靜態景物描寫", "動態場面描寫", "實用文格式", "人物心理活動"], "ans": 0}], "hard": [{"q": "以下哪一段環境描寫，最適合用來作為《到海灘去》的背景，且動靜結合？", "a": ["碧海藍天之下，金黃色的沙灘在陽光下閃閃發光。微風吹來，海浪嘩啦嘩啦地拍打著沙灘。海灘上，同學們有的在暢泳，有的在撿貝殼，到處充滿了歡聲笑語。", "海灘很大，有大海、有沙子，還有很多人。我們今天去海灘玩了。", "天氣晴朗，我們坐車去海灘，沙灘上有很多人。我很開心。", "海灘上有水，水很涼，大家在游泳。"], "ans": 0}, {"q": "「海面好像一顆巨大的藍寶石，在陽光的照耀下，散發著點點金光。」這句話：", "a": ["用了明喻法描寫大海，非常生動", "是暗喻句", "是擬人句", "句子不通順"], "ans": 0}, {"q": "要寫好一次去大自然的經歷，寫作的順序通常是：", "a": ["先寫自然環境（天空、海風、景物）-> 再寫人在環境中的活動和細節 -> 最後寫個人感受", "先寫回家 -> 再寫風景 -> 最後寫出發", "只有自己吃了甚麼 -> 寫風景", "only 天氣 -> 寫回家"], "ans": 0}, {"q": "「夕陽西下，一輪紅日漸漸西沉，天空都被染成了美麗的晚霞。」這個環境描寫最適合用在：", "a": ["開頭，介紹早上的景色", "結尾或黃昏時間的過渡段落", "介紹出發時的原因", "不適合使用"], "ans": 1}, {"q": "「我們赤著腳走在沙灘上，軟綿綿的沙子十分柔細，溫暖了我們的小腳丫。」這句話：", "a": ["通過觸覺細緻地寫出了走在沙灘上的舒服感受", "是聽覺描寫", "是擬聲開頭", "沒有寫出任何感受"], "ans": 0}, {"q": "「海浪像個頑皮的孩子，蹦蹦跳跳地奔向岸邊，又悄悄地退了回去。」這句話結合了：", "a": ["比喻 + 擬人描寫環境", "只有比喻", "只有擬人", "排比"], "ans": 0}, {"q": "「秋天的落葉像鋪了一地金黃的地毯。」這屬於：", "a": ["環境描寫和比喻", "語言描寫", "動作描寫", "心理描寫"], "ans": 0}, {"q": "「暴風雨要來了，黑壓壓的烏雲像一隻巨大的怪獸，吞沒了最後一線陽光。」這句話結合了：", "a": ["環境描寫、明喻和擬人", "只有環境描寫", "only 明喻", "only 排比"], "ans": 0}, {"q": "「山間流淌著清澈的泉水，發出琴聲般美妙的響聲，令人陶醉。」這句話運用了：", "a": ["環境、聽覺描寫與比喻", "環境、視覺描寫與擬人", "環境、嗅覺描寫與排比", "只有聽覺"], "ans": 0}, {"q": "「海灘上的沙子被太陽曬得發燙，像一塊大熱鐵板。」這句話：", "a": ["用明喻生動地寫出了沙子實感", "是擬人句", "是暗喻句", "是排比句"], "ans": 0}, {"q": "「一望無際的油菜花田在微風中翻滾著金色的波浪，散發出陣陣誘人的清香，蝴蝶在花叢中快活地跳著舞。」這段環境描寫：", "a": ["同時運用了視覺、嗅覺、比喻和擬人，非常生動", "只有環境描寫", "沒有運用修辭", "是暗喻句"], "ans": 0}, {"q": "寫作文《秋天的公園》時，以下哪段描寫能最好地做到「步移景易、動靜結合」？", "a": ["秋天到了，公園裏的樹葉黃了，花兒謝了，有很多老人在散步。我很喜歡秋天。", "一進公園大門，迎面吹來陣陣涼爽的秋風。遠處，高大的楓樹像一團團燃燒的火，落葉在空中如黃蝶翩翩起舞（動）。湖面上，幾隻鴨子在快活地暢游，打破了如鏡水面（靜）的寧靜。長椅上坐著看報的老人，整個公園顯得安寧而美麗。", "公園裏有楓樹和湖水，鴨子在游泳。天氣很涼爽，風景很漂亮。", "因為到了秋天，公園變得很安靜，秋風徐徐，葉子落了。"], "ans": 1}, {"q": "「天空中聚起了黑沉沉的烏雲，狂風狂暴地搖晃著路旁的大樹，街上的人們驚慌地四處奔跑躲避。不一會兒，豆大的雨點便劈劈啪啪地下了起來。」這段環境描寫的作用是：", "a": ["烘托緊張的氣氛，預示著一場大雨的到來，推動事情發展", "為了介紹天氣", "為了增加字數", "說明人們很慌張"], "ans": 0}, {"q": "「清晨，太陽悄悄探出了頭，溫柔地把金光灑在帶著露珠的草地上，草地顯得生機盎然。」這句話：", "a": ["運用了擬人描寫，生動地展現了清晨陽光和大地甦醒的景象", "是明喻句", "是交代原因", "是實用文格式"], "ans": 0}, {"q": "在《美麗的校園》中，如何把「操場」的環境描寫得更有空間感？", "a": ["我們的操場很大，裏面有紅色的跑道和綠色的草地，很好看。", "站在教學樓高處往下看，操場中央那片綠瑩瑩的草地就像一塊巨大的綠色地毯，四周紅色的跑道環繞着它，在陽光下格外醒目。課間，那裏便成了同學們歡樂的海洋。", "操場上有很多同學，大家都在玩耍，非常熱鬧。", "因為操場很大，所以我們都在那裏上體育課。"], "ans": 1}, {"q": "「小溪流水『淙淙』地響，岸邊野花點點，清澈的溪水裏可以看見幾條小魚在自由自在地游動。」這段環境描寫：", "a": ["動靜結合，包含了聽覺和視覺，展現了小溪的靈動與清幽", "只有聽覺描寫", "沒有景物描寫", "是點題開頭"], "ans": 0}, {"q": "「夕陽把海水和天空染成了美麗的金黃色，波光粼粼的海面上，金色的晚霞隨波盪漾，令人流連忘返。」這句話：", "a": ["運用了豐富的色彩詞和動態描寫，極具畫面感", "只是普通的流水帳", "是明喻句", "是日記首行"], "ans": 0}, {"q": "「冬天的早晨，寒風像利刃一樣刮在臉上，光禿禿的枝條在風中無助地顫抖，街道顯得冷冷清清。」這段話：", "a": ["結合了比喻、擬人，成功烘托出冬天清晨的寒冷與蕭條", "只有環境描寫", "沒有修辭", "是日記天氣"], "ans": 0}, {"q": "在環境描寫中，以下哪組詞語「不適合」用來描寫「生機勃勃的春天」？", "a": ["春意盎然、百花盛開、萬物復甦", "枯枝敗葉、寒風凜冽、雪花飛舞", "草長鶯飛、風和日麗、桃紅柳綠", "綠意盎然、生機蓬勃、鳥語花香"], "ans": 1}, {"q": "「遠處，連綿起伏的群山在大霧中若隱若現，宛如一幅水墨畫。」這句話的修辭是：", "a": ["明喻，將群山比作水墨畫", "擬人，將群山擬人化", "暗喻，因為有「宛如」", "排比"], "ans": 0}]}, "10": {"title": "邀請與祝賀", "icon": "💌", "introTitle": "第十關：邀請卡與賀卡大師", "teaching": "寫實用文要講格式！寫卡片給長輩（如：老師、舅父、祖父母）要用尊稱「您」，同輩用「你」；要有上款、內容、祝頌語、下款及日期。", "example": "💡 例：<b>親愛的秀儀姑姐（上款）</b>：... 誠意邀請<b>您（敬稱）</b>出席... <b>姪女小萍敬上（下款）</b>，<b>三月六日（日期）</b>。", "easy": [{"q": "寫邀請卡或賀卡給長輩（如：祖父母、老師），應該用哪一個字代表對方？", "a": ["你", "您", "佢", "他"], "ans": 1}, {"q": "在卡片中，「收卡人的名字或稱謂」寫在最上面，這叫甚麼？", "a": ["上款", "下款", "祝賀語", "日期"], "ans": 0}, {"q": "寫卡片的人的名字寫在右下角，這叫甚麼？", "a": ["上款", "下款", "邀請原因", "日期"], "ans": 1}, {"q": "以下哪一個是合適的「賀卡祝賀語」？", "a": ["希望你能抽空出席！", "恭喜你在「兒童小提琴比賽」中奪得冠軍！", "時間：晚上七時正", "地點：開心中學禮堂"], "ans": 1}, {"q": "寫賀卡給長輩，下款的啟告語應該用哪一個表示尊敬？", "a": ["敬上", "上", "不用寫", "敬啟"], "ans": 0}, {"q": "卡片的「日期」應該寫在卡片的哪一個位置？", "a": ["最上面上款前", "右下角，下款的下面", "正中間", "左下角"], "ans": 1}, {"q": "以下哪一個是「邀請卡」必備的資訊？", "a": ["活動的時間、地點和日期", "卡片的價錢", "活動的背景音樂", "收卡人的生日"], "ans": 0}, {"q": "「祝您身體健康！」這在實用文中屬於甚麼部分？", "a": ["上款", "下款", "祝頌語", "邀請原因"], "ans": 2}, {"q": "「親愛的班主任林老師」屬於：", "a": ["上款", "下款", "日期", "祝頌語"], "ans": 0}, {"q": "「二零二六-年八月十日」屬於：", "a": ["日期", "上款", "下款", "祝頌語"], "ans": 0}, {"q": "寫信或卡片給「同輩朋友」，下款啟告語可以使用：", "a": ["啟 / 上", "敬上", "拜啟", "叩上"], "ans": 0}, {"q": "以下哪句最適合寫在「給同學的生日賀卡」中？", "a": ["祝你生日快樂，學業進步！", "誠意邀請您出席我的生日會。", "祝您身體健康，工作順利！", "時間：星期六早上"], "ans": 0}, {"q": "邀請卡中的「誠意邀請」通常是在表達什麼？", "a": ["邀請對方的誠意和原因", "活動的結束時間", "卡片的價錢", "寫卡人的稱呼"], "ans": 0}, {"q": "「親愛的祖父母：」這在格式上是：", "a": ["上款", "下款", "祝頌語", "日期"], "ans": 0}, {"q": "下款中的「學生 小明 敬上」，小明與林老師的關係是：", "a": ["師生關係", "祖孫關係", "父子關係", "同輩關係"], "ans": 0}, {"q": "在賀卡中，祝頌語「祝工作順利」適合送給誰？", "a": ["已經工作的朋友或長輩", "正在讀小學的同學", "剛出生的嬰兒", "退休的爺爺"], "ans": 0}, {"q": "以下哪一項是寫卡片時最不需要的格式？", "a": ["收信人姓名", "寄信人姓名", "信件的郵票價錢", "寄信日期"], "ans": 2}, {"q": "寫邀請卡給老師，文中要用：", "a": ["您", "你", "佢", "他"], "ans": 0}, {"q": "「九月十日」寫在下款的下面，這是什麼？", "a": ["日期", "上款", "下款", "祝頌語"], "ans": 0}, {"q": "「恭喜你在鋼琴比賽中奪冠！」這是屬於卡片中的：", "a": ["祝賀內容", "邀請時間", "上款", "日期"], "ans": 0}], "hard": [{"q": "小明想邀請「志強舅父」週末去濕地公園。以下哪一個上款與敬稱「最正確、最得體」？", "a": ["上款寫「親愛的志強舅父：」，文中用「您」稱呼。", "上款寫「志強：」，文中用「你」稱呼。", "上款寫「老強：」，文中用「您」稱呼。", "上款寫「親愛的舅父：」，文中用「佢」稱呼。"], "ans": 0}, {"q": "續上題，寫給「志強舅父」的邀請卡，下款和日期哪一個格式完全正確？", "a": ["外甥 小明 敬上 / 九月二日", "小明 / 今天", "姪兒 小明 敬上 / 九月二日", "同學 小明 上 / 九月"], "ans": 0}, {"q": "小芳要寫一張賀卡恭喜堂妹「小思」鋼琴比賽奪得冠軍，以下哪句「最合適」？", "a": ["恭喜你，小思！希望你能再接再厲，早日取得更好的成績！加油啊！", "恭喜您，堂妹。請您明天準時出席鋼琴比賽，地點在學校禮堂。", "希望你能抽空出席，我真的希望你能來啊！", "祝你生日快樂，身體健康！"], "ans": 0}, {"q": "請選出下款關係稱謂與上款「完全配對正確」的選項：", "a": ["上款：親愛的老師 / 下款：學生 小強 敬上", "上款：親愛的爺爺 / 下款：外甥 小強 敬上", "上款：親愛的姑姐 / 下款：孫兒 小強 敬上", "上款：親愛的同學 / 下款：姪兒 小強 敬上"], "ans": 0}, {"q": "在寫給「同輩同學」的邀請卡中，下款應該用哪一個啟告語最自然？", "a": ["啟", "敬上", "上 / 啟（或直接寫名字）", "叩上"], "ans": 2}, {"q": "「親愛的王老師：我將在學校表演，誠意邀請您前來觀看。... 學生小明敬上」這張卡片缺少了什麼？", "a": ["表演的具體日期和時間", "小明的年級", "老師的住址", "祝頌語"], "ans": 0}, {"q": "實用文中，上款之後通常要加上甚麼標點符號？", "a": ["冒號（：）", "感嘆號（！）", "問號（？）", "逗號（，）"], "ans": 0}, {"q": "寫卡片給「外婆」，正確的尊稱和下款是：", "a": ["上款用「您」，下款用「外孫 / 外孫女 敬上」", "上款用「你」，下款用「姪兒 敬上」", "上款用「您」，下款用「學生 敬上」", "上款用「你」，下款用「孫兒 敬上」"], "ans": 0}, {"q": "賀卡中的「祝頌語」（如：祝學業進步）通常寫在：", "a": ["正文之後，下款之前，空兩格或另起一行頂格寫", "最上面", "下款的下面", "日期的下面"], "ans": 0}, {"q": "在寫給「老師」的邀請卡中，最得體的表達是：", "a": ["誠意邀請您前來指導。", "你一定要來啊！", "希望你抽空來玩。", "請你快點來。"], "ans": 0}, {"q": "林老師：我們將於本星期五（十月十日）下午二時正，在學校禮堂舉行「中文朗誦比賽」。我是參賽者之一，真的非常希望您能抽空前來觀看指導，期待您的光臨！這段正文：", "a": ["格式與內容完全得體正確", "缺少了比賽的地點", "缺少了小明的名字", "時間不夠詳細"], "ans": 0}, {"q": "寫賀卡給「大伯父」恭賀他「新居落成」，以下哪個祝賀語最適合？", "a": ["祝大伯父：新居落成，大展宏圖，生活美滿！", "祝您學業進步，天天開心！", "恭喜您在比賽中奪得冠軍！", "希望大伯父能抽空出席！"], "ans": 0}, {"q": "如果上款是「親愛的舅父母：」，那麼寫卡片的人與收卡人的關係是：", "a": ["外甥 / 外甥女", "姪兒 / 姪女", "孫兒 / 孫女", "學生"], "ans": 0}, {"q": "寫邀請卡給同輩好友「子軒」來參加自己的生日會，以下哪組下款與敬稱最自然？", "a": ["上款「親愛的子軒：」，文中用「你」，下款「好友小強上」", "上款「子軒：」，文中用「您」，下款「小強敬上」", "上款「親愛的軒哥：」，文中用「佢」，下款「姪子小強」", "上款「子軒同學：」，文中用「您」，下款「學生小強上」"], "ans": 0}, {"q": "在實用文邀請卡中，為什麼必須寫清楚「星期幾」和「具體時間」？", "a": ["因為如果只寫日期，對方可能不知道具體時間而錯過活動，寫清星期幾更方便對方安排日程", "為了增加字數", "因為卡片紙張有空位", "為了格式好看"], "ans": 0}, {"q": "「祝 / 身體健康」在格式上的寫法是：", "a": ["「祝」字空兩格寫在正文下，另起一行頂格寫「身體健康」", "「祝身體健康」寫在同一行頂格", "寫在下款的右邊", "寫在日期的最下面"], "ans": 0}, {"q": "寫給「表姐」的生日賀卡，以下哪個尊稱與下款啟告語「最不合適」？", "a": ["上款用「您」，下款用「姪兒 小明 敬上」", "上款用「你」，下款用「表弟 小明 上」", "上款用「親愛的表姐：」，下款用「小明」", "上款用「表姐：」，下款用「小明 啟」"], "ans": 0}, {"q": "「誠意邀請您出席我的畢業禮。」這句話最適合寫在什麼卡片中？", "a": ["邀請卡", "祝賀卡", "慰問卡", "感謝卡"], "ans": 0}, {"q": "在實用文中，若將寫信日期寫在「上款的左邊」，會犯了甚麼格式錯誤？", "a": ["日期位置不對，日期必須寫在卡片右下角，且在下款的下面一行", "日期不能寫阿拉伯數字", "上款左邊不能有字", "沒有錯誤"], "ans": 0}, {"q": "賀卡與邀請卡在「內容功能」上的主要區別是：", "a": ["賀卡是為了向對方表達祝賀和讚賞，邀請卡是為了請對方在特定時間地點出席某活動", "賀卡有下款，邀請卡沒有", "邀請卡給長輩，賀卡給同輩", "沒有任何區別"], "ans": 0}]}, "11": {"title": "一日一記", "icon": "📔", "introTitle": "第十一關：魔法日記日記簿", "teaching": "寫日記要記下「日期、星期和天氣」，並挑選一天中「最難忘、最有感受」的一件事來寫，不需要把起床、吃飯等瑣事全部寫成像流水帳！", "example": "💡 例：<b>九月一日 星期五 晴（日記首行）</b>。今天真是個難忘的開學日！早上...（寫重點事件與心情感受）。", "easy": [{"q": "寫日記時，第一行必須寫下甚麼資訊？", "a": ["日期、星期、天氣", "自己的名字", "一天的開支", "學校的地址"], "ans": 0}, {"q": "日記的作用主要是記錄甚麼？", "a": ["當天發生的事情和自己的感受、想法", "未來的計劃", "別人的八卦", "故事書的內容"], "ans": 0}, {"q": "寫日記時，應該要怎樣選擇內容？", "a": ["把大大小小的事情全部記下來，像流水帳", "挑選一天中最有意義或感受最深刻的事情來寫", "只寫天氣", "隨便編造故事"], "ans": 1}, {"q": "「十月二十日 星期五 晴」這是日記的甚麼部分？", "a": ["日記的第一行（格式）", "日記的結尾", "日記的標題", "日記的署名"], "ans": 0}, {"q": "以下哪一個「不適合」作為日記的天氣記錄？", "a": ["陰", "雨", "高興", "晴"], "ans": 2}, {"q": "寫日記可以用第一人稱「我」來寫嗎？", "a": ["可以，而且最常用「我」", "絕對不行", "要用「您」", "要用「他」"], "ans": 0}, {"q": "「我要替自己打氣，希望下次有更好的表現！」這通常寫在日記的哪裏？", "a": ["第一行", "正文開頭", "結尾（抒發感受或對未來的期望）", "不應該寫"], "ans": 2}, {"q": "以下哪一項最適合寫進日記？", "a": ["今天我早上刷了牙", "代表班級參加問答比賽並獲得冠軍的經歷", "我中午吃了一碗飯", "我晚上九點睡覺"], "ans": 1}, {"q": "日記需要像寫信一樣寫上款（如：親愛的小明）嗎？", "a": ["不需要", "需要", "看情況", "必須寫"], "ans": 0}, {"q": "「晴、陰、雨、雪」屬於日記首行的：", "a": ["天氣", "日期", "星期", "時間"], "ans": 0}, {"q": "日記的「星期」主要寫在第一行的：", "a": ["日期和天氣的中間", "最前面", "最後面", "正文開頭"], "ans": 0}, {"q": "「今天真是倒霉的一天！」這句話最適合寫在日記的：", "a": ["正文開頭（直接抒發當天感受）", "結尾", "第一行格式", "下款"], "ans": 0}, {"q": "以下哪種天氣「不適合」寫在日記首行？", "a": ["颳風", "晴天", "生病", "下雨"], "ans": 2}, {"q": "「今天放學後，天空突然下起了傾盆大雨。」這是日記的：", "a": ["事情經過（起因）", "首行格式", "感悟結尾", "上款"], "ans": 0}, {"q": "日記的結尾通常會寫：", "a": ["當天事情帶給自己的反思或對未來的期望", "當天的日期", "收信人的名字", "明天的天氣預報"], "ans": 0}, {"q": "以下哪個日記格式是「最正確」的？", "a": ["十月十日 星期五 晴", "十月十日 晴 星期五", "星期五 晴 十月十日", "晴 星期五 十月十日"], "ans": 0}, {"q": "「我暗暗下定決心，以後一定要好好複習！」這是在日記中表達：", "a": ["自己的決心和期望", "當天發生的事情", "日記的天氣", "當天的日期"], "ans": 0}, {"q": "日記需要寫「下款敬上、日期」嗎？", "a": ["不需要，日記不是寫信，不用寫敬啟和署名", "必須寫", "寫在最上面", "寫在中間"], "ans": 0}, {"q": "「今天，我代表學校參加足球比賽，射入關鍵一球！」這是一篇關於什麼的日記？", "a": ["難忘的比賽經歷", "普通的日常生活", "幫忙做家務", "生病的過程"], "ans": 0}, {"q": "「天空灰濛濛的，正如我今天低落的心情。」這句話屬於什麼寫法？", "a": ["利用天氣烘托心情", "只是寫天氣", "是首行格式", "是日記下款"], "ans": 0}], "hard": [{"q": "小志參加了學校的問答比賽，回家後他想寫日記。以下哪一組內容是他「最應該記錄」的？", "a": ["自己在比賽時緊張的心情、搶答的激烈經過 and 當下的感受", "早上媽媽做早餐的步驟、一個月前被選中參賽的經過", "自己何時吃晚飯、洗澡和睡覺的時間", "今天天氣好不好、小狗有沒有叫"], "ans": 0}, {"q": "「十月十日 星期五 晴。今天放學後，我懷著忐忑的心情到學校天台參加園藝班……」這段日記開頭好在哪裡？", "a": ["格式正確，且一開頭就用「忐忑的心情」點出感受，吸引讀者", "字數非常多", "寫了天氣是晴天", "寫了地點是天台"], "ans": 0}, {"q": "如果日記寫成：「早上我七點起床。七點半吃早餐。八點上學。中午吃麵包。下午放學。晚上睡覺。」這犯了甚麼寫作毛病？", "a": ["像流水帳，平淡無奇，沒有重點和感受", "錯別字太多", "格式不正確", "字數太少"], "ans": 0}, {"q": "日記的結尾：「我會小心呵護我的盆栽，希望它能快高長大！」這句話的作用是：", "a": ["交代時間的流逝", "表達對事件的感受、反思或對未來的期盼", "記錄當天的天氣變化", "沒有作用"], "ans": 1}, {"q": "在日記中寫「特別的事情」時，我們「不應該」：", "a": ["加入自己的心理活動 and 真實感受", "把不相關的、重重複複的瑣事全部塞進去", "運用五感法或擬人法來美化句子", "寫出事件的結果"], "ans": 1}, {"q": "「十一月一日 星期六 陰。今天我和朋友吵架了，心裡像壓了一塊大石頭一樣沉重。」這段日記開頭：", "a": ["成功運用了心理描寫和比喻，點出難過的心情", "格式不正確", "沒有寫事情經過", "太過悲傷，不能寫"], "ans": 0}, {"q": "「大雨嘩啦啦地下著，我的心情也像這天氣一樣，灰濛濛的。」這句話：", "a": ["成功利用天氣環境烘托了低落的心情", "是日記的格式", "是下款", "是言語開頭"], "ans": 0}, {"q": "寫關於「做家務」的日記，下列哪項能寫出「體會」？", "a": ["今天掃地很累，我體會到了媽媽每天做家務的辛苦，以後我要多幫忙。", "我今天掃地了，地乾淨了。", "媽媽讓我掃地，我不高興。", "掃地很簡單。"], "ans": 0}, {"q": "「我暗暗發誓，以後一定要改掉粗心的壞習慣！」這句話在日記中屬於：", "a": ["事件的反思與未來的期盼（結尾）", "事件的起因", "天氣的描寫", "首行格式"], "ans": 0}, {"q": "寫日記時，如果遇到了不開心的事情，應該怎麼寫？", "a": ["不能寫，日記只能記錄開心的事", "如實記錄，並寫下自己的反思、排解方法或未來的期望", "隨便編造一件開心的事代替", "只寫日期 and 天氣"], "ans": 1}, {"q": "請找出「格式和內容結構完全正確」的一段日記：", "a": ["十月五日 星期天 雨。今天我和爸爸去放風箏。雖然下著大雨，但風箏飛得很高。我很開心！", "十一月十日 星期一 陰。今天在學校發回了數學測驗卷。看著考卷上刺眼的『75』分，我心裏難過極了，眼眶裡淚水直打轉。放學回家，我把這件事一五一十地告訴了媽媽。媽媽沒有責怪我，反而溫柔地安慰我，並幫我分析錯題。我暗暗下定決心：下次考試前一定要加倍努力，改掉粗心的毛病，爭取考得好成績！", "十二月五日 晴。今天早上七點起床，吃了一個熱騰騰的包子，然後去上學。在學校上了六節課，下午三點半放學回家。晚上九點我就去睡覺了。今天真充實！", "日記：今天我和表哥去海洋公園，玩了過山車，很好玩。"], "ans": 1}, {"q": "在日記中，「今天真是難忘的一天！」這類點出情感基調的句子，最適合放在哪裡？", "a": ["正文第一句，能直接定下當天的心情，引出下文", "寫在日期的上面", "寫在最後一行日期下", "不應該寫"], "ans": 0}, {"q": "「天空蔚藍，陽光燦爛，我的心情也跟這陽光一樣，無比晴朗！」這句景物烘托，在日記中最適合用來寫：", "a": ["一次開心的郊遊或獲得表揚的經歷", "一次考試失利的悲傷心情", "自己生病發燒的痛苦經歷", "和同學吵架後的難過"], "ans": 0}, {"q": "日記中，如果寫「幫媽媽分擔家務」，以下哪段最不符合「拒絕流水帳」的寫作原則？", "a": ["今天媽媽很累，我自告奮勇幫忙洗碗。我看見碗很髒，我用洗潔精洗乾淨。洗完後，我把碗放好。媽媽讚我，我很高興。", "今天媽媽生病了，我自告奮勇幫忙洗碗。看著堆積如山的髒盤子，我先學著媽媽的樣子繫上圍裙，然後使使勁地擦拭。雖然水有些涼，手也酸了，但看著碗碟被洗得亮晶晶、整整齊齊地排在架上，我心裏甜滋滋的。我終於體會到媽媽平時的辛苦了！", "今天我幫媽媽掃地。我拿掃帚掃。我把垃圾倒進垃圾桶。然後我拖地。媽媽讚我是好孩子。", "今天我很乖，幫媽媽做了很多家務。"], "ans": 1}, {"q": "寫日記時，如果對天氣的描寫寫了「今天天氣很好，有很多白雲」，可以如何修改得更有小作家文學色彩？", "a": ["今天的天空像一片蔚藍的大海，幾朵白雲像悠閒的小船一樣在上面緩緩漂浮。", "今天天空很藍，雲很多。", "因為天氣很好，所以我很開心。", "天上有許多白雲，像棉花糖。"], "ans": 0}, {"q": "日記結尾：「看著鏡子裏臉紅耳赤的自己，我感到無比羞愧。我以後一定要做個誠實的孩子，再也不說謊了。」這段話的作用是：", "a": ["進行自我反思，抒發真實心理感受，昇華日記的主題", "交代了故事的地點是在鏡子前", "記錄了當天晚上的天氣", "告訴大家事情的結果"], "ans": 0}, {"q": "「九月十日 星期四 晴。今天，是一年一度的教師節，也是我過得最充實、最快樂的一天。」這句開頭在結構上的主要優點是：", "a": ["格式完備，且開篇點題，用「充實、快樂」吸引讀者想探究發生了甚麼", "字數很多", "說明了今天是星期四", "交代了教師節的由來"], "ans": 0}, {"q": "寫日記《我的新寵物》時，如果只寫「今天爸爸買了一隻烏龜，牠很小，我很喜歡」，會缺乏甚麼細節？", "a": ["缺乏運用五感（如：烏龜硬邦邦的外殼、綠油油的皮膚）與擬人動態（如：調皮地探頭）的精彩細寫", "沒有寫烏龜的價錢", "沒有寫烏龜的名字", "沒有寫今天的天氣"], "ans": 0}, {"q": "以下哪一項「不應該」出現在小學生的日記正文中？", "a": ["今天的功課很多，我寫到晚上十點，覺得有些疲倦。", "今天，我決定編造一個我去太空探險並拯救外星人的故事寫在日記裏。", "今天在學校和同學玩遊戲時摔倒了，膝蓋破了皮，但我學會了堅強，沒有流淚。", "今天放學路上，我看見一隻受傷的小鳥，並和媽媽一起把牠送到了獸醫診所。"], "ans": 1}, {"q": "「日記」與「普通記事作文」的最大相同點與不同點是：", "a": ["都是寫人記事，但日記必須在首行寫明『日期、星期和天氣』，且更強調個人的內心獨白與當日反思", "日記必須寫上款，作文不用", "日記不用寫感受，作文要寫", "兩者完全沒有區別"], "ans": 0}]}};
+
+        let currentLevelId = 1;
+        let currentQuestions = [];
+        let questionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+        let userAnswersHistory = [];
+
+        window.onload = function() {
+            generateLobbyGrid();
+            showLobby();
+        };
+
+        function getStarsAndScoreHtml(levelId) {
+            const bestScore = localStorage.getItem(`level_score_lvl_${levelId}`);
+            if (bestScore === null) {
+                return {
+                    stars: `<span class="star-empty">⛤⛤⛤</span>`,
+                    scoreText: "未挑戰"
+                };
+            }
+
+            const scoreNum = parseInt(bestScore);
+            let starsStr = "";
+            
+            if (scoreNum === 20) {
+                starsStr = `<span class="star-big">🌟🌟🌟</span>`;
+            } else if (scoreNum >= 10) {
+                starsStr = `<span class="star-small">⭐⭐⭐</span>`;
+            } else {
+                starsStr = `<span class="star-empty">⛤⛤⛤</span>`;
+            }
+
+            return {
+                stars: starsStr,
+                scoreText: `最高得分: ${scoreNum} 分`
+            };
+        }
+
+        function generateLobbyGrid() {
+            const grid = document.getElementById("levels-grid");
+            grid.innerHTML = "";
+            for (let id in gameLevels) {
+                const lvl = gameLevels[id];
+                const card = document.createElement("div");
+                card.className = "level-card active";
+                card.onclick = () => showIntro(id);
+                
+                const meta = getStarsAndScoreHtml(id);
+
+                card.innerHTML = `
+                    <span class="icon">${lvl.icon}</span>
+                    <span class="num">關卡 ${id}</span>
+                    <div class="title">${lvl.title}</div>
+                    <div class="stars-container">${meta.stars}</div>
+                    <div class="score-badge">${meta.scoreText}</div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function showLobby() {
+            document.getElementById("lobby-view").classList.remove("hidden");
+            document.getElementById("intro-view").classList.add("hidden");
+            document.getElementById("quiz-view").classList.add("hidden");
+            document.getElementById("result-view").classList.add("hidden");
+            document.getElementById("game-title").innerText = "小三上中文寫作大冒險";
+            generateLobbyGrid();
+        }
+
+        function confirmBackToLobby() {
+            if (confirm("📢 現在回到地圖主頁，這關的做題進度將會遺失喔！確定要返回嗎？")) {
+                showLobby();
+            }
+        }
+
+        function confirmClearRecords() {
+            if (confirm("🧹 確定要清除所有關卡的星星和最高分數記錄嗎？此操作將會重新開始喔！")) {
+                for (let id in gameLevels) {
+                    localStorage.removeItem(`level_score_lvl_${id}`);
+                }
+                alert("🧹 紀錄清除成功！快點燃鬥志重新挑戰吧！");
+                generateLobbyGrid();
+            }
+        }
+
+        function showIntro(levelId) {
+            currentLevelId = parseInt(levelId);
+            const lvl = gameLevels[currentLevelId];
+
+            document.getElementById("game-title").innerText = `關卡 ${currentLevelId} - ${lvl.title}`;
+            document.getElementById("intro-title-text").innerText = lvl.introTitle;
+            document.getElementById("intro-teaching-text").innerHTML = lvl.teaching;
+            document.getElementById("intro-example-text").innerHTML = lvl.example;
+
+            document.getElementById("lobby-view").classList.add("hidden");
+            document.getElementById("intro-view").classList.remove("hidden");
+            document.getElementById("quiz-view").classList.add("hidden");
+            document.getElementById("result-view").classList.add("hidden");
+        }
+
+        function startGameSession() {
+            const lvl = gameLevels[currentLevelId];
+            
+            const shuffledEasy = shuffleArray([...lvl.easy]);
+            const shuffledHard = shuffleArray([...lvl.hard]);
+
+            const selectedEasy = shuffledEasy.slice(0, 10);
+            const selectedHard = shuffledHard.slice(0, 10);
+
+            currentQuestions = [...selectedEasy, ...selectedHard];
+            
+            userAnswersHistory = [];
+            currentQuestions.forEach(q => {
+                userAnswersHistory.push({
+                    qText: q.q,
+                    options: q.a,
+                    correctIndex: q.ans,
+                    userSelectedIndex: -1,
+                    isCorrect: false
+                });
+            });
+
+            questionIndex = 0;
+            score = 0;
+            
+            document.getElementById("lobby-view").classList.add("hidden");
+            document.getElementById("intro-view").classList.add("hidden");
+            document.getElementById("quiz-view").classList.remove("hidden");
+            document.getElementById("result-view").classList.add("hidden");
+
+            document.getElementById("level-indicator").innerText = `${lvl.icon} 關卡 ${currentLevelId}`;
+            updateScoreDisplay();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            selectedOption = null;
+            const qData = currentQuestions[questionIndex];
+            const history = userAnswersHistory[questionIndex];
+
+            document.getElementById("wrong-next-panel").classList.add("hidden");
+            document.getElementById("btn-prev-q").disabled = (questionIndex === 0);
+            document.getElementById("btn-next-q").disabled = false;
+
+            if (questionIndex === 19) {
+                document.getElementById("btn-next-q").innerHTML = `提交結算 <i class="fa-solid fa-flag-checkered"></i>`;
+            } else {
+                document.getElementById("btn-next-q").innerHTML = `下一題 <i class="fa-solid fa-arrow-right"></i>`;
+            }
+
+            document.getElementById("question-indicator").innerText = `第 ${questionIndex + 1} / 20 題`;
+            const progressPercent = ((questionIndex) / 20) * 100;
+            document.getElementById("game-progress").style.width = `${progressPercent}%`;
+
+            const difficultyTag = questionIndex < 10 ? "⭐ [基礎挑戰]" : "🔥 [進階挑戰]";
+            document.getElementById("q-text").innerHTML = `
+                <div style="display:flex; flex-direction:column;">
+                    <span style="color:${questionIndex < 10 ? '#4ECA64':'#FF5C77'}; font-weight:bold; font-size:0.82rem; margin-bottom:4px;">${difficultyTag}</span>
+                    <span>${qData.q}</span>
+                </div>
+            `;
+
+            const ttsQBtn = document.getElementById("tts-q-trigger");
+            ttsQBtn.style.animation = "float 1.5s ease-in-out infinite";
+
+            const optionsBox = document.getElementById("options-box");
+            optionsBox.innerHTML = "";
+            qData.a.forEach((optText, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                
+                if (history.userSelectedIndex !== -1) {
+                    if (idx === history.correctIndex) {
+                        btn.classList.add("correct");
+                    } else if (idx === history.userSelectedIndex) {
+                        btn.classList.add("wrong");
+                    }
+                }
+
+                btn.innerHTML = `
+                    <span><b>${idx + 1}.</b> ${optText}</span>
+                    <button class="option-tts-btn" onclick="speakOption(event, '${optText}')" title="點讀該選項"><i class="fa-solid fa-volume-high"></i></button>
+                `;
+                
+                btn.onclick = () => selectOption(idx, btn);
+                optionsBox.appendChild(btn);
+            });
+
+            // speakText(qData.q); // 已停用自動讀題，需手動點擊喇叭朗讀
+        }
+
+        function navigatePrev() {
+            if (questionIndex > 0) {
+                questionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function navigateNext() {
+            if (questionIndex < 19) {
+                questionIndex++;
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function selectOption(index, buttonElement) {
+            const history = userAnswersHistory[questionIndex];
+            if (history.userSelectedIndex !== -1) return;
+
+            history.userSelectedIndex = index;
+            const qData = currentQuestions[questionIndex];
+            const correctIndex = qData.ans;
+            const optionButtons = document.getElementById("options-box").getElementsByClassName("option-btn");
+
+            if (index === correctIndex) {
+                buttonElement.classList.add("correct");
+                history.isCorrect = true;
+                score += 1;
+                updateScoreDisplay();
+                
+                playCorrectSound();
+                startConfettiEffect();
+                speakText("答對了！你太棒了！");
+
+                setTimeout(() => {
+                    navigateNext();
+                }, 2000);
+            } else {
+                buttonElement.classList.add("wrong");
+                optionButtons[correctIndex].classList.add("correct");
+                history.isCorrect = false;
+                speakText("不太對，看清楚答案，再試試看！");
+                document.getElementById("wrong-next-panel").classList.remove("hidden");
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById("score-counter").innerText = `得分: ${score} / 20 分`;
+        }
+
+        function updateResultCardUI() {
+            document.getElementById("final-score").innerText = `得分: ${score} / 20 分`;
+
+            const previousBest = parseInt(localStorage.getItem(`level_score_lvl_${currentLevelId}`)) || 0;
+            if (score > previousBest) {
+                localStorage.setItem(`level_score_lvl_${currentLevelId}`, score);
+            }
+
+            const emojiEl = document.getElementById("result-emoji");
+            const msgEl = document.getElementById("result-msg");
+
+            if (score === 20) {
+                emojiEl.innerText = "👑";
+                msgEl.innerText = "太完美了！你得到了滿分 20 分，成功點亮了閃耀大星星！🌟🌟🌟";
+            } else if (score >= 10) {
+                emojiEl.innerText = "⭐";
+                msgEl.innerText = "表現很棒！你已達到合格分數，成功點亮了可愛小星星勳章！⭐⭐⭐";
+            } else {
+                emojiEl.innerText = "🍀";
+                msgEl.innerText = "差一點點就合格 (10分) 囉！多做下方錯題練習，再次挑戰必定成功！";
+            }
+        }
+
+        function showResult() {
+            document.getElementById("quiz-view").classList.add("hidden");
+            document.getElementById("result-view").classList.remove("hidden");
+
+            updateResultCardUI();
+
+            if (score === 20) {
+                // speakText("太完美了！你獲得了二十分滿分！"); // 已停用自動讀題
+            } else if (score >= 10) {
+                // speakText("做得好！你順利合格了！"); // 已停用自動讀題
+            } else {
+                // speakText("沒關係，多讀幾遍，重新挑戰一次吧！"); // 已停用自動讀題
+            }
+
+            generateReportList();
+        }
+
+        function restartLevel() {
+            startGameSession();
+        }
+
+        function generateReportList() {
+            const listEl = document.getElementById("report-list");
+            listEl.innerHTML = "";
+
+            userAnswersHistory.forEach((record, idx) => {
+                const item = document.createElement("div");
+                item.className = "report-item";
+                
+                const statusText = record.isCorrect 
+                    ? `<span class="report-status status-correct"><i class="fa-solid fa-circle-check"></i> 答對</span>` 
+                    : `<span class="report-status status-wrong"><i class="fa-solid fa-circle-xmark"></i> 答錯</span>`;
+
+                const actionButton = record.isCorrect 
+                    ? `<span style="color:#999; font-size:0.85rem;"><i class="fa-solid fa-face-smile"></i> 完成了！</span>` 
+                    : `<button class="btn btn-blue" style="padding:6px 14px; font-size:0.85rem; margin:0; border-radius:12px; box-shadow: 0 3px 0px #1A75C7;" onclick="openRedoQuestion(${idx})"><i class="fa-solid fa-play"></i> 重新挑戰</button>`;
+
+                item.innerHTML = `
+                    <div style="flex: 1; padding-right: 10px;">
+                        <strong style="color:var(--primary-color);">第 ${idx+1} 題：</strong>
+                        <span style="font-size:0.95rem; line-height: 1.4;">${record.qText}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content: space-between; gap: 15px; margin-top: 5px;">
+                        ${statusText}
+                        ${actionButton}
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        function openRedoQuestion(historyIndex) {
+            const record = userAnswersHistory[historyIndex];
+            
+            const currentHint = levelWritingHints[currentLevelId] || "細心閱讀題目，找出句子或格式中的關鍵答案喔！";
+            document.getElementById("redo-hint-text").innerText = currentHint;
+
+            document.getElementById("redo-q-text").innerText = `第 ${historyIndex + 1} 題：${record.qText}`;
+            document.getElementById("redo-speak-q-btn").onclick = () => speakText(record.qText);
+            document.getElementById("redo-feedback").innerText = "";
+
+            const box = document.getElementById("redo-options-box");
+            box.innerHTML = "";
+
+            let isRedoFinished = false;
+
+            record.options.forEach((optText, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerHTML = `
+                    <span><b>${idx + 1}.</b> ${optText}</span>
+                    <button class="option-tts-btn" onclick="speakOption(event, '${optText}')"><i class="fa-solid fa-volume-high"></i></button>
+                `;
+                
+                btn.onclick = () => {
+                    if (isRedoFinished) return;
+
+                    if (idx === record.correctIndex) {
+                        isRedoFinished = true;
+                        btn.className = "option-btn correct";
+                        document.getElementById("redo-feedback").innerHTML = "<span style='color:var(--correct-color);'><i class='fa-solid fa-face-laugh-beam'></i> 答對了！你太棒了！</span>";
+                        playCorrectSound();
+                        startConfettiEffect();
+                        // speakText("完全正確！你成功改正了錯誤！"); // 已停用自動讀題
+                        
+                        record.isCorrect = true;
+                        score += 1;
+                        
+                        updateResultCardUI();
+                        
+                        setTimeout(() => {
+                            closeRedoModal();
+                            generateReportList();
+                        }, 1500);
+                    } else {
+                        btn.className = "option-btn wrong";
+                        document.getElementById("redo-feedback").innerHTML = "<span><i class='fa-solid fa-hand-fist'></i> 差一點點，再試試別的答案！</span>";
+                        // speakText("不太對，再想一想！"); // 已停用自動讀題
+                    }
+                };
+                box.appendChild(btn);
+            });
+
+            document.getElementById("redo-modal").classList.remove("hidden");
+        }
+
+        function closeRedoModal() {
+            document.getElementById("redo-modal").classList.add("hidden");
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function speakCurrentQuestion() {
+            const qData = currentQuestions[questionIndex];
+            if (qData) {
+                let fullSpeechText = qData.q + "。選項有：";
+                qData.a.forEach((optText, idx) => {
+                    fullSpeechText += `。第${idx + 1}個選項：${optText}。`;
+                });
+                speakText(fullSpeechText);
+            }
+        }
+
+        function speakOption(event, text) {
+            event.stopPropagation();
+            speakText(text);
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "").replace(/💡/g, "").replace(/例：/g, "例如：");
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'zh-HK'; 
+                utterance.rate = 0.86;    
+                utterance.pitch = 1.12;   
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playCorrectSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                const now = ctx.currentTime;
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                osc.frequency.setValueAtTime(1046.50, now + 0.24);
+                
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                
+                osc.start();
+                osc.stop(now + 0.5);
+            } catch (e) {
+                console.log("AudioContext blocked.");
+            }
+        }
+
+        const confettiCanvas = document.getElementById("confetti-canvas");
+        const confettiCtx = confettiCanvas.getContext("2d");
+        let confettiActive = false;
+        let particles = [];
+
+        function resizeConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeConfetti);
+
+        function startConfettiEffect() {
+            resizeConfetti();
+            confettiCanvas.classList.remove("hidden");
+            confettiActive = true;
+            particles = [];
+            
+            for (let i = 0; i < 110; i++) {
+                particles.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * confettiCanvas.height,
+                    color: `hsl(${Math.random() * 360}, 100%, 55%)`,
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+                    tiltAngle: 0
+                });
+            }
+            animateConfetti();
+            
+            setTimeout(() => {
+                confettiActive = false;
+                confettiCanvas.classList.add("hidden");
+            }, 2000);
+        }
+
+        function animateConfetti() {
+            if (!confettiActive) return;
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            
+            particles.forEach((p, index) => {
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle);
+                p.tilt = Math.sin(p.tiltAngle - index / 3) * 15;
+
+                confettiCtx.beginPath();
+                confettiCtx.lineWidth = p.r;
+                confettiCtx.strokeStyle = p.color;
+                confettiCtx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                confettiCtx.stroke();
+            });
+            requestAnimationFrame(animateConfetti);
+        }
+    </script>
+</body>
+</html>
