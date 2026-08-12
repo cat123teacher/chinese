@@ -862,7 +862,10 @@
             <img src="cat.jpeg" class="logo-cat-img" alt="Teacher Cat Logo" onerror="this.onerror=null; this.outerHTML='<span class=\'logo-cat\'>🐱</span>';">
             <span>幼稚園K2K3看圖說故事</span>
         </div>
-        <div class="lang-switcher">
+        <div class="lang-switcher" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <button class="btn-lang" onclick="openHelpModal()" style="border-color: #FF9800; color: #E65100; background: #FFF3E0; font-size: 14px; padding: 8px 15px; display: inline-flex; align-items: center; gap: 5px;">
+                <span>❓</span> 聽不到聲音或不能出廣東話/普通話？
+            </button>
             <button class="btn-lang active" onclick="switchLanguage('zh-HK')" id="btn-cantonese">
                 <span>🇭🇰</span> 廣東話
             </button>
@@ -1420,8 +1423,82 @@
             speechSynthesis.onvoiceschanged = () => {};
         }
 
+        
+        // Help Modal Controls
+        function openHelpModal() {
+            pauseFullStory();
+            document.getElementById('help-modal').style.display = 'flex';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').style.display = 'none';
+        }
+    
         // Start homepage
         initHomepage();
     </script>
+
+    <!-- HELP MODAL -->
+    <div class="modal" id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(74, 62, 61, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div class="modal-content" style="background: white; width: 100%; max-width: 600px; border-radius: 32px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh;">
+            <div class="modal-header" style="padding: 15px 30px; background: #FF9800; display: flex; justify-content: space-between; align-items: center; color: white; font-weight: bold; font-size: 20px;">
+                <span>🔊 聽不到聲音或不能出廣東話/普通話設定教學</span>
+                <span class="modal-close" onclick="closeHelpModal()" style="color: white; font-size: 35px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body" style="padding: 25px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; text-align: left; line-height: 1.6; font-size: 15px; color: #4A3E3D;">
+                <div style="background: #FFF3E0; border-left: 6px solid #FF9800; padding: 15px; border-radius: 12px; font-weight: bold; color: #E65100; font-size: 16px;">
+                    📢 貼心提示：請先檢查手機是否開啟了「靜音模式」🔕，並將「媒體音量」調大 🔊 喔！
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <h3 style="color: #FF5722; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 18px;">
+                        <span>🍎</span> iPhone / iPad (iOS) 設定教學：
+                    </h3>
+                    <ol style="padding-left: 20px; font-weight: bold; display: flex; flex-direction: column; gap: 5px;">
+                        <li>開啟手機的 <span style="color: #2196F3;">「設定」 (Settings)</span> ⚙️</li>
+                        <li>向下滾動，點選 <span style="color: #2196F3;">「輔助使用」 (Accessibility)</span> 👤</li>
+                        <li>在「視覺」欄位中，點選 <span style="color: #2196F3;">「朗讀內容」 (Spoken Content)</span> 🗣️</li>
+                        <li>點擊 <span style="color: #2196F3;">「聲音」 (Voices)</span> 🎵</li>
+                        <li>點選 <span style="color: #2196F3;">「中文」 (Chinese)</span></li>
+                        <li>確保已下載並勾選了語音包：
+                            <ul style="padding-left: 20px; font-weight: normal; margin-top: 5px; list-style-type: disc;">
+                                <li>🔊 <strong style="color: #E91E63;">廣東話</strong>：選擇「中文（香港）」（推薦下載高質素聲音或 Siri 聲音）</li>
+                                <li>🔊 <strong style="color: #E91E63;">普通話</strong>：選擇「中文（中國）」或「中文（台灣）」</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <hr style="border: none; border-top: 1px dashed #E0E0E0; margin: 15px 0;">
+
+                <div>
+                    <h3 style="color: #4CAF50; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 18px;">
+                        <span>🤖</span> Android 安卓手機設定教學：
+                    </h3>
+                    <ol style="padding-left: 20px; font-weight: bold; display: flex; flex-direction: column; gap: 5px;">
+                        <li>開啟手機的 <span style="color: #2196F3;">「設定」 (Settings)</span> ⚙️</li>
+                        <li>選擇 <span style="color: #2196F3;">「系統」 (System)</span> 或 <span style="color: #2196F3;">「其他設定」</span> ➡️ <span style="color: #2196F3;">「語言與輸入法」</span></li>
+                        <li>點選 <span style="color: #2196F3;">「文字轉語音輸出」 (Text-to-speech output)</span> 🗣️</li>
+                        <li>確保首選引擎為 <span style="color: #2196F3;">「Google 語音服務」 (Speech Services by Google)</span></li>
+                        <li>點擊引擎旁邊的 <span style="color: #2196F3;">「⚙️ 設定圖示」</span> ➡️ 選擇 <span style="color: #2196F3;">「安裝語音資料」</span></li>
+                        <li>找到並下載語音包：
+                            <ul style="padding-left: 20px; font-weight: normal; margin-top: 5px; list-style-type: disc;">
+                                <li>🔊 <strong style="color: #E91E63;">中文（香港）</strong>（廣東話語音包）</li>
+                                <li>🔊 <strong style="color: #E91E63;">中文（中國）</strong>（普通話語音包）</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="background: #F4F9FF; border: 2px solid #2196F3; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 14px; color: #555;">
+                    🌐 <strong>瀏覽器建議</strong>：部分手機內建瀏覽器（如微信/WeChat內置瀏覽器）可能會限制網頁發音。推薦使用手機自帶的 <strong>Safari (iPhone)</strong> 或 <strong>Chrome (Android)</strong> 瀏覽器開啟網頁，效果最好喔！
+                </div>
+            </div>
+            <div style="padding: 15px; background: #F5F5F5; text-align: center; border-top: 1px solid #E0E0E0;">
+                <button class="btn-story btn-play" onclick="closeHelpModal()" style="padding: 10px 30px; font-size: 16px; margin: 0 auto; display: inline-flex; background-color: #FF9800; border-radius: 50px; border: none; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(255,152,0,0.3);">確認，我知道了！ 👍</button>
+            </div>
+        </div>
+    </div>
+    
 </body>
 </html>
