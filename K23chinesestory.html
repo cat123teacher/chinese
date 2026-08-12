@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>幼稚園K2K3看圖說故事</title>
+    <style>
+        :root {
+            --primary: #FF7B93;
+            --secondary: #FFD25A;
+            --bg-main: #FFF9E6;
+            --text-dark: #4A3E3D;
+            --radius: 24px;
+            --shadow: 0 10px 20px rgba(0,0,0,0.05);
+            --font-family: 'Comic Sans MS', 'Microsoft JhengHei', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: #FFF;
+            padding: 15px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+            border-bottom: 4px solid var(--secondary);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo-cat {
+            font-size: 36px;
+            animation: bounce 2s infinite alternate;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-lang {
+            padding: 10px 20px;
+            border: 3px solid #E0E0E0;
+            border-radius: 50px;
+            background: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-lang.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 6px 12px rgba(255,123,147,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        /* HOME SCREEN */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4 / 5;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 15px;
+            background: rgba(0,0,0,0.06);
+            border-radius: var(--radius) 0 0 var(--radius);
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: var(--secondary);
+        }
+
+        .book-cover-emoji {
+            font-size: 70px;
+            margin: 20px 0;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+            transition: transform 0.2s ease;
+        }
+
+        .book-card:hover .book-cover-emoji {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .book-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .book-theme {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.05);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* STORY VIEW SCREEN */
+        .story-screen {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .story-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .btn-back {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255,123,147,0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-back:hover {
+            transform: scale(1.05);
+            background-color: #ff5c7a;
+        }
+
+        .story-info {
+            text-align: right;
+        }
+
+        .story-info-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .story-panels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .panel-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 4px dashed #FFD25A;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .panel-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .panel-illustration {
+            width: 100%;
+            height: 200px;
+            background: #FDFBF7;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 75px;
+            gap: 15px;
+            border: 2px solid #F0EAE0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .panel-preview-text {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+            text-align: center;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* LIGHTBOX MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(74, 62, 61, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+        }
+
+        .modal-header {
+            padding: 15px 30px;
+            background: var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+        .modal-close {
+            font-size: 35px;
+            cursor: pointer;
+            color: var(--text-dark);
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-illustration {
+            width: 100%;
+            height: 320px;
+            background: #FFFCEF;
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 130px;
+            gap: 30px;
+            border: 4px solid var(--secondary);
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.03);
+        }
+
+        .subtitle-box {
+            background: #FFF5F7;
+            border-left: 8px solid var(--primary);
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 22px;
+            line-height: 1.6;
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+        .storyteller-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-story {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-play {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-play:hover {
+            background-color: #43A047;
+            transform: translateY(-2px);
+        }
+
+        .btn-pause {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background-color: #FB8C00;
+            transform: translateY(-2px);
+        }
+
+        .btn-article {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-article:hover {
+            background-color: #1E88E5;
+            transform: translateY(-2px);
+        }
+
+        /* ARTICLE SECTION */
+        .article-panel {
+            display: none;
+            margin-top: 20px;
+            background: #F4F9FF;
+            border: 3px solid #2196F3;
+            border-radius: var(--radius);
+            padding: 25px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .article-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1E88E5;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sentence-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px dashed #D0E3F5;
+            font-size: 18px;
+            gap: 20px;
+            line-height: 1.5;
+        }
+
+        .sentence-row:last-child {
+            border-bottom: none;
+        }
+
+        .sentence-text {
+            flex-grow: 1;
+            font-weight: bold;
+        }
+
+        .btn-speak-sentence {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            border: none;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(33,150,243,0.3);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-speak-sentence:hover {
+            background: #1E88E5;
+            transform: scale(1.1);
+        }
+
+        .highlight-text {
+            color: var(--primary);
+            transition: color 0.3s;
+        }
+
+
+        /* PICTURE BOOK STYLES (ADDED IN V2) */
+        .book-cover-container {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid rgba(0,0,0,0.05);
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .book-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover .book-cover-img {
+            transform: scale(1.1) rotate(-1deg);
+        }
+
+        .story-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .story-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .story-main-image-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 4px solid var(--secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-main-img {
+            max-width: 100%;
+            max-height: 480px;
+            border-radius: 12px;
+            object-fit: contain;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .story-main-img:hover {
+            transform: scale(1.02);
+        }
+
+        .story-panels-side {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .panel-card {
+            background: white;
+            border-radius: 18px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+            text-align: left;
+        }
+
+        .panel-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(255,123,147,0.15);
+        }
+
+        .panel-card-badge {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(255,123,147,0.3);
+        }
+
+        .panel-card-preview {
+            font-size: 16px;
+            line-height: 1.4;
+            color: var(--text-dark);
+            font-weight: bold;
+        }
+
+        .modal-illustration {
+            width: 100%;
+            height: auto;
+            min-height: 250px;
+            background: #FFFCEF;
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 4px solid var(--secondary);
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.03);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            object-fit: contain;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        /* Nav controls for lightbox */
+        .lightbox-nav-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-nav-arrow {
+            background: #FFF;
+            border: 2px solid var(--secondary);
+            color: var(--text-dark);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-nav-arrow:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        /* ANIMATIONS */
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* RESPONSIVENESS */
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            .book-card {
+                padding: 15px;
+                aspect-ratio: auto;
+            }
+
+            .book-cover-emoji {
+                font-size: 55px;
+                margin: 10px 0;
+            }
+
+            .book-title {
+                font-size: 16px;
+            }
+
+            .story-panels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                max-height: 95vh;
+            }
+
+            .modal-illustration {
+                height: 200px;
+                font-size: 80px;
+            }
+
+            .subtitle-box {
+                font-size: 18px;
+            }
+        }
+
+        /* Added styles in V6 */
+        .logo-cat-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .logo-cat-img:hover {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        /* Return button styles */
+        .btn-return-adventure {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #FF9800, #FF5722);
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 16px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(255,87,34,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid #FFF;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-return-adventure:hover {
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255,87,34,0.5);
+            background: linear-gradient(135deg, #FFB74D, #FF7043);
+        }
+
+        /* Beautiful Non-fixed Footer styles */
+        footer {
+            background: #FFFFFF;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 6px solid var(--secondary);
+            margin-top: 50px;
+            width: 100%;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.03);
+            border-radius: 32px 32px 0 0;
+        }
+        .footer-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .footer-social-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: white !important;
+            font-weight: bold;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .social-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-youtube { background-color: #FF0000; }
+        .btn-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .btn-facebook { background-color: #1877F2; }
+        .btn-threads { background-color: #101010; }
+        .btn-xhs { background-color: #FF2442; }
+        .btn-douyin { background-color: #010101; border: 2px solid #00f2fe; }
+
+        /* Responsive refinements */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px 10px;
+            }
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            .book-card {
+                padding: 12px;
+                border-radius: 16px;
+            }
+            .book-cover-container {
+                height: 120px;
+                margin-bottom: 8px;
+            }
+            .book-title {
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+            .book-theme {
+                font-size: 11px;
+                padding: 2px 8px;
+            }
+            .btn-return-adventure {
+                font-size: 16px;
+                padding: 12px 24px;
+            }
+            .social-btn {
+                padding: 10px 18px;
+                font-size: 13px;
+                width: 100%; /* Stack nicely on narrow phones */
+                justify-content: center;
+            }
+            header {
+                padding: 10px 15px;
+            }
+            .header-title {
+                font-size: 18px;
+            }
+            .logo-cat-img {
+                width: 35px;
+                height: 35px;
+            }
+            .btn-lang {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <img src="cat.jpeg" class="logo-cat-img" alt="Teacher Cat Logo" onerror="this.onerror=null; this.outerHTML='<span class=\'logo-cat\'>🐱</span>';">
+            <span>幼稚園K2K3看圖說故事</span>
+        </div>
+        <div class="lang-switcher">
+            <button class="btn-lang active" onclick="switchLanguage('zh-HK')" id="btn-cantonese">
+                <span>🇭🇰</span> 廣東話
+            </button>
+            <button class="btn-lang" onclick="switchLanguage('zh-CN')" id="btn-mandarin">
+                <span>🇨🇳</span> 普通話
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- HOME SCREEN -->
+        <div id="home-screen">
+            <div class="grid-container" id="book-grid"></div>
+            <!-- Return Button -->
+            <div style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
+                <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-return-adventure">
+                    <span>🚀</span> 返回小朋友學習大冒險
+                </a>
+            </div>
+        </div>
+
+        <!-- STORY VIEW SCREEN -->
+        <div id="story-screen" class="story-screen">
+            <div class="story-header">
+                <button class="btn-back" onclick="showHomeScreen()">
+                    <span>🔙</span> 返回故事書架
+                </button>
+                <div class="story-info">
+                    <div class="story-info-title" id="current-story-title">故事標題</div>
+                    <div class="book-theme" id="current-story-theme">故事主題</div>
+                </div>
+            </div>
+
+            <div class="story-layout">
+                <div class="story-main-image-box">
+                    <!-- Quick Play controls directly above illustration -->
+                    <div style="display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                        <button class="btn-story btn-play" onclick="playFullStory()" style="padding: 10px 20px; font-size: 16px; background-color: #4CAF50; color: white; border-radius: 50px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(76,175,80,0.3); transition: all 0.2s;">
+                            <span>🔊</span> 播放整篇故事
+                        </button>
+                        <button class="btn-story btn-pause" onclick="pauseFullStory()" style="padding: 10px 20px; font-size: 16px; background-color: #FF9800; color: white; border-radius: 50px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(255,152,0,0.3); transition: all 0.2s;">
+                            <span>⏸</span> 暫停播放
+                        </button>
+                    </div>
+                    <img class="story-main-img" id="story-main-image" src="" alt="故事全景圖" onclick="openImageZoom()" title="點擊放大圖片">
+                    <div style="margin-top: 12px; font-weight: bold; color: var(--primary); font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+                        <div style="color: #E91E63; background-color: #FFF0F2; padding: 12px 24px; border-radius: 50px; border: 3px dashed #FF7B93; font-size: 15px; margin-bottom: 5px; display: inline-block; max-width: 90%;">
+                            👪 小朋友和爸爸媽媽可以自己試一下看圖說故事，然後才細心聆聽 Teacher Cat 老師說故事 🐱
+                        </div>
+                        <div style="color: #666; font-size: 14px;">🔍 提示：點擊上面大圖可以放大觀看喔！</div>
+                        
+                        
+                        <button class="btn-story btn-article" id="btn-full-story-article" onclick="toggleFullStoryArticle()" style="margin-top: 15px; background-color: #2196F3; color: white; border: none; padding: 12px 25px; font-size: 18px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(33,150,243,0.3); transition: all 0.2s;">
+                            <span>📖</span> 完整故事文章內容
+                        </button>
+                    </div>
+
+                    <!-- ON-PAGE FULL STORY ARTICLE TOGGLE BOX -->
+                    <div class="article-panel" id="full-story-article-panel" style="display: none; width: 100%; margin-top: 20px; background: #F4F9FF; border: 3px solid #2196F3; border-radius: 18px; padding: 25px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.05); animation: slideDown 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                            <h3 style="color: #1E88E5; font-size: 20px; display: flex; align-items: center; gap: 8px; margin: 0;">
+                                <span>📖</span> <span id="full-article-title">故事完整文章</span>
+                            </h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-story btn-play" onclick="playFullStory()" style="padding: 8px 16px; font-size: 15px; background-color: #4CAF50; color: white; border-radius: 50px; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 8px rgba(76,175,80,0.3);">
+                                    🔊 播放整篇故事
+                                </button>
+                                <button class="btn-story btn-pause" onclick="pauseFullStory()" style="padding: 8px 16px; font-size: 15px; background-color: #FF9800; color: white; border-radius: 50px; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 8px rgba(255,152,0,0.3);">
+                                    ⏸ 暫停播放
+                                </button>
+                            </div>
+                        </div>
+                        <div id="full-story-sentences-container"></div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- STANDARD NON-FIXED FOOTER -->
+    <footer>
+        <div class="footer-title">🏫 Teacher Cat 的快樂AI教室</div>
+        <div class="footer-social-grid">
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-btn btn-whatsapp">
+                <span>💬</span> WhatsApp 分享群組
+            </a>
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-btn btn-youtube">
+                <span>📺</span> YouTube
+            </a>
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-btn btn-instagram">
+                <span>📸</span> Instagram
+            </a>
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-btn btn-facebook">
+                <span>👥</span> Facebook
+            </a>
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-btn btn-threads">
+                <span>🧵</span> Threads
+            </a>
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-btn btn-xhs">
+                <span>📕</span> 小紅書
+            </a>
+            <a href="https://www.douyin.com/search/74254902683" target="_blank" class="social-btn btn-douyin">
+                <span>🎵</span> 抖音號：74254902683
+            </a>
+        </div>
+    </footer>
+
+    <!-- FULLSCREEN IMAGE ZOOM MODAL -->
+    <div class="modal" id="image-zoom-modal" onclick="closeImageZoom()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; cursor: pointer;">
+        <span class="modal-close" style="position: absolute; top: 20px; right: 30px; color: white; font-size: 50px; cursor: pointer;">&times;</span>
+        <img class="zoom-modal-content" id="zoomed-story-image" style="max-width: 95%; max-height: 80%; border-radius: 16px; border: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: contain;">
+        <div style="color: white; margin-top: 15px; font-weight: bold; font-size: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">點擊任意地方關閉 ❌</div>
+    </div>
+
+    <!-- LIGHTBOX MODAL -->
+    <div class="modal" id="lightbox-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-title-text">單幅畫面放大</span>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-illustration" id="modal-illustration-container">
+                    <!-- Emojis render here -->
+                </div>
+                <div class="subtitle-box" id="modal-subtitle">
+                    <!-- Text render here -->
+                </div>
+
+                <div class="storyteller-controls">
+                    <button class="btn-story btn-play" onclick="startStorytelling()">
+                        <span>🐱</span> 貓咪老師說故事
+                    </button>
+                    <button class="btn-story btn-pause" onclick="pauseStorytelling()">
+                        <span>⏸</span> 暫停說故事
+                    </button>
+                    <button class="btn-story btn-article" onclick="toggleArticle()">
+                        <span>📖</span> 故事內容文章
+                    </button>
+                </div>
+
+                <!-- ARTICLE EXPAND PANEL -->
+                <div class="article-panel" id="article-expand-panel">
+                    <div class="article-title">
+                        <span>📖</span> <span id="article-title-text">完整故事文章內容</span>
+                    </div>
+                    <div id="article-sentences-container">
+                        <!-- Sentence Rows render here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Story database injected from python script
+        const stories = [{"id": 1, "title": "迷路的小白兔", "theme": "熱心助人", "emoji": "🐰", "color": "#FFECEC", "panels": [{"emojis": ["🐰", "🌲", "😢"], "text_zh": "有一隻可愛的小白兔，在黑漆漆的森林裏迷路了。牠找不到回家的路，傷心地在樹下大哭起來。", "sentences": ["有一隻可愛的小白兔，在黑漆漆的森林裏迷路了。", "牠找不到回家的路，傷心地在樹下大哭起來。"]}, {"emojis": ["💡", "🐛", "🐜"], "text_zh": "這時候，成群的螢火蟲提著明亮的小燈籠飛了過來。小昆蟲們也熱心地圍過來，為小白兔照亮前方的路。", "sentences": ["這時候，成群的螢火蟲提著明亮的小燈籠飛了過來。", "小昆蟲們也熱心地圍過來，為小白兔照亮前方的路。"]}, {"emojis": ["🐰", "🏡", "😊"], "text_zh": "在大家熱心的幫助下，小白兔看清了回家的路。牠安全地回到了溫暖的蘑菇房子，高興地向大家道謝。", "sentences": ["在大家熱心的幫助下，小白兔看清了回家的路。", "牠安全地回到了溫暖的蘑菇房子，高興地向大家道謝。"]}], "image": 9}, {"id": 2, "title": "偷蜜糖的黑熊", "theme": "不要弄巧反拙", "emoji": "🐻", "color": "#FFF3E0", "panels": [{"emojis": ["🐻", "🍯", "👀"], "text_zh": "貪吃的黑熊悄悄溜到樹屋旁，偷走了窗台上的蜜糖罐。牠抱著大蜜罐，心裏美滋滋的，口水直流。", "sentences": ["貪吃的黑熊悄悄溜到樹屋旁，偷走了窗台上的蜜糖罐。", "牠抱著大蜜罐，心裏美滋滋的，口水直流。"]}, {"emojis": ["🐻", "🐝", "🏃"], "text_zh": "黑熊剛打開罐子準備享用，沒想到裏面飛出了一大群憤怒的蜜蜂。蜜蜂們嗡嗡地叫著，向黑熊發起猛烈進攻。", "sentences": ["黑熊剛打開罐子準備享用，沒想到裏面飛出了一大群憤怒的蜜蜂。", "蜜蜂們嗡嗡地叫著，向黑熊發起猛烈進攻。"]}, {"emojis": ["🐻", "🤕", "😭"], "text_zh": "黑熊被蜜蜂追得落荒而逃，身上被叮得滿是紅包。牠一邊跑一邊哭，後悔自己不應該去偷蜜糖。", "sentences": ["黑熊被蜜蜂追得落荒而逃，身上被叮得滿是紅包。", "牠一邊跑一邊哭，後悔自己不應該去偷蜜糖。"]}], "image": 1}, {"id": 3, "title": "自作自受的小豬", "theme": "替人着想", "emoji": "🐷", "color": "#FCE4EC", "panels": [{"emojis": ["🐷", "🍉", "😋"], "text_zh": "小豬一邊在路上散步，一邊津津有味地吃著香甜的西瓜。牠覺得美味極了，心情非常愉快。", "sentences": ["小豬一邊在路上散步，一邊津津有味地吃著香甜的西瓜。", "牠覺得美味極了，心情非常愉快。"]}, {"emojis": ["🐷", "🍉", "💢"], "text_zh": "吃完西瓜後，小豬隨手將西瓜皮扔在乾淨的馬路上。牠完全沒有想到這會給別人帶來危險。", "sentences": ["吃完西瓜後，小豬隨手將西瓜皮扔在乾淨的馬路上。", "牠完全沒有想到這會給別人帶來危險。"]}, {"emojis": ["🐷", "💥", "😭"], "text_zh": "小豬轉身往回走時，一個不小心踩到了自己扔的西瓜皮。牠腳下一滑，重重地摔在地上，痛得哇哇大哭。", "sentences": ["小豬轉身往回走時，一個不小心踩到了自己扔的西瓜皮。", "牠腳下一滑，重重地摔在地上，痛得哇哇大哭。"]}], "image": 10}, {"id": 4, "title": "懂事的小烏鴉", "theme": "孝順父母", "emoji": "🐦", "color": "#ECEFF1", "panels": [{"emojis": ["🐦", "👵", "🥚"], "text_zh": "烏鴉媽媽每天辛苦地飛出去找蟲子，細心地哺育小烏鴉長大。小烏鴉在媽媽的關愛下健康成長。", "sentences": ["烏鴉媽媽每天辛苦地飛出去找蟲子，細心地哺育小烏鴉長大。", "小烏鴉在媽媽的關愛下健康成長。"]}, {"emojis": ["🐦", "🐛", "👵"], "text_zh": "日子一天天過去，烏鴉媽媽年老生病了，再也飛不動。長大的小烏鴉主動飛出去，尋找最美味的蟲子。", "sentences": ["日子一天天過去，烏鴉媽媽年老生病了，再也飛不動。", "長大的小烏鴉主動飛出去，尋找最美味的蟲子。"]}, {"emojis": ["🐦", "❤️", "👵"], "text_zh": "小烏鴉飛回巢裏，小心翼翼地把蟲子餵到媽媽嘴裏。烏鴉媽媽流下了感動的淚水，誇獎牠是個懂事的孩子。", "sentences": ["小烏鴉飛回巢裏，小心翼翼地把蟲子餵到媽媽嘴裏。", "烏鴉媽媽流下了感動的淚水，誇獎牠是個懂事的孩子。"]}], "image": 11}, {"id": 5, "title": "團結的小螞蟻", "theme": "團結精神", "emoji": "🐜", "color": "#EFEBE9", "panels": [{"emojis": ["🐜", "🍪", "❓"], "text_zh": "一隻小螞蟻在草地上發現了一塊美味的大餅乾。牠使使勁地推啊推，可是餅乾太重了，牠怎麼也搬不動。", "sentences": ["一隻小螞蟻在草地上發現了一塊美味的大餅乾。", "牠使使勁地推啊推，可是餅乾太重了，牠怎麼也搬不動。"]}, {"emojis": ["🐜", "🐜", "🐜"], "text_zh": "小螞蟻沒有放棄，牠立刻跑回洞穴，找來了許許多多的同伴。大家排著整齊的隊伍，一起來到大餅乾旁。", "sentences": ["小螞蟻沒有放棄，牠立刻跑回洞穴，找來了許許多多的同伴。", "大家排著整齊的隊伍，一起來到大餅乾旁。"]}, {"emojis": ["🐜", "🏡", "🎉"], "text_zh": "「一二，一二！」螞蟻們齊心協力抬起大餅乾，高高興興地搬回了家。牠們高興地在洞穴裏舉辦了分享大會。", "sentences": ["「一二，一二！」螞蟻們齊心協力抬起大餅乾，高高興興地搬回了家。", "牠們高興地在洞穴裏舉辦了分享大會。"]}], "image": 12}, {"id": 6, "title": "小雞搶食物", "theme": "不與人計較", "emoji": "🐥", "color": "#FFFDE7", "panels": [{"emojis": ["🐥", "🐛", "🐥"], "text_zh": "兩隻小雞在草地上同時發現了一條胖嘟嘟的小蟲子。牠們誰也不肯讓誰，都想把這頓美味獨吞。", "sentences": ["兩隻小雞在草地上同時發現了一條胖嘟嘟的小蟲子。", "牠們誰也不肯讓誰，都想把這頓美味獨吞。"]}, {"emojis": ["🐥", "💢", "🐥"], "text_zh": "兩隻小雞憤怒地瞪著對方，用力爭奪着這條蟲子。牠們拉扯得不可開交，嘴裏發出吱吱的吵鬧聲。", "sentences": ["兩隻小雞憤怒地瞪著對方，用力爭奪着這條蟲子。", "牠們拉扯得不可開交，嘴裏發出吱吱的吵鬧聲。"]}, {"emojis": ["🐛", "🏃", "🐥"], "text_zh": "在牠們爭奪不休的時候，小蟲子趁機悄悄地溜走了。兩隻小雞發現蟲子不見了，只能傻傻地站在那裏面面相覷。", "sentences": ["在牠們爭奪不休的時候，小蟲子趁機悄悄地溜走了。", "兩隻小雞發現蟲子不見了，只能傻傻地站在那裏面面相覷。"]}], "image": 13}, {"id": 7, "title": "放風箏", "theme": "熱心助人", "emoji": "🦔", "color": "#E8F5E9", "panels": [{"emojis": ["🦔", "🪁", "🌲"], "text_zh": "小刺蝟在草地上開心地放風箏，一陣大風吹過，風箏線斷了。風箏高高地掛在樹梢上，小刺蝟急得哭了起來。", "sentences": ["小刺蝟在草地上開心地放風箏，一陣大風吹過，風箏線斷了。", "風箏高高地掛在樹梢上，小刺蝟急得哭了起來。"]}, {"emojis": ["🦔", "😢", "🐒"], "text_zh": "這時，一隻活潑的小猴子路過，看見小刺蝟在哭泣，便上前詢問原因。聽完後，小猴子拍拍胸口說包在牠身上。", "sentences": ["這時，一隻活潑的小猴子路過，看見小刺蝟在哭泣，便上前詢問原因。", "聽完後，小猴子拍拍胸口說包在牠身上。"]}, {"emojis": ["🦔", "🪁", "😊"], "text_zh": "小猴子靈活地爬上大樹，小心翼翼地幫小刺蝟取下了風箏。小刺蝟拿回風箏，破涕為笑，連聲向小猴子道謝。", "sentences": ["小猴子靈活地爬上大樹，小心翼翼地幫小刺蝟取下了風箏。", "小刺蝟拿回風箏，破涕為笑，連聲向小猴子道謝。"]}], "image": 14}, {"id": 8, "title": "見義勇為的猴子", "theme": "主動幫助別人", "emoji": "🐒", "color": "#EFEBE9", "panels": [{"emojis": ["🐥", "😢", "🌲"], "text_zh": "一隻剛出生不久的小雞不小心從高高的樹巢上掉了下來。牠站在樹下，一邊發抖一邊害怕地哭泣。", "sentences": ["一隻剛出生不久的小雞不小心從高高的樹巢上掉了下來。", "牠站在樹下，一邊發抖一邊害怕地哭泣。"]}, {"emojis": ["🐒", "👀", "🐥"], "text_zh": "小猴子聽到了哭聲，連忙從樹上下來。牠溫柔地抱起受驚的小雞，安慰牠不要害怕。", "sentences": ["小猴子聽到了哭聲，連忙從樹上下來。", "牠溫柔地抱起受驚的小雞，安慰牠不要害怕。"]}, {"emojis": ["🐥", "🏡", "❤️"], "text_zh": "小猴子敏捷地爬上大樹，把小雞安全地送回了溫暖的鳥巢裏。鳥媽媽感動地對小猴子連聲致謝。", "sentences": ["小猴子敏捷地爬上大樹，把小雞安全地送回了溫暖的鳥巢裏。", "鳥媽媽感動地對小猴子連聲致謝。"]}], "image": 15}, {"id": 9, "title": "請白雲幫忙", "theme": "關心別人", "emoji": "🐻", "color": "#E3F2FD", "panels": [{"emojis": ["🐻", "⛏️", "☀️"], "text_zh": "烈日當空，熊哥哥在田裏辛苦地揮舞鐵鏟挖地。牠熱得滿頭大汗，累得有些站不穩了。", "sentences": ["烈日當空，熊哥哥在田裏辛苦地揮舞鐵鏟挖地。", "牠熱得滿頭大汗，累得有些站不穩了。"]}, {"emojis": ["🐻", "👧", "☁️"], "text_zh": "熊妹妹在旁邊非常心疼哥哥。牠朝著天空大聲呼喊，請天上的白雲飄過來幫忙遮擋猛烈的陽光。", "sentences": ["熊妹妹在旁邊非常心疼哥哥。", "牠朝著天空大聲呼喊，請天上的白雲飄過來幫忙遮擋猛烈的陽光。"]}, {"emojis": ["🐻", "🌳", "☁️"], "text_zh": "善良的白雲立刻飄了過來，幫熊哥哥擋住了猛烈的太陽。熊哥哥在清涼的樹蔭下休息，感激妹妹的體貼。", "sentences": ["善良的白雲立刻飄了過來，幫熊哥哥擋住了猛烈的太陽。", "熊哥哥在清涼的樹蔭下休息，感激妹妹的體貼。"]}], "image": 16}, {"id": 10, "title": "誰的膽子大", "theme": "學習勇敢", "emoji": "🏥", "color": "#E0F7FA", "panels": [{"emojis": ["🐰", "🐕", "🏥"], "text_zh": "在長頸鹿醫生的診所門口，小狗和小兔因為害怕打針而害怕得縮在一角。小狗甚至嚇得哇哇大哭起來。", "sentences": ["在長頸鹿醫生的診所門口，小狗和小兔因為害怕打針而害怕得縮在一角。", "小狗甚至嚇得哇哇大哭起來。"]}, {"emojis": ["🐰", "💉", "😎"], "text_zh": "輪到小兔打針了，牠深吸一口氣，閉上眼睛，堅強地配合長頸鹿醫生。小兔哼都沒哼一聲，表現得非常勇敢。", "sentences": ["輪到小兔打針了，牠深吸一口氣，閉上眼睛，堅強地配合長頸鹿醫生。", "小兔哼都沒哼一聲，表現得非常勇敢。"]}, {"emojis": ["🐕", "😭", "👑"], "text_zh": "看見小兔這麼勇敢，旁邊的小狗感到有些慚愧。不過輪到小狗時，牠還是忍不住閉著眼睛大哭，大家鼓勵牠要像小兔一樣勇敢。", "sentences": ["看見小兔這麼勇敢，旁邊的小狗感到有些慚愧。", "不過輪到小狗時，牠還是忍不住閉著眼睛大哭，大家鼓勵牠要像小兔一樣勇敢。"]}], "image": 17}, {"id": 11, "title": "誰偷吃了水果", "theme": "不要貪心", "emoji": "🐿️", "color": "#FFF3E0", "panels": [{"emojis": ["🐿️", "🍓", "🍒"], "text_zh": "小松鼠用小車拉著滿滿一車剛採摘的草莓和櫻桃。牠一邊推車一邊唱歌，心情十分愉快。", "sentences": ["小松鼠用小車拉著滿滿一車剛採摘的草莓和櫻桃。", "牠一邊推車一邊唱歌，心情十分愉快。"]}, {"emojis": ["🐭", "😋", "🤢"], "text_zh": "小老鼠悄悄跟在車後，趁小松鼠不注意，偷偷塞了滿嘴的水果。牠一口氣吃了太多沒洗的水果，結果肚子開始劇烈疼痛。", "sentences": ["小老鼠悄悄跟在車後，趁小松鼠不注意，偷偷塞了滿嘴的水果。", "牠一口氣吃了太多沒洗的水果，結果肚子開始劇烈疼痛。"]}, {"emojis": ["🐿️", "😂", "🐭"], "text_zh": "小老鼠痛得在地上直打滾。小松鼠回頭看到這一幕，明白是牠偷吃了水果，無奈地搖了搖頭，教育牠不要貪心和不誠實。", "sentences": ["小老鼠痛得在地上直打滾。", "小松鼠回頭看到這一幕，明白是牠偷吃了水果，無奈地搖了搖頭，教育牠不要貪心和不誠實。"]}], "image": 18}, {"id": 12, "title": "大象秋千", "theme": "慷慨助人", "emoji": "🐘", "color": "#E1F5FE", "panels": [{"emojis": ["🐿️", "🐒", "📯"], "text_zh": "小動物們在樹下快樂地盪鞦韆，沒想到「啪」的一聲，鞦韆繩突然斷了。大家摔在地上，感到非常沮喪。", "sentences": ["小動物們在樹下快樂地盪鞦韆，沒想到「啪」的一聲，鞦韆繩突然斷了。", "大家摔在地上，感到非常沮喪。"]}, {"emojis": ["🐘", "👃", "🎡"], "text_zh": "這時，一隻大象路過，看見大家垂頭喪氣。牠慷慨地捲起長長的鼻子，捲住樹枝，讓小動物們坐在牠的鼻子上當鞦韆。", "sentences": ["這時，一隻大象路過，看見大家垂頭喪氣。", "牠慷慨地捲起長長的鼻子，捲住樹枝，讓小動物們坐在牠的鼻子上當鞦韆。"]}, {"emojis": ["🐘", "🥰", "🎉"], "text_zh": "小動物們在「大象鞦韆」上開心地盪來盪去，森林裏又充滿了歡聲笑語。大象看著大家玩得開心，也高興地笑了。", "sentences": ["小動物們在「大象鞦韆」上開心地盪來盪去，森林裏又充滿了歡聲笑語。", "大象看著大家玩得開心，也高興地笑了。"]}], "image": 19}, {"id": 13, "title": "嘴巴漏洞的小豬", "theme": "學習節儉", "emoji": "🐷", "color": "#FCE4EC", "panels": [{"emojis": ["🐷", "🍚", "💦"], "text_zh": "小豬吃飯時總是狼吞虎嚥，嘴巴像個無底洞，吃得滿臉都是。大量的米粒和蔬菜屑不停地掉在餐桌和地上。", "sentences": ["小豬吃飯時總是狼吞虎嚥，嘴巴像個無底洞，吃得滿臉都是。", "大量的米粒和蔬菜屑不停地掉在餐桌和地上。"]}, {"emojis": ["🐥", "😋", "🐷"], "text_zh": "幾隻小雞跑了過來，開心地在地上啄食小豬掉落的米粒。小雞們高興地說：「謝謝小豬請我們吃大餐！」", "sentences": ["幾隻小雞跑了過來，開心地在地上啄食小豬掉落的米粒。", "小雞們高興地說：「謝謝小豬請我們吃大餐！」"]}, {"emojis": ["🐷", "😳", "🐔"], "text_zh": "小豬聽了，臉刷地一下紅了，覺得非常慚愧。牠下定決心要改掉浪費的壞習慣，以後吃飯一定會乾乾淨淨。", "sentences": ["小豬聽了，臉刷地一下紅了，覺得非常慚愧。", "牠下定決心要改掉浪費的壞習慣，以後吃飯一定會乾乾淨淨。"]}], "image": 24}, {"id": 14, "title": "小螞蟻過河", "theme": "熱心助人", "emoji": "🐜", "color": "#EFEBE9", "panels": [{"emojis": ["🐜", "🌊", "😢"], "text_zh": "小螞蟻們排著隊準備去對岸找食物，卻被一條湍急的小河攔住了去路。牠們急得團團轉，不知道該怎麼辦。", "sentences": ["小螞蟻們排著隊準備去對岸找食物，卻被一條湍急的小河攔住了去路。", "牠們急得團團轉，不知道該怎麼辦。"]}, {"emojis": ["🐒", "🐿️", "🪵"], "text_zh": "這時，熱心的小猴子和小松鼠看見了。牠們一起動手，合力抬來了一塊長木板，小心地架在小河兩岸。", "sentences": ["這時，熱心的小猴子和小松鼠看見了。", "牠們一起動手，合力抬來了一塊長木板，小心地架在小河兩岸。"]}, {"emojis": ["🐜", "🪵", "😊"], "text_zh": "小螞蟻們排成一列，高高興興地從木板橋上走了過去。牠們站在對岸，揮舞著小手向熱心的猴子和松鼠致謝。", "sentences": ["小螞蟻們排成一列，高高興興地從木板橋上走了過去。", "牠們站在對岸，揮舞著小手向熱心的猴子 and 松鼠致謝。"]}], "image": 20}, {"id": 15, "title": "足球漂走了", "theme": "幫助別人", "emoji": "⚽", "color": "#E3F2FD", "panels": [{"emojis": ["🦊", "⚽", "🌊"], "text_zh": "小狐狸在河邊開心地踢足球，一個用力過度，足球不小心掉進了河裏。足球順著水流越漂越遠，小狐狸急得在岸邊直跳腳。", "sentences": ["小狐狸在河邊開心地踢足球，一個用力過度，足球不小心掉進了河裏。", "足球順著水流越漂越遠，小狐狸急得在岸邊直跳腳。"]}, {"emojis": ["🐟", "⚽", "🆙"], "text_zh": "在水裏游玩的小魚們看見了，立刻游到足球下面。牠們齊心協力，用小腦袋一下一下地把足球頂向岸邊。", "sentences": ["在水裏游玩的小魚們看見了，立刻游到足球下面。", "牠們齊心協力，用小腦袋一下一下地把足球頂向岸邊。"]}, {"emojis": ["🦊", "⚽", "😃"], "text_zh": "足球終於被頂回了岸上，小狐狸開心地抱起足球。牠對水裏的小魚們揮手致謝，小魚們也高興地在水裏搖尾巴。", "sentences": ["足球終於被頂回了岸上，小狐狸開心地抱起足球。", "牠對水裏的小魚們揮手致謝，小魚們也高興地在水裏搖尾巴。"]}], "image": 23}, {"id": 16, "title": "小蜜蜂回來了", "theme": "保持乾淨", "emoji": "🧼", "color": "#E8F5E9", "panels": [{"emojis": ["🐷", "🧼", "🐝"], "text_zh": "小豬擁有一塊印有美麗小蜜蜂圖案的手帕，牠非常喜歡。但是小豬不愛乾淨，手帕很快就變得又髒又臭。", "sentences": ["小豬擁有一塊印有美麗小蜜蜂圖案的手帕，牠非常喜歡。", "但是小豬不愛乾淨，手帕很快就變得又髒又臭。"]}, {"emojis": ["🐷", "🦠", "😡"], "text_zh": "手帕上的小蜜蜂圖案變得非常生氣，甚至漸漸消失了，不願意待在骯髒的手帕上。小豬看見後非常著急。", "sentences": ["手帕上的小蜜蜂圖案變得非常生氣，甚至漸漸消失了，不願意待在骯髒的手帕上。", "小豬看見後非常著急。"]}, {"emojis": ["🐷", "✨", "😊"], "text_zh": "小豬連忙用肥皂把手帕洗得乾乾淨淨，手帕散發出清香。神奇的是，那隻美麗的小蜜蜂又開心地回到了手帕上。", "sentences": ["小豬連忙用肥皂把手帕洗得乾乾淨淨，手帕散發出清香。", "神奇的是，那隻美麗的小蜜蜂又開心地回到了手帕上。"]}], "image": 27}, {"id": 17, "title": "鴕鳥媽媽藏蛋", "theme": "物歸原主", "emoji": "🥚", "color": "#FFF3E0", "panels": [{"emojis": ["🐻", "🥚", "👀"], "text_zh": "小熊在森林裏玩滾彩蛋遊戲，突然在灌木叢旁發現了一顆大大的蛋。大蛋在草地上滾動著，十分奇特。", "sentences": ["小熊在森林裏玩滾彩蛋遊戲，突然在灌木叢旁發現了一顆大大的蛋。", "大蛋在草地上滾動著，十分奇特。"]}, {"emojis": ["🐣", "🐻", "❤️"], "text_zh": "「卡嚓」一聲，大蛋裂開了，一隻可愛的小鴕鳥伸出了小腦袋。小鴕鳥看見小熊，親切地叫着媽媽，小熊連忙抱起牠。", "sentences": ["「卡嚓」一聲，大蛋裂開了，一隻可愛的小鴕鳥伸出了小腦袋。", "小鴕鳥看見小熊，親切地叫着媽媽，小熊連忙抱起牠。"]}, {"emojis": ["🦩", "👶", "🐻"], "text_zh": "小熊抱著小鴕鳥四處尋找，終於找到了焦急萬分的鴕鳥媽媽。看著母子團聚，小熊露出了欣慰的笑容。", "sentences": ["小熊抱著小鴕鳥四處尋找，終於找到了焦急萬分的鴕鳥媽媽。", "看著母子團聚，小熊露出了欣慰的笑容。"]}], "image": 28}, {"id": 18, "title": "小蛇架橋", "theme": "助人不求回報", "emoji": "🐍", "color": "#E8F5E9", "panels": [{"emojis": ["🐌", "🌊", "😢"], "text_zh": "小蝸牛想去河對岸找鮮嫩的草葉吃，可是河上沒有橋。小蝸牛望著河水，急得眼淚直淌。", "sentences": ["小蝸牛想去河對岸找鮮嫩的草葉吃，可是河上沒有橋。", "小蝸牛望著河水，急得眼淚直淌。"]}, {"emojis": ["🐍", "橋", "🐌"], "text_zh": "一隻善良的小蛇路過，決定伸出援手。牠將自己長長的身軀橫跨在小河兩岸，變成了一座穩固的「綠色小橋」。", "sentences": ["一隻善良的小蛇路過，決定伸出援手。", "牠將自己長長的身軀橫跨在小河兩岸，變成了一座穩固的「綠色小橋」。"]}, {"emojis": ["🐌", "👍", "🐍"], "text_zh": "小蝸牛小心翼翼地從「小蛇橋」上爬了過去，順利到達對岸。牠高興地向小蛇道謝，誇獎小蛇是個大好人。", "sentences": ["小蝸牛小心翼翼地從「小蛇橋」上爬了過去，順利到達對岸。", "小蝸牛高興地向小蛇道謝，誇獎小蛇是個大好人。"]}], "image": 25}, {"id": 19, "title": "給貓喝酒", "theme": "團隊合作", "emoji": "🍷", "color": "#F5F5F5", "panels": [{"emojis": ["🐱", "🐭", "😰"], "text_zh": "大黑貓天天在洞口守著，老鼠們躲在裏面不敢出去找食物，肚子餓得咕嚕嚕直叫。老鼠們聚在一起商量對策。", "sentences": ["大黑貓天天在洞口守著，老鼠們躲在裏面不敢出去找食物，肚子餓得咕嚕嚕直叫。", "老鼠們聚在一起商量對策。"]}, {"emojis": ["🐭", "🍷", "🐱"], "text_zh": "聰明的老鼠們合力推來了一大壇香噴噴的美酒，悄悄放在大黑貓面前。黑貓聞到酒香，忍不住大口大口地喝了起來。", "sentences": ["聰明的老鼠們合力推來了一大壇香噴噴的美酒，悄悄放在大黑貓面前。", "黑貓聞到酒香，忍不住大口大口地喝了起來。"]}, {"emojis": ["🐱", "🥴", "💤"], "text_zh": "沒過多久，大黑貓就醉倒在地上，呼呼大睡起來。老鼠們高高興興地跑出洞穴找食物，團結合作取得了勝利。", "sentences": ["沒過多久，大黑貓就醉倒在地上，呼呼大睡起來。", "老鼠們高高興興地跑出洞穴找食物，團結合作取得了勝利。"]}], "image": 26}, {"id": 20, "title": "溜冰表演", "theme": "謙虛學習", "emoji": "⛸️", "color": "#E0F7FA", "panels": [{"emojis": ["🐻", "⛸️", "😎"], "text_zh": "小熊在結冰的湖面上展示自己高超的溜冰技巧。牠在冰上飛快地旋轉，得意洋洋地向大家炫耀。", "sentences": ["小熊在結冰的湖面上展示自己高超的溜冰技巧。", "牠在冰上飛快地旋轉，得意洋洋地向大家炫耀。"]}, {"emojis": ["🐻", "💥", "🕳️"], "text_zh": "因為小熊太得意了，動作做得越來越大。突然，牠腳下一滑，重重地摔在冰面上，甚至把冰面震出了一道裂痕。", "sentences": ["因為小熊太得意了，動作做得越來越大。", "突然，牠腳下一滑，重重地摔在冰面上，甚至把冰面震出了一道裂痕。"]}, {"emojis": ["🐻", "🤕", "😭"], "text_zh": "小熊摔得鼻青臉腫，坐在冰面上痛得嚎啕大哭。這件事提醒大家，做任何事情都要謙虛，不能驕傲自滿。", "sentences": ["小熊摔得鼻青臉腫，坐在冰面上痛得嚎啕大哭。", "這件事提醒大家，做任何事情都要謙虛，不能驕傲自滿。"]}], "image": 22}, {"id": 21, "title": "誰送的禮物", "theme": "關心朋友", "emoji": "🎁", "color": "#FFEDE0", "panels": [{"emojis": ["🐿️", "🤒", "🛌"], "text_zh": "小松鼠生病了，無精打采地躺在床上。牠覺得十分孤單，多麼希望有好朋友能來陪陪牠啊。", "sentences": ["小松鼠生病了，無精打采地躺在床上。", "牠覺得十分孤單，多麼希望有好朋友能來陪陪牠啊。"]}, {"emojis": ["🎁", "🚪", "👀"], "text_zh": "這時，門口傳來輕輕的敲門聲。小松鼠打開門一看，門口沒有人，卻放著一個包裝精美的愛心禮物盒。", "sentences": ["這時，門口傳來輕輕的敲門聲。", "小松鼠打開門一看，門口沒有人，卻放著一個包裝精美的愛心禮物盒。"]}, {"emojis": ["🐿️", "🤔", "❤️"], "text_zh": "小松鼠拿著禮物，開心地猜想是誰送來的關懷。這份神祕的禮物讓牠的心裏感到無比溫暖。", "sentences": ["小松鼠拿著禮物，開心地猜想是誰送來的關懷。", "這份神祕的禮物讓牠的心裏感到無比溫暖。"]}], "image": 3}, {"id": 22, "title": "蹺蹺板", "theme": "不以大欺小", "emoji": "⚖️", "color": "#F3E5F5", "panels": [{"emojis": ["🐕", "🐿️", "💢"], "text_zh": "小松鼠正在高興地玩蹺蹺板，一隻調皮的小狗走了過來，憑藉自己體型大，硬是把小松鼠趕走了。小松鼠委屈地站在一旁。", "sentences": ["小松鼠正在高興地玩蹺蹺板，一隻調皮的小狗走了過來，憑藉自己體型大，硬是把小松鼠趕走了。", "小松鼠委屈地站在一旁。"]}, {"emojis": ["🐕", "🐔", "⚖️"], "text_zh": "這時，一隻體型很大的公雞走了過來。大公雞二話不說坐到了蹺蹺板的另一頭，「啪」的一聲，重重地把小狗給壓了上去。", "sentences": ["這時，一隻體型很大的公雞走了過來。", "大公雞二話不說坐到了蹺蹺板的另一頭，「啪」的一聲，重重地把小狗給壓了上去。"]}, {"emojis": ["🐿️", "😄", "🐕"], "text_zh": "小狗被高高吊在空中，嚇得大喊大叫。小松鼠看見這一幕，開心地笑了，這讓小狗明白不能以大欺小。", "sentences": ["小狗被高高吊在空中，嚇得大喊大叫。", "小松鼠看見這一幕，開心地笑了，這讓小狗明白不能以大欺小。"]}], "image": 4}, {"id": 23, "title": "小蛇的毛衣", "theme": "學習關心別人", "emoji": "🧶", "color": "#E8F5E9", "panels": [{"emojis": ["🐍", "❄️", "🥶"], "text_zh": "寒冷的冬天到了，雪花飄飄。小蛇沒有手也沒有腳，在雪地裏凍得直打冷顫，縮成了一團。", "sentences": ["寒冷的冬天到了，雪花飄飄。", "小蛇沒有手也沒有腳，在雪地裏凍得直打冷顫，縮成了一團。"]}, {"emojis": ["🐻", "🧶", "🧵"], "text_zh": "好心的熊媽媽看見了，覺得小蛇太可憐了。牠連忙拿出綠色的毛線，一針一線地為小蛇編織了一件特別長的毛衣。", "sentences": ["好心的熊媽媽看見了，覺得小蛇太可憐了。", "牠連忙拿出綠色的毛線，一針一線地為小蛇編織了一件特別長的毛衣。"]}, {"emojis": ["🐍", "🧥", "😊"], "text_zh": "小蛇穿上這件長長的、溫暖的綠色毛衣，感到全身上下都暖和了。牠高興地在雪地裏扭動，感激熊媽媽的關懷。", "sentences": ["小蛇穿上這件長長的、溫暖的綠色毛衣，感到全身上下都暖和了。", "小蛇高興地在雪地裏扭動，感激熊媽媽的關懷。"]}], "image": 2}, {"id": 24, "title": "貪吃的小豬", "theme": "不要貪心", "emoji": "🍰", "color": "#FCE4EC", "panels": [{"emojis": ["🐷", "🍰", "🍬"], "text_zh": "小豬一個人在家，偷偷把冰箱裏的蛋糕、糖果和零食全部吃個精光。牠的肚子脹得像個圓滾滾的大皮球。", "sentences": ["小豬一個人在家，偷偷把冰箱裏的蛋糕、糖果和零食全部吃個精光。", "牠的肚子脹得像個圓滾滾的大皮球。"]}, {"emojis": ["🐷", "🚪", "🚪"], "text_zh": "這時，小羊和小鹿在門外大聲喊小豬出去玩。小豬開心地答應了，急急忙忙地往門口跑去。", "sentences": ["這時，小羊和小鹿在門外大聲喊小豬出去玩。", "小豬開心地答應了，急急忙忙地往門口跑去。"]}, {"emojis": ["🐷", "🚪", "😰"], "text_zh": "可是，因為小豬的肚子實在太大了，牠「哎呀」一聲，卡在門框中間動彈不得。牠急得大汗淋漓，後悔自己吃得太多。", "sentences": ["可是，因為小豬的肚子實在太大了，牠「哎呀」一聲，卡在門框中間動彈不得。", "牠急得大汗淋漓，後悔自己吃得太多。"]}], "image": 6}, {"id": 25, "title": "小猴子吃桃", "theme": "感謝他人", "emoji": "🍑", "color": "#FFF3E0", "panels": [{"emojis": ["🐒", "🍑", "🌊"], "text_zh": "小猴子看見河對岸有一棵大桃樹，上面掛滿了紅彤彤的甜桃。可是河水太深，小猴子不會游泳，只能在河邊乾著急。", "sentences": ["小猴子看見河對岸有一棵大桃樹，上面掛滿了紅彤彤的甜桃。", "可是河水太深，小猴子不會游泳，只能在河邊乾著急。"]}, {"emojis": ["🦛", "🐒", "🏊"], "text_zh": "這時，一隻大河馬游了過來。大河馬熱心地讓小猴子爬上牠寬闊的背，馱着牠平穩地游到了河對岸。", "sentences": ["這時，一隻大河馬游了過來。", "大河馬熱心地讓小猴子爬上牠寬闊的背，馱着牠平穩地游到了河對岸。"]}, {"emojis": ["🐒", "🍑", "🦛"], "text_zh": "小猴子爬上桃樹，摘了許多又大又甜的桃子。牠沒有獨吞，而是挑選了最大最紅的桃子送給河馬，開心地和好朋友分享成果。", "sentences": ["小猴子爬上桃樹，摘了許多又大又甜的桃子。", "牠沒有獨吞，而是挑選了最大最紅的桃子送給河馬，開心地和好朋友分享成果。"]}], "image": 21}, {"id": 26, "title": "小貓釣魚", "theme": "不貪別人的成果", "emoji": "🎣", "color": "#FFFDE7", "panels": [{"emojis": ["🐿️", "🐟", "🍯"], "text_zh": "小松鼠在河邊辛苦地釣魚，好不容易釣到了一條大魚，高興地放進水桶裏。接著，牠又轉過身專心地繼續釣魚。", "sentences": ["小松鼠在河邊辛苦地釣魚，好不容易釣到了一條大魚，高興地放進水桶裏。", "接著，牠又轉過身專心地繼續釣魚。"]}, {"emojis": ["🐱", "🎣", "🤫"], "text_zh": "躲在樹上的小貓看見了，便悄悄放下一根空釣線。牠偷偷地把小松鼠桶裏的魚給釣了上來，覺得自己不費吹灰之力就得到了大魚。", "sentences": ["躲在樹上的小貓看見了，便悄悄放下一根空釣線。", "牠偷偷地把小松鼠桶裏的魚給釣了上來，覺得自己不費吹灰之力就得到了大魚。"]}, {"emojis": ["🐿️", "❓", "🐱"], "text_zh": "小松鼠回頭一看，發現桶裏空空如也，驚訝得摸著腦袋百思不得其解。樹上的小貓抱著魚，不知道自己的行為是不對的。", "sentences": ["小松鼠回頭一看，發現桶裏空空如也，驚訝得摸著腦袋百思不得其解。", "樹上的小貓抱著魚，不知道自己的行為是不對的。"]}], "image": 5}, {"id": 27, "title": "狐狸偷葡萄", "theme": "做正當的行為", "emoji": "🍇", "color": "#F3E5F5", "panels": [{"emojis": ["🦊", "🍇", "👀"], "text_zh": "狡猾的狐狸溜進了農民的葡萄園。看著架子上掛滿了晶瑩剔透的紫葡萄，狐狸高興得直咽口水，伸手想去偷摘。", "sentences": ["狡猾的狐狸溜進了農民的葡萄園。", "看著架子上掛滿了晶瑩剔透的紫葡萄，狐狸高興得直咽口水，伸手想去偷摘。"]}, {"emojis": ["🐕", "🐕", "💢"], "text_zh": "看守果園的大狼狗警惕地發現了狐狸。牠立刻猛衝過來，張大嘴巴，對著狐狸發出無比憤怒的汪汪吠叫聲。", "sentences": ["看守果園的大狼狗警惕地發現了狐狸。", "牠立刻猛衝過來，張大嘴巴，對著狐狸發出無比憤怒的汪汪吠叫聲。"]}, {"emojis": ["🦊", "🏃", "💦"], "text_zh": "狐狸被大狼狗嚇得魂飛魄散，連滾帶爬地往果園外逃跑。牠累得滿頭大汗，再也不敢動偷東西的壞心思了。", "sentences": ["狐狸被大狼狗嚇得魂飛魄散，連滾帶爬地往果園外逃跑。", "牠累得滿頭大汗，再也不敢動偷東西的壞心思了。"]}], "image": 7}, {"id": 28, "title": "不冷了", "theme": "幫助朋友", "emoji": "🐦", "color": "#E3F2FD", "panels": [{"emojis": ["🐿️", "🌲", "🥶"], "text_zh": "北風呼呼地吹，小松鼠在寒風中的樹洞裏冷得直打哆嗦。牠緊緊抱著自己的大尾巴，可還是冷得發抖。", "sentences": ["北風呼呼地吹，小松鼠在寒風中的樹洞裏冷得直打哆嗦。", "牠緊緊抱著自己的大尾巴，可還是冷得發抖。"]}, {"emojis": ["🐦", "🍃", "🛌"], "text_zh": "這時，一隻熱心的小鳥飛了過來，發現了寒冷的小松鼠。小鳥連忙叼來了一片巨大的、厚實的落葉當作棉被，輕輕覆蓋在小松鼠身上。", "sentences": ["這時，一隻熱心的小鳥飛了過來，發現了寒冷的小松鼠。", "小鳥連忙叼來了一片巨大的、厚實的落葉當作棉被，輕輕覆蓋在小松鼠身上。"]}, {"emojis": ["🐿️", "🥰", "🐦"], "text_zh": "蓋上了厚葉子棉被，小松鼠頓時覺得全身上下都暖和了。牠甜甜地向小鳥道謝，兩隻小動物開心地抱在了一起。", "sentences": ["蓋上了厚葉子棉被，小松鼠頓時覺得全身上下都暖和了。", "小松鼠甜甜地向小鳥道謝，兩隻小動物開心地抱在了一起。"]}], "image": 8}];
+
+        
+        // Image Zoom Modal Functions
+        function openImageZoom() {
+            const zoomModal = document.getElementById('image-zoom-modal');
+            const zoomedImg = document.getElementById('zoomed-story-image');
+            zoomedImg.src = `story${currentStory.image}.jpg`;
+            zoomedImg.onerror = function() {
+                this.onerror = null;
+                this.src = `https://placehold.co/800x600/ffd25a/4a3e3d?text=${currentStory.emoji}+${currentStory.title}`;
+            };
+            zoomModal.style.display = 'flex';
+        }
+
+        function closeImageZoom() {
+            document.getElementById('image-zoom-modal').style.display = 'none';
+        }
+
+        // On-page Full Story Article functions
+        function toggleFullStoryArticle() {
+            const panel = document.getElementById('full-story-article-panel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+                buildFullStoryArticle();
+            }
+        }
+
+        function buildFullStoryArticle() {
+            document.getElementById('full-article-title').innerText = `${currentStory.title} - 完整故事閱讀`;
+            const container = document.getElementById('full-story-sentences-container');
+            container.innerHTML = '';
+
+            let sentenceIndex = 0;
+            currentStory.panels.forEach((panel, panelIdx) => {
+                panel.sentences.forEach((sentence) => {
+                    const row = document.createElement('div');
+                    row.className = 'sentence-row';
+                    row.style.borderBottom = '1px dashed #D0E3F5';
+                    row.style.padding = '12px 15px';
+                    row.style.display = 'flex';
+                    row.style.justifyContent = 'space-between';
+                    row.style.alignItems = 'center';
+                    row.style.fontSize = '18px';
+                    row.style.gap = '20px';
+
+                    const currentIdx = sentenceIndex;
+                    row.innerHTML = `
+                        <div class="sentence-text" id="full-sent-${currentIdx}" style="font-weight: bold; line-height: 1.5; flex-grow: 1;">${sentence}</div>
+                        <button class="btn-speak-sentence" onclick="speakFullStorySentence('${sentence.replace(/'/g, "\'")}', ${currentIdx})" style="width: 42px; height: 42px; font-size: 18px; background-color: #2196F3; border-radius: 50%; color: white; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 3px 6px rgba(33,150,243,0.3); flex-shrink: 0; transition: transform 0.2s;">🔊</button>
+                    `;
+                    container.appendChild(row);
+                    sentenceIndex++;
+                });
+            });
+        }
+
+        function speakFullStorySentence(text, idx) {
+            pauseFullStory();
+            
+            const rows = document.querySelectorAll('#full-story-sentences-container .sentence-text');
+            rows.forEach(r => r.style.color = 'inherit');
+
+            const activeRow = document.getElementById(`full-sent-${idx}`);
+            if (activeRow) activeRow.style.color = '#FF7B93';
+
+            speakText(text, () => {
+                if (activeRow) activeRow.style.color = 'inherit';
+            });
+        }
+
+        let isFullStoryPlaying = false;
+        let fullStoryCurrentIdx = 0;
+        let fullStorySentences = [];
+
+        function playFullStory() {
+            // If already playing, don't restart, just keep going
+            if (isFullStoryPlaying) return;
+
+            pauseFullStory();
+            
+            const allSentences = [];
+            currentStory.panels.forEach(panel => {
+                panel.sentences.forEach(s => allSentences.push(s));
+            });
+
+            // If empty, story changed, or we already finished playing, reset
+            if (fullStorySentences.length === 0 || 
+                JSON.stringify(fullStorySentences) !== JSON.stringify(allSentences) || 
+                fullStoryCurrentIdx >= allSentences.length) {
+                fullStorySentences = allSentences;
+                fullStoryCurrentIdx = 0;
+            }
+
+            isFullStoryPlaying = true;
+            
+            function playNext() {
+                if (!isFullStoryPlaying) return;
+
+                if (fullStoryCurrentIdx >= fullStorySentences.length) {
+                    isFullStoryPlaying = false;
+                    fullStoryCurrentIdx = 0;
+                    const rows = document.querySelectorAll('#full-story-sentences-container .sentence-text');
+                    rows.forEach(r => r.style.color = 'inherit');
+                    return;
+                }
+
+                const rows = document.querySelectorAll('#full-story-sentences-container .sentence-text');
+                rows.forEach(r => r.style.color = 'inherit');
+
+                const activeRow = document.getElementById(`full-sent-${fullStoryCurrentIdx}`);
+                if (activeRow) activeRow.style.color = '#FF7B93';
+
+                if (activeRow) {
+                    activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                speakText(fullStorySentences[fullStoryCurrentIdx], () => {
+                    if (!isFullStoryPlaying) return;
+                    if (activeRow) activeRow.style.color = 'inherit';
+                    fullStoryCurrentIdx++;
+                    playNext();
+                });
+            }
+
+            playNext();
+        }
+
+        function pauseFullStory() {
+            isFullStoryPlaying = false;
+            window.speechSynthesis.cancel();
+            const rows = document.querySelectorAll('#full-story-sentences-container .sentence-text');
+            rows.forEach(r => r.style.color = 'inherit');
+        }
+
+        let selectedLang = 'zh-HK'; // Default
+        let currentStory = null;
+        let currentPanelIndex = 0;
+        let currentUtterance = null;
+        let isSpeaking = false;
+
+        // Populate homepage with 28 storybooks (Updated in V2 with images)
+        function initHomepage() {
+            const grid = document.getElementById('book-grid');
+            grid.innerHTML = '';
+
+            stories.forEach(story => {
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.style.backgroundColor = story.color;
+                card.onclick = () => loadStory(story.id);
+
+                card.innerHTML = `
+                    <div class="book-cover-container">
+                        <img class="book-cover-img" src="story${story.image}.jpg" alt="${story.title}" onerror="this.onerror=null; this.src='https://placehold.co/200x250/ff7b93/ffffff?text=${story.emoji}';">
+                    </div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+                        <div class="book-title" style="margin-top: 5px;">${story.title}</div>
+                        <div class="book-theme">${story.theme}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Switch speech and app language
+        function switchLanguage(lang) {
+            selectedLang = lang;
+            document.getElementById('btn-cantonese').classList.remove('active');
+            document.getElementById('btn-mandarin').classList.remove('active');
+
+            if (lang === 'zh-HK') {
+                document.getElementById('btn-cantonese').classList.add('active');
+            } else {
+                document.getElementById('btn-mandarin').classList.add('active');
+            }
+
+            // Stop any ongoing speech when language switches
+            pauseFullStory();
+            isSpeaking = false;
+        }
+
+        // Navigate to Story Panel view (Updated in V2 with images)
+        function loadStory(storyId) {
+            pauseFullStory();
+            currentStory = stories.find(s => s.id === storyId);
+            
+            document.getElementById('current-story-title').innerText = currentStory.title;
+            document.getElementById('current-story-theme').innerText = `主題：${currentStory.theme}`;
+
+            // Set main full image
+            const mainImg = document.getElementById('story-main-image');
+            mainImg.src = `story${currentStory.image}.jpg`;
+            mainImg.onerror = function() {
+                this.onerror = null;
+                this.src = `https://placehold.co/600x400/ffd25a/4a3e3d?text=${currentStory.emoji}+${currentStory.title}`;
+            };
+
+            document.getElementById('full-story-article-panel').style.display = 'none';
+            buildFullStoryArticle(); // Pre-build sentences container
+
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('story-screen').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Go back to book rack
+        function showHomeScreen() {
+            pauseFullStory();
+            document.getElementById('story-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Lightbox zoom Modal (Updated in V2 with images and navigation)
+        function openLightbox(panelIndex) {
+            pauseFullStory();
+            currentPanelIndex = panelIndex;
+            const panel = currentStory.panels[panelIndex];
+
+            document.getElementById('modal-title-text').innerText = `${currentStory.title} - 第 ${panelIndex + 1} 幅畫`;
+            
+            // Build illustration with image
+            const illustContainer = document.getElementById('modal-illustration-container');
+            illustContainer.innerHTML = `
+                <img class="modal-img" src="story${currentStory.image}.jpg" alt="${currentStory.title}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/ff7b93/ffffff?text=${currentStory.emoji}';">
+            `;
+
+            // Build Subtitle
+            document.getElementById('modal-subtitle').innerText = panel.text_zh;
+
+            // Hide article expand panel by default
+            document.getElementById('article-expand-panel').style.display = 'none';
+
+            // Rebuild navigation controls
+            buildModalControls();
+
+            // Show Modal
+            document.getElementById('lightbox-modal').style.display = 'flex';
+        }
+
+        function buildModalControls() {
+            // Remove existing nav if any
+            const existingNav = document.getElementById('modal-nav-container');
+            if (existingNav) existingNav.remove();
+
+            // Create nav container
+            const navContainer = document.createElement('div');
+            navContainer.id = 'modal-nav-container';
+            navContainer.className = 'lightbox-nav-controls';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn-nav-arrow';
+            prevBtn.innerHTML = '👈 上一幅圖';
+            prevBtn.disabled = currentPanelIndex === 0;
+            prevBtn.style.opacity = currentPanelIndex === 0 ? '0.5' : '1';
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (currentPanelIndex > 0) openLightbox(currentPanelIndex - 1);
+            };
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn-nav-arrow';
+            nextBtn.innerHTML = '下一幅圖 👉';
+            nextBtn.disabled = currentPanelIndex === currentStory.panels.length - 1;
+            nextBtn.style.opacity = currentPanelIndex === currentStory.panels.length - 1 ? '0.5' : '1';
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (currentPanelIndex < currentStory.panels.length - 1) openLightbox(currentPanelIndex + 1);
+            };
+
+            navContainer.appendChild(prevBtn);
+            navContainer.appendChild(nextBtn);
+
+            const modalBody = document.querySelector('.modal-body');
+            // Insert before article panel
+            const articlePanel = document.getElementById('article-expand-panel');
+            modalBody.insertBefore(navContainer, articlePanel);
+        }
+
+        function closeModal() {
+            pauseFullStory();
+            document.getElementById('lightbox-modal').style.display = 'none';
+            isSpeaking = false;
+        }
+
+        // Text-to-Speech synthesis
+        function speakText(text, callback) {
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = selectedLang;
+            
+            // Search matching voice for Cantonese/Mandarin
+            const voices = window.speechSynthesis.getVoices();
+            let matchedVoice = null;
+            
+            if (selectedLang === 'zh-HK') {
+                matchedVoice = voices.find(v => v.lang.includes('HK') || v.lang.includes('zh-HK') || v.lang.includes('Yue'));
+            } else {
+                matchedVoice = voices.find(v => v.lang.includes('CN') || v.lang.includes('zh-CN') || v.lang.includes('zh-TW') || v.lang.includes('Mandarin'));
+            }
+
+            if (matchedVoice) {
+                utterance.voice = matchedVoice;
+            }
+
+            // Adjust speech rate slightly slower for K2-K3 kids
+            utterance.rate = 0.85;
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                if (callback) callback();
+            };
+
+            utterance.onerror = () => {
+                isSpeaking = false;
+                if (callback) callback();
+            };
+
+            currentUtterance = utterance;
+            isSpeaking = true;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Teacher Cat says the story panels
+        function startStorytelling() {
+            pauseFullStory();
+            const panel = currentStory.panels[currentPanelIndex];
+            const subtitleBox = document.getElementById('modal-subtitle');
+            
+            // Visual text highlight simulation
+            subtitleBox.classList.add('highlight-text');
+
+            speakText(panel.text_zh, () => {
+                subtitleBox.classList.remove('highlight-text');
+            });
+        }
+
+        function pauseStorytelling() {
+            if (window.speechSynthesis.speaking) {
+                pauseFullStory();
+                document.getElementById('modal-subtitle').classList.remove('highlight-text');
+                isSpeaking = false;
+            }
+        }
+
+        // Toggle article panel
+        function toggleArticle() {
+            const panel = document.getElementById('article-expand-panel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'block';
+                buildArticlePanel();
+            }
+        }
+
+        // Build article layout with play button for each sentence
+        function buildArticlePanel() {
+            const panel = currentStory.panels[currentPanelIndex];
+            document.getElementById('article-title-text').innerText = `${currentStory.title}的完整對白`;
+            
+            const container = document.getElementById('article-sentences-container');
+            container.innerHTML = '';
+
+            panel.sentences.forEach((sentence, idx) => {
+                const row = document.createElement('div');
+                row.className = 'sentence-row';
+
+                row.innerHTML = `
+                    <div class="sentence-text" id="sent-${idx}">${sentence}</div>
+                    <button class="btn-speak-sentence" onclick="speakSingleSentence('${sentence}', ${idx})">🔊</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Speak a single sentence and highlight it
+        function speakSingleSentence(text, idx) {
+            pauseFullStory();
+            // Remove highlight from all sentences
+            const rows = document.querySelectorAll('.sentence-text');
+            rows.forEach(r => r.style.color = 'inherit');
+
+            const activeRow = document.getElementById(`sent-${idx}`);
+            activeRow.style.color = '#FF7B93';
+
+            speakText(text, () => {
+                activeRow.style.color = 'inherit';
+            });
+        }
+
+        // Ensure voices are loaded (Web Speech API async load)
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {};
+        }
+
+        // Start homepage
+        initHomepage();
+    </script>
+</body>
+</html>
