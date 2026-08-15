@@ -1,0 +1,4826 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🎒 小一人文上大冒險 🌟</title>
+    
+    <!-- Load rounded kid-friendly Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FF5E7E;
+            --primary-hover: #FF7FA0;
+            --secondary-color: #FFD200;
+            --success-color: #2ED573;
+            --info-color: #1E90FF;
+            --bg-color: #F0F4F8;
+            --text-color: #2F3542;
+            --card-bg: #FFFFFF;
+            
+            /* Premium Cute Theme Palette */
+            --candy-pink: #FF6B81;
+            --candy-orange: #FFA502;
+            --candy-green: #2ED573;
+            --candy-blue: #70A1FF;
+            --candy-purple: #A29BFE;
+            --soft-yellow: #FFF2E8;
+            --chunky-shadow-color: rgba(47, 53, 66, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Fredoka', 'Comic Sans MS', 'Chalkboard SE', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 12px;
+            gap: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating Clouds Background Animation */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+        }
+        .cloud-1 {
+            width: 120px; height: 40px; top: 10%; left: -150px;
+            animation: drift 25s linear infinite;
+        }
+        .cloud-1::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+        .cloud-1::after { width: 70px; height: 70px; top: -35px; left: 40px; }
+
+        .cloud-2 {
+            width: 180px; height: 50px; top: 40%; right: -200px;
+            animation: drift-reverse 35s linear infinite;
+        }
+        .cloud-2::before { width: 70px; height: 70px; top: -35px; left: 20px; }
+        .cloud-2::after { width: 90px; height: 90px; top: -45px; left: 65px; }
+
+        .cloud-3 {
+            width: 100px; height: 35px; top: 75%; left: -120px;
+            animation: drift 30s linear infinite 5s;
+        }
+        .cloud-3::before { width: 40px; height: 40px; top: -20px; left: 10px; }
+        .cloud-3::after { width: 55px; height: 55px; top: -25px; left: 30px; }
+
+        @keyframes drift {
+            0% { left: -150px; }
+            100% { left: 100vw; }
+        }
+        @keyframes drift-reverse {
+            0% { right: -200px; }
+            100% { right: 100vw; }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 820px;
+            background: var(--card-bg);
+            border-radius: 35px;
+            box-shadow: 0 15px 0 #E2B200, 0 30px 40px rgba(0,0,0,0.15);
+            border: 8px solid var(--secondary-color);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 580px;
+            z-index: 5;
+            transition: transform 0.2s ease;
+        }
+
+        /* Responsive Persistent Top-Left Logo */
+        .top-logo-bar {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+        .top-logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px var(--chunky-shadow-color);
+            object-fit: cover;
+            background-color: var(--primary-color);
+            animation: pulse-avatar 2s infinite alternate;
+        }
+        .top-logo-text {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px var(--chunky-shadow-color);
+            border: 2px solid #E4E7EB;
+        }
+
+        @keyframes pulse-avatar {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Screens */
+        .screen {
+            padding: 35px 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Header Text Styles */
+        h1 {
+            font-size: 2.3rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            text-shadow: 3px 3px 0px var(--secondary-color);
+            letter-spacing: 1px;
+            font-weight: 900;
+            animation: title-float 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes title-float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            margin-bottom: 25px;
+            color: #57606F;
+            font-weight: bold;
+        }
+
+        /* Achievement Record Section on Home Screen */
+        .progress-record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 680px;
+            margin: 10px auto 15px auto;
+            background: #E0F2FE;
+            border: 3px dashed #0284C7;
+            border-radius: 22px;
+            padding: 12px 20px;
+            gap: 15px;
+        }
+
+        .progress-record-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+            color: #0369A1;
+            font-size: 1.1rem;
+        }
+
+        .clear-btn {
+            background: #FF4757;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #C23616;
+            transition: all 0.1s ease;
+        }
+
+        .clear-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        /* Level Grid & Deluxe Buttons */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 680px;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            border-radius: 26px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        /* Stylized Gradients for Level Buttons (High contrast, very attractive) */
+        .level-btn:nth-child(1) {
+            background: linear-gradient(135deg, #FF6B81 0%, #FF4757 100%);
+            border: 4px solid #FFF1F2;
+            box-shadow: 0 6px 0 #D63031, 0 10px 20px var(--chunky-shadow-color);
+        }
+        .level-btn:nth-child(2) {
+            background: linear-gradient(135deg, #FF9F43 0%, #FA8231 100%);
+            border: 4px solid #FFF9F3;
+            box-shadow: 0 6px 0 #E67E22, 0 10px 20px var(--chunky-shadow-color);
+        }
+        .level-btn:nth-child(3) {
+            background: linear-gradient(135deg, #20BF6B 0%, #059669 100%);
+            border: 4px solid #ECFDF5;
+            box-shadow: 0 6px 0 #047857, 0 10px 20px var(--chunky-shadow-color);
+        }
+        .level-btn:nth-child(4) {
+            background: linear-gradient(135deg, #2E86DE 0%, #1A5F7A 100%);
+            border: 4px solid #F0F9FF;
+            box-shadow: 0 6px 0 #0F4C81, 0 10px 20px var(--chunky-shadow-color);
+        }
+        .level-btn:nth-child(5) {
+            background: linear-gradient(135deg, #00D2D3 0%, #018D8E 100%);
+            border: 4px solid #ECFEFE;
+            box-shadow: 0 6px 0 #007374, 0 10px 20px var(--chunky-shadow-color);
+        }
+        .level-btn:nth-child(6) {
+            background: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
+            border: 4px solid #F5F3FF;
+            box-shadow: 0 6px 0 #5352ED, 0 10px 20px var(--chunky-shadow-color);
+        }
+
+        .level-btn:hover {
+            transform: translateY(-5px);
+        }
+
+        .level-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--chunky-shadow-color);
+        }
+
+        .level-btn .badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-btn .title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            line-height: 1.3;
+        }
+
+        /* Star & Highscore Container on Home cards */
+        .star-badge-container {
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 8px 12px;
+            border-radius: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .highscore-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: bold;
+        }
+
+        .star-small {
+            font-size: 1.4rem;
+            color: var(--secondary-color);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* Pulsing Big Gold Star for Perfect Score */
+        .star-large {
+            font-size: 1.8rem;
+            display: inline-block;
+            animation: star-pulse 0.8s infinite alternate;
+            filter: drop-shadow(0 2px 5px rgba(255, 210, 0, 0.6));
+        }
+
+        @keyframes star-pulse {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.2) rotate(5deg); }
+        }
+
+        .star-none {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: bold;
+        }
+
+        /* Level Intro Screen Content */
+        .intro-box {
+            background: #FFFBE6;
+            border: 4px dashed #FFD200;
+            border-radius: 25px;
+            padding: 22px;
+            margin: 20px 0;
+            text-align: left;
+            width: 100%;
+            max-width: 680px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .intro-title {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intro-desc {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            color: #4A4A4A;
+            font-weight: 600;
+        }
+
+        .intro-example {
+            background: white;
+            border-left: 6px solid #FFD200;
+            padding: 14px;
+            border-radius: 0 15px 15px 0;
+            font-size: 1.05rem;
+            color: #55585F;
+            font-style: italic;
+            font-weight: 600;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.02);
+        }
+
+        /* General & Interactive Action Buttons */
+        .btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 22px;
+            padding: 14px 35px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #20BF6B;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #20BF6B;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #20BF6B;
+        }
+
+        .btn-secondary {
+            background: #A4B0BE;
+            box-shadow: 0 6px 0 #747D8C;
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 8px 0 #747D8C;
+        }
+        .btn-secondary:active {
+            box-shadow: 0 2px 0 #747D8C;
+        }
+
+        /* Play Screen Header */
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 22px;
+            background: #F8F9FA;
+            border-bottom: 4px solid #E4E7EB;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .progress-bar-container {
+            width: 50%;
+            height: 18px;
+            background: #E4E7EB;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #CED4DA;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ED573, #7BED9F);
+            width: 0%;
+            transition: width 0.3s ease-out;
+            border-radius: 10px;
+        }
+
+        .status-text {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #57606F;
+        }
+
+        /* Question Box Styling */
+        .question-box {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            width: 100%;
+            max-width: 680px;
+            margin: 15px auto;
+            border: 4px solid #E4E7EB;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.03);
+        }
+
+        .difficulty-indicator {
+            background: #FFEAA7;
+            color: #D35400;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-bottom: 18px;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .difficulty-indicator.deep {
+            background: #FFD2D2;
+            color: #C0392B;
+        }
+
+        .question-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 22px;
+            padding: 0 10px;
+        }
+
+        .question-text {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: var(--text-color);
+            line-height: 1.5;
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        /* High Visibility Interactive Audio Buttons */
+        .audio-btn {
+            background: linear-gradient(135deg, #00A8FF, #0072FF);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0056B3, 0 6px 12px rgba(0,0,0,0.1);
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 0 #0056B3, 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .audio-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 0 #0056B3;
+        }
+
+        /* Options layout & styling optimized for mobile tapping */
+        .options-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option-card {
+            background: #FFF;
+            border: 3px solid #E4E7EB;
+            border-radius: 20px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            box-shadow: 0 5px 0 #E4E7EB, 0 5px 10px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            position: relative;
+        }
+
+        .option-card:hover {
+            border-color: var(--info-color);
+            background-color: #F8FBFF;
+            box-shadow: 0 6px 0 #0056B3, 0 8px 15px rgba(0,0,0,0.05);
+        }
+
+        .option-card:active {
+            transform: scale(0.97) translateY(4px);
+            box-shadow: 0 1px 0 #E4E7EB;
+        }
+
+        .option-card.correct {
+            background-color: #ECFDF5 !important;
+            border-color: var(--success-color) !important;
+            box-shadow: 0 4px 0 #047857 !important;
+            color: #065F46;
+        }
+
+        .option-card.wrong {
+            background-color: #FEF2F2 !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 4px 0 #B91C1C !important;
+            color: #991B1B;
+        }
+
+        .option-letter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-grow: 1;
+        }
+
+        .option-letter {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F1F2F6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.15rem;
+            color: #57606F;
+            flex-shrink: 0;
+            font-weight: 900;
+            border: 2px solid #E4E7EB;
+        }
+
+        .option-card:hover .option-letter {
+            background: var(--info-color);
+            color: white;
+            border-color: var(--info-color);
+        }
+
+        .option-card.correct .option-letter {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .option-card.wrong .option-letter {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .option-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        /* Cute Golden Bell Audio Speaker Option Button */
+        .opt-audio-btn {
+            background: linear-gradient(135deg, #FFD200, #FFA500);
+            color: #5C3A00;
+            border: 2px solid #FF8C00;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.15rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            box-shadow: 0 3px 0 #B37400;
+        }
+        .opt-audio-btn:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 4px 0 #B37400;
+        }
+        .opt-audio-btn:active {
+            transform: scale(0.9) rotate(-5deg);
+            box-shadow: 0 1px 0 #B37400;
+        }
+
+        /* Option Speaker animation class when read */
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+        .opt-audio-btn.reading {
+            animation: wiggle 0.25s ease infinite alternate;
+        }
+
+        /* Navigation Buttons styled beautifully */
+        .nav-btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 25px;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            flex: 1;
+            font-size: 1.1rem;
+            padding: 14px 10px;
+            border-radius: 20px;
+            min-height: 52px; /* iOS safe touch target */
+        }
+
+        .btn-secondary-nav {
+            background: linear-gradient(to bottom, #A4B0BE, #747D8C);
+            color: white;
+            border: 2px solid #57606F;
+            box-shadow: 0 4px 0 #2F3542;
+        }
+        .btn-secondary-nav:hover {
+            box-shadow: 0 6px 0 #2F3542;
+        }
+        .btn-secondary-nav:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #2F3542;
+        }
+
+        .btn-wrong-next {
+            background: linear-gradient(135deg, #FF9F43, #FA8231);
+            color: white;
+            border: 2px solid #E67E22;
+            border-radius: 22px;
+            padding: 14px 45px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #D35400, 0 8px 15px rgba(0,0,0,0.1);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: bounce-attention 1.5s infinite;
+        }
+        .btn-wrong-next:hover {
+            box-shadow: 0 8px 0 #D35400, 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .btn-wrong-next:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #D35400;
+        }
+        @keyframes bounce-attention {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Confetti Stars */
+        .star-particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 999;
+            animation: blow-out 0.8s ease-out forwards;
+        }
+
+        @keyframes blow-out {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
+        /* Score Summary Screen Card */
+        .results-box {
+            background: #FFF;
+            border-radius: 30px;
+            padding: 26px 22px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px var(--chunky-shadow-color);
+            margin-bottom: 25px;
+            border: 4px solid #E4E7EB;
+        }
+
+        .score-value {
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin: 10px 0;
+            text-shadow: 3px 3px 0px var(--secondary-color);
+        }
+
+        .feedback-msg {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #2F3640;
+            margin-bottom: 15px;
+        }
+
+        .achievement-badge {
+            font-size: 4.2rem;
+            animation: bounce 1.2s infinite alternate;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+
+        .summary-title-bar {
+            background: #FFF2E8;
+            border: 3px dashed #FF9F43;
+            color: #D35400;
+            padding: 12px 15px;
+            border-radius: 16px;
+            font-weight: 900;
+            margin: 22px 0 12px 0;
+            font-size: 1.05rem;
+        }
+
+        .results-summary-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 3px solid #E4E7EB;
+            border-radius: 18px;
+            padding: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+            background: #F8F9FA;
+        }
+
+        .summary-item {
+            padding: 12px;
+            border-bottom: 2px solid #F1F2F6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-radius: 10px;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item.wrong-item {
+            background: #FFF5F5;
+        }
+
+        .summary-item-text {
+            font-size: 0.98rem;
+            font-weight: bold;
+            color: #2F3640;
+            line-height: 1.4;
+        }
+
+        .summary-btn-retry {
+            background: linear-gradient(135deg, #FF9F43, #FA8231);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #D35400;
+            transition: all 0.1s ease;
+        }
+        .summary-btn-retry:hover {
+            background: #FFAF5B;
+        }
+        .summary-btn-retry:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .btn-restart-level {
+            background: linear-gradient(135deg, #2ED573, #20BF6B);
+            color: white;
+            box-shadow: 0 6px 0 #047857;
+            border-radius: 22px;
+            padding: 14px 30px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-restart-level:hover {
+            box-shadow: 0 8px 0 #047857;
+            transform: translateY(-2px);
+        }
+        .btn-restart-level:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #047857;
+        }
+
+        /* Return to Main Portal Button styling (Deluxe Gradient Link) */
+        .btn-main-adventure-portal {
+            background: linear-gradient(135deg, #12CBC4, #1289A7);
+            color: white;
+            border: 3px solid #EBFDFC;
+            border-radius: 24px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0A5F75, 0 10px 20px var(--chunky-shadow-color);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 680px;
+            margin: 15px auto;
+        }
+        
+        .btn-main-adventure-portal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 #0A5F75, 0 12px 25px var(--chunky-shadow-color);
+        }
+        .btn-main-adventure-portal:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0A5F75;
+        }
+
+        /* Responsive Flowing Footer styling */
+        .global-footer {
+            border-top: 3px solid #E4E7EB;
+            background: #FFFFFF;
+            padding: 22px 25px;
+            width: 100%;
+            max-width: 820px;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px var(--chunky-shadow-color);
+            margin: 10px 0 20px 0;
+            z-index: 5;
+        }
+        
+        .footer-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            row-gap: 10px;
+        }
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: #4b6584;
+            font-size: 0.88rem;
+            font-weight: 900;
+            padding: 8px 12px;
+            background: #F8F9FA;
+            border-radius: 12px;
+            border: 2px solid #E4E7EB;
+            transition: all 0.2s ease;
+        }
+        .footer-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            background: #FFF5F7;
+            border-color: var(--primary-color);
+        }
+        .footer-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        .text-icon {
+            font-size: 1.1rem;
+        }
+        .xhs-text-icon { color: #ff2442; }
+        .dy-text-icon { color: #000000; }
+
+        /* Interactive Retry Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(47, 53, 66, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 12px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 650px;
+            border: 8px solid var(--secondary-color);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: zoom-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+        @keyframes zoom-in {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            background: #FFFBE6;
+            padding: 15px 25px;
+            border-bottom: 4px solid #FFD200;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            color: var(--primary-color);
+            font-size: 1.35rem;
+            font-weight: 900;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #A4B0BE;
+            transition: color 0.15s ease;
+        }
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+        .modal-body {
+            padding: 20px 22px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        /* Prominent Tip Alert inside Modal */
+        .retry-hint-banner {
+            background: #FFF2E8;
+            border: 2px solid #FFA940;
+            color: #D46B08;
+            border-radius: 16px;
+            padding: 12px 15px;
+            margin-bottom: 18px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(212, 107, 8, 0.04);
+            animation: pop-bounce 0.5s ease-out;
+        }
+        @keyframes pop-bounce {
+            0% { transform: scale(0.85); opacity: 0; }
+            70% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        canvas#confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* RESPONSIVE IPAD & PHONE MOBILE MEDIA QUERIES */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 8px;
+                gap: 15px;
+            }
+            .game-container {
+                border-radius: 28px;
+                border-width: 6px;
+                min-height: auto;
+            }
+            h1 {
+                font-size: 1.9rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 18px;
+            }
+            .progress-record-header {
+                flex-direction: column;
+                padding: 10px 15px;
+                gap: 8px;
+                border-radius: 18px;
+            }
+            .level-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .level-btn {
+                border-radius: 22px;
+                padding: 16px 12px;
+            }
+            .level-btn .title {
+                font-size: 1.15rem;
+            }
+            .top-logo-bar {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+            .top-logo-img {
+                width: 42px;
+                height: 42px;
+            }
+            .top-logo-text {
+                font-size: 1rem;
+            }
+            #screen-home {
+                padding-top: 15px;
+            }
+            .screen {
+                padding: 20px 15px;
+            }
+            .question-box {
+                padding: 16px;
+                border-radius: 22px;
+            }
+            .question-text {
+                font-size: 1.25rem;
+            }
+            .audio-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+            }
+            .option-text {
+                font-size: 1.05rem;
+            }
+            .option-letter {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .opt-audio-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            .btn-main-adventure-portal {
+                border-radius: 18px;
+                padding: 12px 20px;
+                font-size: 1.05rem;
+            }
+            .global-footer {
+                padding: 15px 15px;
+                border-radius: 20px;
+            }
+            .footer-links {
+                gap: 8px;
+            }
+            .footer-link {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                border-radius: 10px;
+            }
+            .btn-wrong-next {
+                font-size: 1.15rem;
+                padding: 12px 35px;
+            }
+            .score-value {
+                font-size: 3.5rem;
+            }
+            .achievement-badge {
+                font-size: 3.5rem;
+            }
+            .modal-content {
+                border-radius: 24px;
+                border-width: 6px;
+            }
+            .modal-header {
+                padding: 12px 18px;
+            }
+            .modal-body {
+                padding: 15px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cute animated floating clouds backdrop -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+
+    <div class="game-container">
+        <canvas id="confetti"></canvas>
+
+        <!-- Persistent Mascot Profile Header -->
+        <div class="top-logo-bar">
+            <img src="cat.jpeg" class="top-logo-img" alt="Teacher Cat Logo" onerror="this.src='https://placehold.co/100x100/ff5e7e/ffffff?text=🐱';">
+            <span class="top-logo-text">Teacher Cat AI 教室</span>
+        </div>
+
+        <!-- 1. HOME SCREEN -->
+        <div id="screen-home" class="screen active" style="padding-top: 80px;">
+            <h1>🎒 小一人文上大冒險 🌟</h1>
+            <div class="subtitle">小學一年級 人文科關卡溫習遊戲</div>
+            
+            <!-- Progress Record Header with Clear button -->
+            <div class="progress-record-header">
+                <div class="progress-record-title">
+                    <span>🏆 關卡進度與成就記錄</span>
+                </div>
+                <button class="clear-btn" onclick="clearStorage()">🗑️ 清除所有記錄</button>
+            </div>
+
+            <div class="level-grid">
+                <button class="level-btn" onclick="selectLevel('level1')">
+                    <span class="badge">第一關</span>
+                    <span class="title">🏫 奇妙校園探秘</span>
+                    <div id="stars-display-level1" class="stars-container"></div>
+                </button>
+                <button class="level-btn" onclick="selectLevel('level2')">
+                    <span class="badge">第二關</span>
+                    <span class="title">👥 學校成員大集合</span>
+                    <div id="stars-display-level2" class="stars-container"></div>
+                </button>
+                <button class="level-btn" onclick="selectLevel('level3')">
+                    <span class="badge">第三關</span>
+                    <span class="title">🚦 快樂守規小達人</span>
+                    <div id="stars-display-level3" class="stars-container"></div>
+                </button>
+                <button class="level-btn" onclick="selectLevel('level4')">
+                    <span class="badge">第四關</span>
+                    <span class="title">🌱 我的成長變變變</span>
+                    <div id="stars-display-level4" class="stars-container"></div>
+                </button>
+                <button class="level-btn" onclick="selectLevel('level5')">
+                    <span class="badge">第五關</span>
+                    <span class="title">🧼 健康好習慣戰士</span>
+                    <div id="stars-display-level5" class="stars-container"></div>
+                </button>
+                <button class="level-btn" onclick="selectLevel('level6')">
+                    <span class="badge">第六關</span>
+                    <span class="title">🛡️ 保護自己大作戰</span>
+                    <div id="stars-display-level6" class="stars-container"></div>
+                </button>
+            </div>
+            
+            <p style="color: #4A4A4A; font-size: 1.05rem; margin-top: 5px; font-weight: 900;">點選上面的關卡，開始你的溫習大冒險吧！</p>
+            
+            <!-- Return to Main Adventure Link Portal -->
+            <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-main-adventure-portal">🎒 返回小朋友學習大冒險 ➔</a>
+        </div>
+
+        <!-- 2. INTRO/TEACHING SCREEN -->
+        <div id="screen-intro" class="screen">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; margin-bottom: 8px; flex-wrap: wrap;">
+                <h1 id="intro-level-title" style="margin-bottom: 0;">關卡標題</h1>
+                <button class="audio-btn" onclick="readLevelIntro()" title="朗讀重點">🔊</button>
+            </div>
+            <div class="subtitle" id="intro-level-subtitle" style="margin-top: 5px;">關卡介紹</div>
+
+            <div class="intro-box">
+                <div class="intro-title">💡 關卡重點學一學</div>
+                <div class="intro-desc" id="intro-level-desc">這關我們會學習很多重要的觀念喔！</div>
+                <div class="intro-example" id="intro-level-example">例子：這裡會顯示有趣的例子。</div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 20px; width: 100%; max-width: 450px;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="goHome(false)">返回首頁</button>
+                <button class="btn" style="flex: 1;" onclick="startLevel()">🎮 開始挑戰！</button>
+            </div>
+        </div>
+
+        <!-- 3. GAMEPLAY SCREEN -->
+        <div id="screen-game" class="screen" style="padding-top: 75px;">
+            <div class="game-header">
+                <div class="status-text" id="level-name-indicator" style="font-weight: 900; color: var(--primary-color);">第一關</div>
+                <div class="progress-bar-container">
+                    <div id="game-progress" class="progress-bar"></div>
+                </div>
+                <div id="question-counter" class="status-text">1 / 20</div>
+            </div>
+
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="question-box">
+                    <div id="difficulty-badge" class="difficulty-indicator">淺程度</div>
+                    
+                    <div class="question-wrapper">
+                        <div id="question-text" class="question-text">題目載入中...</div>
+                        <button class="audio-btn" onclick="readQuestion()" title="朗讀題目">🔊</button>
+                    </div>
+
+                    <div class="options-list" id="options-container">
+                        <!-- Options injected by JS -->
+                    </div>
+
+                    <!-- Next Question button directly below options on incorrect answer -->
+                    <div id="wrong-next-btn-container" style="display: none; margin-top: 20px; width: 100%; text-align: center;">
+                        <button class="btn-wrong-next" onclick="loadNextQuestion()">下一題 ➡️</button>
+                    </div>
+
+                    <!-- Question Navigation buttons (上一頁, 回到主頁, 下一頁) -->
+                    <div class="nav-btn-container">
+                        <button id="prev-btn" class="btn btn-nav btn-secondary-nav" onclick="loadPrevQuestion()">⬅️ 上一頁</button>
+                        <button id="home-btn" class="btn btn-nav btn-secondary-nav" onclick="goHome(true)">🏠 回到主頁</button>
+                        <button id="next-btn" class="btn btn-nav" onclick="loadNextQuestion()">下一頁 ➡️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RESULTS / SUMMARY SCREEN -->
+        <div id="screen-results" class="screen" style="padding-top: 80px;">
+            <h1>🏆 冒險完成！ 🏆</h1>
+            <div class="subtitle" id="result-level-title">關卡名稱</div>
+
+            <div class="results-box">
+                <div id="achievement-emoji" class="achievement-badge">🥇</div>
+                <div class="feedback-msg" id="feedback-message">太棒了！</div>
+                <div style="font-size: 1.15rem; color: #4b6584; font-weight: 900;">你的分數</div>
+                <div class="score-value" id="score-text">100</div>
+                <div style="font-size: 1.1rem; color: #778ca3; font-weight: bold; margin-bottom: 20px;" id="score-detail">答對了 20 題 / 共 20 題</div>
+                
+                <!-- Results Summary & Retry list -->
+                <div class="summary-title-bar">🔍 答題總結（點擊答錯的題目可以重新挑戰喔！）</div>
+                <div id="results-summary-container" class="results-summary-container">
+                    <!-- Summary items will be dynamically rendered here -->
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+                    <button class="btn-restart-level" onclick="restartCurrentLevel()">🔄 重新挑戰這一關</button>
+                    <button class="btn btn-secondary" onclick="goHome(false)">返回首頁</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Flowing Footer with social links (Appears at natural bottom) -->
+        <div class="global-footer">
+            <div class="footer-title">Teacher Cat 的快樂AI教室</div>
+            <div class="footer-links">
+                <a href="https://www.youtube.com/@TeacherCat123" target="_blank" title="YouTube" class="footer-link">
+                    <svg class="footer-icon" viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span>YouTube</span>
+                </a>
+                <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" title="Instagram" class="footer-link">
+                    <svg class="footer-icon" viewBox="0 0 24 24"><path fill="#E1306C" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                    <span>Instagram</span>
+                </a>
+                <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" title="Facebook" class="footer-link">
+                    <svg class="footer-icon" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span>Facebook</span>
+                </a>
+                <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" title="Threads" class="footer-link">
+                    <svg class="footer-icon" viewBox="0 0 24 24"><path fill="#000000" d="M12.586 16.293c-2.43 0-3.953-1.127-3.953-2.915 0-1.77 1.474-2.834 4.041-2.834.707 0 1.353.076 1.843.195l-.01.378c-.022.682-.124 1.933-.873 2.656-.255.247-.638.397-1.048.397v.323zm5.666-6.72c-.173-.422-.444-.794-.784-1.076-.87-.723-2.222-1.09-4.016-1.09-3.23 0-5.71 1.97-5.71 5.378 0 3.518 2.502 5.32 5.518 5.32 1.832 0 3.195-.44 4.05-1.31.57-.577.892-1.345.98-2.146l-2.016-.002c-.066.38-.22.705-.443.93-.418.423-1.144.623-2.155.623-2.07 0-3.385-1.114-3.385-3.39 0-2.316 1.36-3.414 3.562-3.414 1.137 0 1.937.222 2.38.658.19.19.336.438.412.72l2.018-.42zm1.611 2.336c0-4.836-3.79-8.409-8.4-8.409-4.85 0-8.463 3.65-8.463 8.5 0 4.814 3.51 8.5 8.463 8.5 2.535 0 4.673-.913 6.02-2.57 1.182-1.45 1.76-3.42 1.76-5.556v-.465h-1.928c0 .153.008.31.008.465 0 1.636-.454 3.036-1.303 4.076-.948 1.164-2.454 1.79-4.557 1.79-3.454 0-6.045-2.42-6.045-6.24 0-3.84 2.59-6.25 6.045-6.25 3.327 0 5.927 2.32 5.927 6.132v.596c0 .68-.418 1.132-1.027 1.132-.345 0-.623-.153-.78-.432l-.24-.46c.195-.365.3-.803.3-1.282V12c0-3.13-2.436-5.073-5.327-5.073-2.91 0-5.32 2.01-5.32 5.073 0 2.923 2.19 4.964 5.255 4.964.81 0 1.545-.164 2.15-.477.567.892 1.527 1.44 2.727 1.44 1.836 0 3.19-1.382 3.19-3.21v-.657z" fill="#000000"/></svg>
+                    <span>Threads</span>
+                </a>
+                <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" title="小紅書" class="footer-link">
+                    <span class="text-icon xhs-text-icon">📕</span>
+                    <span>小紅書</span>
+                </a>
+                <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" title="WhatsApp" class="footer-link">
+                    <svg class="footer-icon" viewBox="0 0 24 24"><path fill="#25D366" d="M12.031 6c-2.767 0-5.016 2.207-5.016 4.911 0 .86.223 1.699.65 2.453l-.692 2.545 2.603-.681c.72.392 1.53.598 2.353.598 2.766 0 5.015-2.207 5.015-4.911 0-2.704-2.247-4.915-5.013-4.915zm3.041 6.945c-.125.353-.624.673-.86.708-.236.03-.532.053-.873-.058-.23-.074-.515-.175-1.033-.4-2.209-.961-3.64-3.221-3.753-3.37-.112-.151-.914-1.222-.914-2.329 0-1.107.575-1.65.78-1.874.204-.224.448-.28.597-.28h.425c.137 0 .323.007.492.413.175.421.597 1.47.649 1.574.053.107.089.231.018.373-.072.144-.108.231-.213.354-.105.123-.219.273-.313.373-.105.111-.214.231-.092.441.121.21.536.883 1.15 1.433.79.707 1.455.926 1.66 1.033.204.105.323.089.445-.053.121-.144.524-.61.666-.818.14-.21.284-.175.48-.105.197.07 1.248.59 1.46.702.213.112.353.167.406.26.053.093.053.536-.073.889zM12 0C5.373 0 0 5.373 0 12c0 2.112.551 4.095 1.517 5.824L.078 24l6.304-1.655C8.04 23.327 9.978 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm.031 20.893c-1.611 0-3.195-.414-4.593-1.199l-.328-.184-3.076.804.819-3.011-.205-.32c-.86-1.348-1.314-2.919-1.314-4.536 0-4.636 3.791-8.411 8.413-8.411 4.62 0 8.41 3.774 8.41 8.411 0 4.636-3.79 8.412-8.41 8.412z"/></svg>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#" onclick="alert('抖音號: 74254902683'); return false;" class="footer-link">
+                    <span class="text-icon dy-text-icon">🎵</span>
+                    <span>抖音號: 74254902683</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal overlay for retrying incorrect questions -->
+    <div id="retry-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔄 重新挑戰第 <span id="retry-q-num">1</span> 題</h2>
+                <button class="modal-close" onclick="closeRetryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="retry-difficulty" class="difficulty-indicator">難度</div>
+                
+                <!-- Prominent Tip Banner inside retry modal (Requirement 1) -->
+                <div id="retry-hint-banner" class="retry-hint-banner">
+                    💡 溫馨提示：請仔細閱讀題目，找出唯一的正確答案。加油，你可以的！
+                </div>
+
+                <div class="question-wrapper" style="margin-top: 10px;">
+                    <div id="retry-question-text" class="question-text" style="font-size: 1.25rem;">題目載入中...</div>
+                    <button class="audio-btn" id="retry-read-btn" onclick="readRetryQuestion()" title="朗讀題目">🔊</button>
+                </div>
+                <div class="options-list" id="retry-options-container" style="margin-top: 20px;">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 15px 22px; background: #F8F9FA; border-top: 2px solid #E4E7EB; display: flex; justify-content: flex-end;">
+                <button class="btn btn-secondary" style="padding: 10px 25px; font-size: 1.1rem;" onclick="closeRetryModal()">關閉視窗</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Error Listener to capture and display any hidden device/browser-specific runtime errors on screen
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Unhandled error: ", message, " at ", source, ":", lineno);
+            const errorDiv = document.createElement('div');
+            errorDiv.style.position = 'fixed';
+            errorDiv.style.top = '0';
+            errorDiv.style.left = '0';
+            errorDiv.style.width = '100%';
+            errorDiv.style.background = '#FF4757';
+            errorDiv.style.color = 'white';
+            errorDiv.style.padding = '15px';
+            errorDiv.style.fontSize = '14px';
+            errorDiv.style.zIndex = '999999';
+            errorDiv.style.textAlign = 'left';
+            errorDiv.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+            errorDiv.innerHTML = `
+                <strong>⚠️ 遊戲運行出錯 (請向老師/家長報告)：</strong><br>
+                錯誤原因: ${message}<br>
+                位置: ${source}:${lineno}:${colno}<br>
+                <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 5px 15px; border: none; border-radius: 8px; background: white; color: #FF4757; font-weight: bold; cursor: pointer;">關閉提示</button>
+            `;
+            if (document.body) {
+                document.body.appendChild(errorDiv);
+            } else {
+                window.addEventListener('DOMContentLoaded', () => {
+                    document.body.appendChild(errorDiv);
+                });
+            }
+            return false;
+        };
+        // Safe in-memory fallback for safeStorage in Safari Private Browsing / Restricted Mode / iFrame
+        const safeStorage = {
+            _data: {},
+            getItem: function(key) {
+                try {
+                    if (typeof window !== 'undefined' && 'localStorage' in window && window.localStorage !== null) {
+                        return window.localStorage.getItem(key);
+                    }
+                } catch (e) {
+                    console.warn("window.localStorage.getItem blocked, using fallback memory", e);
+                }
+                return this._data[key] !== undefined ? this._data[key] : null;
+            },
+            setItem: function(key, val) {
+                try {
+                    if (typeof window !== 'undefined' && 'localStorage' in window && window.localStorage !== null) {
+                        window.localStorage.setItem(key, val);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("window.localStorage.setItem blocked, using fallback memory", e);
+                }
+                this._data[key] = String(val);
+            },
+            removeItem: function(key) {
+                try {
+                    if (typeof window !== 'undefined' && 'localStorage' in window && window.localStorage !== null) {
+                        window.localStorage.removeItem(key);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("window.localStorage.removeItem blocked, using fallback memory", e);
+                }
+                delete this._data[key];
+            }
+        };
+
+        const database = {
+    "level1": {
+        "title": "探索我的奇妙校園",
+        "desc": "認識學校的不同設施與環境，掌握在各個地方應該遵守的安全規則和正確行為，做個愛護校園的小達人！",
+        "examples": "例子：在【圖書館】看書時要保持安靜，看完了要把圖書放回原位。而在【操場】上可以跑步和做運動，但絕對不能在走廊和課室裡奔跑喔！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "我們可以在哪裏借閱圖書和安靜閱讀？",
+                "options": [
+                    "圖書館",
+                    "小賣部",
+                    "音樂室"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "進行體育課、跑步和做體操，應該去哪裏？",
+                "options": [
+                    "音樂室",
+                    "操場",
+                    "校務處"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "上音樂課時，我們最可能在課室裏看到甚麼設備？",
+                "options": [
+                    "樂譜架和鋼琴",
+                    "顯微鏡",
+                    "大黑板"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "在學校跌倒受傷，覺得身體不舒服，應該去哪裏？",
+                "options": [
+                    "小賣部",
+                    "醫療室",
+                    "圖書館"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "我們可以在哪裏買到美味的健康小食？",
+                "options": [
+                    "音樂室",
+                    "校務處",
+                    "小賣部"
+                ],
+                "answer": 2,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "上視藝課時，我們最主要做甚麼活動？",
+                "options": [
+                    "做手工和畫畫",
+                    "打籃球",
+                    "唱歌"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "老師會在課室的甚麼地方寫字教學？",
+                "options": [
+                    "地板上",
+                    "黑板或電子白板",
+                    "窗戶上"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "下列哪一個地方是校長和行政老師處理學校事務的辦公室？",
+                "options": [
+                    "校務處",
+                    "電腦室",
+                    "體育館"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "在圖書館看完圖書後，我們應該怎麼做？",
+                "options": [
+                    "隨便放在地上",
+                    "把圖書放回原位或書架上",
+                    "把書藏在書包裡"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "當你想喝水時，應該如何正確使用學校的飲水機？",
+                "options": [
+                    "直接把嘴套在出水口上",
+                    "用自己的水杯或水樽裝水",
+                    "用手捧水喝"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "我們可以在哪裏看到很多電腦並學習打字？",
+                "options": [
+                    "音樂室",
+                    "電腦室",
+                    "禮堂"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "當全校學生要一起聽講座或看表演時，會去哪裏集合？",
+                "options": [
+                    "禮堂",
+                    "走廊",
+                    "洗手間"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "下列哪一樣東西最適合用來清潔雙手？",
+                "options": [
+                    "洗手液和清水",
+                    "泥土",
+                    "乾衣服"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "在校園裡，看到垃圾時我們應該丟到哪裏？",
+                "options": [
+                    "垃圾桶或回收箱",
+                    "課室角落",
+                    "走廊"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "下雨天時，我們進學校前應該把雨傘放在哪裏？",
+                "options": [
+                    "隨便丟在大門口",
+                    "雨傘架或用雨傘袋裝好",
+                    "抱在懷裡上課"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "在學校裡，如果我們迷路了，應該找誰幫忙？",
+                "options": [
+                    "老師或校工叔叔",
+                    "陌生人",
+                    "自己躲起來哭"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "下列哪一項是操場上的設施？",
+                "options": [
+                    "排球網和跑道",
+                    "大鋼琴",
+                    "大量圖書"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "上課鐘聲響起時，我們應該怎麼做？",
+                "options": [
+                    "繼續在操場玩耍",
+                    "立刻排隊回課室準備上課",
+                    "在走廊奔跑"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "當我們要在走廊通道行走時，應該怎樣做？",
+                "options": [
+                    "慢慢靠右行，不要奔跑",
+                    "和同學賽跑",
+                    "閉上眼睛走"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "如果我們想洗手，應該去哪裏？",
+                "options": [
+                    "洗手間或洗手盆",
+                    "圖書館",
+                    "校務處"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "如果學校突然響起火警鐘聲，以下哪一個逃生行為是正確的？",
+                "options": [
+                    "留在座位寫功課",
+                    "有秩序地跟隨老師走到安全集合點",
+                    "立刻收拾書包搭電梯逃跑"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "在電腦室上課時，以下哪一項是學生的正確行為？",
+                "options": [
+                    "隨意開關其他同學的電腦",
+                    "妥善保管自己的密碼，不告訴他人",
+                    "一邊玩電腦一邊吃薯片"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "在圖書館裡，為甚麼要保持安靜？",
+                "options": [
+                    "因為說話會打擾其他正在專心閱讀的人",
+                    "因為圖書館不能呼吸",
+                    "因為老師不准任何人發出聲音"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "小息時在走廊奔跑，最可能導致甚麼嚴重的後果？",
+                "options": [
+                    "會跑得更快",
+                    "會撞倒同學或自己跌倒受傷",
+                    "會得到獎勵"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "如果看到視藝室的桌上有不屬於自己的手工材料，你應該？",
+                "options": [
+                    "直接拿來用",
+                    "不經同意帶回家",
+                    "不要亂動，先詢問老師"
+                ],
+                "answer": 2,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "使用課室內的電器設備（如投影機或冷氣機）時，學生應該？",
+                "options": [
+                    "在沒有老師允許下隨便開關",
+                    "請老師或班長協助，不可隨意觸摸",
+                    "用木尺去戳插座"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "小晴在圖書館發現一本很喜歡的圖書，她可以怎樣做？",
+                "options": [
+                    "偷偷塞進書包帶回家",
+                    "辦理借書手續後才帶回家閱讀",
+                    "在書上畫上記號表示是自己的"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "當大喇叭廣播正在播放學校重要消息時，我們應該？",
+                "options": [
+                    "和旁邊的同學繼續大聲說話",
+                    "保持安靜，專心聆聽廣播內容",
+                    "大聲唱歌蓋過廣播"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "如果我們在體育課時感到呼吸困難或腳痛，正確的做法是？",
+                "options": [
+                    "忍耐不說，免得被老師罵",
+                    "立刻向體育老師報告並休息",
+                    "自己跑回課室睡覺"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "在小賣部等候購買小食時，下列哪一項是守規矩的表現？",
+                "options": [
+                    "插隊到最前面",
+                    "安靜排隊，耐心等候",
+                    "一邊排隊一邊和同學打架"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "當課室的日光燈壞了不停閃爍，我們應該？",
+                "options": [
+                    "自己搬椅子上去換燈泡",
+                    "告訴老師，由學校聯絡技術員或校工維修",
+                    "當作沒看見，繼續上課"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "在洗手間洗手後，我們應該怎樣避免濕滑的地板令他人跌倒？",
+                "options": [
+                    "把雙手的水隨意甩在地上",
+                    "用手帕或抹手紙抹乾雙手",
+                    "把濕手抹在別人的衣服上"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "如果發現操場上有欄杆損壞了，正確的做法是？",
+                "options": [
+                    "當作玩具繼續爬上去玩",
+                    "立刻報告老師，並不要靠近危險地方",
+                    "自己動手修理"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "在圖書館閱讀圖書時，以下哪一項是愛護公物的行為？",
+                "options": [
+                    "一邊看一邊把書頁折角",
+                    "輕輕翻閱，不隨意塗畫或撕毀",
+                    "用原子筆在書上寫字"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "如果我們需要使用科學室的顯微鏡，必須？",
+                "options": [
+                    "趁老師不注意時進去玩",
+                    "在老師的指導和允許下安全使用",
+                    "自己跟同學進去隨便按按鍵"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "以下哪一項是不正確使用課室走廊的行為？",
+                "options": [
+                    "把書包和雜物整齊放在走廊中央",
+                    "靠右慢慢走",
+                    "保持走廊通道暢通"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "當別班的同學在走廊向你打招呼時，你應該？",
+                "options": [
+                    "大聲叫喊回應他",
+                    "微笑着向他點頭或輕聲打招呼",
+                    "不理睬他並跑走"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "如果看見有低年級的同學在操場上哭泣，我們應該？",
+                "options": [
+                    "嘲笑他",
+                    "不關自己的事走開",
+                    "上前關心並帶他找老師或社工幫忙"
+                ],
+                "answer": 2,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "在醫療室休息時，我們應該？",
+                "options": [
+                    "在裏面大聲玩耍和跑跳",
+                    "保持安靜休息，配合醫療人員指導",
+                    "隨便拿藥水來玩"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "如果看見學校有些不認識的校外來賓，我們應該？",
+                "options": [
+                    "大聲叫喊並圍觀",
+                    "有禮貌地向他們點頭或說「早安」",
+                    "向他們投擲粉筆"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    "level2": {
+        "title": "認識溫暖的學校成員",
+        "desc": "認識學校裡各個崗位成員的工作，學會用禮貌和感恩的心與他們相處，共同建立和諧的校園生活！",
+        "examples": "例子：【校長】管理學校所有事情，【老師】教導我們讀書，而辛苦清潔學校的是【校工叔叔和姨姨】。見到他們時，都要有禮貌地說聲「早安」或「謝謝」喔！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "在學校裡，負責教導我們各種知識和做人道理的人是誰？",
+                "options": [
+                    "校工叔叔/姨姨",
+                    "老師",
+                    "書記"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "管理學校所有大小事務、帶領學校前進的「學校火車頭」是誰？",
+                "options": [
+                    "社工",
+                    "校長",
+                    "同班同學"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "看見校園乾乾淨淨，我們要感謝誰每天辛苦地打掃和清潔？",
+                "options": [
+                    "校工叔叔/姨姨",
+                    "書記",
+                    "社工"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "當你感到難過、不開心或有心事想找人傾訴時，可以找誰幫忙？",
+                "options": [
+                    "社工姐姐/哥哥",
+                    "小賣部阿姨",
+                    "陌生人"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "負責處理學校文書工作、幫我們印發通告和收費的叔叔姨姨是誰？",
+                "options": [
+                    "書記",
+                    "班長",
+                    "體育老師"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "早上在校門口遇見校長時，我們應該說甚麼？",
+                "options": [
+                    "「校長，早安！」",
+                    "「你要去哪裏？」",
+                    "甚麼都不說，低頭走過"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "當老師或同學幫助了我們，我們應該抱著甚麼態度？",
+                "options": [
+                    "不理不睬",
+                    "說一聲「謝謝！」",
+                    "覺得是理所當然的"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "不小心弄壞了別人的東西，我們應該對他們說甚麼？",
+                "options": [
+                    "「對不起！」",
+                    "「不是我做的！」",
+                    "「不要緊！」"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "當別人向我們誠懇地道歉說「對不起」時，我們應該大方地說：",
+                "options": [
+                    "「不要緊，原諒你！」",
+                    "「我要告訴老師罰你！」",
+                    "「我不理你了！」"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "在課堂上協助主科老師準備教材、幫忙照顧同學的人是誰？",
+                "options": [
+                    "教學助理",
+                    "圖書管理員",
+                    "校外訪客"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "當你忘記帶功課回學校時，你應該怎樣向老師解釋？",
+                "options": [
+                    "大聲哭鬧",
+                    "誠實地說出原因並向老師道歉",
+                    "說謊騙老師說功課不見了"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "負責在電腦室維修電腦、確保網絡順暢的專業人員是誰？",
+                "options": [
+                    "資訊科技技術員",
+                    "校長",
+                    "書記"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "在班上協助老師維持秩序、收發功課的同學通常是誰？",
+                "options": [
+                    "班長或風紀",
+                    "最愛說話的同學",
+                    "剛轉學的同學"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "小息時看到校工姨姨正在拖地，我們應該：",
+                "options": [
+                    "在剛拖乾淨的濕滑地面上奔跑",
+                    "繞路走並提醒其他同學小心，不弄髒地方",
+                    "把垃圾扔在地上讓她掃"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "當你肚子痛或跌傷時，學校裡哪位專業人員會幫你檢查和擦藥？",
+                "options": [
+                    "學校護士/醫療室老師",
+                    "體育老師",
+                    "書記"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "上課時，如果我們有問題想問老師，正確的做法是：",
+                "options": [
+                    "直接大聲叫喊老師的名字",
+                    "先舉手，等老師點名後再站起來發言",
+                    "跟旁邊的同學一直說"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "放學時，看到辛苦指揮交通、保護我們過馬路的校警或老師，我們應該：",
+                "options": [
+                    "向他們揮手並說「再見，謝謝！」",
+                    "大聲叫喊並跑過馬路",
+                    "假裝看不見"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "當同班同學不小心把水倒在桌上，我們應該：",
+                "options": [
+                    "大聲嘲笑他",
+                    "主動拿抹布或紙巾幫忙他清理",
+                    "假裝看不見並走開"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "如果我們忘記帶筆袋，可以怎樣做？",
+                "options": [
+                    "偷偷拿旁邊同學的筆來用",
+                    "有禮貌地向同學借，並說「請」和「謝謝」",
+                    "在課室裡大哭大鬧"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "在學校裡，我們應該怎樣對待所有學校成員？",
+                "options": [
+                    "只尊敬校長，不理會校工",
+                    "有禮貌、互相尊重和互助互愛",
+                    "喜歡誰就對誰好，不喜歡的就不理"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "小明發現自己的功課有些不懂得做，回到學校後他可以：",
+                "options": [
+                    "抄襲旁邊同學的功課",
+                    "在小息時有禮貌地請教老師或教學助理",
+                    "把功課藏起來不交"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "如果看見校工叔叔正抱著一疊很重的文件走過，你應該：",
+                "options": [
+                    "假裝沒看見，從他身邊跑過",
+                    "幫他推開前面的門，並說「叔叔我幫你開門」",
+                    "站在前面擋住他的路"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "學校社工的主要職責，以下哪一項描述最準確？",
+                "options": [
+                    "只負責懲罰不聽話的壞學生",
+                    "陪伴和協助遇到情緒或生活困難的同學解決問題",
+                    "負責全校的清潔工作"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "關於「書記」的工作，以下哪一項是正確的？",
+                "options": [
+                    "他們在操場教我們打球",
+                    "他們在校務處處理學校的各種文書和行政工作",
+                    "他們在廚房為我們煮午餐"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "當教學助理在課堂上提醒你要專心時，你應該：",
+                "options": [
+                    "不理會他，繼續跟同學聊天",
+                    "立刻坐好，專心聽課並向他點頭示意",
+                    "大聲反駁他"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "在排隊上校車時，如果有人不小心踩到你的腳並說了「對不起」，你應該：",
+                "options": [
+                    "也用力踩他一腳報仇",
+                    "微笑著說「不要緊，下次小心點就好」",
+                    "大聲哭鬧讓全車人看他"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "下列哪一項行為**不符合**尊敬師長的表現？",
+                "options": [
+                    "聽從老師的教導和規勸",
+                    "在老師背後給老師起難聽的外號",
+                    "見到老師主動問好"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "如果看到有同學在欺負低年級的學弟，而你感到害怕，你應該：",
+                "options": [
+                    "跟著一起欺負",
+                    "立刻去找老師、社工或風紀同學來幫忙",
+                    "當作沒看見，趕快走開"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "在校務處前等候書記姐姐幫忙蓋印章時，我們應該：",
+                "options": [
+                    "在校務處門口大聲玩耍",
+                    "安靜地排隊等候，並在完成後說謝謝",
+                    "一直拍打櫃檯催促她"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "當校長在週會上讚揚全校同學守秩序時，我們應該：",
+                "options": [
+                    "在台下得意地大聲叫喊",
+                    "感到高興，並繼續保持良好的守規行為",
+                    "覺得無聊，閉上眼睛睡覺"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "如果我們不小心把圖書館的圖書撕破了，正確的做法是：",
+                "options": [
+                    "偷偷把書放回書架，假裝沒發生過",
+                    "主動向圖書館老師或書記坦白，並道歉詢問如何補救",
+                    "把撕破的頁面扔進垃圾桶"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "下列關於學校「風紀同學」的職責，哪一項是正確的？",
+                "options": [
+                    "他們是學校的管理員，可以隨便懲罰同學",
+                    "他們協助老師維持學校秩序，我們應該配合他們",
+                    "他們負責幫全班同學做功課"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "在小賣部，當阿姨不小心找多了零錢給你，你應該：",
+                "options": [
+                    "偷偷收起來買更多玩具",
+                    "立刻退還給阿姨，並告訴她找多了",
+                    "買東西請旁邊的同學吃"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "當你想進入校務處找老師時，應該先怎麼做？",
+                "options": [
+                    "直接衝進去大聲喊叫",
+                    "在門口先敲門，獲得允許後再有禮貌地走進去",
+                    "偷偷摸摸溜進去"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "在學校陸運會上，當裁判老師宣判你輸了比賽，你應該：",
+                "options": [
+                    "在地上耍賴大哭，說裁判不公平",
+                    "尊重裁判的決定，並向獲勝的同學祝賀",
+                    "把體育器材扔掉"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "如果同桌的同學今天看起來非常憂傷，甚至在默默流淚，你應該：",
+                "options": [
+                    "嘲笑他是「愛哭鬼」",
+                    "輕聲關心他，或提議陪他一起去找社工姐姐傾訴",
+                    "告訴全班同學讓他難堪"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "關於資訊科技技術員，以下哪一個情況我們需要找他幫忙？",
+                "options": [
+                    "我的水樽蓋打不開了",
+                    "課室裏的電腦投屏設備壞了無法連線上課",
+                    "我的橡皮擦不見了"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "當有校外來賓來我們課室參觀時，我們應該：",
+                "options": [
+                    "繼續大聲吵鬧，不理會他們",
+                    "坐姿端正，專心上課，展現良好的精神面貌",
+                    "轉過頭一直盯著他們看"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "如果不小心把班上的公物（如粉筆擦）弄丟了，我們應該：",
+                "options": [
+                    "偷偷把別班的粉筆擦拿過來",
+                    "誠實地告訴班主任，並承擔責任想辦法補辦",
+                    "假裝不知道是誰弄丟的"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "為甚麼學校需要有不同職位的成員？",
+                "options": [
+                    "因為這樣學校看起來比較熱鬧",
+                    "因為學校的事務繁多，需要大家分工合作，共同照顧學生",
+                    "因為這樣可以請更多人來陪伴同學玩耍"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    "level3": {
+        "title": "快樂的校園守規生活",
+        "desc": "學習課堂守則、愛護公物，並學會與同學和諧相處。遵守校規，讓我們每天的上學生活都既安全又快樂！",
+        "examples": "例子：上課想說話要先【舉手】。學校的桌椅是【公物】，我們絕對不能在上面亂塗鴉。小息排隊買零食時，要遵守秩序不能【插隊】喔！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "上課時，如果我們想要發言或提問，應該先怎麼做？",
+                "options": [
+                    "大聲叫喊",
+                    "先舉手，等老師批准後再說",
+                    "直接站起來大叫"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "每天上學前，我們應該自己檢查書包，確保帶齊甚麼東西？",
+                "options": [
+                    "家裡的玩具",
+                    "當天要用的課本和文具",
+                    "零食"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "在課室上課時，我們的坐姿應該是怎樣的？",
+                "options": [
+                    "整個人趴在桌子上",
+                    "背部挺直，雙腳放平，專心聽講",
+                    "把腳放在桌子上"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "小息時，我們可以在哪裏和同學一起玩紙牌或棋類遊戲？",
+                "options": [
+                    "課室的座位上",
+                    "走廊上狂奔",
+                    "樓梯口"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "小息時，如果想去洗手間，以下哪一項是正確的？",
+                "options": [
+                    "擅自跑出去，不告訴任何人",
+                    "在課堂進行中隨便走出去",
+                    "趁小息時間去，並注意衞生"
+                ],
+                "answer": 2,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "下列哪一項是小學生在學校必須遵守的「校規」？",
+                "options": [
+                    "上課時要專心，不隨便說話",
+                    "不准帶水樽回校",
+                    "每天都要帶玩具上學"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "當老師正在黑板上寫字教學時，我們應該：",
+                "options": [
+                    "低頭玩手指",
+                    "專心看著黑板，認真聽老師講解",
+                    "和旁邊同學玩剪刀石頭布"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "在走廊上行走時，我們應該：",
+                "options": [
+                    "一邊跑一邊大聲叫喊",
+                    "靠右慢慢走，保持安靜",
+                    "和同學推來推去"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "課室裏的桌椅是學校的公物，我們應該：",
+                "options": [
+                    "用小刀在桌上刻字",
+                    "在桌椅上畫上自己喜歡的圖畫",
+                    "好好愛護，保持乾淨整潔"
+                ],
+                "answer": 2,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "當我們做錯事情被老師規勸時，我們應該：",
+                "options": [
+                    "低頭認錯，誠心接受教導並改正",
+                    "大聲哭鬧，說老師不公平",
+                    "跑出課室不理老師"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "小息結束、上課鐘聲響起時，我們應該：",
+                "options": [
+                    "繼續在操場玩，等老師來拉我們",
+                    "立刻停止玩耍，排隊有秩序地回課室",
+                    "去小賣部買零食"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "如果我們不小心把別人的筆盒碰落地上，應該：",
+                "options": [
+                    "假裝沒看見",
+                    "幫忙撿起來，並誠懇地說「對不起」",
+                    "用腳把筆盒踢得更遠"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "我們上甚麼課時，會需要帶彩色筆、剪刀和膠水來做手工？",
+                "options": [
+                    "體育課",
+                    "視藝課",
+                    "數學課"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "下列哪一項是我們在學校應該積極參與的「課外活動」？",
+                "options": [
+                    "童軍、朗誦或陸運會",
+                    "在走廊玩追逐遊戲",
+                    "在課室裡睡覺"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "如果我們忘記帶課本，應該怎樣做才對？",
+                "options": [
+                    "跟旁邊的同學搶書看",
+                    "有禮貌地告訴老師，並請同學一起看一本書",
+                    "偷偷溜出課室不客氣"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "在學校裡，看見地上有一張廢紙，我們應該：",
+                "options": [
+                    "一腳踢開",
+                    "主動撿起來放進垃圾桶",
+                    "假裝看不見"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "上體育課時，我們應該穿著甚麼服裝？",
+                "options": [
+                    "整齊的校服和皮鞋",
+                    "舒適的體育服和運動鞋",
+                    "漂亮的睡衣"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "下列哪一種行為最能體現「愛護公物」？",
+                "options": [
+                    "把學校的圖書當成畫紙塗鴉",
+                    "輕拿輕放學校的平板電腦",
+                    "把粉筆折斷扔在地上"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "與同學一起做小組討論時，我們應該：",
+                "options": [
+                    "只顧自己說，不給別人發言",
+                    "專心聆聽同學的想法，互相配合",
+                    "大聲爭吵"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "當別人在台上進行演講或表演時，我們應該：",
+                "options": [
+                    "保持安靜並在結束時熱烈鼓掌",
+                    "在台下大聲吹口哨或玩電話",
+                    "轉過頭去不看"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "關於學校的「校規」，以下哪一個說法是正確的？",
+                "options": [
+                    "校規是為了限制我們的自由，很討厭",
+                    "校規是為了保護每位學生的安全和學習環境，大家都必須遵守",
+                    "只有高年級的學生才需要遵守校規"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "小息時，如果你的好朋友邀請你一起去校務處「探險」玩耍，你應該：",
+                "options": [
+                    "高興地答應並一起去",
+                    "拒絕他，並告訴他校務處是辦公地方，不應進去玩耍",
+                    "偷偷一個人進去玩"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "在上電腦課時，當老師還沒有發出指令，你應該：",
+                "options": [
+                    "隨意點擊電腦下載好玩的網絡遊戲",
+                    "雙手放好，專心聽老師講解今天的使用步驟",
+                    "把電腦的電源線拔掉"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "課堂上，小明突然覺得肚子非常痛，甚至快要吐了，他應該：",
+                "options": [
+                    "不舉手直接衝出課室跑回家",
+                    "立刻舉手向老師報告，請老師帶他去醫療室或通知家長",
+                    "忍耐到放學，甚麼都不說"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "在學校裡，如果遇到不認識的人給你糖果並叫你跟他走，你應該：",
+                "options": [
+                    "高興地拿糖果並跟他走",
+                    "大聲說「不！」，立刻拒絕並跑向有老師或人的安全地方",
+                    "接過糖果，叫他等一下"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "放學排隊時，有些同學因為想早點回家而插隊，你應該：",
+                "options": [
+                    "跟著一起插隊",
+                    "有禮貌地提醒他要排隊，或者請值日老師協助維持秩序",
+                    "在背後用力推他"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "在視藝室上完手工課後，我們應該怎樣處理我們的桌面？",
+                "options": [
+                    "直接拍拍屁股走人，留給校工清理",
+                    "主動把垃圾和剪碎的紙張收拾乾淨，放進垃圾桶",
+                    "把多餘的膠水塗在桌子上"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "如果我們因為遲到而錯過了早會，回到課室時我們應該：",
+                "options": [
+                    "偷偷摸摸溜進去，當作沒事發生",
+                    "先在門口說「報告」，得到老師允許後有禮貌地進去並解釋原因",
+                    "在門口大喊大叫"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "下列哪一項行為會影響到其他同學在課堂上的學習？",
+                "options": [
+                    "專心做筆記",
+                    "在老師講課時，小聲跟鄰座同學討論昨天玩的遊戲",
+                    "積極舉手回答問題"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "在小賣部排隊時，前面的人走得很慢，正確的做法是：",
+                "options": [
+                    "用力推前面的同學催促他",
+                    "保持安全距離，耐心跟著隊伍前進",
+                    "大聲罵前面的同學"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "當大雨天進行室內小息時，我們應該：",
+                "options": [
+                    "在課室裡追逐打鬧",
+                    "留在座位上看圖書、畫畫或與同桌輕聲聊天",
+                    "在走廊玩滑地遊戲"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "關於學校舉行的「陸運會」，以下哪一項是不正確的態度？",
+                "options": [
+                    "輸了比賽就大哭大鬧，埋怨隊友",
+                    "勝不驕、敗不餒，全力以赴做到最好",
+                    "為努力參賽的同學熱烈加油打氣"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "如果我們看見同學不小心把學校的課室門弄壞了，我們應該：",
+                "options": [
+                    "幫他隱瞞，假裝沒看見",
+                    "勸他主動向老師報告，或者自己去告訴老師來處理",
+                    "大聲嘲笑他，並告訴全校"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "課堂小組活動中，如果小組成員的意見和你不一樣，你應該：",
+                "options": [
+                    "大發脾氣，堅持只要聽自己的",
+                    "有禮貌地讓大家輪流發表意見，找出最好的方法",
+                    "退出小組，自己一個人做"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "在小息時間，我們**不應該**做以下哪一件事？",
+                "options": [
+                    "和同學在走廊玩捉迷藏和奔跑",
+                    "去圖書館安靜地看一會兒書",
+                    "在課室裡一邊休息一邊喝水"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "如果我們在放學時，發現自己的功課簿不見了，正確的應對是：",
+                "options": [
+                    "回家大哭大鬧，怪媽媽沒幫忙收拾",
+                    "有禮貌地回課室尋找，或詢問負責收功課的班長或老師",
+                    "直接放棄，明天跟老師說沒發功課"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "當學校廣播正在播放國歌並舉行升旗禮時，我們應該：",
+                "options": [
+                    "和同學交頭接耳，哈哈大笑",
+                    "肅立、雙眼注視國旗，保持莊嚴和尊重",
+                    "在課室裡繼續寫字"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "如果看見有同學不小心把果汁灑在樓梯上，為了防範意外，我們應該：",
+                "options": [
+                    "假裝沒看到走開",
+                    "立刻報告老師或校工阿姨，以便及時清理，防止同學滑倒",
+                    "站在那裡看誰會跌倒"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "在科學課上做實驗時，以下哪一項是安全守則？",
+                "options": [
+                    "隨便把實驗儀器放進嘴裡嚐嚐",
+                    "嚴格遵守老師的指示，不隨意觸摸危險藥品",
+                    "和同學一邊做實驗一邊打鬧"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "遵守校規和課室規則，最主要能為我們帶來甚麼好處？",
+                "options": [
+                    "可以得到校長發很多獎金",
+                    "能讓我們在安全、和諧、愉快的環境中好好學習和成長",
+                    "可以不用做任何功課"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    "level4": {
+        "title": "記錄我的成長與蛻變",
+        "desc": "認識人生的各個成長階段，理解每個人都有自己的成長節奏。學會自理、接受自己，並懂得適時尋求大人的幫助！",
+        "examples": "例子：我們現在讀一年級，屬於【兒童期】。像收拾書包、洗臉刷牙是我們【做得來】的事；但像用火煮食、用刀切水果等【做不來】又有危險的事，一定要請大人幫忙喔！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "我們一出生、還不會走路、需要爸爸媽媽抱著餵奶的時期是甚麼期？",
+                "options": [
+                    "嬰兒期",
+                    "老年期",
+                    "兒童期"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "我們現在讀小學一年級（大約 6 至 10 歲），正處於生命的哪一個階段？",
+                "options": [
+                    "成年期",
+                    "兒童期",
+                    "青春期"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "當我們長大到 65 歲以上，頭髮變白、滿臉皺紋，是處於甚麼期？",
+                "options": [
+                    "幼兒期",
+                    "老年期",
+                    "嬰兒期"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "下列哪一項是我們長大後，身體最明顯發生的「生理變化」？",
+                "options": [
+                    "身高和體重會增加",
+                    "眼睛的顏色會變綠",
+                    "手指會減少"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "每個人的成長速度都是一樣的嗎？",
+                "options": [
+                    "每個人都完全相同",
+                    "每個人都有自己的成長速度，有些快、有些慢",
+                    "高的人永遠長得快"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "小明發現自己比同班的小強矮了一點，他應該抱持甚麼態度？",
+                "options": [
+                    "感到自卑和難過",
+                    "接受並愛護自己的身體，每個人都有獨特的成長步伐",
+                    "不跟小強做朋友了"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "以下哪一項是一年級小學生「自己做得來」的自理事情？",
+                "options": [
+                    "自己刷牙和洗澡",
+                    "開瓦斯爐煮晚餐",
+                    "用大熨斗熨衣服"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "以下哪一項是一年級小學生「做不來、有危險性」的事，應該請大人幫忙？",
+                "options": [
+                    "收拾自己的書包",
+                    "用鋒利的菜刀切水果",
+                    "自己穿鞋子"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "當你遇到做不來或有危險的事情時，你應該怎樣做？",
+                "options": [
+                    "自己偷偷嘗試做",
+                    "有禮貌地請父母或老師幫忙",
+                    "直接放棄不理它"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "嬰兒時期，我們最主要的食物是甚麼？",
+                "options": [
+                    "漢堡和薯條",
+                    "母乳或嬰兒奶粉",
+                    "白米飯"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "下列哪一項是我們在「幼兒期」（約 2 至 5 歲）學會的重要本領？",
+                "options": [
+                    "學會說話和自己走路",
+                    "駕駛汽車",
+                    "去公司上班賺錢"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "我們可以用甚麼工具來測量自己有沒有長高？",
+                "options": [
+                    "體重磅",
+                    "身高尺",
+                    "溫度計"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "成長過程中，除了身高變高，我們的甚麼也會跟著增加？",
+                "options": [
+                    "體重",
+                    "耳朵的數量",
+                    "眼睛的數量"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "當我們遇到成長中的煩惱和疑問時，最好的做法是：",
+                "options": [
+                    "躲在房間不理人",
+                    "跟爸爸媽媽或老師傾訴和請教",
+                    "上網隨便相信陌生人的話"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "小學生的自理能力非常重要，以下哪項是自我管理的良好表現？",
+                "options": [
+                    "每天自己收拾好第二天的課本和書包",
+                    "等媽媽幫忙穿鞋子才上學",
+                    "讓爸爸幫忙做功課"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "下列生命階段的先後順序，哪一個是正確的？",
+                "options": [
+                    "嬰兒期 -> 兒童期 -> 老年期",
+                    "老年期 -> 嬰兒期 -> 兒童期",
+                    "兒童期 -> 嬰兒期 -> 老年期"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "我們在成長中會學到更多知識，這代表我們的甚麼能力提升了？",
+                "options": [
+                    "學習與適應能力",
+                    "睡覺能力",
+                    "偏食能力"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "每個人都是世界上「獨一無二」的，這句話的意思是：",
+                "options": [
+                    "每個人都有自己獨特的美麗與價值，要好好珍愛自己",
+                    "大家都長得一模一樣",
+                    "只有高的人才是最寶貴的"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "下列哪一項是一年級學生每天應該自己做好的衛生工作？",
+                "options": [
+                    "自己洗臉、刷牙和洗澡",
+                    "幫全家人洗衣服",
+                    "去廚房炒菜"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "隨着年齡增長，我們的衣服和鞋子會變小，這說明了：",
+                "options": [
+                    "衣服縮水了",
+                    "我們的身體正在健康地長大",
+                    "我們變矮了"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "小學一年級的子進發現自己長得比同齡的思思矮，以下哪一個解釋是正確的？",
+                "options": [
+                    "因為子進生病了",
+                    "因為每個人都有不同的成長速度，這是非常正常的生理現象",
+                    "因為女孩子永遠比男孩子高"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "如果我們在學校不小心把鞋帶弄鬆了，而自己又還不會綁鞋帶，正確的做法是：",
+                "options": [
+                    "不理它，拖著鞋帶跑，跌倒也沒關係",
+                    "有禮貌地請老師或身邊懂得绑鞋帶的同學幫忙，並認真學習",
+                    "坐在地上大哭大鬧"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "關於「生命的成長階段」，以下哪一項描述是正確的？",
+                "options": [
+                    "我們可以不經歷嬰兒期，直接變成兒童",
+                    "每個人都會經歷生老病死的自然過程，我們要用心過好每一天",
+                    "長大到成年期後，我們就不會再變老了"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "媽媽正在廚房煮晚餐，小明非常想幫忙，以下哪一項是他「做得來且安全」的家務？",
+                "options": [
+                    "用大火炒菜",
+                    "幫忙把餐具擺放整齊",
+                    "用鋒利的菜刀切肉"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "在兒童期，我們的大腦和身體發育迅速，為了健康成長，我們應該：",
+                "options": [
+                    "每天玩網絡遊戲到深夜",
+                    "保持均衡飲食，多運動，並有充足的睡眠",
+                    "只吃自己喜歡的糖果和炸雞"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "思思的爸爸媽媽正在經歷「成年期」，以下關於成年期的特點，哪項是正確的？",
+                "options": [
+                    "他們不需要上班工作",
+                    "他們的身體已經發育成熟，並且承擔著照顧家庭和社會的責任",
+                    "他們不能學習新知識了"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "當你發現以前穿起來剛好的校服，現在變得太緊、太短了，你應該：",
+                "options": [
+                    "覺得自己太胖了而節食不吃東西",
+                    "高興地告訴父母，這代表自己的身體正在健康成長，需要換新校服了",
+                    "把校服撕破"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "下列哪一項是小學生開始「長大、懂事」的具體行為表現？",
+                "options": [
+                    "衣服弄髒了，隨地亂丟等媽媽來撿",
+                    "遇到不懂的事主動思考，並學會自己收拾玩具和書包",
+                    "想要玩具時就在玩具店地上打滾"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "如果同班的小強因為長得比較胖而遭到個別同學嘲笑，你應該：",
+                "options": [
+                    "跟著一起笑他",
+                    "上前制止，並安慰小強，告訴他每個人都是獨特且值得尊重的",
+                    "當作沒看到，不理會小強"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "關於我們的一生，大約 11 至 17 歲，身體會發生很大變化、開始注重青春形象的時期是：",
+                "options": [
+                    "嬰兒期",
+                    "青春期",
+                    "老年期"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "想打開課室的高窗戶通風，但窗戶太高，一年級的你應該：",
+                "options": [
+                    "自己爬上桌子和椅子去開窗",
+                    "有禮貌地請老師或校工叔叔幫忙，注意安全",
+                    "用掃帚把窗戶玻璃敲碎"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "小明想吃蘋果，但他知道自己用刀切水果有危險，他應該：",
+                "options": [
+                    "自己偷偷拿水果刀來切",
+                    "請爸爸媽媽幫忙切，自己在旁邊看著學習安全常識",
+                    "用手把蘋果砸碎"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "每個人在成長中的「自理能力」都是慢慢培養出來的，這意味著：",
+                "options": [
+                    "我們一出生就甚麼都會做",
+                    "我們要勇於嘗試做得來的事，並在大人指導下學習新技能",
+                    "我們一輩子都要依賴爸爸媽媽幫忙"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "在成長的過程中，我們會換牙，乳齒脫落並長出恆齒。這時我們應該：",
+                "options": [
+                    "不刷牙，等新牙長出來",
+                    "更加注意口腔衞生，每天早晚認真刷牙，保護新長出的恆齒",
+                    "用手去大力搖晃每一顆牙齒"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "以下哪一項是一年級學生「做得來」的學校責任？",
+                "options": [
+                    "每天自己準時起床，並帶齊課本和功課上學",
+                    "替學校設計考試題目",
+                    "修理電腦室壞掉的伺服器"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "如果我們發現自己的體重在最近增加了許多，且醫生說有些超重，我們應該：",
+                "options": [
+                    "每天不吃午餐來減肥",
+                    "減少吃零食和汽水，多做運動，保持健康生活習慣",
+                    "不再量體重，當作沒這回事"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "在成長日記中，記錄自己的身高、體重和學會的新技能，主要能幫助我們：",
+                "options": [
+                    "向別人炫耀自己有多厲害",
+                    "看見自己的進步，學會感恩，並建立自信心",
+                    "浪費紙張"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "當我們看到爺爺奶奶因為年紀大而行動緩慢、眼睛看不清時，我們應該：",
+                "options": [
+                    "嫌棄他們走得太慢",
+                    "主動攙扶他們，關心他們的身體，做個孝順的孩子",
+                    "不跟他們說話"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "每個人都有長處和短處，比如小明唱歌很好聽，但體育不太好。他應該：",
+                "options": [
+                    "因為體育不好而討厭自己",
+                    "接受自己的不完美，欣賞自己的長處，並努力改善短處",
+                    "放棄唱歌，每天只哭泣"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "生命是寶貴的，健康的身體是一切的基礎。我們在兒童期最應該做的是：",
+                "options": [
+                    "養成良好的生活好習慣，好好保護自己的身體",
+                    "每天只看電視，不運動也不學習",
+                    "隨便嘗試危險的極限挑戰"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    "level5": {
+        "title": "養成健康生活好習慣",
+        "desc": "掌握正確的洗手和洗頭步驟，養成規律作息、健康飲食和充足睡眠的習慣，建立強健的體魄！",
+        "examples": "例子：洗手最少要揉搓【20秒】，順序是濕手、加皂、起泡、揉搓、沖水和抹乾。小學生每天需要【9至12小時】的睡眠才足夠喔！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "小學生每天大約需要多少小時的充足睡眠，身體才能健康發育？",
+                "options": [
+                    "3至4小時",
+                    "9至12小時",
+                    "20小時"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "吃東西進食時，我們應該養成甚麼樣的良好習慣？",
+                "options": [
+                    "狼吞虎嚥，吃得越快越好",
+                    "慢慢咀嚼，不偏食，不浪費食物",
+                    "一邊跑一邊吃"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "以下哪一組食物是「有益身體」的健康食物？",
+                "options": [
+                    "薯片、糖果和汽水",
+                    "蔬菜、水果、雞蛋和牛奶",
+                    "杯麵和雪糕"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "洗手時，最少要揉搓雙手多少秒，才能有效殺滅細菌？",
+                "options": [
+                    "2秒",
+                    "20秒",
+                    "20分鐘"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "為了預防疾病，我們應該在甚麼時候一定要洗手？",
+                "options": [
+                    "吃飯前和上洗手間後",
+                    "玩完電腦後立刻去睡覺",
+                    "看書前"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "洗頭時，我們應該輕按頭皮多少時間，以便清潔乾淨？",
+                "options": [
+                    "10秒",
+                    "1至2分鐘",
+                    "1個小時"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "洗頭後，我們應該用甚麼來抹乾頭髮和耳朵？",
+                "options": [
+                    "髒髒的衣服",
+                    "乾淨的毛巾或乾髮帽",
+                    "抹腳墊"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "下列哪一項是良好的個人衛生好習慣？",
+                "options": [
+                    "一個星期才刷一次牙",
+                    "每天早晚刷牙，飯後漱口",
+                    "指甲留得很長不剪"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "如果我們長時間沉迷玩網絡遊戲而不休息，會對甚麼造成嚴重傷害？",
+                "options": [
+                    "視力和身體健康",
+                    "課室的電腦",
+                    "小賣部的零食"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "當我們感到眼睛疲勞時，最應該做甚麼？",
+                "options": [
+                    "繼續看手機螢幕",
+                    "閉上眼睛休息，或者望向遠處的綠色植物",
+                    "用力揉眼睛"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "下列哪一種飲料對小學生的身體最健康、最有益？",
+                "options": [
+                    "冰汽水",
+                    "白開水或鮮牛奶",
+                    "珍珠奶茶"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "吃完晚餐後，在睡覺前，我們應該做甚麼來保護牙齒？",
+                "options": [
+                    "吃一些巧克力糖",
+                    "刷牙和漱口，清潔口腔",
+                    "喝一大杯甜果汁"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "如果我們的指甲太長，裏面藏了黑色的污垢，我們應該：",
+                "options": [
+                    "用牙齒咬掉",
+                    "請爸爸媽媽用指甲鉗幫忙剪乾淨",
+                    "不管它，繼續用手拿東西吃"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "每天放學回家後，我們應該怎樣妥善安排時間？",
+                "options": [
+                    "先玩 5 小時電腦遊戲",
+                    "先做功課和溫習，然後運動，並有充足的休息",
+                    "一直看電視直到深夜"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "以下哪一項是預防疾病、保持身體健康最簡單有效的方法？",
+                "options": [
+                    "不吃蔬菜",
+                    "用正確的步驟認真洗手",
+                    "不洗澡也不洗頭"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "當我們打噴嚏或咳嗽時，應該怎樣做才是有禮貌又衛生的？",
+                "options": [
+                    "直接對著別人的臉吐氣",
+                    "用手帕、紙巾或手肘衣袖遮蓋口鼻",
+                    "大聲叫喊"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "我們每天應該喝多少杯水，才能維持身體所需的水分？",
+                "options": [
+                    "半杯",
+                    "大約 6 至 8 杯白開水",
+                    "10瓶汽水"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "下列哪一項食物屬於「無益」的零食，我們應該少吃？",
+                "options": [
+                    "新鮮的紅蘋果",
+                    "糖果和油炸薯條",
+                    "蒸雞蛋"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "用正確的方法洗手，以下哪一個步驟是第一步？",
+                "options": [
+                    "加入適量洗手液",
+                    "用水弄濕雙手",
+                    "抹乾雙手"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "我們應該多久洗一次澡，以保持身體清潔不發出臭味？",
+                "options": [
+                    "每個月一次",
+                    "每天洗澡一次",
+                    "有重要節日才洗"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "小明想要用正確的六個步驟洗手，請幫他找出正確的順序：",
+                "options": [
+                    "(1)弄濕雙手 -> (2)加洗手液 -> (3)起泡 -> (4)揉搓20秒 -> (5)沖水 -> (6)抹乾",
+                    "(1)抹乾 -> (2)沖水 -> (3)起泡 -> (4)弄濕 -> (5)加洗手液 -> (6)揉搓",
+                    "(1)加洗手液 -> (2)起泡 -> (3)抹乾 -> (4)弄濕 -> (5)沖水 -> (6)揉搓"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "洗頭的正確步驟中，以下哪一個順序是科學又安全的？",
+                "options": [
+                    "(1)弄濕頭髮 -> (2)加洗髮水 -> (3)按頭皮1-2分鐘 -> (4)沖洗 -> (5)抹乾 -> (6)梳理",
+                    "(1)梳理 -> (2)抹乾 -> (3)沖洗 -> (4)加洗髮水 -> (5)按頭皮 -> (6)弄濕",
+                    "(1)按頭皮 -> (2)沖洗 -> (3)弄濕 -> (4)加洗髮水 -> (5)抹乾 -> (6)梳理"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "子進每天放學回家都一直坐在電腦前玩網絡遊戲，直到深夜不睡覺。這樣做會帶來甚麼負面影響？",
+                "options": [
+                    "會讓子進變得更聰明",
+                    "會導致睡眠不足、記憶力下降，影響身體發育和學習精神",
+                    "會得到學校的獎狀"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "敏敏很喜歡吃零食，經常以薯片和糖果代替正餐。媽媽說這樣不對，因為：",
+                "options": [
+                    "薯片和糖果會讓人長得太高",
+                    "零食缺乏身體發育所需的營養，且高糖高油，容易導致蛀牙和肥胖",
+                    "零食太便宜了"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "關於「個人衞生習慣」，以下哪一個說法是正確的？",
+                "options": [
+                    "洗手時只要隨便用水沖一下 1 秒鐘就乾淨了",
+                    "洗頭後，除了抹乾頭髮，也要把耳朵周圍抹乾，預防發炎",
+                    "我們不用天天洗澡，因為身體會自己變乾淨"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "每天早上和晚上，我們都應該刷牙。刷牙最主要的目的是甚麼？",
+                "options": [
+                    "讓牙齒變綠色",
+                    "清除食物殘渣和牙菌斑，預防蛀牙，保持口腔健康與口氣清新",
+                    "為了好玩"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "小學生如果長期偏食，只吃肉類而不吃蔬菜和水果，可能會：",
+                "options": [
+                    "身體變得非常強壯",
+                    "缺乏維生素和膳食纖維，容易引起便秘，免疫力下降容易生病",
+                    "長得比別人快"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "當你覺得今天功課很多，時間不夠用時，你應該怎樣「妥善安排時間」？",
+                "options": [
+                    "不吃晚餐，也不睡覺，通宵做功課",
+                    "先做功課，安排短暫休息，並按時上床睡覺，明天早點起床溫習",
+                    "直接不做功課，繼續玩遊戲"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "為甚麼我們提倡要「節約用水」？以下哪一項是生活中的省水好習慣？",
+                "options": [
+                    "天天不洗澡來省水",
+                    "洗澡時以淋浴代替浸浴（浴缸泡澡），並在塗洗手液時關掉水龍頭",
+                    "把家裡的水龍頭一直開著"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "如果我們在看書時，坐姿不端正，經常駝背、眼睛離書本太近，會：",
+                "options": [
+                    "讓看書速度變快",
+                    "影響骨骼發育、導致駝背，並容易引起近視",
+                    "讓身體感到很舒服"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "關於進食時「慢慢咀嚼」，以下哪一個是主要的原因？",
+                "options": [
+                    "為了讓吃飯時間變長，可以不用做功課",
+                    "有助於食物在胃部消化，預防肚子痛，並且能更安全地吞嚥",
+                    "為了跟旁邊的同學聊天"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "小晴今天放學後，合理的健康作息時間表應該如何安排？",
+                "options": [
+                    "(1)溫習做功課 -> (2)到戶外適度運動 1 小時 -> (3)吃健康晚餐 -> (4)準時睡覺",
+                    "(1)看電視 3 小時 -> (2)深夜做功課 -> (3)玩手機到凌晨 -> (4)睡覺 4 小時",
+                    "(1)睡覺 5 小時 -> (2)吃夜宵 -> (3)不吃正餐 -> (4)看漫畫"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "如果我們不小心吃了一些不乾淨的食物，可能會導致甚麼問題？",
+                "options": [
+                    "長高得更快",
+                    "細菌進入肚子，引起急性腸胃炎、肚子痛和拉肚子",
+                    "力氣變大"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "在炎熱的夏天，運動過後我們出了很多汗，正確的做法是：",
+                "options": [
+                    "立刻站在冷氣機前猛吹冷風消暑",
+                    "先用毛巾抹乾汗水，稍作休息，然後多喝溫開水補充水分",
+                    "立刻喝三瓶冰汽水"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "關於睡眠對小學生的重要性，以下哪一項說法是錯誤的？",
+                "options": [
+                    "充足睡眠可以幫助我們恢復體力",
+                    "充足睡眠有利於腦部發育和記憶力提升",
+                    "只要不覺得累，每天只睡 4 小時就足夠了"
+                ],
+                "answer": 2,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "如果我們的手指頭受傷流血了，在處理傷口前，我們必須：",
+                "options": [
+                    "用嘴巴用力吸吮傷口",
+                    "先用乾淨的肥皂和清水洗乾淨雙手，避免細菌感染傷口",
+                    "直接用手帕綁起來"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "當我們去小賣部買盒裝牛奶時，必須注意包裝上的甚麼重要資訊？",
+                "options": [
+                    "包裝盒的顏色好不好看",
+                    "有效日期（食用期限），確保牛奶沒有過期變質",
+                    "裡面送不送玩具"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "下列哪一項不是妥善管理時間的行為？",
+                "options": [
+                    "每天設定固定的功課和閱讀時間",
+                    "把所有功課都留到星期日深夜才一口氣做完",
+                    "定時做運動和按時睡覺"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "如果你的好朋友因為牙痛而哭泣，你應該提醒他以後要注意：",
+                "options": [
+                    "每天少吃甜食，並在早晚認真用正確的方法刷牙，定期看牙醫",
+                    "以後不准再張開嘴巴",
+                    "多喝汽水"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "保持個人衛生、健康飲食和作息，主要能讓我們達到甚麼目標？",
+                "options": [
+                    "成為班上最有錢的人",
+                    "預防疾病，保持身體和心理的健康，精力充沛地學習與生活",
+                    "不用參加任何考試"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    "level6": {
+        "title": "學會聰明地保護自己",
+        "desc": "認識男女身體結構及私隱部位，分辨好的與壞的接觸。學會拒絕危險侵害、保護隱私，並懂得向信任的人大聲求助！",
+        "examples": "例子：衣服遮蓋的地方是我們的【私隱部位】，絕對不能給別人摸或看。像好朋友握手是【好的接觸】，而拉頭髮、打人或被摸私隱部位則是【壞的接觸】，一定要大聲說「不」並告訴大人！",
+        "questions": [
+            {
+                "id": 1,
+                "text": "男孩子和女孩子的身體結構和甚麼部位是不一樣的？",
+                "options": [
+                    "私隱部位（隱私部位）",
+                    "手指數量",
+                    "眼睛形狀"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 2,
+                "text": "我們身體的隱私部位（如背心和褲子遮蓋的地方）是指：",
+                "options": [
+                    "不可以隨便給人看，更絕對不能給別人觸摸的私密地方",
+                    "可以隨便給陌生人看的地方",
+                    "手掌和腳掌"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 3,
+                "text": "當好朋友之間手拉手，或者爸爸媽媽溫暖地擁抱你，這屬於：",
+                "options": [
+                    "壞的接觸",
+                    "好的接觸",
+                    "有危險的接觸"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 4,
+                "text": "好的接觸會給我們帶來甚麼樣的感覺？",
+                "options": [
+                    "害怕、不安和討厭",
+                    "舒服、溫暖和安全",
+                    "生氣和難過"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 5,
+                "text": "如果有人用力拉扯你的頭髮、打你或故意推倒你，這屬於：",
+                "options": [
+                    "好的接觸",
+                    "壞的接觸",
+                    "友好的遊戲"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 6,
+                "text": "壞的接觸會給我們帶來甚麼樣的感覺？",
+                "options": [
+                    "高興和興奮",
+                    "討厭、不安、害怕或身體疼痛",
+                    "舒服"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 7,
+                "text": "如果有陌生人想要摸你的私隱部位，你應該：",
+                "options": [
+                    "答應他，並幫他保守秘密",
+                    "大聲說「不！」，立刻拒絕並跑去向信任的大人求助",
+                    "默默忍受"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 8,
+                "text": "遇到壞的接觸或危險時，我們絕對不應該：",
+                "options": [
+                    "大聲呼救",
+                    "保守秘密不告訴父母",
+                    "告訴老師"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 9,
+                "text": "在學校裡，下列哪一位是我們可以完全信任並尋求幫助的人？",
+                "options": [
+                    "老師和社工哥哥/姐姐",
+                    "剛認識的校外陌生來賓",
+                    "欺負你的同學"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 10,
+                "text": "如果有陌生人在路邊向你問路，並叫你上他的車帶路，你應該：",
+                "options": [
+                    "熱心地坐上他的車帶路",
+                    "堅決拒絕，立刻走開，跑向人多的安全地方",
+                    "接過他給的零食"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 11,
+                "text": "關於我們的隱私部位，以下哪一個說法是正確的？",
+                "options": [
+                    "只有女孩子才有隱私部位",
+                    "男孩子和女孩子都有隱私部位，大家都必須好好保護",
+                    "隱私部位可以隨便給同學看"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 12,
+                "text": "我們可以用隨便偷看別人的私隱部位嗎？",
+                "options": [
+                    "不可以，我們必須尊重別人的身體和隱私",
+                    "可以，因為大家都是好朋友",
+                    "只要別人不發現就可以"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 13,
+                "text": "如果有人觸摸你，讓你感到很不舒服或害怕，你應該：",
+                "options": [
+                    "認為是自己的錯，不敢告訴任何人",
+                    "大聲拒絕，並立刻告訴爸爸媽媽、老師或社工",
+                    "當作沒事發生"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 14,
+                "text": "當我們跌倒受傷、或者遇到困難時，誰是我們在學校可以信任的人？",
+                "options": [
+                    "老師、社工、醫療室護士或校工",
+                    "校外的陌生人",
+                    "隔壁學校的學生"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 15,
+                "text": "下列哪一項行為屬於「好的接觸」？",
+                "options": [
+                    "媽媽溫柔地親吻你的臉龐",
+                    "陌生人在巴士上摸你的大腿",
+                    "同學故意絆倒你"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 16,
+                "text": "如果有陌生人要送你玩具和糖果，並要求你跟他去公園，你應該：",
+                "options": [
+                    "高興地拿著玩具跟他走",
+                    "有禮貌地搖頭拒絕，並立刻回到父母或老師身邊",
+                    "收下糖果，並帶他回家"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 17,
+                "text": "遇到危險大聲呼救時，我們最應該喊甚麼，以便引起周圍人的注意？",
+                "options": [
+                    "「救命呀！」或「不要觸摸我！」",
+                    "「哈哈，真好玩！」",
+                    "甚麼都不喊"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 18,
+                "text": "如果有人觸摸你後威脅你：「如果告訴你父母，我就打你！」你應該：",
+                "options": [
+                    "聽他的話，永遠保密",
+                    "不要害怕威脅，一定要立刻告訴父母或老師，保護自己",
+                    "躲在房間哭"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 19,
+                "text": "我們可以用手去隨便摸別人的私隱部位嗎？",
+                "options": [
+                    "不可以，我們必須尊重並保護別人的身體",
+                    "可以，如果是開玩笑就可以",
+                    "只要對方同意就可以"
+                ],
+                "answer": 0,
+                "difficulty": "easy"
+            },
+            {
+                "id": 20,
+                "text": "保護自己的身體安全，是誰的責任？",
+                "options": [
+                    "只是老師的責任",
+                    "是每個人（包括我們自己、父母和學校）共同的責任",
+                    "跟自己無關"
+                ],
+                "answer": 1,
+                "difficulty": "easy"
+            },
+            {
+                "id": 21,
+                "text": "敏敏在搭乘扶手電梯時，被一個不認識的叔叔故意用手摸了私隱部位，敏敏感到了害怕。她應該：",
+                "options": [
+                    "保持沉默，因為對方警告她不能說",
+                    "大聲呼救，勇敢說「不！」，並在出電梯後立刻告訴媽媽或身邊的保安員",
+                    "回到家後不告訴任何人"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 22,
+                "text": "關於「隱私部位」，以下哪一個是正確的保護原則？",
+                "options": [
+                    "洗澡時不需要清潔私隱部位",
+                    "隱私部位是神聖和私密的，任何人（除非爸爸媽媽幫忙清潔或醫生檢查）都不能隨便觸摸",
+                    "只有在公共場所才需要保護隱私"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 23,
+                "text": "在放學路上，有陌生人自稱是爸爸的朋友，說爸爸受傷了要帶你坐車去醫院，你應該：",
+                "options": [
+                    "立刻跟他上車，因為我很擔心爸爸",
+                    "不跟他走，立刻打電話給媽媽確認，或跑回學校向老師報告和求助",
+                    "自己一個人走路去醫院"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 24,
+                "text": "如果班上的同學在玩耍時，不小心用尺子打到了你的手，這屬於：",
+                "options": [
+                    "故意的壞接觸",
+                    "不小心的碰撞，如果他道歉，我們可以原諒他並提醒他下次小心",
+                    "不可原諒的侵害"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 25,
+                "text": "關於「祕密」，如果有人觸摸了你，並叫你保守這個「不可告訴父母的祕密」，你應該：",
+                "options": [
+                    "聽話保密，因為不應該做個告密的人",
+                    "這是不對的「壞祕密」，我們必須立刻告訴父母或信任的老師，絕對不能隱瞞",
+                    "只告訴其他同學"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 26,
+                "text": "當我們去別的同學家裡玩，同學的哥哥想強行抱你，讓你感到非常討厭和不安，你應該：",
+                "options": [
+                    "為了禮貌，默默忍耐",
+                    "大聲說「我不喜歡這樣，請放開我！」，並立刻回家告訴父母",
+                    "跟他打架"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 27,
+                "text": "如果我們看見有陌生人在學校門口鬼鬼祟祟地盯著同學看，我們應該：",
+                "options": [
+                    "上前跟他聊天",
+                    "立刻告訴學校的保安叔叔、校工或老師，讓學校提高警惕",
+                    "當作沒看見，繼續跟同學玩"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 28,
+                "text": "在公共洗手間，如果有陌生人試圖推開你正在使用的廁所門，你應該：",
+                "options": [
+                    "默默地不發出聲音",
+                    "大聲喊「裏面有人！」並用力把門鎖緊，如果他繼續，大聲呼救",
+                    "開門讓他進來"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 29,
+                "text": "下列關於「好的接觸」與「壞的接觸」的分辨，哪項是正確的？",
+                "options": [
+                    "只要是熟人（如鄰居或親戚）的觸摸，不論甚麼部位，都是好的接觸",
+                    "不論是誰（熟人或陌生人），只要觸摸你的隱私部位或讓你感到不安、討厭，就是壞的接觸",
+                    "只有陌生人的觸摸才是壞的接觸"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 30,
+                "text": "如果你的身體有些不舒服，需要去醫院看醫生，當醫生需要檢查你的隱私部位時：",
+                "options": [
+                    "醫生可以直接檢查，不需要任何人陪同",
+                    "必須有你的爸爸媽媽或監護人在場陪同，這才是安全和合法的醫療檢查",
+                    "堅決拒絕檢查"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 31,
+                "text": "當我們跟爸爸媽媽在大型商場裡走散了，以下哪一個是安全、聰明的自救方法？",
+                "options": [
+                    "自己一個人走出商場，沿著馬路走回家",
+                    "留在原地不要亂跑，或者找商場穿制服的工作人員、保安員求助",
+                    "跟路過的陌生人走，請他帶你回家"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 32,
+                "text": "下列哪一項行為**不是**保護自己身體安全的正確做法？",
+                "options": [
+                    "記住父母的電話號碼和家庭地址",
+                    "一個人深夜在沒有大人陪同下到樓下公園玩耍",
+                    "不隨便跟陌生人說話"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 33,
+                "text": "如果同班的低年級學妹告訴你，她經常在校車上被某個同學拉扯頭髮、搶走零食，你應該：",
+                "options": [
+                    "告訴她要忍耐，不要惹事生非",
+                    "鼓勵她並陪同她一起去向老師或社工姐姐報告這件事，維護安全",
+                    "叫她以後不要坐校車"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 34,
+                "text": "如果有陌生人自稱是快遞員，在你一個人家裡時敲門要進來送貨，你應該：",
+                "options": [
+                    "立刻開門讓他進來，並幫忙簽收",
+                    "絕對不開門，並大聲隔著門說「請放在門口」或打電話給父母，不透露自己一個人在家",
+                    "把門打開一條縫跟他聊天"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 35,
+                "text": "在游泳池或海灘更衣室沖涼洗澡時，如果發現有人用手機透過門縫偷看，我們應該：",
+                "options": [
+                    "假裝沒看見，快點洗完",
+                    "立刻大聲呼喊呼救，並向救生員或管理人員舉報，保護自己的隱私",
+                    "跟他開玩笑"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 36,
+                "text": "關於我們身體的控制權（身體自主權），以下說法哪項是正確的？",
+                "options": [
+                    "我的身體是屬於我自己的，我有權拒絕任何讓我感到不舒服的接觸",
+                    "爸爸媽媽可以把我的身體送給別人玩",
+                    "只要對方是長輩，他就可以隨便對我的身體做任何事"
+                ],
+                "answer": 0,
+                "difficulty": "hard"
+            },
+            {
+                "id": 37,
+                "text": "如果有陌生人想拉你的手帶你去買冰淇淋，以下哪一個反應是正確的？",
+                "options": [
+                    "「太好了，我最喜歡吃巧克力冰淇淋！」",
+                    "用力甩開他的手，大聲說「我不認識你，不要拉我！」並立刻跑向人多的地方",
+                    "默默跟著他走"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 38,
+                "text": "當我們被欺負或遇到不安全的觸摸時，有些小朋友會感到害羞或害怕被罵而不敢說。我們應該明白：",
+                "options": [
+                    "被欺負是我們自己的錯，確實很丟臉",
+                    "錯的是那個欺負或觸摸我們的人，我們是無辜的，一定要勇敢說出來",
+                    "保持沉默是唯一的辦法"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 39,
+                "text": "在網上玩遊戲時，如果有網友詢問你讀哪間學校、家裡住哪裏、並向你要照片，你應該：",
+                "options": [
+                    "大方地把學校名稱和住址告訴他，並發送照片",
+                    "拒絕提供任何個人資料，並立刻告訴爸爸媽媽",
+                    "跟他約好時間在學校門口見面"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            },
+            {
+                "id": 40,
+                "text": "保護自己的隱私部位，以下哪一項是不適當的行為？",
+                "options": [
+                    "洗完澡後，穿好睡衣才走出客廳",
+                    "和同學玩耍時，隨便拉開自己的褲子開玩笑",
+                    "不讓別人隨意觸摸自己的身體"
+                ],
+                "answer": 1,
+                "difficulty": "hard"
+            }
+        ]
+    }
+};
+
+        let currentLevelKey = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = []; // stores selectedIdx or null
+        let isCorrectArray = []; // stores true or false for each question
+        let score = 0;
+        let answered = false;
+        let retryQuestionIndex = -1; // stores index of currently retrying question
+
+        window.onload = function() {
+            try {
+                updateHomeStars();
+            } catch (e) {
+                console.error("Error updating stars on load:", e);
+            }
+            try {
+                if (typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+                    window.speechSynthesis.getVoices();
+                }
+            } catch (e) {
+                console.error("SpeechSynthesis initial voice fetch failed:", e);
+            }
+        };
+
+        // Requirements: Highscore, Star Display, and Level Overwrite score (Only if higher!)
+        function updateHomeStars() {
+            const levels = ['level1', 'level2', 'level3', 'level4', 'level5', 'level6'];
+            levels.forEach(lvl => {
+                const highscoreKey = `highscore_` + lvl;
+                const hasPlayed = safeStorage.getItem(highscoreKey) !== null;
+                const highscore = parseInt(safeStorage.getItem(highscoreKey)) || 0;
+                
+                let starHtml = '';
+                let scoreHtml = '';
+                
+                if (!hasPlayed) {
+                    starHtml = '<span class="star-none">☆ 尚未挑戰</span>';
+                    scoreHtml = '<span class="highscore-text">最高得分: -- / 20</span>';
+                } else {
+                    scoreHtml = `<span class="highscore-text">最高得分: <strong style="color: var(--secondary-color); font-size: 1rem; text-shadow: 1px 1px 0 rgba(0,0,0,0.5);">${highscore}</strong> / 20</span>`;
+                    if (highscore === 20) {
+                        starHtml = '<span class="star-large">🌟</span><span style="font-size: 0.85rem; color: #FFF; font-weight: 900; display: block; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">🏆 滿分大獎勵!</span>';
+                    } else if (highscore >= 10) {
+                        starHtml = '<span class="star-small">⭐</span><span style="font-size: 0.85rem; color: #FFF; font-weight: 900; display: block; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">👍 合格進步獎!</span>';
+                    } else {
+                        starHtml = '<span class="star-none">☆</span><span style="font-size: 0.85rem; color: rgba(255,255,255,0.7); font-weight: 900; display: block;">💪 繼續加油！</span>';
+                    }
+                }
+                
+                document.getElementById(`stars-display-` + lvl).innerHTML = `
+                    <div class="star-badge-container">
+                        ${scoreHtml}
+                        <div style="margin-top: 4px;">${starHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Record Clearing function
+        function clearStorage() {
+            if (confirm("🍎 親愛的小朋友/家長，確定要清除所有關卡的最高分數和星星記錄嗎？")) {
+                const levels = ['level1', 'level2', 'level3', 'level4', 'level5', 'level6'];
+                levels.forEach(lvl => {
+                    safeStorage.removeItem(`highscore_` + lvl);
+                });
+                updateHomeStars();
+                speakText("記錄已清除成功！");
+                alert("🗑️ 所有冒險進度已成功清除！");
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId !== 'screen-results') {
+                stopConfetti();
+            }
+        }
+
+        function selectLevel(levelKey) {
+            currentLevelKey = levelKey;
+            const levelInfo = database[levelKey];
+            
+            document.getElementById('intro-level-title').innerText = levelInfo.title;
+            document.getElementById('intro-level-subtitle').innerText = "小學人文科一年級 1上 精選練習";
+            document.getElementById('intro-level-desc').innerText = levelInfo.desc;
+            document.getElementById('intro-level-example').innerText = levelInfo.examples;
+            
+            showScreen('screen-intro');
+            // speakText(levelInfo.title + "。教學重點：" + levelInfo.desc + "。例子：" + levelInfo.examples); // Auto-read disabled!
+        }
+
+        function startLevel() {
+            const levelInfo = database[currentLevelKey];
+            document.getElementById('level-name-indicator').innerText = levelInfo.title;
+            
+            const easyPool = levelInfo.questions.filter(q => q.difficulty === 'easy');
+            const hardPool = levelInfo.questions.filter(q => q.difficulty === 'hard');
+            
+            // Randomly select 10 from easy and 10 from hard
+            const selectedEasy = getRandomElements(easyPool, 10);
+            const selectedHard = getRandomElements(hardPool, 10);
+            
+            currentQuestions = [...selectedEasy, ...selectedHard];
+            currentQuestionIndex = 0;
+            userAnswers = new Array(20).fill(null);
+            isCorrectArray = new Array(20).fill(false);
+            score = 0;
+            
+            showScreen('screen-game');
+            displayQuestion();
+        }
+
+        function restartCurrentLevel() {
+            startLevel();
+        }
+
+        function goHome(confirmRequired) {
+            if (confirmRequired) {
+                if (!confirm("亲爱的小朋友，確定要退出當前的關卡挑戰，返回首頁嗎？")) {
+                    return;
+                }
+            }
+            window.speechSynthesis.cancel();
+            showScreen('screen-home');
+        }
+
+        function getRandomElements(arr, num) {
+            const shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        function displayQuestion() {
+            answered = false;
+            document.getElementById('wrong-next-btn-container').style.display = 'none';
+            
+            const q = currentQuestions[currentQuestionIndex];
+            
+            // Update question counter
+            document.getElementById('question-counter').innerText = `${currentQuestionIndex + 1} / 20`;
+            
+            const progressPercent = (currentQuestionIndex / 20) * 100;
+            document.getElementById('game-progress').style.width = `${progressPercent}%`;
+            
+            const diffBadge = document.getElementById('difficulty-badge');
+            if (currentQuestionIndex < 10) {
+                diffBadge.innerText = "⭐ 基礎篇 (淺程度)";
+                diffBadge.className = "difficulty-indicator";
+            } else {
+                diffBadge.innerText = "🔥 挑戰篇 (深程度)";
+                diffBadge.className = "difficulty-indicator deep";
+            }
+
+            document.getElementById('question-text').innerText = q.text;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C'];
+            
+            // Render option cards
+            q.options.forEach((opt, idx) => {
+                const card = document.createElement('div');
+                card.className = 'option-card';
+                card.onclick = (e) => selectOption(idx, e);
+                
+                card.innerHTML = `
+                    <div class="option-letter-wrapper">
+                        <div class="option-letter">${letters[idx]}</div>
+                        <div class="option-text">${opt}</div>
+                    </div>
+                    <button class="opt-audio-btn" onclick="event.stopPropagation(); playOptionTTS(${idx}, this)" title="朗讀選項">🔊</button>
+                `;
+                optionsContainer.appendChild(card);
+            });
+
+            // If question has already been answered previously (when user goes back with "上一頁")
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const previousSelectedIdx = userAnswers[currentQuestionIndex];
+                answered = true;
+                const cards = document.querySelectorAll('.option-card');
+                
+                cards.forEach(c => c.style.pointerEvents = 'none');
+                
+                if (previousSelectedIdx === q.answer) {
+                    cards[previousSelectedIdx].classList.add('correct');
+                } else {
+                    cards[previousSelectedIdx].classList.add('wrong');
+                    cards[q.answer].classList.add('correct');
+                }
+            }
+
+            // Auto-read question text for kids - Disabled for quiet mode
+            // readQuestion();
+        }
+
+        function selectOption(selectedIdx, e) {
+            if (answered) return;
+            answered = true;
+            
+            const q = currentQuestions[currentQuestionIndex];
+            const cards = document.querySelectorAll('.option-card');
+            
+            userAnswers[currentQuestionIndex] = selectedIdx;
+            cards.forEach(c => c.style.pointerEvents = 'none');
+            
+            if (selectedIdx === q.answer) {
+                // Correct!
+                cards[selectedIdx].classList.add('correct');
+                isCorrectArray[currentQuestionIndex] = true;
+                playCorrectSound();
+                
+                // Confetti particle burst from the exact click location
+                const rect = cards[selectedIdx].getBoundingClientRect();
+                const clickX = e ? e.clientX : (rect.left + rect.width / 2);
+                const clickY = e ? e.clientY : (rect.top + rect.height / 2);
+                spawnStars(clickX, clickY);
+                
+                // speakText("答對了！好棒喔！"); // Disabled auto-speech on correct
+            } else {
+                // Wrong!
+                cards[selectedIdx].classList.add('wrong');
+                cards[q.answer].classList.add('correct');
+                isCorrectArray[currentQuestionIndex] = false;
+                playWrongSound();
+                
+                // speakText("答錯了，不要緊，正確答案是 " + q.options[q.answer] + "。請點擊下方的橙色按鈕前往下一題。"); // Disabled auto-speech on incorrect
+                
+                // Show Next Question button directly below options on incorrect answer
+                document.getElementById('wrong-next-btn-container').style.display = 'block';
+            }
+        }
+
+        function loadPrevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function loadNextQuestion() {
+            // Requirement 1 of current request: Children can skip questions anytime!
+            if (!answered) {
+                // Kid skipped the question - record as unanswered and wrong
+                userAnswers[currentQuestionIndex] = null;
+                isCorrectArray[currentQuestionIndex] = false;
+            }
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 20) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateResultsUI(currentScore, isSilent) {
+            const pct = Math.round((currentScore / 20) * 100);
+            document.getElementById('score-text').innerText = pct + "分";
+            document.getElementById('score-detail').innerText = `答對了 ` + currentScore + ` 題 / 共 20 題`;
+            
+            let emoji = '🥇';
+            let feedback = '太完美了！你完全掌握了這個關卡的知識！';
+            
+            if (currentScore === 20) {
+                emoji = '👑';
+                feedback = '超神勇！你答對了所有問題，獲得了大滿貫金星星！';
+                startConfetti();
+            } else if (currentScore >= 18) {
+                emoji = '🏆';
+                feedback = '超厲害！你是不折不扣的人文科知識小達人！';
+                startConfetti();
+            } else if (currentScore >= 12) {
+                emoji = '🥇';
+                feedback = '做得非常好！你已經很熟悉大部分的內容了！';
+                startConfetti();
+            } else if (currentScore >= 10) {
+                emoji = '👍';
+                feedback = '合格了！再多挑戰一次你就能拿到高分滿分喔！';
+                stopConfetti();
+            } else {
+                emoji = '💪';
+                feedback = '加油！不要氣餒，重新挑戰這一關再試試看吧！';
+                stopConfetti();
+            }
+            
+            document.getElementById('achievement-emoji').innerText = emoji;
+            document.getElementById('feedback-message').innerText = feedback;
+            
+            if (!isSilent) {
+                speakText("挑戰完成！你的得分是 " + pct + " 分。" + feedback);
+            }
+        }
+
+        function showResults() {
+            const levelInfo = database[currentLevelKey];
+            document.getElementById('result-level-title').innerText = levelInfo.title;
+            
+            // Calculate final score
+            score = isCorrectArray.filter(v => v === true).length;
+            
+            // Save to safeStorage if higher (Requirement 2: Limit overwriting only to higher score)
+            const prevHighscore = parseInt(safeStorage.getItem(`highscore_` + currentLevelKey)) || 0;
+            if (score > prevHighscore) {
+                safeStorage.setItem(`highscore_` + currentLevelKey, score);
+            }
+            updateHomeStars();
+            
+            updateResultsUI(score, false);
+            
+            // Build summary list for wrong/correct questions
+            renderSummaryList();
+            
+            showScreen('screen-results');
+        }
+
+        function renderSummaryList() {
+            const container = document.getElementById('results-summary-container');
+            container.innerHTML = '';
+            
+            currentQuestions.forEach((q, idx) => {
+                const item = document.createElement('div');
+                const isCorrect = isCorrectArray[idx];
+                item.className = `summary-item ${isCorrect ? 'correct-item' : 'wrong-item'}`;
+                
+                if (isCorrect) {
+                    item.innerHTML = `
+                        <div class="summary-item-text">
+                            <span style="color: var(--success-color);">🟢 ✔️ 第 ${idx + 1} 題</span>: ${q.text} 
+                        </div>
+                        <span style="color: #4b6584; font-size: 0.85rem; font-weight: bold;">(已答對)</span>
+                    `;
+                } else {
+                    item.innerHTML = `
+                        <div class="summary-item-text">
+                            <span style="color: var(--primary-color);">🔴 ❌ 第 ${idx + 1} 題</span>: ${q.text}
+                        </div>
+                        <button class="summary-btn-retry" onclick="openRetryModal(${idx})">🔄 重新挑戰</button>
+                    `;
+                }
+                container.appendChild(item);
+            });
+        }
+
+        function openRetryModal(index) {
+            retryQuestionIndex = index;
+            const q = currentQuestions[index];
+            
+            document.getElementById('retry-q-num').innerText = index + 1;
+            document.getElementById('retry-question-text').innerText = q.text;
+            
+            const diffIndicator = document.getElementById('retry-difficulty');
+            if (q.difficulty === 'easy') {
+                diffIndicator.innerText = "⭐ 基礎題";
+                diffIndicator.className = "difficulty-indicator";
+            } else {
+                diffIndicator.innerText = "🔥 挑戰題";
+                diffIndicator.className = "difficulty-indicator deep";
+            }
+            
+            const optionsContainer = document.getElementById('retry-options-container');
+            optionsContainer.innerHTML = '';
+            
+            // Set Chinese tip pop-up in modal body
+            document.getElementById('retry-hint-banner').innerText = "💡 溫馨提示：請仔細閱讀題目，找出唯一的正確答案。加油，你可以的！";
+            
+            const letters = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const card = document.createElement('div');
+                card.className = 'option-card';
+                card.onclick = (e) => selectRetryOption(idx, e);
+                
+                card.innerHTML = `
+                    <div class="option-letter-wrapper">
+                        <div class="option-letter">${letters[idx]}</div>
+                        <div class="option-text">${opt}</div>
+                    </div>
+                    <button class="opt-audio-btn" onclick="event.stopPropagation(); playRetryOptionTTS(${idx}, this)" title="朗讀選項">🔊</button>
+                `;
+                optionsContainer.appendChild(card);
+            });
+            
+            document.getElementById('retry-modal').style.display = 'flex';
+            
+            // Automated Audio Prompt for retry mode - Disabled for quiet mode
+            // speakText("重新挑戰第 " + (index + 1) + " 題！請仔細閱讀題目，選出正確的答案。加油，你可以的！");
+            // setTimeout(() => {
+            //     readRetryQuestion();
+            // }, 4000);
+        }
+
+        function selectRetryOption(selectedIdx, e) {
+            const q = currentQuestions[retryQuestionIndex];
+            const cards = document.querySelectorAll('#retry-options-container .option-card');
+            
+            if (selectedIdx === q.answer) {
+                // Correct!
+                cards[selectedIdx].classList.add('correct');
+                playCorrectSound();
+                
+                const rect = cards[selectedIdx].getBoundingClientRect();
+                const clickX = e ? e.clientX : (rect.left + rect.width / 2);
+                const clickY = e ? e.clientY : (rect.top + rect.height / 2);
+                spawnStars(clickX, clickY);
+                
+                // speakText("答對了！你太棒了！"); // Disabled auto-speech on retry correct
+                cards.forEach(c => c.style.pointerEvents = 'none');
+                
+                // Update correctness state
+                isCorrectArray[retryQuestionIndex] = true;
+                
+                // Live recalculate score on result screen
+                score = isCorrectArray.filter(v => v === true).length;
+                
+                // Update high score (Requirement 2: Limit overwriting only to higher score)
+                const prevHighscore = parseInt(safeStorage.getItem(`highscore_` + currentLevelKey)) || 0;
+                if (score > prevHighscore) {
+                    safeStorage.setItem(`highscore_` + currentLevelKey, score);
+                }
+                updateHomeStars();
+                
+                // Update results UI live (silent)
+                updateResultsUI(score, true);
+                
+                // Automatically close modal and refresh list
+                setTimeout(() => {
+                    closeRetryModal();
+                    renderSummaryList();
+                }, 1300);
+            } else {
+                // Requirement 2: Can retry wrong answers continuously immediately until correct!
+                cards[selectedIdx].classList.add('wrong');
+                playWrongSound();
+                // speakText("答錯了，不要緊，再試一次看看！"); // Disabled auto-speech on retry incorrect
+                // Allow clicking other options directly (pointer-events not locked for others)
+                cards[selectedIdx].style.pointerEvents = 'none'; // Lock only the clicked wrong card
+            }
+        }
+
+        function closeRetryModal() {
+            document.getElementById('retry-modal').style.display = 'none';
+        }
+
+        function readRetryQuestion() {
+            const q = currentQuestions[retryQuestionIndex];
+            const optTexts = q.options.map((opt, i) => String.fromCharCode(65 + i) + ` : ` + opt).join('。');
+            speakText(q.text + "。選項有： " + optTexts);
+        }
+
+        function playRetryOptionTTS(idx, btn) {
+            const q = currentQuestions[retryQuestionIndex];
+            const letters = ['A', 'B', 'C'];
+            
+            // Add visual wiggle class
+            if (btn) btn.classList.add('reading');
+            speakText(`選項 ` + letters[idx] + `：` + q.options[idx]);
+            setTimeout(() => {
+                if (btn) btn.classList.remove('reading');
+            }, 2000);
+        }
+
+        // Text To Speech TTS engine
+        function speakText(text) {
+            try {
+                if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis !== null) {
+                    window.speechSynthesis.cancel();
+                    let utterance = new SpeechSynthesisUtterance(text);
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const hkVoice = voices.find(v => v.lang === 'zh-HK' || v.lang.includes('HK'));
+                    if (hkVoice) {
+                        utterance.voice = hkVoice;
+                        utterance.lang = 'zh-HK';
+                    } else {
+                        utterance.lang = 'zh-TW';
+                    }
+                    
+                    utterance.rate = 1.05;
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (e) {
+                console.warn("speechSynthesis error:", e);
+            }
+        }
+
+        function readLevelIntro() {
+            const levelInfo = database[currentLevelKey];
+            if (levelInfo) {
+                speakText(levelInfo.title + "。教學重點：" + levelInfo.desc + "。例子：" + levelInfo.examples);
+            }
+        }
+
+        function readQuestion() {
+            const q = currentQuestions[currentQuestionIndex];
+            const optTexts = q.options.map((opt, i) => `${String.fromCharCode(65 + i)} : ${opt}`).join('。');
+            speakText(q.text + "。選項有： " + optTexts);
+        }
+
+        function playOptionTTS(idx, btn) {
+            const q = currentQuestions[currentQuestionIndex];
+            const letters = ['A', 'B', 'C'];
+            
+            // Add visual wiggle class
+            if (btn) btn.classList.add('reading');
+            speakText(`選項 ${letters[idx]}：${q.options[idx]}`);
+            setTimeout(() => {
+                if (btn) btn.classList.remove('reading');
+            }, 2000);
+        }
+
+        // Synthesize Audio (Chime / Buzzer)
+        function playCorrectSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                osc.type = 'sine';
+                
+                // Upward C-major Arpeggio (Happy chime!)
+                osc.frequency.setValueAtTime(523.25, now);      // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.08);  // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.16);  // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.25, now + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } catch (e) {
+                console.log("AudioContext blocked or uninitialized", e);
+            }
+        }
+
+        function playWrongSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                osc.type = 'triangle';
+                
+                // Soft downward buzz
+                osc.frequency.setValueAtTime(180.00, now);      // F3
+                osc.frequency.setValueAtTime(120.00, now + 0.12); // B2
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } catch (e) {
+                console.log("AudioContext blocked or uninitialized", e);
+            }
+        }
+
+        // Stars particles burst on correct answer
+        function spawnStars(x, y) {
+            const colors = ['#FFD200', '#FF5E7E', '#4CD137', '#00A8FF', '#9C27B0', '#FF9F43'];
+            const icons = ['⭐', '✨', '🌟', '🎉', '🌈', '🎈'];
+            
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'star-particle';
+                p.innerText = icons[Math.floor(Math.random() * icons.length)];
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.fontSize = (Math.random() * 15 + 18) + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 120 + 50;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                const rot = (Math.random() * 360) + 'deg';
+                
+                p.style.setProperty('--tx', tx + 'px');
+                p.style.setProperty('--ty', ty + 'px');
+                p.style.setProperty('--rot', rot);
+                
+                document.body.appendChild(p);
+                
+                // Cleanup
+                setTimeout(() => {
+                    p.remove();
+                }, 800);
+            }
+        }
+
+        // Confetti Overlay animation for achievements
+        let confettiInterval;
+        function startConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            
+            const pieces = [];
+            const colors = ['#FF5E7E', '#FFD200', '#4CD137', '#00A8FF', '#9C27B0'];
+            
+            for (let i = 0; i < 80; i++) {
+                pieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5
+                });
+            }
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    ctx.stroke();
+                    
+                    p.y += Math.cos(p.d) + 2;
+                    p.tilt = Math.sin(p.d - 10) * 2;
+                    
+                    if (p.y > canvas.height) {
+                        p.y = -20;
+                        p.x = Math.random() * canvas.width;
+                    }
+                });
+            }
+            
+            clearInterval(confettiInterval);
+            confettiInterval = setInterval(draw, 24);
+        }
+
+        function stopConfetti() {
+            clearInterval(confettiInterval);
+            const canvas = document.getElementById('confetti');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+    </script>
+</body>
+</html>
