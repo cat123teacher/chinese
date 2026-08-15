@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌟 小一科學下大冒險 🌟</title>
+    <!-- 引入國外免費字型與圖標資源，讓網頁更具親和力 -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Noto+Sans+HK:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-font: 'Fredoka', 'Noto Sans HK', 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            --bubble-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.2s;
+            --cartoon-border: 4px solid #333333;
+        }
+
+        /* 🌟 防止手機用戶雙擊縮放，優化點擊延遲 */
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--primary-font);
+            background: linear-gradient(180deg, #FFF3F3 0%, #E0F7FA 100%);
+            margin: 0;
+            padding: 12px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #3C3C3C;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 👑 左上方 Teacher Cat 圓形圖標 - 繽紛發光 */
+        .top-left-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 4px solid #FFF;
+            box-shadow: 0 8px 16px rgba(255, 94, 98, 0.3);
+            background-color: #FFF;
+            overflow: hidden;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: logoPulse 2s infinite alternate;
+        }
+
+        @keyframes logoPulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,94,98,0.3); }
+            100% { transform: scale(1.06); box-shadow: 0 0 20px rgba(255,94,98,0.6); }
+        }
+
+        .top-left-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .top-left-logo .fallback-emoji {
+            font-size: 38px;
+            line-height: 1;
+        }
+
+        /* 🎨 Confetti 畫布 */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* 📦 遊戲外部滾動容器 - 專為行動端最佳寬度優化 */
+        .game-container {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 70px;
+        }
+
+        /* 🎮 遊戲主卡片 - Q彈軟萌卡通風 */
+        .game-wrapper {
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 32px;
+            box-shadow: 0 16px 0px rgba(0, 0, 0, 0.05), 0 25px 50px rgba(0, 0, 0, 0.08);
+            border: 6px solid #FFF;
+            padding: 24px;
+            position: relative;
+            transition: var(--transition-speed);
+        }
+
+        h1.main-title {
+            font-size: 2rem;
+            color: #FF5E62;
+            text-shadow: 3px 3px 0px #FFE3E3;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6a82fb;
+            margin-bottom: 22px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 🔊 發音按鈕 - 大頭Q版卡通風 */
+        .speak-btn {
+            background: linear-gradient(135deg, #FFD54F, #FFB300);
+            border: 3px solid #FFF;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 6px 0px #D89600, 0 10px 15px rgba(0,0,0,0.1);
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        .speak-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #D89600, 0 5px 8px rgba(0,0,0,0.15);
+        }
+
+        /* 🧹 清除記錄按鈕 - 立體紅色 */
+        .clear-btn {
+            background: linear-gradient(135deg, #FF8A80, #FF5252);
+            color: white;
+            border: 3px solid #FFF;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 4px 0px #D32F2F, 0 6px 10px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .clear-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px #D32F2F, 0 3px 5px rgba(0,0,0,0.15);
+        }
+
+        /* 🌟 主頁關卡列表 */
+        .level-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        /* 關卡卡片 - 變身神奇寶貝卡牌風格 */
+        .level-card {
+            padding: 18px 24px;
+            border-radius: 28px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.06), 0 12px 20px rgba(0,0,0,0.06);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            border: 4px solid #FFF;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100px;
+            width: 50px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+
+        .level-card:hover::before {
+            left: 120%;
+        }
+
+        .level-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.08);
+        }
+
+        .level-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .level-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ⭐ 星星進度與最高分樣式 */
+        .star-container {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 呼吸特效大滿分金星 */
+        .star-large {
+            font-size: 1.9rem;
+            color: #FFDF00;
+            text-shadow: 0 0 8px rgba(255, 223, 0, 0.8), 2px 2px 0px rgba(0,0,0,0.15);
+            animation: starPulse 1.2s infinite alternate;
+            display: inline-block;
+        }
+
+        /* 小合格星星 */
+        .star-small {
+            font-size: 1.4rem;
+            color: #FFD700;
+            text-shadow: 1.5px 1.5px 0px rgba(0,0,0,0.15);
+        }
+
+        .star-empty {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+        }
+
+        .high-score-badge {
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes starPulse {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.2) rotate(5deg); }
+        }
+
+        .level-card .arrow-icon {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 1.5px 1.5px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 💡 學習導學卡 - 繪本風格 */
+        .intro-box {
+            background: #F4FBEF;
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 22px;
+            border: 4px dashed #8BC34A;
+            text-align: left;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .intro-title {
+            font-size: 1.4rem;
+            color: #33691E;
+            font-weight: 700;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #4A4A4A;
+            margin-bottom: 18px;
+        }
+
+        .example-box {
+            background: #FFFDE7;
+            border-radius: 22px;
+            padding: 16px;
+            border: 3px solid #FFF59D;
+            font-size: 1.05rem;
+            color: #E65100;
+            line-height: 1.6;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        /* 答題介面 */
+        .level-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #3F51B5;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 🍬 糖果斜紋進度條 */
+        .progress-bar {
+            width: 100%;
+            height: 18px;
+            background: #ECEFF1;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+            border: 3px solid #FFF;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: repeating-linear-gradient(
+                -45deg,
+                #FF6B6B,
+                #FF6B6B 10px,
+                #FF8E53 10px,
+                #FF8E53 20px
+            );
+            background-size: 40px 40px;
+            width: 0%;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: moveStripes 1.5s linear infinite;
+        }
+
+        @keyframes moveStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 0; }
+        }
+
+        .difficulty-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .tag-easy { background-color: #66BB6A; }
+        .tag-hard { background-color: #FFA726; }
+
+        /* ❓ 題目區塊 */
+        .question-box {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F4F7FB;
+            padding: 20px;
+            border-radius: 26px;
+            border: 3px solid #E2E8F0;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.02);
+        }
+
+        /* 📋 選項列表 */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* 🥚 選項卡片 - 肥嘟嘟卡通風格 */
+        .option-card {
+            background: white;
+            border: 3px solid #E2E8F0;
+            border-radius: 24px;
+            padding: 16px 20px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            box-shadow: 0 6px 0px #E2E8F0, 0 8px 15px rgba(0,0,0,0.02);
+        }
+
+        .option-card:hover {
+            border-color: #5C6BC0;
+            background-color: #F8F9FF;
+        }
+
+        .option-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #E2E8F0, 0 4px 8px rgba(0,0,0,0.08);
+        }
+
+        /* 🔊 選項內建喇叭 */
+        .speak-opt-btn {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            color: #1565C0;
+            border-radius: 50%;
+            border: 2px solid #FFF;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-left: 15px;
+            box-shadow: 0 3px 0px #90CAF9, 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.1s;
+        }
+
+        .speak-opt-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0px #90CAF9;
+        }
+
+        /* 答題回饋效果 */
+        .option-card.correct-picked {
+            border-color: #66BB6A !important;
+            background-color: #E8F5E9 !important;
+            box-shadow: 0 6px 0px #4CAF50 !important;
+            animation: popBounce 0.5s ease;
+        }
+
+        .option-card.wrong-picked {
+            border-color: #EF5350 !important;
+            background-color: #FFEBEE !important;
+            box-shadow: 0 6px 0px #F44336 !important;
+            animation: wobbleShake 0.5s ease;
+        }
+
+        .option-card.correct-unpicked {
+            border-color: #66BB6A !important;
+            background-color: #FFFFFF !important;
+        }
+
+        .option-card.disabled {
+            pointer-events: none;
+        }
+
+        @keyframes popBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px) scale(1.02); }
+        }
+
+        @keyframes wobbleShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* 🎮 導航按鈕欄 - 彩色立體風格 */
+        .nav-button-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 14px 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: 3px solid #FFF;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .nav-btn-prev { 
+            background: linear-gradient(135deg, #B0BEC5, #78909C); 
+            box-shadow: 0 5px 0px #546E7A, 0 8px 12px rgba(0,0,0,0.1);
+        }
+        .nav-btn-prev:active { transform: translateY(3px); box-shadow: 0 2px 0px #546E7A; }
+
+        .nav-btn-home { 
+            background: linear-gradient(135deg, #FFB74D, #FFA726); 
+            box-shadow: 0 5px 0px #FB8C00, 0 8px 12px rgba(0,0,0,0.1);
+        }
+        .nav-btn-home:active { transform: translateY(3px); box-shadow: 0 2px 0px #FB8C00; }
+
+        .nav-btn-next { 
+            background: linear-gradient(135deg, #81C784, #66BB6A); 
+            box-shadow: 0 5px 0px #43A047, 0 8px 12px rgba(0,0,0,0.1);
+        }
+        .nav-btn-next:active { transform: translateY(3px); box-shadow: 0 2px 0px #43A047; }
+        
+        .nav-btn:disabled {
+            background: #CFD8DC !important;
+            box-shadow: 0 5px 0px #90A4AE !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 答錯時閃爍引導下一題大按鈕 */
+        .wrong-next-container {
+            margin-top: 18px;
+            text-align: center;
+            display: none;
+            animation: attentionPulse 1.2s infinite alternate;
+        }
+
+        @keyframes attentionPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        /* 🏆 結算成績與總結列表 */
+        .summary-list {
+            text-align: left;
+            margin-top: 20px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 12px;
+            border-top: 3px dashed #E2E8F0;
+            padding-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-radius: 22px;
+            background: #F8F9FA;
+            margin-bottom: 12px;
+            border-left: 6px solid #CCC;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .summary-item.correct { border-left-color: #66BB6A; background: #F1FBF2; }
+        .summary-item.wrong { border-left-color: #EF5350; background: #FFF5F5; }
+
+        /* 🔄 列表內「重新做」按鈕 */
+        .summary-redo-btn {
+            background: linear-gradient(135deg, #FF7043, #FF5722);
+            color: white;
+            border: 2px solid #FFF;
+            border-radius: 18px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 0px #E64A19;
+            transition: all 0.1s;
+        }
+
+        .summary-redo-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0px #E64A19;
+        }
+
+        /* 🔄 錯題重做彈窗 (Redo Modal) - 夢幻巨型氣泡 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: #FFF;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 36px;
+            padding: 26px;
+            box-sizing: border-box;
+            border: 6px solid #FF5722;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: popBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+        }
+
+        /* 統一行動大按鈕 - Q彈立體質地 */
+        .action-btn {
+            background: linear-gradient(135deg, #26A69A, #00B0FF);
+            color: white;
+            border: 3px solid #FFF;
+            padding: 15px 36px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0px #00838F, 0 10px 20px rgba(0,0,0,0.15);
+            transition: all 0.1s;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #00838F, 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #FF7043, #FF3D00);
+            box-shadow: 0 6px 0px #D84315, 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .btn-orange:active {
+            box-shadow: 0 2px 0px #D84315;
+        }
+
+        /* 🏫 Teacher Cat 底部聯絡欄 - 美麗的靜態貼紙排版 */
+        .game-footer {
+            width: 100%;
+            max-width: 640px;
+            margin-top: 45px;
+            margin-bottom: 25px;
+            padding-top: 25px;
+            border-top: 4px dashed #CFD8DC;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: 1.25rem;
+            color: #FF5E62;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 1.5px 1.5px 0px #FFE3E3;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .social-btn {
+            padding: 10px 18px;
+            border-radius: 24px;
+            text-decoration: none;
+            color: white !important;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid #FFF;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+        }
+
+        .social-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px rgba(0,0,0,0.1);
+        }
+
+        .youtube { background: #FF0000; }
+        .instagram { background: linear-gradient(45deg, #405DE6, #C13584, #FD1D1D); }
+        .facebook { background: #1877F2; }
+        .threads { background: #000000; }
+        .xhs { background: #FE2C55; }
+        .whatsapp { background: #25D366; }
+        .douyin { background: #000000; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- 🐱 左上方 Teacher Cat 圓形圖標 -->
+    <div class="top-left-logo">
+        <img src="cat.jpeg" alt="Teacher Cat Logo" onerror="this.style.display='none'; document.getElementById('emoji-logo').style.display='block';">
+        <div class="fallback-emoji" id="emoji-logo" style="display:none;">🐱</div>
+    </div>
+
+    <!-- 🎨 炫酷彩花畫布 -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- 📦 遊戲總容器 -->
+    <div class="game-container">
+        
+        <div class="game-wrapper">
+
+            <!-- ═════════ 1. 主畫面（關卡選單） ═════════ -->
+            <div id="menu-screen" class="screen active">
+                <h1 class="main-title">🌟 小一科學下大冒險 🌟</h1>
+                <div class="subtitle">Teacher Cat 的快樂AI教室 🪐 智趣啟蒙</div>
+                
+                <!-- 星星進度面板 -->
+                <div style="background: rgba(238, 242, 246, 0.8); padding: 12px 18px; border-radius: 24px; display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px; width: 100%;">
+                    <span style="font-weight: bold; color: #37474F; font-size: 1.05rem;">⭐ Progress Record 挑戰進度：</span>
+                    <button class="clear-btn" style="margin: 0;" onclick="clearAllRecords()"><i class="fa-solid fa-broom"></i> 清除記錄</button>
+                </div>
+
+                <p style="font-size:1.1rem; color:#555; font-weight:bold; margin-top: 10px; text-align: center;">請選擇一個神奇世界開始挑戰吧！🔊</p>
+                
+                <div class="level-grid">
+                    <!-- 關卡 1 -->
+                    <div class="level-card" style="background: linear-gradient(135deg, #FF7B8E 0%, #FFA2D0 100%);" onclick="selectLevel(1)">
+                        <div class="level-info">
+                            <span class="level-name">🏡 關卡 1：神奇材料魔法屋</span>
+                            <div class="star-container" id="stars-level-1">☆☆☆</div>
+                        </div>
+                        <span class="arrow-icon"><i class="fa-solid fa-circle-arrow-right"></i></span>
+                    </div>
+                    <!-- 關卡 2 -->
+                    <div class="level-card" style="background: linear-gradient(135deg, #5C9DFE 0%, #9FE5FE 100%);" onclick="selectLevel(2)">
+                        <div class="level-info">
+                            <span class="level-name">🚀 關卡 2：未來科技大發現</span>
+                            <div class="star-container" id="stars-level-2">☆☆☆</div>
+                        </div>
+                        <span class="arrow-icon"><i class="fa-solid fa-circle-arrow-right"></i></span>
+                    </div>
+                    <!-- 關卡 3 -->
+                    <div class="level-card" style="background: linear-gradient(135deg, #FFB733 0%, #FF8359 100%);" onclick="selectLevel(3)">
+                        <div class="level-info">
+                            <span class="level-name">🏃 關卡 3：精靈運動與位置</span>
+                            <div class="star-container" id="stars-level-3">☆☆☆</div>
+                        </div>
+                        <span class="arrow-icon"><i class="fa-solid fa-circle-arrow-right"></i></span>
+                    </div>
+                    <!-- 關卡 4 -->
+                    <div class="level-card" style="background: linear-gradient(135deg, #B18EFC 0%, #76A8FC 100%);" onclick="selectLevel(4)">
+                        <div class="level-info">
+                            <span class="level-name">🔮 關卡 4：光影城堡探秘</span>
+                            <div class="star-container" id="stars-level-4">☆☆☆</div>
+                        </div>
+                        <span class="arrow-icon"><i class="fa-solid fa-circle-arrow-right"></i></span>
+                    </div>
+                    <!-- 關卡 5 -->
+                    <div class="level-card" style="background: linear-gradient(135deg, #FFA4A4 0%, #FFD29F 100%); border-color: #FFA4A4;" onclick="selectLevel(5)">
+                        <div class="level-info">
+                            <span class="level-name" style="color:#FFF;">🌞 關卡 5：太陽公公與月亮姐姐</span>
+                            <div class="star-container" id="stars-level-5">☆☆☆</div>
+                        </div>
+                        <span class="arrow-icon" style="color:#FFF;"><i class="fa-solid fa-circle-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- 🌟 傳送門：返回小朋友學習大冒險 -->
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="https://cat123teacher.github.io/chinese/main.html" target="_blank" class="action-btn" style="background: linear-gradient(135deg, #12c2e9, #c471ed, #f64f59); text-decoration: none; display: inline-block; padding: 14px 34px; font-size: 1.1rem; box-shadow: 0 6px 0px #bf2c37, 0 10px 20px rgba(246,79,89,0.35);">
+                        <i class="fa-solid fa-rocket animate-bounce"></i> 返回小朋友學習大冒險
+                    </a>
+                </div>
+            </div>
+
+            <!-- ═════════ 2. 導學與學習錦囊畫面 ═════════ -->
+            <div id="intro-screen" class="screen">
+                <h2 id="intro-level-title" style="color: #3F51B5; font-size: 1.7rem; text-align:center;">關卡學習</h2>
+                
+                <div class="intro-box">
+                    <div class="intro-title">
+                        <span>💡 學習小錦囊</span>
+                        <button class="speak-btn" onclick="speakTextById('intro-summary-text')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    <div id="intro-summary-text" class="intro-text"></div>
+                    
+                    <div class="example-box">
+                        <strong>🌟 例題示範：</strong><br>
+                        <span id="intro-example-text"></span>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="action-btn" onclick="startLevel()"><i class="fa-solid fa-play"></i> 進入挑戰！</button>
+                    <br>
+                    <button class="action-btn btn-orange" style="padding: 10px 28px; font-size: 1rem; margin-top:18px;" onclick="goHome()"><i class="fa-solid fa-circle-arrow-left"></i> 返回主選單</button>
+                </div>
+            </div>
+
+            <!-- ═════════ 3. 遊戲答題畫面 ═════════ -->
+            <div id="quiz-screen" class="screen">
+                <div class="level-header">
+                    <span id="quiz-level-name">關卡進行中</span>
+                    <span id="quiz-progress" style="background: #E8EAF6; padding: 4px 12px; border-radius: 12px;">0/20</span>
+                </div>
+                
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+
+                <div>
+                    <span id="difficulty-badge" class="difficulty-tag">簡單挑戰</span>
+                </div>
+
+                <div class="question-box">
+                    <span id="question-text" style="flex: 1;">正在載入神奇的科學問題...</span>
+                    <button class="speak-btn" onclick="speakCurrentQuestion()"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+
+                <div class="options-container">
+                    <div class="option-card" id="opt-0" onclick="checkAnswer(0)">
+                        <span>A. 選項一</span>
+                    </div>
+                    <div class="option-card" id="opt-1" onclick="checkAnswer(1)">
+                        <span>B. 選項二</span>
+                    </div>
+                    <div class="option-card" id="opt-2" onclick="checkAnswer(2)">
+                        <span>C. 選項三</span>
+                    </div>
+                </div>
+
+                <!-- 🌟 答錯後自動冒出的「下一題」直覺大按鈕 -->
+                <div class="wrong-next-container" id="wrong-next-area">
+                    <button class="action-btn" style="background: linear-gradient(135deg, #00b09b, #96c93d); padding: 14px 45px; font-size: 1.25rem; box-shadow: 0 6px 0px #5c9314;" onclick="nextQuestion()">下一題 <i class="fa-solid fa-forward"></i></button>
+                </div>
+
+                <!-- 🎮 題目導航按鈕欄 -->
+                <div class="nav-button-bar">
+                    <button class="nav-btn nav-btn-prev" id="nav-prev-btn" onclick="prevQuestion()"><i class="fa-solid fa-caret-left"></i> 上一頁</button>
+                    <button class="nav-btn nav-btn-home" onclick="confirmGoHome()"><i class="fa-solid fa-house"></i> 主選單</button>
+                    <button class="nav-btn nav-btn-next" id="nav-next-btn" onclick="nextQuestion()">下一頁 <i class="fa-solid fa-caret-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ═════════ 4. 結算與成績報告畫面 ═════════ -->
+            <div id="result-screen" class="screen" style="text-align: center;">
+                <div id="result-emoji" style="font-size: 5.5rem; margin-bottom: 10px; animation: attentionPulse 1s infinite alternate;">🏆</div>
+                <h2 style="font-size: 2rem; color: #4CAF50; margin: 10px 0; font-weight: 900;">挑戰完成！</h2>
+                <div id="score-text" style="font-size: 3.2rem; font-weight: 900; color: #E91E63; margin-bottom: 10px; text-shadow: 2px 2px 0px #FFEB3B;">0 / 20 分</div>
+                <div id="evaluation-text" style="font-size: 1.35rem; font-weight: bold; color: #424242; margin-bottom: 25px; line-height: 1.5; padding: 0 10px;">做得非常好！</div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 25px;">
+                    <button class="action-btn btn-orange" onclick="startLevel()"><i class="fa-solid fa-rotate-right"></i> 重新挑戰這一關</button>
+                    <button class="action-btn" onclick="goHome()"><i class="fa-solid fa-house"></i> 挑戰其他關卡</button>
+                </div>
+
+                <h3 style="text-align: left; margin: 15px 0 5px 0; color: #3F51B5; font-size: 1.25rem;"><i class="fa-solid fa-chart-simple"></i> 冒險答題報告：</h3>
+                <p style="text-align: left; font-size: 0.95rem; color: #616161; margin: 0 0 15px 0;">(若有答錯或跳過的題目，可以點擊右側的 <b>🔄 重新挑戰</b>，一直答到對為止喔！)</p>
+                
+                <!-- 答題狀況總結 -->
+                <div class="summary-list" id="summary-list-container"></div>
+            </div>
+
+        </div>
+
+        <!-- ═════════ 5. 🏫 Teacher Cat 底部資訊欄 ═════════ -->
+        <footer class="game-footer">
+            <div class="footer-title">Teacher Cat 的快樂AI教室</div>
+            <div class="footer-links">
+                <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-btn youtube"><i class="fa-brands fa-youtube"></i> YouTube</a>
+                <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fa-brands fa-facebook"></i> Facebook</a>
+                <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-btn threads"><i class="fa-brands fa-threads"></i> Threads</a>
+                <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-btn xhs"><i class="fa-solid fa-book-open"></i> 小紅書</a>
+                <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-btn whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp分享群</a>
+                <span class="social-btn douyin"><i class="fa-solid fa-music"></i> 抖音: 74254902683</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ═════════ 🔄 錯題重新挑戰 Modal 彈窗 ═════════ -->
+    <div class="modal-overlay" id="redo-modal">
+        <div class="modal-content">
+            <h2 id="redo-modal-title" style="color: #FF5722; font-size: 1.5rem; margin-top: 0; font-weight: 900;"><i class="fa-solid fa-rotate-right"></i> 重新挑戰題</h2>
+            
+            <!-- 💡 自動中文提示條 -->
+            <div style="background-color: #FFF3E0; border: 3px solid #FFE0B2; padding: 12px; border-radius: 20px; margin-bottom: 18px; font-weight: bold; color: #E65100; font-size: 1.05rem; line-height: 1.5;">
+                💡 練習小提示：請選出正確答案！如果答錯了不用擔心，可以繼續點選其他答案，直到答對為止喔！加油！
+            </div>
+
+            <div class="question-box" style="margin-bottom: 18px;">
+                <span id="redo-question-text" style="flex: 1;">題目載入中...</span>
+                <button class="speak-btn" id="redo-speak-q-btn"><i class="fa-solid fa-volume-high"></i></button>
+            </div>
+
+            <div class="options-container" id="redo-options-container" style="margin-bottom: 22px;"></div>
+
+            <div id="redo-feedback" style="font-size: 1.3rem; font-weight: bold; min-height: 35px; margin-bottom: 18px;"></div>
+
+            <button class="action-btn" id="redo-close-btn" style="display: none;" onclick="closeRedoModal()">關閉並返回總結 <i class="fa-solid fa-circle-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ══════════════ 📜 遊戲核心 JS 邏輯 ══════════════ -->
+    <script>
+        // ── 題庫數據庫 ──
+        const levelData = {
+            1: {
+                title: "🏡 神奇材料魔法屋",
+                bgColor: "linear-gradient(180deg, #FFF0F5 0%, #E8F5E9 100%)",
+                intro: "歡迎來到材料魔法屋！在這裡，我們會認識大自然給我們的「自然物品」（如石頭、樹葉）和人類動手做的「人造物品」（如鉛筆、椅子），還會探測物品是硬、是軟、有沒有彈性，以及能不能透光喔！",
+                example: "紙盒和玻璃盒，哪一個通常比較重呢？答案：玻璃盒！我們可以用「天秤」稱量來找出準確的答案喔！",
+                questions: [
+                    { q: "樹葉是從大自然的大樹上落下來的，它是什麼物品？", o: ["自然物品", "人造物品", "太空物品"], a: 0, level: "easy" },
+                    { q: "我們上課坐的木椅是人類製造出來的，它是什麼物品？", o: ["自然物品", "人造物品", "神秘外星物"], a: 1, level: "easy" },
+                    { q: "書桌是給我們寫字和承放重物用的，它需要具備什麼特質？", o: ["非常軟", "非常硬", "非常有彈性"], a: 1, level: "easy" },
+                    { q: "拉扯橡皮圈時它會變長，放手後會變回原狀，這代表它有什麼？", o: ["磁力", "透光性", "彈性"], a: 2, level: "easy" },
+                    { q: "玻璃杯掉在地上很容易打破，這代表玻璃有什麼特點？", o: ["容易折斷", "易碎性", "很有拉伸力"], a: 1, level: "easy" },
+                    { q: "洗澡或洗碗用的海綿，用手捏起來是怎麼樣的？", o: ["軟軟的", "硬邦邦的", "刺刺的"], a: 0, level: "easy" },
+                    { q: "香甜可口的梨子是果樹上自然結出來的，它是？", o: ["人造物品", "自然物品", "電子產品"], a: 1, level: "easy" },
+                    { q: "我們寫字用的木製鉛筆是人類做出來的，它是？", o: ["自然物品", "人造物品", "天然寶石"], a: 1, level: "easy" },
+                    { q: "裁縫師做衣服量度身體尺寸，使用哪種尺比較適合？", o: ["硬邦邦的鐵尺", "軟綿綿的毛線", "可以彎曲的軟尺"], a: 2, level: "easy" },
+                    { q: "不論是自然物品還是人造物品，我們都要怎麼做？", o: ["隨意亂丟", "好好愛惜", "用完就弄壞"], a: 1, level: "easy" },
+                    { q: "玻璃盒 and 厚紙盒相比，哪一個通常比較重？", o: ["玻璃盒", "紙盒", "兩個一樣輕"], a: 0, level: "hard" },
+                    { q: "如果想測試一件物品是不是透光，可以用什麼工具？", o: ["放大鏡", "電筒", "天秤"], a: 1, level: "hard" },
+                    { q: "用電筒玩科學測試時，絕對不能做什麼危險事？", o: ["直接照射自己或別人的眼睛", "照向牆壁", "照向玻璃杯"], a: 0, level: "hard" },
+                    { q: "想最準確地比較兩個蘋果的輕重，應該使用什麼工具？", o: ["用眼睛看", "用雙手感覺", "用天秤來稱量"], a: 2, level: "hard" },
+                    { q: "海綿和橡皮圈在受力時會改變形狀，放手會還原，這代表它們具有？", o: ["易碎性", "透光性", "彈性"], a: 2, level: "hard" },
+                    { q: "古代的人 and 現代人相比，誰會使用比較多「自然物品」？", o: ["古代的人", "現代的人", "大家都一樣"], a: 0, level: "hard" },
+                    { q: "鐵尺很硬、軟尺很軟，這說明了同類物品會有什麼不同？", o: ["顏色一定相同", "因為不同用途而有不同的設計", "軟的尺沒有任何用處"], a: 1, level: "hard" },
+                    { q: "為什麼教室的窗戶要用玻璃做，而不是用厚厚木頭？", o: ["因為玻璃是不透光的", "因為玻璃自己會發光", "因為玻璃透光，能讓太陽光照亮教室"], a: 2, level: "hard" },
+                    { q: "以下哪一項是自然存在的物品，不是由人類製造的？", o: ["課室的鐵閘", "海灘上的碎石頭", "寫字用的原子筆"], a: 1, level: "hard" },
+                    { q: "家裏的玻璃杯碎了，這提醒我們玻璃使用時要？", o: ["小心輕放，注意它的易碎性", "用力摔它，看它會不會彈起來", "不需要理會"], a: 0, level: "hard" }
+                ]
+            },
+            2: {
+                title: "🚀 未來科技大發現",
+                bgColor: "linear-gradient(180deg, #E0F2F1 0%, #E3F2FD 100%)",
+                intro: "歡迎來到科技世界！在這裡我們會比較以前 and 現在的電子產品，並學習如何健康、安全、有禮貌地使用這些神奇的科技發明，避免玩得太久傷害身體喔！",
+                example: "看平板電腦時，眼睛要離屏幕多遠才安全呢？答案：大約30至40厘米（大概是我們手臂的一半長度），而且每看20分鐘就要遠望休息20秒喔！",
+                questions: [
+                    { q: "現代智能手機能做什麼「從前手機」做不到的事？", o: ["撥打普通電話", "進行視像通話", "用天線收訊號"], a: 1, level: "easy" },
+                    { q: "以下哪一個是現代人常用而從前沒有的科技產品？", o: ["平板電腦", "舊式按鍵手機", "黑白電視機"], a: 0, level: "easy" },
+                    { q: "以下哪一個是以前（爺爺奶奶小時候）常見的舊式電子產品？", o: ["智能手錶", "舊式按鍵手機", "無線藍牙耳機"], a: 1, level: "easy" },
+                    { q: "為了身體健康，每天除了使用電腦，我們還必須要做什麼？", o: ["一值躺著睡課", "多做運動鍛煉身體", "一直看電視"], a: 1, level: "easy" },
+                    { q: "在巴士上用手機聽歌或看影片時，應該怎麼做才是有禮貌？", o: ["把聲音開到最大", "戴上耳機並注意音量", "大聲和旁邊的人說話"], a: 1, level: "easy" },
+                    { q: "在馬路上行走時，我們可以一邊走路一邊玩手機嗎？", o: ["可以，因為我很聰明", "不可以，這樣非常危險", "只要走得慢就可以"], a: 1, level: "easy" },
+                    { q: "我們每天玩平板電腦或手機的連續時間，不應該多於多少小時？", o: ["兩小時", "五小時", "十小時"], a: 0, level: "easy" },
+                    { q: "看平板或電腦時，眼睛與屏幕最少要保持多遠的距離？", o: ["5厘米（貼著屏幕）", "100厘米（太遠了）", "30至40厘米"], a: 2, level: "easy" },
+                    { q: "我們用電腦或手機上網學習時，應該有什麼？", o: ["沒有計劃，隨便亂點", "明確的學習目標", "一邊玩遊戲一邊聊天"], a: 1, level: "easy" },
+                    { q: "如果想用平板電腦拍下同學的可愛樣貌，應該先怎麼做？", o: ["偷偷拍下不告訴他", "先徵得同學和老師的同意", "直接拍完放上網"], a: 1, level: "easy" },
+                    { q: "現在的智能電視 and 以前的舊電視相比，有什麼優點？", o: ["電視體積更大更重", "畫面更加清晰明亮", "不能連接網絡"], a: 1, level: "hard" },
+                    { q: "如果天天長時間玩電子遊戲不休息，會對身體造成什麼壞處？", o: ["視力受損、肌肉酸痛、體能下降", "身體會變得強壯", "會變得非常有活力"], a: 0, level: "hard" },
+                    { q: "護眼的「20-20-20」原則是：每看屏幕20分鐘，便應該？", o: ["玩遊戲20分鐘", "閉上眼睛睡覺兩小時", "遠望休息20秒"], a: 2, level: "hard" },
+                    { q: "以前的舊式電腦 and 現在的手提電腦相比，在外形上有什麼特點？", o: ["體積比較大，不方便攜帶", "比現在的手提電腦還要輕", "都是輕觸式屏幕的"], a: 0, level: "hard" },
+                    { q: "在圖書館看教學影片時，為了不打擾別人，我們應該？", o: ["戴上耳機，保持安靜", "把聲音開小一點點直接播", "大聲叫同學一起看"], a: 0, level: "hard" },
+                    { q: "手提電腦對我們的日常學習和生活有什麼好處？", o: ["讓我們不用再看書本", "可以隨身攜帶，方便處理文件", "可以用來代替體育課"], a: 1, level: "hard" },
+                    { q: "為什麼在馬路上走路時絕對不能看手機？", o: ["因為會看不清路上的危險，容易發生交通意外", "因為手機在外面會壞掉", "因為媽媽會生氣"], a: 0, level: "hard" },
+                    { q: "現在的智能手錶除了解時間，還能幫我們做什麼？", o: ["幫我們煮飯洗碗", "量度心跳和記錄運動數據", "代替我們去學校上課"], a: 1, level: "hard" },
+                    { q: "以下哪一項是使用科技產品的「好習慣」？", o: ["躲在黑暗的被窩裡看手機", "一邊吃飯一邊看電視", "控制玩遊戲時間，定時讓眼睛休息"], a: 2, level: "hard" },
+                    { q: "用手機或電腦網上學習時，若遇到不懂的網站彈出，應該？", o: ["隨便點擊同意", "立刻關掉，並告訴爸爸媽媽或老師", "輸入自己的名字和生日"], a: 1, level: "hard" }
+                ]
+            },
+            3: {
+                title: "🏃 精靈運動與位置",
+                bgColor: "linear-gradient(180deg, #FFF9E6 0%, #F5F7FA 100%)",
+                intro: "歡迎來到運動與位置的世界！我們會學習用「前、後、左、右」和「遠、近」來告訴別人你在哪裡。還會一起動起來，比較誰運動得快，誰運動得慢喔！",
+                example: "如果我們坐摩天輪轉了一大圈，最後回到起點，我們的位置有改變嗎？答案：與起點相比，我們的位置「沒有改變」喔！因為我們又回到了同一個起點地方！",
+                questions: [
+                    { q: "我們可以用什麼來清楚地告訴別人某個物品的位置？", o: ["顏色和大小", "方向和距離", "味道和聲音"], a: 1, level: "easy" },
+                    { q: "以下哪一個詞語不是用來描述方向的？", o: ["左面", "後面", "很慢"], a: 2, level: "easy" },
+                    { q: "在路口停在紅綠燈前面的小汽車，此時它有運動嗎？", o: ["有運動", "沒有運動", "正在天空飛"], a: 1, level: "easy" },
+                    { q: "在公園裡正高高盪著鞦韆的小朋友，他有運動嗎？", o: ["有運動", "沒有運動", "在睡覺"], a: 0, level: "easy" },
+                    { q: "步行、騎單車、坐飛機，哪一種前進的方式最慢？", o: ["步行", "騎單車", "坐飛機"], a: 0, level: "easy" },
+                    { q: "步行、坐巴士、坐飛機，哪一種旅行的方式最快？", o: ["步行", "坐巴士", "坐飛機"], a: 2, level: "easy" },
+                    { q: "你坐摩天輪轉了一圈回到原來的起點，和起點相比，你的位置有改變嗎？", o: ["有改變", "沒有改變", "變高了"], a: 1, level: "easy" },
+                    { q: "如果想知道兩個物體誰運動得比較快，我們必須進行什麼？", o: ["稱量重量", "測試透光", "相互比較"], a: 2, level: "easy" },
+                    { q: "在賽跑比賽中，跑得最快的人會最先到達哪裡？", o: ["終點線", "起點處", "旁邊的看台"], a: 0, level: "easy" },
+                    { q: "小青蛇在草地上飛快地爬來爬去，它此時有運動嗎？", o: ["有運動", "沒有運動", "正在閉眼睡覺"], a: 0, level: "easy" },
+                    { q: "如果一個物體完全沒有運動，那麼它的位置會怎樣？", o: ["會不斷改變", "不會改變", "會消失不見"], a: 1, level: "hard" },
+                    { q: "站在講台上的老師，對於坐在前排和後排的同學，老師和他們的什麼不同？", o: ["老師的衣服顏色", "距離（前排近，後排遠）", "老師的年齡大小"], a: 1, level: "hard" },
+                    { q: "車輪在馬路上滾動，陀螺在地上旋轉，滾動和旋轉都是？", o: ["物體運動的例子", "靜止不動的例子", "自然物品的特點"], a: 0, level: "hard" },
+                    { q: "坐巴士和騎單車相比，哪一個通常移動得比較快？", o: ["坐巴士", "騎單車", "大家都一樣慢"], a: 0, level: "hard" },
+                    { q: "在賽跑中，如果有兩個小朋友同時起跑，我們怎樣知道誰跑得比較慢？", o: ["看誰穿的鞋子比較漂亮", "看誰在相同時間內跑得距離比較短", "看誰的個子比較高"], a: 1, level: "hard" },
+                    { q: "一隻小熊在山洞裡靜止著睡覺，此時小熊有運動嗎？", o: ["有運動", "沒有運動", "在不停滾動"], a: 1, level: "hard" },
+                    { q: "小華坐在小明的前面，那麼從小明的角度看，小華是在他的？", o: ["前面", "後面", "左面"], a: 0, level: "hard" },
+                    { q: "如果天空只有一隻小鳥在飛，沒有其他東西，我們能直接判斷牠飛得快慢嗎？", o: ["能，因為牠在飛", "不能，因為沒有另一個物體作比較，無法確定快慢", "能，因為鳥類都很慢"], a: 1, level: "hard" },
+                    { q: "小紅距離學校5米，小藍距離學校10米，誰離學校比較近？", o: ["小紅", "小藍", "大家都一樣近"], a: 0, level: "hard" },
+                    { q: "小狗跑步、火車行駛、飛機飛行，將它們的速度從最快到最慢排序，哪一項正確？", o: ["飛機 > 火車 > 小狗", "小狗 > 火車 > 飛機", "火車 > 小狗 > 飛機"], a: 0, level: "hard" }
+                ]
+            },
+            4: {
+                title: "🔮 光影城堡探秘",
+                bgColor: "linear-gradient(180deg, #F3E5F5 0%, #ECEFF1 100%)",
+                intro: "歡迎來到光影城堡！我們會尋找會自己發光的「光源」，還會用手影做出可愛的動物。我們要探秘影子是怎麼產生的，還有美麗的彩虹是怎麼形成的喔！",
+                example: "把手電筒慢慢移近玩具熊，玩具熊的影子會變大還是變小呢？答案：物體越接近光源，背後的影子就會「變大」喔！移遠則會變小！",
+                questions: [
+                    { q: "以下哪一個天體會自己發光，是真正的自然光源？", o: ["美麗的月亮", "明亮的太陽", "閃閃發光的水晶"], a: 1, level: "easy" },
+                    { q: "晚上停電時，我們可以用哪個人造光源來暫時照明？", o: ["關掉的手機", "手電筒", "不透光的木板"], a: 1, level: "easy" },
+                    { q: "天上的月亮很亮，它是光源嗎？", o: ["是，因為它會發光", "不是，它只是反射太陽的光", "是，因為它是自然界的一部分"], a: 1, level: "easy" },
+                    { q: "當光線被擋住時，影子會出現在物體的哪一面？", o: ["迎光面（面對光的一面）", "背光面（背對光的一面）", "最頂部上面"], a: 1, level: "easy" },
+                    { q: "光線照在以下哪種物體上，會產生最明顯、最清晰的影子？", o: ["透明的乾淨玻璃", "不透光的紙板", "薄薄的透明塑料袋"], a: 1, level: "easy" },
+                    { q: "當我們把手電筒慢慢「移近」物體時，物體的影子會發生什麼變化？", o: ["影子會變大", "影子會變小", "影子會瞬間消失"], a: 0, level: "easy" },
+                    { q: "如果你把皮球向左滾動，皮球的影子會向哪一個方向移動？", o: ["向右移動", "向左移動（和皮球相同）", "留在原地不動"], a: 1, level: "easy" },
+                    { q: "我們在天空中看見的美麗彩虹，通常在什麼時候出現？", o: ["大晴天的中午", "下大雨的夜晚", "剛下完雨、太陽出來的時候"], a: 2, level: "easy" },
+                    { q: "大樓的玻璃幕牆能反射刺眼的陽光，它是光源嗎？", o: ["不是，它自己不會發光", "是，因為它看起來很亮", "是，它是人造光源"], a: 0, level: "easy" },
+                    { q: "夏天夜裡在草叢中一閃一閃發光的螢火蟲，它是？", o: ["自然光源", "人造光源", "不是光源"], a: 0, level: "easy" },
+                    { q: "如果你把手電筒向右移動，物體靜止不動，影子的移動方向是？", o: ["也向右移動（相同）", "向左移動（相反）", "向下移動"], a: 1, level: "hard" },
+                    { q: "看似單色白色的太陽光，其實裡面包含多少種顏色的光？", o: ["只有一種白色光", "只有紅和藍兩種光", "包含紅橙黃綠青藍紫等多於一種顏色的光"], a: 2, level: "hard" },
+                    { q: "在實驗課上，我們可以用什麼工具把太陽光分散成七彩的光芒？", o: ["放大鏡", "三稜鏡", "平面鏡"], a: 1, level: "hard" },
+                    { q: "雨後晴天，空氣中亮晶晶的什麼東西起到了三稜鏡的作用，分散了光線形成彩虹？", o: ["飄浮的塵埃", "小水滴", "飛過的小鳥"], a: 1, level: "hard" },
+                    { q: "如果你想把牆上的兔子手影「變小」，應該怎麼做？", o: ["把手移近光源（電筒）", "把手移離光源，靠近牆壁", "用更強的手電筒照射"], a: 1, level: "hard" },
+                    { q: "為什麼透明的玻璃杯在手電筒照射下，幾乎看不到影子？", o: ["因為玻璃是不透光的", "因為玻璃會把光線全部反射", "開為玻璃是透光的，光線能穿透過去"], a: 2, level: "hard" },
+                    { q: "以下哪一組物品「都不是」光源？", o: ["月亮、水晶、鏡子", "太陽、螢火蟲、閃電", "蠟燭、街燈、電筒"], a: 0, level: "hard" },
+                    { q: "用手做出小狗的形狀，牆上的影子看起來也是小狗，這說明了？", o: ["影子和物體的形狀是相似的", "影子有自己的生命", "影子的顏色和手一樣"], a: 0, level: "hard" },
+                    { q: "點燃的蠟燭和發光的螢火蟲，它們分別屬於什麼光源？", o: ["蠟燭是自然光源，螢火蟲是人造光源", "蠟燭是人造光源，螢火蟲是自然光源", "兩者都是人造光源"], a: 1, level: "hard" },
+                    { q: "在完全沒有一點點光線的漆黑房間裡，我們會？", o: ["眼睛適應後就能看得很清楚", "什麼東西也看不見", "只能看到白色的東西"], a: 1, level: "hard" }
+                ]
+            },
+            5: {
+                title: "🌞 太陽公公與月亮姐姐",
+                bgColor: "linear-gradient(180deg, #FFF1F0 0%, #ECEFF1 100%)",
+                intro: "歡迎來到日夜交替的世界！我們會學習太陽東升西落的規律，認識人類在白天和夜晚的不同活動，還會探測那些在黑夜裡不睡覺、活潑可愛的夜行性動物喔！",
+                example: "早上上學時面向太陽，我們的右手邊是哪一個方向呢？答案：早上太陽在東方，面向東方時，我們的右手邊就是「南方」喔！",
+                questions: [
+                    { q: "每天清晨，紅彤彤的太陽是從哪一個方向升起來的？", o: ["南方", "東方", "西方"], a: 1, level: "easy" },
+                    { q: "傍晚黃昏，太陽慢慢落山，它是落向哪一個方向？", o: ["西方", "北方", "東方"], a: 0, level: "easy" },
+                    { q: "在一天之中，太陽在什麼時候升得最高，此時天色最明亮？", o: ["早上", "中午", "黃昏"], a: 1, level: "easy" },
+                    { q: "當黑夜來臨，天色昏暗，大部分的小朋友此時都在做什麼？", o: ["去學校上課", "在床上睡覺休息", "去公園遠足"], a: 1, level: "easy" },
+                    { q: "以下哪一種小動物最喜歡在黑夜裡飛來飛去捉昆蟲和活動？", o: ["美麗的蝴蝶", "活潑的小狗", "神奇的貓頭鷹"], a: 2, level: "easy" },
+                    { q: "如果早晨你面向東方的太陽，你的背後是什麼方向？", o: ["西方", "南方", "北方"], a: 0, level: "easy" },
+                    { q: "以下哪種植物非常有趣，它的花朵和葉子會追隨太陽的方向轉動？", o: ["向日葵", "黃槐", "仙人掌"], a: 0, level: "easy" },
+                    { q: "黑夜的郊野公園非常黑暗而且沒有街燈，我們適合去那裡遠足嗎？", o: ["適合，因為很刺激", "不適合，因為看不清路，非常不安全", "適合，可以帶手電筒跑"], a: 1, level: "easy" },
+                    { q: "中午12點放學時，太陽高高掛在我們頭頂的哪一個方向？", o: ["西方低空", "東方低空", "南方高空"], a: 2, level: "easy" },
+                    { q: "像貓頭鷹和蝙蝠這樣白天睡覺、黑夜出來活動的動物，叫作？", o: ["白天動物", "夜行性動物", "飛行性動物"], a: 1, level: "easy" },
+                    { q: "在沒有電燈的古代，人們過著「日出而作，日入而息」的生活，意思是？", o: ["太陽出來就去工作，太陽落山就回家休息", "每天都睡二十個小時", "白天睡覺，晚上工作"], a: 0, level: "hard" },
+                    { q: "為什麼有些職業（如警察、醫護、消防員）在黑夜也需要工作當值？", o: ["因為他們白天不喜歡工作", "為了在夜間也能保護市民安全、照顧病人和維持治安", "因為夜間工資比較高"], a: 1, level: "hard" },
+                    { q: "清晨上學時，如果你的背部朝向太陽，那麼此時你正面對著？", o: ["東方", "西方", "南方"], a: 1, level: "hard" },
+                    { q: "夜晚在馬路上，為什麼街燈多數都會亮起來？", o: ["為了給天上的小鳥照路", "提供光線，保護司機和行人的交通安全", "為了裝飾馬路"], a: 1, level: "hard" },
+                    { q: "下列哪一種動物「不是」在黑夜活動的夜行性動物？", o: ["野豬", "麻雀", "蝙蝠"], a: 1, level: "hard" },
+                    { q: "野豬喜歡在黑夜出來尋找食物，它的哪一種感覺器官特別靈敏？", o: ["聽覺", "嗅覺", "視覺"], a: 1, level: "hard" },
+                    { q: "早上8時，小明面向太陽去上學。請問他面向的是哪一個方向？", o: ["東方", "西方", "南方"], a: 0, level: "hard" },
+                    { q: "黃昏下午6時，小華面向即將落山的太陽。請問他面向的是哪一個方向？", o: ["東方", "西方", "北方"], a: 1, level: "hard" },
+                    { q: "在晴朗的白天，我們一般看不見天空中的什麼天體？", o: ["太陽", "白雲", "月亮和星星"], a: 2, level: "hard" },
+                    { q: "以下哪一項活動最適合在天色昏暗的「黑夜」進行？", o: ["去大草地踢足球", "觀賞璀璨的煙花和賞月", "在學校操場上體育課"], a: 1, level: "hard" }
+                ]
+            }
+        };
+
+        // ── 遊戲運行變數 ──
+        let currentLevelId = null;
+        let questionList = []; 
+        let currentQuestionIndex = 0;
+        let score = 0;
+        
+        // ── 音樂合成器 ──
+        let audioCtx = null;
+        function playSound(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        setTimeout(() => {
+                            let osc = audioCtx.createOscillator();
+                            let gain = audioCtx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            osc.start();
+                            osc.stop(audioCtx.currentTime + 0.35);
+                        }, idx * 75);
+                    });
+                } else if (type === 'wrong') {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
+                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3); 
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.32);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.32);
+                }
+            } catch (e) {
+                console.log("瀏覽器不支援 Web Audio API", e);
+            }
+        }
+
+        // ── 噴灑五彩碎紙特效 (Confetti) ──
+        function triggerConfettiEffect() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+
+            let particles = [];
+            const colors = ['#FFC107', '#FF5722', '#E91E63', '#9C27B0', '#3F51B5', '#00BCD4', '#4CAF50', '#00E676', '#FF3D00'];
+            
+            for (let i = 0; i < 75; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * -canvas.height - 20,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.08 + 0.03,
+                    tiltAngle: 0
+                });
+            }
+            
+            let animationFrameId;
+            let framesRun = 0;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let active = false;
+                
+                particles.forEach((p, idx) => {
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(p.tiltAngle) + 4 + p.r / 2) / 2;
+                    p.x += Math.sin(p.tiltAngle) * 1.5;
+                    p.tilt = Math.sin(p.tiltAngle - idx / 3) * 12;
+                    
+                    if (p.y < canvas.height) {
+                        active = true;
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    ctx.stroke();
+                });
+                
+                framesRun++;
+                if (active && framesRun < 180) { 
+                    animationFrameId = requestAnimationFrame(draw);
+                } else {
+                    canvas.style.display = 'none';
+                    cancelAnimationFrame(animationFrameId);
+                }
+            }
+            draw();
+        }
+
+        // ── 🔊 TTS 慢速廣東話朗讀 ──
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-HK'; 
+                utterance.rate = 0.8; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakTextById(id) {
+            const text = document.getElementById(id).innerText;
+            speakText(text);
+        }
+
+        // ── 頁面切換 ──
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function goHome() {
+            window.speechSynthesis.cancel();
+            document.body.style.background = "linear-gradient(180deg, #FFF3F3 0%, #E0F7FA 100%)";
+            renderMenuStars(); 
+            showScreen('menu-screen');
+        }
+
+        function confirmGoHome() {
+            if (confirm("現在離開關卡，進度不會保存喔！確定要回到主選單嗎？")) {
+                goHome();
+            }
+        }
+
+        // ── 🧹 清除所有記錄 ──
+        function clearAllRecords() {
+            if (confirm("親愛的家長或小朋友，你確定要清除所有關卡的星星和分數紀錄嗎？數據清除後將無法復原喔！")) {
+                for (let i = 1; i <= 5; i++) {
+                    localStorage.removeItem(`p1_science_lvl_${i}_best`);
+                }
+                renderMenuStars();
+                alert("記錄已成功清除！🧹");
+            }
+        }
+
+        // ── 🌟 渲染首頁進度與不同大小星星 ──
+        function renderMenuStars() {
+            for (let i = 1; i <= 5; i++) {
+                const highscore = localStorage.getItem(`p1_science_lvl_${i}_best`);
+                const starEl = document.getElementById(`stars-level-${i}`);
+                
+                if (highscore === null) {
+                    starEl.innerHTML = `
+                        <span class="star-empty">☆</span>
+                        <span class="star-empty">☆</span>
+                        <span class="star-empty">☆</span>
+                        <span class="high-score-badge">尚未挑戰</span>
+                    `;
+                } else {
+                    const scoreNum = parseInt(highscore);
+                    let starHTML = "";
+                    
+                    if (scoreNum === 20) {
+                        starHTML = `
+                            <span class="star-large" title="滿分大金星！">★</span>
+                            <span class="star-large" title="滿分大金星！">★</span>
+                            <span class="star-large" title="滿分大金星！">★</span>
+                        `;
+                    } else if (scoreNum >= 10) {
+                        starHTML = `
+                            <span class="star-small" title="合格！">★</span>
+                            <span class="star-small" title="合格！">★</span>
+                            <span class="star-small" title="合格！">★</span>
+                        `;
+                    } else {
+                        starHTML = `
+                            <span class="star-empty">☆</span>
+                            <span class="star-empty">☆</span>
+                            <span class="star-empty">☆</span>
+                        `;
+                    }
+                    
+                    starEl.innerHTML = `${starHTML} <span class="high-score-badge">🏆 最高紀錄: ${scoreNum}/20 分</span>`;
+                }
+            }
+        }
+
+        // ── 進入導學錦囊 ──
+        function selectLevel(levelId) {
+            currentLevelId = levelId;
+            const data = levelData[levelId];
+            document.body.style.background = data.bgColor;
+            
+            document.getElementById('intro-level-title').innerText = data.title;
+            document.getElementById('intro-summary-text').innerText = data.intro;
+            document.getElementById('intro-example-text').innerText = data.example;
+            
+            showScreen('intro-screen');
+            // speakText("這關我們來學習：" + data.intro); // 根據要求：取消自動讀題
+        }
+
+        // ── 抽取「10簡單 + 10困難」混合題目並開始 ──
+        function startLevel() {
+            const allQs = levelData[currentLevelId].questions;
+            
+            const easyPool = allQs.filter(q => q.level === 'easy');
+            const hardPool = allQs.filter(q => q.level === 'hard');
+            
+            function shuffle(arr) {
+                return arr.sort(() => Math.random() - 0.5);
+            }
+            
+            shuffle(easyPool);
+            shuffle(hardPool);
+            
+            const selectedEasy = easyPool.slice(0, 10);
+            const selectedHard = hardPool.slice(0, 10);
+            
+            questionList = [...selectedEasy, ...selectedHard].map((q, idx) => ({
+                ...q,
+                globalIndex: idx, 
+                userAnswer: null, 
+                firstAttemptCorrect: null 
+            }));
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.getElementById('quiz-level-name').innerText = levelData[currentLevelId].title;
+            showScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        // ── 載入題目 ──
+        function loadQuestion() {
+            window.speechSynthesis.cancel();
+            document.getElementById('wrong-next-area').style.display = 'none'; 
+            const currentQuestion = questionList[currentQuestionIndex];
+            
+            const displayNum = currentQuestionIndex + 1;
+            document.getElementById('quiz-progress').innerText = `${displayNum} / 20`;
+            document.getElementById('progress-fill').style.width = `${(displayNum / 20) * 100}%`;
+            
+            const badge = document.getElementById('difficulty-badge');
+            if (currentQuestion.level === 'easy') {
+                badge.innerText = `🟢 簡單挑戰 (第 ${displayNum} 題)`;
+                badge.className = "difficulty-tag tag-easy";
+            } else {
+                badge.innerText = `🔴 精英挑戰 (第 ${displayNum} 題)`;
+                badge.className = "difficulty-tag tag-hard";
+            }
+            
+            document.getElementById('question-text').innerText = currentQuestion.q;
+            
+            const optionsContainer = document.querySelector('.options-container');
+            optionsContainer.innerHTML = '';
+            
+            currentQuestion.o.forEach((optionText, idx) => {
+                const isSelected = currentQuestion.userAnswer === idx;
+                const isCorrect = currentQuestion.a === idx;
+                
+                const card = document.createElement('div');
+                card.className = "option-card";
+                
+                const letter = ["A", "B", "C"][idx];
+                const contentSpan = document.createElement('span');
+                contentSpan.innerHTML = `<b>${letter}.</b> ${optionText}`;
+                card.appendChild(contentSpan);
+                
+                const speakOptBtn = document.createElement('button');
+                speakOptBtn.className = "speak-opt-btn";
+                speakOptBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+                speakOptBtn.onclick = function(e) {
+                    e.stopPropagation(); 
+                    speakText(`選項 ${letter}：${optionText}`);
+                };
+                card.appendChild(speakOptBtn);
+                
+                if (currentQuestion.userAnswer !== null) {
+                    card.classList.add('disabled');
+                    if (isSelected) {
+                        card.classList.add(isCorrect ? 'correct-picked' : 'wrong-picked');
+                    } else if (isCorrect) {
+                        card.classList.add('correct-unpicked');
+                    }
+                } else {
+                    card.onclick = function() { checkAnswer(idx); };
+                }
+                
+                optionsContainer.appendChild(card);
+            });
+            
+            document.getElementById('nav-prev-btn').disabled = (currentQuestionIndex === 0);
+            
+            const nextBtn = document.getElementById('nav-next-btn');
+            if (currentQuestionIndex === 19) {
+                nextBtn.innerHTML = `🏁 查看結果`;
+            } else {
+                nextBtn.innerHTML = `下一頁 <i class="fa-solid fa-caret-right"></i>`;
+            }
+            
+            nextBtn.disabled = false; 
+            // speakCurrentQuestion(); // 根據要求：取消自動讀題
+        }
+
+        // ── 朗讀題目全體 ──
+        function speakCurrentQuestion() {
+            const currentQuestion = questionList[currentQuestionIndex];
+            const displayNum = currentQuestionIndex + 1;
+            speakText(`第${displayNum}題：${currentQuestion.q}。 A：${currentQuestion.o[0]}。 B：${currentQuestion.o[1]}。 C：${currentQuestion.o[2]}。`);
+        }
+
+        // ── 檢查答題 ──
+        function checkAnswer(selectedIndex) {
+            const currentQuestion = questionList[currentQuestionIndex];
+            if (currentQuestion.userAnswer !== null) return; 
+            
+            currentQuestion.userAnswer = selectedIndex;
+            const isCorrect = (selectedIndex === currentQuestion.a);
+            currentQuestion.firstAttemptCorrect = isCorrect;
+            
+            if (isCorrect) {
+                playSound('correct');
+                triggerConfettiEffect();
+            } else {
+                playSound('wrong');
+                document.getElementById('wrong-next-area').style.display = 'block';
+            }
+            
+            loadQuestion();
+        }
+
+        // ── 上一題 ──
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        // ── 下一題或進入結算 ──
+        function nextQuestion() {
+            if (currentQuestionIndex < 19) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishAndShowSummary();
+            }
+        }
+
+        // ── 實時動態計算當前關卡分數並覆蓋最高紀錄 ──
+        function recalculateAndSaveScore() {
+            let correctCount = 0;
+            questionList.forEach(q => {
+                if (q.userAnswer === q.a) {
+                    correctCount++;
+                }
+            });
+            score = correctCount;
+
+            document.getElementById('score-text').innerText = `${score} / 20 分`;
+
+            const emojiEl = document.getElementById('result-emoji');
+            const evalEl = document.getElementById('evaluation-text');
+            
+            let evaluation = "";
+            let emoji = "";
+            if (score === 20) {
+                emoji = "🏆";
+                evaluation = "太神奇了！你得到了滿分！獲得「超級科學小博士」稱號！👑 (獲得了3顆亮亮大金星！)";
+            } else if (score >= 10) {
+                emoji = "⭐";
+                evaluation = "做得十分出色！你是一位厲害的「科學探險家」！👍 (獲得了3顆合格星星！)";
+            } else if (score >= 5) {
+                emoji = "🎈";
+                evaluation = "做得好！你獲得了獎牌，繼續挑戰，只要拿到10分以上就能得到星星喔！";
+            } else {
+                emoji = "🌱";
+                evaluation = "加油喔！多看幾次「學習小錦囊」，你下次一定會拿到星星的！";
+            }
+            
+            emojiEl.innerText = emoji;
+            evalEl.innerText = evaluation;
+
+            const currentBestStr = localStorage.getItem(`p1_science_lvl_${currentLevelId}_best`);
+            const currentBest = currentBestStr !== null ? parseInt(currentBestStr) : -1;
+            
+            if (score > currentBest) {
+                localStorage.setItem(`p1_science_lvl_${currentLevelId}_best`, score);
+                renderMenuStars(); 
+            }
+        }
+
+        // ── 關卡完成，顯示總結頁面 ──
+        function finishAndShowSummary() {
+            window.speechSynthesis.cancel();
+            recalculateAndSaveScore();
+            renderSummaryList();
+            showScreen('result-screen');
+            
+            const evalText = document.getElementById('evaluation-text').innerText;
+            // speakText(`冒險結束了！你得到了 ${score} 分。${evalText}`); // 根據要求：取消自動讀題
+        }
+
+        // ── 渲染總結列表（容錯：支持未回答題目） ──
+        function renderSummaryList() {
+            const container = document.getElementById('summary-list-container');
+            container.innerHTML = '';
+            
+            questionList.forEach((q, idx) => {
+                const item = document.createElement('div');
+                const isCorrect = (q.userAnswer === q.a);
+                item.className = `summary-item ${isCorrect ? 'correct' : 'wrong'}`;
+                
+                const textSpan = document.createElement('span');
+                textSpan.style.flex = "1";
+                
+                const userAnsText = q.userAnswer !== null ? q.o[q.userAnswer] : "<span style='color:#FF5722; font-weight:bold;'>（未回答/已跳過 ⏭️）</span>";
+                
+                textSpan.innerHTML = `<b>第 ${idx+1} 題：</b> ${q.q}<br>` + 
+                                     `<span style="font-size:0.85rem; color:#666;">你選了：${userAnsText} | 正確答案：${q.o[q.a]}</span>`;
+                item.appendChild(textSpan);
+                
+                if (!isCorrect) {
+                    const redoBtn = document.createElement('button');
+                    redoBtn.className = "summary-redo-btn";
+                    redoBtn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> 重新做這題`;
+                    redoBtn.onclick = function() {
+                        openRedoModal(idx);
+                    };
+                    item.appendChild(redoBtn);
+                } else {
+                    const okBadge = document.createElement('span');
+                    okBadge.style.color = "#4CAF50";
+                    okBadge.style.fontWeight = "bold";
+                    okBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> 答對了！`;
+                    item.appendChild(okBadge);
+                }
+                
+                container.appendChild(item);
+            });
+        }
+
+        // ── 🔄 錯題重新挑戰 Modal 彈窗 ──
+        let redoQuestionIndex = null;
+        function openRedoModal(questionIdx) {
+            redoQuestionIndex = questionIdx;
+            const q = questionList[questionIdx];
+            
+            document.getElementById('redo-modal-title').innerHTML = `<i class="fa-solid fa-rotate-right"></i> 重新挑戰第 ${questionIdx+1} 題`;
+            document.getElementById('redo-question-text').innerText = q.q;
+            document.getElementById('redo-feedback').innerText = '';
+            document.getElementById('redo-close-btn').style.display = 'none';
+            
+            document.getElementById('redo-speak-q-btn').onclick = function() {
+                speakText(`重新挑戰第${questionIdx+1}題：${q.q}。 A：${q.o[0]}。 B：${q.o[1]}。 C：${q.o[2]}。`);
+            };
+            
+            const container = document.getElementById('redo-options-container');
+            container.innerHTML = '';
+            
+            q.o.forEach((optionText, idx) => {
+                const card = document.createElement('div');
+                card.className = "option-card";
+                card.id = `redo-opt-${idx}`;
+                
+                const letter = ["A", "B", "C"][idx];
+                const contentSpan = document.createElement('span');
+                contentSpan.innerHTML = `<b>${letter}.</b> ${optionText}`;
+                card.appendChild(contentSpan);
+                
+                const speakOptBtn = document.createElement('button');
+                speakOptBtn.className = "speak-opt-btn";
+                speakOptBtn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+                speakOptBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    speakText(`選項 ${letter}：${optionText}`);
+                };
+                card.appendChild(speakOptBtn);
+                
+                card.onclick = function() {
+                    if (idx === q.a) {
+                        playSound('correct');
+                        triggerConfettiEffect();
+                        
+                        document.querySelectorAll('#redo-options-container .option-card').forEach(c => c.classList.add('disabled'));
+                        card.classList.add('correct-picked');
+                        
+                        document.getElementById('redo-feedback').innerHTML = '<span style="color:#4CAF50;">🎉 太厲害了！你終於答對了！🌟</span>';
+                        document.getElementById('redo-close-btn').style.display = 'inline-block';
+                        
+                        questionList[redoQuestionIndex].userAnswer = q.a; 
+                        recalculateAndSaveScore(); 
+                        
+                        // speakText("太棒了，這次答對了！"); // 根據要求：取消自動讀題
+                    } else {
+                        playSound('wrong');
+                        card.classList.add('wrong-picked');
+                        document.getElementById('redo-feedback').innerHTML = '<span style="color:#F44336;">❤️ 不對喔，再試試看其他答案！</span>';
+                        // speakText("不對喔，再動動腦筋試試看！"); // 根據要求：取消自動讀題
+                    }
+                };
+                
+                container.appendChild(card);
+            });
+            
+            document.getElementById('redo-modal').style.display = 'flex';
+            // speakText("重新挑戰！請動動腦筋選出正確答案。如果答錯了，可以繼續猜，直到答對為止喔！"); // 根據要求：取消自動讀題
+        }
+
+        function closeRedoModal() {
+            document.getElementById('redo-modal').style.display = 'none';
+            renderSummaryList(); 
+        }
+
+        // 頁面初始化
+        window.onload = function() {
+            renderMenuStars();
+        };
+    </script>
+</body>
+</html>

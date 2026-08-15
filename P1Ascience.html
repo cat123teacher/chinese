@@ -1,0 +1,5778 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小一科學大冒險 - Science Adventure Game</title>
+    <!-- Font Awesome Icons for premium children visual design -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=ZCOOL+KuaiLe&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary-font: 'Fredoka', 'Noto Sans TC', sans-serif;
+            --title-font: 'ZCOOL KuaiLe', 'Noto Sans TC', sans-serif;
+            --main-bg: #FFF9E6;
+            --accent-purple: #9C27B0;
+            --text-dark: #3E2723;
+            --cartoon-border: 4px solid #3E2723;
+            --btn-border: 3px solid #3E2723;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--primary-font);
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF2CC 50%, #FFEBE0 100%);
+            /* Playful background pattern with subtle floating pastel circles */
+            background-image: 
+                radial-gradient(circle at 10% 15%, rgba(255, 152, 0, 0.08) 120px, transparent 120px),
+                radial-gradient(circle at 90% 10%, rgba(76, 175, 80, 0.07) 150px, transparent 150px),
+                radial-gradient(circle at 80% 85%, rgba(33, 150, 243, 0.08) 140px, transparent 140px),
+                radial-gradient(circle at 15% 80%, rgba(156, 39, 176, 0.06) 160px, transparent 160px);
+            background-size: 100% 100%;
+            background-attachment: fixed;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            padding: 15px 8px;
+        }
+
+        /* Responsive full container */
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: #FFFFFF;
+            border: 6px solid #3E2723;
+            border-radius: 36px;
+            box-shadow: 0 12px 0 #3E2723, 0 20px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 78vh;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.255);
+            margin-bottom: 25px;
+        }
+
+        /* View Animation & Padding optimizations */
+        .view {
+            display: none;
+            flex-direction: column;
+            padding: 24px 20px;
+            flex-grow: 1;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Sound Buttons styled beautifully as floating candy */
+        .speaker-btn {
+            background: #E0F2F1;
+            border: var(--btn-border);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #3E2723;
+            transition: all 0.1s ease;
+            outline: none;
+            flex-shrink: 0;
+        }
+        .speaker-btn:hover {
+            background: #B2DFDB;
+        }
+        .speaker-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #3E2723;
+        }
+        .speaker-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #00796B;
+        }
+
+        .speak-option-btn {
+            background: #FFF3E0;
+            border: 2px solid #3E2723;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #3E2723;
+            transition: all 0.1s ease;
+            font-size: 16px;
+            color: #E65100;
+            flex-shrink: 0;
+            outline: none;
+        }
+        .speak-option-btn:hover {
+            background: #FFE0B2;
+        }
+        .speak-option-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #3E2723;
+        }
+
+        /* Header Style */
+        .header {
+            text-align: center;
+            padding: 22px 10px 18px 10px;
+            background: #FFEB3B;
+            border-bottom: 6px solid #3E2723;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .logo-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 3px solid #3E2723;
+            box-shadow: 0 4px 0 #3E2723;
+            background: white;
+            object-fit: cover;
+        }
+
+        .header h1 {
+            font-family: var(--title-font);
+            font-size: 32px;
+            color: #FF5722;
+            text-shadow: 2px 2px 0 #FFFFFF, 4px 4px 0 #FF9800, 5px 5px 0 #3E2723;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #5D4037;
+            font-weight: bold;
+            margin-top: 4px;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px dashed rgba(62,39,35,0.2);
+        }
+
+        /* Home View: Level Grid Optimized for Mobile/iPad */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Force 2-columns on mobile, highly thumb-friendly! */
+            gap: 14px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 550px) {
+            .level-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on iPad/Tablet sizes */
+                gap: 16px;
+            }
+        }
+
+        .level-card {
+            border-radius: 22px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 4px solid #3E2723;
+            box-shadow: 0 6px 0 #3E2723;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 165px;
+        }
+
+        .level-card:hover {
+            transform: scale(1.04) translateY(-3px);
+            box-shadow: 0 9px 0 #3E2723;
+        }
+
+        .level-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #3E2723;
+        }
+
+        .level-icon {
+            font-size: 42px;
+            margin-bottom: 5px;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .level-title {
+            font-family: var(--primary-font);
+            font-weight: 700;
+            font-size: 15px;
+            color: #3E2723;
+            line-height: 1.3;
+            margin-bottom: 6px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-badge {
+            background: #FF5722;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 12px;
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            border: 2px solid #3E2723;
+            box-shadow: 0 3px 0 #3E2723;
+        }
+
+        /* Progress Star System styles */
+        .stars-container {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3px;
+            height: 25px;
+        }
+
+        .small-star {
+            font-size: 17px;
+            color: #FFC107;
+            text-shadow: 1px 1px 0 #3E2723;
+        }
+
+        .big-star {
+            font-size: 24px;
+            color: #FFD700;
+            display: inline-block;
+            animation: starScale 0.8s ease-in-out infinite alternate;
+            filter: drop-shadow(1px 1px 0 #3E2723);
+        }
+
+        @keyframes starScale {
+            from { transform: scale(1); }
+            to { transform: scale(1.18); }
+        }
+
+        .empty-star {
+            font-size: 16px;
+            color: #B0BEC5;
+            text-shadow: none;
+        }
+
+        .level-score-display {
+            font-size: 11px;
+            font-weight: bold;
+            color: #5D4037;
+            margin-top: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1px 6px;
+            border-radius: 8px;
+            border: 1px dashed rgba(62,39,35,0.3);
+        }
+
+        /* Intro View: Teaching & Examples */
+        .intro-box {
+            background: #FFFDE7;
+            border: 4px solid #3E2723;
+            border-radius: 22px;
+            padding: 18px;
+            margin-bottom: 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #4E342E;
+            box-shadow: 0 4px 0 #3E2723;
+            text-align: justify;
+        }
+
+        .intro-title-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .intro-teaching-text {
+            font-weight: bold;
+            font-size: 18px;
+            color: #E65100;
+        }
+
+        .example-box {
+            background: #E8F5E9;
+            border: 3px dashed #3E2723;
+            border-radius: 18px;
+            padding: 15px;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .example-tag {
+            background: #4CAF50;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            border: 2px solid #3E2723;
+        }
+
+        .example-q {
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #2E7D32;
+            font-size: 16px;
+            padding-top: 5px;
+        }
+
+        .example-opt {
+            background: white;
+            border: 2px solid #3E2723;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .example-opt.correct {
+            background: #C8E6C9;
+            color: #1B5E20;
+        }
+
+        .example-explain {
+            font-size: 13px;
+            color: #1B5E20;
+            margin-top: 10px;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            border: 2px solid #3E2723;
+        }
+
+        /* Buttons and Navigation Row - Responsive & Slick */
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 12px;
+        }
+
+        .btn {
+            font-family: var(--title-font);
+            font-size: 22px;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: var(--btn-border);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+            outline: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(4px) !important;
+        }
+
+        .btn-green {
+            background: #4CAF50;
+            box-shadow: 0 5px 0 #2E7D32, inset 0 -4px 0 rgba(0,0,0,0.15);
+        }
+        .btn-green:active {
+            box-shadow: 0 1px 0 #2E7D32, inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        .btn-orange {
+            background: #FF9800;
+            box-shadow: 0 5px 0 #E65100, inset 0 -4px 0 rgba(0,0,0,0.15);
+        }
+        .btn-orange:active {
+            box-shadow: 0 1px 0 #E65100, inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        .btn-red {
+            background: #E53935;
+            box-shadow: 0 5px 0 #B71C1C, inset 0 -4px 0 rgba(0,0,0,0.15);
+        }
+        .btn-red:active {
+            box-shadow: 0 1px 0 #B71C1C, inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        .btn-blue {
+            background: #2196F3;
+            box-shadow: 0 5px 0 #1565C0, inset 0 -4px 0 rgba(0,0,0,0.15);
+            font-size: 18px;
+            padding: 10px 16px;
+        }
+        .btn-blue:active {
+            box-shadow: 0 1px 0 #1565C0, inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        .btn-purple {
+            background: #9C27B0;
+            box-shadow: 0 6px 0 #7B1FA2, inset 0 -4px 0 rgba(0,0,0,0.15);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn-purple:active {
+            box-shadow: 0 2px 0 #7B1FA2, inset 0 -2px 0 rgba(0,0,0,0.15);
+        }
+
+        /* Play View: Question Board */
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            background: #ECEFF1;
+            padding: 8px 12px;
+            border-radius: 16px;
+            border: 3px solid #3E2723;
+            box-shadow: 0 3px 0 #3E2723;
+        }
+
+        .progress-text {
+            font-weight: 900;
+            color: #37474F;
+            font-size: 14px;
+        }
+
+        .score-badge {
+            background: #FFEB3B;
+            border: 2px solid #3E2723;
+            color: #F57F17;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 13px;
+            box-shadow: 0 2px 0 #3E2723;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid #3E2723;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: #FAFAFA;
+            border: 4px solid #3E2723;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 15px;
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 6px 0 #3E2723;
+        }
+
+        .question-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .difficulty-indicator {
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+            border: 2px solid #3E2723;
+            box-shadow: 0 2px 0 #3E2723;
+        }
+
+        .diff-easy {
+            background: #4CAF50;
+        }
+
+        .diff-hard {
+            background: #E53935;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1.45;
+            color: #2D3748;
+            flex-grow: 1;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* Claymorphic option list */
+        .option-item {
+            background: white;
+            border: 3px solid #3E2723;
+            border-radius: 18px;
+            padding: 12px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 5px 0 #3E2723, inset 0 -3px 0 rgba(0,0,0,0.05);
+        }
+
+        .option-item:hover {
+            background: #FAFAFA;
+        }
+
+        .option-item:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #3E2723;
+        }
+
+        .option-main-click {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .option-label {
+            background: #ECEFF1;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #546E7A;
+            flex-shrink: 0;
+            border: 2px solid #3E2723;
+            box-shadow: 0 2px 0 #3E2723;
+        }
+
+        .option-text {
+            flex-grow: 1;
+            color: #37474F;
+        }
+
+        /* Correct / Wrong highlighters */
+        .option-item.correct-choice {
+            border-color: #3E2723 !important;
+            background: #E8F5E9 !important;
+            box-shadow: 0 5px 0 #2E7D32 !important;
+            color: #2E7D32 !important;
+        }
+        .option-item.correct-choice .option-label {
+            background: #4CAF50 !important;
+            color: white !important;
+            border-color: #3E2723 !important;
+        }
+        .option-item.correct-choice .option-text {
+            color: #1B5E20 !important;
+        }
+
+        .option-item.wrong-choice {
+            border-color: #3E2723 !important;
+            background: #FBE9E7 !important;
+            box-shadow: 0 5px 0 #D84315 !important;
+            color: #C62828 !important;
+        }
+        .option-item.wrong-choice .option-label {
+            background: #FF5722 !important;
+            color: white !important;
+            border-color: #3E2723 !important;
+        }
+        .option-item.wrong-choice .option-text {
+            color: #B71C1C !important;
+        }
+
+        /* Mid-game custom notification banners */
+        .cute-toast {
+            position: fixed; /* fix on center screen */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: #FFF59D;
+            border: 4px solid #3E2723;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #E65100;
+            box-shadow: 0 8px 0 #3E2723;
+            z-index: 100;
+            display: none;
+            animation: popToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            text-align: center;
+        }
+
+        @keyframes popToast {
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Great pop-up badge banner on correct answer */
+        .success-banner {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: #4CAF50;
+            border: 4px solid #3E2723;
+            color: white;
+            font-family: var(--title-font);
+            font-size: 28px;
+            padding: 16px 32px;
+            border-radius: 24px;
+            box-shadow: 0 8px 0 #3E2723;
+            z-index: 100;
+            pointer-events: none;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .success-banner.pop {
+            display: block;
+            animation: popSuccess 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popSuccess {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            25% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -80%) scale(0.8); opacity: 0; }
+        }
+
+        /* Result View styles */
+        .result-box {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .mascot-celebration {
+            font-size: 80px;
+            margin-bottom: 12px;
+            animation: jump 1.5s infinite ease-in-out;
+        }
+
+        @keyframes jump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(0.95); }
+        }
+
+        .final-score {
+            font-size: 28px;
+            font-weight: 900;
+            color: #FF9800;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 0 white, 2px 2px 0 #3E2723;
+        }
+
+        .badge-award {
+            font-family: var(--title-font);
+            font-size: 24px;
+            color: #E040FB;
+            margin: 8px 0 16px 0;
+            background: #F3E5F5;
+            padding: 8px 16px;
+            border-radius: 18px;
+            border: 3px dashed #3E2723;
+            box-shadow: 0 3px 0 #3E2723;
+            display: inline-block;
+        }
+
+        .results-summary {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            color: #5D4037;
+        }
+
+        /* Redo / Rechallenge Section on summary */
+        .summary-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #3E2723;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            text-align: left;
+            border-left: 5px solid #FF9800;
+            padding-left: 8px;
+        }
+
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .summary-item {
+            background: #F5F5F5;
+            border-radius: 15px;
+            padding: 10px 12px;
+            border-left: 6px solid #B0BEC5;
+            border: 2px solid #3E2723;
+            box-shadow: 0 3px 0 #3E2723;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-item.correct {
+            border-left-color: #4CAF50;
+            background: #E8F5E9;
+        }
+
+        .summary-item.wrong {
+            border-left-color: #E53935;
+            background: #FFEBEE;
+        }
+
+        .summary-q-text {
+            font-weight: bold;
+            font-size: 14px;
+            color: #2D3748;
+        }
+
+        .summary-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            gap: 10px;
+        }
+
+        .status-badge {
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 6px;
+            border: 1.5px solid #3E2723;
+        }
+        .status-badge.correct {
+            background: #C8E6C9;
+            color: #2E7D32;
+        }
+        .status-badge.wrong {
+            background: #FFCDD2;
+            color: #C62828;
+        }
+        .status-badge.corrected {
+            background: #E1BEE7;
+            color: #7B1FA2;
+            animation: pulseGlowTiny 1s infinite alternate;
+        }
+
+        @keyframes pulseGlowTiny {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Modal Overlay for Redo Mode */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .modal-card {
+            background: #FFFFFF;
+            border: 5px solid #3E2723;
+            border-radius: 28px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 0 #3E2723;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .redo-alert-banner {
+            background: #FFF3E0;
+            border: 2px dashed #3E2723;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #E65100;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.3;
+        }
+
+        .modal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .modal-close-btn {
+            background: #ECEFF1;
+            border: 2px solid #3E2723;
+            font-size: 20px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #546E7A;
+            font-weight: bold;
+            box-shadow: 0 2px 0 #3E2723;
+            transition: all 0.1s;
+        }
+        .modal-close-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        /* Floating effects & particles */
+        .confetti {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: fall 1.8s linear forwards;
+            z-index: 999;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(75vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Footer Section styled normally as part of document flow, not fixed! */
+        .footer-relative {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 10px;
+            padding: 20px 12px;
+            background: #FFFFFF;
+            border: 6px solid #3E2723;
+            border-radius: 28px;
+            box-shadow: 0 8px 0 #3E2723;
+            text-align: center;
+        }
+
+        .footer-relative h3 {
+            font-family: var(--title-font);
+            font-size: 20px;
+            color: #FF5722;
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 0 white;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        @media(max-width: 450px) {
+            .social-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .social-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: 12px;
+            border: 2.5px solid #3E2723;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 0 #3E2723;
+        }
+
+        .social-card:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #3E2723;
+        }
+
+        .sc-yt { background: #E53935; } /* Red */
+        .sc-ig { background: #E1306C; } /* Pinkish */
+        .sc-fb { background: #1877F2; } /* Blue */
+        .sc-th { background: #222222; } /* Black */
+        .sc-xhs { background: #FF2442; } /* Red */
+        .sc-wa { background: #25D366; } /* Green */
+        .sc-dy { background: #333333; } /* Dark Gray */
+
+        .social-card-title {
+            margin-top: 4px;
+        }
+
+        .copyright-text {
+            font-size: 11px;
+            color: #795548;
+            font-weight: bold;
+            margin-top: 12px;
+            border-top: 1px dashed #E0E0E0;
+            padding-top: 10px;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 6px 0 #3E2723, 0 0 5px rgba(156, 39, 176, 0.4); }
+            100% { box-shadow: 0 6px 0 #3E2723, 0 0 15px rgba(156, 39, 176, 0.8); }
+        }
+
+        /* Responsive Adaptations for Smaller Screens */
+        @media(max-width: 500px) {
+            .header h1 { font-size: 24px; }
+            .view { padding: 16px 12px; }
+            .question-text { font-size: 17px; }
+            .option-item { font-size: 15px; padding: 10px 12px; }
+            .btn { font-size: 18px; padding: 8px 16px; }
+            .level-icon { font-size: 36px; }
+            .level-card { padding: 12px 8px; min-height: 145px; border-radius: 18px; }
+            .logo-img { width: 44px; height: 44px; }
+            .header { padding: 15px 8px; }
+            .btn-row { gap: 8px; }
+            #quit-btn { font-size: 13px !important; padding: 6px 10px !important; }
+        }
+</style>
+</head>
+<body>
+
+    <!-- Main Game Frame -->
+    <div class="game-container">
+        
+        <!-- Top Left Head Photo (cat.jpeg) inside Header -->
+        <div class="header">
+            <div class="logo-box">
+                <img src="cat.jpeg" class="logo-img" onerror="this.style.display='none';" alt="Teacher Cat Logo">
+                <h1>小一科學大冒險</h1>
+            </div>
+            <div class="subtitle">繽紛互動科學探究遊戲 🌟 溫習全攻略</div>
+        </div>
+
+        <!-- 1. Home View (Level Selector) -->
+        <div id="home-view" class="view active">
+            <p style="text-align: center; font-weight: bold; font-size: 17px; margin-bottom: 15px; color: #5D4037;">
+                歡迎來到科學冒險世界！請點選一個關卡開始挑戰：
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #FFF3E0; padding: 10px 15px; border-radius: 20px; border: 3px solid #FFE082;">
+                <span style="font-weight: 900; color: #E65100; font-size: 16px;">🌟 Progress Record (挑戰進度記錄)</span>
+                <button id="clear-records-btn" class="btn btn-red" style="font-size: 12px; padding: 4px 10px; border-radius: 12px; max-width: 100px; box-shadow: 0 3px 0 #3E2723;"><i class="fa-solid fa-trash-can"></i> 清除記錄</button>
+            </div>
+            <div class="level-grid" id="level-grid">
+                <!-- Programmatically generated -->
+            </div>
+
+            <!-- Return back Link Button -->
+            <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 10px;">
+                <a href="https://cat123teacher.github.io/chinese/main.html" target="_self" class="btn btn-purple" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 400px; animation: pulseGlow 1.5s infinite alternate;">
+                    <i class="fa-solid fa-paw"></i> 返回小朋友學習大冒險
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. Intro View (Teaching & Examples) -->
+        <div id="intro-view" class="view">
+            <div class="intro-title-row">
+                <div id="intro-level-icon" style="font-size: 45px;">🔬</div>
+                <h2 id="intro-level-title" style="font-weight: 900; font-size: 22px;">關卡名稱</h2>
+            </div>
+            
+            <div class="intro-box">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+                    <div class="intro-teaching-text">💡 溫習大師小教學</div>
+                    <button class="speaker-btn" id="speak-teaching-btn" aria-label="朗讀教學內容">
+                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                </div>
+                <div id="intro-teaching-content">教學文字載入中...</div>
+                
+                <!-- Inside Intro Box Example -->
+                <div class="example-box">
+                    <span class="example-tag">例題溫習</span>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div class="example-q" id="example-question">例題載入中...</div>
+                        <button class="speaker-btn" id="speak-example-btn" style="width:40px; height:40px; border-width:2px; box-shadow:0 3px 0 #00BFA5;" aria-label="朗讀例題">
+                            <svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                        </button>
+                    </div>
+                    <div id="example-options"></div>
+                    <div class="example-explain" id="example-explanation">解析載入中...</div>
+                </div>
+            </div>
+
+            <!-- Navigation Row -->
+            <div class="btn-row">
+                <button class="btn btn-red" id="back-home-btn"><i class="fa-solid fa-house"></i> 回到主頁</button>
+                <button class="btn btn-green" id="start-game-btn" style="flex-grow: 2;">開始挑戰 <i class="fa-solid fa-rocket"></i></button>
+            </div>
+        </div>
+
+        <!-- 3. Play View (Active Challenge) -->
+        <div id="play-view" class="view">
+            <!-- HUD panel -->
+            <div class="hud-row">
+                <div class="progress-text" id="hud-progress">問題 1 / 20</div>
+                <div class="score-badge" id="hud-score">得分: 0 / 20</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <!-- Cute floating success banner -->
+            <div id="success-banner" class="success-banner">答對了！👍🌟🎉</div>
+            
+            <!-- Cute warning toast -->
+            <div id="cute-toast" class="cute-toast">請先選取答案再按下一頁喔！🎒</div>
+
+            <!-- Question Card -->
+            <div class="question-card">
+                <div class="question-top-row">
+                    <span id="hud-difficulty" class="difficulty-indicator diff-easy">第一階段：淺程度 ⭐</span>
+                    <button class="speaker-btn" id="speak-question-btn" aria-label="朗讀問題與選項">
+                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                </div>
+                <div class="question-text" id="question-text">科學問題正在載入中，請稍候...</div>
+            </div>
+
+            <!-- Choice Options -->
+            <div class="options-list" id="options-list">
+                <!-- Choices generated -->
+            </div>
+
+            <!-- Custom "Next Question" button for Wrong selections (stays until clicked) -->
+            <div id="next-q-btn-container" style="display: none; justify-content: center; margin-top: 15px;">
+                <button id="next-q-btn" class="btn btn-orange" style="width: 100%; font-size: 20px; padding: 10px 0; border-radius: 20px;">下一題 <i class="fa-solid fa-circle-chevron-right"></i></button>
+            </div>
+
+            <!-- Bottom Control Panel (Always present) -->
+            <div class="btn-row" style="margin-top: 25px; border-top: 2px dashed #ECEFF1; padding-top: 15px;">
+                <button class="btn btn-blue" id="nav-prev-btn"><i class="fa-solid fa-circle-chevron-left"></i> 上一頁</button>
+                <button class="btn btn-red" id="quit-btn" style="font-size: 15px; padding: 8px 12px;"><i class="fa-solid fa-circle-xmark"></i> 放棄</button>
+                <button class="btn btn-blue" id="nav-next-btn">下一頁 <i class="fa-solid fa-circle-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 4. Result View -->
+        <div id="result-view" class="view">
+            <div class="result-box">
+                <div class="mascot-celebration" id="result-mascot">🎉</div>
+                <h2 id="result-congrats" style="font-family: var(--title-font); font-size: 28px; color: #4CAF50; margin-bottom: 10px;">太棒了！</h2>
+                <div class="badge-award" id="result-badge">科學小博士 🏆</div>
+                <div class="final-score" id="result-score">獲得得分：18 / 20 分</div>
+                <p class="results-summary" id="result-summary">你已經成功完成了溫習！恭喜你！</p>
+                
+                <!-- Dynamic Navigation Panel -->
+                <div class="btn-row" style="margin-bottom: 25px;">
+                    <button class="btn btn-orange" id="result-rechallenge-btn" style="flex-grow: 1; font-size: 18px;">重新挑戰這一關 <i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="btn btn-green" id="result-home-btn" style="flex-grow: 1; font-size: 18px;">回到主頁 <i class="fa-solid fa-house"></i></button>
+                </div>
+
+                <!-- Review Section -->
+                <div class="summary-title">🔍 溫習與重新挑戰錯題：</div>
+                <div class="summary-list" id="summary-list">
+                    <!-- Cards will be populated here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Redo Modal Overlay (Saves children from frustrating continuous errors) -->
+    <div class="modal-overlay" id="redo-modal">
+        <div class="modal-card">
+            <!-- Header row with Chinese Warning Alert -->
+            <div class="modal-title-row">
+                <h3 style="font-family: var(--title-font); font-size: 22px; color: #E65100;">💪 錯題特訓模式</h3>
+                <button class="modal-close-btn" id="modal-close-x" aria-label="關閉">×</button>
+            </div>
+            
+            <!-- Beautiful Chinese Warning Alert Banner -->
+            <div class="redo-alert-banner">
+                <span>💡</span>
+                <div><strong>溫馨提示：</strong>答錯了沒關係！請細心選出正確答案，可以一直答到對為止喔！加油！🎒✨</div>
+            </div>
+
+            <!-- Active Question detail -->
+            <div class="question-card" style="margin-bottom: 15px; border-color: #FFA726;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 10px;">
+                    <span class="difficulty-indicator" style="background:#FFA726;">錯題訂正</span>
+                    <button class="speaker-btn" id="modal-speak-q-btn" style="width:40px; height:40px; border-width:2px; box-shadow:0 3px 0 #00BFA5;" aria-label="朗讀問題">
+                        <svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                </div>
+                <div class="question-text" id="modal-q-text" style="font-size: 18px;">錯題載入中...</div>
+            </div>
+
+            <!-- Active Options List -->
+            <div class="options-list" id="modal-options-list">
+                <!-- Modal choices populated programmatically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Colorful natural flow footer containing Social Media and Contacts -->
+    <div class="footer-relative">
+        <h3>Teacher Cat 的快樂 AI 教室 🐾</h3>
+        
+        <div class="social-grid">
+            <!-- YouTube -->
+            <a href="https://www.youtube.com/@TeacherCat123" target="_blank" class="social-card sc-yt">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                <span class="social-card-title">YouTube</span>
+            </a>
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" class="social-card sc-ig">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                <span class="social-card-title">Instagram</span>
+            </a>
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" class="social-card sc-fb">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <span class="social-card-title">Facebook</span>
+            </a>
+            <!-- Threads -->
+            <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="social-card sc-th">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12.55 12c.11-.84.23-2.78-1.12-3.34-.34-.14-.72-.11-1 .08-.34.22-.54.62-.57 1.13-.05.81.06 2.63 1.17 3.19.33.17.72.16 1.02-.02.32-.2.47-.56.5-1.04zm7.98 4.41c-.42.92-1.06 1.63-1.89 2.12-.9.53-1.95.8-3.14.8-1.57 0-2.88-.47-3.92-1.4a10.8 10.8 0 0 1-2.48-3.56c-.66-1.58-.95-3.21-.86-4.9.09-1.63.57-3.03 1.45-4.17C10.53 4.14 11.96 3.5 13.9 3.5c1.65 0 2.94.49 3.86 1.45.85.89 1.24 2.11 1.18 3.61-.06 1.44-.54 2.61-1.42 3.49-.82.82-1.88 1.23-3.15 1.23-1.16 0-1.96-.34-2.4-.76-.32-.3-.5-.73-.55-1.27h-.08c-.46.79-1.12 1.34-1.97 1.66-.45.17-.92.25-1.4.25-1.1 0-1.96-.34-2.58-1-.62-.68-.91-1.66-.86-2.92.05-1.26.43-2.28 1.12-3.05.74-.81 1.76-1.22 3.03-1.22 1.22 0 2.1.37 2.63 1.1h.08c.06-.55.25-.97.58-1.25.43-.37 1.02-.56 1.77-.56.88 0 1.55.28 2 .84.45.56.63 1.37.54 2.4l-.16 1.83c-.08.88-.04 1.51.13 1.9.12.28.35.42.7.42.38 0 .7-.17.96-.51.27-.35.42-.87.45-1.55l.06-.94c.12-2.32-.42-4.15-1.62-5.46C17.38 5.43 15.42 4.7 13.2 4.7c-2.44 0-4.38.83-5.8 2.5C6 8.87 5.24 11.23 5.12 14.28c-.1 2.5.4 4.6 1.5 6.27 1.15 1.76 2.87 2.65 5.15 2.65 1.78 0 3.32-.51 4.62-1.53a8.9 8.9 0 0 0 2.97-4.34l1.17.08z"/></svg>
+                <span class="social-card-title">Threads</span>
+            </a>
+            <!-- 小紅書 -->
+            <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="social-card sc-xhs">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm4.184 14.908c-.378.434-.841.696-1.393.784-.464.075-.921-.015-1.341-.264-.523-.309-.81-.785-.81-1.397v-.483h-1.28v.483c0 .612-.287 1.088-.81 1.397-.42.249-.877.339-1.341.264-.552-.088-1.015-.35-1.393-.784-.339-.387-.501-.861-.487-1.42h8.952c.014.559-.148 1.033-.487 1.42zm.487-2.908h-8.952c-.014-.559.148-1.033.487-1.42.378-.434.841-.696 1.393-.784.464-.075.921.015 1.341.264.523.309.81.785.81 1.397v.483h1.28v-.483c0-.612.287-1.088.81-1.397.42-.249.877-.339 1.341-.264.552.088 1.015.35 1.393.784.339.387.501.861.487 1.42z"/></svg>
+                <span class="social-card-title">小紅書</span>
+            </a>
+            <!-- WhatsApp -->
+            <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="social-card sc-wa">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.731-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 2.01 14.12 1.01 11.5 1.01c-5.436 0-9.861 4.372-9.865 9.801 0 1.697.469 3.35 1.358 4.796L1.934 21.9l6.326-1.631c-1.623-1.123-1.613-1.115-1.613-1.115z"/></svg>
+                <span class="social-card-title">分享Group</span>
+            </a>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <a href="#" onclick="return false;" class="social-card sc-dy" style="display:inline-flex; flex-direction:row; gap:10px; width:100%; max-width:280px; margin:0 auto; padding:8px 15px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.01.08 1.53.63 3.02 1.69 4.12 1.13 1.08 2.65 1.65 4.19 1.76v3.91c-1.39-.17-2.73-.78-3.82-1.67-.53-.41-.98-.92-1.35-1.49v6.88c.05 1.83-.41 3.67-1.39 5.17-1.57 2.45-4.43 3.95-7.37 3.8-3.1-.06-6.04-1.99-7.23-4.85-1.46-3.32-.42-7.46 2.45-9.68 1.77-1.42 4.1-2.07 6.37-1.81v4.02c-1.21-.19-2.48.14-3.41.95-.97.82-1.43 2.15-1.19 3.39.26 1.5 1.54 2.69 3.05 2.8 1.45.14 2.92-.76 3.44-2.12.28-.68.37-1.42.34-2.15V.02z"/></svg>
+                <span>抖音號：74254902683</span>
+            </a>
+        </div>
+
+        <div class="copyright-text">
+            © 2026 小一科學大冒險 🌟 專為小學生健康成長設計 | Teacher Cat 快樂AI教室
+        </div>
+    </div>
+
+    <script>
+        // Inject game database (360 highly engaging, kid-friendly questions)
+        const levelData = [
+    {
+        "id": 1,
+        "title": "我是小科學家",
+        "icon": "🔬",
+        "color": "#E3F2FD",
+        "accent": "#1E88E5",
+        "teaching": "科學家最喜歡觀察世界！我們可以用眼、耳、鼻、皮膚來細心觀察。科學探究有四個重要步驟：1. 觀察身邊事物；2. 提出科學問題；3. 進行科學探究；4. 分享探究結果。記住哦！並不是所有問題都是科學問題，例如「今天午餐吃甚麼」就不是科學問題了！",
+        "example": {
+            "q": "哪一個是科學能解答的問題？",
+            "options": [
+                "甚麼蛋糕最好吃？",
+                "為甚麼小鳥能飛？",
+                "明天穿甚麼衣服？"
+            ],
+            "ans": 1,
+            "explanation": "「為什麼小鳥能飛」是關於大自然規律的，可以用科學探究來解答！"
+        },
+        "questions": [
+            {
+                "q": "科學家最喜歡做甚麼？",
+                "options": [
+                    "細心觀察事物",
+                    "天天在家睡覺",
+                    "不停吃糖果"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們可以用甚麼來觀察身邊的事物？",
+                "options": [
+                    "用毛公仔",
+                    "用我們的感覺器官",
+                    "用新買的玩具車"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "科學探究的第一步通常是甚麼？",
+                "options": [
+                    "觀察身邊事物",
+                    "直接告訴別人答案",
+                    "不理會它"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們對大自然感到好奇，應該怎樣做？",
+                "options": [
+                    "假裝看不見",
+                    "多觀察，多動腦筋",
+                    "叫媽媽把東西丟掉"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "科學探究可以加深我們對甚麼的認識？",
+                "options": [
+                    "加深對童話角色的認識",
+                    "加深對大自然的認識",
+                    "加深對電腦遊戲的認識"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是科學家常用的工具？",
+                "options": [
+                    "放大鏡",
+                    "玩具飛機",
+                    "彩色畫筆"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們觀察花朵時，以下哪種做法是正確的？",
+                "options": [
+                    "用手把花朵摘下來",
+                    "只用眼睛和鼻子細心觀察",
+                    "用腳踩扁花朵"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "進行科學探究後，我們應該和同學怎樣？",
+                "options": [
+                    "自己藏起來不說",
+                    "分享探究結果，一起討論",
+                    "和同學吵架"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "「小貓為甚麼會喵喵叫？」這是一個甚麼問題？",
+                "options": [
+                    "一個好玩的科學問題",
+                    "一個沒有意義的問題",
+                    "一個不可以問的問題"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們想知道一粒種子會長出甚麼，可以做甚麼？",
+                "options": [
+                    "動手種植，進行探究",
+                    "一直猜測，不付諸行動",
+                    "去買一盤假花"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項是科學探究的方法？",
+                "options": [
+                    "動手做測試",
+                    "合上眼睛不看",
+                    "直接哭泣"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "科學家在做實驗時，態度應該是怎樣的？",
+                "options": [
+                    "一邊玩耍一邊做",
+                    "認真、細心和安全",
+                    "非常急躁和粗心"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們觀察事物時，哪一個器官最先幫我們看到顏色？",
+                "options": [
+                    "耳朵",
+                    "眼睛",
+                    "嘴巴"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "「為什麼有些石頭是紅色的？」這是一個科學問題嗎？",
+                "options": [
+                    "是，這是關於大自然的科學問題",
+                    "不是，這只是個普通問題",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們聽到了小鳥的叫聲，這是在運用哪種觀察？",
+                "options": [
+                    "用鼻子聞",
+                    "用耳朵聽",
+                    "用皮膚觸摸"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "科學探究的第三個步驟是甚麼？",
+                "options": [
+                    "提出科學問題",
+                    "進行科學探究",
+                    "分享探究結果"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大自然有很多奇妙的事物，我們可以用甚麼心態面對？",
+                "options": [
+                    "害怕和躲避",
+                    "好奇和想去探索",
+                    "覺得很無聊"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "讀完一本有趣的科學童話書，我們可以怎樣？",
+                "options": [
+                    "把書撕掉",
+                    "想一想裡面的科學道理",
+                    "忘記它"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當科學家發現新事物時，他們會怎樣？",
+                "options": [
+                    "寫下來並和大家分享",
+                    "當作秘密不告訴任何人",
+                    "扔掉新發現"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "「樹葉為甚麼會變黃？」這是科學能解答的問題嗎？",
+                "options": [
+                    "能，這是科學可以探究的問題",
+                    "不能，這是魔法",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個問題是科學「不能」解答的？",
+                "options": [
+                    "今天晚上媽媽會煮甚麼菜？",
+                    "為甚麼彩虹有七種顏色？",
+                    "為甚麼植物需要水？"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們想知道兩個杯子哪個裝的水比較多，最好的探究方法是甚麼？",
+                "options": [
+                    "用尺量度杯子的高度",
+                    "把兩個杯子的水倒入相同的量杯比較",
+                    "用手摸摸杯子"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "子進想知道「種子在黑暗中能發芽嗎？」，他應該怎樣設計探究？",
+                "options": [
+                    "一盆放陽光下，一盆放黑暗中，其餘條件相同",
+                    "只放一盆在黑暗中，不作對比",
+                    "放兩盆在太陽下"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "下列關於科學問題的說法，哪項是正確的？",
+                "options": [
+                    "所有問題都可以用科學來解答",
+                    "只有關於自然界運作的問題才是科學問題",
+                    "科學不能解答任何問題"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們做的科學測試結果和我們預想的不一樣，我們應該？",
+                "options": [
+                    "修改測試數據",
+                    "認真記錄真實結果，再找出原因",
+                    "當作甚麼都沒發生"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "科學探究的四個步驟中，最後一步是「分享探究結果」，這是為甚麼？",
+                "options": [
+                    "為了向別人炫耀自己聰明",
+                    "為了讓大家一起討論和互相學習",
+                    "因為沒有其他事情可以做了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在進行科學探究時，以下哪種行為是不安全的？",
+                "options": [
+                    "未經老師同意就用口嚐未知的液體",
+                    "用眼睛看物體的顏色",
+                    "用尺子測量長度"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "朗朗說：「我覺得紅色的花比較香。」他應該如何探究這個說法？",
+                "options": [
+                    "直接相信這個說法",
+                    "收集不同顏色的花，閉上眼睛聞一聞並作記錄",
+                    "在網上和人吵架"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "科學家在記錄觀察數據時，以下哪種做法是正確的？",
+                "options": [
+                    "把不喜歡的數據擦掉",
+                    "如實記錄觀察到的每一個細節",
+                    "憑感覺隨便寫一個數字"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們要學習科學探究？",
+                "options": [
+                    "因為這能幫我們更好地認識世界和大自然",
+                    "因為可以不用做其他功課",
+                    "因為可以買很多玩具"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們看到天上有奇怪的光，科學的態度應該是：",
+                "options": [
+                    "害怕地躲進被窩",
+                    "仔細觀察它的形狀、顏色，並記錄時間",
+                    "不理會它"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一個是科學問題？",
+                "options": [
+                    "今天星期幾？",
+                    "為什麼仙人掌能在沙漠生長？",
+                    "我的鉛筆去哪裡了？"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們在進行科學探究「磁鐵能吸起甚麼」時，應該：",
+                "options": [
+                    "只試一種鐵釘",
+                    "嘗試鐵釘、塑料尺、紙張等不同物品並記錄",
+                    "直接在紙上寫答案"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "科學探究中的「控制變量」是指甚麼？（適合小一的說法）",
+                "options": [
+                    "每次測試只改變一個地方，其他地方保持一樣",
+                    "甚麼地方都要改變",
+                    "暗中不變"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果小組合作做科學測試，意見不同時應該：",
+                "options": [
+                    "不跟對方說話",
+                    "用測試結果和事實來討論，互相尊重",
+                    "看誰的聲音大"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "「為什麼熱水放久了會變涼？」這是一個：",
+                "options": [
+                    "生活習慣問題",
+                    "科學探究可以解答的問題",
+                    "童話故事問題"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "科學觀察「不包括」以下哪一項？",
+                "options": [
+                    "憑空想像花朵有香氣",
+                    "用手摸摸樹皮是粗糙的",
+                    "用尺量度植物長高了多少"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大自然中的「自然現象」是指：",
+                "options": [
+                    "在電視上播放的卡通片",
+                    "風、雨、彩虹等自然發生的變化",
+                    "人類製造的玩具車"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們分享探究結果時，可以用甚麼方式？",
+                "options": [
+                    "畫圖、說話報告或展示照片",
+                    "大聲哭鬧",
+                    "把紙藏起來"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "科學探究的第二個步驟是甚麼？",
+                "options": [
+                    "進行科學探究",
+                    "提出科學問題",
+                    "細心觀察身邊事物"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "神奇動物小百科",
+        "icon": "🦁",
+        "color": "#FFF3E0",
+        "accent": "#FB8C00",
+        "teaching": "動物是有生命的，牠們生存必須具備三大生存條件：水、空氣和食物。動物有不同的活動方式，例如：小魚在水裡游動、小鳥在空中飛行、馬兒在陸地走動。人類也是動物的一種。看見野生動物時，我們要愛護牠們，保持距離，不驚嚇、不隨意觸摸，更不能隨便餵食零食！",
+        "example": {
+            "q": "以下哪一項「不是」動物生存必備的條件？",
+            "options": [
+                "水",
+                "玩具",
+                "空氣"
+            ],
+            "ans": 1,
+            "explanation": "動物生存需要水、空氣和食物。玩具不是生存必備的條件哦！"
+        },
+        "questions": [
+            {
+                "q": "以下哪一項是有生命的？",
+                "options": [
+                    "玩具小熊",
+                    "一隻真的小狗",
+                    "塑膠花"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項「不是」動物生存必備的條件？",
+                "options": [
+                    "空氣",
+                    "玩具",
+                    "水"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "魚兒在水裡主要的活動方式是甚麼？",
+                "options": [
+                    "爬行",
+                    "游動",
+                    "飛行"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "小鳥在天空中主要的活動方式是甚麼？",
+                "options": [
+                    "飛行",
+                    "游動",
+                    "奔跑"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "馬兒在草原上主要的活動方式是甚麼？",
+                "options": [
+                    "飛行",
+                    "游動",
+                    "走動或奔跑"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "人類是動物的一種嗎？",
+                "options": [
+                    "是，人類也是動物的一種",
+                    "不是，人類是植物",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一隻是有生命的動物？",
+                "options": [
+                    "布偶貓",
+                    "真的波斯貓",
+                    "陶瓷貓"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "動物需要吃食物嗎？",
+                "options": [
+                    "需要，食物提供能量讓牠們生存",
+                    "不需要，牠們只需要曬太陽",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "魚缸裡養魚，為甚麼要裝空氣泵（打氣機）？",
+                "options": [
+                    "為了讓魚缸更好看",
+                    "因為魚也需要呼吸水中的空氣",
+                    "為了讓魚玩耍"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們看見野生猴子時，應該怎麼做？",
+                "options": [
+                    "大聲叫喊並觸摸牠們",
+                    "保持適當距離，靜靜觀察，不驚嚇牠們",
+                    "拿香蕉去餵牠們"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項是小狗的活動方式？",
+                "options": [
+                    "走動和奔跑",
+                    "游泳 and 飛行",
+                    "一直不動"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "蝴蝶和鳥兒都能在天空：",
+                "options": [
+                    "游動",
+                    "爬行",
+                    "飛行"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "動物如果沒有水喝，會怎樣？",
+                "options": [
+                    "會長得更大",
+                    "會生病甚至死亡",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "金魚如果離開了水，牠能生存嗎？",
+                "options": [
+                    "能，牠可以呼吸空氣",
+                    "不能，牠必須在水裡生活",
+                    "不知道"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是溫柔對待小動物的行為？",
+                "options": [
+                    "輕輕撫摸家裡的小貓",
+                    "用力拉小狗的尾巴",
+                    "用石頭扔小鳥"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "斑馬生活在甚麼地方？",
+                "options": [
+                    "深海裡",
+                    "有植物生長的陸地（草原）",
+                    "冰天雪地"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種動物會爬行？",
+                "options": [
+                    "老鷹",
+                    "蛇",
+                    "海豚"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大熊貓最喜歡吃甚麼？",
+                "options": [
+                    "竹子",
+                    "漢堡包",
+                    "朱古力"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "蚊子和老鼠對人類健康有甚麼影響？",
+                "options": [
+                    "會傳播疾病，要保持衛生避免接觸",
+                    "會帶來好運",
+                    "沒有任何影響"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們在郊野公園看到小鳥，可以做甚麼？",
+                "options": [
+                    "用相機拍下小鳥的照片",
+                    "用網子把牠捉回家",
+                    "用石頭打牠"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "為什麼海豚需要游到水面呼吸？",
+                "options": [
+                    "因為牠們想看風景",
+                    "因為海豚是哺乳動物，需要用肺呼吸空氣",
+                    "因為牠們在水裡會融化"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項「不屬於」動物的特徵？",
+                "options": [
+                    "牠們是有生命的",
+                    "牠們會開花結果",
+                    "牠們會活動和生長"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在野外看見小猴子，朗朗想摸牠，子進應該怎樣勸阻他？",
+                "options": [
+                    "「好啊，我們一起摸！」",
+                    "「不要摸，野生動物危險，我們應保持距離。」",
+                    "「用棍子打牠吧！」"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "下列哪種說法是正確的？",
+                "options": [
+                    "所有會飛的都是鳥類",
+                    "蝙蝠會飛，但牠不是鳥類，是哺乳動物",
+                    "魚類不需要空氣也能生存"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼魚能生活在水裡？",
+                "options": [
+                    "因為魚不需要空氣",
+                    "因為魚有鰓，可以呼吸水中的空氣",
+                    "因為魚是玩具"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們說「人類是動物的一種」，因為人類：",
+                "options": [
+                    "和動物一樣有生命，需要水、空氣和食物",
+                    "會生長在泥土裡",
+                    "會開花結果"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們過度餵飼家中的寵物，會怎樣？",
+                "options": [
+                    "寵物會變得更健康",
+                    "寵物會過肥，影響身體健康",
+                    "沒有任何變化"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "老鼠、蚊子和蟑螂，我們稱牠們為害蟲/害獸，因為：",
+                "options": [
+                    "牠們長得很可愛",
+                    "禮物會傳播細菌和疾病，破壞家居衛生",
+                    "牠們會在天空中飛"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項行為能展現出我們「愛護大自然中的動物」？",
+                "options": [
+                    "把森林裡的小松鼠捉回家養",
+                    "不打擾野生動物的生活，保護牠們的居所",
+                    "在池塘邊扔垃圾"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "植物和動物生存條件有甚麼「不同」的地方？",
+                "options": [
+                    "植物不需要水",
+                    "動物不需要陽光來直接製造食物，但植物需要陽光",
+                    "動物不需要空氣"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼布偶熊不是動物？",
+                "options": [
+                    "因為牠不會動，沒有生命，不需要水和食物",
+                    "因為牠長得不夠大",
+                    "因為牠不是用泥土做的"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "蝸牛在下雨後會爬出來，牠們的活動方式是：",
+                "options": [
+                    "飛行",
+                    "游動",
+                    "緩慢爬行"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們去參觀農場時，應該：",
+                "options": [
+                    "跟從工作人員指示，不隨意拍打餵飼動物",
+                    "追趕小雞小鴨",
+                    "偷偷把小兔子帶走"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "鯨魚是生活在海洋裡的動物，牠生存需要：",
+                "options": [
+                    "不需要空氣",
+                    "需要空氣、水和食物（小魚蝦）",
+                    "需要泥土"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種動物不是靠四條腿行走的？",
+                "options": [
+                    "袋鼠（靠跳躍）",
+                    "獅子",
+                    "羊"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "蜜蜂在花叢中飛來飛去，牠對植物有甚麼好處？",
+                "options": [
+                    "沒有好處，會咬死花朵",
+                    "幫助花朵傳播花粉，對植物有益",
+                    "只是在玩耍"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "動物的「生命週期」是指：",
+                "options": [
+                    "牠們一生會經歷出生、生長、繁殖和死亡",
+                    "牠們每天的生活時間表",
+                    "牠們坐火車環遊世界"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們不能隨意觸摸街上的流浪狗？",
+                "options": [
+                    "因為流浪狗可能帶有病菌或因驚恐而咬人",
+                    "因為流浪狗太髒了",
+                    "因為流浪狗不喜歡人類"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一種動物主要在夜間活動？",
+                "options": [
+                    "斑馬",
+                    "蝙蝠",
+                    "大公雞"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們去郊遊時發現受傷的野生動物，正確的做法是：",
+                "options": [
+                    "不理會牠",
+                    "帶回家自己用藥水醫治",
+                    "通知漁護署或保護動物組織來協助"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "植物成長記",
+        "icon": "🌱",
+        "color": "#E8F5E9",
+        "accent": "#43A047",
+        "teaching": "植物也是有生命的，會經歷長葉、開花和結果的過程。植物健康生長需要四大條件：泥土、水、空氣和陽光。香港有很多常見植物，例如洋紫荊（香港市花）、木棉樹（春天開紅花）、鳳凰木（夏天開紅花）和芒草（秋天金黃色）。大樹能為我們遮蔭，也是小動物的家。我們要好好保護花草，不能隨意採摘和踐踏！",
+        "example": {
+            "q": "洋紫荊是香港的市花，牠需要甚麼來健康生長？",
+            "options": [
+                "可樂和糖果",
+                "泥土、水、空氣和陽光",
+                "只需要曬太陽"
+            ],
+            "ans": 1,
+            "explanation": "植物健康生長需要泥土、水、空氣和陽光！缺一不可哦！"
+        },
+        "questions": [
+            {
+                "q": "以下哪一項是植物生存最重要的條件？",
+                "options": [
+                    "朱古力和汽水",
+                    "泥土、水、空氣和陽光",
+                    "玩具和睡覺"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "洋紫荊是香港常見的植物，也是：",
+                "options": [
+                    "香港的市花",
+                    "一種動物",
+                    "一隻小鳥"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種植物在秋天會變成美麗的紅色或黃色？",
+                "options": [
+                    "芒草",
+                    "洋紫荊",
+                    "楓葉/紅葉"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "種子種下後，通常最先長出甚麼？",
+                "options": [
+                    "花朵",
+                    "果實",
+                    "幼苗和綠葉"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物會經歷甚麼成長過程？",
+                "options": [
+                    "長葉、開花、結果",
+                    "走動、奔跑、睡覺",
+                    "不長大"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大樹能為小鳥提供甚麼？",
+                "options": [
+                    "玩具車",
+                    "安全的居所（鳥巢）",
+                    "雨傘"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物是有生命的嗎？",
+                "options": [
+                    "是，植物有生命，會生長和變化",
+                    "不是，植物像石頭一樣沒有生命",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們可以用甚麼來為植物提供水分？",
+                "options": [
+                    "牛奶",
+                    "清水",
+                    "可樂"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "芒草是香港秋天很受歡迎的植物，牠們看起來是：",
+                "options": [
+                    "粉紅色的花朵",
+                    "金黃或銀白色的草浪",
+                    "高大的紅木棉"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在公園裡，我們「不應該」怎樣對待花草？",
+                "options": [
+                    "用眼睛觀賞它們",
+                    "隨意採摘花朵和踐踏草地",
+                    "幫落葉拍照"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物需要陽光是因為：",
+                "options": [
+                    "陽光能幫牠們製造食物，讓牠們健康生長",
+                    "植物怕黑",
+                    "植物需要曬黑"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種是香港春天常見、開紅花的樹？",
+                "options": [
+                    "木棉樹",
+                    "洋紫荊",
+                    "松樹"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當植物不夠水時，牠會表現得怎樣？",
+                "options": [
+                    "葉子垂下，變得乾枯",
+                    "長得更高更大",
+                    "跳起舞來"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物的根通常生長在甚麼地方？",
+                "options": [
+                    "空氣中",
+                    "泥土裡",
+                    "樹枝頂端"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項「不是」植物的一部分？",
+                "options": [
+                    "葉子",
+                    "尾巴",
+                    "花朵"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物需要呼吸空氣嗎？",
+                "options": [
+                    "需要，植物和動物一樣需要空氣",
+                    "不需要，植物不呼吸",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "有些植物的莖上有甚麼，我們觀察時要小心被刺傷？",
+                "options": [
+                    "尖刺",
+                    "羽毛",
+                    "牙齒"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "鳳凰木在夏天會開甚麼顏色的花？",
+                "options": [
+                    "鮮紅色的花，像火一樣",
+                    "藍色的花",
+                    "黑色的花"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大樹能為我們人類和動物提供甚麼遮擋陽光？",
+                "options": [
+                    "屋頂",
+                    "綠蔭/遮蔭",
+                    "大傘"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "植物會走動去尋找食物嗎？",
+                "options": [
+                    "不會，牠們留在原地，靠根吸收水分，靠葉子和陽光製造食物",
+                    "會，牠們晚上會走動",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們把一盆植物完全放在一個沒有陽光的黑盒裡，牠會怎樣？",
+                "options": [
+                    "長得更好",
+                    "不能健康生長，葉子會變黃並枯萎",
+                    "沒有任何影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在幼苗上塗上凡士林，會堵塞牠吸入空氣的小孔，幼苗會怎樣？",
+                "options": [
+                    "長得更茂盛",
+                    "不能健康成長",
+                    "變成紅色"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們說植物能「美化環境」？",
+                "options": [
+                    "因為植物有美麗的綠葉和繽紛的花朵，讓人心情愉快",
+                    "因為植物會唱歌",
+                    "開火車"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "仙人掌能夠在極少水的沙漠生存，因為：",
+                "options": [
+                    "牠的莖能儲存水分，葉子變成了刺以減少水分流失",
+                    "牠完全不需要水",
+                    "牠是假的"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "植物的「果實」裡面通常有甚麼，可以用來繁殖後代？",
+                "options": [
+                    "種子",
+                    "糖果",
+                    "小蟲"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一種香港植物在秋天會長出長長的、銀白色的花穗？",
+                "options": [
+                    "芒草",
+                    "洋紫荊",
+                    "木棉"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們天天給盆栽澆過多的水，讓泥土一直濕漉漉的，會：",
+                "options": [
+                    "植物長得更快",
+                    "植物的根會爛掉，導致植物死亡",
+                    "植物會變成水草"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大樹對大自然生態非常重要，因為：",
+                "options": [
+                    "提供氧氣、美化環境、也是很多小動物的家",
+                    "牠們會開火車",
+                    "牠們能製造塑料"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "鳳凰木、洋紫荊和木棉樹的共同點是：",
+                "options": [
+                    "都是香港常見的樹木，都會開花",
+                    "都是長在水裡的植物",
+                    "都不需要泥土"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼不應該在樹幹上刻字或畫畫？",
+                "options": [
+                    "原因這樣會破壞樹皮，讓樹木容易生病和受傷",
+                    "因為樹木會哭出聲來",
+                    "因為畫得不好看"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "有些植物有「牙齒」或「尖刺」，這是為了：",
+                "options": [
+                    "吃小動物",
+                    "保護自己，防止被動物吃掉",
+                    "裝飾自己"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當你發現家裡的盆栽葉子垂下來，土壤很乾，你應該：",
+                "options": [
+                    "馬上倒一整桶冰水進去",
+                    "適量澆水，並把盆栽移到通風有光的地方",
+                    "把它扔掉"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們吃蘋果和橙，其實是在吃植物的哪個部分？",
+                "options": [
+                    "根",
+                    "果實",
+                    "莖"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "種子發芽需要甚麼條件？（不需要陽光，但需要另外三樣）",
+                "options": [
+                    "適量的水分、空氣和合適的溫度",
+                    "陽光、可樂、肥料",
+                    "泥土、玩具、陽光"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "植物的「莖」有甚麼作用？",
+                "options": [
+                    "支撐植物身體，並輸送水分和養分",
+                    "用來呼吸空氣",
+                    "用來開花"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於落葉，以下哪種說法是正確的？",
+                "options": [
+                    "落葉在泥土裡腐爛後能變成肥料，幫助其他植物生長",
+                    "落葉是垃圾，應該全部燒掉",
+                    "落葉沒有生命，所以完全沒有用"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如何證明植物是有生命的？",
+                "options": [
+                    "因為牠會長高、會長出新葉、會開花結果",
+                    "因為牠會叫",
+                    "因為牠會走路"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在公園看到美麗的洋紫荊，以下哪位小孩的做法正確？",
+                "options": [
+                    "朗朗把花摘下來帶回家給媽媽",
+                    "子進用相機拍下美麗的花朵，沒有摘它",
+                    "美美用腳踢樹幹"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種植物需要較多的水分才能生長？",
+                "options": [
+                    "仙人掌",
+                    "水稻/荷花",
+                    "芒草"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們把植物種在「沒有養分」的沙子裡，只給清水，牠會：",
+                "options": [
+                    "長得非常高大",
+                    "生長緩慢，不夠健康",
+                    "馬上變成大樹"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "title": "愛護大自然",
+        "icon": "🌳",
+        "color": "#F1F8E9",
+        "accent": "#7CB342",
+        "teaching": "地球是人類和動植物共同的家園，我們必須愛護環境。在日常生活中，我們可以自備環保購物袋、做好垃圾分類回收（廢紙、塑膠、金屬等）、珍惜水和電、不亂扔垃圾，並多乘搭公共交通工具（減少排放廢氣）。大自然中的森林被稱為地球的肺，給我們提供氧氣，不應該在樹幹上刻字，也不要在野外隨便生火，以免引起火災！",
+        "example": {
+            "q": "以下哪一種行為能保護我們的地球？",
+            "options": [
+                "出門時自備環保購物袋",
+                "用過的一次性塑膠袋隨手扔掉",
+                "把開水龍頭一直開著"
+            ],
+            "ans": 0,
+            "explanation": "自備環保袋可以減少塑膠垃圾，是愛護地球、保護環境的好行為！"
+        },
+        "questions": [
+            {
+                "q": "我們到郊外玩耍時，應該怎樣處理垃圾？",
+                "options": [
+                    "隨地扔在草地上",
+                    "放進垃圾箱，或自己帶回家分類回收",
+                    "藏在樹洞裡"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪種袋子最環保，去超級市場時應該自備？",
+                "options": [
+                    "一次性塑膠袋",
+                    "可循環再用的環保購物袋",
+                    "紙袋"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "離開房間時，我們應該：",
+                "options": [
+                    "把燈和冷氣關掉，節約能源",
+                    "讓燈一直亮著",
+                    "把所有電器都打開"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "刷牙時，我們應該：",
+                "options": [
+                    "讓水龍頭一直開著流海水",
+                    "用杯子裝水，並把水龍頭關上，珍惜水源",
+                    "一邊刷牙一邊玩水"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "看見野生動物（如松鼠、小鳥）時，我們應該：",
+                "options": [
+                    "用零食餵牠們",
+                    "保持安靜，不驚擾牠們，不隨意餵飼",
+                    "用網子去捕捉牠們"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項是愛護地球的行為？",
+                "options": [
+                    "多搭乘公共交通工具",
+                    "天天叫爸爸開私家車接送",
+                    "隨意浪費紙張"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在公園看到草地，我們應該：",
+                "options": [
+                    "在上面亂跑，把草踩死",
+                    "愛護綠化，不在不准踐踏的草地上奔跑",
+                    "在草地上寫字"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "紙張是由甚麼製造的？我們應該珍惜它。",
+                "options": [
+                    "樹木",
+                    "石頭",
+                    "塑膠"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是可以回收的垃圾？",
+                "options": [
+                    "乾淨的塑膠瓶和鋁罐",
+                    "吃剩的雞骨頭",
+                    "用過的髒紙巾"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當我們看到街上的花朵時，應該：",
+                "options": [
+                    "摘下一朵戴在頭上",
+                    "愛惜它，讓它留在枝頭美化環境",
+                    "把花葉全部拔掉"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "珍惜用水是愛護地球的表現。洗手後，我們應該：",
+                "options": [
+                    "把水龍頭關緊，不讓它滴水",
+                    "不用關緊，讓它一直滴",
+                    "玩一會兒水再走"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們應該如何對待郊野公園的設施？",
+                "options": [
+                    "在長椅上刻字",
+                    "愛惜公共設施，保持清潔",
+                    "把垃圾扔在燒烤爐裡"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "垃圾分類回收箱有不同的顏色。你知道藍色回收箱回收甚麼嗎？",
+                "options": [
+                    "廢紙",
+                    "塑膠瓶",
+                    "金屬罐"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們不應該隨便購買不必要的玩具和物品，這是為了：",
+                "options": [
+                    "減少垃圾，愛護地球資源",
+                    "因為錢不夠",
+                    "因為家裡放不下"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大自然給我們提供了甚麼？",
+                "options": [
+                    "新鮮空氣、乾淨的水和美麗的風景",
+                    "電子遊戲和電視機",
+                    "塑膠玩具車"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "保護環境是誰的責任？",
+                "options": [
+                    "只有老師的責任",
+                    "我們每一個人（包括小朋友）的責任",
+                    "只有清潔工人的責任"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在郊外烤肉後，我們必須：",
+                "options": [
+                    "把火完全熄滅，並清理好垃圾才離開",
+                    "留下一點火種沒關係",
+                    "直接走掉"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪種做法是浪費電力的行為？",
+                "options": [
+                    "白天陽光充足時，不開燈",
+                    "睡覺時不關電視，讓它開整晚",
+                    "使用節能燈泡"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們說「地球是我們唯一的家」，所以我們應該：",
+                "options": [
+                    "好好愛護地球的環境和資源",
+                    "隨便破壞，反正還有其他星球",
+                    "不理會環境污染"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在郊外遇到野生小猴子，牠向你討食物，你應該：",
+                "options": [
+                    "給牠吃巧克力",
+                    "不給野生動物餵食，避免改變牠們的生存習性",
+                    "拿石頭砸牠"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "垃圾回收箱有「三色桶」。請問黃色桶是用來回收甚麼的？",
+                "options": [
+                    "金屬（如鋁罐、鐵罐）",
+                    "塑膠（如膠瓶）",
+                    "廢紙"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們要實行「垃圾源頭減廢」（少買沒用的東西）？",
+                "options": [
+                    "因為可以省錢",
+                    "因為垃圾堆填區快要滿了，我們要減少製造垃圾保護地球",
+                    "因為商店不賣東西"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "隨意拋棄塑膠袋和塑膠吸管對大自然有甚麼危害？",
+                "options": [
+                    "沒有危害，它們會融化在泥土裡",
+                    "它們很難分解，流入海洋會被海洋生物誤食而導致死亡",
+                    "會讓植物長得更快"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大氣層像地球的「大衣」。如果人類排放太多廢氣，會：",
+                "options": [
+                    "地球會越來越美麗",
+                    "導致地球溫度上升（溫室效應），破壞生態平衡",
+                    "大氣層會變厚保護我們"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "去郊野公園遠足時，朗朗看到美麗的野花想採摘，子進該怎麼說？",
+                "options": [
+                    "「摘吧！這裡這麼多，摘一朵沒關係。」",
+                    "「不要摘，這會破壞自然生態，留給所有人欣賞吧。」",
+                    "「用火燒掉它吧。」"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼多乘搭公共交通工具（如地鐵、巴士）比自己開私家車更環保？",
+                "options": [
+                    "因為公共交通工具可以載很多人，平均每人排放的廢氣較少",
+                    "因為私家車比較慢",
+                    "因為公共交通工具車票比較便宜"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一種行為符合「綠色低碳生活」？",
+                "options": [
+                    "洗澡洗一個小時",
+                    "夏天把冷氣溫度調得極低（如16度），然後穿外套",
+                    "多吃蔬菜，減少浪費食物，實行「惜食」"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在公園看到野生雀巢，有可愛的小鳥蛋，我們應該：",
+                "options": [
+                    "拿回家孵化",
+                    "用樹枝去戳鳥巢",
+                    "不走近打擾，遠距離觀賞"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們在學校裡，可以用甚麼行動來實踐環境保護？",
+                "options": [
+                    "用雙面寫字，珍惜紙張；午餐不剩飯菜",
+                    "每次洗手用十張抹手紙",
+                    "把垃圾隨手丟在課室地上"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "有些植物長有「尖刺」（如仙人掌、含羞草的刺），這能防止野生動物傷害牠們。我們對待牠們應該：",
+                "options": [
+                    "用剪刀把刺全部剪掉",
+                    "小心觀察，不隨意觸摸，避免自己受傷也保護植物",
+                    "用火燒"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "珍惜水源非常重要。以下哪種水可以用來澆花以達到「水資源循環再用」？",
+                "options": [
+                    "洗米水或洗完蔬菜的乾淨水",
+                    "含有洗潔精和肥皂的髒水",
+                    "滾燙的熱水"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼在郊外不能隨便生火？",
+                "options": [
+                    "因為會弄髒衣服",
+                    "因為容易引起森林大火，燒毀樹木和動物的家",
+                    "因為會被警察抓"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於塑膠回收，以下哪種步驟是正確的？",
+                "options": [
+                    "直接把裝有剩餘汽水的塑膠瓶扔進回收箱",
+                    "把塑膠瓶清洗乾淨、倒空水分、撕掉包裝並壓扁後，才放進藍色回收箱",
+                    "把塑膠瓶燒掉"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們每個人都隨意浪費食物，會造成甚麼影響？",
+                "options": [
+                    "食物會越來越多",
+                    "製造大量廚餘垃圾，增加地球負擔，且浪費了農民的辛勤勞動",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在海灘玩耍時，我們不應該：",
+                "options": [
+                    "堆沙堡",
+                    "把塑膠玩具和垃圾留在沙灘上",
+                    "幫家長收拾垃圾"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大樹能吸收空氣中的甚麼氣體，並釋放我們呼吸需要的氧氣？",
+                "options": [
+                    "二氧化碳",
+                    "水蒸氣",
+                    "有害廢氣"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪項「不是」珍惜用電的好習慣？",
+                "options": [
+                    "使用一級能源效益標籤的電器",
+                    "不看電視時，讓電視一直開著「待機」而不關電源",
+                    "白天盡量利用自然光"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大自然和人類的關係是：",
+                "options": [
+                    "大自然是人類的，我們可以隨意破壞",
+                    "人類依賴大自然生存，我們必須保護大自然，與牠和諧相處",
+                    "人類不需要大自然也能活得很好"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當你在街上看到有人隨地吐痰或亂扔垃圾，你應該明白：",
+                "options": [
+                    "這是非常不文明和破壞環境衛生的行為",
+                    "這很酷，我也要學",
+                    "這沒關係，有清潔工清理"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "減少使用一次性餐具（如塑膠刀叉、紙杯）的目的是：",
+                "options": [
+                    "因為一次性餐具不好用",
+                    "減少垃圾製造，愛護森林和地球資源",
+                    "因為一次性餐具很貴"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "title": "神奇的五官感官",
+        "icon": "👁️",
+        "color": "#FFFDE7",
+        "accent": "#FBC02D",
+        "teaching": "人類有五大感覺器官：眼睛（視覺：看顏色和形狀）、耳朵（聽覺：聽聲音）、鼻子（嗅覺：聞氣味）、舌頭（味覺：嚐甜酸苦鹹）、皮膚（觸覺：感受冷熱和軟硬）。我們要好好保護五官：閱讀時保持30厘米以上距離；烈日下戴上太陽眼鏡保護眼睛；不要隨意用手挖耳孔或鼻孔。絕對不能隨意用舌頭去嚐不知道是甚麼的液體，以免中毒受傷！",
+        "example": {
+            "q": "我們用甚麼感覺器官來分辨糖果的甜味？",
+            "options": [
+                "鼻子",
+                "舌頭",
+                "眼睛"
+            ],
+            "ans": 1,
+            "explanation": "舌頭是我們的味覺器官，可以幫我們分辨甜、酸、苦、鹹的味道！"
+        },
+        "questions": [
+            {
+                "q": "我們可以用哪一個器官來觀察五彩繽紛的顏色？",
+                "options": [
+                    "耳朵",
+                    "眼睛",
+                    "鼻子"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們能聽到美妙的音樂，是靠哪一個器官？",
+                "options": [
+                    "眼睛",
+                    "舌頭",
+                    "耳朵"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "媽媽煮了香噴噴的湯，我們是用甚麼器官聞到氣味的？",
+                "options": [
+                    "肚子",
+                    "鼻子",
+                    "手"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "冰淇淋甜甜的，西瓜甜甜的，我們是用甚麼器官分辨味道的？",
+                "options": [
+                    "舌頭",
+                    "牙齒",
+                    "耳朵"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們能感覺到貓咪的毛是軟軟的，冰塊是冰冰的，是靠：",
+                "options": [
+                    "舌頭",
+                    "眼睛",
+                    "皮膚"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "眼睛可以幫我們做甚麼？",
+                "options": [
+                    "分辨氣味",
+                    "看東西、分辨形狀和顏色",
+                    "分辨聲音的冷暖"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當小狗對你吠叫時，你是用甚麼器官知道牠在叫？",
+                "options": [
+                    "耳朵",
+                    "鼻子",
+                    "舌頭"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "鼻子不能幫我們做甚麼？",
+                "options": [
+                    "聞到花的香味",
+                    "聞到臭味",
+                    "看見美麗的圖畫"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們吃檸檬時覺得很酸，這是因為甚麼器官發揮了作用？",
+                "options": [
+                    "舌頭",
+                    "皮膚",
+                    "鼻子"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是保護眼睛的正確行為？",
+                "options": [
+                    "在烈日下戴上太陽眼鏡",
+                    "一邊走路一邊看書",
+                    "用手揉眼睛"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們用手摸石頭，我們會感覺到石頭是：",
+                "options": [
+                    "軟軟的",
+                    "硬硬和粗糙的",
+                    "甜甜的"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們有幾個主要的感覺器官？",
+                "options": [
+                    "3個",
+                    "5個",
+                    "10個"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "耳朵的功能是：",
+                "options": [
+                    "分辨味道",
+                    "分辨聲音（如大聲、小聲、高音、低音）",
+                    "看見顏色"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們可以用皮膚感受到甚麼？",
+                "options": [
+                    "物體的冷熱和軟硬",
+                    "彩虹的顏色",
+                    "音樂的旋律"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "「這朵花是紅色的，而且香香的。」這句話運用了哪兩個感覺器官？",
+                "options": [
+                    "眼睛和鼻子",
+                    "耳朵和舌頭",
+                    "皮膚和眼睛"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們不應該用手隨意去挖甚麼，以免受傷和受細菌感染？",
+                "options": [
+                    "耳朵和鼻孔",
+                    "手掌",
+                    "膝蓋"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當你合上眼睛，你「不能」做甚麼？",
+                "options": [
+                    "聽音樂",
+                    "分辨眼前氣球的顏色",
+                    "聞到蘋果的香味"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "舌頭能幫我們分辨哪些基本的味道？",
+                "options": [
+                    "甜、酸、苦、鹹",
+                    "冷、熱、軟、硬",
+                    "紅、黃、藍、綠"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們想知道一隻杯子是熱的還是冷的，我們可以用：",
+                "options": [
+                    "耳朵聽",
+                    "皮膚觸摸感覺",
+                    "鼻子聞"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們閱讀時，眼睛和書本應該保持多少距離？",
+                "options": [
+                    "3厘米",
+                    "30厘米以上",
+                    "不用保持距離"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "盲人（失明人士）失去了視覺，他們「不能」使用哪一個器官的功能？",
+                "options": [
+                    "眼睛",
+                    "耳朵",
+                    "皮膚"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "盲人可以用甚麼器官來「閱讀」凸出的點字書？",
+                "options": [
+                    "用耳朵聽",
+                    "用手指的皮膚觸摸",
+                    "用鼻子聞"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們感冒鼻塞時，吃東西常常會覺得「沒味道」，這是因為：",
+                "options": [
+                    "舌頭也壞了",
+                    "嗅覺（鼻子）和味覺（舌頭）是互相影響的",
+                    "食物真的變味了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在猛烈陽光下，我們「不應該」做甚麼，以免傷害眼睛？",
+                "options": [
+                    "戴上太陽眼鏡",
+                    "直接用眼睛望向太陽",
+                    "戴上帽子遮蔭"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當廚房的煤氣洩漏時，哪一個感覺器官能最快警告我們有危險？",
+                "options": [
+                    "眼睛看到煙霧",
+                    "鼻子聞到煤氣的特殊臭味",
+                    "皮膚感到熱"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們不應該隨便嘗試不認識的液體，是因為：",
+                "options": [
+                    "怕被媽媽罵",
+                    "未知液體可能有毒、酸性或有害，會灼傷舌頭和身體",
+                    "因為液體不好喝"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當你聽到火警鐘聲響起，你應該馬上怎樣？這說明感覺器官有甚麼作用？",
+                "options": [
+                    "合上眼睛睡覺；感覺器官沒有用",
+                    "跟從大人指示安全逃生；感覺器官能幫我們察覺危機，保護安全",
+                    "大聲唱歌遮蓋鐘聲"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "子進用雙手摸一個水果，覺得「圓圓的、滑滑的、硬硬的」；用鼻子聞覺得「香香甜甜的」；用眼睛看是「綠色有條紋的」。這最可能是甚麼水果？",
+                "options": [
+                    "西瓜",
+                    "香蕉",
+                    "士多啤梨"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "朗朗在游泳時，為了保護眼睛不被池水（有消毒藥水）刺激，他應該：",
+                "options": [
+                    "戴上泳鏡",
+                    "一直合上眼睛游泳",
+                    "不理會它"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們用不乾淨的手揉眼睛，可能會：",
+                "options": [
+                    "讓眼睛變大",
+                    "把細菌帶進眼睛，導致眼睛發炎（如紅眼症）",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項是保護聽覺（耳朵）的正確行為？",
+                "options": [
+                    "每天戴耳機用最大音量聽歌兩個小時",
+                    "不把細小的物件（如棉花棒、手指）塞進耳道",
+                    "同學在耳邊大聲叫喊時不避開"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼在非常寒冷的地方，我們的皮膚會起「雞皮疙瘩」？",
+                "options": [
+                    "這是皮膚對寒冷環境作出的自然反應，提醒我們要穿衣保暖",
+                    "因為皮膚生病了",
+                    "因為好玩"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在進行科學探究「分辨水和洗手液」時，哪種感覺器官「不適合」用來測試？",
+                "options": [
+                    "用眼睛看（水是透明的，洗手液可能帶有顏色）",
+                    "直接用舌頭去嚐味道",
+                    "用手觸摸（洗手液比較黏滑）"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們戴上耳塞（或用手捂住耳朵），我們主要失去了哪種感覺？",
+                "options": [
+                    "視覺",
+                    "聽覺",
+                    "觸覺"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們如何用感覺器官來分辨「真蘋果」和「塑膠玩具蘋果」？",
+                "options": [
+                    "只用眼睛看就可以，完全不用其他器官",
+                    "用手摸（真的較有水分/冰涼），用鼻子聞（真的有蘋果香氣）",
+                    "直接用腳踩"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於保護五官，以下哪位小孩的做法是錯誤的？",
+                "options": [
+                    "子進在猛烈陽光下戴上太陽眼鏡",
+                    "朗朗每天用手挖鼻孔，直到流鼻血",
+                    "美美閱讀時保持30厘米距離"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當你感覺到有一隻蚊子停在你的手臂上，你是靠甚麼器官知道的？",
+                "options": [
+                    "耳朵",
+                    "皮膚（觸覺）",
+                    "舌頭"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們在看書或使用平板電腦20-30分鐘後，要遠眺（看遠處）綠色植物？",
+                "options": [
+                    "為了讓眼睛的肌肉得到休息，保護視力，預防近視",
+                    "因為綠色植物很好吃",
+                    "因為必須要這樣做"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們吃熱湯時，如果湯太熱，會灼傷我們的：",
+                "options": [
+                    "眼睛",
+                    "舌頭（味覺器官）",
+                    "耳朵"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種生活習慣會損害我們的感覺器官功能？",
+                "options": [
+                    "早晚刷牙，徹底清潔",
+                    "長時間在黑暗環境下看手機螢幕",
+                    "每天做一小時運動"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "title": "健康生活小姿勢",
+        "icon": "🏃",
+        "color": "#F3E5F5",
+        "accent": "#8E24AA",
+        "teaching": "脊椎是我們身體的重要支撐。為了保護脊椎健康，我們在坐、立和走路時，都要保持腰背挺直，不要彎腰駝背。健康的生活習慣也非常重要：小朋友每天應有9至12小時的充足睡眠；每天做最少一小時運動強健骨骼；均衡飲食，多吃蔬菜水果，不偏食、不偏愛零食。多喝水、保持個人衛生，才能健康快樂地成長！",
+        "example": {
+            "q": "寫字讀書時，我們應該保持怎樣的姿勢？",
+            "options": [
+                "趴在桌子上寫",
+                "保持腰背挺直",
+                "歪著身體坐"
+            ],
+            "ans": 1,
+            "explanation": "保持腰背挺直可以保護我們的脊椎，讓我們長得高又直，不易腰酸背痛！"
+        },
+        "questions": [
+            {
+                "q": "我們身體裡面支撐我們坐、立、走的支柱叫甚麼？",
+                "options": [
+                    "脊椎（骨骼）",
+                    "肚子",
+                    "肌肉"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "讀書寫字時，我們的腰背應該怎樣？",
+                "options": [
+                    "彎彎曲曲的",
+                    "保持挺直",
+                    "趴在桌子上"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是走路時的正確姿勢？",
+                "options": [
+                    "低著頭，駝著背",
+                    "挺直腰背，抬頭向前看",
+                    "左右搖晃"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "小學一年級的小朋友，每天應該睡覺大約多少小時？",
+                "options": [
+                    "1小時",
+                    "9至12小時",
+                    "24小時"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "為了健康成長，我們每天應該最少做多久運動？",
+                "options": [
+                    "完全不做運動",
+                    "最少做一小時運動",
+                    "只做5分鐘運動"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種是健康的飲食習慣？",
+                "options": [
+                    "每天只吃糖果 and 薯片",
+                    "均衡飲食，多吃蔬菜水果，不偏食",
+                    "每餐都吃得極飽"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當我們坐在椅子上時，哪種姿勢是正確的？",
+                "options": [
+                    "整個人滑下去，半躺著",
+                    "背部貼著椅背，雙腳放平，腰背挺直",
+                    "把腳放在桌子上"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項是保護脊椎健康的行為？",
+                "options": [
+                    "坐著時保持腰背挺直",
+                    "天天躺在沙發上玩手機",
+                    "走路時彎腰駝背"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "每天早睡早起是好習慣嗎？",
+                "options": [
+                    "是，能讓身體和腦部得到充分休息",
+                    "不是，晚睡晚起才好",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種食物對我們的身體最有益？",
+                "options": [
+                    "新鮮的西蘭花和蘋果",
+                    "炸雞和汽水",
+                    "雪糕和朱古力"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們看電視或平板電腦時，應該：",
+                "options": [
+                    "離螢幕非常近",
+                    "保持適當距離，定時讓眼睛休息",
+                    "一直看，不休息"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們天天偏食，只吃肉，不吃蔬菜，會怎樣？",
+                "options": [
+                    "會變得更強壯",
+                    "會缺乏維生素，容易便秘和生病",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "每天多喝甚麼有助於身體排毒和保持水分？",
+                "options": [
+                    "珍珠奶茶",
+                    "白開水/清水",
+                    "汽水"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在猛烈陽光下做運動，我們應該怎樣保護皮膚？",
+                "options": [
+                    "甚麼都不做",
+                    "塗上防曬用品，或穿防曬衣物",
+                    "穿很厚的羽絨大衣"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項不是健康的生活習慣？",
+                "options": [
+                    "天天定時吃三餐",
+                    "一邊吃飯一邊看手機",
+                    "每天最少做一小時運動"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "書包太重會傷害我們的甚麼？",
+                "options": [
+                    "脊椎和肩膀",
+                    "頭髮",
+                    "手指甲"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們應該如何保持個人衛生？",
+                "options": [
+                    "一個星期不洗澡",
+                    "飯前洗手，每天洗澡，勤剪指甲",
+                    "不用洗手直接拿東西吃"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當我們感到身體疲倦時，這是在提醒我們：",
+                "options": [
+                    "需要去吃大餐",
+                    "需要睡覺或休息了",
+                    "需要跑得更快"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "偏食是健康的習慣嗎？",
+                "options": [
+                    "不是，偏食會導致營養不均衡",
+                    "是，喜歡吃甚麼就只吃甚麼",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "每天定時吃三餐，對我們的身體：",
+                "options": [
+                    "沒有用，想吃就吃",
+                    "非常重要，能提供穩定的能量",
+                    "會讓人變笨"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "長期保持「彎腰駝背」的姿勢，會對身體造成甚麼壞影響？",
+                "options": [
+                    "會長得更高",
+                    "會導致脊椎彎曲變形，引起背痛，影響發育",
+                    "沒有任何影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "小學生的書包重量不應該超過體重的：",
+                "options": [
+                    "10%（即不能太重）",
+                    "50%（越重越好）",
+                    "100%"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為了保護脊椎，我們搬運地上重物時應該怎樣做？",
+                "options": [
+                    "直接彎腰用背部力量提起來",
+                    "先蹲下來，保持腰背挺直，用大腿力量抱起重物",
+                    "用腳踢"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼兒童期需要充足的睡眠（9-12小時）？",
+                "options": [
+                    "因為睡覺時身體會釋放生長激素，幫助我們長高和修復身體",
+                    "因為不用上學",
+                    "因為好玩"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "健康生活金字塔中，我們應該吃得最多的是甚麼？",
+                "options": [
+                    "油、鹽、糖類",
+                    "五穀類（如米飯、麵包）及蔬菜水果",
+                    "肉類和海鮮"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於電子產品，以下哪項是健康的「屏幕時間」建議？",
+                "options": [
+                    "每天玩5個小時遊戲",
+                    "每次使用電子屏幕20-30分鐘後，應休息至少20-30秒",
+                    "一整天都不關機"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "朗朗說：「我很喜歡吃炸薯條，天天吃沒關係。」子進該怎樣勸他？",
+                "options": [
+                    "「好啊，我也天天吃！」",
+                    "「薯條是高油高鹽的垃圾食物，天天吃會不健康，我們應少吃。」",
+                    "「你應該吃更多。」"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "走路時把頭低下，看著地面，長期這樣會：",
+                "options": [
+                    "讓脖子（頸椎）承受太大壓力，引起酸痛和姿勢不良",
+                    "讓人撿到錢",
+                    "沒有關係"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在烈日下進行戶外活動時，除了塗防曬，還應注意：",
+                "options": [
+                    "不停奔跑不休息",
+                    "定時到陰涼處休息，並補充足夠的水分，預防中暑",
+                    "穿黑色的厚衣服"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們說「每天做一小時運動」，運動對身體骨骼有甚麼好處？",
+                "options": [
+                    "會讓骨骼變軟",
+                    "能強健骨骼和肌肉，促進身體血液循環，幫助成長",
+                    "會讓人長不高"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們每餐都吃得太飽（吃撐了），會對身體造成甚麼負擔？",
+                "options": [
+                    "會讓消化器官（胃部）太累，引起腸胃不適，甚至導致肥胖",
+                    "會長得像超人一樣強壯",
+                    "沒有任何負擔"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於偏食，以下哪種說法是正確的？",
+                "options": [
+                    "小朋友只吃喜歡的食物，是正常成長不需要改正",
+                    "偏食會導致某些營養素缺乏，影響身體和腦部發育",
+                    "偏食能讓大腦變聰明"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們讀書時桌椅高度不合適，我們應該：",
+                "options": [
+                    "勉強使用，不理會",
+                    "請家長或老師協助調整，以保持坐姿挺直，保護脊椎",
+                    "躺在地上讀書"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項是預防「脊椎側彎」的好方法？",
+                "options": [
+                    "單肩背很重的書包",
+                    "坐著時不翹腳，保持身體左右平衡，腰背挺直",
+                    "經常歪著身體寫字"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "充足的水分對身體有多種好處，但不包括以下哪一項？",
+                "options": [
+                    "幫助消化食物和排走廢物",
+                    "調節體溫（出汗）",
+                    "直接幫我們長出新牙齒"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            },
+            {
+                "q": "下列哪種生活方式最健康？",
+                "options": [
+                    "每天睡5小時，多吃炸雞，不做運動",
+                    "早睡早起，飲食均衡，每天運動，保持姿勢端正",
+                    "不吃早餐，晚上很晚才睡"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "美美上課時總是歪著頭、趴在桌上聽課，這會：",
+                "options": [
+                    "讓她聽得更清楚",
+                    "容易引起肩膀和頸椎酸痛，並養成不良坐姿",
+                    "讓她得到老師稱讚"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們不應該「一邊吃飯一邊看電視/手機」？",
+                "options": [
+                    "因為電視會壞掉",
+                    "因為這會分散注意力，影響胃部消化，且容易吃得過多",
+                    "因為食物會變冷"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在郊外遠足時，如果感到頭暈、流汗非常多，正確的做法是：",
+                "options": [
+                    "繼續跑，堅持到底",
+                    "馬上到陰涼處坐下休息，解開衣服鈕扣，慢慢補充溫水",
+                    "馬上吃一大包糖果"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種運動對鍛鍊身體平衡和骨骼健康非常有益？",
+                "options": [
+                    "一直坐在沙發上玩手指",
+                    "跑步、跳繩、游泳等有氧運動",
+                    "躺在床上看電視"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "title": "牙齒保衛戰",
+        "icon": "🦷",
+        "color": "#E0F7FA",
+        "accent": "#00ACC1",
+        "teaching": "我們一生有兩套牙齒。小時候長出的是乳齒（共20顆），兒童期乳齒會陸續脫落，長出更強壯、一生只有一套的恆齒。如果恆齒脫落了，就不會再長出新牙了！我們要好好愛護牠們：早晚要用含氟牙膏徹底刷牙（包括外側面、內側面和咬合面）；飯後漱口；少吃太甜、粘牙的食物，並每半年定期看牙醫檢查牙齒，預防蛀牙！",
+        "example": {
+            "q": "如果我們不小心讓恆齒脫落了，還會長出新牙嗎？",
+            "options": [
+                "會，會一直長",
+                "不會，恆齒脫落了就不會再長了",
+                "不知道"
+            ],
+            "ans": 1,
+            "explanation": "不會！恆齒一生只有一套，一旦脫落就不會再長出新牙，所以必須非常珍惜！"
+        },
+        "questions": [
+            {
+                "q": "我們一共有兩套牙齒。小時候長出的第一套牙齒叫甚麼？",
+                "options": [
+                    "乳齒",
+                    "恆齒",
+                    "金牙"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當乳齒脫落後，長出的第二套、更堅固的牙齒叫甚麼？",
+                "options": [
+                    "乳齒",
+                    "恆齒",
+                    "假牙"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "健康的牙齒通常是甚麼顏色的？",
+                "options": [
+                    "白色",
+                    "黃色",
+                    "黑色"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們每天最少應該刷牙多少次？",
+                "options": [
+                    "完全不刷牙",
+                    "最少兩次（早晨和晚上）",
+                    "一個星期刷一次"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "刷牙時，我們「不應該」忽略牙齒的哪一個面？",
+                "options": [
+                    "外側面",
+                    "內側面",
+                    "外側面、內側面和咬合面都要徹底清潔"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種食物最容易引起蛀牙？",
+                "options": [
+                    "糖果和甜汽水",
+                    "西蘭花和胡蘿蔔",
+                    "雞肉和雞蛋"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當你覺得牙齒痛時，你應該：",
+                "options": [
+                    "忍著痛不說",
+                    "告訴家長，並去看牙醫檢查",
+                    "吃更多的糖果"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "為了保護牙齒，我們「不應該」常用牙齒做甚麼？",
+                "options": [
+                    "咬太硬的物件（如玩具、瓶蓋）",
+                    "咀嚼食物",
+                    "微拍照片"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "牙齒能幫我們做甚麼？",
+                "options": [
+                    "咀嚼食物、幫助發音，並讓笑容更美麗",
+                    "用來咬別的小朋友",
+                    "用來呼吸"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大約在甚麼時期，我們的乳齒會開始脫落並更換恆齒？",
+                "options": [
+                    "嬰兒期",
+                    "兒童期（小學時期）",
+                    "老年期"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "刷牙後，我們還應該吃零食嗎？",
+                "options": [
+                    "不應該，特別是晚上刷牙後，不應再進食",
+                    "應該，可以一邊吃一邊睡",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們刷牙時要用甚麼來清潔牙齒？",
+                "options": [
+                    "牙刷和牙膏",
+                    "肥皂",
+                    "清水抹面紙"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果我們不刷牙，牙齒上會長甚麼，導致蛀牙？",
+                "options": [
+                    "牙菌斑和細菌",
+                    "小花朵",
+                    "新牙齒"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "乳齒一共有多少顆？（趣味常識，源於課程答案）",
+                "options": [
+                    "10顆",
+                    "20顆",
+                    "32顆"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "恆齒比乳齒更加：",
+                "options": [
+                    "軟",
+                    "堅固和長久",
+                    "容易脫落"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如果恆齒脫落了，還會再長出新牙齒嗎？",
+                "options": [
+                    "會，會一直長",
+                    "不會，恆齒一生只有一套，脫落了就不會再長",
+                    "不知道"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一個是愛護牙齒的好習慣？",
+                "options": [
+                    "早晚刷牙，飯後漱口，定期看牙醫",
+                    "天天喝可樂",
+                    "用牙籤大力戳牙齦"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們應該常用牙刷的甚麼部分來刷牙？",
+                "options": [
+                    "刷毛",
+                    "刷柄",
+                    "包裝盒"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪種飲料對牙齒最健康？",
+                "options": [
+                    "白開水",
+                    "可口可樂",
+                    "甜橙汁"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "為什麼我們要定期（如每半年）看牙醫？",
+                "options": [
+                    "因為好玩",
+                    "為了及早發現並治療蛀牙，保持口腔健康",
+                    "因為牙醫會送玩具"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "刷牙時，牙刷應該如何放置在牙齒與牙齦之間？",
+                "options": [
+                    "隨便亂刷",
+                    "刷毛與牙齒呈約45度角，輕輕打圈或上下刷",
+                    "用力橫向鋸著刷"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼恆齒脫落後不會再長？",
+                "options": [
+                    "因為人類一生只有兩套牙齒，恆齒是最後一套",
+                    "因為牙齒生病了",
+                    "因為牙齒忘記了生長"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "偏食、不吃蔬菜水果，會缺乏維他命C，容易導致：",
+                "options": [
+                    "牙齒變多",
+                    "流牙血（牙齦發炎）",
+                    "牙齒變黑"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種食物能幫忙清潔牙齒纖維，對牙齒健康有益？",
+                "options": [
+                    "粘牙的麥芽糖",
+                    "高纖維的蔬菜和蘋果",
+                    "軟軟的蛋糕"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "朗朗說：「反正我的乳齒遲早會換，所以長了蛀牙也不用理會。」子進應該說：",
+                "options": [
+                    "「對啊，不用理它。」",
+                    "「不對，乳齒蛀了會影響恆齒的生長和排列，而且會很痛，一定要看牙醫！」",
+                    "「那我們多吃點糖吧。」"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們的乳齒開始搖晃時，正確的處理方法是：",
+                "options": [
+                    "用骯髒的手大力把它拔出來",
+                    "讓它自然脫落，或請牙醫和家長幫忙處理，保持傷口清潔",
+                    "用線綁著門鎖用力拉"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "牙齒的「咬合面」是指牙齒的哪個部分？",
+                "options": [
+                    "牙齒的內側",
+                    "用來咀嚼、磨碎食物的頂部表面",
+                    "牙齒的最外側"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "有些小朋友喜歡「吮手指」或「咬筆桿」，這對牙齒有甚麼壞影響？",
+                "options": [
+                    "會讓牙齒長得更快",
+                    "會使牙齒排列不整齊，影響咬合和外觀",
+                    "會讓牙齒變白"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們刷牙後，還要輕輕刷一刷「舌頭」表面？",
+                "options": [
+                    "因為可以讓舌頭變長",
+                    "因為舌頭表面也藏有細菌和食物殘渣，刷舌頭能減少口臭",
+                    "因為好玩"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "氟化物（Fluoride）是牙膏中常見的成分，它的作用是：",
+                "options": [
+                    "讓牙膏變甜",
+                    "強化牙齒琺瑯質，預防蛀牙",
+                    "讓牙膏有彩虹顏色"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們睡前不刷牙，嘴裡的細菌會利用食物殘渣產生甚麼，從而腐蝕牙齒？",
+                "options": [
+                    "糖分",
+                    "酸性物質",
+                    "水分"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於牙刷的使用，我們應該：",
+                "options": [
+                    "一隻牙刷用五年不換",
+                    "大約每三個月更換一次牙刷，如果刷毛彎曲了要馬上換",
+                    "和兄弟姊妹共用一隻牙刷"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "美美吃完午餐後沒有刷牙，她可以做甚麼來簡單保護牙齒？",
+                "options": [
+                    "喝一杯糖水",
+                    "用清水漱口，帶走食物殘渣",
+                    "吃一口巧克力"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "恆齒一共有多少顆？（成年人，包含智慧齒）",
+                "options": [
+                    "20顆",
+                    "28至32顆",
+                    "100顆"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "健康的牙齦（牙肉）應該呈甚麼顏色？",
+                "options": [
+                    "粉紅色且結實",
+                    "鮮紅色且經常流血",
+                    "黑色"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種行為會損害牙齒健康？",
+                "options": [
+                    "用牙齒來咬開堅硬的開心果殼或蟹鉗",
+                    "每天使用牙線清潔牙縫",
+                    "早晚用含氟牙膏刷牙"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們咀嚼食物時，要用「兩邊牙齒」均勻咀嚼，而不是只用一邊？",
+                "options": [
+                    "因為一邊會累",
+                    "長期只用一邊咀嚼會導致面部肌肉發育不對稱，且加重單側牙齒磨損",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "牙齒結構中，最外層、最堅硬用來保護牙齒的部分叫甚麼？",
+                "options": [
+                    "牙髓",
+                    "琺瑯質",
+                    "牙根"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們不小心撞傷了牙齒，讓牙齒斷裂或脫落，我們應該：",
+                "options": [
+                    "把斷牙扔掉",
+                    "把脫落的牙齒放進牛奶或生理鹽水中，立刻去看牙醫，有機會接回",
+                    "不理會它，等它自己好"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "多吃含鈣（Calcium）的食物有助於牙齒和骨骼健康。以下哪種食物含鈣豐富？",
+                "options": [
+                    "牛奶、豆腐、深綠色蔬菜",
+                    "白麵包",
+                    "薯條"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "title": "美麗地球的環境",
+        "icon": "🌍",
+        "color": "#E0F2F1",
+        "accent": "#00897B",
+        "teaching": "地球表面由海洋、陸地、沙漠和冰雪所組成。在世界地圖上，不同顏色代表不同環境：藍色代表海洋，綠色代表茂密的植物/森林，黃色代表乾燥的沙漠，白色代表寒冷的冰雪。不同的自然環境居住著不同的生物：北極熊適應冰雪環境；駱駝能在沙漠不喝水生存；斑馬和獅子奔跑在草原上；鯨魚和海豚暢游在海洋中。我們一定要愛惜地球！",
+        "example": {
+            "q": "在世界地圖上，綠色代表甚麼？",
+            "options": [
+                "海洋",
+                "有植物生長的陸地（如森林、草原）",
+                "沙漠"
+            ],
+            "ans": 1,
+            "explanation": "綠色代表植物茂密生長的陸地，如森林、樹木和草地！"
+        },
+        "questions": [
+            {
+                "q": "在世界地圖上，藍色的部分代表甚麼？",
+                "options": [
+                    "陸地",
+                    "海洋",
+                    "冰雪"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在世界地圖上，綠色的部分代表甚麼？",
+                "options": [
+                    "沙漠",
+                    "有植物生長的陸地（森林/草原）",
+                    "海洋"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在世界地圖上，黃色的部分代表甚麼？",
+                "options": [
+                    "冰雪",
+                    "沙漠",
+                    "森林"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "在世界地圖上，白色的部分代表甚麼？",
+                "options": [
+                    "冰雪覆蓋的陸地",
+                    "海洋",
+                    "大氣層"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "北極熊生活在甚麼樣的環境中？",
+                "options": [
+                    "炎熱的沙漠",
+                    "冰雪覆蓋的陸地（北極）",
+                    "深海"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "駱駝生活在甚麼樣的環境中？",
+                "options": [
+                    "冰川",
+                    "炎熱乾燥的沙漠",
+                    "森林"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大鯨魚和小海豚生活在甚麼環境中？",
+                "options": [
+                    "海洋",
+                    "陸地上的大樹上",
+                    "沙漠"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "包圍著地球表面的空氣，我們稱之為：",
+                "options": [
+                    "大氣層",
+                    "海洋",
+                    "陸地"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "大氣層像一件大衣，能幫地球：",
+                "options": [
+                    "遮擋有害的陽光，並使地球保持溫暖",
+                    "變得非常寒冷",
+                    "製造好玩的玩具"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "斑馬和獅子生活在甚麼地方？",
+                "options": [
+                    "有植物生長的陸地（草原）",
+                    "冰雪世界",
+                    "深海裡"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "地球表面佔面積最多的是陸地還是海洋？",
+                "options": [
+                    "陸地",
+                    "海洋",
+                    "一樣多"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種動物「不是」生活在陸地上的？",
+                "options": [
+                    "鯊魚",
+                    "長頸鹿",
+                    "大象"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "仙人掌最適合生活在以下哪種環境？",
+                "options": [
+                    "冰川",
+                    "海洋",
+                    "沙漠"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "地球是我們生活的地方，它是一顆：",
+                "options": [
+                    "星星/行星",
+                    "平扁的紙張",
+                    "正方形的盒子"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪種自然景觀不屬於陸地？",
+                "options": [
+                    "高山",
+                    "海洋",
+                    "草原"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "地球上的空氣，我們能用眼睛直接看見嗎？",
+                "options": [
+                    "看見，它是藍色的",
+                    "看不見，它是透明無色的",
+                    "不知道"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一種動物生活在有植物生長的陸地（草原/森林）？",
+                "options": [
+                    "企鵝",
+                    "猴子",
+                    "駱駝"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "地球表面被甚麼包圍著，讓我們可以呼吸？",
+                "options": [
+                    "大氣（空氣）",
+                    "泥土",
+                    "海水"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項是保護地球環境的良好行為？",
+                "options": [
+                    "自備環保袋，減少垃圾",
+                    "在樹木上刻字",
+                    "把污水倒進河流"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "沙漠的環境特點是：",
+                "options": [
+                    "非常多水",
+                    "非常寒冷",
+                    "炎熱、乾燥、很少水"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "為什麼企鵝和北極熊不能在沙漠生存？",
+                "options": [
+                    "因為企鵝不喜歡黃色",
+                    "因為牠們適應了極其寒冷的冰雪環境，無法在炎熱乾燥的沙漠中生活",
+                    "因為沙漠有太多水了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果地球沒有大氣層（保護衣），會發生甚麼事？",
+                "options": [
+                    "地球會變得很安全",
+                    "地球會受到有害陽光直射，且白天極熱、夜晚極冷，生命無法生存",
+                    "沒有任何影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大氣層是如何保護我們的地球的？",
+                "options": [
+                    "阻擋有害的陽光（如紫外線），並使地球不會太寒冷",
+                    "幫我們擋雨",
+                    "讓地球一直下雪"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在世界地圖上，如果綠色面積變少了，這代表甚麼環境危機？",
+                "options": [
+                    "地球的植物和森林正在被破壞（如過度砍伐樹木）",
+                    "海洋變多了",
+                    "冰雪融化了"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼駱駝可以在沙漠生活很多天不喝水？",
+                "options": [
+                    "開火車因為駱駝是假的",
+                    "因為駱駝的身體構造適應了沙漠（如駝峰能儲存能量），能減少水分流失",
+                    "因為駱駝不喜歡水"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "地球上的水資源，大部分是鹹水（海水）還是淡水（可飲用水）？",
+                "options": [
+                    "大部分是鹹水（海洋佔了地球表面約70%）",
+                    "大部分是淡水",
+                    "一樣多"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "地球的大氣層中，有我們呼吸最需要的甚麼氣體？",
+                "options": [
+                    "氧氣",
+                    "二氧化碳",
+                    "廢氣"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果全球天氣變暖，北極的冰川（白色部分）會怎樣？這會危害到甚麼動物？",
+                "options": [
+                    "冰川會融化，會讓北極熊和企鵝失去家園",
+                    "冰川會變多，動物更高興",
+                    "沒有影響"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "仙人掌的葉子退化成「刺」，這對牠在沙漠生存有甚麼幫助？",
+                "options": [
+                    "幫助牠和其他植物吵架",
+                    "減少水分水分蒸發，保護自己不被動物吃掉",
+                    "讓牠長得像恐龍"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們說「陸地是很多動植物的家」。以下哪種動植物不屬於陸地生態？",
+                "options": [
+                    "松鼠和松樹",
+                    "海豚和海草",
+                    "斑馬和含羞草"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在地球上，為什麼高山頂端常常有白色的部分？",
+                "options": [
+                    "因為高山頂端溫度極低，常年覆蓋著冰雪",
+                    "因為有人塗了白油漆",
+                    "因為雲朵掉在上面了"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "地球表面的海洋中，含有大量的鹽分，所以海水是：",
+                "options": [
+                    "甜的",
+                    "鹹的，不能直接飲用",
+                    "無色無味的"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項是愛護地球自然環境的「綠色生活」表現？",
+                "options": [
+                    "多搭乘公共交通工具，減少汽車廢氣排放",
+                    "用過的一次性餐具隨手扔在沙灘",
+                    "天天洗熱水澡洗兩小時"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "斑馬身上的黑白條紋在有植物生長的陸地（草原）上有甚麼作用？",
+                "options": [
+                    "為了好看",
+                    "提供保護色，迷惑獵食者，保護安全",
+                    "因為牠們生病了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼森林（地圖上的綠色部分）被稱為「地球的肺」？",
+                "options": [
+                    "因為森林會像人一樣呼吸",
+                    "因為森林裡的樹木能吸收二氧化碳，產生大量氧氣，淨化空氣",
+                    "因為森林大"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果我們亂丟塑料垃圾到海洋中，會對海洋環境造成甚麼後果？",
+                "options": [
+                    "讓海水變藍",
+                    "破壞海洋生態，魚類和海龜可能誤食塑料致死",
+                    "沒有任何影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "地球的大氣層還可以阻擋宇宙中掉落下來的甚麼，保護地面安全？",
+                "options": [
+                    "小雨滴",
+                    "流星或隕石（在大氣層中摩擦燒毀）",
+                    "宇宙飛船"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼世界各地的沙漠（地圖上的黃色部分）植物非常稀少？",
+                "options": [
+                    "因為沙子太燙了，而且雨水極少，普通植物無法生長",
+                    "因為沒有人去種植",
+                    "因為沙漠植物不漂亮"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "地球上的「淡水」主要儲存在哪裡？",
+                "options": [
+                    "冰川和高山冰雪中",
+                    "海洋中",
+                    "大氣層中"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "要保護地球的美麗環境，小朋友可以做甚麼？",
+                "options": [
+                    "珍惜水電、不浪費食物、做好垃圾分類回收",
+                    "天天買新玩具，用完就丟",
+                    "不用理會環境保護"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "title": "水與空氣的秘密",
+        "icon": "💧",
+        "color": "#E0F7FA",
+        "accent": "#0097A7",
+        "teaching": "水 and 空氣是生命最重要的必需品。乾淨的水是：透明、無色、無味、無氣味的，水會流動，而且沒有固定形狀，形狀隨容器改變。空氣則是：看不見、摸不到（除非風吹）、無色無味、無固定形狀，並且存在於我們周圍所有地方。流動的空氣會形成風。我們探究時一定要注意安全，絕對不能用舌頭去嚐不知名的液體，也不能把膠袋套在頭上玩耍！",
+        "example": {
+            "q": "清水和空氣都有甚麼共同特性？",
+            "options": [
+                "都是白色的",
+                "都沒有固定形狀，而且都會流動",
+                "都可以用眼睛直接看見"
+            ],
+            "ans": 1,
+            "explanation": "清水和空氣都會流動，都沒有固定形狀，形狀會隨著瓶子或空間而改變！"
+        },
+        "questions": [
+            {
+                "q": "清水有顏色嗎？",
+                "options": [
+                    "有，是白色的",
+                    "沒有，清水是無色、透明的",
+                    "有，是藍色的"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "乾淨的水有氣味（味道）嗎？",
+                "options": [
+                    "有，甜甜的",
+                    "沒有，水是無味、無氣味的",
+                    "有，酸酸的"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當你把水倒進圓形杯，它變圓；倒進方形盒，它變方。這說明：",
+                "options": [
+                    "水沒有固定形狀，形狀會隨容器改變",
+                    "水非常神奇，會變魔法",
+                    "水是活的"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "水會流動嗎？",
+                "options": [
+                    "不會，水是一直不動的",
+                    "會，水會由高處向低處流動",
+                    "不知道"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們周圍有空氣嗎？",
+                "options": [
+                    "沒有，只有風吹時才有",
+                    "有，空氣存在於我們四周，看不見但摸得著流動",
+                    "只有教室裡有"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們能用眼睛直接看見乾淨的空氣嗎？",
+                "options": [
+                    "能，它是綠色的",
+                    "不能，它是無色、看不見的",
+                    "不知道"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "空氣有固定形狀嗎？",
+                "options": [
+                    "有，它是正方形的",
+                    "沒有固定形狀，會隨著盛裝的容器改變",
+                    "它是圓形的"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪一項不是水 and 空氣的共同特徵？",
+                "options": [
+                    "都沒有固定形狀",
+                    "都會流動",
+                    "都可以直接用眼睛看見"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當風吹過來時，我們能感覺到甚麼？",
+                "options": [
+                    "感覺到水的流動",
+                    "感覺到空氣的流動（風）",
+                    "看見空氣的顏色"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "把空膠袋裝滿空氣並封口，用手輕輕按，會覺得：",
+                "options": [
+                    "硬邦邦的",
+                    "軟軟的，有彈性",
+                    "甚麼感覺也沒有"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "魚缸裡的魚需要呼吸嗎？",
+                "options": [
+                    "不需要，魚不需要呼吸",
+                    "需要，魚用鰓呼吸溶解在水裡的空氣（氧氣）",
+                    "魚是吃水的"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪種生物生存「不需要」水和空氣？",
+                "options": [
+                    "小狗",
+                    "植物",
+                    "玩具熊"
+                ],
+                "ans": 2,
+                "difficulty": "easy"
+            },
+            {
+                "q": "當我們口渴時，最健康的飲料是：",
+                "options": [
+                    "白開水",
+                    "可樂",
+                    "糖水"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們不應該用甚麼方法去探究不明液體（如洗潔精、藥水）？",
+                "options": [
+                    "用眼睛看顏色",
+                    "直接用舌頭去嚐味道",
+                    "用尺量度杯子高度"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "水和空氣對生命來說是：",
+                "options": [
+                    "生命必不可少的必需品",
+                    "可有可無的東西",
+                    "只有動物需要"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "如何安全地聞杯子裡未知液體的氣味？",
+                "options": [
+                    "把鼻子湊得很近，用力吸氣",
+                    "用手在杯口輕輕扇動（扇聞法），讓少量氣味飄進鼻子",
+                    "直接喝一口試試"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "空氣能流動嗎？",
+                "options": [
+                    "能，流動的空氣會形成風",
+                    "不能，空氣永遠不動",
+                    "不知道"
+                ],
+                "ans": 0,
+                "difficulty": "easy"
+            },
+            {
+                "q": "泳圈裡充滿了甚麼，能讓我們安全地在水上游水？",
+                "options": [
+                    "水",
+                    "空氣（能提供浮力）",
+                    "泥土"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "我們吸入的是甚麼？呼出的是廢氣。",
+                "options": [
+                    "海水",
+                    "空氣",
+                    "泥土"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "以下哪項關於水的特性是錯誤的？",
+                "options": [
+                    "水是無色無味的",
+                    "水有固定的形狀，不會改變",
+                    "水會流動"
+                ],
+                "ans": 1,
+                "difficulty": "easy"
+            },
+            {
+                "q": "子進將同樣容量的水倒進不同形狀的瓶子裡。請問水的形狀改變了嗎？水的體積改變了嗎？",
+                "options": [
+                    "形狀改變了，但水的體積（容量）沒有改變",
+                    "形狀和體積都改變了",
+                    "都沒有改變"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "我們如何用科學探究證明「看不見的空氣確實存在」？",
+                "options": [
+                    "閉上眼睛想像",
+                    "把塑料袋張開收集空氣並密封，袋子會鼓起來；或把空杯壓入水中會產生氣泡",
+                    "大聲叫喊"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "水和牛奶有甚麼「相同」和「不同」的地方？",
+                "options": [
+                    "相同點：都會流動、無固定形狀；不同點：水無色透明，牛奶是白色不透明的",
+                    "完全一樣，沒有不同",
+                    "相同點：都是白色；不同點：味道不同"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "在探究「水和空氣」的特性時，為什麼絕對不能用嘴嚐味道？",
+                "options": [
+                    "因為嚐味道會弄髒衣服",
+                    "因為未知液體可能是有毒、有腐蝕性的化學品，會危害生命安全",
+                    "因為味道不好吃"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大風吹過樹梢，樹葉搖擺。這個現象證明了：",
+                "options": [
+                    "樹葉自己會動",
+                    "看不見的空氣正在流動，形成了風",
+                    "樹木生病了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們把一個空玻璃杯直立、倒扣著壓入水槽中，杯底的紙巾會濕嗎？為什麼？",
+                "options": [
+                    "會濕，因為杯子裡甚麼都沒有",
+                    "不會濕，因為杯子裡的空氣佔據了空間，阻擋水進入杯中",
+                    "會濕，因為水會穿過杯子"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "洗手液和清水有甚麼不同？我們可以用甚麼感官分辨？",
+                "options": [
+                    "用眼睛看（洗手液較粘稠、有顏色），用鼻子聞（洗手液通常有香味），用皮膚摸（洗手液滑溜溜的）",
+                    "完全沒有辦法分辨",
+                    "直接用舌頭嚐"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼在烈日下，我們不能用「熱水」或「冰水」直接洗臉，而是用溫水？",
+                "options": [
+                    "因為溫水最乾淨",
+                    "溫水最溫和，不會刺激皮膚，避免因極端溫度灼傷或凍傷皮膚",
+                    "因為溫水便宜"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當魚缸裡的水太髒、沒有定時更換時，魚會怎樣？為什麼？",
+                "options": [
+                    "魚會長得更大",
+                    "水中的氧氣會減少，且有害物質增多，魚會缺氧生病甚至死亡",
+                    "沒有影響"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "下列關於水和空氣的「共同點」，哪項是正確的？",
+                "options": [
+                    "它們都是看不見的",
+                    "它們都沒有固定形狀，而且都會流動",
+                    "它們都有甜甜的味道"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼我們在游泳時，必須定時把頭抬出水面？",
+                "options": [
+                    "因為我們是人類，必須用肺呼吸空氣中的氧氣，無法在水下呼吸",
+                    "因為水太冷了",
+                    "因為要看風景"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪種生活行為能幫助珍惜和保護「生命之源——水」？",
+                "options": [
+                    "洗手後不關緊水龍頭，讓它一直流",
+                    "實行淘米水、洗菜水用作灌溉盆栽或沖廁所",
+                    "天天玩水槍"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當空氣被吸入人體後，身體會吸收其中的氧氣，並呼出甚麼氣體？",
+                "options": [
+                    "新鮮空氣",
+                    "二氧化碳（廢氣）",
+                    "氧氣"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "如果你手裡拿著一個充了氣的氣球，不小心鬆開了吹口，氣球會飛走。這是因為：",
+                "options": [
+                    "氣球會魔法",
+                    "氣球內部的空氣快速噴出，產生流動的推力",
+                    "氣球太輕了"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "水在溫度極低（如0度以下）時會變成冰，形狀會變得怎樣？",
+                "options": [
+                    "依然沒有固定形狀，會流動",
+                    "會變成有固定形狀的固體，不再流動",
+                    "會消失"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "大氣層包圍著地球。如果大氣中充滿了工廠和汽車排放的「廢氣」，會：",
+                "options": [
+                    "讓大氣層更好看",
+                    "污染空氣，損害人類和動植物的呼吸系統，影響健康",
+                    "讓植物生長得更快"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "以下哪一項「不能」證明空氣是有力量的？",
+                "options": [
+                    "風能吹起風帆，讓船隻前進",
+                    "風能轉動風力發電機的葉片",
+                    "水龍頭流出的水能沖走污垢"
+                ],
+                "ans": 2,
+                "difficulty": "hard"
+            },
+            {
+                "q": "當我們把泥土放入水中，會看見有小氣泡冒出來。這說明了：",
+                "options": [
+                    "泥土會呼吸",
+                    "泥土中藏有空氣",
+                    "泥土變成了魚"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            },
+            {
+                "q": "關於水的特性，以下哪種探究方法是正確且安全的？",
+                "options": [
+                    "用眼睛觀察清水是透明的；用鼻子聞清水是沒有味道的",
+                    "直接喝一大口來試試有沒有毒",
+                    "用火燒一燒"
+                ],
+                "ans": 0,
+                "difficulty": "hard"
+            },
+            {
+                "q": "為什麼不應該把塑膠袋套在頭上玩耍？",
+                "options": [
+                    "因為會弄髒頭髮",
+                    "因為套在頭上會阻隔空氣，導致缺氧窒息，非常危險",
+                    "因為塑膠袋很貴"
+                ],
+                "ans": 1,
+                "difficulty": "hard"
+            }
+        ]
+    }
+];
+
+        // Game State Variables
+        let currentLevel = null;
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let audioPlaying = null;
+        let canAnswer = true;
+        
+        // History tracker for previous / next button navigation
+        let userAnswers = Array(20).fill(null); // stores index of chosen option or null
+
+        // Synthesize Beep Sounds using Web Audio API (Offline robust!)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); // A5
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'chime') {
+                    osc.type = 'sine';
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    notes.forEach((freq, idx) => {
+                        const playOsc = audioCtx.createOscillator();
+                        const playGain = audioCtx.createGain();
+                        playOsc.connect(playGain);
+                        playGain.connect(audioCtx.destination);
+                        playOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.12);
+                        playGain.gain.setValueAtTime(0.12, audioCtx.currentTime + idx * 0.12);
+                        playGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.12 + 0.35);
+                        playOsc.start(audioCtx.currentTime + idx * 0.12);
+                        playOsc.stop(audioCtx.currentTime + idx * 0.12 + 0.35);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio not supported or blocked: ", e);
+            }
+        }
+
+        // Speech Synthesis Function with Cantonese/Traditional Chinese support
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any ongoing speech
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                
+                // Prioritize Cantonese voice (zh-HK), then Taiwanese Mandarin (zh-TW), then Chinese Mandarin (zh-CN)
+                let selectedVoice = voices.find(v => v.lang.includes('zh-HK')) || 
+                                    voices.find(v => v.lang.includes('zh-TW')) || 
+                                    voices.find(v => v.lang.includes('zh-CN'));
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                utterance.rate = 0.85; // Perfectly slow for P1 children
+                utterance.pitch = 1.15; // Soft kid-friendly high tone
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Setup the level grid displaying stars and high scores from localStorage
+        function setupHomeGrid() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = '';
+            
+            levelData.forEach((lvl) => {
+                const card = document.createElement('div');
+                card.className = 'level-card';
+                card.style.backgroundColor = lvl.color;
+                card.style.borderColor = lvl.accent;
+                card.style.boxShadow = `0 8px 0 ${lvl.accent}44`;
+                
+                // Fetch saved high score
+                const recordStr = localStorage.getItem(`level_${lvl.id}_record`);
+                let starsHTML = '<span class="empty-star">☆</span><span class="empty-star">☆</span><span class="empty-star">☆</span>';
+                let scoreText = '最高得分: --';
+                
+                if (recordStr) {
+                    const record = JSON.parse(recordStr);
+                    const savedScore = record.score;
+                    scoreText = `最高得分: ${savedScore} / 20`;
+                    
+                    if (savedScore === 20) {
+                        // Full marks: 3 Big Shiny Stars!
+                        starsHTML = `
+                            <span class="big-star">🌟</span>
+                            <span class="big-star">🌟</span>
+                            <span class="big-star">🌟</span>
+                        `;
+                    } else if (savedScore >= 15) {
+                        // 15-19: 2 small lit stars
+                        starsHTML = `
+                            <span class="small-star">⭐</span>
+                            <span class="small-star">⭐</span>
+                            <span class="empty-star">☆</span>
+                        `;
+                    } else if (savedScore >= 10) {
+                        // 10-14: 1 small lit star
+                        starsHTML = `
+                            <span class="small-star">⭐</span>
+                            <span class="empty-star">☆</span>
+                            <span class="empty-star">☆</span>
+                        `;
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="level-badge" style="background:${lvl.accent}">第 ${lvl.id} 關</div>
+                    <div class="level-icon">${lvl.icon}</div>
+                    <div class="level-title">${lvl.title}</div>
+                    <div class="level-score-display">${scoreText}</div>
+                    <div class="stars-container">${starsHTML}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    openLevelIntro(lvl);
+                });
+                grid.appendChild(card);
+            });
+        }
+
+        // Open Level Intro page (Teaching & Examples)
+        function openLevelIntro(level) {
+            currentLevel = level;
+            
+            // Populate data
+            document.getElementById('intro-level-icon').textContent = level.icon;
+            document.getElementById('intro-level-title').textContent = `${level.title}`;
+            document.getElementById('intro-teaching-content').textContent = level.teaching;
+            
+            // Example Question
+            const example = level.example;
+            document.getElementById('example-question').textContent = `例題：${example.q}`;
+            
+            const exOptsContainer = document.getElementById('example-options');
+            exOptsContainer.innerHTML = '';
+            
+            example.options.forEach((opt, idx) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = `example-opt ${idx === example.ans ? 'correct' : ''}`;
+                optDiv.textContent = `${String.fromCharCode(65 + idx)}. ${opt}`;
+                exOptsContainer.appendChild(optDiv);
+            });
+            
+            document.getElementById('example-explanation').textContent = `💡 小博士解析：${example.explanation}`;
+            
+            // TTS button config
+            document.getElementById('speak-teaching-btn').onclick = () => {
+                speakText(`教學重點。${level.teaching}`);
+            };
+            
+            document.getElementById('speak-example-btn').onclick = () => {
+                speakText(`例題。${example.q}。選項 A：${example.options[0]}。選項 B：${example.options[1]}。選項 C：${example.options[2]}。解析：${example.explanation}`);
+            };
+            
+            switchView('intro-view');
+        }
+
+        // Switch Views helper
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.speechSynthesis.cancel(); // cancel any active reading
+        }
+
+        // Start Level Challenge
+        function startLevel() {
+            score = 0;
+            currentQuestionIndex = 0;
+            canAnswer = true;
+            userAnswers = Array(20).fill(null); // Reset answers tracker
+            
+            // Randomly pick questions: 10 easy (from 20), 10 hard (from 20)
+            const easyPool = currentLevel.questions.filter(q => q.difficulty === 'easy');
+            const hardPool = currentLevel.questions.filter(q => q.difficulty === 'hard');
+            
+            const shuffledEasy = shuffleArray([...easyPool]).slice(0, 10);
+            const shuffledHard = shuffleArray([...hardPool]).slice(0, 10);
+            
+            selectedQuestions = [...shuffledEasy, ...shuffledHard];
+            
+            // Hide custom "Next Question" block
+            document.getElementById('next-q-btn-container').style.display = 'none';
+            
+            updateHUD();
+            showQuestion();
+            switchView('play-view');
+        }
+
+        // Helper: Shuffle Array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Calculate score dynamically based on userAnswers
+        function calculateScore() {
+            let currentScore = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans !== null && ans === selectedQuestions[idx].ans) {
+                    currentScore++;
+                }
+            });
+            return currentScore;
+        }
+
+        // Update HUD display
+        function updateHUD() {
+            score = calculateScore();
+            document.getElementById('hud-progress').textContent = `問題 ${currentQuestionIndex + 1} / 20`;
+            document.getElementById('hud-score').textContent = `得分: ${score} / 20`;
+            
+            const progressPct = ((currentQuestionIndex) / 20) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+        }
+
+        // Render Current Question
+        function showQuestion() {
+            const qData = selectedQuestions[currentQuestionIndex];
+            const prevChoice = userAnswers[currentQuestionIndex];
+            
+            // Hide custom next button
+            document.getElementById('next-q-btn-container').style.display = 'none';
+            
+            // Dynamically style bottom next button for last question
+            const navNextBtn = document.getElementById('nav-next-btn');
+            if (currentQuestionIndex === 19) {
+                navNextBtn.innerHTML = "看成績 🏆";
+                navNextBtn.style.background = "#4CAF50"; // Green for finish
+                navNextBtn.style.boxShadow = "0 6px 0 #2E7D32";
+            } else {
+                navNextBtn.innerHTML = "下一頁 ▶";
+                navNextBtn.style.background = ""; // Restore default CSS
+                navNextBtn.style.boxShadow = "";
+            }
+            
+            // Set difficulty indicator
+            const diffBadge = document.getElementById('hud-difficulty');
+            if (currentQuestionIndex < 10) {
+                diffBadge.textContent = '第一階段：淺程度 ⭐';
+                diffBadge.className = 'difficulty-indicator diff-easy';
+            } else {
+                diffBadge.textContent = '第二階段：深程度 🔥';
+                diffBadge.className = 'difficulty-indicator diff-hard';
+            }
+            
+            document.getElementById('question-text').textContent = qData.q;
+            
+            // Populate Options list
+            const optsContainer = document.getElementById('options-list');
+            optsContainer.innerHTML = '';
+            
+            qData.options.forEach((opt, idx) => {
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.style.borderColor = currentLevel.accent + '66';
+                item.style.boxShadow = `0 6px 0 ${currentLevel.accent}22`;
+                
+                item.innerHTML = `
+                    <div class="option-main-click">
+                        <div class="option-label" style="background:${currentLevel.color}; color:${currentLevel.accent}; border-color:${currentLevel.accent}33">${String.fromCharCode(65 + idx)}</div>
+                        <div class="option-text">${opt}</div>
+                    </div>
+                    <button class="speak-option-btn" aria-label="朗讀選項">🔊</button>
+                `;
+                
+                const mainClickPart = item.querySelector('.option-main-click');
+                const speakBtn = item.querySelector('.speak-option-btn');
+                
+                // Options speaking trigger (stops bubbling so they don't accidently submit answer)
+                speakBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    speakText(`選項 ${String.fromCharCode(65 + idx)}：${opt}`);
+                });
+                
+                // Answer selection
+                mainClickPart.addEventListener('click', () => {
+                    if (canAnswer) handleAnswer(idx, item);
+                });
+                
+                optsContainer.appendChild(item);
+            });
+            
+            // If historical answer exists (user navigated back), lock screen and highlight their results
+            if (prevChoice !== null) {
+                canAnswer = false;
+                const items = optsContainer.querySelectorAll('.option-item');
+                const correctIndex = qData.ans;
+                
+                if (prevChoice === correctIndex) {
+                    items[correctIndex].classList.add('correct-choice');
+                } else {
+                    items[prevChoice].classList.add('wrong-choice');
+                    items[correctIndex].classList.add('correct-choice');
+                }
+            } else {
+                canAnswer = true;
+            }
+            
+            // Main Speaker reads question + all options
+            document.getElementById('speak-question-btn').onclick = () => {
+                let optionsText = qData.options.map((o, i) => `選項 ${String.fromCharCode(65 + i)}：${o}`).join('。');
+                speakText(`問題：${qData.q}。 ${optionsText}`);
+            };
+        }
+
+        // Handle Choice Selection
+        function handleAnswer(selectedIndex, clickedItem) {
+            canAnswer = false;
+            window.speechSynthesis.cancel(); // Stop reading
+            
+            const qData = selectedQuestions[currentQuestionIndex];
+            const correctIndex = qData.ans;
+            userAnswers[currentQuestionIndex] = selectedIndex; // Store answer
+            
+            const items = document.querySelectorAll('.option-item');
+            
+            if (selectedIndex === correctIndex) {
+                // Correct choice
+                clickedItem.classList.add('correct-choice');
+                playSound('correct');
+                score = calculateScore();
+                triggerConfetti(clickedItem);
+                
+                // Show floating big Correct Banner
+                const succBanner = document.getElementById('success-banner');
+                succBanner.classList.add('pop');
+                setTimeout(() => succBanner.classList.remove('pop'), 1400);
+                
+                document.getElementById('hud-score').textContent = `得分: ${score} / 20`;
+                
+                // Correct answers automatically slide forward after 1.8s
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < 20) {
+                        updateHUD();
+                        showQuestion();
+                    } else {
+                        finishLevel();
+                    }
+                }, 1800);
+                
+            } else {
+                // Wrong choice
+                clickedItem.classList.add('wrong-choice');
+                playSound('wrong');
+                items[correctIndex].classList.add('correct-choice'); // Highlite correct one
+                
+                score = calculateScore();
+                document.getElementById('hud-score').textContent = `得分: ${score} / 20`;
+                
+                // WRONG ANSWER REQUIREMENT: Auto-reveal custom next button to proceed. NO AUTO ADVANCE!
+                const nextBtnContainer = document.getElementById('next-q-btn-container');
+                nextBtnContainer.style.display = 'flex';
+                
+                // Focus child eye on next button
+                document.getElementById('next-q-btn').onclick = () => {
+                    nextBtnContainer.style.display = 'none';
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < 20) {
+                        updateHUD();
+                        showQuestion();
+                    } else {
+                        finishLevel();
+                    }
+                };
+            }
+        }
+
+        // Trigger particle celebratory explosion
+        function triggerConfetti(target) {
+            const emojis = ['🌟', '✨', '🎈', '🎉', '🍎', '🐱', '🌱'];
+            const rect = target.getBoundingClientRect();
+            
+            for (let i = 0; i < 15; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                conf.style.left = `${rect.left + rect.width / 2 + (Math.random() - 0.5) * 100}px`;
+                conf.style.top = `${rect.top - 20}px`;
+                
+                const speedX = (Math.random() - 0.5) * 15;
+                const speedY = -Math.random() * 15 - 5;
+                
+                document.body.appendChild(conf);
+                
+                let x = parseFloat(conf.style.left);
+                let y = parseFloat(conf.style.top);
+                let gravity = 0.6;
+                let opacity = 1;
+                let rotation = 0;
+                const rotSpeed = (Math.random() - 0.5) * 10;
+                
+                let curX = speedX;
+                let curY = speedY;
+
+                const timer = setInterval(() => {
+                    x += curX;
+                    y += curY;
+                    curY += gravity;
+                    opacity -= 0.02;
+                    rotation += rotSpeed;
+                    
+                    conf.style.left = `${x}px`;
+                    conf.style.top = `${y}px`;
+                    conf.style.opacity = opacity;
+                    conf.style.transform = `rotate(${rotation}deg)`;
+                    
+                    if (opacity <= 0) {
+                        clearInterval(timer);
+                        conf.remove();
+                    }
+                }, 20);
+            }
+        }
+
+        // Previous and Next Navigation Buttons at bottom
+        document.getElementById('nav-prev-btn').onclick = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                updateHUD();
+                showQuestion();
+            } else {
+                showToast("這已經是第一題囉！🎒");
+            }
+        };
+
+        document.getElementById('nav-next-btn').onclick = () => {
+            if (currentQuestionIndex < 19) {
+                currentQuestionIndex++;
+                updateHUD();
+                showQuestion();
+            } else {
+                finishLevel();
+            }
+        };
+
+        // Custom Toast banner triggers
+        function showToast(text) {
+            const toast = document.getElementById('cute-toast');
+            toast.textContent = text;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        // Update results display elements dynamically
+        function updateResultFeedback() {
+            let mascot = '🎉';
+            let title = '太棒了！';
+            let badge = '科學小博士 🏆';
+            let desc = '';
+            
+            if (score === 20) {
+                mascot = '🏆';
+                title = '滿分神童！大獲全勝！';
+                badge = '皇家科學小院士 🎖️';
+                desc = `你太厲害了！20題全部答對！你獲得了 3 顆閃亮的大星星！大自然都為你的聰明才智歡呼喝采！`;
+            } else if (score >= 15) {
+                mascot = '🌟';
+                title = '成績優異！非常優秀！';
+                badge = '資深科學探究員 🔍';
+                desc = `恭喜你！答對了 ${score} 題！你獲得了 2 顆小星星！只要再仔細一點點，下次一定拿滿分！`;
+            } else if (score >= 10) {
+                mascot = '😀';
+                title = '順利過關！繼續努力！';
+                badge = '新手科學探險家 🎒';
+                desc = `你答對了 ${score} 題，順利及格！你獲得了 1 顆小星星！請點選下方的錯題進行複習，爭取進步吧！`;
+            } else {
+                mascot = '💪';
+                title = '加油！再試一次吧！';
+                badge = '熱心科學助理 🧪';
+                desc = `你答對了 ${score} 題。雖然沒有拿到星星，但不要氣餒！點擊下方的錯題重新練習，一定能學會！`;
+            }
+            
+            document.getElementById('result-mascot').textContent = mascot;
+            document.getElementById('result-congrats').textContent = title;
+            document.getElementById('result-badge').textContent = badge;
+            document.getElementById('result-score').textContent = `獲得得分：${score} / 20 分`;
+            document.getElementById('result-summary').textContent = desc;
+        }
+
+        // Finish Level Screen: Save scores, update records
+        function finishLevel() {
+            playSound('chime');
+            document.getElementById('progress-bar').style.width = `100%`;
+            
+            // Calculate final score dynamically
+            score = calculateScore();
+            
+            // Read existing records
+            const savedRecordStr = localStorage.getItem(`level_${currentLevel.id}_record`);
+            let savedHighScore = 0;
+            if (savedRecordStr) {
+                savedHighScore = JSON.parse(savedRecordStr).score;
+            }
+            
+            // Save new highscore if higher
+            if (score > savedHighScore) {
+                localStorage.setItem(`level_${currentLevel.id}_record`, JSON.stringify({
+                    score: score,
+                    timestamp: new Date().getTime()
+                }));
+            }
+            
+            // Redraw Grid with updated stars/scores
+            setupHomeGrid();
+            
+            // Update Text feedback elements
+            updateResultFeedback();
+            
+            // Render Review Cards
+            renderReviewSummary();
+            
+            switchView('result-view');
+        }
+
+        // Render Review Cards with corrected markers & redo links
+        function renderReviewSummary() {
+            const container = document.getElementById('summary-list');
+            container.innerHTML = '';
+            
+            selectedQuestions.forEach((qData, idx) => {
+                const item = document.createElement('div');
+                const chosenIdx = userAnswers[idx];
+                const isCorrect = (chosenIdx === qData.ans);
+                
+                item.className = `summary-item ${isCorrect ? 'correct' : 'wrong'}`;
+                item.id = `summary-item-${idx}`;
+                
+                let metaHTML = '';
+                if (isCorrect) {
+                    metaHTML = `
+                        <div class="summary-meta">
+                            <span class="status-badge correct">✅ 答對了！</span>
+                            <span style="color:#2E7D32;">正確答案：${String.fromCharCode(65 + qData.ans)}</span>
+                        </div>
+                    `;
+                } else {
+                    metaHTML = `
+                        <div class="summary-meta" id="meta-container-${idx}">
+                            <span class="status-badge wrong">❌ 答錯了</span>
+                            <button class="btn btn-orange" style="font-size:12px; padding:4px 10px; border-radius:10px; box-shadow:none;" onclick="openRedoModal(${idx})">
+                                💪 重新挑戰此題
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                item.innerHTML = `
+                    <div class="summary-q-text">第 ${idx + 1} 題：${qData.q}</div>
+                    ${metaHTML}
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Open Redo Modal Overlay (Continually challenge wrong questions until correct)
+        let activeRedoIdx = null;
+
+        function openRedoModal(questionIndex) {
+            // Automatically alert warning pop-up for children
+            alert("💡 溫馨提示：答錯了沒關係！請細心選出正確答案，可以一直答到對為止喔！加油！🎒✨");
+            
+            activeRedoIdx = questionIndex;
+            const qData = selectedQuestions[questionIndex];
+            
+            document.getElementById('modal-q-text').textContent = qData.q;
+            
+            const optsContainer = document.getElementById('modal-options-list');
+            optsContainer.innerHTML = '';
+            
+            qData.options.forEach((opt, idx) => {
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.style.borderColor = '#FF980088';
+                item.style.boxShadow = '0 4px 0 #FF980022';
+                
+                item.innerHTML = `
+                    <div class="option-main-click">
+                        <div class="option-label" style="background:#FFF3E0; color:#FF9800; border-color:#FF980044">${String.fromCharCode(65 + idx)}</div>
+                        <div class="option-text">${opt}</div>
+                    </div>
+                    <button class="speak-option-btn" aria-label="朗讀選項">🔊</button>
+                `;
+                
+                const mainClickPart = item.querySelector('.option-main-click');
+                const speakBtn = item.querySelector('.speak-option-btn');
+                
+                speakBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    speakText(`選項 ${String.fromCharCode(65 + idx)}：${opt}`);
+                };
+                
+                // Continuous validation click
+                mainClickPart.onclick = () => {
+                    if (idx === qData.ans) {
+                        // Redeemed!
+                        item.classList.add('correct-choice');
+                        playSound('correct');
+                        triggerConfetti(item);
+                        
+                        // Speak encouragement
+                        // speakText("答對了！你太棒了！"); // Disabled auto-read
+                        
+                        // Update userAnswers and recalculate session score
+                        userAnswers[activeRedoIdx] = qData.ans;
+                        score = calculateScore();
+                        
+                        // Update score and title displays instantly on result-view
+                        updateResultFeedback();
+                        
+                        // Overwrite high score if this correction makes it higher!
+                        const savedRecordStr = localStorage.getItem(`level_${currentLevel.id}_record`);
+                        let savedHighScore = 0;
+                        if (savedRecordStr) {
+                            savedHighScore = JSON.parse(savedRecordStr).score;
+                        }
+                        if (score > savedHighScore) {
+                            localStorage.setItem(`level_${currentLevel.id}_record`, JSON.stringify({
+                                score: score,
+                                timestamp: new Date().getTime()
+                            }));
+                            setupHomeGrid(); // Instantly update home page stars
+                        }
+                        
+                        // Update summary item class and label instantly
+                        const summaryItem = document.getElementById(`summary-item-${activeRedoIdx}`);
+                        summaryItem.className = 'summary-item correct';
+                        
+                        const metaContainer = document.getElementById(`meta-container-${activeRedoIdx}`);
+                        metaContainer.innerHTML = `<span class="status-badge corrected">🎉 已修正！</span> <span style="color:#4CAF50;">正確答案：${String.fromCharCode(65 + qData.ans)}</span>`;
+                        
+                        // Close modal after brief success window
+                        setTimeout(() => {
+                            closeRedoModal();
+                        }, 1200);
+                    } else {
+                        // Wrong again - let them immediately choose another
+                        item.classList.add('wrong-choice');
+                        playSound('wrong');
+                        // speakText("不對哦，再試試看！"); // Disabled auto-read
+                    }
+                };
+                
+                optsContainer.appendChild(item);
+            });
+            
+            // Speak standard modal warning automatically on entry
+            document.getElementById('modal-speak-q-btn').onclick = () => {
+                let optionsText = qData.options.map((o, i) => `選項 ${String.fromCharCode(65 + i)}：${o}`).join('。');
+                speakText(`問題：${qData.q}。 ${optionsText}`);
+            };
+            
+            // Auto Popup warning speak & render display
+            document.getElementById('redo-modal').style.display = 'flex';
+            // speakText("答錯了沒關係！請細心選出正確答案，可以一直答到對為止喔！加油！"); // Disabled auto-read
+        }
+
+        function closeRedoModal() {
+            document.getElementById('redo-modal').style.display = 'none';
+            window.speechSynthesis.cancel();
+        }
+
+        document.getElementById('modal-close-x').onclick = closeRedoModal;
+
+        // Button clicks
+        document.getElementById('back-home-btn').onclick = () => { switchView('home-view'); };
+        document.getElementById('start-game-btn').onclick = () => { startLevel(); };
+        
+        document.getElementById('quit-btn').onclick = () => {
+            if (confirm('你確定要放棄這關的科學挑戰嗎？')) {
+                switchView('home-view');
+            }
+        };
+        
+        document.getElementById('result-home-btn').onclick = () => { switchView('home-view'); };
+        document.getElementById('result-rechallenge-btn').onclick = () => { startLevel(); };
+
+        // Clear Records click
+        document.getElementById('clear-records-btn').onclick = () => {
+            if (confirm('你確定要清除所有的挑戰記錄和星星嗎？這將無法復原喔！🐾')) {
+                localStorage.clear();
+                setupHomeGrid();
+                alert('記錄已全部重設！✨');
+            }
+        };
+
+        // On Page Load
+        window.onload = () => {
+            setupHomeGrid();
+            // Pre-load synth voices
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+            }
+        };
+    </script>
+</body>
+</html>
