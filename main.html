@@ -5,328 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小朋友練習遊戲大冒險 🌟</title>
     <style>
-        /* 繪本風格背景：活潑的天空漸層 */
-        body {
-            font-family: 'Comic Sans MS', 'Microsoft JhengHei', 'PingFang HK', sans-serif;
-            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            position: relative; 
-            color: #333; /* 使用深炭灰色代替純黑，對小朋友眼睛更友善 */
-        }
-        
-        /* 頁首左上角圖標：加粗邊框與繪本風陰影 */
-        .top-left-logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 85px;
-            height: 85px;
-            border-radius: 50%; 
-            border: 4px solid #333;
-            box-shadow: 4px 4px 0px #333;
-            object-fit: cover;
-            background-color: white;
-            z-index: 10;
-            transition: transform 0.2s;
-        }
-        .top-left-logo:hover {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        /* 標題彈跳與鮮豔色彩 */
-        @keyframes bounce-fun {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-8px) rotate(-3deg); }
-            75% { transform: translateY(-4px) rotate(3deg); }
-        }
-        h1 {
-            color: #ff5e7e;
-            font-size: 42px;
-            text-shadow: 3px 3px 0px #333, -2px -2px 0px #fff; /* 卡通描邊效果 */
-            margin-top: 15px;
-            letter-spacing: 2px;
-            font-weight: 900;
-        }
-        h1 span {
-            display: inline-block;
-            animation: bounce-fun 2.5s infinite;
-        }
-
-        /* 主容器：像一本打開的圖畫書 */
-        .container {
-            max-width: 850px;
-            margin: 10px auto;
-            background: #ffffff;
-            padding: 35px 25px;
-            border-radius: 30px;
-            border: 5px solid #333;
-            box-shadow: 10px 10px 0px #333; /* 繪本平塗陰影 */
-            position: relative;
-        }
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 3px dashed #ffd166;
-            border-radius: 20px;
-            pointer-events: none;
-        }
-
-        /* 主選單按鈕：手繪風格 */
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 35px;
-            position: relative;
-            z-index: 2;
-        }
-        .age-btn {
-            font-size: 26px;
-            font-weight: 900;
-            padding: 20px;
-            border: 4px solid #333;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.1s ease-in-out;
-            color: #333;
-        }
-        
-        /* 充滿童趣的按壓效果 */
-        .age-btn:active, .game-card:active, .back-btn:active {
-            transform: translate(6px, 6px) !important;
-            box-shadow: 0px 0px 0px #333 !important;
-        }
-        
-        /* 各年級與分類專屬糖果色 */
+        body { font-family: 'Comic Sans MS', 'Microsoft JhengHei', 'PingFang HK', sans-serif; background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); text-align: center; margin: 0; padding: 20px; position: relative; color: #333; }
+        .top-left-logo { position: absolute; top: 20px; left: 20px; width: 85px; height: 85px; border-radius: 50%; border: 4px solid #333; box-shadow: 4px 4px 0px #333; object-fit: cover; background-color: white; z-index: 10; transition: transform 0.2s; }
+        .top-left-logo:hover { transform: scale(1.1) rotate(-5deg); }
+        @keyframes bounce-fun { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-8px) rotate(-3deg); } 75% { transform: translateY(-4px) rotate(3deg); } }
+        h1 { color: #ff5e7e; font-size: 42px; text-shadow: 3px 3px 0px #333, -2px -2px 0px #fff; margin-top: 15px; letter-spacing: 2px; font-weight: 900; }
+        h1 span { display: inline-block; animation: bounce-fun 2.5s infinite; }
+        .container { max-width: 850px; margin: 10px auto; background: #ffffff; padding: 35px 25px; border-radius: 30px; border: 5px solid #333; box-shadow: 10px 10px 0px #333; position: relative; }
+        .container::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 3px dashed #ffd166; border-radius: 20px; pointer-events: none; }
+        .btn-group { display: flex; flex-direction: column; gap: 20px; margin-top: 35px; position: relative; z-index: 2; }
+        .age-btn { font-size: 26px; font-weight: 900; padding: 20px; border: 4px solid #333; border-radius: 20px; cursor: pointer; transition: all 0.1s ease-in-out; color: #333; }
+        .age-btn:active, .game-card:active, .back-btn:active { transform: translate(6px, 6px) !important; box-shadow: 0px 0px 0px #333 !important; }
         .btn-n { background-color: #ffd166; box-shadow: 6px 6px 0px #333; }
         .btn-n:hover { background-color: #ffda85; transform: translateY(-2px); }
-
         .btn-k1 { background-color: #ff9f1c; box-shadow: 6px 6px 0px #333; }
         .btn-k1:hover { background-color: #ffb703; transform: translateY(-2px); }
-
         .btn-k2 { background-color: #06d6a0; box-shadow: 6px 6px 0px #333; }
         .btn-k2:hover { background-color: #2ce0b3; transform: translateY(-2px); }
-        
         .btn-k3 { background-color: #4cc9f0; box-shadow: 6px 6px 0px #333; }
         .btn-k3:hover { background-color: #48bfe3; transform: translateY(-2px); }
-        
         .btn-p1 { background-color: #118ab2; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-p1:hover { background-color: #1eb2e0; transform: translateY(-2px); }
-
         .btn-p2 { background-color: #8338ec; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-p2:hover { background-color: #9d4edd; transform: translateY(-2px); }
-
         .btn-p3 { background-color: #f25c54; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-p3:hover { background-color: #f77f77; transform: translateY(-2px); }
-
         .btn-phonic { background-color: #3a86ff; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-phonic:hover { background-color: #609dff; transform: translateY(-2px); }
-
         .btn-draw { background-color: #ff70a6; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-draw:hover { background-color: #ff99c8; transform: translateY(-2px); }
-
-        /* 科目專屬顏色 */
         .btn-chi { background-color: #ef476f; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-eng { background-color: #9d4edd; color: #fff; box-shadow: 6px 6px 0px #333; }
         .btn-math { background-color: #ff9f1c; box-shadow: 6px 6px 0px #333; }
-        .btn-gs { background-color: #4cc9f0; color: #fff; box-shadow: 6px 6px 0px #333; } /* 常識專屬色 */
-        .btn-gs:hover { background-color: #48bfe3; transform: translateY(-2px); }
-        
-        /* 區塊顯示控制與標題 */
-        .section-div {
-            display: none; 
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
-        }
-        .section-div h2 {
-            font-size: 34px;
-            font-weight: 900;
-            text-shadow: 2px 2px 0px #fff, 4px 4px 0px #333;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-        }
-
-        /* 遊戲卡片網格 */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
-            margin-top: 25px;
-        }
-
-        /* 繪本風遊戲小卡 */
-        .game-card {
-            background-color: #fff9e6;
-            border: 4px solid #333;
-            border-radius: 25px;
-            padding: 30px 15px;
-            text-decoration: none;
-            color: #333;
-            font-size: 22px;
-            font-weight: 900;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 6px 6px 0px #333;
-            transition: all 0.15s ease-in-out;
-            position: relative;
-            overflow: hidden;
-        }
-        /* 卡片裝飾小圓點 */
-        .game-card::after {
-            content: '';
-            position: absolute;
-            top: 10px; right: 10px;
-            width: 12px; height: 12px;
-            background-color: #ff5e7e;
-            border-radius: 50%;
-            border: 2px solid #333;
-        }
-        .game-card:hover {
-            transform: translate(-3px, -3px) scale(1.02);
-            box-shadow: 9px 9px 0px #333;
-            background-color: #ffffff;
-            color: #ef476f;
-        }
-
-        /* 遊戲圖示果凍動畫 */
-        @keyframes jelly {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15) rotate(5deg); }
-        }
-        .game-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.2));
-            animation: jelly 3s infinite ease-in-out;
-        }
-        
-        /* 可愛返回按鈕 */
-        .back-btn {
-            background-color: #fff;
-            color: #333;
-            font-size: 20px;
-            font-weight: 900;
-            padding: 12px 25px;
-            border: 4px solid #333;
-            border-radius: 18px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            display: inline-block;
-            box-shadow: 4px 4px 0px #333;
-            transition: all 0.1s;
-        }
-        .back-btn.home {
-            background-color: #ff99cc;
-        }
-
-        /* 底部聯絡資訊：塗鴉板風格 */
-        .footer {
-            margin-top: 50px;
-            padding: 25px;
-            background-color: #fffaf0;
-            border-radius: 20px;
-            border: 4px dashed #333;
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            line-height: 1.8;
-            position: relative;
-            z-index: 2;
-        }
-        .footer h3 {
-            color: #ff9f1c;
-            text-shadow: 1px 1px 0px #333;
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: 900;
-        }
-        .footer a {
-            color: #333;
-            background-color: #fff;
-            text-decoration: none;
-            margin: 6px;
-            padding: 8px 15px;
-            border-radius: 12px;
-            display: inline-block;
-            transition: all 0.2s;
-            border: 3px solid #333;
-            box-shadow: 3px 3px 0px #333;
-        }
-        .footer a:hover {
-            background-color: #06d6a0;
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px #333;
-        }
-        .footer a:active {
-            transform: translate(3px, 3px);
-            box-shadow: 0px 0px 0px #333;
-        }
-        .douyin-text {
-            display: inline-block;
-            margin: 15px 8px 0;
-            background-color: #ffd166;
-            padding: 8px 20px;
-            border-radius: 12px;
-            border: 3px solid #333;
-            box-shadow: 3px 3px 0px #333;
-        }
-
-        /* 📱 手機版專屬優化 📱 */
+        .btn-gs { background-color: #06d6a0; color: #fff; box-shadow: 6px 6px 0px #333; }
+        .btn-gs:hover { background-color: #2ce0b3; transform: translateY(-2px); }
+        .section-div { display: none; margin-top: 20px; position: relative; z-index: 2; }
+        .section-div h2 { font-size: 34px; font-weight: 900; text-shadow: 2px 2px 0px #fff, 4px 4px 0px #333; margin-bottom: 30px; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-top: 25px; }
+        .game-card { background-color: #fff9e6; border: 4px solid #333; border-radius: 25px; padding: 30px 15px; text-decoration: none; color: #333; font-size: 22px; font-weight: 900; display: flex; flex-direction: column; align-items: center; box-shadow: 6px 6px 0px #333; transition: all 0.15s ease-in-out; position: relative; }
+        .game-card::after { content: ''; position: absolute; top: 10px; right: 10px; width: 12px; height: 12px; background-color: #ff5e7e; border-radius: 50%; border: 2px solid #333; }
+        .game-card:hover { transform: translate(-3px, -3px) scale(1.02); box-shadow: 9px 9px 0px #333; background-color: #ffffff; color: #ef476f; }
+        @keyframes jelly { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15) rotate(5deg); } }
+        .game-icon { font-size: 60px; margin-bottom: 15px; filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.2)); animation: jelly 3s infinite ease-in-out; }
+        .back-btn { background-color: #fff; color: #333; font-size: 20px; font-weight: 900; padding: 12px 25px; border: 4px solid #333; border-radius: 18px; cursor: pointer; margin-bottom: 20px; display: inline-block; box-shadow: 4px 4px 0px #333; transition: all 0.1s; }
+        .back-btn.home { background-color: #ff99cc; }
+        .footer { margin-top: 50px; padding: 25px; background-color: #fffaf0; border-radius: 20px; border: 4px dashed #333; font-size: 16px; font-weight: bold; color: #333; line-height: 1.8; position: relative; z-index: 2; }
+        .footer h3 { color: #ff9f1c; text-shadow: 1px 1px 0px #333; margin-top: 0; margin-bottom: 20px; font-size: 24px; font-weight: 900; }
+        .footer a { color: #333; background-color: #fff; text-decoration: none; margin: 6px; padding: 8px 15px; border-radius: 12px; display: inline-block; transition: all 0.2s; border: 3px solid #333; box-shadow: 3px 3px 0px #333; }
+        .footer a:hover { background-color: #06d6a0; transform: translate(-2px, -2px); box-shadow: 5px 5px 0px #333; }
+        .douyin-text { display: inline-block; margin: 15px 8px 0; background-color: #ffd166; padding: 8px 20px; border-radius: 12px; border: 3px solid #333; box-shadow: 3px 3px 0px #333; }
         @media (max-width: 600px) {
             body { padding: 15px 10px; }
-            .top-left-logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 10px;
-                width: 75px; 
-                height: 75px;
-            }
-            .container {
-                padding: 25px 15px; 
-                border-width: 4px;
-                box-shadow: 6px 6px 0px #333;
-            }
-            h1 {
-                font-size: 30px; 
-            }
-            .age-btn {
-                font-size: 24px; 
-                padding: 18px; 
-            }
-            .section-div h2 {
-                font-size: 28px;
-            }
-            .game-grid {
-                grid-template-columns: 1fr; 
-                gap: 20px;
-            }
-            .game-card {
-                padding: 20px 15px;
-            }
-            .footer {
-                padding: 20px 10px;
-            }
-            .footer p {
-                display: flex;
-                flex-direction: column; 
-                gap: 8px; 
-            }
-            .footer a {
-                margin: 0;
-            }
+            .top-left-logo { position: relative; top: 0; left: 0; margin-bottom: 10px; width: 75px; height: 75px; }
+            .container { padding: 25px 15px; border-width: 4px; box-shadow: 6px 6px 0px #333; }
+            h1 { font-size: 30px; }
+            .age-btn { font-size: 24px; padding: 18px; }
+            .section-div h2 { font-size: 28px; }
+            .game-grid { grid-template-columns: 1fr; gap: 20px; }
+            .game-card { padding: 20px 15px; }
+            .footer { padding: 20px 10px; }
+            .footer p { display: flex; flex-direction: column; gap: 8px; }
+            .footer a { margin: 0; }
         }
     </style>
 </head>
 <body>
 
-<!-- 最左上角圖標 -->
 <img src="cat.jpeg" alt="Teacher Cat" class="top-left-logo" onerror="this.style.display='none'">
 
 <div class="container">
@@ -334,7 +78,7 @@
     <p style="font-size: 22px; color: #555; font-weight: bold;">準備好開始了嗎？選一個喜歡的分類吧！</p>
 
     <!-- 【主目錄】 -->
-    <div id="home-menu" class="btn-group" style="display: flex;">
+    <div id="home-menu" class="btn-group">
         <button class="age-btn btn-n" onclick="showSection('n-games')">🐣 幼稚園 N</button>
         <button class="age-btn btn-k1" onclick="showSection('k1-games')">🐥 幼稚園 K1</button>
         <button class="age-btn btn-k2" onclick="showSection('k2-games')">🐧 幼稚園 K2</button>
@@ -343,20 +87,20 @@
         <button class="age-btn btn-p2" onclick="showSection('p2-menu')">🎒 小學二年級</button>
         <button class="age-btn btn-p3" onclick="showSection('p3-menu')">📏 小學三年級</button>
         <button class="age-btn btn-phonic" onclick="showSection('phonic-games')">🔤 Phonic英文拼音</button>
-        <!-- 輕鬆畫畫Game：直接跳轉至指定連結 -->
         <button class="age-btn btn-draw" onclick="window.location.href='https://cat123teacher.github.io/chinese/drawing.html'">🎨 輕鬆畫畫Game</button>
     </div>
 
-    <!-- 【小一目錄 (選科)】 -->
+    <!-- 【小一選科】 -->
     <div id="p1-menu" class="section-div btn-group">
         <button class="back-btn" style="align-self: center;" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #118ab2;">🎓 小學一年級 科目</h2>
         <button class="age-btn btn-chi" onclick="showSection('p1-chi-games')">📚 中文冒險</button>
         <button class="age-btn btn-eng" onclick="showSection('p1-eng-games')">🔤 英文挑戰</button>
         <button class="age-btn btn-math" onclick="showSection('p1-math-games')">🔢 數學樂園</button>
+        <button class="age-btn btn-gs" onclick="showSection('p1-human-science-games')">🌿 人文和科學</button>
     </div>
 
-    <!-- 【小二目錄 (選科)】 -->
+    <!-- 【小二選科】 -->
     <div id="p2-menu" class="section-div btn-group">
         <button class="back-btn" style="align-self: center;" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #8338ec;">🎒 小學二年級 科目</h2>
@@ -366,7 +110,7 @@
         <button class="age-btn btn-gs" onclick="showSection('p2-gs-games')">🌍 常識探索</button>
     </div>
 
-    <!-- 【小三目錄 (選科)】 -->
+    <!-- 【小三選科】 -->
     <div id="p3-menu" class="section-div btn-group">
         <button class="back-btn" style="align-self: center;" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #f25c54;">📏 小學三年級 科目</h2>
@@ -376,97 +120,50 @@
         <button class="age-btn btn-gs" onclick="showSection('p3-gs-games')">🌍 常識探索</button>
     </div>
 
-    <!-- ==================== 遊戲列表區 ==================== -->
-
-    <!-- 幼稚園 N 遊戲區 -->
+    <!-- ==================== 幼稚園遊戲區 ==================== -->
     <div id="n-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #ffd166;">🐣 幼稚園 N 遊戲</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card">
-                <span class="game-icon">🧩</span>
-                K1圖解邏輯遊戲<br>(讀題發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
-                <span class="game-icon">🔤</span>
-                K1-K3幼稚園認字卡<br>(粵普英發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card">
-                <span class="game-icon">🧸</span>
-                幼稚園K2K3看圖說故事
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card"><span class="game-icon">🧩</span>K1圖解邏輯遊戲<br>(讀題發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card"><span class="game-icon">🔤</span>K1-K3幼稚園認字卡<br>(粵普英發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card"><span class="game-icon">🧸</span>幼稚園K2K3看圖說故事</a>
         </div>
     </div>
 
-    <!-- 幼稚園 K1 遊戲區 -->
     <div id="k1-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #ff9f1c;">🐥 幼稚園 K1 遊戲</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
-                <span class="game-icon">🐻</span>
-                20內加減練習小遊戲
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card">
-                <span class="game-icon">🧩</span>
-                K1圖解邏輯遊戲<br>(讀題發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
-                <span class="game-icon">🔤</span>
-                K1-K3幼稚園認字卡<br>(粵普英發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card">
-                <span class="game-icon">🧸</span>
-                幼稚園K2K3看圖說故事
-            </a>
+            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card"><span class="game-icon">🐻</span>20內加減練習小遊戲</a>
+            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card"><span class="game-icon">🧩</span>K1圖解邏輯遊戲<br>(讀題發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card"><span class="game-icon">🔤</span>K1-K3幼稚園認字卡<br>(粵普英發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card"><span class="game-icon">🧸</span>幼稚園K2K3看圖說故事</a>
         </div>
     </div>
 
-    <!-- 幼稚園 K2 遊戲區 -->
     <div id="k2-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #06d6a0;">🐧 幼稚園 K2 遊戲</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
-                <span class="game-icon">🐻</span>
-                20內加減練習小遊戲
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card">
-                <span class="game-icon">🧩</span>
-                K1圖解邏輯遊戲<br>(讀題發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
-                <span class="game-icon">🔤</span>
-                K1-K3幼稚園認字卡<br>(粵普英發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card">
-                <span class="game-icon">🧸</span>
-                幼稚園K2K3看圖說故事
-            </a>
+            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card"><span class="game-icon">🐻</span>20內加減練習小遊戲</a>
+            <a href="https://cat123teacher.github.io/chinese/K1math.html" class="game-card"><span class="game-icon">🧩</span>K1圖解邏輯遊戲<br>(讀題發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card"><span class="game-icon">🔤</span>K1-K3幼稚園認字卡<br>(粵普英發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card"><span class="game-icon">🧸</span>幼稚園K2K3看圖說故事</a>
         </div>
     </div>
 
-    <!-- 幼稚園 K3 遊戲區 -->
     <div id="k3-games" class="section-div">
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #4cc9f0;">🚀 幼稚園 K3 遊戲</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card">
-                <span class="game-icon">🐻</span>
-                20內加減練習小遊戲
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card">
-                <span class="game-icon">🔤</span>
-                K1-K3幼稚園認字卡<br>(粵普英發音版)
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card">
-                <span class="game-icon">🧸</span>
-                幼稚園K2K3看圖說故事
-            </a>
+            <a href="https://cat123teacher.github.io/Teacher_Cat_1-100-addition/0to20.html" class="game-card"><span class="game-icon">🐻</span>20內加減練習小遊戲</a>
+            <a href="https://cat123teacher.github.io/chinese/word.html" class="game-card"><span class="game-icon">🔤</span>K1-K3幼稚園認字卡<br>(粵普英發音版)</a>
+            <a href="https://cat123teacher.github.io/chinese/K23chinesestory.html" class="game-card"><span class="game-icon">🧸</span>幼稚園K2K3看圖說故事</a>
         </div>
     </div>
 
-    <!-- 小一：中文區 -->
+    <!-- ==================== 小學一年級遊戲區 ==================== -->
     <div id="p1-chi-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p1-menu')">⬅ 回小一</button>
@@ -474,34 +171,15 @@
         </div>
         <h2 style="color: #ef476f;">📚 小一 - 中文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/chinese.html" class="game-card">
-                <span class="game-icon">📚</span>
-                小一中文文法大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/chinese2.html" class="game-card">
-                <span class="game-icon">📗</span>
-                小一中文文法大冒險下
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1reading.html" class="game-card">
-                <span class="game-icon">📖</span>
-                小一中文閱讀挑戰
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1writing.html" class="game-card">
-                <span class="game-icon">📝</span>
-                小一初級寫作練習
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1fillin.html" class="game-card">
-                <span class="game-icon">✏️</span>
-                小一填充詞語運用
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1chineselistening" class="game-card">
-                <span class="game-icon">🎧</span>
-                小一中文聆聽大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/chinese.html" class="game-card"><span class="game-icon">📚</span>小一中文文法大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/chinese2.html" class="game-card"><span class="game-icon">📗</span>小一中文文法大冒險下</a>
+            <a href="https://cat123teacher.github.io/chinese/P1reading.html" class="game-card"><span class="game-icon">📖</span>小一中文閱讀挑戰</a>
+            <a href="https://cat123teacher.github.io/chinese/P1writing.html" class="game-card"><span class="game-icon">📝</span>小一初級寫作練習</a>
+            <a href="https://cat123teacher.github.io/chinese/P1fillin.html" class="game-card"><span class="game-icon">✏️</span>小一填充詞語運用</a>
+            <a href="https://cat123teacher.github.io/chinese/P1chineselistening" class="game-card"><span class="game-icon">🎧</span>小一中文聆聽大冒險</a>
         </div>
     </div>
 
-    <!-- 小一：英文區 -->
     <div id="p1-eng-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p1-menu')">⬅ 回小一</button>
@@ -509,30 +187,14 @@
         </div>
         <h2 style="color: #9d4edd;">🔤 小一 - 英文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P1grammar.html" class="game-card">
-                <span class="game-icon">⚔️</span>
-                小一英文文法大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1grammar2.html" class="game-card">
-                <span class="game-icon">🛡️</span>
-                小一英文文法大冒險下
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1englishreading.html" class="game-card">
-                <span class="game-icon">📕</span>
-                小一英文閱讀挑戰
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1englishwriting.html" class="game-card">
-                <span class="game-icon">✍️</span>
-                小一英文初級寫作練習
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1englishlistening" class="game-card">
-                <span class="game-icon">🏝️</span>
-                小一英文聆聽冒險島
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P1grammar.html" class="game-card"><span class="game-icon">⚔️</span>小一英文文法大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P1grammar2.html" class="game-card"><span class="game-icon">🛡️</span>小一英文文法大冒險下</a>
+            <a href="https://cat123teacher.github.io/chinese/P1englishreading.html" class="game-card"><span class="game-icon">📕</span>小一英文閱讀挑戰</a>
+            <a href="https://cat123teacher.github.io/chinese/P1englishwriting.html" class="game-card"><span class="game-icon">✍️</span>小一英文初級寫作練習</a>
+            <a href="https://cat123teacher.github.io/chinese/P1englishlistening" class="game-card"><span class="game-icon">🏝️</span>小一英文聆聽冒險島</a>
         </div>
     </div>
 
-    <!-- 小一：數學區 -->
     <div id="p1-math-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p1-menu')">⬅ 回小一</button>
@@ -540,22 +202,27 @@
         </div>
         <h2 style="color: #ff9f1c;">🔢 小一 - 數學</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P1math100.html" class="game-card">
-                <span class="game-icon">🦁</span>
-                20,50,100內加減練習小遊戲
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1math.html" class="game-card">
-                <span class="game-icon">🧮</span>
-                小一數學乘數初學大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P1math1.html" class="game-card">
-                <span class="game-icon">🍰</span>
-                小一數學除數初學大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P1math100.html" class="game-card"><span class="game-icon">🦁</span>20,50,100內加減練習小遊戲</a>
+            <a href="https://cat123teacher.github.io/chinese/P1math.html" class="game-card"><span class="game-icon">🧮</span>小一數學乘數初學大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P1math1.html" class="game-card"><span class="game-icon">🍰</span>小一數學除數初學大冒險</a>
         </div>
     </div>
 
-    <!-- 小二：中文區 -->
+    <div id="p1-human-science-games" class="section-div">
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="back-btn" onclick="showSection('p1-menu')">⬅ 回小一</button>
+            <button class="back-btn home" onclick="showSection('home-menu')">🏠 回主頁</button>
+        </div>
+        <h2 style="color: #06d6a0;">🌿 小一 - 人文和科學</h2>
+        <div class="game-grid">
+            <a href="https://cat123teacher.github.io/chinese/P1Ahuman.html" class="game-card"><span class="game-icon">🏛️</span>小一人文上大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P1Bhuman.html" class="game-card"><span class="game-icon">🗺️</span>小一人文下大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P1Ascience.html" class="game-card"><span class="game-icon">🔬</span>小一科學上大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P1Bscience.html" class="game-card"><span class="game-icon">🚀</span>小一科學下大冒險</a>
+        </div>
+    </div>
+
+    <!-- ==================== 小學二年級遊戲區 ==================== -->
     <div id="p2-chi-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p2-menu')">⬅ 回小二</button>
@@ -563,30 +230,14 @@
         </div>
         <h2 style="color: #ef476f;">📚 小二 - 中文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P2chinese.html" class="game-card">
-                <span class="game-icon">📗</span>
-                小二詞語運用練習
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2chineselistening" class="game-card">
-                <span class="game-icon">🎧</span>
-                小二中文聆聽大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2chinesereading.html" class="game-card">
-                <span class="game-icon">📖</span>
-                小二中文閱讀大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2chinesewriting.html" class="game-card">
-                <span class="game-icon">📝</span>
-                小二中文寫作大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2chinesesorting.html" class="game-card">
-                <span class="game-icon">🧩</span>
-                小二重組句子練習
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P2chinese.html" class="game-card"><span class="game-icon">📗</span>小二詞語運用練習</a>
+            <a href="https://cat123teacher.github.io/chinese/P2chineselistening" class="game-card"><span class="game-icon">🎧</span>小二中文聆聽大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P2chinesereading.html" class="game-card"><span class="game-icon">📖</span>小二中文閱讀大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P2chinesewriting.html" class="game-card"><span class="game-icon">📝</span>小二中文寫作大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P2chinesesorting.html" class="game-card"><span class="game-icon">🧩</span>小二重組句子練習</a>
         </div>
     </div>
 
-    <!-- 小二：英文區 -->
     <div id="p2-eng-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p2-menu')">⬅ 回小二</button>
@@ -594,30 +245,14 @@
         </div>
         <h2 style="color: #9d4edd;">🔤 小二 - 英文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P2writing.html" class="game-card">
-                <span class="game-icon">✍️</span>
-                小二英文寫作練習
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2Agrammar.html" class="game-card">
-                <span class="game-icon">⚔️</span>
-                小二上文法大挑戰
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2Bgrammar.html" class="game-card">
-                <span class="game-icon">🛡️</span>
-                小二下文法大挑戰
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2reading.html" class="game-card">
-                <span class="game-icon">📖</span>
-                小二英文閱讀理解
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2englishlistening" class="game-card">
-                <span class="game-icon">🏝️</span>
-                小二英文聆聽冒險島
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P2writing.html" class="game-card"><span class="game-icon">✍️</span>小二英文寫作練習</a>
+            <a href="https://cat123teacher.github.io/chinese/P2Agrammar.html" class="game-card"><span class="game-icon">⚔️</span>小二上文法大挑戰</a>
+            <a href="https://cat123teacher.github.io/chinese/P2Bgrammar.html" class="game-card"><span class="game-icon">🛡️</span>小二下文法大挑戰</a>
+            <a href="https://cat123teacher.github.io/chinese/P2reading.html" class="game-card"><span class="game-icon">📖</span>小二英文閱讀理解</a>
+            <a href="https://cat123teacher.github.io/chinese/P2englishlistening" class="game-card"><span class="game-icon">🏝️</span>小二英文聆聽冒險島</a>
         </div>
     </div>
 
-    <!-- 小二：數學區 -->
     <div id="p2-math-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p2-menu')">⬅ 回小二</button>
@@ -625,18 +260,11 @@
         </div>
         <h2 style="color: #ff9f1c;">🔢 小二 - 數學</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P2Amath.html" class="game-card">
-                <span class="game-icon">➕</span>
-                小二上數學大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P2Bmath.html" class="game-card">
-                <span class="game-icon">➖</span>
-                小二下數學大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P2Amath.html" class="game-card"><span class="game-icon">➕</span>小二上數學大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P2Bmath.html" class="game-card"><span class="game-icon">➖</span>小二下數學大冒險</a>
         </div>
     </div>
 
-    <!-- 小二：常識區 -->
     <div id="p2-gs-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p2-menu')">⬅ 回小二</button>
@@ -644,14 +272,11 @@
         </div>
         <h2 style="color: #4cc9f0;">🌍 小二 - 常識</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P2GS.html" class="game-card">
-                <span class="game-icon">🌍</span>
-                小二常識大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P2GS.html" class="game-card"><span class="game-icon">🌍</span>小二常識大冒險</a>
         </div>
     </div>
 
-    <!-- 小三：中文區 -->
+    <!-- ==================== 小學三年級遊戲區 ==================== -->
     <div id="p3-chi-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p3-menu')">⬅ 回小三</button>
@@ -659,26 +284,13 @@
         </div>
         <h2 style="color: #ef476f;">📚 小三 - 中文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P3chinese.html" class="game-card">
-                <span class="game-icon">📗</span>
-                小三詞語運用
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3Achinesewriting.html" class="game-card">
-                <span class="game-icon">📝</span>
-                小三上中文寫作大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3Bchinesewriting.html" class="game-card">
-                <span class="game-icon">✍️</span>
-                小三下中文寫作大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3chinesereading.html" class="game-card">
-                <span class="game-icon">📖</span>
-                小三中文閱讀大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P3chinese.html" class="game-card"><span class="game-icon">📗</span>小三詞語運用</a>
+            <a href="https://cat123teacher.github.io/chinese/P3Achinesewriting.html" class="game-card"><span class="game-icon">📝</span>小三上中文寫作大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P3Bchinesewriting.html" class="game-card"><span class="game-icon">✍️</span>小三下中文寫作大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P3chinesereading.html" class="game-card"><span class="game-icon">📖</span>小三中文閱讀大冒險</a>
         </div>
     </div>
 
-    <!-- 小三：英文區 -->
     <div id="p3-eng-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p3-menu')">⬅ 回小三</button>
@@ -686,26 +298,13 @@
         </div>
         <h2 style="color: #9d4edd;">🔤 小三 - 英文</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P3writing.html" class="game-card">
-                <span class="game-icon">✍️</span>
-                小三英文寫作練習
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3englishgrammar.html" class="game-card">
-                <span class="game-icon">⚔️</span>
-                小三英文文法大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3Benglishgrammar.html" class="game-card">
-                <span class="game-icon">🛡️</span>
-                小三下英文文法大冒險
-            </a>
-            <a href="https://cat123teacher.github.io/chinese/P3englishlistening.html" class="game-card">
-                <span class="game-icon">🎧</span>
-                小三英文聆聽大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P3writing.html" class="game-card"><span class="game-icon">✍️</span>小三英文寫作練習</a>
+            <a href="https://cat123teacher.github.io/chinese/P3englishgrammar.html" class="game-card"><span class="game-icon">⚔️</span>小三英文文法大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P3Benglishgrammar.html" class="game-card"><span class="game-icon">🛡️</span>小三下英文文法大冒險</a>
+            <a href="https://cat123teacher.github.io/chinese/P3englishlistening.html" class="game-card"><span class="game-icon">🎧</span>小三英文聆聽大冒險</a>
         </div>
     </div>
 
-    <!-- 小三：數學區 -->
     <div id="p3-math-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p3-menu')">⬅ 回小三</button>
@@ -713,14 +312,10 @@
         </div>
         <h2 style="color: #ff9f1c;">🔢 小三 - 數學</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P3Amath.html" class="game-card">
-                <span class="game-icon">➕</span>
-                小三上數學大冒險
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P3Amath.html" class="game-card"><span class="game-icon">➕</span>小三上數學大冒險</a>
         </div>
     </div>
 
-    <!-- 小三：常識區 -->
     <div id="p3-gs-games" class="section-div">
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="back-btn" onclick="showSection('p3-menu')">⬅ 回小三</button>
@@ -728,10 +323,7 @@
         </div>
         <h2 style="color: #4cc9f0;">🌍 小三 - 常識</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/P3GS.html" class="game-card">
-                <span class="game-icon">🌍</span>
-                小三常識大挑戰
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/P3GS.html" class="game-card"><span class="game-icon">🌍</span>小三常識大挑戰</a>
         </div>
     </div>
 
@@ -740,16 +332,11 @@
         <button class="back-btn" onclick="showSection('home-menu')">⬅ 返回主目錄</button>
         <h2 style="color: #3a86ff;">🔤 Phonic英文拼音</h2>
         <div class="game-grid">
-            <a href="https://cat123teacher.github.io/chinese/phonic.html" class="game-card">
-                <span class="game-icon">🎰</span>
-                Letterland英文拼音老虎機
-            </a>
+            <a href="https://cat123teacher.github.io/chinese/phonic.html" class="game-card"><span class="game-icon">🎰</span>Letterland英文拼音老虎機</a>
         </div>
     </div>
 
-    <!-- ======================================================= -->
-
-    <!-- 每頁最下方的 Teacher Cat 資訊區 -->
+    <!-- ==================== 頁尾資訊區 ==================== -->
     <div class="footer">
         <h3>✨ Teacher Cat 的快樂AI教室 ✨</h3>
         <p>
@@ -760,8 +347,11 @@
             <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">📕 小紅書</a>
             <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">💬 WhatsApp 群組</a>
         </p>
-        <p>
-            <span class="douyin-text">🎵 抖音號：74254902683</span>
+        <p><span class="douyin-text">🎵 抖音號：74254902683</span></p>
+        <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+        <p style="font-size: 15px; margin: 10px 0;">
+            <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank" style="box-shadow: none; border: none; background: transparent; font-size: 15px; text-decoration: underline; padding: 0; margin: 0 15px; color: #555;">ℹ️ 關於我們</a>
+            <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank" style="box-shadow: none; border: none; background: transparent; font-size: 15px; text-decoration: underline; padding: 0; margin: 0 15px; color: #555;">🔒 隱私權政策</a>
         </p>
     </div>
 
@@ -774,34 +364,25 @@
 </div>
 
 <script>
-    // 透過這個函數來切換不同的顯示區塊
     function showSection(sectionId) {
         const sections = [
             'home-menu', 'p1-menu', 'p2-menu', 'p3-menu',
             'n-games', 'k1-games', 'k2-games', 'k3-games', 
-            'p1-chi-games', 'p1-eng-games', 'p1-math-games',
+            'p1-chi-games', 'p1-eng-games', 'p1-math-games', 'p1-human-science-games',
             'p2-chi-games', 'p2-eng-games', 'p2-math-games', 'p2-gs-games',
             'p3-chi-games', 'p3-eng-games', 'p3-math-games', 'p3-gs-games',
             'phonic-games'
         ];
-        
         sections.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
-        
         const target = document.getElementById(sectionId);
         if (target) {
-            if (['home-menu', 'p1-menu', 'p2-menu', 'p3-menu'].includes(sectionId)) {
-                target.style.display = 'flex';
-            } else {
-                target.style.display = 'block';
-            }
+            target.style.display = (sectionId === 'home-menu' || sectionId.endsWith('-menu')) ? 'flex' : 'block';
         }
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
-
 </body>
 </html>
