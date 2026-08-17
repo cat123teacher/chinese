@@ -6,6 +6,27 @@
     <title>小朋友練習遊戲大冒險 🌟</title>
     <style>
         body { font-family: 'Comic Sans MS', 'Microsoft JhengHei', 'PingFang HK', sans-serif; background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); text-align: center; margin: 0; padding: 20px; position: relative; color: #333; }
+        
+        /* 頂部固定導覽按鈕 (三條槓) */
+        .menu-toggle-btn { position: fixed; top: 20px; right: 20px; font-size: 18px; font-weight: 900; padding: 10px 16px; background-color: #ffd166; border: 4px solid #333; border-radius: 15px; cursor: pointer; box-shadow: 4px 4px 0px #333; z-index: 999; transition: all 0.1s ease-in-out; }
+        .menu-toggle-btn:hover { background-color: #ffda85; transform: translateY(-2px); }
+        .menu-toggle-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #333; }
+
+        /* 全螢幕遮罩 */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); z-index: 1000; display: none; backdrop-filter: blur(2px); }
+        
+        /* 側邊導覽抽屜面板 */
+        .nav-drawer { position: fixed; top: 0; right: -320px; width: 290px; height: 100%; background-color: #fffaf0; border-left: 5px solid #333; box-shadow: -10px 0px 0px rgba(0,0,0,0.1); z-index: 1001; transition: right 0.3s ease-in-out; padding: 30px 20px; box-sizing: border-box; text-align: left; overflow-y: auto; }
+        .nav-drawer.open { right: 0; }
+        .close-menu-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; background: none; border: none; cursor: pointer; transition: transform 0.2s; }
+        .close-menu-btn:hover { transform: scale(1.2) rotate(90deg); }
+        .nav-drawer h3 { font-size: 24px; color: #ff5e7e; margin-top: 10px; margin-bottom: 25px; border-bottom: 4px solid #333; padding-bottom: 10px; font-weight: 900; text-shadow: 1px 1px 0px #fff; }
+        
+        /* 導覽選單內連結樣式 */
+        .drawer-links a { display: block; font-size: 18px; font-weight: bold; color: #333; text-decoration: none; padding: 10px 15px; margin-bottom: 8px; border-radius: 12px; border: 3px solid transparent; transition: all 0.2s; }
+        .drawer-links a:hover { background-color: #fff; border-color: #333; color: #ff5e7e; transform: translateX(5px); }
+
+        /* 原頁面基礎樣式保持 */
         .top-left-logo { position: absolute; top: 20px; left: 20px; width: 85px; height: 85px; border-radius: 50%; border: 4px solid #333; box-shadow: 4px 4px 0px #333; object-fit: cover; background-color: white; z-index: 10; transition: transform 0.2s; }
         .top-left-logo:hover { transform: scale(1.1) rotate(-5deg); }
         @keyframes bounce-fun { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-8px) rotate(-3deg); } 75% { transform: translateY(-4px) rotate(3deg); } }
@@ -56,6 +77,7 @@
         .douyin-text { display: inline-block; margin: 15px 8px 0; background-color: #ffd166; padding: 8px 20px; border-radius: 12px; border: 3px solid #333; box-shadow: 3px 3px 0px #333; }
         @media (max-width: 600px) {
             body { padding: 15px 10px; }
+            .menu-toggle-btn { position: fixed; top: 15px; right: 15px; font-size: 15px; padding: 8px 12px; }
             .top-left-logo { position: relative; top: 0; left: 0; margin-bottom: 10px; width: 75px; height: 75px; }
             .container { padding: 25px 15px; border-width: 4px; box-shadow: 6px 6px 0px #333; }
             h1 { font-size: 30px; }
@@ -71,6 +93,34 @@
 </head>
 <body>
 
+<!-- 頂部導引按鈕 -->
+<button class="menu-toggle-btn" onclick="toggleMenu()">☰ 導覽選單</button>
+
+<!-- 側邊欄背景遮罩 -->
+<div id="menu-overlay" class="menu-overlay" onclick="toggleMenu()"></div>
+
+<!-- 側邊導航面板 -->
+<div id="nav-drawer" class="nav-drawer">
+    <button class="close-menu-btn" onclick="toggleMenu()">❌</button>
+    <h3>🌟 冒險傳送門</h3>
+    <div class="drawer-links">
+        <a href="#" onclick="clickMenuLink('n-games')">🐣 幼稚園 N 遊戲</a>
+        <a href="#" onclick="clickMenuLink('k1-games')">🐥 幼稚園 K1 遊戲</a>
+        <a href="#" onclick="clickMenuLink('k2-games')">🐧 幼稚園 K2 遊戲</a>
+        <a href="#" onclick="clickMenuLink('k3-games')">🚀 幼稚園 K3 遊戲</a>
+        <hr style="border: 1px dashed #ddd; margin: 10px 0;">
+        <a href="#" onclick="clickMenuLink('p1-menu')">🎓 小學一年級</a>
+        <a href="#" onclick="clickMenuLink('p2-menu')">🎒 小學二年級</a>
+        <a href="#" onclick="clickMenuLink('p3-menu')">📏 小學三年級</a>
+        <hr style="border: 1px dashed #ddd; margin: 10px 0;">
+        <a href="#" onclick="clickMenuLink('phonic-games')">🔤 Phonic 英文拼音</a>
+        <a href="https://cat123teacher.github.io/chinese/drawing.html">🎨 輕鬆畫畫 Game</a>
+        <hr style="border: 1px dashed #ddd; margin: 10px 0;">
+        <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank">ℹ️ 關於我們</a>
+        <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank">🔒 隱私權政策</a>
+    </div>
+</div>
+
 <img src="cat.jpeg" alt="Teacher Cat" class="top-left-logo" onerror="this.style.display='none'">
 
 <div class="container">
@@ -78,7 +128,7 @@
     <p style="font-size: 22px; color: #555; font-weight: bold;">準備好開始了嗎？選一個喜歡的分類吧！</p>
 
     <!-- 【主目錄】 -->
-    <div id="home-menu" class="btn-group">
+    <div id="home-menu" class="btn-group" style="display: flex;">
         <button class="age-btn btn-n" onclick="showSection('n-games')">🐣 幼稚園 N</button>
         <button class="age-btn btn-k1" onclick="showSection('k1-games')">🐥 幼稚園 K1</button>
         <button class="age-btn btn-k2" onclick="showSection('k2-games')">🐧 幼稚園 K2</button>
@@ -364,6 +414,26 @@
 </div>
 
 <script>
+    // 控制側邊選單顯示/隱藏
+    function toggleMenu() {
+        const drawer = document.getElementById('nav-drawer');
+        const overlay = document.getElementById('menu-overlay');
+        if (drawer.classList.contains('open')) {
+            drawer.classList.remove('open');
+            overlay.style.display = 'none';
+        } else {
+            drawer.classList.add('open');
+            overlay.style.display = 'block';
+        }
+    }
+
+    // 點擊選單連結跳轉並收合選單
+    function clickMenuLink(sectionId) {
+        showSection(sectionId);
+        toggleMenu();
+    }
+
+    // 主切換區塊邏輯
     function showSection(sectionId) {
         const sections = [
             'home-menu', 'p1-menu', 'p2-menu', 'p3-menu',
