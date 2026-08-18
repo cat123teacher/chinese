@@ -38,6 +38,7 @@
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
+            transition: background 0.3s;
         }
         
         /* 夢幻浮動泡泡背景層 */
@@ -136,6 +137,25 @@
             flex-direction: column;
             align-items: center;
             flex-grow: 1;
+        }
+        
+        /* ⚡ 關卡進行時的專屬全局優化（隱藏頂部與頁尾以最大化屏幕高度） */
+        body.playing-mode {
+            background: linear-gradient(135deg, #FFF5F6 0%, #FFE9EC 100%);
+        }
+        body.playing-mode header,
+        body.playing-mode footer {
+            display: none !important;
+        }
+        body.playing-mode .container {
+            padding: 10px;
+            max-width: 100vw;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         /* 關卡設定面板 */
@@ -242,7 +262,7 @@
             padding: 12px 10px;
             box-sizing: border-box;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.2s, filter 0.2s;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
             text-decoration: none;
             color: white;
             overflow: hidden;
@@ -337,17 +357,34 @@
             z-index: 3;
         }
 
-        /* 遊戲介面 */
-        .hidden {
-            display: none !important;
+        /* ========================================================
+           📱 全新高響應自適應雙端布局架構（解決圖片過小問題）
+           ======================================================== */
+        
+        /* 預設：豎向 (Portrait) 視圖下的關卡排版 */
+        .game-layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
         }
+        
+        .game-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+            gap: 12px;
+        }
+        
         .game-controls {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 650px;
-            margin-bottom: 20px;
             gap: 15px;
+            margin-bottom: 0;
         }
         
         .btn {
@@ -409,7 +446,6 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 20px;
             border: 4px solid white;
             animation: pulse-timer 1.5s infinite ease-in-out;
             font-family: 'Fredoka', 'Comic Sans MS', monospace;
@@ -418,7 +454,8 @@
         @keyframes pulse-timer {
             0% { transform: scale(1); }
             50% { transform: scale(1.04); box-shadow: 0 12px 25px rgba(255, 168, 52, 0.5); }
-            100% { transform: scale(1); }\n        }
+            100% { transform: scale(1); }
+        }
         .big-timer-icon {
             font-size: 2.6rem;
             animation: wobble-icon 2s infinite ease-in-out;
@@ -432,7 +469,6 @@
             font-size: 1.55rem;
             font-weight: 900;
             color: #FF5A79;
-            margin-bottom: 20px;
             background: white;
             padding: 8px 28px;
             border-radius: 25px;
@@ -443,7 +479,7 @@
             gap: 10px;
         }
 
-        /* 圖片舞台 */
+        /* 圖片舞台 - 豎向 */
         .image-stage {
             position: relative;
             max-width: 100%;
@@ -454,14 +490,15 @@
             box-shadow: 0 12px 35px rgba(0,0,0,0.12);
             display: inline-block;
             touch-action: none;
-            margin-bottom: 50px; /* 大緩衝距離 */
+            margin-bottom: 50px;
         }
         .game-img {
             max-width: 100%;
-            max-height: 65vh;
+            max-height: 65vh; /* 豎向屏幕最大利用高度 */
             display: block;
             border-radius: 14px;
             pointer-events: none;
+            object-fit: contain;
         }
 
         /* 紅色圈圈觸控感應層 */
@@ -512,6 +549,133 @@
         @keyframes particleFly {
             0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
             100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.3) rotate(360deg); opacity: 0; }
+        }
+
+        /* ========================================================
+           🔄 關鍵修復！橫向模式 (Landscape Mode) 排版優化：
+           我們為 #game-screen 加上了 :not(.hidden) 的限制，
+           確保在首頁/載入時，只要有 .hidden 類別，它就絕對維持隱藏，
+           徹底解決橫放時首頁被空底欄、空遊戲版面覆蓋或重疊的 bug！
+           ======================================================== */
+        @media (orientation: landscape) {
+            body.playing-mode .container {
+                padding: 5px !important;
+                height: 100vh !important;
+                justify-content: center !important;
+            }
+            
+            #game-screen:not(.hidden) {
+                width: 100% !important;
+                height: 98vh !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .game-layout-wrapper {
+                flex-direction: row !important; /* 橫向雙欄並排佈局 */
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 15px !important;
+                width: 98vw !important;
+                height: 94vh !important;
+                box-sizing: border-box;
+            }
+
+            /* 左側的 Q 版控制面板，在橫向時化身為「側邊控制座」 */
+            .game-sidebar {
+                width: 22vw !important;
+                min-width: 155px !important;
+                max-width: 220px !important;
+                height: 90vh !important;
+                background: rgba(255, 255, 255, 0.88) !important;
+                border: 3.5px solid #FFD1D1 !important;
+                border-radius: 24px !important;
+                padding: 10px !important;
+                box-shadow: 0 6px 20px rgba(255, 90, 121, 0.08) !important;
+                backdrop-filter: blur(5px);
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 8px !important;
+            }
+
+            /* 按鈕在此模式下轉為垂直堆疊，左右手都好按 */
+            .game-sidebar .game-controls {
+                flex-direction: column !important;
+                width: 100% !important;
+                gap: 6px !important;
+                margin-bottom: 0 !important;
+            }
+
+            .game-sidebar .btn {
+                width: 100% !important;
+                font-size: 1.15rem !important;
+                padding: 10px 5px !important;
+                border-radius: 25px !important;
+                box-shadow: 0 5px 0 rgba(0,0,0,0.1) !important;
+            }
+            .game-sidebar .btn:active {
+                transform: translateY(3px) !important;
+                box-shadow: 0 2px 0 rgba(0,0,0,0.08) !important;
+            }
+
+            /* 大大個計時器尺寸在側欄中自適應縮小，保證顯示完整 */
+            .game-sidebar .big-timer-container {
+                font-size: 1.9rem !important;
+                padding: 6px 15px !important;
+                margin-bottom: 0 !important;
+                border-radius: 30px !important;
+                width: 100% !important;
+                animation: none !important; /* 橫屏時不縮放，減少視覺干擾 */
+            }
+            .game-sidebar .big-timer-icon {
+                font-size: 1.7rem !important;
+            }
+
+            /* 圈圈數量提示 */
+            .game-sidebar .info-panel {
+                font-size: 1.15rem !important;
+                padding: 6px 10px !important;
+                margin-bottom: 0 !important;
+                border-radius: 18px !important;
+                width: 100% !important;
+                justify-content: center !important;
+                gap: 5px !important;
+            }
+
+            /* 右側遊戲圖片舞台：寬高極限放大，高達 90vh */
+            .game-layout-wrapper .image-stage {
+                flex-grow: 1 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 6px !important; /* 極簡窄邊，提供最大繪圖空間 */
+                border-radius: 20px !important;
+                margin-bottom: 0 !important; /* 去除底部外邊距 */
+                height: 90vh !important;
+                max-width: 74vw !important;
+                background: #fff !important;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+            }
+
+            /* 圖片：高度放大至 86vh 滿版高度，高寬等比縮放，徹底解決圖片過小的問題！ */
+            .game-layout-wrapper .game-img {
+                height: 86vh !important;
+                max-height: 86vh !important;
+                width: auto !important;
+                max-width: 100% !important;
+                object-fit: contain !important;
+                border-radius: 14px !important;
+            }
+
+            .game-layout-wrapper .circle-overlay {
+                top: 6px !important;
+                left: 6px !important;
+                right: 6px !important;
+                bottom: 6px !important;
+            }
         }
 
         /* 彈出視窗 */
@@ -732,8 +896,8 @@
             100% { transform: translateY(-5px); }
         }
 
-        /* 📱 手機及平板的排版與手勢專屬優化 */
-        @media (max-width: 600px) {
+        /* 📱 手機及平板在 Portrait 豎屏下的細節微調 */
+        @media (max-width: 600px) and (orientation: portrait) {
             header {
                 padding-left: 80px;
                 padding-right: 20px;
@@ -805,7 +969,7 @@
             .big-timer-container {
                 font-size: 2.1rem;
                 padding: 8px 25px;
-                margin-bottom: 12px;
+                margin-bottom: 0;
             }
             .big-timer-icon {
                 font-size: 1.9rem;
@@ -813,7 +977,7 @@
             .info-panel {
                 font-size: 1.25rem;
                 padding: 6px 18px;
-                margin-bottom: 12px;
+                margin-bottom: 0;
             }
             
             .image-stage {
@@ -823,7 +987,7 @@
             }
             .game-img {
                 border-radius: 10px;
-                max-height: 52vh;
+                max-height: 58vh; /* 豎向解鎖更長的高度 */
             }
             .circle-overlay {
                 top: 6px;
@@ -847,6 +1011,11 @@
                 font-size: 0.85rem;
                 gap: 15px;
             }
+        }
+
+        /* 絕對隱藏類，以確保不管是 ID 還是類別，都有最高優先級隱藏不顯示 */
+        .hidden, #game-screen.hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -901,31 +1070,39 @@
             </div>
         </div>
 
-        <!-- 遊戲主畫面 -->
-        <div id="game-screen" class="hidden" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <!-- 遊戲主畫面 (採用響應式自適應雙欄佈局) -->
+        <div id="game-screen" class="hidden" style="width: 100%;">
             
-            <div class="game-controls">
-                <button class="btn btn-home" onclick="goHome()">🏠 回主頁</button>
-                <button class="btn btn-clear" onclick="clearCircles()">🔄 重設</button>
-                <button class="btn btn-ans" onclick="showAnswer()">👁️ 查看答案</button>
+            <div class="game-layout-wrapper">
+                
+                <!-- 1) 側邊/頂部控制欄 (Sidebar) -->
+                <div class="game-sidebar">
+                    <div class="game-controls">
+                        <button class="btn btn-home" onclick="goHome()">🏠 回主頁</button>
+                        <button class="btn btn-clear" onclick="clearCircles()">🔄 重設</button>
+                        <button class="btn btn-ans" onclick="showAnswer()">👁️ 查看答案</button>
+                    </div>
+
+                    <!-- 大大個計時器 (只在啟用計時模式下顯示) -->
+                    <div id="big-timer-container" class="big-timer-container hidden">
+                        <span class="big-timer-icon">⏱️</span>
+                        <span id="timer-time">00:00</span>
+                    </div>
+
+                    <div class="info-panel">
+                        <span id="level-indicator">關卡 1</span>
+                        <span>🔴 <span id="circle-count">0</span> / 5</span>
+                    </div>
+                </div>
+
+                <!-- 2) 遊戲主圖片舞台 (橫向模式時會最大化尺寸) -->
+                <div class="image-stage">
+                    <img id="game-image" class="game-img" src="" alt="找不同關卡">
+                    <div id="click-overlay" class="circle-overlay"></div>
+                </div>
+                
             </div>
 
-            <!-- 大大個計時器 (只在啟用計時模式下顯示) -->
-            <div id="big-timer-container" class="big-timer-container hidden">
-                <span class="big-timer-icon">⏱️</span>
-                <span id="timer-time">00:00</span>
-            </div>
-
-            <div class="info-panel">
-                <span id="level-indicator">關卡 1</span>
-                <span>🔴 圈圈數量: <span id="circle-count">0</span> / 5</span>
-            </div>
-
-            <div class="image-stage">
-                <img id="game-image" class="game-img" src="" alt="找不同關卡">
-                <div id="click-overlay" class="circle-overlay"></div>
-            </div>
-            
         </div>
 
     </div>
@@ -946,7 +1123,7 @@
             <p id="congrats-text" style="font-size: 1.25rem; margin: 8px 0; font-weight: bold; line-height: 1.4; color: #555;">小朋友，你太厲害了！</p>
             
             <!-- 答案圖片展示區，方便小朋友自己對答案 -->
-            <div style="background: #FFEBEF; padding: 8px; border-radius: 16px; border: 3px dashed #FF8B94; margin: 10px 0; width: 100%; max-width: 380px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="background: #FFEBEF; padding: 8px; border-radius: 16px; border: 3px dashed #FF8B94; margin: 10px 0; width: 100%; max-width: 380px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
                 <img id="congrats-answer-image" src="" alt="答案圖片" style="width: 100%; max-height: 25vh; object-fit: contain; border-radius: 10px; display: block; margin: 0 auto;">
             </div>
 
@@ -1135,6 +1312,9 @@
             currentLevel = levelNum;
             playSparkleSound();
             
+            // ⚡ 進入關卡時，自動加入 'playing-mode' 隱藏首尾，釋放 100% 螢幕空間
+            document.body.classList.add('playing-mode');
+            
             document.getElementById('game-image').src = `${levelNum}find.jpg`;
             document.getElementById('level-indicator').innerText = `📖 第 ${levelNum} 關`;
             
@@ -1150,6 +1330,10 @@
         function goHome() {
             playSparkleSound();
             stopTimer();
+            
+            // ⚡ 回到首頁時，移除 'playing-mode' 以正常顯示首尾和聯絡欄
+            document.body.classList.remove('playing-mode');
+            
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('home-screen').classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -1226,7 +1410,7 @@
                 const timeStr = minutes > 0 ? `${minutes}分${seconds}秒` : `${seconds}秒`;
                 congratsText.innerHTML = `你用了 <strong style="color: #FF5A79; font-size: 1.5rem; text-shadow: 1px 1px 0px white;">${timeStr}</strong> 成功找出 5 個不同！🎉<br><span style="color:#666; font-size:1rem; font-weight:bold;">對一對下面的答案吧：</span>`;
             } else {
-                congratsText.innerHTML = `成功找出了 5 個不同的地方！🏆<br><span style="color:#666; font-size:1rem; font-weight:bold;">對一對下面的答案吧：</span>`;
+                congratsText.innerHTML = `成功找出了 5 個不同的地方！🏆<br><span style="color:#666; font-size:1rem; font-weight:bold;\">對一對下面的答案吧：</span>`;
             }
             
             modal.classList.remove('hidden');
@@ -1258,6 +1442,7 @@
             modal.classList.remove('hidden');
         }
 
+        // 關閉答案
         function closeAnswer() {
             playPopSound();
             isPaused = false;
