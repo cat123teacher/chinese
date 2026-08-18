@@ -1029,6 +1029,67 @@
             }
         }
 
+
+        /* ========================================================
+           🖨️ 列印專用樣式 (Print Stylesheet)
+           ======================================================== */
+        #print-area {
+            display: none !important;
+        }
+
+        .btn-print {
+            background: #B28DFF !important;
+            box-shadow: 0 8px 0 #8E6CD1, 0 12px 18px rgba(0,0,0,0.15) !important;
+            width: 100%;
+            max-width: 650px;
+        }
+        .btn-print:active {
+            transform: translateY(6px) !important;
+            box-shadow: 0 2px 0 #8E6CD1, 0 4px 8px rgba(0,0,0,0.12) !important;
+        }
+
+        @media print {
+            /* 隱藏所有網頁上的其它視覺元素 */
+            body > *:not(#print-area), 
+            header, footer, .container, .bg-bubbles, #answer-modal, #congrats-modal, #game-screen {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+                background-image: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            #print-area {
+                display: block !important;
+                width: 100% !important;
+            }
+            
+            .print-page {
+                page-break-after: always;
+                break-after: page;
+                width: 100vw !important;
+                height: 100vh !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box;
+                padding: 20px;
+            }
+            
+            .print-page img {
+                max-width: 100% !important;
+                max-height: 95vh !important;
+                width: auto !important;
+                height: auto !important;
+                object-fit: contain !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+        }
+
         /* 絕對隱藏類，以確保不管是 ID 還是類別，都有最高優先級隱藏不顯示 */
         .hidden, #game-screen.hidden {
             display: none !important;
@@ -1093,6 +1154,8 @@
                 
                 <!-- 1) 側邊/頂部控制欄 (Sidebar) -->
                 <div class="game-sidebar">
+                    <!-- 🖨️ 圖片列印按鈕 (方便小朋友印出來紙上玩) -->
+                    <button class="btn btn-print" onclick="printLevel()">🖨️ 列印紙張玩</button>
                     <div class="game-controls">
                         <button class="btn btn-home" onclick="goHome()">🏠 回主頁</button>
                         <button class="btn btn-clear" onclick="clearCircles(true)">🔄 重設</button>
@@ -1129,6 +1192,16 @@
             <img id="answer-image" class="modal-content" src="" alt="答案圖片">
         </div>
         <button class="btn btn-close-modal" onclick="closeAnswer()">❌ 關閉答案</button>
+    </div>
+
+    <!-- 🖨️ 隱藏的列印圖片容器 -->
+    <div id="print-area">
+        <div class="print-page">
+            <img id="print-img-find" src="" alt="找不同">
+        </div>
+        <div class="print-page">
+            <img id="print-img-ans" src="" alt="答案">
+        </div>
     </div>
 
     <!-- 答對 5 個時的慶祝彈出畫面效果 (包含答案圖片供小朋友核對) -->
@@ -1268,6 +1341,35 @@
                     osc.stop(now + idx * 0.12 + 0.4);
                 });
             } catch(e) { console.log(e); }
+        }
+
+
+        // 🖨️ 智能列印關卡功能 (第1頁：找不同原圖，第2頁：答案原圖)
+        function printLevel() {
+            playSparkleSound();
+            
+            const imgFind = document.getElementById('print-img-find');
+            const imgAns = document.getElementById('print-img-ans');
+            
+            // 設定正確圖片路徑
+            imgFind.src = `${currentLevel}find.jpg`;
+            imgAns.src = `${currentLevel}findans.jpg`;
+            
+            // 確保兩張圖片都完全加載完畢後，再啟動系統列印，避免印出空白頁
+            let loadedCount = 0;
+            const triggerPrint = () => {
+                loadedCount++;
+                if (loadedCount === 2) {
+                    window.print();
+                }
+            };
+            
+            imgFind.onload = triggerPrint;
+            imgAns.onload = triggerPrint;
+            
+            // 若圖片已被快取，手動觸發加載完畢事件
+            if (imgFind.complete) triggerPrint();
+            if (imgAns.complete) triggerPrint();
         }
 
         // 控制計時器設定
