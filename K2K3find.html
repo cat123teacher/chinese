@@ -1011,6 +1011,22 @@
                 font-size: 0.85rem;
                 gap: 15px;
             }
+            
+            /* 讓彈出答案視窗的「關閉答案」和「挑戰成功」按鈕在手機直向時大小適中、精緻可愛，防擠壓 */
+            .btn-close-modal {
+                width: 170px !important;
+                font-size: 1.1rem !important;
+                padding: 10px 15px !important;
+                margin-top: 15px !important;
+                border-bottom-width: 3.5px !important;
+            }
+            .congrats-box .btn-close-modal {
+                width: 220px !important;
+                font-size: 1.15rem !important;
+                padding: 10px 15px !important;
+                margin-top: 10px !important;
+                border-bottom-width: 4px !important;
+            }
         }
 
         /* 絕對隱藏類，以確保不管是 ID 還是類別，都有最高優先級隱藏不顯示 */
@@ -1079,7 +1095,7 @@
                 <div class="game-sidebar">
                     <div class="game-controls">
                         <button class="btn btn-home" onclick="goHome()">🏠 回主頁</button>
-                        <button class="btn btn-clear" onclick="clearCircles()">🔄 重設</button>
+                        <button class="btn btn-clear" onclick="clearCircles(true)">🔄 重設</button>
                         <button class="btn btn-ans" onclick="showAnswer()">👁️ 查看答案</button>
                     </div>
 
@@ -1422,10 +1438,13 @@
             goHome();
         }
 
-        function clearCircles() {
+        function clearCircles(resetTimer = false) {
             clickOverlay.innerHTML = '';
             circles = [];
             updateCountDisplay();
+            if (resetTimer) {
+                startTimer(); // 🔄 重設時也將計時器歸零並重新計時！
+            }
         }
 
         function updateCountDisplay() {
