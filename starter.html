@@ -979,6 +979,26 @@
                 <h1>Cambridge Starter練習遊戲</h1>
                 <button class="btn-clear-records" onclick="confirmClearRecords()">🗑️ Clear Records</button>
             </div>
+            
+            <!-- CHINESE VOICE SETTINGS PANEL -->
+            <div class="voice-settings-panel" style="margin: 15px auto 20px auto; background: #F0F9FF; border: 3px dashed #0284C7; border-radius: 16px; padding: 15px 20px; text-align: center; max-width: 600px; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                <div style="font-weight: 900; color: #0284C7; font-size: 1.1rem; display: flex; align-items: center; gap: 6px;">
+                    📢 Chinese Voice Setting (中文發音設定):
+                </div>
+                <div style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                    <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.15rem; background: white; border: 3px solid #0284C7; border-radius: 25px; padding: 8px 18px; cursor: pointer; transition: all 0.1s; box-shadow: 0 3px 0 #0284C7; user-select: none;">
+                        <input type="radio" name="chinese_lang" value="zh-HK" checked style="transform: scale(1.3); cursor: pointer;" onchange="setChineseVoiceLanguage('zh-HK')">
+                        廣東話 (Cantonese) 🇭🇰
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.15rem; background: white; border: 3px solid #10B981; border-radius: 25px; padding: 8px 18px; cursor: pointer; transition: all 0.1s; box-shadow: 0 3px 0 #10B981; user-select: none;">
+                        <input type="radio" name="chinese_lang" value="zh-CN" style="transform: scale(1.3); cursor: pointer;" onchange="setChineseVoiceLanguage('zh-CN')">
+                        普通話 (Mandarin) 🇨🇳
+                    </label>
+                </div>
+                <button class="btn" style="background: #F8FAFC; color: #475569; border: 2.5px solid #CBD5E1; box-shadow: 0 3px 0 #94A3B8; padding: 6px 14px; font-size: 0.88rem; font-weight: 800; border-radius: 50px; margin-top: 5px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; outline: none;" onclick="showVoiceHelpModal()">
+                    ❓ 如果不能正常發出普通話和廣東話教學？
+                </button>
+            </div>
             <h2>Select a unit to play:</h2>
             <div class="grid-levels" id="levelGrid">
                 <!-- Levels with stars & highest score dynamically injected -->
@@ -1148,6 +1168,65 @@
                 <div id="redoFeedback"></div>
                 
                 <button class="btn" style="margin-top: 15px; width: 100%; display: none; background: var(--secondary); box-shadow: 0 4px 0px #37A19A;" id="btnExitRedo" onclick="closeRedoModal()">Save & Return ➔</button>
+            </div>
+        </div>
+
+        <!-- VOICE DIAGNOSTIC HELP POPUP MODAL -->
+        <div class="popup-overlay" id="voiceHelpModal">
+            <div class="popup-card" style="border-color: #0284C7; max-width: 600px; width: 95%; text-align: left; max-height: 85vh; overflow-y: auto; padding: 25px;">
+                <h3 style="color: #0284C7; font-size: 1.55rem; margin-bottom: 15px; text-align: center; border-bottom: 2px solid #E0F2FE; padding-bottom: 8px; font-weight: 900;">
+                    📢 語音播放問題排解教學
+                </h3>
+                
+                <div style="font-size: 0.95rem; line-height: 1.6; color: #334155; font-family: sans-serif;">
+                    <p style="margin-bottom: 12px; font-weight: bold; color: #FF6B6B; font-size: 1rem;">
+                        💡 小提示：本遊戲使用瀏覽器內置的「文字轉語音 (TTS)」技術。如果您的設備（尤其是 iPhone/iPad）無法發出聲音，通常是因為系統尚未下載對應的中文語音包，請按照以下步驟快速開啟：
+                    </p>
+
+                    <!-- Apple section -->
+                    <div style="background: #F8FAFC; border-left: 4px solid #0284C7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0;">
+                        <h4 style="color: #0F172A; font-weight: 900; margin-bottom: 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 6px;">
+                            🍎 Apple (iPhone / iPad) 設定步驟：
+                        </h4>
+                        <ol style="padding-left: 20px; font-size: 0.92rem; margin: 0;">
+                            <li style="margin-bottom: 4px;">開啟設備的 <strong>「設定」 (Settings)</strong> ➔ 點選 <strong>「輔助使用」 (Accessibility)</strong>。</li>
+                            <li style="margin-bottom: 4px;">點選 <strong>「朗讀內容」 (Spoken Content)</strong> ➔ 點選 <strong>「聲音」 (Voices)</strong>。</li>
+                            <li style="margin-bottom: 4px;">點選 <strong>「中文」 (Chinese)</strong>：
+                                <ul style="padding-left: 15px; margin: 4px 0; list-style-type: circle;">
+                                    <li style="margin-bottom: 2px;"><strong>廣東話：</strong>點選 <strong>「廣東話 (香港)」 (Chinese - Hong Kong)</strong> ➔ 下載並點選標準或增強版聲音（例如 Siri 廣東話、Sinji 雅婷 等）。</li>
+                                    <li style="margin-bottom: 2px;"><strong>普通話：</strong>點選 <strong>「中文 (中國大陸)」</strong> 或 <strong>「中文 (台灣)」</strong> ➔ 下載並點選聲音（例如 Siri、美佳 等）。</li>
+                                </ul>
+                            </li>
+                            <li style="margin-bottom: 4px;"><strong>非常重要：</strong>請確認語音包旁的「下載雲端 ☁️」圖標已點擊並完成下載（下載後右側會顯示打勾或顯示大小）。</li>
+                            <li style="margin-bottom: 4px;">檢查手機左側的<strong>物理靜音開關（側邊靜音鍵）已關閉</strong>（紅色標誌不能露出來），並調大媒體音量！</li>
+                        </ol>
+                    </div>
+
+                    <!-- Android section -->
+                    <div style="background: #F8FAFC; border-left: 4px solid #10B981; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0;">
+                        <h4 style="color: #0F172A; font-weight: 900; margin-bottom: 6px; font-size: 1.05rem; display: flex; align-items: center; gap: 6px;">
+                            🤖 Android (三星 / 小米 / OPPO / vivo) 設定步驟：
+                        </h4>
+                        <ol style="padding-left: 20px; font-size: 0.92rem; margin: 0;">
+                            <li style="margin-bottom: 4px;">開啟手機的 <strong>「設定」 (Settings)</strong> ➔ 在搜尋欄輸入 <strong>「文字轉語音」 (Text-to-speech)</strong> 並點選進入（通常位於系統語言與輸入法中）。</li>
+                            <li style="margin-bottom: 4px;">確認 <strong>「偏好引擎」 (Preferred engine)</strong> 選擇為 <strong>「Speech Services by Google」 (Google 文字轉語音)</strong>。</li>
+                            <li style="margin-bottom: 4px;">點選偏好引擎右側的 <strong>「設定 (齒輪)」</strong> ➔ 點選 <strong>「安裝語音資料」 (Install voice data)</strong>。</li>
+                            <li style="margin-bottom: 4px;">搜尋並下載 <strong>「中文 (粵語/香港)」</strong> 或 <strong>「中文 (普通話/中國/台灣)」</strong> 語音包套件。</li>
+                            <li style="margin-bottom: 4px;">返回遊戲重新整理網頁，並確保已開啟媒體音量（非來電訊號音量）！</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- General browser section -->
+                    <div style="background: #FFFBEB; border-left: 4px solid #F59E0B; padding: 10px 12px; border-radius: 6px; font-size: 0.88rem; color: #78350F; font-weight: bold; border-top: 1px solid #FEF3C7; border-right: 1px solid #FEF3C7; border-bottom: 1px solid #FEF3C7;">
+                        ⚠️ 備註：部分內置瀏覽器（如 Line / WeChat 內置瀏覽器）可能會限制聲音播放，強烈推薦使用 Safari (iOS) 或 Google Chrome (Android) 開啟此網頁，即可獲得最佳、最標準的真人語音播放效果！
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; width: 100%;">
+                    <button class="btn" style="background: #0284C7; color: white; box-shadow: 0 4px 0 #0369A1; width: 80%; font-size: 1.15rem; font-weight: bold; border-radius: 50px; margin: 0 auto; display: block;" onclick="closeVoiceHelpModal()">
+                        我明白了 Close ✖
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1536,11 +1615,42 @@
         let spellingInput = [];
         let activeRedoIndex = null;
         let redoSpellingInput = [];
+        let currentChineseLangCode = localStorage.getItem('currentChineseLangCode') || 'zh-HK';
 
         // INITIALIZE APP
         window.addEventListener('DOMContentLoaded', () => {
             renderLevelMenu();
+            
+            // Sync voice settings radio checked state
+            const radios = document.getElementsByName('chinese_lang');
+            radios.forEach(radio => {
+                if (radio.value === currentChineseLangCode) {
+                    radio.checked = true;
+                }
+            });
         });
+
+        // CHINESE VOICE LANGUAGE SETTING ACTIONS
+        function setChineseVoiceLanguage(langCode) {
+            currentChineseLangCode = langCode;
+            localStorage.setItem('currentChineseLangCode', langCode);
+            
+            // Trigger quick sound test
+            if (langCode === 'zh-HK') {
+                playWordSound('廣東話', 'zh-HK');
+            } else {
+                playWordSound('普通话', 'zh-CN');
+            }
+        }
+
+        // VOICE DIAGNOSTIC HELP MODAL ACTIONS
+        function showVoiceHelpModal() {
+            document.getElementById('voiceHelpModal').classList.add('active');
+        }
+
+        function closeVoiceHelpModal() {
+            document.getElementById('voiceHelpModal').classList.remove('active');
+        }
 
         // RENDER LEVEL MENU WITH STARS & HIGHEST SCORES
         function renderLevelMenu() {
@@ -1770,6 +1880,12 @@
             let voice = null;
             if (langCode.startsWith('en')) {
                 voice = voices.find(v => v.lang.startsWith('en-'));
+            } else if (langCode === 'zh-HK') {
+                // Find Cantonese voice (HK, Cantonese, zh-HK)
+                voice = voices.find(v => v.lang.includes('HK') || v.lang.includes('zh-HK') || v.lang.toLowerCase().includes('cantonese') || v.lang.toLowerCase().includes('yue'));
+            } else if (langCode === 'zh-CN') {
+                // Find Mandarin voice (CN, Mainland, zh-CN, Mandarin, Hans)
+                voice = voices.find(v => (v.lang.includes('CN') || v.lang.includes('zh-CN') || v.lang.toLowerCase().includes('mandarin') || v.lang.toLowerCase().includes('putonghua') || v.lang.includes('zh-Hans')) && !v.lang.includes('HK') && !v.lang.includes('TW'));
             } else {
                 voice = voices.find(v => v.lang.startsWith('zh-') || v.lang.includes('HK'));
             }
@@ -2043,7 +2159,7 @@
             if (lang === 'en') {
                 playWordSound(answerPopupWord.en, 'en-US');
             } else {
-                playWordSound(answerPopupWord.zh, 'zh-HK');
+                playWordSound(answerPopupWord.zh, currentChineseLangCode);
             }
         }
 
@@ -2246,7 +2362,7 @@
             hintBox.innerHTML = `💡 Hint (中文提示): <strong>${word.zh}</strong>`;
             
             // Speak Chinese
-            playWordSound(word.zh, 'zh-HK');
+            playWordSound(word.zh, currentChineseLangCode);
 
             document.getElementById('redoModalTitle').innerText = `Correction: Item #${index+1}`;
             document.getElementById('redoFeedback').innerText = '';
