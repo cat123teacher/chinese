@@ -150,6 +150,18 @@
             box-shadow: 0 2px 0px #D6BE3C;
         }
 
+        .btn-purple {
+            background: #9B5DE5;
+            box-shadow: 0 6px 0px #7B3DB5;
+            color: white;
+        }
+        .btn-purple:hover {
+            background-color: #A86CE6;
+        }
+        .btn-purple:active {
+            box-shadow: 0 2px 0px #7B3DB5;
+        }
+
         /* Level select grid */
         .grid-levels {
             display: grid;
@@ -1017,10 +1029,30 @@
             <h1 id="stageMenuTitle">Unit Title</h1>
             <h2>Choose your STAGE:</h2>
             <div class="stage-box">
+                <button class="btn btn-purple" onclick="enterStudyRoom()">📖 Study Room (溫書室)</button>
                 <button class="btn btn-secondary" onclick="startStage(1)">🎵 Stage 1: Listening</button>
                 <button class="btn btn-accent" onclick="startStage(2)">📣 Stage 2: Speaking</button>
                 <button class="btn" onclick="startStage(3)">✍️ Stage 3: Spelling</button>
             </div>
+        </div>
+
+        <!-- PAGE 2B: STUDY ROOM -->
+        <div class="page" id="pageStudyRoom">
+            <h1 id="studyRoomTitle">📖 Study Room (溫書室)</h1>
+            <h2>Review the wordlist picture book page:</h2>
+            
+            <div class="zoom-controls-row" style="display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%; flex-wrap: wrap;">
+                <button class="btn" style="background: #FFF; color: #FF6B6B; border: 3px solid #FF6B6B; box-shadow: 0 3px 0 #D84B4B; padding: 6px 12px; font-size: 0.95rem; font-weight: 800; margin: 0; min-width: 85px; height: 38px; line-height: 20px; display: inline-flex; align-items: center; justify-content: center;" onclick="zoomStudyImg(0.25)">🔍 放大 (+)</button>
+                <button class="btn" style="background: #FFF; color: #4ECDC4; border: 3px solid #4ECDC4; box-shadow: 0 3px 0 #37A19A; padding: 6px 12px; font-size: 0.95rem; font-weight: 800; margin: 0; min-width: 85px; height: 38px; line-height: 20px; display: inline-flex; align-items: center; justify-content: center;" onclick="zoomStudyImg(-0.25)">🔍 縮小 (-)</button>
+                <button class="btn" style="background: #FFF; color: #718096; border: 3px solid #CBD5E1; box-shadow: 0 3px 0 #94A3B8; padding: 6px 12px; font-size: 0.95rem; font-weight: 800; margin: 0; min-width: 85px; height: 38px; line-height: 20px; display: inline-flex; align-items: center; justify-content: center;" onclick="resetStudyImg()">🔄 重設</button>
+            </div>
+            
+            <div id="studyWordImgContainer" style="overflow: auto; width: 100%; max-height: 450px; background: #F8FAFC; border: 3px solid #9B5DE5; border-radius: 12px; margin-bottom: 15px; position: relative; display: block; text-align: center;">
+                <img id="studyWordImg" src="" style="width: 100%; height: auto; display: inline-block; border-radius: 8px; transition: width 0.15s ease-out;" onerror="this.style.display='none'">
+                <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; pointer-events: none; z-index: 10;" id="studyZoomIndicator">Zoom: 100%</div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="exitStudyRoom()" style="margin-top: 10px;">◀ Back to Stages</button>
         </div>
 
         <!-- PAGE 3: LISTENING CHALLENGE -->
@@ -2653,6 +2685,65 @@
 
         function closeTipsModal() {
             document.getElementById('tipsModal').classList.remove('active');
+        }
+
+        // --- STUDY ROOM LOGIC ---
+        let currentStudyZoom = 1.0;
+
+        function enterStudyRoom() {
+            if (!currentLevel) return;
+            document.getElementById('studyRoomTitle').innerText = `📖 ${currentLevel.title} Study Room`;
+            
+            // Set image source dynamically based on level
+            const imgEl = document.getElementById('studyWordImg');
+            if (currentLevel.id) {
+                imgEl.src = `starter${currentLevel.id}.jpg`;
+                imgEl.style.display = 'inline-block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+            
+            resetStudyImg();
+            switchPage('pageStudyRoom');
+        }
+
+        function exitStudyRoom() {
+            switchPage('pageStages');
+        }
+
+        function zoomStudyImg(amount) {
+            currentStudyZoom += amount;
+            if (currentStudyZoom < 1.0) currentStudyZoom = 1.0;
+            if (currentStudyZoom > 3.0) currentStudyZoom = 3.0;
+            applyStudyZoom();
+        }
+
+        function resetStudyImg() {
+            currentStudyZoom = 1.0;
+            applyStudyZoom();
+        }
+
+        function applyStudyZoom() {
+            const img = document.getElementById('studyWordImg');
+            const container = document.getElementById('studyWordImgContainer');
+            const indicator = document.getElementById('studyZoomIndicator');
+            if (!img || !indicator) return;
+
+            const widthPct = Math.round(currentStudyZoom * 100);
+            img.style.width = widthPct + '%';
+            indicator.innerText = 'Zoom: ' + widthPct + '%';
+
+            if (currentStudyZoom > 1.0) {
+                img.style.marginLeft = '0';
+                img.style.marginRight = 'auto';
+            } else {
+                img.style.marginLeft = 'auto';
+                img.style.marginRight = 'auto';
+                if (container) {
+                    container.scrollLeft = 0;
+                    container.scrollTop = 0;
+                }
+            }
         }
 
     </script>
