@@ -1176,8 +1176,17 @@
                         <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; pointer-events: none; z-index: 10;" id="zoomIndicator">Zoom: 100%</div>
                     </div>
                     
-                    <div id="tipsWordEn" style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin: 3px 0; letter-spacing: 1px;">apple</div>
-                    <div id="tipsWordZh" style="font-size: 1.8rem; color: #4A5568; font-weight: bold; margin-bottom: 12px;">蘋果</div>
+                    <!-- English Word Block -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0;">
+                        <span id="tipsWordEn" style="font-size: 2.5rem; font-weight: bold; color: var(--primary); letter-spacing: 1px;">apple</span>
+                        <button class="feedback-speaker-btn" style="width: 44px; height: 42px; font-size: 1.2rem; margin: 0; display: inline-flex; align-items: center; justify-content: center;" onclick="playTipsWordSound('en')">🔊</button>
+                    </div>
+                    
+                    <!-- Chinese Word Block -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 10px 0;">
+                        <span id="tipsWordZh" style="font-size: 1.8rem; color: #4A5568; font-weight: bold;">蘋果</span>
+                        <button class="feedback-speaker-btn" style="width: 44px; height: 42px; font-size: 1.2rem; margin: 0; background: #E0F2FE; display: inline-flex; align-items: center; justify-content: center;" onclick="playTipsWordSound('zh')">🔊</button>
+                    </div>
                 </div>
                 <button class="btn" style="background: var(--accent); color: #444; box-shadow: 0 4px 0px #D6BE3C; width: 80%; margin: 5px auto;" onclick="closeTipsModal()">Close ✖</button>
             </div>
@@ -2623,7 +2632,7 @@
         }
 
         // --- TIPS MODAL LOGIC ---
-        let currentZoom = 1.0;
+        
 
         function zoomTipsImg(amount) {
             currentZoom += amount;
@@ -2660,10 +2669,24 @@
             }
         }
 
+        // --- TIPS MODAL LOGIC ---
+        let currentZoom = 1.0;
+        let tipsWord = null;
+
+        function playTipsWordSound(lang) {
+            if (!tipsWord) return;
+            if (lang === 'en') {
+                playWordSound(tipsWord.en, 'en-US');
+            } else {
+                playWordSound(tipsWord.zh, currentChineseLangCode);
+            }
+        }
+
         function showQuestionTips() {
             const currentWord = selectedWords[currentWordIndex];
             if (!currentWord) return;
             
+            tipsWord = currentWord;
             document.getElementById('tipsWordEn').innerText = currentWord.en;
             document.getElementById('tipsWordZh').innerText = currentWord.zh;
             
