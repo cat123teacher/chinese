@@ -196,6 +196,7 @@
         
         <!-- HOME SCREEN: LEVEL SELECT -->
         <div id="screen-home" class="space-y-6 animate__animated animate__fadeIn">
+
             <!-- Compact merged Progress Record Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-3xl border-4 border-amber-200 shadow-sm">
                 <div class="flex items-center space-x-2 flex-grow max-w-lg">
@@ -209,6 +210,39 @@
                 <div class="flex-shrink-0 text-right">
                     <button class="kids-btn-3d bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600 text-white font-extrabold text-xs py-2 px-4 rounded-2xl active:translate-y-1 transition-all shadow-sm flex items-center space-x-1" onclick="resetAllProgress()">
                         <span>清除記錄 🗑️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Language Setting & Help Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-sky-50 to-indigo-50 p-5 rounded-3xl border-4 border-sky-200 shadow-md">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">🗣️</span>
+                    <div class="text-left">
+                        <span class="text-xs md:text-sm font-black text-sky-800 block">朗讀語言設定 (Voice Language):</span>
+                        <span class="text-[11px] text-slate-500 font-bold block">請選擇題目與答案的朗讀發音</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Cantonese Button -->
+                    <button id="lang-btn-cantonese" class="kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-sky-400 via-sky-500 to-sky-600 text-white font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-sky-700" onclick="setLanguage('zh-HK')">
+                        <span class="text-base">🗣️</span>
+                        <span>廣東話</span>
+                        <span id="lang-badge-cantonese" class="bg-white text-sky-600 text-[10px] font-black px-1.5 py-0.5 rounded-full">使用中</span>
+                    </button>
+                    
+                    <!-- Putonghua Button -->
+                    <button id="lang-btn-putonghua" class="kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-slate-200 to-slate-300 text-slate-700 font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-slate-400" onclick="setLanguage('zh-CN')">
+                        <span class="text-base">🗣️</span>
+                        <span>普通話</span>
+                        <span id="lang-badge-putonghua" class="bg-slate-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full hidden">設定</span>
+                    </button>
+                    
+                    <!-- Help Link Button -->
+                    <button class="text-rose-500 hover:text-rose-600 text-xs font-black underline flex items-center space-x-1 active:scale-95 transition-all p-1" onclick="openSpeechHelpModal()">
+                        <span>❓</span>
+                        <span>聽不到聲音或不能出廣東話/普通話</span>
                     </button>
                 </div>
             </div>
@@ -397,6 +431,68 @@
             </div>
         </div>
 
+        <!-- SPEECH HELP MODAL -->
+        <div id="modal-speech-help" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay animate__animated animate__fadeIn">
+            <div class="bg-white w-full max-w-xl rounded-3xl border-4 border-sky-400 p-6 md:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto animate__animated animate__bounceInDown">
+                
+                <!-- Close Button -->
+                <button class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-black text-xl" onclick="closeSpeechHelpModal()">
+                    ❌
+                </button>
+
+                <div class="flex items-center space-x-2 bg-sky-50 p-3 rounded-2xl border border-sky-200">
+                    <span class="text-2xl">🔊</span>
+                    <h3 class="text-lg font-black text-sky-800">聽不到聲音或發音不正確？語音設定教學</h3>
+                </div>
+
+                <div class="space-y-5 text-slate-700 text-sm md:text-base">
+                    <p class="font-bold text-amber-600">💡 小提示：本遊戲使用你的手機/平板內建的「文字轉語音(TTS)」功能來朗讀。如果你聽不到聲音，請根據以下方法進行設定：</p>
+                    
+                    <!-- iOS settings -->
+                    <div class="space-y-2 border-l-4 border-sky-400 pl-3 text-left">
+                        <h4 class="font-black text-sky-800 text-base flex items-center space-x-1">
+                            <span>🍎</span> <span>蘋果手機 (iPhone / iPad) 設定方法：</span>
+                        </h4>
+                        <ol class="list-decimal pl-5 space-y-1 font-bold text-xs md:text-sm text-slate-600">
+                            <li>確認手機側邊的<strong class="text-rose-500">「靜音開關」</strong>沒有開啟（橘色線），並調大音量。</li>
+                            <li>前往手機的 <strong class="text-slate-800">「設定」 (Settings)</strong>。</li>
+                            <li>點選 <strong class="text-slate-800">「輔助功能」 (Accessibility)</strong>。</li>
+                            <li>點選 <strong class="text-slate-800">「朗讀內容」 (Spoken Content)</strong>。</li>
+                            <li>點選 <strong class="text-slate-800">「聲音」 (Voices)</strong>。</li>
+                            <li>點選 <strong class="text-slate-800">「中文」 (Chinese)</strong>。</li>
+                            <li>下載並選擇 <strong class="text-sky-600">「廣東話 (香港)」(Cantonese - Hong Kong)</strong> 如 Siri、婷婷，或者 <strong class="text-sky-600">「普通話 (中國)」(Mandarin - China)</strong>。確保已下載高品質聲音，否則可能無法發聲。</li>
+                        </ol>
+                    </div>
+
+                    <!-- Android settings -->
+                    <div class="space-y-2 border-l-4 border-emerald-400 pl-3 text-left">
+                        <h4 class="font-black text-emerald-800 text-base flex items-center space-x-1">
+                            <span>🤖</span> <span>安卓手機 (Android) 設定方法：</span>
+                        </h4>
+                        <ol class="list-decimal pl-5 space-y-1 font-bold text-xs md:text-sm text-slate-600">
+                            <li>確認手機音量已調大，且未開啟「靜音/勿擾模式」。</li>
+                            <li>前往手機的 <strong class="text-slate-800">「設定」 (Settings)</strong>。</li>
+                            <li>點選 <strong class="text-slate-800">「系統」或「輔助功能」</strong> ➔ <strong class="text-slate-800">「文字轉語音輸出」 (Text-to-speech output)</strong>。</li>
+                            <li>在「偏好的引擎」中，推薦選擇 <strong class="text-emerald-600">「Google 文字轉語音引擎」 (Speech Services by Google)</strong>。</li>
+                            <li>點選語言，選擇 <strong class="text-slate-800">「中文（香港）」</strong> 或 <strong class="text-slate-800">「中文（中國）」</strong>。</li>
+                            <li>點按旁邊的設定圖示，安裝對應的語音資料檔案（語音包）。</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- General tip -->
+                    <p class="text-xs text-slate-400 font-bold bg-slate-50 p-2.5 rounded-xl border text-left">
+                        ⚠️ 備註：部分瀏覽器（如部分 Android 內建瀏覽器或微信/Line 內置瀏覽器）可能會限制語音功能。如仍有問題，推薦使用 <strong class="text-slate-600">Safari (iOS)</strong> 或 <strong class="text-slate-600">Google Chrome (Android)</strong> 瀏覽器開啟本遊戲。
+                    </p>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button class="kids-btn-3d bg-gradient-to-b from-sky-400 via-sky-500 to-sky-600 text-white font-black py-3 px-8 rounded-2xl shadow-md border-b-8 border-sky-700 hover:border-b-4 active:translate-y-1 transition-all text-base md:text-lg" onclick="closeSpeechHelpModal()">
+                        我明白啦 ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Requirement 4: Footer at the very bottom containing Teacher Cat social links -->
@@ -429,9 +525,16 @@
                     <span>🎵</span> <span>抖音: 74254902683</span>
                 </span>
             </div>
-            <div class="text-[11px] text-slate-400 font-bold pt-2 border-t border-slate-100">
-                本溫習遊戲題目參考《3MS 1B 人文科 溫習全攻略》改編製作，供小一學生複習使用。
+            <!-- Requirement footer links -->
+            <div class="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-xs md:text-sm text-amber-700 font-extrabold mt-4 pt-4 border-t border-amber-100">
+                <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank" class="hover:text-amber-900 transition-colors underline decoration-2 decoration-amber-300 hover:decoration-amber-500">關於我們</a>
+                <span class="text-amber-300">|</span>
+                <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank" class="hover:text-amber-900 transition-colors underline decoration-2 decoration-amber-300 hover:decoration-amber-500">隱私權政策</a>
+                <span class="text-amber-300">|</span>
+                <span class="text-slate-500">Copyright by ©Teacher Cat 快樂AI教室</span>
             </div>
+            
+
         </div>
     </footer>
 
@@ -3016,17 +3119,74 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Text-to-Speech Cantonese Speaker
+        // Multi-lingual State
+        let currentLanguage = 'zh-HK'; // Default is Cantonese (Hong Kong)
+
+        // Text-to-Speech Multi-lingual Speaker
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel(); // Stop any previous speech
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'zh-HK'; // Cantonese for Hong Kong
+                utterance.lang = currentLanguage; // Use selected language
                 utterance.rate = 0.85; // Slightly slower for primary kids
                 window.speechSynthesis.speak(utterance);
             } else {
                 console.log("TTS not supported by this browser.");
             }
+        }
+
+        // Change Voice Language (Cantonese / Putonghua)
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            const btnCantonese = document.getElementById('lang-btn-cantonese');
+            const btnPutonghua = document.getElementById('lang-btn-putonghua');
+            const badgeCantonese = document.getElementById('lang-badge-cantonese');
+            const badgePutonghua = document.getElementById('lang-badge-putonghua');
+            
+            if (lang === 'zh-HK') {
+                // Highlight Cantonese Button
+                btnCantonese.className = "kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-sky-400 via-sky-500 to-sky-600 text-white font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-sky-700";
+                badgeCantonese.className = "bg-white text-sky-600 text-[10px] font-black px-1.5 py-0.5 rounded-full";
+                badgeCantonese.textContent = "使用中";
+                badgeCantonese.classList.remove('hidden');
+                
+                // Dim Putonghua Button
+                btnPutonghua.className = "kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-slate-200 to-slate-300 text-slate-700 font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-slate-400";
+                badgePutonghua.className = "bg-slate-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full";
+                badgePutonghua.textContent = "設定";
+                badgePutonghua.classList.add('hidden');
+                
+                speakText("已切換為廣東話發音！");
+            } else {
+                // Dim Cantonese Button
+                btnCantonese.className = "kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-slate-200 to-slate-300 text-slate-700 font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-slate-400";
+                badgeCantonese.className = "bg-slate-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full";
+                badgeCantonese.textContent = "設定";
+                badgeCantonese.classList.add('hidden');
+                
+                // Highlight Putonghua Button
+                btnPutonghua.className = "kids-btn-3d px-5 py-2.5 bg-gradient-to-b from-sky-400 via-sky-500 to-sky-600 text-white font-black text-sm rounded-2xl flex items-center space-x-1.5 shadow-md active:translate-y-1 transition-all border-b-4 border-sky-700";
+                badgePutonghua.className = "bg-white text-sky-600 text-[10px] font-black px-1.5 py-0.5 rounded-full";
+                badgePutonghua.textContent = "使用中";
+                badgePutonghua.classList.remove('hidden');
+                
+                speakText("已切换为普通话发音！");
+            }
+        }
+
+        // Open Speech Help Modal
+        function openSpeechHelpModal() {
+            window.speechSynthesis.cancel();
+            const modal = document.getElementById('modal-speech-help');
+            modal.classList.remove('hidden');
+            modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay animate__animated animate__fadeIn";
+        }
+
+        // Close Speech Help Modal
+        function closeSpeechHelpModal() {
+            const modal = document.getElementById('modal-speech-help');
+            modal.classList.add('hidden');
         }
 
                 function speakLevelTitle(levelKey) {
