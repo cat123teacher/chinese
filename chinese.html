@@ -68,7 +68,7 @@
         .retry-btn:active { transform: translateY(4px); box-shadow: none; }
 
         /* 文法提示框 (Modal) - 手機優化 */
-        #hint-modal, #troubleshoot-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;}
+        #hint-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;}
         .hint-content { background: #fff9c4; border: 6px dashed #ff9f43; border-radius: 25px; padding: 25px; max-width: 95%; width: 550px; text-align: left; box-shadow: 0 15px 35px rgba(0,0,0,0.3); animation: popIn 0.3s ease-out; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
         @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .hint-content h2 { color: #eb3b5a; margin-top: 0; text-align: center; font-size: 32px; text-shadow: 1px 1px #fff; display: flex; justify-content: center; align-items: center; gap: 15px; flex-shrink: 0;}
@@ -85,12 +85,72 @@
         .footer-links a { text-decoration: none; font-weight: bold; transition: color 0.2s ease; }
         .footer-links a:hover { text-decoration: underline; }
         
-        /* 語言切換排版 */
-        .lang-setting-container { background: #e3f2fd; border: 3px solid #90caf9; border-radius: 20px; padding: 15px; margin: 15px auto 25px; max-width: 650px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 6px 12px rgba(0,0,0,0.05); }
-        .lang-btns { display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 5px; }
-        .lang-sub-btn { font-size: 18px; padding: 8px 22px; margin: 5px; border-radius: 25px; }
+
+
+        /* ========================================== 雙語音設定面板與排解彈窗專用樣式 ========================================== */
+        /* 發音設定卡片外框 */ 
+        .voice-settings-panel { 
+            margin: 15px auto 20px auto; 
+            background: #F0F9FF; 
+            border: 3px dashed #0284C7; 
+            border-radius: 16px; 
+            padding: 15px 20px; 
+            text-align: center; 
+            max-width: 600px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+        }
+        /* 廣東話與普通話 Radio 標籤按鈕 */ 
+        .voice-label-btn { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-weight: 800; 
+            font-size: 1.15rem; 
+            background: white; 
+            border-radius: 25px; 
+            padding: 8px 18px; 
+            cursor: pointer; 
+            transition: all 0.1s; 
+            user-select: none; 
+        }
+        .voice-label-btn.cantonese { border: 3px solid #0284C7; box-shadow: 0 3px 0 #0284C7; }
+        .voice-label-btn.mandarin { border: 3px solid #10B981; box-shadow: 0 3px 0 #10B981; }
+        .voice-label-btn:active { transform: translateY(2px); box-shadow: none; }
+        /* 彈窗背景遮罩 (Modal Overlay) */ 
+        .popup-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0, 0, 0, 0.5); 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            padding: 15px; 
+        }
+        .popup-overlay.active { display: flex; }
+        /* 彈窗卡片本體 */ 
+        .popup-card { 
+            background: white; 
+            border-radius: 24px; 
+            padding: 25px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25); 
+            transform: scale(0.85); 
+            transition: transform 0.2s ease; 
+            max-height: 85vh; 
+            overflow-y: auto; 
+        }
+        .popup-overlay.active .popup-card { transform: scale(1); }
         .troubleshoot-link { font-size: 16px; color: #ff4757; font-weight: bold; text-decoration: underline; cursor: pointer; transition: color 0.2s ease; }
         .troubleshoot-link:hover { color: #ff6b81; }
+
     </style>
 </head>
 <body>
@@ -100,12 +160,12 @@
 <div id="correct-effect">🌟</div>
 
 <!-- 聲音疑難排解提示框 (Modal) -->
-<div id="troubleshoot-modal" class="hidden">
-    <div class="hint-content" style="background: #e3f2fd; border: 6px dashed #1e88e5;">
-        <h2 style="color: #0d47a1;">
+<div id="voiceHelpModal" class="popup-overlay">
+    <div class="popup-card" style="background: #e3f2fd; border: 6px dashed #1e88e5; max-width: 550px; width: 95%;">
+        <h2 style="color: #0d47a1; text-align: center; margin-top: 0; font-size: 28px;">
             📢 聽不到聲音解決教學
         </h2>
-        <div class="hint-text-box" style="font-size: 18px; line-height: 1.6; color: #1a237e;">
+        <div class="hint-text-box" style="font-size: 18px; line-height: 1.6; color: #1a237e; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 15px; overflow-y: auto; max-height: 50vh;">
             <p style="margin-top:0;"><strong>📱 iPhone / iPad (iOS) 設定：</strong></p>
             <ol style="padding-left: 20px; margin: 5px 0 15px;">
                 <li>打開手機<strong>「設定」</strong> (Settings)。</li>
@@ -133,8 +193,8 @@
                 <li>重新整理本網頁即可聽到聲音！</li>
             </ol>
         </div>
-        <div style="text-align: center; flex-shrink: 0; padding-bottom: 5px;">
-            <button class="btn" style="background-color: #1e88e5; box-shadow: 0 6px 0 #1565c0; padding: 12px 35px;" onclick="closeTroubleshootModal()">明白，去設定！</button>
+        <div style="text-align: center; flex-shrink: 0; padding-top: 15px;">
+            <button class="btn" style="background-color: #1e88e5; box-shadow: 0 6px 0 #1565c0; padding: 12px 35px; margin: 0;" onclick="closeVoiceHelpModal()">明白，去設定！</button>
         </div>
     </div>
 </div>
@@ -163,17 +223,21 @@
         <h1>🌟 小一中文文法大冒險 🌟</h1>
         <p style="font-size: 22px; color: #576574; font-weight: bold; margin-top: 5px;">請選擇關卡，收集進度大星星！</p>
         
-        <!-- 語言與發音設定區塊 -->
-        <div class="lang-setting-container">
-            <div style="font-size: 20px; font-weight: bold; color: #1565c0; display: flex; align-items: center; gap: 8px;">
+        <!-- 語言與發音設定區塊 (Bilingual Voice Settings) -->
+        <div class="voice-settings-panel">
+            <div style="font-size: 20px; font-weight: bold; color: #0284C7; display: flex; align-items: center; gap: 8px;">
                 🗣️ 選擇發音語言 (Language Setting)
             </div>
-            <div class="lang-btns">
-                <button id="lang-hk-btn" class="btn lang-sub-btn" style="background-color: #ff6b81; box-shadow: 0 4px 0 #ee5253;" onclick="changeLanguage('zh-HK')">廣東話 (zh-HK) 🟢</button>
-                <button id="lang-cn-btn" class="btn lang-sub-btn" style="background-color: #a4b0be; box-shadow: 0 4px 0 #747d8c;" onclick="changeLanguage('zh-CN')">普通話 (zh-CN)</button>
+            <div style="display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 5px;">
+                <label class="voice-label-btn cantonese">
+                    <input type="radio" name="chinese_lang" value="zh-HK" onclick="setChineseVoiceLanguage('zh-HK')"> 廣東話 (zh-HK)
+                </label>
+                <label class="voice-label-btn mandarin">
+                    <input type="radio" name="chinese_lang" value="zh-CN" onclick="setChineseVoiceLanguage('zh-CN')"> 普通話 (zh-CN)
+                </label>
             </div>
             <div style="margin-top: 5px;">
-                <span class="troubleshoot-link" onclick="openTroubleshootModal()">
+                <span class="troubleshoot-link" onclick="showVoiceHelpModal()">
                     ❓ 聽不到聲音或不能出廣東話/普通話？
                 </span>
             </div>
@@ -457,47 +521,51 @@
         petText.innerText = petStages[completedCount].text;
     }
 
-    // --- 遊戲與發音語系設定邏輯 ---
-    let currentLang = 'zh-HK'; // 預設廣東話
+    // --- 遊戲與發音語系設定邏輯 (完全對接雙語發音設定.txt) ---
+    // 1. 初始化狀態：自動讀取之前保存的設定，預設為廣東話 ('zh-HK')
+    let currentChineseLangCode = localStorage.getItem('currentChineseLangCode') || 'zh-HK';
+
+    // 2. 當頁面加載完成時，自動同步 Radio 按鈕的打勾狀態
+    window.addEventListener('DOMContentLoaded', () => {
+        const radios = document.getElementsByName('chinese_lang');
+        radios.forEach(radio => {
+            if (radio.value === currentChineseLangCode) {
+                radio.checked = true;
+            }
+        });
+    });
+
+    // 3. 切換語言函式（點選 radio 時觸發）
+    function setChineseVoiceLanguage(langCode) {
+        currentChineseLangCode = langCode;
+        localStorage.setItem('currentChineseLangCode', langCode); // 永久保存至硬碟
+        
+        // 播放確認音
+        if (langCode === 'zh-HK') {
+            playWordSound("已設定為廣東話發音", "zh-HK");
+        } else {
+            playWordSound("已设定为普通话发音", "zh-CN");
+        }
+    }
+
+    // 4. 顯示/關閉故障指南彈窗的控制
+    function showVoiceHelpModal() {
+        document.getElementById('voiceHelpModal').classList.add('active');
+    }
+
+    function closeVoiceHelpModal() {
+        document.getElementById('voiceHelpModal').classList.remove('active');
+    }
+
+    // 舊版相容層
+    function openTroubleshootModal() { showVoiceHelpModal(); }
+    function closeTroubleshootModal() { closeVoiceHelpModal(); }
+
     let currentLevel = 1;
     let questionList = [];
     let currentQIndex = 0;
     let isRetryMode = false;
     let hasSavedScoreForThisRun = false; 
-
-    function changeLanguage(lang) {
-        currentLang = lang;
-        const hkBtn = document.getElementById('lang-hk-btn');
-        const cnBtn = document.getElementById('lang-cn-btn');
-        
-        if (lang === 'zh-HK') {
-            hkBtn.style.backgroundColor = '#ff6b81';
-            hkBtn.style.boxShadow = '0 4px 0 #ee5253';
-            hkBtn.innerHTML = '廣東話 (zh-HK) 🟢';
-            
-            cnBtn.style.backgroundColor = '#a4b0be';
-            cnBtn.style.boxShadow = '0 4px 0 #747d8c';
-            cnBtn.innerHTML = '普通話 (zh-CN)';
-            playTTS("已設定為廣東話發音");
-        } else {
-            cnBtn.style.backgroundColor = '#ff6b81';
-            cnBtn.style.boxShadow = '0 4px 0 #ee5253';
-            cnBtn.innerHTML = '普通話 (zh-CN) 🟢';
-            
-            hkBtn.style.backgroundColor = '#a4b0be';
-            hkBtn.style.boxShadow = '0 4px 0 #747d8c';
-            hkBtn.innerHTML = '廣東話 (zh-HK)';
-            playTTS("已设定为普通话发音");
-        }
-    }
-
-    function openTroubleshootModal() {
-        document.getElementById('troubleshoot-modal').classList.remove('hidden');
-    }
-
-    function closeTroubleshootModal() {
-        document.getElementById('troubleshoot-modal').classList.add('hidden');
-    }
 
     // 初始化首頁與星星渲染
     function renderHome() {
@@ -671,18 +739,18 @@
             if (selectedIndex === correctIndex) {
                 playSuccessSound();
                 showCorrectEffect();
-                playTTS(currentLang === 'zh-HK' ? "答對了！好棒！" : "答对了！真棒！");
+                playTTS(currentChineseLangCode === 'zh-HK' ? "答對了！好棒！" : "答对了！真棒！");
                 btnElement.style.backgroundColor = "#2ed573";
                 setTimeout(proceedNext, 2000); 
             } else {
                 playWrongSound();
-                playTTS(currentLang === 'zh-HK' ? "哎呀，答錯了，看看提示吧！" : "哎呀，答错了，看看提示吧！");
+                playTTS(currentChineseLangCode === 'zh-HK' ? "哎呀，答錯了，看看提示吧！" : "哎呀，答错了，看看提示吧！");
                 btnElement.style.backgroundColor = "#ff4757";
                 buttons[correctIndex].style.backgroundColor = "#2ed573";
                 
                 let nextBtn = document.getElementById('skip-btn');
                 if (currentQIndex === questionList.length - 1) {
-                    nextBtn.innerText = currentLang === 'zh-HK' ? "完成，查看成績 ➡️" : "完成，查看成绩 ➡️";
+                    nextBtn.innerText = currentChineseLangCode === 'zh-HK' ? "完成，查看成績 ➡️" : "完成，查看成绩 ➡️";
                 } else {
                     nextBtn.innerText = "Move to next question ➡️";
                 }
@@ -696,7 +764,7 @@
                 qData.userAns = selectedIndex; 
                 playSuccessSound();
                 showCorrectEffect();
-                playTTS(currentLang === 'zh-HK' ? "答對了！好棒！" : "答对了！真棒！");
+                playTTS(currentChineseLangCode === 'zh-HK' ? "答對了！好棒！" : "答对了！真棒！");
                 btnElement.style.backgroundColor = "#2ed573";
                 
                 const buttons = document.querySelectorAll('.option-btn');
@@ -705,7 +773,7 @@
                 setTimeout(() => { showResultScreen(); }, 2000); 
             } else {
                 playWrongSound();
-                playTTS(currentLang === 'zh-HK' ? "哎呀，還是錯了，再試一次吧！" : "哎呀，还是错了，再试一次吧！");
+                playTTS(currentChineseLangCode === 'zh-HK' ? "哎呀，還是錯了，再試一次吧！" : "哎呀，还是错了，再试一次吧！");
                 btnElement.style.backgroundColor = "#ff4757";
                 btnElement.disabled = true; 
                 btnElement.dataset.wrong = "true"; 
@@ -734,7 +802,7 @@
         document.getElementById('hint-example').innerText = data.example;
         document.getElementById('hint-modal').classList.remove('hidden');
         if (autoPlay) {
-            let prefix = currentLang === 'zh-HK' ? "請看看提示，然後再選一次吧！" : "请看看提示，然后再选一次吧！";
+            let prefix = currentChineseLangCode === 'zh-HK' ? "請看看提示，然後再選一次吧！" : "请看看提示，然后再选一次吧！";
             playTTS(prefix + data.desc + "例子：" + data.example);
         }
     }
@@ -763,7 +831,7 @@
         else { showResultScreen(); } 
     }
     function confirmGoHome() {
-        let msg = currentLang === 'zh-HK' ? "確定要回到主頁嗎？目前的進度會消失喔！" : "确定要回到主页吗？目前的进度会消失喔！";
+        let msg = currentChineseLangCode === 'zh-HK' ? "確定要回到主頁嗎？目前的進度會消失喔！" : "确定要回到主页吗？目前的进度会消失喔！";
         if(confirm(msg)) { renderHome(); showScreen('home-screen'); }
     }
 
@@ -808,11 +876,11 @@
 
         showScreen('result-screen');
         if(!isRetryMode && currentScore === 20) { 
-            playTTS(currentLang === 'zh-HK' ? `太厲害了！滿分，獲得大星星！` : `太厉害了！满分，获得大星星！`); 
+            playTTS(currentChineseLangCode === 'zh-HK' ? `太厲害了！滿分，獲得大星星！` : `太厉害了！满分，获得大星星！`); 
         } else if (!isRetryMode && currentScore >= 10) { 
-            playTTS(currentLang === 'zh-HK' ? `恭喜過關！獲得小星星，得分是 ${currentScore} 分` : `恭喜过关！获得小星星，得分是 ${currentScore} 分`); 
+            playTTS(currentChineseLangCode === 'zh-HK' ? `恭喜過關！獲得小星星，得分是 ${currentScore} 分` : `恭喜过关！获得小星星，得分是 ${currentScore} 分`); 
         } else if (!isRetryMode) { 
-            playTTS(currentLang === 'zh-HK' ? `繼續加油，得分是 ${currentScore} 分` : `继续加油，得分是 ${currentScore} 分`); 
+            playTTS(currentChineseLangCode === 'zh-HK' ? `繼續加油，得分是 ${currentScore} 分` : `继续加油，得分是 ${currentScore} 分`); 
         }
     }
 
@@ -833,25 +901,34 @@
         showHintModal(true); 
     }
 
-    // 發音 API
-    function playTTS(text) {
+    // 5. 基礎播音器核心（文字轉語音）
+    function playWordSound(word, langCode = 'zh-HK') {
+        if (!word) return;
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel(); 
-            let cleanText = text.replace(/_+/g, "甚麼"); 
-            if (currentLang === 'zh-CN') {
+            let cleanText = word.replace(/_+/g, "甚麼"); 
+            if (langCode === 'zh-CN') {
                 cleanText = cleanText.replace(/甚麼/g, "什麼");
+                cleanText = cleanText.replace(/邊度/g, "哪裡");
+                cleanText = cleanText.replace(/嘢/g, "東西");
+                cleanText = cleanText.replace(/㗎/g, "嗎");
             }
             const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = currentLang; 
+            utterance.lang = langCode; 
             utterance.rate = 0.9; 
             window.speechSynthesis.speak(utterance);
         }
     }
 
+    // 舊版與相容層：題目、選項、答對答錯呼叫的 playTTS
+    function playTTS(text) {
+        playWordSound(text, currentChineseLangCode);
+    }
+
     function playCurrentQuestion() {
         if(questionList[currentQIndex]) {
             let qData = questionList[currentQIndex];
-            playTTS((currentLang === 'zh-HK' ? "題目是：" : "题目是：") + qData.q);
+            playTTS((currentChineseLangCode === 'zh-HK' ? "題目是：" : "题目是：") + qData.q);
         }
     }
 </script>
