@@ -365,10 +365,13 @@
             background-color: #22223b;
             color: white;
             text-align: center;
-            padding: 20px 0;
+            padding: 20px 20px;
             margin-top: auto;
             font-size: 1.1em;
+            box-sizing: border-box;
         }
+        .footer-links a { color: #ffd56b; text-decoration: none; margin: 0 10px; font-weight: bold; }
+        .footer-links a:hover { text-decoration: underline; color: #fff; }
         .social-links a { color: #ffd56b; text-decoration: none; margin: 0 10px; font-weight: bold; }
         .social-links a:hover { text-decoration: underline; color: #fff; }
 
@@ -396,6 +399,146 @@
             align-items: center;
             font-size: 5em;
         }
+
+        /* 語言設定區樣式 */
+        .lang-setting-container {
+            background-color: #f0f4f8;
+            border: 3px solid #d0e1fd;
+            border-radius: 25px;
+            padding: 15px 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .lang-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .lang-set-btn {
+            background-color: white;
+            color: var(--text-dark);
+            border: 3px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #bbb;
+        }
+
+        .lang-set-btn:hover {
+            background-color: #fff9eb;
+            border-color: var(--secondary);
+        }
+
+        .lang-set-btn.active {
+            background-color: #e8f5e9;
+            border-color: #2e7d32;
+            color: #2e7d32;
+            box-shadow: 0 4px 0 #1b5e20;
+        }
+
+        .lang-set-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .voice-help-link {
+            color: #0288d1;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: color 0.2s;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .voice-help-link:hover {
+            color: #01579b;
+        }
+
+        /* Modal 彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-box {
+            background: white;
+            width: 95%;
+            max-width: 650px;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            border: 6px solid #ffbd59;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .modal-close:hover { color: var(--primary); }
+
+        .tab-container {
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #f1f1f1;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #f1f1f1;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 20px;
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -414,6 +557,16 @@
         <h1>🎈 小一中文文法大冒險下 🎈</h1>
         <p style="font-size:1.3em; color:#666;">點擊關卡開始！完成關卡收集星星喔！</p>
         
+        <!-- 聲音語言設定區 -->
+        <div class="lang-setting-container">
+            <span style="font-weight: bold; font-size: 1.1em; color: var(--text-dark);">🗣️ 聲音語言設定 (Voice Language)：</span>
+            <div class="lang-btns">
+                <button id="lang-hk-btn" class="lang-set-btn active" onclick="setLanguage('zh-HK')">🇭🇰 廣東話 (Cantonese)</button>
+                <button id="lang-cn-btn" class="lang-set-btn" onclick="setLanguage('zh-CN')">🇨🇳 普通話 (Mandarin)</button>
+            </div>
+            <span class="voice-help-link" onclick="openVoiceHelp()">❓ 聽不到聲音或不能出廣東話/普通話？</span>
+        </div>
+
         <button class="clear-btn" onclick="clearRecords()">🗑️ 清除所有記錄</button>
 
         <div class="level-grid" id="level-grid"></div>
@@ -424,6 +577,63 @@
                 🚀 返回小朋友學習大冒險
             </button>
         </a>
+    </div>
+
+    <!-- 語音設定說明彈窗 (Help Modal) -->
+    <div id="voice-help-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeVoiceHelp()">&times;</span>
+            <h2 style="color: var(--primary);">🔊 聽不到聲音或發音不正確？</h2>
+            <p style="font-size: 1.1em; text-align: left; line-height: 1.5; color: #555; margin-bottom: 20px;">
+                本遊戲使用您的手機或電腦內建的語音系統進行朗讀。如果您在朗讀時聽不到聲音，或點擊「廣東話」時發出了普通話（或相反），請跟著下面的教學更改您的系統設定：
+            </p>
+            
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button id="tab-ios-btn" class="tab-btn active" onclick="switchHelpTab('ios')">🍎 iPhone / iPad (iOS)</button>
+                    <button id="tab-android-btn" class="tab-btn" onclick="switchHelpTab('android')">🤖 Android 手機/平板</button>
+                </div>
+                
+                <div id="help-ios-content" class="tab-content">
+                    <ol style="text-align: left; line-height: 1.8; font-size: 1.1em; padding-left: 20px; margin: 0;">
+                        <li>打開蘋果手機的 <strong>「設定」 (Settings)</strong> ⚙️</li>
+                        <li>向下滾動，選擇 <strong>「輔助使用」 (Accessibility)</strong> 👁️</li>
+                        <li>選擇 <strong>「語音內容」 (Spoken Content)</strong> 🗣️</li>
+                        <li>進入 <strong>「聲音」 (Voices)</strong></li>
+                        <li>選擇 <strong>「中文」 (Chinese)</strong></li>
+                        <li>
+                            在這裡你可以下載並點選：
+                            <ul>
+                                <li><strong>廣東話 (Cantonese)</strong>: 建議下載高品質的「Siri」或「雅婷」語音。</li>
+                                <li><strong>國語/普通話 (Mandarin)</strong>: 建議下載「Siri」、「美佳」或高品質語音。</li>
+                            </ul>
+                        </li>
+                        <li>⚠️ <strong>特別注意：</strong> 請確認手機左側的<strong>「靜音實體開關」</strong>已關閉，並將音量調大。</li>
+                    </ol>
+                </div>
+                
+                <div id="help-android-content" class="tab-content hidden">
+                    <ol style="text-align: left; line-height: 1.8; font-size: 1.1em; padding-left: 20px; margin: 0;">
+                        <li>打開安卓手機的 <strong>「設定」 (Settings)</strong> ⚙️</li>
+                        <li>向下滾動，選擇 <strong>「系統」</strong> 或 <strong>「其他設定」</strong></li>
+                        <li>進入 <strong>「語言與輸入法」 (Languages & Input)</strong></li>
+                        <li>選擇 <strong>「文字轉語音輸出」 (Text-to-speech output)</strong> 🗣️</li>
+                        <li>點擊 <strong>「偏好的引擎」 (Preferred engine)</strong> 旁的設定齒輪 ⚙️ (通常預設為 Google / 三星 引擎)</li>
+                        <li>選擇 <strong>「安裝語音資料」 (Install voice data)</strong></li>
+                        <li>
+                            下載並更新：
+                            <ul>
+                                <li><strong>中文（香港）</strong> (廣東話語音檔)</li>
+                                <li><strong>中文（中國）/ 普通話</strong> (國語/普通話語音檔)</li>
+                            </ul>
+                        </li>
+                        <li>下載成功後，回到上一頁，將<strong>「語言」</strong>設定為「使用系統語言」或手動選擇。</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <button class="action-btn" style="margin-top: 20px; background-color: var(--btn-easy); box-shadow: 0 6px 0 #2e7d32;" onclick="closeVoiceHelp()">我知道了！👍</button>
+        </div>
     </div>
 
     <div id="intro-screen" class="hidden">
@@ -496,13 +706,24 @@
 
 <footer>
     <h3>Teacher Cat 的快樂AI教室</h3>
-    <div class="social-links">
+    
+    <!-- 關於我們 & 隱私政策 導航 -->
+    <div class="footer-links" style="margin-bottom: 15px; font-size: 1.1em;">
+        <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank">關於我們</a> |
+        <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank">隱私權政策</a>
+    </div>
+
+    <div class="social-links" style="margin-bottom: 15px;">
         <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> |
         <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">Instagram</a> |
         <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">Facebook</a> |
         <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank">Threads</a> |
         <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank">小紅書</a> |
         <a href="https://v.douyin.com/idk2195/" target="_blank">抖音 (74254902683)</a>
+    </div>
+    
+    <div style="font-size: 0.95em; color: #ccc;">
+        Copyright by ©Teacher Cat 快樂AI教室
     </div>
 </footer>
 
@@ -609,7 +830,7 @@
              examples: ["1. 上款是「親愛的外公」。", "2. 下款是「外孫女心兒」。", "3. 信件日期是「四月十八日」。"],
              article: article2,
              baseEasy: [
-                 { q: "這封信是寫給誰的？", options: ["外孫女", "同學", "外公", "老師"], answer: 2 },
+                 { q: "這封信 is 寫給誰的？", options: ["外孫女", "同學", "外公", "老師"], answer: 2 },
                  { q: "學校將於哪一天舉辦匯演？", options: ["4月18日", "4月30日", "3月30日", "5月1日"], answer: 1 },
                  { q: "寫信人是誰？", options: ["外公", "老師", "心兒", "媽媽"], answer: 2 },
                  { q: "心兒在哪所小學讀書？", options: ["北元朗", "南元朗", "沙田", "大埔"], answer: 1 },
@@ -809,7 +1030,7 @@
                  { q: "郊遊這項活動，讓我們的學習充滿______。", options: ["樂趣", "趣事", "設施", "嘉賓"], answer: 0 },
                  { q: "下次寫信，我會告訴你更多學校的______。", options: ["趣事", "樂趣", "設施", "嘉賓"], answer: 0 },
                  { q: "小鳥在樹林裡______地飛來飛去。", options: ["自由自在", "鳥語花香", "樂呵呵", "努力"], answer: 0 },
-                 { q: "校長邀請了許多家長和______前來觀看表演。", options: ["嘉賓", "設施", "趣事", "樂趣"], answer: 0 },
+                 { q: "校長邀請了許多家長 and ______前來觀看表演。", options: ["嘉賓", "設施", "趣事", "樂趣"], answer: 0 },
                  { q: "田裡的小苗長高了，農夫看了______。", options: ["樂悠悠", "氣沖沖", "慢吞吞", "靜悄悄"], answer: 0 },
                  { q: "看到魔術師變出白鴿，大家都感到十分______。", options: ["興奮", "安靜", "沉悶", "害怕"], answer: 0 },
                  { q: "祝您身體______，每天都開開心心！", options: ["健康", "順利", "努力", "精彩"], answer: 0 },
@@ -874,9 +1095,45 @@
     let currentQuestionIndex = 0;
     let currentLevel = 1;
     let retryQuestionData = null; 
-    let currentSessionScore = 0; // 新增：用來追蹤這一次遊玩的即時分數
+    let currentSessionScore = 0; 
+    let currentLang = 'zh-HK'; // 預設廣東話
 
     let levelScores = JSON.parse(localStorage.getItem('chinese_grammar_scores')) || {};
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.getElementById('lang-hk-btn').classList.toggle('active', lang === 'zh-HK');
+        document.getElementById('lang-cn-btn').classList.toggle('active', lang === 'zh-CN');
+        
+        if (lang === 'zh-HK') {
+            speakText('已切換為廣東話');
+        } else {
+            speakText('已切换为普通话');
+        }
+    }
+
+    function openVoiceHelp() {
+        window.speechSynthesis.cancel();
+        document.getElementById('voice-help-modal').classList.remove('hidden');
+    }
+
+    function closeVoiceHelp() {
+        document.getElementById('voice-help-modal').classList.add('hidden');
+    }
+
+    function switchHelpTab(platform) {
+        if (platform === 'ios') {
+            document.getElementById('tab-ios-btn').classList.add('active');
+            document.getElementById('tab-android-btn').classList.remove('active');
+            document.getElementById('help-ios-content').classList.remove('hidden');
+            document.getElementById('help-android-content').classList.add('hidden');
+        } else {
+            document.getElementById('tab-ios-btn').classList.remove('active');
+            document.getElementById('tab-android-btn').classList.add('active');
+            document.getElementById('help-ios-content').classList.add('hidden');
+            document.getElementById('help-android-content').classList.remove('hidden');
+        }
+    }
 
     function clearRecords() {
         if(confirm("確定要清除所有關卡記錄和星星嗎？")) {
@@ -1092,7 +1349,7 @@
         hideAll();
         document.getElementById('result-screen').classList.remove('hidden');
         
-        currentSessionScore = 0; // 重置當前分數並重新計算
+        currentSessionScore = 0; 
         let summaryHtml = '';
         
         currentQuestions.forEach((q, i) => {
@@ -1172,13 +1429,12 @@
     }
 
     function submitRetryAnswer(selectedIndex, btnElement) {
-        if (btnElement.disabled) return; // 防止小朋友連按
+        if (btnElement.disabled) return; 
         
         let container = document.getElementById('game-container');
         document.getElementById('retry-hint-box').classList.add('hidden'); 
         
         if(selectedIndex === retryQuestionData.answer) {
-            // 答對後立刻鎖定所有按鈕，防止重複加分
             let btns = document.querySelectorAll('#retry-options-grid .option-btn');
             btns.forEach(b => b.disabled = true);
 
@@ -1189,17 +1445,14 @@
             showConfetti();
             speakText("答對了！好聰明！");
             
-            // --- 即時加分並覆蓋邏輯 ---
-            currentSessionScore++; // 當前分數 +1
-            document.getElementById('final-score').innerText = currentSessionScore; // 更新畫面的大分數
+            currentSessionScore++; 
+            document.getElementById('final-score').innerText = currentSessionScore; 
             
             let oldMax = levelScores[currentLevel] || 0;
             if (currentSessionScore > oldMax) {
-                // 如果加上這 1 分超越了歷史最高分，就覆蓋儲存！
                 levelScores[currentLevel] = currentSessionScore;
                 localStorage.setItem('chinese_grammar_scores', JSON.stringify(levelScores));
                 
-                // 動態更新星星獎勵提示
                 let maxScore = levelScores[currentLevel];
                 if (maxScore === 20) {
                     document.getElementById('star-reward-msg').innerText = "太厲害了！你獲得了 🌟 大星星滿分！";
@@ -1207,7 +1460,6 @@
                     document.getElementById('star-reward-msg').innerText = "做得好！你獲得了 ⭐ 小星星合格！";
                 }
             }
-            // ---------------------------
             
             setTimeout(() => {
                 let listItem = document.getElementById(`summary-item-${retryQuestionData.originalIndex}`);
@@ -1239,7 +1491,7 @@
             window.speechSynthesis.cancel(); 
             let cleanText = text.replace(/想一想：|小挑戰：|注意看：|[0-9A-Za-z\.\-\>]/g, ''); 
             const u = new SpeechSynthesisUtterance(cleanText);
-            u.lang = 'zh-HK'; 
+            u.lang = currentLang; 
             u.rate = 0.9;
             window.speechSynthesis.speak(u);
         }

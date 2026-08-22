@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!-- 鎖定螢幕縮放，防止小朋友拖拉時不小心放大網頁 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>小一初級寫作練習</title>
+<title>🌟 小一初級寫作練習 🌟</title>
 
 <style>
     /* ✨ 童趣波點背景 ✨ */
@@ -30,6 +30,138 @@
     h1 { color: #E65100; font-size: 42px; margin-bottom: 5px; text-shadow: 2px 3px 0px #FFE0B2; font-weight: 900; letter-spacing: 2px;}
     h2 { color: #3949AB; font-size: 24px; margin-top: 5px; font-weight: bold; }
     
+    /* 🔊 語音設定區域樣式 */
+    .voice-setting-panel {
+        background: #FFF3E0;
+        border: 3px solid #FFB74D;
+        border-radius: 20px;
+        padding: 15px;
+        margin: 20px auto;
+        max-width: 650px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .voice-title {
+        font-size: 18px;
+        font-weight: 900;
+        color: #E65100;
+    }
+    .voice-btn {
+        background: #FFF;
+        border: 2px solid #FFB74D;
+        color: #E65100;
+        padding: 8px 16px;
+        border-radius: 15px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+        transition: 0.2s;
+        box-shadow: 0 3px 0 #FFB74D;
+    }
+    .voice-btn.active {
+        background: #E65100;
+        color: #FFF;
+        border-color: #BF360C;
+        box-shadow: 0 3px 0 #BF360C;
+    }
+    .voice-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 0 0 transparent;
+    }
+    .voice-help-link {
+        font-size: 14px;
+        color: #1565C0;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 5px;
+        display: inline-block;
+    }
+    .voice-help-link:hover {
+        color: #0D47A1;
+    }
+
+    /* 彈出說明視窗 (Modal) */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        padding: 15px;
+    }
+    .modal-content {
+        background: #FFF;
+        border-radius: 30px;
+        border: 6px solid #FFCA28;
+        max-width: 600px;
+        width: 100%;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        text-align: left;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    .modal-header {
+        font-size: 24px;
+        font-weight: 900;
+        color: #E65100;
+        margin-bottom: 15px;
+        border-bottom: 3px dashed #FFCA28;
+        padding-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-tab-btn {
+        background: #FFF3E0;
+        border: 2px solid #FFB74D;
+        padding: 8px 16px;
+        border-radius: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-right: 8px;
+        color: #E65100;
+    }
+    .modal-tab-btn.active {
+        background: #FFCA28;
+        color: #333;
+        border-color: #FFA000;
+    }
+    .instruction-step {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+        color: #333;
+    }
+    .instruction-step strong {
+        color: #E65100;
+    }
+    .modal-close-btn {
+        background: linear-gradient(to bottom, #FF8A65, #E64A19);
+        color: #FFF;
+        border: none;
+        padding: 12px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 20px;
+        cursor: pointer;
+        display: block;
+        margin: 20px auto 0 auto;
+        box-shadow: 0 4px 0 #BF360C;
+    }
+    .modal-close-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 0 0 transparent;
+    }
+
     /* 關卡按鈕升級：彩色 3D 漸層 */
     .level-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;}
     .level-btn { border: none; border-radius: 25px; padding: 18px 15px; font-size: 22px; font-weight: 900; color: #fff; cursor: pointer; width: 45%; transition: 0.15s; display: flex; flex-direction: column; align-items: center; gap: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
@@ -87,39 +219,66 @@
     .pop-anim { animation: popScale 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     @keyframes popScale { 0% { transform: scale(0.1) rotate(-10deg); opacity: 0; } 50% { transform: scale(1.5) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 0; } }
 
-    /* 🔥 聯絡欄修改：跟隨網頁內容，加入各平台連結與手機自動換行排版 */
+    /* 🌟 Footer 結構：分為兩層，支持響應式換行與精美排版 */
     .footer { 
         margin-top: 50px; 
         background: #FFE0B2; 
         border-top: 5px solid #FF9800; 
-        padding: 25px 15px; 
-        font-size: 16px; 
+        padding: 30px 20px; 
+        font-size: 15px; 
         font-weight: bold; 
         color: #D84315; 
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .footer-title { 
+        font-size: 24px; 
+        font-weight: 900; 
+        color: #D84315; 
+        margin-bottom: 5px;
+    }
+    .footer-links-row {
+        display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        align-items: center;
+        gap: 15px;
+        margin-bottom: 5px;
+    }
+    .footer-social-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 12px;
     }
-    .footer-title {
-        width: 100%;
-        text-align: center;
-        font-size: 22px;
-        margin-bottom: 8px;
-        font-weight: 900;
-        color: #D84315;
-    }
     .footer a, .footer span.dy-tag { 
-        color: #1565C0; text-decoration: none; font-weight: 900; padding: 8px 15px; background: #FFF; border-radius: 12px; border: 2px solid #BBDEFB; white-space: nowrap; box-shadow: 0 4px 0 #90CAF9; transition: 0.1s; display: inline-block; cursor: pointer;
+        color: #1565C0; 
+        text-decoration: none; 
+        font-weight: 900; 
+        padding: 8px 16px; 
+        background: #FFF; 
+        border-radius: 12px; 
+        border: 2px solid #BBDEFB; 
+        white-space: nowrap; 
+        box-shadow: 0 4px 0 #90CAF9; 
+        display: inline-block; 
+        transition: 0.1s;
+        cursor: pointer;
     }
     .footer a:active, .footer span.dy-tag:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
     
-    /* 各平台專屬顏色按鈕設計 */
+    /* 特定按鈕樣式 */
+    .footer a.legal-btn { color: #37474F; border-color: #CFD8DC; box-shadow: 0 4px 0 #B0BEC5; background-color: #ECEFF1; }
     .footer a.wa-btn { color: #2E7D32; border-color: #A5D6A7; box-shadow: 0 4px 0 #81C784;}
     .footer a.threads-btn { color: #000; border-color: #E0E0E0; box-shadow: 0 4px 0 #9E9E9E;}
     .footer a.xhs-btn { color: #D32F2F; border-color: #FFCDD2; box-shadow: 0 4px 0 #E53935;}
     .footer span.dy-tag { color: #000; border-color: #E0E0E0; box-shadow: 0 4px 0 #BDBDBD; cursor: default; }
+    .copyright-text {
+        font-size: 14px;
+        color: #D84315;
+        margin-top: 10px;
+    }
 </style>
 </head>
 <body>
@@ -136,6 +295,15 @@
     <div id="home-screen" class="screen active-screen">
         <h1 style="margin-top:20px;">🌟 小一初級寫作練習 🌟</h1>
         <h2>(每次挑戰 20 題，全對可獲大星星！🌟)</h2>
+        
+        <!-- 🔊 語音設定控制台 -->
+        <div class="voice-setting-panel">
+            <span class="voice-title">🔊 語音朗讀設定:</span>
+            <button class="voice-btn active" id="btn-lang-cantonese" onclick="setSpeechLang('zh-HK')">廣東話 (Cantonese)</button>
+            <button class="voice-btn" id="btn-lang-mandarin" onclick="setSpeechLang('zh-CN')">普通話 (Putonghua)</button>
+            <span class="voice-help-link" onclick="openTroubleshootModal()">❓ 聽不到聲音或不能出廣東話/普通話？</span>
+        </div>
+
         <div class="level-grid" id="level-grid"></div>
         <br><br>
         <a href="https://cat123teacher.github.io/chinese/main.html" class="btn-main" style="display:inline-block; text-decoration:none; background:linear-gradient(to bottom, #AB47BC, #6A1B9A); box-shadow: 0 6px 0 #4A148C; margin-top:20px;">🌍 返回學習大冒險</a>
@@ -166,7 +334,7 @@
         <div style="font-size:24px; color:#1976D2; font-weight:900; margin-bottom:10px; background:#E3F2FD; display:inline-block; padding:8px 20px; border-radius:20px; border:3px solid #90CAF9;" id="progress-text"></div>
         
         <div class="question-header">
-            <button class="audio-btn" onclick="playAudioText(document.getElementById('question-text').innerText)">🔊</button>
+            <button class="audio-btn" id="btn-tts-question" onclick="playAudioText(document.getElementById('question-text').innerText)">🔊</button>
             <span id="question-text"></span>
         </div>
         
@@ -200,22 +368,110 @@
     <div style="font-size:65px; color:#E65100; font-weight:900; text-shadow: 4px 4px 0px #FFF, 0 10px 15px rgba(0,0,0,0.2); margin-top:20px;">太棒啦！答對了！</div>
 </div>
 
-<!-- 🔥 全新 Teacher Cat 的快樂AI教室 聯絡欄：加入了各個平台與抖音號 -->
+<!-- 📱 故障排除彈出式說明視窗 (Troubleshooting Modal) -->
+<div class="modal-overlay" id="ts-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>🔊 聽不到聲音 / 語音設定教學</span>
+            <span style="cursor:pointer; font-size:28px; color:#999;" onclick="closeTroubleshootModal()">×</span>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <button class="modal-tab-btn active" id="tab-ios" onclick="switchTab('ios')">🍎 iPhone / iPad (iOS)</button>
+            <button class="modal-tab-btn" id="tab-android" onclick="switchTab('android')">🤖 Android (安卓)</button>
+        </div>
+        
+        <!-- iOS 指南 -->
+        <div id="guide-ios" class="guide-content">
+            <div class="instruction-step">1. 確保手機側邊的 <strong>「靜音開關」已關閉</strong>，並把 <strong>「媒體音量」調大</strong>。</div>
+            <div class="instruction-step">2. 打開手機的 <strong>「設定」 (Settings)</strong>。</div>
+            <div class="instruction-step">3. 向下滑動找到並點擊 <strong>「輔助使用」 (Accessibility)</strong>。</div>
+            <div class="instruction-step">4. 點選 <strong>「朗讀內容」 (Spoken Content)</strong>。</div>
+            <div class="instruction-step">5. 點擊 <strong>「聲音」 (Voices)</strong> ➡️ 選擇 <strong>「中文」</strong>。</div>
+            <div class="instruction-step">6. 下載並選擇 <strong>「廣東話 (香港)」</strong>（建議高品質 Siri 或 Ting-Ting 語音）或 <strong>「普通話 (中國)」</strong>（建議 Ting-Ting Siri 語音）。</div>
+            <div class="instruction-step">7. 重新載入網頁，即可流暢聽到標準的發音囉！</div>
+        </div>
+
+        <!-- Android 指南 -->
+        <div id="guide-android" class="guide-content" style="display:none;">
+            <div class="instruction-step">1. 確保手機 <strong>「媒體音量」已調大</strong>，並關閉靜音/勿擾模式。</div>
+            <div class="instruction-step">2. 打開手機的 <strong>「設定」 (Settings)</strong>。</div>
+            <div class="instruction-step">3. 點擊 <strong>「系統」</strong> 或 <strong>「其他設定」</strong> ➡️ 選擇 <strong>「語言與輸入法」</strong>。</div>
+            <div class="instruction-step">4. 找到 <strong>「文字轉語音輸出」 (Text-to-speech output)</strong>。</div>
+            <div class="instruction-step">5. 在「偏好引擎」旁點擊 <strong>設定齒輪 ⚙️</strong> ➡️ 選擇 <strong>「安裝語音資料」</strong>。</div>
+            <div class="instruction-step">6. 找到 <strong>「中文（香港）」</strong> 或 <strong>「中文（中國）」</strong> 並點選下載高品質語音包。</div>
+            <div class="instruction-step">7. 重新載入網頁即可順利聽到聲音！</div>
+        </div>
+
+        <button class="modal-close-btn" onclick="closeTroubleshootModal()">我知道了 (Back to Game)</button>
+    </div>
+</div>
+
+<!-- 🔥 包含最新隱私條款、關於我們、社群平台的 Footer 聯絡欄 -->
 <div class="footer">
     <div class="footer-title">Teacher Cat 的快樂AI教室</div>
-    <a href="https://www.youtube.com/@TeacherCat123" target="_blank">📺 YouTube</a>
-    <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
-    <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
-    <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="threads-btn">🧵 Threads</a>
-    <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="xhs-btn">📕 小紅書</a>
-    <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="wa-btn">💬 WhatsApp 群組</a>
-    <span class="dy-tag">🎵 抖音號：74254902683</span>
+    
+    <!-- 關於我們、隱私政策、版權聲明 -->
+    <div class="footer-links-row">
+        <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank" class="legal-btn">ℹ️ 關於我們</a>
+        <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank" class="legal-btn">🔒 隱私權政策</a>
+    </div>
+
+    <!-- 社群聯絡管道 -->
+    <div class="footer-social-row">
+        <a href="https://www.youtube.com/@TeacherCat123" target="_blank">📺 YouTube</a>
+        <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank">📸 Instagram</a>
+        <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank">📘 Facebook</a>
+        <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="threads-btn">🧵 Threads</a>
+        <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" class="xhs-btn">📕 小紅書</a>
+        <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" class="wa-btn">💬 WhatsApp 分享 Group</a>
+        <span class="dy-tag">🎵 抖音號：74254902683</span>
+    </div>
+
+    <div class="copyright-text">Copyright by ©Teacher Cat 快樂AI教室</div>
 </div>
 
 <script>
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 function initAudio() { if(!audioCtx) audioCtx = new AudioContext(); }
+
+// 預設發音語言
+let speechLang = 'zh-HK'; 
+
+function setSpeechLang(lang) {
+    speechLang = lang;
+    document.getElementById('btn-lang-cantonese').classList.remove('active');
+    document.getElementById('btn-lang-mandarin').classList.remove('active');
+    
+    if (lang === 'zh-HK') {
+        document.getElementById('btn-lang-cantonese').classList.add('active');
+    } else {
+        document.getElementById('btn-lang-mandarin').classList.add('active');
+    }
+}
+
+function openTroubleshootModal() {
+    document.getElementById('ts-modal').style.display = 'flex';
+}
+
+function closeTroubleshootModal() {
+    document.getElementById('ts-modal').style.display = 'none';
+}
+
+function switchTab(platform) {
+    document.getElementById('tab-ios').classList.remove('active');
+    document.getElementById('tab-android').classList.remove('active');
+    document.getElementById('guide-ios').style.display = 'none';
+    document.getElementById('guide-android').style.display = 'none';
+    
+    if (platform === 'ios') {
+        document.getElementById('tab-ios').classList.add('active');
+        document.getElementById('guide-ios').style.display = 'block';
+    } else {
+        document.getElementById('tab-android').classList.add('active');
+        document.getElementById('guide-android').style.display = 'block';
+    }
+}
 
 function playSound(isCorrect) {
     initAudio();
@@ -245,16 +501,21 @@ function playAudioText(text, e) {
     if(e) e.stopPropagation(); 
     if(!text) return;
     const utterance = new SpeechSynthesisUtterance(text.replace(/____/g, "空格").replace(/❌/g, ""));
-    utterance.lang = "zh-HK"; utterance.rate = 0.85; 
+    utterance.lang = speechLang; utterance.rate = 0.85; 
     speechSynthesis.speak(utterance);
 }
 
 const LEVEL_HINTS = [
-    "寫作第一步：想想句子中的『甚麼時間』和『甚麼人』喔！", "寫作第二步：找出主角『在哪裡(地點)』和『做甚麼(事情)』！",
-    "四素句組合：時間 ➡️ 人物 ➡️ 地點 ➡️ 事情，順序不要錯喔！", "人感句：想想角色遇到這件事時，心裡是甚麼感受？",
-    "句型擴張：先寫出四素句，最後加上心裡的感覺！", "擴寫細節：加入具體的動作或形容詞，畫面會更生動！",
-    "對話擴寫：想想人物在這個情況下，會開口說甚麼話？", "段落公式一：1. 點題 ➡️ 2. 事例 ➡️ 3. 動作",
-    "段落公式二：1. 點題 ➡️ 2. 動作細節 ➡️ 3. 心情", "段落公式三：1. 點題 ➡️ 2. 人物對話 ➡️ 3. 心情或結果"
+    "寫作第一步：想想句子中的『甚麼時間』和『甚麼人』喔！", 
+    "寫作第二步：找出主角『在哪裡(地點)』和『做甚麼(事情)』！",
+    "四素句組合：時間 ➡️ 人物 ➡️ 地點 ➡️ 事情，順序不要錯喔！", 
+    "人感句：想想角色遇到這件事時，心裡是甚麼感受？",
+    "句型擴張：先寫出四素句，最後加上心裡的感覺！", 
+    "擴寫細節：加入具體的動作或形容詞，畫面會更生動！",
+    "對話擴寫：想想人物在這個情況下，會開口說甚麼話？", 
+    "段落公式一：1. 點題 ➡️ 2. 事例 ➡️ 3. 動作",
+    "段落公式二：1. 點題 ➡️ 2. 動作細節 ➡️ 3. 心情", 
+    "段落公式三：1. 點題 ➡️ 2. 人物對話 ➡️ 3. 心情或結果"
 ];
 
 function genLevel(t) {
@@ -268,7 +529,7 @@ function genLevel(t) {
     const ePers = ["我", "爸爸", "妹妹", "哥哥", "媽媽", "弟弟", "爺爺", "姐姐", "大家", "奶奶", "同學", "朋友", "一家人", "老師", "小狗", "小鳥", "農夫", "貓咪", "市民", "叔叔"];
     const ePla = ["學校", "廚房", "公園", "操場", "客廳", "房間", "山頂", "花園", "泳池", "家裡", "課室", "圖書館", "超市", "餐廳", "門口", "樹上", "田裡", "沙發上", "廣場", "舞台上"];
     const eAct = ["寫字", "煮飯", "玩滑梯", "跑步", "看電視", "睡覺", "看風景", "澆花", "游泳", "喝熱湯", "看書", "溫習", "買菜", "吃飯", "等門", "唱歌", "種菜", "休息", "倒數", "跳舞"];
-    const eEmo = ["感到很開心", "感到很滿足", "感到很快樂", "感到很輕鬆", "感到很平靜", "感到很疲倦", "感到很高興", "感到很得意", "感到很涼快", "感到很溫暖", "看得很專心", "溫習得很認真", "感到很興奮", "感到很滿意", "心裡很焦急", "感到很自由", "覺得很辛苦", "感覺很慵懶", "感到很激動", "充滿了自信"];
+    const eEmo = ["感到很開心", "感到很滿足", "感到很快樂", "感到很輕鬆", "感到很平靜", "感到很疲倦", "感到很高興", "感到很得意", "感到很涼快", "感到很溫暖", "看得很專心", "溫習得很認真", "感到很興奮", "感到很滿足", "心裡很焦急", "感到很自由", "覺得很辛苦", "感覺很慵懶", "感到很激動", "充滿了自信"];
     const eDet = ["整理書包", "洗乾淨手", "穿上外套", "綁好鞋帶", "削好蘋果", "蓋好被子", "帶備水樽", "拿着水壺", "戴上泳鏡", "穿上厚衣", "翻開書本", "拿出筆記", "推着購物車", "點了菜式", "搖着尾巴", "拍拍翅膀", "抹抹汗水", "伸個懶腰", "舉起雙手", "穿上舞衣"];
     const eDia = ["早晨！", "真好吃！", "很好玩！", "跑得快！", "好看！", "我想睡覺。", "風景好漂亮！", "開了很多花！", "水很涼！", "好喝啊！", "真有趣！", "大家很努力！", "買了很多食物！", "飯菜很美味！", "汪汪！", "吱吱叫！", "終於做完了！", "喵喵！", "新年快樂！", "大家拍手吧！"];
     const eTopList = ["早上回到學校", "昨天去到廚房", "今天去了公園", "明天去操場玩", "晚上坐在客廳", "下午回到房間", "秋天爬上山頂", "春天來到花園", "夏天去了泳池", "冬天待在家裡", "小息留在課室", "放學去圖書館", "星期天去超市", "週末去了餐廳", "中午來到門口", "清晨走到樹下", "黃昏來到田裡", "傍晚坐在沙發上", "除夕來到廣場", "節日登上舞台"];
@@ -348,7 +609,7 @@ const levelData = [
     { id: 6, title: "第 6 關：擴寫動作五感細節", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('運用五感觀察法，加入具體的細節，畫面會更生動！')}運用「五感觀察法」（視覺、聽覺、嗅覺、味覺、觸覺），加入具體的細節，畫面會更生動！<br><br><b>💡 課文例子：</b>${btnAudio('輕輕地撫摸小草。啊！軟軟的。')}「輕輕地撫摸小草。啊！軟軟的。」(這句用了觸覺喔！)`, ...genLevel(6) },
     { id: 7, title: "第 7 關：擴寫與感歎號運用", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('在句子中加入驚歎，並正確使用感歎號來表示驚喜或意外的感覺。')}在句子中加入驚歎，並正確使用「感歎號 (！)」來表示驚喜或意外的感覺。<br><br><b>💡 課文例子：</b>${btnAudio('媽媽跟我一起聞一聞小花。啊！香香的！')}「媽媽跟我一起聞一聞小花。啊！香香的！」`, ...genLevel(7) },
     { id: 8, title: "第 8 關：段落公式一 (點題，事例，動作。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('根據寫作公式，第一步先點題，再寫出發生了甚麼事例，最後加上主角的動作。')}根據寫作公式，第一步先「點題」，再寫出發生了甚麼「事例」，最後加上主角的「動作」。句子與句子之間要使用逗號！<br><br><b>💡 例子：</b>${btnAudio('昨天我們去公園，公園有大草地，我開心地跑跑跳跳。')}昨天我們去公園 (點題)，公園有大草地 (事例)，我開心地跑跑跳跳 (動作)。`, ...genLevel(8) },
-    { id: 9, title: "第 9 關：段落公式二 (點題，動作，心情。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('把點題加上動作細節和心情，短文會更豐富喔！')}把「點題」加上「動作細節」和「心情」，短文會更豐富喔！句子與句子之間要使用逗號！<br><br><b>💡 例子：</b>${btnAudio('我們到公園散步，爸爸讓我撫摸小草，我感到一陣驚喜。')}我們到公園散步 (點題)，爸爸讓我撫摸小草 (動作)，我感到一陣驚喜 (心情)。`, ...genLevel(9) },
+    { id: 9, title: "第 9 關：段落公式二 (點題，動作，心情。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('把點題加上動作細節 and 心情，短文會更豐富喔！')}把「點題」加上「動作細節」和「心情」，短文會更豐富喔！句子與句子之間要使用逗號！<br><br><b>💡 例子：</b>${btnAudio('我們到公園散步，爸爸讓我撫摸小草，我感到一陣驚喜。')}我們到公園散步 (點題)，爸爸讓我撫摸小草 (動作)，我感到一陣驚喜 (心情)。`, ...genLevel(9) },
     { id: 10, title: "第 10 關：段落公式三 (點題，對話，心情。)", hint: LEVEL_HINTS, tutorial: `<b>📖 課前預習：</b>${btnAudio('故事裡加上人物說的話，會變得像看卡通一樣生動！最後寫下心情或結果。')}故事裡加上人物「說的話」，會變得像看卡通一樣生動！最後寫下心情或結果。<br><br><b>💡 例子：</b>${btnAudio('第一天上學，媽媽說：「不用怕！」，我不再害怕了。')}第一天上學 (點題)，媽媽說：「不用怕！」(對話)，我不再害怕了 (心情/結果)。`, ...genLevel(10) }
 ];
 
@@ -361,7 +622,16 @@ let retryQIndex = 0;
 function renderLevelButtons() {
     const grid = document.getElementById("level-grid");
     grid.innerHTML = ""; 
-    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {};
+    let storedScores = {};
+    try {
+        let val = localStorage.getItem('tc_level_scores');
+        if (val) {
+            storedScores = JSON.parse(val) || {};
+        }
+    } catch (err) {
+        console.error(err);
+        storedScores = {};
+    }
 
     levelData.forEach(level => {
         let score = storedScores[level.id] || 0;
@@ -426,7 +696,7 @@ function renderQuestion() {
     }
 
     document.getElementById("progress-text").innerText = isRetryMode ? `【錯誤重做】第 ${qIndexToRender + 1} 題` : `第 ${currentLevelObj.id} 關 | 題： ${qIndexToRender + 1}/20`;
-    document.getElementById("question-text").innerHTML = "✏️ " + qData.q.replace(/\n/g, "<br>");
+    document.getElementById("question-text").innerHTML = "✏️ " + qData.q.replace(/\\n/g, "<br>");
 
     const dzContainer = document.getElementById("dropzones"); dzContainer.innerHTML = "";
     qData.dropzones.forEach(dz => {
@@ -472,7 +742,7 @@ function renderQuestion() {
             item.classList.add('selected');
             document.querySelectorAll('.drop-box:not(.filled)').forEach(box => box.classList.add('highlight'));
 
-            let touch = e.touches;
+            let touch = e.touches[0];
             window.touchGhost = item.cloneNode(true);
             window.touchGhost.id = "";
             window.touchGhost.style.position = 'fixed';
@@ -489,12 +759,12 @@ function renderQuestion() {
         item.addEventListener('touchmove', function(e) {
             if (!window.touchGhost) return;
             e.preventDefault(); // 絕對禁止 iOS 畫面捲動
-            moveGhost(e.touches);
+            moveGhost(e.touches[0]);
         }, {passive: false});
 
         item.addEventListener('touchend', function(e) {
             if (!window.touchGhost) return;
-            let touch = e.changedTouches;
+            let touch = e.changedTouches[0];
             // 偵測手指放開時，底下是不是空格
             let dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
             
@@ -518,6 +788,7 @@ function moveGhost(touch) {
     }
 }
 
+// 修正 prevQuestion / nextQuestion 邊界及 skipQuestion 分數機制
 function prevQuestion() { if(currentQIndex > 0) { currentQIndex--; renderQuestion(); } }
 function nextQuestion() { if(currentQIndex < 19) { currentQIndex++; renderQuestion(); } else { generateSummary(); } }
 
@@ -601,12 +872,26 @@ function generateSummary() {
     else starText = "加油喔！再試一次爭取星星吧！";
     document.getElementById("star-award-text").innerText = starText;
     
-    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {};
+    let storedScores = {};
+    try {
+        let val = localStorage.getItem('tc_level_scores');
+        if (val) {
+            storedScores = JSON.parse(val) || {};
+        }
+    } catch (err) {
+        console.error(err);
+        storedScores = {};
+    }
+    
     let oldScore = storedScores[currentLevelObj.id] || 0;
     
     if (finalScore > oldScore) { 
         storedScores[currentLevelObj.id] = finalScore; 
-        localStorage.setItem('tc_level_scores', JSON.stringify(storedScores)); 
+        try {
+            localStorage.setItem('tc_level_scores', JSON.stringify(storedScores));
+        } catch (err) {
+            console.error(err);
+        }
     }
     
     let listHTML = "";
@@ -622,7 +907,17 @@ function generateSummary() {
 function startRetry(index) { isRetryMode = true; retryQIndex = index; showScreen('game-screen'); renderQuestion(); }
 
 function openProgressRecord() {
-    let storedScores = JSON.parse(localStorage.getItem('tc_level_scores')) || {}; let html = '';
+    let storedScores = {};
+    try {
+        let val = localStorage.getItem('tc_level_scores');
+        if (val) {
+            storedScores = JSON.parse(val) || {};
+        }
+    } catch (err) {
+        console.error(err);
+        storedScores = {};
+    }
+    let html = '';
     for (let i = 1; i <= 10; i++) {
         let score = storedScores[i], starIcon = '❌', scoreText = '未挑戰', starSize = '28px';
         if (score !== undefined) {
@@ -636,7 +931,11 @@ function openProgressRecord() {
 
 function clearRecord() {
     if(confirm("確定要清除所有辛苦獲得的成績與星星記錄嗎？")) { 
-        localStorage.removeItem('tc_level_scores'); 
+        try {
+            localStorage.removeItem('tc_level_scores');
+        } catch (err) {
+            console.error(err);
+        }
         openProgressRecord(); 
         renderLevelButtons(); 
     }
