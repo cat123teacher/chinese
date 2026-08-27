@@ -14,6 +14,7 @@
             min-height: 550px; position: relative; display: flex; flex-direction: column; 
         }
 
+        /* 左上方專屬圖標 (cat.jpeg) */
         .global-logo {
             position: absolute;
             top: -30px;
@@ -58,6 +59,7 @@
         .voice-btn:active { transform: translateY(2px); }
         .btn-question { background-color: #4CAF50; }
         .btn-hint { background-color: #FF9800; }
+        
         .menu-btn { font-size: 18px; padding: 10px 20px; background-color: #9C27B0; color: white; border: none; border-radius: 15px; cursor: pointer; margin: 10px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn:hover { background-color: #BA68C8; transform: scale(1.05); }
         
@@ -66,6 +68,7 @@
         .nav-btn:active { transform: translateY(2px); }
         .nav-btn.disabled { opacity: 0.4; cursor: not-allowed; }
 
+        /* 社交底底欄 */
         .social-footer { margin-top: 20px; padding-top: 15px; border-top: 3px solid #ffeb3b; font-size: 13px; }
         .social-links a, .social-links span {
             display: inline-block; padding: 5px 10px; border-radius: 8px; 
@@ -87,23 +90,152 @@
         @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
         .reward-icon { font-size: 70px; display: inline-block; margin: 10px; animation: bounceStar 1s infinite alternate ease-in-out; }
         @keyframes bounceStar { 0% { transform: scale(0.8) translateY(0); } 100% { transform: scale(1.3) translateY(-20px); filter: drop-shadow(0 0 15px #FFD700); } }
+
+        /* ⭐ 新增：發音語言切換與說明設定 */
+        .lang-control-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 2px solid #FFE4E1;
+        }
+        .lang-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #E1306C;
+            margin-bottom: 8px;
+        }
+        .lang-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .lang-btn {
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .lang-btn.active {
+            border-color: #FF69B4;
+            background: #FFE4E1;
+            color: #D81B60;
+            box-shadow: 0 2px 4px rgba(255,105,180,0.3);
+        }
+        .tts-help-trigger {
+            font-size: 12px;
+            color: #0066cc;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+        .tts-help-trigger:hover {
+            color: #FF69B4;
+        }
+
+        /* ⭐ 新增：說明彈出視窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 380px;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #FF69B4;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .modal-close {
+            background: #FF69B4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 15px auto 0 auto;
+            font-weight: bold;
+        }
+
+        /* ⭐ 新增：版權與政策 Footer */
+        .copyright-footer {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #777;
+            line-height: 1.6;
+            border-top: 1px dotted #ccc;
+            padding-top: 10px;
+        }
+        .copyright-footer a {
+            color: #0066cc;
+            text-decoration: none;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+        .copyright-footer a:hover {
+            text-decoration: underline;
+            color: #FF69B4;
+        }
     </style>
 </head>
 <body>
 
 <div class="game-container">
     
+    <!-- 圖標：所有頁面左上角都會顯示 -->
     <img src="cat.jpeg" alt="Teacher Cat" class="global-logo">
 
+    <!-- 主選單 -->
     <div id="menu" class="active-screen" style="justify-content: center; align-items: center;">
-        <h1 style="font-size: 26px; color: #FF4500; text-shadow: 2px 2px #FFD700; margin-bottom: 20px;">🌟 幼兒K1圖解邏輯遊戲<br>(發音版) 🌟</h1>
-        <p style="font-weight: bold; color: #555;">請選擇挑戰關卡 (每關10題)</p>
+        <h1 style="font-size: 26px; color: #FF4500; text-shadow: 2px 2px #FFD700; margin-bottom: 15px;">🌟 幼兒K1圖解邏輯遊戲<br>(發音版) 🌟</h1>
+        
+        <!-- ⭐ 新增：廣東話/普通話發音設定面板 -->
+        <div class="lang-control-panel">
+            <div class="lang-title">🗣️ 選擇發音語言 / 选择发音语言</div>
+            <div class="lang-buttons">
+                <button id="lang-hk-btn" class="lang-btn active" onclick="setLanguage('zh-HK')">🇭🇰 廣東話</button>
+                <button id="lang-cn-btn" class="lang-btn" onclick="setLanguage('zh-CN')">🇨🇳 普通話</button>
+            </div>
+            <span class="tts-help-trigger" onclick="openTTSHelp()">❓ 聽不到聲音或不能出廣東話/普通話？</span>
+        </div>
+
+        <p style="font-weight: bold; color: #555; margin-top: 0;">請選擇挑戰關卡 (每關10題)</p>
         <button class="menu-btn" onclick="startLevel(1)">關卡 1：影子大挑戰</button>
         <button class="menu-btn" onclick="startLevel(2)">關卡 2：數數小能手</button>
         <button class="menu-btn" onclick="startLevel(3)">關卡 3：動物分類學</button>
         <button class="menu-btn" onclick="startLevel(4)">關卡 4：順序跳跳過河</button>
         
-        <!-- ⭐ 新增：返回學習大冒險按鈕 -->
+        <!-- 返回學習大冒險按鈕 -->
         <div style="margin-top: 25px; width: 100%; border-top: 2px dashed #FF69B4; padding-top: 15px;">
             <button class="menu-btn" style="background-color: #4CAF50; width: 90%; font-size: 16px; border: 3px solid #2E8B57;" onclick="window.location.href='https://cat123teacher.github.io/chinese/main.html'">
                 🔙 返回小朋友學習大冒險
@@ -111,6 +243,7 @@
         </div>
     </div>
 
+    <!-- 遊戲進行畫面 -->
     <div id="play-screen">
         <h1 id="level-title">關卡標題</h1>
         <div><div class="progress" id="progress-text">第 1 / 10 題</div></div>
@@ -129,6 +262,7 @@
         </div>
     </div>
 
+    <!-- 過關畫面 -->
     <div id="level-complete" style="justify-content: center; align-items: center;">
         <h1 style="font-size: 35px; color: #FFD700; text-shadow: 2px 2px #FF8C00; margin-top: 20px;">🏆 過關啦！ 🏆</h1>
         <p style="font-size: 22px; color: #FF69B4; font-weight: bold;">嘩！你好叻呀，完成咗 10 條題目！</p>
@@ -143,6 +277,7 @@
         <button class="menu-btn" style="padding: 15px 30px; font-size: 20px;" onclick="showMenu()">🏠 返回主選單</button>
     </div>
 
+    <!-- 全域底欄 -->
     <div class="social-footer">
         <div style="font-weight: bold; color: #9C27B0; font-size: 16px; margin-bottom: 8px;">🎓 Teacher Cat 的快樂AI教室 🐱</div>
         <div class="social-links">
@@ -153,11 +288,47 @@
             <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" style="background: #FF2442;">📕 小紅書</a>
             <span style="background: #333;">🎵 抖音: 74254902683</span>
         </div>
+        
+        <!-- ⭐ 新增：關於我們 & 隱私權政策 & Copyright -->
+        <div class="copyright-footer">
+            <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank">關於我們</a> | 
+            <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank">隱私權政策</a>
+            <br>
+            <span>Copyright by ©Teacher Cat 快樂AI教室</span>
+        </div>
     </div>
 
 </div>
 
+<!-- ⭐ 新增：手機發音詳細設定教學彈出視窗 (Modal) -->
+<div id="tts-help-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">🔊 手機聲音設定教學</div>
+        <p style="font-size: 12px; color: #666; text-align: center; margin-top: 0;">本遊戲使用手機內置的語音引擎，如無聲或發音不正確，請家長協助按照以下步驟設定：</p>
+        
+        <p style="font-size: 14px; font-weight: bold; color: #D81B60; margin: 12px 0 5px 0; border-bottom: 2px solid #FFE4E1; padding-bottom: 3px;">🍏 iPhone / iPad (iOS) 設定：</p>
+        <ol style="font-size: 12px; color: #444; padding-left: 20px; line-height: 1.6; margin: 0;">
+            <li>開啟手機的<strong>「設定」</strong>(Settings)。</li>
+            <li>點選<strong>「輔助使用」</strong>(Accessibility) ➔ <strong>「語音內容」</strong>(Spoken Content)。</li>
+            <li>點選<strong>「聲音」</strong>(Voices) ➔ 點選<strong>「中文」</strong>。</li>
+            <li>確保已下載並點選<strong>「廣東話(香港)」</strong>(Cantonese - Hong Kong) 或<strong>「普通話(中國)」</strong>(Mandarin - China) 語音（推薦選擇 Siri 或高品質 Mei-Jia 聲音）。</li>
+        </ol>
+        
+        <p style="font-size: 14px; font-weight: bold; color: #00796B; margin: 15px 0 5px 0; border-bottom: 2px solid #E0F2F1; padding-bottom: 3px;">🤖 Android 手機 / 平板設定：</p>
+        <ol style="font-size: 12px; color: #444; padding-left: 20px; line-height: 1.6; margin: 0;">
+            <li>開啟手機的<strong>「設定」</strong>(Settings)。</li>
+            <li>點選<strong>「系統設定 / 其他設定」</strong> ➔ <strong>「語言與輸入法設定」</strong>。</li>
+            <li>點選<strong>「文字轉語音輸出」</strong>(Text-to-speech output)。</li>
+            <li>點選<strong>「偏好的引擎」</strong>，確保點選<strong>「Google 文字轉語音」</strong>(Speech Services by Google)。</li>
+            <li>點選引擎右側的「齒輪設定」 ➔ <strong>「安裝語音資料」</strong> ➔ 下載廣東話（香港）或普通話（中國）語音包，並確保已連接網絡。</li>
+        </ol>
+        
+        <button class="modal-close" onclick="closeTTSHelp()">我知道了</button>
+    </div>
+</div>
+
 <script>
+    // --- 遊戲數據庫 ---
     const level1MixedData = [
         { type: 'img', n: '熊仔', e: '🐻', qImg: 'bear.png', rightImg: 'bear_right.png' },
         { type: 'img', n: '蝴蝶', e: '🦋', qImg: 'butterfly.png', rightImg: 'butterfly_right.png' },
@@ -183,11 +354,77 @@
     let currentQuestionData = {};
     let level1QuestionPool = []; 
 
+    // ⭐ 全域發音語言設定
+    let currentLang = 'zh-HK';
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.getElementById('lang-hk-btn').classList.toggle('active', lang === 'zh-HK');
+        document.getElementById('lang-cn-btn').classList.toggle('active', lang === 'zh-CN');
+        
+        if (lang === 'zh-HK') {
+            speak("廣東話設定成功！");
+        } else {
+            speak("普通话设定成功！");
+        }
+    }
+
+    function openTTSHelp() {
+        document.getElementById('tts-help-modal').style.display = 'flex';
+    }
+
+    function closeTTSHelp() {
+        document.getElementById('tts-help-modal').style.display = 'none';
+    }
+
+    // ⭐ 新增：廣東話口語翻譯成普通話口語機制 (讓普通話發音最自然流暢)
+    function translateToMandarin(text) {
+        const dictionary = {
+            "搵下下面邊個係": "找一下下面哪一個是",
+            "嘅影子呀？": "的影子呀？",
+            "留意下": "注意一下",
+            "嘅外型特徵啦！": "的外型特徵吧！",
+            "已經係第一頁啦": "已經是第一頁啦",
+            "已經係最後一頁啦，快啲答埋佢啦": "已經是最後一頁啦，快點答完它吧",
+            "答啱啦！叻叻！": "答對啦！真棒！",
+            "哎呀，唔啱喎，試下再諗下啦。": "哎呀，不對喔，試著再想一下吧。",
+            "畫面上總共有幾多個 ": "畫面上總共有多少個 ",
+            " 呀？": " 呀？",
+            "用手指一隻一隻慢慢篤住嚟數啦！": "用手指一個一個慢慢指著數吧！",
+            "請喺下面三個動物入面，搵出邊個係 ": "請在下面三個動物裡面，找出哪一個是 ",
+            "！": "！",
+            "提示：諗下 ": "提示：想一想 ",
+            " 係喺邊度生活或者有咩特徵？": " 是在哪裡生活或者有什麼特徵？",
+            "請順序由 1 開始，一直㩒到 ": "請依順序由 1 開始，一直按到 ",
+            "而家要搵數字 ": "現在要找數字 ",
+            " 呀！": " 呀！",
+            "哎呀跳咗 Step 喎，而家應該要㩒 ": "哎呀跳步囉，現在應該要按 ",
+            "開始第一關：影子大挑戰 🐻": "開始第一關：影子大挑戰 🐻",
+            "開始第二關：數數小能手 🍎": "開始第二關：數數小能手 🍎",
+            "開始第三關：動物分類學 🐳": "開始第三關：動物分類學 🐳",
+            "開始第四關：順序跳跳過河 🔢": "開始第四關：順序跳跳過河 🔢",
+            "已經係第一關啦": "已經是第一關啦",
+            "已經係最後一關啦": "已經是最後一關啦",
+            "嘩！太厲害啦！恭喜你，完成咗十條題目啦！": "哇！太厲害啦！恭喜你，完成了十道題目啦！",
+            "已經是最後一頁啦，快點答完它吧": "已經是最後一頁啦，快點答完它吧"
+        };
+        
+        let result = text;
+        for (let key in dictionary) {
+            result = result.split(key).join(dictionary[key]);
+        }
+        return result;
+    }
+
     function speak(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
-            let msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'zh-HK';
+            let msgText = text;
+            if (currentLang === 'zh-CN') {
+                msgText = translateToMandarin(text);
+            }
+            let msg = new SpeechSynthesisUtterance(msgText);
+            msg.lang = currentLang;
             msg.rate = 0.9;
             window.speechSynthesis.speak(msg);
         }

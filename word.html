@@ -13,6 +13,41 @@
   .active { display: flex; }
   h1 { color: #FF9AA2; text-align: center; font-size: 22px; margin-top: 40px; margin-bottom: 10px; }
   
+  /* --- 新增：語音設定面板樣式 --- */
+  .voice-setup-panel {
+    background: #FFF;
+    border: 3px solid #FFDAC1;
+    border-radius: 25px;
+    padding: 15px;
+    margin: 10px 0 15px 0;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+  }
+  .setup-test-btn {
+    padding: 10px 18px;
+    border-radius: 15px;
+    border: none;
+    background: #E0F2FE;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    color: #0284C7;
+    transition: transform 0.1s, background-color 0.2s;
+    font-family: inherit;
+  }
+  .setup-test-btn:hover { transform: scale(1.05); background-color: #BAE6FD; }
+  .setup-help-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #FF9AA2;
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
   /* 首頁圖卡樣式 */
   .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 500px; margin-top: 10px; }
   .mode-card { 
@@ -43,10 +78,13 @@
   .word { font-size: 28px; line-height: 1.4; color: #333; font-weight: bold; word-break: break-word; }
   .voice-box { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
   .v-btn { padding: 10px 15px; border-radius: 15px; border: none; background: var(--secondary); font-weight: bold; cursor: pointer; font-size: 16px; }
-  footer { background: white; width: 100%; padding: 15px 10px; text-align: center; border-top: 4px solid var(--secondary); font-size: 11px; margin-top: auto; line-height: 1.6; }
-  footer a { color: #FF9AA2; text-decoration: none; font-weight: bold; margin: 0 5px; }
+  
+  /* --- 修改：網頁頁尾 (Footer) 樣式 --- */
+  footer { background: white; width: 100%; padding: 20px 10px; text-align: center; border-top: 4px solid var(--secondary); font-size: 13px; margin-top: auto; line-height: 1.8; }
+  footer a { color: #FF9AA2; text-decoration: none; font-weight: bold; margin: 0 8px; }
+  footer a:hover { text-decoration: underline; }
 
-  /* --- 新增：過關慶祝彈窗動畫與樣式 --- */
+  /* 過關慶祝彈窗與設定教學彈窗樣式 */
   @keyframes popIn {
     0% { transform: scale(0.5); opacity: 0; }
     80% { transform: scale(1.05); opacity: 1; }
@@ -58,7 +96,7 @@
   }
   .modal-box {
     background: white; padding: 30px 20px; border-radius: 30px; text-align: center; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 300px; width: 80%; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 300px; width: 85%; 
     border: 6px solid #FFDAC1; animation: popIn 0.5s ease;
   }
   .modal-icon { font-size: 50px; margin-bottom: 10px; }
@@ -70,8 +108,7 @@
     transition: transform 0.2s;
   }
   .modal-btn:hover { transform: translateY(-3px); }
-  /* --------------------------------------- */
-
+  
 </style>
 </head>
 <body>
@@ -87,8 +124,49 @@
   </div>
 </div>
 
+<!-- 新增：手機設定教學彈窗 -->
+<div id="help-modal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 420px; text-align: left; width: 90%;">
+    <div class="modal-title" style="font-size: 20px; text-align: center;">🛠️ 手機語音設定教學</div>
+    <div class="modal-text" style="font-size: 14px; text-align: left; max-height: 320px; overflow-y: auto; padding-right: 5px;">
+      <p style="color: #FF9AA2; font-weight: bold; border-bottom: 2px solid #FFEDD5; padding-bottom: 3px; margin-top: 5px; font-size: 15px;">📱 蘋果 iPhone (iOS) 設定：</p>
+      <ol style="padding-left: 20px; margin: 5px 0; line-height: 1.6;">
+        <li>打開手機的<strong>「設定」</strong>。</li>
+        <li>點選<strong>「輔助使用」</strong>。</li>
+        <li>選擇<strong>「語音內容」</strong>。</li>
+        <li>點擊<strong>「聲音」</strong>。</li>
+        <li>選擇<strong>「中文」</strong>或<strong>「英文」</strong>。</li>
+        <li>確保已下載並點選<strong>「廣東話 (Siri/雅婷)」</strong>或<strong>「普通話」</strong>的高品質語音。</li>
+      </ol>
+
+      <p style="color: #4BA3E3; font-weight: bold; border-bottom: 2px solid #E0F2FE; padding-bottom: 3px; margin-top: 15px; font-size: 15px;">🤖 安卓 Android 手機設定：</p>
+      <ol style="padding-left: 20px; margin: 5px 0; line-height: 1.6;">
+        <li>打開手機的<strong>「設定」</strong>。</li>
+        <li>選擇<strong>「系統」</strong>或<strong>「一般管理」</strong>。</li>
+        <li>點選<strong>「語言與輸入」</strong>。</li>
+        <li>選擇<strong>「文字轉語音輸出」 (TTS)</strong>。</li>
+        <li>點擊<strong>「偏好的引擎」</strong>旁的設定圖示（如 Google 語音服務）。</li>
+        <li>點擊<strong>「安裝語音資料」</strong>，並下載裝配<strong>「廣東話」</strong>和<strong>「普通話」</strong>語音。</li>
+      </ol>
+    </div>
+    <div style="text-align: center;">
+      <button class="modal-btn" onclick="closeHelpModal()">設定好囉！ 🚀</button>
+    </div>
+  </div>
+</div>
+
 <div id="mode-page" class="page active">
   <h1>🌟 幼兒中英學習卡(粵普英發聲版) 🌟</h1>
+  
+  <!-- 新增：首頁語音測試設定區塊 -->
+  <div class="voice-setup-panel">
+    <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 5px;">
+      <button class="setup-test-btn" onclick="testSpeak('zh-HK')">🔊 測試廣東話</button>
+      <button class="setup-test-btn" onclick="testSpeak('zh-CN')">🔊 測試普通話</button>
+    </div>
+    <a href="javascript:void(0)" class="setup-help-link" onclick="openHelpModal()">⚠️ 聽不到聲音或不能出廣東話/普通話？</a>
+  </div>
+
   <div class="mode-grid">
     <button class="mode-card" onclick="setMode('zh_jr', true)" style="background-color:#FFDAC1;">
       <div class="icon">🍎</div>初級版中文<br><small>(K1-K2 有圖片)</small>
@@ -142,13 +220,12 @@
   </div>
 </div>
 
+<!-- 修改：新網頁頁尾 -->
 <footer>
   <strong>Teacher Cat 的快樂AI教室</strong><br>
-  <a href="https://www.youtube.com/@TeacherCat123" target="_blank">YouTube</a> | 
-  <a href="https://www.instagram.com/teachercat123" target="_blank">Instagram</a> | 
-  <a href="https://www.facebook.com/share/1Gp2hwWUFP/" target="_blank">Facebook</a> |
-  <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank">WhatsApp Group</a><br>
-  抖音號: 74254902683
+  <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank">關於我們</a> | 
+  <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank">隱私權政策</a><br>
+  Copyright by ©Teacher Cat 快樂AI教室
 </footer>
 
 <script>
@@ -175,13 +252,13 @@
     "第一關：學校生活": ["我每天開心地去學校上課。","老師教我們認字和寫字。","下課時，我和同學在操場玩球。","圖書館裡有好多有趣的書。","我的書包裡有鉛筆和橡皮擦。","我們要安靜地坐在位子上聽課。","數學課要學會加法和減法。","我喜歡在美術課畫出漂亮的圖畫。","同學跌倒了，我趕快過去扶他。","我們要愛護學校的課桌椅。","老師稱讚我寫字寫得很整齊。","明天我們要去學校參加活動。","放學後，我會把作業放在書包裡。","校長在台上的說話很親切。","同學們一起分組做勞作。","這本故事書的內容很有趣。","我專心地聽老師講故事。","下課鈴聲響了，大家跑出教室。","我和好朋友約好一起回家。","在學校學習讓我覺得很快樂。"],
     "第二關：環境與大自然": ["天上有一顆亮亮的星星。","秋天到了，樹葉變成黃色的。","今天天氣很好，太陽公公出來了。","下雨的時候，記得要撐雨傘。","公園裡有很多美麗的花朵。","綠綠的草地很適合奔跑。","我們要珍惜水，不可以浪費。","請把垃圾丟進正確的垃圾桶。","夏天的天氣非常熱。","冬天到了，我們要穿上厚外套。","天空中有白白的雲朵。","蝴蝶在花叢中飛來飛去。","小鳥在樹枝上唱歌。","我們要愛護樹木，不可以亂折。","遠處的山看起來很高。","小河裡的魚兒游得很快。","今天吹著涼涼的風。","彩虹出現在雨後的天空。","地球是我們共同的家。","我們要保護環境，讓地球更乾淨。"],
     "第三關：情緒與禮貌": ["我收到禮物，心裡很開心。","玩具壞掉了，我感到很傷心。","我跟同學說：「對不起，我不是故意的。」","看到好朋友，我會主動打招呼。","我生氣的時候會深呼吸。","害怕時，媽媽會抱抱我。","我是一個勇敢的小學生。","弟弟害羞地躲在爸爸後面。","謝謝你幫我撿起地上的東西。","對別人有禮貌是好習慣。","老師誇獎我表現得很乖。","我喜歡和大家分享我的玩具。","我們要學會安靜地等待。","不要搶別人的東西玩。","媽媽辛苦工作，我要聽話。","我們要互相幫助，當好朋友。","我覺得這件事很有意思。","不要為了小事而吵架。","當別人說謝謝時，我會說不客氣。","每天帶著笑容去上學。"],
-    "第四關：日常生活與習慣": ["我每天早上刷牙、洗臉。","吃飯前，一定要記得洗手。","我自己會把衣服摺好。","晚上睡覺前，我會聽媽媽念故事。","我會幫忙把碗筷放到桌上。","我已經長大了，可以自己穿鞋子。","每天都要喝充足的水。","我喜歡吃青菜和水果。","晚上九點，我就要上床睡覺。","我的玩具玩完會收進盒子裡。","出門時，記得戴上帽子。","寫字時，背要坐得直直的。","我會幫忙澆花。","吃完飯要擦乾淨嘴巴。","我會把垃圾整理好。","早上起床，我會把被子疊好。","我會自己洗澡，真是太棒了。","有禮貌的小孩大家都喜歡。","我會把書桌整理得很乾淨。","好習慣讓我的生活更棒。"],
+    "第四關：日常生活與習慣": ["我每天早上刷牙、洗臉。","吃飯前，一定要記得洗手。","我自己會把衣服摺好。","晚上睡覺前，我會聽媽媽念故事.","我會幫忙把碗筷放到桌上。","我已經長大了，可以自己穿鞋子。","每天都要喝充足的水。","我喜歡吃青菜和水果。","晚上九點，我就要上床睡覺。","我的玩具玩完會收進盒子裡。","出門時，記得戴上帽子。","寫字時，背要坐得直直的。","我會幫忙澆花。","吃完飯要擦乾淨嘴巴。","我會把垃圾整理好。","早上起床，我會把被子疊好。","我會自己洗澡，真是太棒了。","有禮貌的小孩大家都喜歡。","我會把書桌整理得很乾淨。","好習慣讓我的生活更棒。"],
     "第五關：交通與安全": ["過馬路時，要牽著大人的手。","紅燈停，綠燈行，紅綠燈要看好。","搭公車時，要找位子坐好。","坐車要記得繫上安全帶。","騎腳踏車要戴上安全帽。","街道上有很多來來往往的車子。","我們不可以單獨跑出家門。","看到路標要遵守規則。","坐捷運時要排隊上車。","過斑馬線最安全。","玩滑板車時要小心路人。","遠離有車經過的地方。","聽從警察叔叔的指揮。","搭飛機可以去很遠的地方。","下雨天走路要看清楚路面。","等車的時候要在站牌旁。","我們要遵守交通規則。","車子在街道上開得很快。","安全第一，千萬不要亂跑。","快樂出門，平安回家。"],
     "第六關：數字與時間": ["現在是早上八點鐘。","一個星期有七天。","我有十根手指頭。","今天是星期五，明天是週末。","時鐘的長針走一圈是一個小時。","我有三本練習簿。","十個小朋友在玩捉迷藏。","我們要準時起床。","下午我們去公園玩。","一年有十二個月。","我的好朋友有五個。","我用了四個顏色筆畫畫。","二加三等於五。","媽媽買了六顆蘋果。","我排在隊伍的第二個。","今天是我們全家出遊的日子。","時間過得好快呀！","九點半我們去睡覺。","我買了八個小積木。","數字真的很好玩。"],
     "第七關：身體與健康": ["我有兩隻眼睛和一個鼻子。","多吃水果身體才會健康。","我長高了，衣服變小了。","運動可以讓力氣變大。","牙齒要每天刷才會白白的。","肚子餓了要吃健康的午餐。","我覺得喉嚨有點痛。","生病了要去看醫生。","我有一雙靈巧的手。","走路要走好，不要跌倒。","我喜歡和大家一起跳舞。","洗手可以把細菌洗掉。","每天都要有精神地去上學。","身體健康最重要。","我會自己綁鞋帶，手很靈活。","多喝水對身體好。","眼睛累了要休息一下。","跳繩可以讓腳更有力。","我跑得比風還要快。","身體強壯就不容易生病。"],
-    "第八關：家人與親情": ["爸爸媽媽很愛我。","爺爺奶奶最疼我了。","哥哥會教我寫作業。","妹妹笑起來好可愛。","週末全家人一起去逛超市。","謝謝媽媽每天幫我做早餐。","我會幫爸爸倒一杯水。","我們是一家人，要互相愛護。","我和姊姊一起玩積木。","家裡有一個溫暖的客廳。","媽媽的手很溫柔。","爸爸下班會帶我玩。","我們家有四個人。","爺爺喜歡在公園散步。","奶奶做的菜最好吃了。","我們要聽父母的話。","我喜歡和家人待在一起。","媽媽叫我起床吃早餐。","家是休息最好的地方。","我們全家人的感情很好。"],
+    "第八關：家人與親情": ["爸爸媽媽很愛我。","爺爺奶奶最疼我了。","哥哥會教我寫作業。","妹妹笑起來好可愛。","週末全家人一起去逛超市。","謝謝媽媽每天幫我做早餐。","我會幫爸爸倒一杯水。","我們是一家人，要互相愛護。","我和姊姊一起玩積木。","家裡有一個溫暖的客廳。","媽媽的手很溫柔。","爸爸下班會帶我玩。","我們家有四個人。","爺爺喜歡在公園散步。","奶奶做的菜最好吃了。","我們要聽父母的話.","我喜歡和家人待在一起。","媽媽叫我起床吃早餐。","家是休息最好的地方。","我們全家人的感情很好。"],
     "第九關：想像與遊戲": ["我想變成一隻快樂的小鳥。","如果我有魔法，我要變出很多糖果。","我在夢裡看到了一座城堡。","玩具士兵正在排隊。","我喜歡玩角色扮演的遊戲。","想像自己正開著一艘大船。","這塊積木看起來像一隻恐龍。","我畫了一張奇怪的臉。","我們來玩躲貓貓好不好？","夢想中的房子很大。","我用報紙摺了一頂帽子。","這是我的祕密基地。","我把娃娃當成我的好朋友。","想像力讓我變得很聰明。","我想去外太空看月亮。","我們一起來編故事吧！","我變成了勇敢的騎士。","這是一場神奇的冒險。","玩具變成了神奇的魔法師。","我的想像力沒有邊界。"],
-    "第十關：食物與飲食": ["這顆蘋果又大又紅。","媽媽煮的麵包很香。","我最喜歡喝新鮮的牛奶。","飯前洗手是好習慣。","吃香蕉可以補充體力。","西瓜切開後有紅紅的汁。","餅乾要慢慢吃，不要噎到。","我會自己用碗筷吃飯。","不要吃太多糖果，牙齒會壞掉。","這裡的水很甜。","這杯熱茶要小心喝。","蛋的味道很好吃。","多吃蔬菜才不會生病。","我們一起分享食物。","這是媽媽親手做的點心。","謝謝農夫辛苦種菜。","吃飽了才有力氣玩。","我最喜歡喝湯了。","食物不能隨便浪費。","大家一起吃飯真熱鬧。"]
+    "第十關：食物與飲食": ["這顆蘋果又大又紅。","媽媽煮的麵包很香。","我最喜歡喝新鮮的牛奶。","飯前洗手是好習慣。","吃香蕉可以補充體力。","西瓜切開後有紅紅的汁。","餅乾要慢慢吃，不要噎到。","我會自己用碗筷吃飯。","不要吃太多糖果，牙齒會壞掉。","這裡的水很甜。","這杯熱茶要小心喝。","蛋的味道很好吃。","多吃蔬菜才不會生病。","我們一起分享食物。","這是媽媽親手做的點心。","謝謝農夫辛苦種菜。","吃飽了才有力氣玩。","我最喜歡喝湯了.","食物不能隨便浪費。","大家一起吃飯真熱鬧。"]
   };
 
   const advEn = {
@@ -265,7 +342,6 @@
     if(currentIndex < currentWords.length - 1) { 
       currentIndex++; update(); 
     } else { 
-      // 改用美化的慶祝彈窗
       showCelebrateModal();
     } 
   }
@@ -279,30 +355,27 @@
     document.getElementById('level-page').classList.add('active'); 
   }
 
-  // --- 新增：顯示慶祝彈窗與讚美語音 ---
   function showCelebrateModal() {
     const modal = document.getElementById('celebrate-modal');
     const title = document.getElementById('modal-title-text');
     const desc = document.getElementById('modal-desc-text');
     
-    // 根據當前模式切換文字與語音語言
     let praiseText = "";
     let voiceLang = "";
     if(currentLang === 'zh') {
       title.innerText = "太棒了！";
       desc.innerHTML = "恭喜你完成這個關卡！<br>你真棒！";
       praiseText = "太棒了！關卡完成！你真棒！";
-      voiceLang = "zh-HK"; // 使用廣東話讚美
+      voiceLang = "zh-HK"; 
     } else {
       title.innerText = "Excellent!";
       desc.innerHTML = "Congratulations!<br>Great job!";
       praiseText = "Excellent! Level completed! Great job!";
-      voiceLang = "en-US"; // 使用英文讚美
+      voiceLang = "en-US"; 
     }
     
     modal.style.display = 'flex';
     
-    // 播放語音讚美
     const u = new SpeechSynthesisUtterance(praiseText); 
     u.lang = voiceLang; 
     window.speechSynthesis.speak(u); 
@@ -310,7 +383,21 @@
 
   function closeModal() {
     document.getElementById('celebrate-modal').style.display = 'none';
-    goBackToLevels(); // 關閉彈窗後自動返回關卡選擇頁面
+    goBackToLevels(); 
+  }
+
+  /* --- 新增：語音測試設定函數 --- */
+  function testSpeak(langCode) {
+    let testText = langCode === 'zh-HK' ? "測試廣東話發音，你好！" : "测试普通话发音，你好！";
+    const u = new SpeechSynthesisUtterance(testText);
+    u.lang = langCode;
+    window.speechSynthesis.speak(u);
+  }
+  function openHelpModal() {
+    document.getElementById('help-modal').style.display = 'flex';
+  }
+  function closeHelpModal() {
+    document.getElementById('help-modal').style.display = 'none';
   }
 </script>
 </body>
