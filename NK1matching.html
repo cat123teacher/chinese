@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>N K1連線大冒險 - Teacher Cat 快樂AI教室</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+HK:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Fredoka', 'Zen Maru Gothic', 'Noto Sans HK', 'Chalkboard SE', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Comic Sans MS', '微軟正黑體', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      padding: 12px;
+      background: linear-gradient(135deg, #FFFDE7 0%, #E8F5E9 50%, #E1F5FE 100%);
+      color: #2C3E50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* 背景卡哇伊可愛飄浮圖案裝飾 */
+    .bg-decoration {
+      position: absolute;
+      font-size: 2.2rem;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatBg 6s ease-in-out infinite alternate;
+    }
+    @keyframes floatBg {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-15px) rotate(12deg); }
+    }
+
+    /* 最左上方圖標 cat.jpeg */
+    .top-left-logo-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 60;
+    }
+    .top-left-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3.5px solid #FF9800;
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+      background: #FFF;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .top-left-logo:hover, .top-left-logo:active {
+      transform: scale(1.12) rotate(-5deg);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+      width: 100%;
+      max-width: 850px;
+      padding-top: 5px;
+      z-index: 10;
+    }
+    
+    .main-title {
+      font-size: 2.3rem;
+      margin: 5px 0 2px 0;
+      font-weight: 700;
+      background: linear-gradient(45deg, #FF6F00, #FF2E93, #7C4DFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(2px 2px 0px #FFF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    p.subtitle {
+      color: #5D4037;
+      font-size: 1.1rem;
+      margin: 0 0 10px 0;
+      font-weight: 600;
+    }
+
+    /* 語音與語言設定區塊 */
+    .setting-bar {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #FFB74D;
+      border-radius: 25px;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 15px rgba(255, 152, 0, 0.12);
+      margin-bottom: 12px;
+      width: 100%;
+      backdrop-filter: blur(5px);
+    }
+    .setting-label {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #E65100;
+    }
+    .lang-toggle-btn {
+      background: #F5F5F5;
+      border: 2px solid #E0E0E0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: bold;
+      color: #616161;
+      transition: all 0.2s ease;
+    }
+    .lang-toggle-btn.active {
+      background: linear-gradient(45deg, #FF9800, #FF5722);
+      color: white;
+      border-color: #F57C00;
+      box-shadow: 0 4px 10px rgba(255, 152, 0, 0.35);
+      transform: scale(1.03);
+    }
+    .help-link-btn {
+      background: #E1F5FE;
+      color: #0288D1;
+      border: 2px dashed #29B6F6;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .help-link-btn:hover {
+      background: #B3E5FC;
+      color: #01579B;
+    }
+
+    /* 頁面容器 */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 850px;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    /* 首頁主題卡片網格 */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 25px;
+    }
+    .theme-card {
+      background: white;
+      border-radius: 28px;
+      padding: 22px 18px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+      border: 4px solid #FFD54F;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .theme-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, #FF8A80, #FFD180, #80D8FF, #A7FFEB);
+    }
+    .theme-card:hover, .theme-card:active {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 15px 28px rgba(0,0,0,0.12);
+    }
+    .theme-icon {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    .theme-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #E65100;
+    }
+    .theme-sub {
+      font-size: 1rem;
+      color: #795548;
+      margin-top: 4px;
+    }
+
+    /* 1) 首頁最下方按鈕：返回小朋友學習大冒險 */
+    .adventure-back-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 15px 0 25px 0;
+    }
+    .adventure-back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #FF4081 0%, #FF6E40 50%, #FFD600 100%);
+      color: white;
+      font-size: 1.35rem;
+      font-weight: bold;
+      padding: 16px 32px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(255, 64, 129, 0.35), inset 0 2px 0 rgba(255,255,255,0.4);
+      border: 3px solid #FFF;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .adventure-back-btn:hover, .adventure-back-btn:active {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 12px 25px rgba(255, 64, 129, 0.45);
+    }
+
+    /* 通用彈窗 Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 15px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #FFF;
+      padding: 28px 22px;
+      border-radius: 32px;
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+      border: 6px solid #4FC3F7;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    
+    .mode-btn {
+      width: 100%;
+      padding: 16px;
+      margin: 10px 0;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .mode-btn:active { transform: scale(0.97); }
+    .btn-zh { background: linear-gradient(135deg, #FF7043, #FF3D00); }
+    .btn-en { background: linear-gradient(135deg, #42A5F5, #1E88E5); }
+
+    /* 語音教學彈窗 */
+    .guide-box { text-align: left; margin-top: 15px; }
+    .guide-title { font-size: 1.1rem; font-weight: bold; color: #0277BD; margin-top: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .guide-steps { background: #F1F8E9; border-radius: 18px; padding: 14px 20px; margin: 0; font-size: 0.95rem; color: #33691E; line-height: 1.6; }
+    .guide-steps li { margin-bottom: 6px; }
+
+    /* 遊戲主畫面與導覽 */
+    .game-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .game-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 10px;
+    }
+    .nav-btn {
+      background: #AB47BC;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex: 1;
+      max-width: 160px;
+    }
+    .nav-btn:hover, .nav-btn:active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    .nav-btn.home-btn { background: linear-gradient(135deg, #FFA726, #FB8C00); }
+    .nav-btn.prev-btn { background: linear-gradient(135deg, #AB47BC, #8E24AA); }
+    .nav-btn.next-btn { background: linear-gradient(135deg, #66BB6A, #43A047); }
+
+    .game-title-box {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: #1B5E20;
+      background: #E8F5E9;
+      padding: 10px 24px;
+      border-radius: 25px;
+      text-align: center;
+      border: 3px solid #81C784;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* 遊戲配對板 - 手機與 iPad 響應式優化 */
+    .game-board {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 520px;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 16px 12px;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 28px;
+      border: 3px dashed #A5D6A7;
+      box-shadow: inset 0 0 15px rgba(76, 175, 80, 0.08);
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 35%;
+      max-width: 240px;
+      z-index: 20;
+      gap: 16px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 26px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.07);
+      border: 4px solid #FFE082;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      min-height: 96px;
+    }
+    .card.selected {
+      border-color: #FF9800;
+      background-color: #FFF3E0;
+      transform: scale(1.04);
+      box-shadow: 0 8px 18px rgba(255, 152, 0, 0.3);
+    }
+    .card.matched {
+      border-color: #66BB6A;
+      background-color: #E8F5E9;
+      cursor: default;
+      opacity: 0.92;
+    }
+
+    /* 答對動畫效果 */
+    @keyframes correctBounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); background-color: #C8E6C9; }
+      100% { transform: scale(1); }
+    }
+    .card.correct-anim { animation: correctBounce 0.5s ease-in-out; }
+
+    /* 粒子動畫容器 */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 200;
+      font-size: 2rem;
+      animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(0, 0) scale(0.8) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.6) rotate(360deg); }
+    }
+
+    
+    .card-img {
+      width: 82px;
+      height: 82px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: #FFF;
+      padding: 4px;
+      border: 3px solid #FFD54F;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .card-img:hover {
+      transform: scale(1.08);
+    }
+
+    .card-left-content { display: flex; align-items: center; gap: 10px; }
+    .card-icon { font-size: 3.8rem; line-height: 1; display: inline-block; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12)); }
+    .card-text { font-size: 1.65rem; font-weight: bold; color: #2C3E50; }
+    .sound-btn {
+      background: linear-gradient(135deg, #FFE082, #FFCA28);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+      flex-shrink: 0;
+    }
+    .sound-btn:active { transform: scale(0.9); }
+
+    /* 通關成功畫面 */
+    .victory-box {
+      display: none;
+      text-align: center;
+      background: #FFF;
+      padding: 35px 20px;
+      border-radius: 32px;
+      border: 6px solid #FFCA28;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .victory-box.active { display: block; }
+    .stars { font-size: 3.8rem; margin: 10px 0; animation: pulseStars 1s infinite alternate; }
+    @keyframes pulseStars {
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
+    }
+
+    /* Footer 全頁頁腳 */
+    footer {
+      margin-top: auto;
+      padding: 25px 15px 18px 15px;
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+      font-size: 0.92rem;
+      color: #5D4037;
+      border-top: 3px dashed #FFD54F;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 24px 24px 0 0;
+      backdrop-filter: blur(5px);
+      z-index: 10;
+    }
+    .footer-brand {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #E65100;
+      margin-bottom: 14px;
+    }
+    .social-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 14px;
+      margin-bottom: 18px;
+    }
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFF;
+      padding: 8px 14px;
+      border-radius: 16px;
+      border: 2px solid #FFE082;
+      color: #D84315;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .social-link:hover, .social-link:active {
+      background: #FFE0B2;
+      transform: translateY(-2px);
+    }
+    .social-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFF;
+      padding: 8px 14px;
+      border-radius: 16px;
+      border: 2px solid #E0E0E0;
+      color: #616161;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .footer-policy-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+    .footer-policy-links a {
+      color: #0288D1;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .footer-policy-links a:hover {
+      text-decoration: underline;
+    }
+    .copyright {
+      font-size: 0.88rem;
+      color: #795548;
+      margin-top: 6px;
+    }
+
+    /* 2) 手機 (Mobile) & iPad 專屬排版優化 */
+    @media (max-width: 768px) {
+      body { padding: 8px; }
+      .top-left-logo { width: 52px; height: 52px; border-width: 3px; }
+      .main-title { font-size: 1.85rem; }
+      p.subtitle { font-size: 0.98rem; }
+      
+      .game-board { min-height: 420px; gap: 12px; }
+      .card { min-height: 84px; padding: 10px 12px; }
+      .card-img { width: 72px; height: 72px; }
+      .card-icon { font-size: 3.2rem; }
+      .card-text { font-size: 1.4rem; }
+      .sound-btn { width: 42px; height: 42px; font-size: 1.15rem; }
+      
+      .nav-btn { padding: 10px 12px; font-size: 0.88rem; }
+      .adventure-back-btn { font-size: 1.15rem; padding: 14px 24px; width: 92%; }
+    }
+
+    @media (max-width: 480px) {
+      .top-left-logo-container { position: relative; top: 0; left: 0; margin-bottom: 5px; }
+      header { padding-top: 0; }
+      .main-title { font-size: 1.6rem; }
+      .setting-bar { padding: 8px 10px; gap: 6px; }
+      .setting-label { width: 100%; text-align: center; margin-bottom: 2px; }
+      .theme-grid { grid-template-columns: 1fr; gap: 14px; }
+      .column { width: 35%; }
+      .card { border-radius: 18px; border-width: 2.5px; }
+      .card-text { font-size: 1.15rem; }
+    }
+  
+    /* 幼兒連線體驗優化：連接圓點與拖拽目標效果 */
+    .game-board {
+      touch-action: none; /* 防止在平板或手機拖拽連線時引發頁面滾動 */
+    }
+
+    .card {
+      position: relative;
+    }
+
+    /* 連接圓點 (Connection Dots) */
+    .conn-dot {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      background: #FF9800;
+      border: 4px solid #FFF;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+      z-index: 30;
+      transition: transform 0.2s, background-color 0.2s;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .left-dot {
+      right: -13px;
+    }
+
+    .right-dot {
+      left: -13px;
+    }
+
+    .card.selected .conn-dot, .card.dragging .conn-dot {
+      background: #FF3D00;
+      transform: translateY(-50%) scale(1.35);
+      animation: pulseDot 0.8s infinite alternate;
+    }
+
+    .card.matched .conn-dot {
+      background: #4CAF50;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .card.drag-target {
+      border-color: #FF9800 !important;
+      background-color: #FFF3E0 !important;
+      transform: scale(1.08) !important;
+      box-shadow: 0 0 20px rgba(255, 152, 0, 0.5) !important;
+    }
+
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 5px rgba(255, 61, 0, 0.5); }
+      100% { box-shadow: 0 0 16px rgba(255, 61, 0, 1); }
+    }
+
+    /* 遊戲玩法提示條 */
+    .game-tip-banner {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border: 2px dashed #81C784;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+
+    /* 🔍 圖案放大按鈕與 Modal 樣式 */
+    .card-img-container {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .zoom-badge {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      background: #FF9800;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 5px;
+      border-radius: 10px;
+      border: 1.5px solid #FFF;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-weight: bold;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .card-img-container:hover .zoom-badge, .card-img-container:active .zoom-badge {
+      transform: scale(1.15);
+      background: #F57C00;
+    }
+
+    /* 圖案放大 Modal */
+    .zoom-modal-content {
+      background: #FFF;
+      padding: 25px 20px;
+      border-radius: 35px;
+      text-align: center;
+      max-width: 450px;
+      width: 92%;
+      border: 6px solid #FFD54F;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes zoomIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .zoom-preview-box {
+      background: #FFFDE7;
+      border: 3px dashed #FFE082;
+      border-radius: 25px;
+      padding: 20px;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+    }
+    .zoom-giant-img {
+      max-width: 220px;
+      max-height: 220px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 20px;
+      border: 4px solid #FFB74D;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      background: #FFF;
+      padding: 6px;
+    }
+    .zoom-giant-icon {
+      font-size: 6.5rem;
+      line-height: 1;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15));
+    }
+    .zoom-word-zh {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #2E7D32;
+      margin-top: 10px;
+    }
+    .zoom-word-en {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #E65100;
+      margin-top: 2px;
+    }
+    .zoom-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+      width: 100%;
+    }
+    .zoom-action-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 50px;
+      border: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease;
+    }
+    .zoom-action-btn:active { transform: scale(0.96); }
+    .btn-sound-play { background: linear-gradient(135deg, #FFCA28, #FFA000); color: #3E2723; }
+    .btn-select-card { background: linear-gradient(135deg, #66BB6A, #388E3C); color: white; }
+    .btn-close-zoom { background: #78909C; color: white; }
+
+  
+    .nav-btn.print-btn {
+      background: linear-gradient(135deg, #0288D1, #01579B);
+    }
+    .nav-btn.print-btn:hover, .nav-btn.print-btn:active {
+      background: #01579B;
+    }
+
+    /* 列印工作紙專用樣式 - 螢幕隱藏 */
+    .print-only {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 6mm 8mm;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      body {
+        background: #FFFDE7 !important;
+        color: #2C3E50 !important;
+        padding: 5px !important;
+        margin: 0 !important;
+        font-family: 'Fredoka', 'Zen Maru Gothic', 'Noto Sans HK', sans-serif !important;
+      }
+
+      /* 隱藏不需要的螢幕介面元件 */
+      header, .top-left-logo-container, .setting-bar, .bg-decoration,
+      .game-nav-bar, .game-tip-banner, .adventure-back-container, footer,
+      .modal, .victory-box, .sound-btn, .zoom-badge, canvas {
+        display: none !important;
+      }
+
+      .screen {
+        display: none !important;
+      }
+
+      #gameScreen.screen.active {
+        display: flex !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #FFF !important;
+        border: 4px dashed #FF9800 !important;
+        border-radius: 28px !important;
+        padding: 16px 18px !important;
+        box-shadow: none !important;
+      }
+
+      /* 顯示鮮艷可愛列印標頭 */
+      .print-only {
+        display: block !important;
+        width: 100%;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .print-brand-header {
+        display: inline-block !important;
+        font-size: 1.35rem !important;
+        font-weight: bold !important;
+        color: #D84315 !important;
+        background: linear-gradient(135deg, #FFE082, #FFCA28) !important;
+        border: 2px solid #FF9800 !important;
+        border-radius: 20px !important;
+        padding: 6px 20px !important;
+        margin-bottom: 6px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+      }
+
+      .print-header-title {
+        font-size: 1.7rem !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin: 6px 0 10px 0 !important;
+        color: #E65100 !important;
+        text-shadow: 1px 1px 0px #FFF !important;
+      }
+
+      .print-meta-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 1.05rem !important;
+        font-weight: bold !important;
+        color: #2E7D32 !important;
+        background: #E8F5E9 !important;
+        border: 2px solid #81C784 !important;
+        border-radius: 18px !important;
+        padding: 8px 16px !important;
+        margin-bottom: 10px !important;
+      }
+
+      .print-task-banner {
+        display: block !important;
+        background: #E1F5FE !important;
+        color: #0277BD !important;
+        border: 2px dashed #29B6F6 !important;
+        border-radius: 18px !important;
+        padding: 8px 14px !important;
+        font-size: 1.05rem !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin-bottom: 10px !important;
+      }
+
+      .game-header {
+        margin-bottom: 8px !important;
+        width: 100% !important;
+      }
+
+      .game-title-box {
+        border: 3px solid #FFB74D !important;
+        background: #FFF3E0 !important;
+        color: #E65100 !important;
+        font-size: 1.3rem !important;
+        font-weight: bold !important;
+        padding: 8px 24px !important;
+        border-radius: 22px !important;
+        box-shadow: none !important;
+        text-align: center !important;
+      }
+
+      /* 工作紙排版：鮮艷吸引 A4 單頁列印 */
+      .game-board {
+        min-height: auto !important;
+        gap: 40px !important;
+        margin-top: 10px !important;
+        padding: 5px !important;
+        background: transparent !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+      }
+
+      .column {
+        width: 43% !important;
+        gap: 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .card {
+        border: 3.5px solid #FFD54F !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.06) !important;
+        background: #FFF8E1 !important;
+        min-height: 92px !important;
+        padding: 8px 14px !important;
+        border-radius: 22px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        position: relative !important;
+      }
+
+      .card-img {
+        width: 76px !important;
+        height: 76px !important;
+        border: 2.5px solid #FFE082 !important;
+        border-radius: 16px !important;
+        background: #FFF !important;
+        padding: 3px !important;
+        object-fit: contain !important;
+      }
+
+      .card-icon {
+        font-size: 3.6rem !important;
+        display: inline-block !important;
+      }
+
+      .card-text {
+        font-size: 1.65rem !important;
+        font-weight: bold !important;
+        color: #2C3E50 !important;
+      }
+
+      /* 保留亮眼圓點，方便幼兒紙上筆連線 */
+      .conn-dot {
+        display: block !important;
+        position: absolute !important;
+        width: 24px !important;
+        height: 24px !important;
+        border-radius: 50% !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 30 !important;
+      }
+
+      .left-dot {
+        right: -12px !important;
+        background: #FF9800 !important;
+        border: 3.5px solid #FFF !important;
+        box-shadow: 0 0 0 2px #FF9800 !important;
+      }
+
+      .right-dot {
+        left: -12px !important;
+        background: #4CAF50 !important;
+        border: 3.5px solid #FFF !important;
+        box-shadow: 0 0 0 2px #4CAF50 !important;
+      }
+
+      .print-footer {
+        display: block !important;
+        text-align: center !important;
+        margin-top: 15px !important;
+        font-size: 0.95rem !important;
+        font-weight: bold !important;
+        color: #E65100 !important;
+        background: #FFF3E0 !important;
+        border: 2px dashed #FFB74D !important;
+        border-radius: 18px !important;
+        padding: 8px 12px !important;
+      }
+    }</style>
+</head>
+<body>
+
+  <!-- 背景卡通圖案裝飾 -->
+  <div class="bg-decoration" style="top: 8%; left: 3%;">🎈</div>
+  <div class="bg-decoration" style="top: 15%; right: 4%; animation-delay: -2s;">⭐</div>
+  <div class="bg-decoration" style="bottom: 20%; left: 2%; animation-delay: -4s;">🌈</div>
+  <div class="bg-decoration" style="bottom: 12%; right: 3%; animation-delay: -1s;">☁️</div>
+
+  <!-- 每頁最左上方圖標 (cat.jpeg) -->
+  <div class="top-left-logo-container">
+    <img src="cat.jpeg" alt="Teacher Cat Logo" class="top-left-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><circle cx='30' cy='30' r='28' fill='%23FF9800'/><text x='30' y='38' font-size='30' text-anchor='middle' fill='white'>🐱</text></svg>';">
+  </div>
+
+  <header>
+    <h1 class="main-title">🐱 N K1連線大冒險 🌟</h1>
+    <p class="subtitle">聽一聽、睇一睇，動動手指連一連！</p>
+    
+    <!-- 廣東話 / 普通話 設定按鈕與說明 -->
+    <div class="setting-bar">
+      <span class="setting-label">🗣️ 中文發音設定：</span>
+      <button id="btnCantonese" class="lang-toggle-btn active" onclick="setChineseVoice('zh-HK')">廣東話 (zh-HK)</button>
+      <button id="btnMandarin" class="lang-toggle-btn" onclick="setChineseVoice('zh-CN')">普通話 (zh-CN)</button>
+      <button class="help-link-btn" onclick="openSpeechHelpModal()">
+        ❓ 聽不到聲音或不能出廣東話/普通話？
+      </button>
+    </div>
+  </header>
+
+  <!-- 首頁：5個主題選項 -->
+  <div id="homeScreen" class="screen active">
+    <div class="theme-grid" id="themeGrid"></div>
+
+    <!-- 1) 首頁最下方按鈕："返回小朋友學習大冒險" -->
+    <div class="adventure-back-container">
+      <a href="https://cat123teacher.github.io/chinese/main.html" class="adventure-back-btn" target="_self">
+        🚀 返回小朋友學習大冒險 🌈
+      </a>
+    </div>
+  </div>
+
+  <!-- 模式選擇彈窗 -->
+  <div id="modeModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalThemeTitle" style="color:#00796B; margin-top:0; font-size:1.6rem;">選擇遊戲關卡</h2>
+      <p id="modalVoiceNotice" style="color:#E65100; font-size:1.05rem; margin-bottom:18px; font-weight:bold;">目前中文發音：廣東話</p>
+      <button class="mode-btn btn-zh" onclick="startGame('zh')">🇨🇳 中文圖詞配對</button>
+      <button class="mode-btn btn-en" onclick="startGame('en')">🇬🇧 英文圖詞配對</button>
+      <button class="nav-btn" style="background:#78909C; margin-top:12px; width:100%; border-radius:50px; padding:14px; max-width:100%; font-size:1.1rem;" onclick="closeModal()">返回首頁</button>
+    </div>
+  </div>
+
+  <!-- 語音設定詳細教學彈窗 -->
+  <div id="speechHelpModal" class="modal">
+    <div class="modal-content">
+      <h2 style="color:#0288D1; margin-top:0;">📱 聽不到廣東話或普通話？</h2>
+      <p style="color:#555; font-size:0.95rem; text-align:left; line-height:1.5;">
+        如果你的手機或平板無法朗讀語音，通常是因為系統尚未下載廣東話或普通話的語音包。請跟隨以下步驟輕鬆開啟設定：
+      </p>
+
+      <div class="guide-box">
+        <div class="guide-title">🍎 iPhone / iPad (iOS) 設定方法：</div>
+        <ol class="guide-steps">
+          <li>開啟 iPhone <b>「設定」 (Settings)</b></li>
+          <li>進入 <b>「輔助功能」 (Accessibility)</b> ➔ 點選 <b>「朗讀內容」 (Spoken Content)</b></li>
+          <li>點選 <b>「聲音」 (Voices)</b></li>
+          <li>選擇 <b>「中文」</b>，然後下載並勾選 <b>「廣東話 (香港)」</b> 或 <b>「普通話 (中國大陸/台灣)」</b></li>
+          <li>建議選擇「增強版」音質，發音會更自然清晰！</li>
+        </ol>
+
+        <div class="guide-title">🤖 Android (三星 / Xiaomi / Pixel 等) 設定方法：</div>
+        <ol class="guide-steps">
+          <li>開啟手機 <b>「設定」 (Settings)</b></li>
+          <li>點選 <b>「系統 / 一般管理」</b> ➔ <b>「語言與輸入法」</b></li>
+          <li>點選 <b>「文字轉語音輸出」 (Text-to-speech output)</b></li>
+          <li>點選 Preferred Engine 旁的 <b>⚙️ 齒輪圖示</b> ➔ <b>「安裝語音資料」</b></li>
+          <li>找到並下載 <b>「廣東話 (香港)」</b> 或 <b>「中文 (普通話)」</b> 語音包。</li>
+        </ol>
+      </div>
+
+      <button class="mode-btn btn-en" style="margin-top:20px; background:#0288D1;" onclick="closeSpeechHelpModal()">我知道了，返回遊戲</button>
+    </div>
+  </div>
+
+  
+  <!-- 🔍 圖案放大檢視 Modal -->
+  <div id="imageZoomModal" class="modal">
+    <div class="zoom-modal-content">
+      <h2 style="color:#E65100; margin:0 0 5px 0; font-size:1.5rem;">🔍 圖案放大看</h2>
+      <div class="zoom-preview-box" id="zoomPreviewBox">
+        <!-- 動態注入大圖片或大 Emoji -->
+      </div>
+      <div id="zoomWordZh" class="zoom-word-zh">生字</div>
+      <div id="zoomWordEn" class="zoom-word-en">Word</div>
+
+      <div class="zoom-btn-group">
+        <button class="zoom-action-btn btn-sound-play" onclick="playZoomVoice()">🔊 聽發音</button>
+        <button class="zoom-action-btn btn-select-card" onclick="selectCardFromZoom()">✅ 選取這張卡片進行連線</button>
+        <button class="zoom-action-btn btn-close-zoom" onclick="closeImageZoomModal()">❌ 關閉大圖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 遊戲主畫面 -->
+  <div id="gameScreen" class="screen">
+    <!-- 列印工作紙標頭（螢幕隱藏，列印時顯示） -->
+    <div class="print-only">
+      <div class="print-brand-header">🐱 Teacher Cat 快樂AI教室 🌟</div>
+      <div class="print-header-title">🎨 N K1連線大冒險 — 幼兒學習工作紙</div>
+      <div class="print-meta-row">
+        <span id="printThemeName" class="print-badge">主題：我與我的身體</span>
+        <span class="print-badge">班別／姓名：__________________</span>
+        <span class="print-badge">日期：__________________</span>
+      </div>
+      <div class="print-task-banner">
+        ✏️ 幼兒連線任務：請用彩色筆，把左邊圖案和右邊正確字詞連起來吧！
+      </div>
+    </div>
+    <div class="game-header">
+      <!-- 上一頁、回到主頁、下一頁 按鈕 -->
+      <div class="game-nav-bar">
+        <button class="nav-btn prev-btn" onclick="prevLevel()">⬅️ 上一頁</button>
+        <button class="nav-btn home-btn" onclick="goHome()">🏠 主頁</button>
+        <button class="nav-btn print-btn" onclick="printWorksheet()">🖨️ 列印</button>
+        <button class="nav-btn next-btn" onclick="nextLevel()">➡️ 下一頁</button>
+      </div>
+      <div id="gameTitle" class="game-title-box">主題名</div>
+    </div>
+
+    
+    <div class="game-tip-banner">
+      👉 <b>小提示：</b>按一下圖案或 🔍 <b>可以放大看大圖</b>喔！用手指<b>按住圖案滑過連線區</b>即可連線！
+    </div>
+
+    <div class="game-board" id="gameBoard">
+      <canvas id="lineCanvas"></canvas>
+      <div class="column" id="leftCol"></div>
+      <div class="column" id="rightCol"></div>
+    </div>
+
+    <div class="print-footer print-only">🌟 Teacher Cat 快樂AI教室 ｜ 🏠 更多免費幼兒學習資源：https://cat123teacher.github.io/chinese/main.html</div>
+    <!-- 通關成功畫面 -->
+    <div id="victoryBox" class="victory-box">
+      <h2>🎉 太棒了！完美通關！ 🎉</h2>
+      <div class="stars">⭐️ ⭐️ ⭐️</div>
+      <div style="display:flex; gap:12px; margin-top:18px; justify-content:center; flex-wrap:wrap;">
+        <button class="nav-btn" style="background:#FFA726; padding:12px 20px; font-size:1.1rem; max-width:none;" onclick="restartGame()">🔄 再玩一次</button>
+        <button class="nav-btn next-btn" style="padding:12px 20px; font-size:1.1rem; max-width:none;" onclick="nextLevel()">➡️ 挑戰下一關</button>
+      </div>
+      <button class="nav-btn home-btn" style="margin-top:12px; width:100%; justify-content:center; padding:12px; font-size:1.1rem; border-radius:50px; max-width:100%;" onclick="goHome()">🏠 返回選擇主題</button>
+    </div>
+  </div>
+
+  <!-- Footer 頁腳標籤與完整社群連結 -->
+  <footer>
+    <div class="footer-brand">Teacher Cat 的快樂AI教室</div>
+    
+    <div class="social-grid">
+      <a href="https://www.youtube.com/@TeacherCat123" target="_blank" rel="noopener noreferrer" class="social-link">▶️ YouTube</a>
+      <a href="https://www.instagram.com/teachercat123?igsh=d2NjcXVsenVhNjkz&utm_source=qr" target="_blank" rel="noopener noreferrer" class="social-link">📸 Instagram</a>
+      <a href="https://www.facebook.com/share/1Gp2hwWUFP/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a>
+      <a href="https://www.threads.com/@teachercat123?igshid=NTc4MTIwNjQ2YQ==" target="_blank" rel="noopener noreferrer" class="social-link">🧵 Threads</a>
+      <a href="https://xhslink.com/m/5UQtqPpcsWK" target="_blank" rel="noopener noreferrer" class="social-link">📕 小紅書</a>
+      <a href="https://chat.whatsapp.com/Jj4ny1yzFz1D2Ljzccw6ni" target="_blank" rel="noopener noreferrer" class="social-link">💬 WhatsApp 分享 Group</a>
+      <span class="social-tag">🎵 抖音: 74254902683</span>
+    </div>
+
+    <div class="footer-policy-links">
+      <a href="https://cat123teacher.github.io/chinese/about_us.html" target="_blank" rel="noopener noreferrer">關於我們</a>
+      <span>|</span>
+      <a href="https://cat123teacher.github.io/chinese/privacy_policy.html" target="_blank" rel="noopener noreferrer">隱私權政策</a>
+    </div>
+
+    <div class="copyright">
+      Copyright by ©Teacher Cat 快樂AI教室
+    </div>
+  </footer>
+
+  <script>
+    // 5大主題與50個生字數據庫 (源自 K1 課程資料)
+    const themeKeys = ['body', 'family', 'school', 'animals', 'colors'];
+    
+    const gameData = {
+      body: {
+        title: "我與我的身體", enTitle: "Myself & My Body", icon: "👤",
+        words: [
+          { id: "head", zh: "頭", en: "head", icon: "🗣️" },
+          { id: "hand", zh: "手", en: "hand", icon: "✋" },
+          { id: "face", zh: "臉", en: "face", icon: "😊" },
+          { id: "foot", zh: "腳", en: "foot", icon: "🦶" },
+          { id: "eye", zh: "眼睛", en: "eye", icon: "👁️" },
+          { id: "hair", zh: "頭髮", en: "hair", icon: "💇" },
+          { id: "ear", zh: "耳朵", en: "ear", icon: "👂" },
+          { id: "mouth", zh: "嘴巴", en: "mouth", icon: "👄" },
+          { id: "nose", zh: "鼻子", en: "nose", icon: "👃" },
+          { id: "body", zh: "身體", en: "body", icon: "🧍" }
+        ]
+      },
+      family: {
+        title: "我的家庭", enTitle: "My Family", icon: "🏠",
+        words: [
+          { id: "father", zh: "爸爸", en: "father", icon: "👨" },
+          { id: "mother", zh: "媽媽", en: "mother", icon: "👩" },
+          { id: "brother", zh: "兄弟", en: "brother", icon: "👦" },
+          { id: "sister", zh: "姊妹", en: "sister", icon: "👧" },
+          { id: "baby", zh: "嬰兒", en: "baby", icon: "👶" },
+          { id: "boy", zh: "男孩子", en: "boy", icon: "🧒" },
+          { id: "girl", zh: "女孩子", en: "girl", icon: "👧" },
+          { id: "home", zh: "家", en: "home", icon: "🏡" },
+          { id: "family", zh: "家庭", en: "family", icon: "👨‍👩‍👧‍👦" },
+          { id: "love", zh: "愛", en: "love", icon: "❤️" }
+        ]
+      },
+      school: {
+        title: "我的學校與生活", enTitle: "My School", icon: "🏫",
+        words: [
+          { id: "school", zh: "學校", en: "school", icon: "🏫" },
+          { id: "teacher", zh: "老師", en: "teacher", icon: "👩‍🏫" },
+          { id: "friend", zh: "朋友", en: "friend", icon: "🧑‍🤝‍🧑" },
+          { id: "book", zh: "書本", en: "book", icon: "📖" },
+          { id: "pen", zh: "筆", en: "pen", icon: "✏️" },
+          { id: "bag", zh: "書包", en: "bag", icon: "🎒" },
+          { id: "table", zh: "桌子", en: "table", icon: "🪑" },
+          { id: "chair", zh: "椅子", en: "chair", icon: "🪑" },
+          { id: "play", zh: "玩耍", en: "play", icon: "🛝" },
+          { id: "toy", zh: "玩具", en: "toy", icon: "🧸" }
+        ]
+      },
+      animals: {
+        title: "常見動物", enTitle: "Animals", icon: "🐶",
+        words: [
+          { id: "dog", zh: "狗", en: "dog", icon: "🐶" },
+          { id: "cat", zh: "貓", en: "cat", icon: "🐱" },
+          { id: "bird", zh: "鳥", en: "bird", icon: "🐦" },
+          { id: "fish", zh: "魚", en: "fish", icon: "🐟" },
+          { id: "rabbit", zh: "兔子", en: "rabbit", icon: "🐰" },
+          { id: "cow", zh: "牛", en: "cow", icon: "🐮" },
+          { id: "pig", zh: "豬", en: "pig", icon: "🐷" },
+          { id: "duck", zh: "鴨子", en: "duck", icon: "🦆" },
+          { id: "bear", zh: "熊", en: "bear", icon: "🐻" },
+          { id: "monkey", zh: "猴子", en: "monkey", icon: "🐒" }
+        ]
+      },
+      colors: {
+        title: "顏色與形狀", enTitle: "Colors & Shapes", icon: "🎨",
+        words: [
+          { id: "red", zh: "紅色", en: "red", icon: "🔴" },
+          { id: "blue", zh: "藍色", en: "blue", icon: "🔵" },
+          { id: "yellow", zh: "黃色", en: "yellow", icon: "🟡" },
+          { id: "green", zh: "綠色", en: "green", icon: "🟢" },
+          { id: "black", zh: "黑色", en: "black", icon: "⚫" },
+          { id: "circle", zh: "圓形", en: "circle", icon: "⭕" },
+          { id: "square", zh: "正方形", en: "square", icon: "⬛" },
+          { id: "star", zh: "星形", en: "star", icon: "⭐️" },
+          { id: "sun", zh: "太陽", en: "sun", icon: "☀️" },
+          { id: "tree", zh: "樹木", en: "tree", icon: "🌳" }
+        ]
+      }
+    };
+
+    let selectedChineseLang = 'zh-HK';
+    let currentThemeIndex = 0;
+    let currentThemeKey = 'body';
+    let currentMode = 'zh';
+    let selectedLeft = null;
+    let matchedPairs = [];
+    let current5Words = [];
+
+    // 音效合成器 (Web Audio API)
+    function playCorrectAudioSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        const notes = [523.25, 659.25, 783.99]; // C5 -> E5 -> G5
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+          
+          gain.gain.setValueAtTime(0.35, ctx.currentTime + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.35);
+          
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          
+          osc.start(ctx.currentTime + idx * 0.08);
+          osc.stop(ctx.currentTime + idx * 0.08 + 0.35);
+        });
+      } catch (e) {
+        console.log("Audio initialized upon interaction");
+      }
+    }
+
+    // 答對畫面粒子爆炸特效
+    function triggerCorrectVisualEffect(leftCard, rightCard) {
+      leftCard.classList.add('correct-anim');
+      rightCard.classList.add('correct-anim');
+      setTimeout(() => {
+        leftCard.classList.remove('correct-anim');
+        rightCard.classList.remove('correct-anim');
+      }, 500);
+
+      const rect1 = leftCard.getBoundingClientRect();
+      const rect2 = rightCard.getBoundingClientRect();
+      const midX = (rect1.right + rect2.left) / 2;
+      const midY = (rect1.top + rect2.top) / 2;
+
+      const emojis = ['⭐', '✨', '🎉', '🌟', '💖', '🎈'];
+      for (let i = 0; i < 9; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = `${midX}px`;
+        p.style.top = `${midY}px`;
+        
+        const dx = (Math.random() - 0.5) * 200;
+        const dy = (Math.random() - 0.5) * 200 - 30;
+        p.style.setProperty('--dx', `${dx}px`);
+        p.style.setProperty('--dy', `${dy}px`);
+        
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
+    }
+
+    // 切換廣東話 / 普通話
+    function setChineseVoice(lang) {
+      selectedChineseLang = lang;
+      document.getElementById('btnCantonese').classList.toggle('active', lang === 'zh-HK');
+      document.getElementById('btnMandarin').classList.toggle('active', lang === 'zh-CN');
+      
+      const testText = lang === 'zh-HK' ? '已切換為廣東話' : '已切换为普通话';
+      speak(testText, lang);
+    }
+
+    function openSpeechHelpModal() {
+      document.getElementById('speechHelpModal').classList.add('active');
+    }
+    function closeSpeechHelpModal() {
+      document.getElementById('speechHelpModal').classList.remove('active');
+    }
+
+    // 發音功能 (Web Speech API)
+    function speak(text, lang) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang || (currentMode === 'zh' ? selectedChineseLang : 'en-US');
+        utterance.rate = 0.85;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // 初始化首頁
+    function initHome() {
+      const grid = document.getElementById('themeGrid');
+      grid.innerHTML = '';
+      themeKeys.forEach((key, index) => {
+        const theme = gameData[key];
+        const card = document.createElement('div');
+        card.className = 'theme-card';
+        card.onclick = () => openModal(key, index);
+        card.innerHTML = `
+          <div class="theme-icon">${theme.icon}</div>
+          <div class="theme-title">${theme.title}</div>
+          <div class="theme-sub">${theme.enTitle}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function openModal(key, index) {
+      currentThemeKey = key;
+      currentThemeIndex = index !== undefined ? index : themeKeys.indexOf(key);
+      document.getElementById('modalThemeTitle').innerText = gameData[key].title;
+      const langName = selectedChineseLang === 'zh-HK' ? '廣東話' : '普通話';
+      document.getElementById('modalVoiceNotice').innerText = `目前中文發音：${langName}`;
+      document.getElementById('modeModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modeModal').classList.remove('active');
+    }
+
+    function startGame(mode) {
+      currentMode = mode;
+      closeModal();
+      document.getElementById('homeScreen').classList.remove('active');
+      document.getElementById('gameScreen').classList.add('active');
+      document.getElementById('victoryBox').classList.remove('active');
+      
+      const theme = gameData[currentThemeKey];
+      const langNotice = mode === 'zh' ? (selectedChineseLang === 'zh-HK' ? '廣東話' : '普通話') : '英文';
+      document.getElementById('gameTitle').innerText = `${theme.title} (${langNotice})`;
+
+      const shuffled = [...theme.words].sort(() => 0.5 - Math.random());
+      current5Words = shuffled.slice(0, 5);
+
+      renderBoard();
+    }
+
+    function prevLevel() {
+      currentThemeIndex = (currentThemeIndex - 1 + themeKeys.length) % themeKeys.length;
+      currentThemeKey = themeKeys[currentThemeIndex];
+      startGame(currentMode);
+    }
+
+    function nextLevel() {
+      currentThemeIndex = (currentThemeIndex + 1) % themeKeys.length;
+      currentThemeKey = themeKeys[currentThemeIndex];
+      startGame(currentMode);
+    }
+
+        let isDragging = false;
+    let dragStartCard = null;
+    let dragStartPos = { x: 0, y: 0 };
+    let currentPointerPos = { x: 0, y: 0 };
+    let hoverTargetCard = null;
+    let touchMoveDistance = 0;
+
+    function renderBoard() {
+      selectedLeft = null;
+      matchedPairs = [];
+      isDragging = false;
+      dragStartCard = null;
+      hoverTargetCard = null;
+      clearCanvas();
+
+      const leftCol = document.getElementById('leftCol');
+      const rightCol = document.getElementById('rightCol');
+      leftCol.innerHTML = '';
+      rightCol.innerHTML = '';
+
+      const targetLang = currentMode === 'zh' ? selectedChineseLang : 'en-US';
+
+      // 左欄（圖案 - 支持點擊放大 + 🔍 標籤 + 雙重載入備用）
+      const leftItems = [...current5Words].sort(() => 0.5 - Math.random());
+      leftItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = item.id;
+        card.dataset.side = 'left';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'card-left-content';
+
+        // 圖片與 🔍 放大按鈕容器
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'card-img-container';
+        imgContainer.title = '按一下放大圖案';
+
+        const img = document.createElement('img');
+        img.className = 'card-img';
+        img.alt = '';
+        img.src = `${item.id}.jpg`;
+
+        img.onerror = function() {
+          if (!this.dataset.triedLong) {
+            this.dataset.triedLong = 'true';
+            this.src = `${item.id}-${item.id}.jpg`;
+          } else {
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'card-icon';
+            iconSpan.textContent = item.icon;
+            if (this.parentNode) {
+              this.parentNode.replaceChild(iconSpan, this);
+            }
+          }
+        };
+
+        const zoomBadge = document.createElement('div');
+        zoomBadge.className = 'zoom-badge';
+        zoomBadge.innerHTML = '🔍放大';
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(zoomBadge);
+
+        // 點擊圖案或🔍標籤開啓放大 Modal
+        imgContainer.onclick = (e) => {
+          e.stopPropagation();
+          openImageZoomModal(item, card, imgContainer);
+        };
+
+        contentDiv.appendChild(imgContainer);
+        card.appendChild(contentDiv);
+
+        const textVal = currentMode === 'zh' ? item.zh : item.en;
+        const soundBtn = document.createElement('button');
+        soundBtn.className = 'sound-btn';
+        soundBtn.innerHTML = '🔊';
+        soundBtn.onclick = (e) => {
+          e.stopPropagation();
+          speak(textVal, targetLang);
+        };
+        card.appendChild(soundBtn);
+
+        const dot = document.createElement('div');
+        dot.className = 'conn-dot left-dot';
+        card.appendChild(dot);
+
+        attachCardEvents(card, item);
+        leftCol.appendChild(card);
+      });
+
+      // 右欄（文字）
+      const rightItems = [...current5Words].sort(() => 0.5 - Math.random());
+      rightItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = item.id;
+        card.dataset.side = 'right';
+        const textVal = currentMode === 'zh' ? item.zh : item.en;
+
+        const dot = document.createElement('div');
+        dot.className = 'conn-dot right-dot';
+        card.appendChild(dot);
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'card-text';
+        textSpan.textContent = textVal;
+        card.appendChild(textSpan);
+
+        const soundBtn = document.createElement('button');
+        soundBtn.className = 'sound-btn';
+        soundBtn.innerHTML = '🔊';
+        soundBtn.onclick = (e) => {
+          e.stopPropagation();
+          speak(textVal, targetLang);
+        };
+        card.appendChild(soundBtn);
+
+        attachCardEvents(card, item);
+        rightCol.appendChild(card);
+      });
+
+      setTimeout(resizeCanvas, 150);
+    }
+
+    // 為卡片綁定 Pointer / Touch 拖拽與點擊事件（兼顧滑動拉線與點擊連線）
+    function attachCardEvents(card, item) {
+      const handleStart = (e) => {
+        if (card.classList.contains('matched')) return;
+        
+        // 點擊發音按鈕時不觸發拖拽
+        if (e.target.closest('.sound-btn')) return;
+
+        const touch = e.touches ? e.touches[0] : e;
+        isDragging = true;
+        dragStartCard = card;
+        touchMoveDistance = 0;
+
+        // 計算圓點的起點座標
+        const dot = card.querySelector('.conn-dot');
+        const dotRect = dot.getBoundingClientRect();
+        const boardRect = document.getElementById('gameBoard').getBoundingClientRect();
+        
+        dragStartPos = {
+          x: dotRect.left + dotRect.width / 2 - boardRect.left,
+          y: dotRect.top + dotRect.height / 2 - boardRect.top
+        };
+        currentPointerPos = { ...dragStartPos };
+
+        card.classList.add('dragging');
+        
+        // 播放語音
+        const targetLang = currentMode === 'zh' ? selectedChineseLang : 'en-US';
+        const textVal = currentMode === 'zh' ? item.zh : item.en;
+        speak(textVal, targetLang);
+
+        drawLines();
+      };
+
+      card.addEventListener('mousedown', handleStart);
+      card.addEventListener('touchstart', handleStart, { passive: false });
+    }
+
+    // 全局拖拽移動與釋放事件
+    function initGlobalDragListeners() {
+      const gameBoard = document.getElementById('gameBoard');
+
+      const handleMove = (e) => {
+        if (!isDragging || !dragStartCard) return;
+
+        const touch = e.touches ? e.touches[0] : e;
+        const clientX = touch.clientX;
+        const clientY = touch.clientY;
+
+        const boardRect = gameBoard.getBoundingClientRect();
+        currentPointerPos = {
+          x: clientX - boardRect.left,
+          y: clientY - boardRect.top
+        };
+
+        touchMoveDistance += 1;
+
+        // 檢測手指當前位置下方的卡片 (elementFromPoint)
+        const elemUnder = document.elementFromPoint(clientX, clientY);
+        const targetCard = elemUnder ? elemUnder.closest('.card') : null;
+
+        // 清除舊高亮
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('drag-target'));
+
+        if (targetCard && !targetCard.classList.contains('matched') && targetCard !== dragStartCard) {
+          // 確保是跨邊連接 (左到右 或 右到左)
+          if (targetCard.dataset.side !== dragStartCard.dataset.side) {
+            hoverTargetCard = targetCard;
+            targetCard.classList.add('drag-target');
+          } else {
+            hoverTargetCard = null;
+          }
+        } else {
+          hoverTargetCard = null;
+        }
+
+        drawLines();
+      };
+
+      const handleEnd = (e) => {
+        if (!isDragging || !dragStartCard) return;
+
+        dragStartCard.classList.remove('dragging');
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('drag-target'));
+
+        if (hoverTargetCard) {
+          // 1. 手指拉線釋放在目標卡片上 ➔ 進行配對檢查
+          checkPairMatch(dragStartCard, hoverTargetCard);
+        } else if (touchMoveDistance < 5) {
+          // 2. 移動距離極小 ➔ 視為「點擊模式」
+          handleCardTap(dragStartCard);
+        } else {
+          // 未命中目標，清除狀態
+          drawLines();
+        }
+
+        isDragging = false;
+        dragStartCard = null;
+        hoverTargetCard = null;
+      };
+
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('touchmove', handleMove, { passive: false });
+
+      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('touchend', handleEnd);
+    }
+
+    // 點擊選取邏輯 (Tap-to-Connect)
+    function handleCardTap(card) {
+      if (card.classList.contains('matched')) return;
+
+      if (!selectedLeft) {
+        // 第一下點擊（左邊或右邊皆可）
+        selectedLeft = card;
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      } else if (selectedLeft === card) {
+        // 重複點擊同一張卡片 ➔ 取消選取
+        card.classList.remove('selected');
+        selectedLeft = null;
+      } else if (selectedLeft.dataset.side === card.dataset.side) {
+        // 點擊同邊的其他卡片 ➔ 切換選取目標
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        selectedLeft = card;
+        card.classList.add('selected');
+      } else {
+        // 點擊對面的卡片 ➔ 進行配對檢查！
+        checkPairMatch(selectedLeft, card);
+        selectedLeft = null;
+      }
+      drawLines();
+    }
+
+    // 檢查兩張卡片是否配對成功
+    function checkPairMatch(card1, card2) {
+      const targetLang = currentMode === 'zh' ? selectedChineseLang : 'en-US';
+
+      if (card1.dataset.id === card2.dataset.id) {
+        // 配對成功！
+        card1.classList.remove('selected', 'dragging');
+        card2.classList.remove('selected', 'dragging');
+        card1.classList.add('matched');
+        card2.classList.add('matched');
+
+        // 判斷哪張是左卡、哪張是右卡
+        const leftCard = card1.dataset.side === 'left' ? card1 : card2;
+        const rightCard = card1.dataset.side === 'right' ? card1 : card2;
+
+        matchedPairs.push({ left: leftCard, right: rightCard });
+        drawLines();
+
+        // 音效與慶祝效果
+        playCorrectAudioSound();
+        triggerCorrectVisualEffect(leftCard, rightCard);
+
+        const successSpeech = currentMode === 'zh' ? (selectedChineseLang === 'zh-HK' ? '答對了！' : '答对了！') : 'Good job!';
+        speak(successSpeech, targetLang);
+
+        if (matchedPairs.length === 5) {
+          setTimeout(() => {
+            document.getElementById('victoryBox').classList.add('active');
+            const winSpeech = currentMode === 'zh' ? (selectedChineseLang === 'zh-HK' ? '太棒了！完美通關！' : '太棒了！完美通关！') : 'Awesome! You win!';
+            speak(winSpeech, targetLang);
+          }, 600);
+        }
+      } else {
+        // 配對失敗
+        const retrySpeech = currentMode === 'zh' ? (selectedChineseLang === 'zh-HK' ? '再試一次' : '再试一次') : 'Try again';
+        speak(retrySpeech, targetLang);
+      }
+    }
+
+    // 繪製順滑彩色連線（包含已配對線條 + 當前拖拽即時動態連線）
+    function drawLines() {
+      const canvas = document.getElementById('lineCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const board = document.getElementById('gameBoard');
+      if (!board) return;
+      const boardRect = board.getBoundingClientRect();
+      const colors = ['#FF4081', '#7C4DFF', '#00E676', '#FF9100', '#00B0FF'];
+
+      // 1. 繪製已配對成功的連線
+      matchedPairs.forEach((pair, idx) => {
+        const dot1 = pair.left.querySelector('.conn-dot');
+        const dot2 = pair.right.querySelector('.conn-dot');
+        if (!dot1 || !dot2) return;
+
+        const r1 = dot1.getBoundingClientRect();
+        const r2 = dot2.getBoundingClientRect();
+
+        const x1 = r1.left + r1.width / 2 - boardRect.left;
+        const y1 = r1.top + r1.height / 2 - boardRect.top;
+        const x2 = r2.left + r2.width / 2 - boardRect.left;
+        const y2 = r2.top + r2.height / 2 - boardRect.top;
+
+        const color = colors[idx % colors.length];
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        // 使用平滑貝茲曲線
+        const cp1x = x1 + (x2 - x1) * 0.5;
+        const cp2x = x1 + (x2 - x1) * 0.5;
+        ctx.bezierCurveTo(cp1x, y1, cp2x, y2, x2, y2);
+        
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 7;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      });
+
+      // 2. 繪製手指拖拽中的實時即時連線 (Live Preview Line)
+      if (isDragging && dragStartCard) {
+        const x1 = dragStartPos.x;
+        const y1 = dragStartPos.y;
+        const x2 = currentPointerPos.x;
+        const y2 = currentPointerPos.y;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#FF3D00';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.setLineDash([8, 6]); // 虛線指引效果
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // 初始化全局拖拽事件
+    window.addEventListener('DOMContentLoaded', () => {
+      initGlobalDragListeners();
+    });
+
+function clearCanvas() {
+      const canvas = document.getElementById('lineCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function resizeCanvas() {
+      const canvas = document.getElementById('lineCanvas');
+      const board = document.getElementById('gameBoard');
+      if (board) {
+        canvas.width = board.clientWidth;
+        canvas.height = board.clientHeight;
+        drawLines();
+      }
+    }
+
+    function restartGame() {
+      document.getElementById('victoryBox').classList.remove('active');
+      startGame(currentMode);
+    }
+
+    function goHome() {
+      document.getElementById('gameScreen').classList.remove('active');
+      document.getElementById('homeScreen').classList.add('active');
+      closeModal();
+    }
+
+    
+    // 🔍 圖案放大 Modal 邏輯
+    let currentZoomItem = null;
+    let currentZoomCard = null;
+
+    function openImageZoomModal(item, card, imgContainer) {
+      currentZoomItem = item;
+      currentZoomCard = card;
+
+      const previewBox = document.getElementById('zoomPreviewBox');
+      previewBox.innerHTML = '';
+
+      // 檢查是圖片還是 Emoji
+      const imgElem = imgContainer.querySelector('.card-img');
+      const iconElem = imgContainer.querySelector('.card-icon');
+
+      if (imgElem && imgElem.tagName === 'IMG' && imgElem.src) {
+        const giantImg = document.createElement('img');
+        giantImg.className = 'zoom-giant-img';
+        giantImg.src = imgElem.src;
+        giantImg.alt = item.zh;
+        giantImg.onerror = function() {
+          previewBox.innerHTML = `<div class="zoom-giant-icon">${item.icon}</div>`;
+        };
+        previewBox.appendChild(giantImg);
+      } else {
+        previewBox.innerHTML = `<div class="zoom-giant-icon">${item.icon}</div>`;
+      }
+
+      document.getElementById('zoomWordZh').innerText = item.zh;
+      document.getElementById('zoomWordEn').innerText = item.en;
+
+      document.getElementById('imageZoomModal').classList.add('active');
+
+      // 自動播放發音
+      playZoomVoice();
+    }
+
+    function playZoomVoice() {
+      if (!currentZoomItem) return;
+      const targetLang = currentMode === 'zh' ? selectedChineseLang : 'en-US';
+      const textVal = currentMode === 'zh' ? currentZoomItem.zh : currentZoomItem.en;
+      speak(textVal, targetLang);
+    }
+
+    function selectCardFromZoom() {
+      closeImageZoomModal();
+      if (currentZoomCard) {
+        handleCardTap(currentZoomCard);
+      }
+    }
+
+    function closeImageZoomModal() {
+      document.getElementById('imageZoomModal').classList.remove('active');
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 300));
+    
+    // 列印工作紙功能
+    function printWorksheet() {
+      const theme = gameData[currentThemeKey];
+      const langNotice = currentMode === 'zh' ? (selectedChineseLang === 'zh-HK' ? '廣東話' : '普通話') : '英文';
+      document.getElementById('printThemeName').innerText = `主題：${theme.title} (${langNotice})`;
+      
+      // 取消卡片選取與狀態，清空畫布，方便印出乾淨工作紙
+      selectedLeft = null;
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected', 'dragging', 'drag-target'));
+      clearCanvas();
+      
+      window.print();
+    }
+
+    window.onload = initHome;
+  </script>
+</body>
+</html>
