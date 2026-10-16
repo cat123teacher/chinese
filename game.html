@@ -108,7 +108,7 @@
             transition: transform 0.1s ease-out;
         }
 
-        /* Action Buttons (Jump & Zoom) */
+        /* Action Buttons */
         .action-btn {
             position: absolute;
             right: 40px;
@@ -176,20 +176,17 @@
     <div id="jump-btn" class="action-btn">⬆️</div>
 
     <script>
-        // --- Game Variables ---
         let camera, scene, renderer;
         let prevTime = performance.now();
         const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
         
         let playerGroup;
         let limbs = { leftArm: null, rightArm: null, leftLeg: null, rightLeg: null };
-        let walkTime = 0; // For animation
+        let walkTime = 0; 
 
         // Inputs
         let joyVector = { x: 0, y: 0 }; 
         let keyVector = { x: 0, y: 0 };
-        let isJumping = false;
         let canJump = false;
         
         // Camera offsets & rotation
@@ -197,10 +194,10 @@
         let camYaw = Math.PI;   
         
         // Zoom Variables
-        let targetCameraDist = 15;
-        let currentCameraDist = 15;
-        const MIN_ZOOM = 5;
-        const MAX_ZOOM = 30;
+        let targetCameraDist = 25;
+        let currentCameraDist = 25;
+        const MIN_ZOOM = 10;
+        const MAX_ZOOM = 50;
 
         const objects = []; 
 
@@ -210,23 +207,25 @@
         function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87CEEB); 
-            scene.fog = new THREE.Fog(0x87CEEB, 50, 300);
+            scene.fog = new THREE.Fog(0x87CEEB, 100, 400);
 
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
             
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(-50, 100, 50);
+            dirLight.position.set(-100, 150, 100);
             dirLight.castShadow = true;
-            dirLight.shadow.camera.top = 100;
-            dirLight.shadow.camera.bottom = -100;
-            dirLight.shadow.camera.left = -100;
-            dirLight.shadow.camera.right = 100;
+            dirLight.shadow.camera.top = 150;
+            dirLight.shadow.camera.bottom = -150;
+            dirLight.shadow.camera.left = -150;
+            dirLight.shadow.camera.right = 150;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
             scene.add(dirLight);
 
-            buildEnvironment();
+            buildEnhancedEnvironment();
 
             renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -246,7 +245,6 @@
 
         function setupUI() {
             const uiLayer = document.getElementById('ui-layer');
-            
             document.getElementById('btn-boy').addEventListener('click', () => startGame('boy'));
             document.getElementById('btn-girl').addEventListener('click', () => startGame('girl'));
 
@@ -254,20 +252,16 @@
                 uiLayer.style.display = 'none';
                 document.getElementById('joystick-container').style.display = 'block';
                 document.getElementById('look-zone').style.display = 'block';
-                
-                const actions = document.querySelectorAll('.action-btn');
-                actions.forEach(btn => btn.style.display = 'flex');
-                
+                document.querySelectorAll('.action-btn').forEach(btn => btn.style.display = 'flex');
                 createCharacter(charType);
             }
         }
 
-        // --- Procedural Character ---
         function createCharacter(type) {
             playerGroup = new THREE.Group();
-            playerGroup.position.set(0, 0, 80); // Start position
+            playerGroup.position.set(0, 0, 80); 
             
-            const headMat = new THREE.MeshStandardMaterial({color: 0xFFDAB9}); // Peach
+            const headMat = new THREE.MeshStandardMaterial({color: 0xFFDAB9}); 
             const headGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
             const head = new THREE.Mesh(headGeo, headMat);
             head.position.y = 3.6;
@@ -276,11 +270,11 @@
 
             let bodyMat, legMat;
             if(type === 'boy') {
-                bodyMat = new THREE.MeshStandardMaterial({color: 0x4169E1}); // Blue
-                legMat = new THREE.MeshStandardMaterial({color: 0x333333});  // Dark grey pants
+                bodyMat = new THREE.MeshStandardMaterial({color: 0x4169E1}); 
+                legMat = new THREE.MeshStandardMaterial({color: 0x333333});  
             } else {
-                bodyMat = new THREE.MeshStandardMaterial({color: 0xFF69B4}); // Pink
-                legMat = new THREE.MeshStandardMaterial({color: 0xFFFFFF});  // White tights
+                bodyMat = new THREE.MeshStandardMaterial({color: 0xFF69B4}); 
+                legMat = new THREE.MeshStandardMaterial({color: 0xFFFFFF});  
             }
 
             const bodyGeo = new THREE.BoxGeometry(1.5, 2, 0.8);
@@ -290,31 +284,221 @@
             playerGroup.add(body);
 
             const limbGeo = new THREE.BoxGeometry(0.5, 1.5, 0.5);
-            
-            limbs.leftArm = new THREE.Mesh(limbGeo, bodyMat);
-            limbs.leftArm.position.set(-1.1, 2.2, 0);
-            limbs.leftArm.castShadow = true;
-            playerGroup.add(limbs.leftArm);
-
-            limbs.rightArm = new THREE.Mesh(limbGeo, bodyMat);
-            limbs.rightArm.position.set(1.1, 2.2, 0);
-            limbs.rightArm.castShadow = true;
-            playerGroup.add(limbs.rightArm);
-
-            limbs.leftLeg = new THREE.Mesh(limbGeo, legMat);
-            limbs.leftLeg.position.set(-0.4, 0.5, 0);
-            limbs.leftLeg.castShadow = true;
-            playerGroup.add(limbs.leftLeg);
-
-            limbs.rightLeg = new THREE.Mesh(limbGeo, legMat);
-            limbs.rightLeg.position.set(0.4, 0.5, 0);
-            limbs.rightLeg.castShadow = true;
-            playerGroup.add(limbs.rightLeg);
+            limbs.leftArm = new THREE.Mesh(limbGeo, bodyMat); limbs.leftArm.position.set(-1.1, 2.2, 0); limbs.leftArm.castShadow = true; playerGroup.add(limbs.leftArm);
+            limbs.rightArm = new THREE.Mesh(limbGeo, bodyMat); limbs.rightArm.position.set(1.1, 2.2, 0); limbs.rightArm.castShadow = true; playerGroup.add(limbs.rightArm);
+            limbs.leftLeg = new THREE.Mesh(limbGeo, legMat); limbs.leftLeg.position.set(-0.4, 0.5, 0); limbs.leftLeg.castShadow = true; playerGroup.add(limbs.leftLeg);
+            limbs.rightLeg = new THREE.Mesh(limbGeo, legMat); limbs.rightLeg.position.set(0.4, 0.5, 0); limbs.rightLeg.castShadow = true; playerGroup.add(limbs.rightLeg);
 
             scene.add(playerGroup);
         }
 
-        // --- UI Interactions ---
+        // --- Environment Building ---
+        function buildEnhancedEnvironment() {
+            // Ground
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: 0x8FBC8F, roughness: 1 }));
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            buildMainEntrance(0, -100);
+            buildCurvedWalkway(-80, -20);
+            buildWoodLouverBuilding(80, -40);
+            buildLibrary(-70, 60);
+            buildGymnasium(70, 70);
+
+            // Trees scattered around
+            const treePositions = [[-30, -50], [30, -50], [-90, -90], [90, -90], [-20, 30], [20, 30], [-100, 20], [100, 20], [0, 120], [-40, 120], [40, 120]];
+            treePositions.forEach(pos => createTree(pos[0], pos[1]));
+        }
+
+        function buildMainEntrance(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Main Building Block
+            const mainBldg = new THREE.Mesh(new THREE.BoxGeometry(80, 60, 40), new THREE.MeshStandardMaterial({color: 0xffffff}));
+            mainBldg.position.set(0, 30, -20);
+            mainBldg.castShadow = true; mainBldg.receiveShadow = true;
+            group.add(mainBldg);
+            addCollider(mainBldg, x, z);
+
+            // Grand Staircase
+            const stairCount = 12;
+            for(let i=0; i<stairCount; i++) {
+                const step = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 3), new THREE.MeshStandardMaterial({color: 0xcccccc}));
+                step.position.set(0, i * 1, i * 3);
+                step.castShadow = true; step.receiveShadow = true;
+                group.add(step);
+                addCollider(step, x, z);
+            }
+
+            // Front Lawn
+            const lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshStandardMaterial({color: 0x7CFC00}));
+            lawn.rotation.x = -Math.PI / 2;
+            lawn.position.set(0, 0.1, 45);
+            lawn.receiveShadow = true;
+            group.add(lawn);
+
+            // Placeholder Sign
+            const sign = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 2), new THREE.MeshStandardMaterial({color: 0x4682B4}));
+            sign.position.set(0, 45, 1);
+            group.add(sign);
+
+            scene.add(group);
+        }
+
+        function buildCurvedWalkway(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Simulate curve with segments
+            const radius = 30;
+            const segments = 6;
+            const angleStep = (Math.PI) / segments;
+
+            for(let i=0; i<=segments; i++) {
+                const angle = i * angleStep;
+                const px = Math.cos(angle) * radius;
+                const pz = Math.sin(angle) * radius;
+
+                // Floors (2 levels)
+                [15, 30].forEach(y => {
+                    const floor = new THREE.Mesh(new THREE.BoxGeometry(12, 2, 10), new THREE.MeshStandardMaterial({color: 0xf0f0f0}));
+                    floor.position.set(px, y, pz);
+                    floor.rotation.y = -angle;
+                    floor.castShadow = true; floor.receiveShadow = true;
+                    group.add(floor);
+                    
+                    // Green planters
+                    const planter = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 2), new THREE.MeshStandardMaterial({color: 0x228B22}));
+                    planter.position.set(px + Math.cos(angle)*5, y+1.5, pz + Math.sin(angle)*5);
+                    planter.rotation.y = -angle;
+                    group.add(planter);
+                });
+
+                // Pillars
+                const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 30), new THREE.MeshStandardMaterial({color: 0xffffff}));
+                pillar.position.set(px, 15, pz);
+                pillar.castShadow = true;
+                group.add(pillar);
+                addCollider(pillar, x, z);
+            }
+            scene.add(group);
+        }
+
+        function buildWoodLouverBuilding(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0, z);
+
+            // Dark Grey Base
+            const base = new THREE.Mesh(new THREE.BoxGeometry(50, 20, 30), new THREE.MeshStandardMaterial({color: 0x333333}));
+            base.position.set(0, 10, 0);
+            base.castShadow = true; base.receiveShadow = true;
+            group.add(base);
+            addCollider(base, x, z);
+
+            // Upper Level (Wood Louvers)
+            const upper = new THREE.Mesh(new THREE.BoxGeometry(54, 30, 34), new THREE.MeshStandardMaterial({color: 0x2a2a2a}));
+            upper.position.set(0, 35, 0);
+            upper.castShadow = true;
+            group.add(upper);
+            addCollider(upper, x, z);
+
+            // Add wooden slats
+            for(let lx = -26; lx <= 26; lx += 2) {
+                const slatFront = new THREE.Mesh(new THREE.BoxGeometry(0.5, 30, 0.5), new THREE.MeshStandardMaterial({color: 0x8B5A2B}));
+                slatFront.position.set(lx, 35, 17.5);
+                group.add(slatFront);
+            }
+
+            scene.add(group);
+        }
+
+        function buildLibrary(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0.5, z);
+
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({color: 0xe0e0e0}));
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            group.add(floor);
+
+            // Bookshelves (Orange)
+            for(let i=0; i<3; i++) {
+                const shelf = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 15), new THREE.MeshStandardMaterial({color: 0xFF8C00}));
+                shelf.position.set(-20 + (i*15), 4, -10);
+                shelf.castShadow = true;
+                group.add(shelf);
+                addCollider(shelf, x, z);
+            }
+
+            // Hexagonal Seating
+            const colors = [0xFFD700, 0x00CED1, 0x32CD32];
+            for(let i=0; i<5; i++) {
+                const hex = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 2, 6), new THREE.MeshStandardMaterial({color: colors[i%3]}));
+                hex.position.set(10 + Math.random()*15, 1, 5 + Math.random()*10);
+                hex.castShadow = true;
+                group.add(hex);
+                addCollider(hex, x, z);
+            }
+            scene.add(group);
+        }
+
+        function buildGymnasium(x, z) {
+            const group = new THREE.Group();
+            group.position.set(x, 0.5, z);
+
+            // Wood Floor
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 90), new THREE.MeshStandardMaterial({color: 0xDEB887}));
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            group.add(floor);
+
+            // Blue Lower Walls
+            const wallMat = new THREE.MeshStandardMaterial({color: 0x008B8B});
+            const w1 = new THREE.Mesh(new THREE.BoxGeometry(62, 10, 2), wallMat); w1.position.set(0, 5, -46); group.add(w1); addCollider(w1, x, z);
+            const w2 = new THREE.Mesh(new THREE.BoxGeometry(62, 10, 2), wallMat); w2.position.set(0, 5, 46); group.add(w2); addCollider(w2, x, z);
+            const w3 = new THREE.Mesh(new THREE.BoxGeometry(2, 10, 90), wallMat); w3.position.set(-31, 5, 0); group.add(w3); addCollider(w3, x, z);
+            const w4 = new THREE.Mesh(new THREE.BoxGeometry(2, 10, 90), wallMat); w4.position.set(31, 5, 0); group.add(w4); addCollider(w4, x, z);
+
+            // Elevated Blue Track (Rectangular Ring)
+            const trackMat = new THREE.MeshStandardMaterial({color: 0x1E90FF});
+            const t1 = new THREE.Mesh(new THREE.BoxGeometry(66, 2, 10), trackMat); t1.position.set(0, 15, -46); group.add(t1);
+            const t2 = new THREE.Mesh(new THREE.BoxGeometry(66, 2, 10), trackMat); t2.position.set(0, 15, 46); group.add(t2);
+            const t3 = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 82), trackMat); t3.position.set(-31, 15, 0); group.add(t3);
+            const t4 = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 82), trackMat); t4.position.set(31, 15, 0); group.add(t4);
+
+            // Basketball Hoops
+            const hoopGroup = new THREE.Group();
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 12), new THREE.MeshStandardMaterial({color: 0x888888})); pole.position.set(0, 6, 0); hoopGroup.add(pole);
+            const board = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 0.2), new THREE.MeshStandardMaterial({color: 0xffffff})); board.position.set(0, 10, 1); hoopGroup.add(board);
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 4, 16), new THREE.MeshStandardMaterial({color: 0xff0000})); ring.rotation.x = Math.PI/2; ring.position.set(0, 9, 2); hoopGroup.add(ring);
+            
+            const hoop1 = hoopGroup.clone(); hoop1.position.set(0, 0, -40); group.add(hoop1); addCollider(pole, x, z - 40);
+            const hoop2 = hoopGroup.clone(); hoop2.rotation.y = Math.PI; hoop2.position.set(0, 0, 40); group.add(hoop2); addCollider(pole, x, z + 40);
+
+            scene.add(group);
+        }
+
+        function createTree(x, z) {
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.2, 5, 8), new THREE.MeshStandardMaterial({color: 0x8B4513}));
+            trunk.position.set(x, 2.5, z); trunk.castShadow = true; scene.add(trunk);
+            const leaves = new THREE.Mesh(new THREE.SphereGeometry(3.5, 8, 8), new THREE.MeshStandardMaterial({color: 0x32CD32, roughness: 0.9}));
+            leaves.position.set(x, 6, z); leaves.castShadow = true; scene.add(leaves);
+            addCollider(trunk, 0, 0); 
+        }
+
+        function addCollider(mesh, offsetX = 0, offsetZ = 0) {
+            const box = new THREE.Box3().setFromObject(mesh);
+            // Apply offset if object is inside a group
+            if(offsetX !== 0 || offsetZ !== 0) {
+                box.min.x += offsetX; box.max.x += offsetX;
+                box.min.z += offsetZ; box.max.z += offsetZ;
+            }
+            objects.push(box);
+        }
+
+        // --- Controls & Logic ---
         function setupZoom() {
             const zIn = document.getElementById('zoom-in-btn');
             const zOut = document.getElementById('zoom-out-btn');
@@ -322,10 +506,8 @@
 
             zIn.addEventListener('touchstart', (e) => { e.preventDefault(); targetCameraDist = Math.max(MIN_ZOOM, targetCameraDist - 5); });
             zIn.addEventListener('mousedown', () => { targetCameraDist = Math.max(MIN_ZOOM, targetCameraDist - 5); });
-            
             zOut.addEventListener('touchstart', (e) => { e.preventDefault(); targetCameraDist = Math.min(MAX_ZOOM, targetCameraDist + 5); });
             zOut.addEventListener('mousedown', () => { targetCameraDist = Math.min(MAX_ZOOM, targetCameraDist + 5); });
-
             jumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (canJump) { velocity.y = 15; canJump = false; } });
             jumpBtn.addEventListener('mousedown', () => { if (canJump) { velocity.y = 15; canJump = false; } });
         }
@@ -333,7 +515,6 @@
         function setupJoystick() {
             const container = document.getElementById('joystick-container');
             const knob = document.getElementById('joystick-knob');
-            
             let isDragging = false;
             let center = { x: 0, y: 0 };
             let maxRadius = 0;
@@ -345,41 +526,21 @@
                 maxRadius = (rect.width / 2) - 10;
             };
 
-            const startDrag = (e) => {
-                e.preventDefault();
-                isDragging = true;
-                updateCenter();
-                knob.style.transition = 'none';
-                moveDrag(e);
-            };
-
+            const startDrag = (e) => { e.preventDefault(); isDragging = true; updateCenter(); knob.style.transition = 'none'; moveDrag(e); };
             const moveDrag = (e) => {
                 if (!isDragging) return;
                 e.preventDefault();
                 let clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
                 let deltaX = clientX - center.x;
                 let deltaY = clientY - center.y;
                 let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-                if (distance > maxRadius) {
-                    let ratio = maxRadius / distance;
-                    deltaX *= ratio;
-                    deltaY *= ratio;
-                }
-
+                if (distance > maxRadius) { let ratio = maxRadius / distance; deltaX *= ratio; deltaY *= ratio; }
                 knob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                 joyVector.x = deltaX / maxRadius;
                 joyVector.y = deltaY / maxRadius;
             };
-
-            const endDrag = () => {
-                isDragging = false;
-                joyVector = { x: 0, y: 0 };
-                knob.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                knob.style.transform = `translate(0px, 0px)`;
-            };
+            const endDrag = () => { isDragging = false; joyVector = { x: 0, y: 0 }; knob.style.transition = 'transform 0.2s'; knob.style.transform = `translate(0px, 0px)`; };
 
             container.addEventListener('touchstart', startDrag, { passive: false });
             container.addEventListener('touchmove', moveDrag, { passive: false });
@@ -391,9 +552,7 @@
 
         function setupTouchLook() {
             const lookZone = document.getElementById('look-zone');
-            let lookTouchId = null;
-            let lastTouchX = 0;
-            let lastTouchY = 0;
+            let lookTouchId = null; let lastTouchX = 0; let lastTouchY = 0;
             const sensitivity = 0.005;
 
             lookZone.addEventListener('touchstart', (e) => {
@@ -401,8 +560,7 @@
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     if (lookTouchId === null) {
                         lookTouchId = e.changedTouches[i].identifier;
-                        lastTouchX = e.changedTouches[i].pageX;
-                        lastTouchY = e.changedTouches[i].pageY;
+                        lastTouchX = e.changedTouches[i].pageX; lastTouchY = e.changedTouches[i].pageY;
                         break;
                     }
                 }
@@ -412,28 +570,21 @@
                 e.preventDefault();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     if (e.changedTouches[i].identifier === lookTouchId) {
-                        const currentX = e.changedTouches[i].pageX;
-                        const currentY = e.changedTouches[i].pageY;
+                        const currentX = e.changedTouches[i].pageX; const currentY = e.changedTouches[i].pageY;
                         camYaw -= (currentX - lastTouchX) * sensitivity;
                         camPitch -= (currentY - lastTouchY) * sensitivity;
-                        camPitch = Math.max(0.1, Math.min(Math.PI / 2 - 0.1, camPitch)); // Clamp pitch
-                        lastTouchX = currentX;
-                        lastTouchY = currentY;
+                        camPitch = Math.max(0.1, Math.min(Math.PI / 2 - 0.1, camPitch));
+                        lastTouchX = currentX; lastTouchY = currentY;
                     }
                 }
             }, { passive: false });
 
-            const endLook = (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === lookTouchId) lookTouchId = null;
-                }
-            };
-            lookZone.addEventListener('touchend', endLook);
-            lookZone.addEventListener('touchcancel', endLook);
+            const endLook = (e) => { for (let i = 0; i < e.changedTouches.length; i++) { if (e.changedTouches[i].identifier === lookTouchId) lookTouchId = null; } };
+            lookZone.addEventListener('touchend', endLook); lookZone.addEventListener('touchcancel', endLook);
         }
 
         function setupKeyboard() {
-            const onKeyDown = (e) => {
+            document.addEventListener('keydown', (e) => {
                 switch (e.code) {
                     case 'ArrowUp': case 'KeyW': keyVector.y = -1; break;
                     case 'ArrowDown': case 'KeyS': keyVector.y = 1; break;
@@ -441,73 +592,15 @@
                     case 'ArrowRight': case 'KeyD': keyVector.x = 1; break;
                     case 'Space': if (canJump) { velocity.y = 15; canJump = false; } break;
                 }
-            };
-            const onKeyUp = (e) => {
+            });
+            document.addEventListener('keyup', (e) => {
                 switch (e.code) {
                     case 'ArrowUp': case 'KeyW': keyVector.y = (keyVector.y === -1) ? 0 : keyVector.y; break;
                     case 'ArrowDown': case 'KeyS': keyVector.y = (keyVector.y === 1) ? 0 : keyVector.y; break;
                     case 'ArrowLeft': case 'KeyA': keyVector.x = (keyVector.x === -1) ? 0 : keyVector.x; break;
                     case 'ArrowRight': case 'KeyD': keyVector.x = (keyVector.x === 1) ? 0 : keyVector.x; break;
                 }
-            };
-            document.addEventListener('keydown', onKeyDown);
-            document.addEventListener('keyup', onKeyUp);
-        }
-
-        function buildEnvironment() {
-            // Ground
-            const groundGeo = new THREE.PlaneGeometry(400, 400);
-            const groundMat = new THREE.MeshStandardMaterial({ color: 0x9e9e9e, roughness: 1 });
-            const ground = new THREE.Mesh(groundGeo, groundMat);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
-
-            // Courtyard
-            const courtGeo = new THREE.PlaneGeometry(60, 40);
-            const courtMat = new THREE.MeshStandardMaterial({ color: 0xCD5C5C });
-            const court = new THREE.Mesh(courtGeo, courtMat);
-            court.rotation.x = -Math.PI / 2;
-            court.position.set(0, 0.05, 10);
-            court.receiveShadow = true;
-            scene.add(court);
-
-            // Field
-            const fieldGeo = new THREE.PlaneGeometry(60, 40);
-            const fieldMat = new THREE.MeshStandardMaterial({ color: 0x7CFC00 });
-            const field = new THREE.Mesh(fieldGeo, fieldMat);
-            field.rotation.x = -Math.PI / 2;
-            field.position.set(40, 0.05, 50);
-            field.receiveShadow = true;
-            scene.add(field);
-
-            // Buildings
-            createBuilding(50, 80, 20, 0, -30, 0xffffff, true);
-            createBuilding(25, 25, 40, -40, 5, 0xFFA500); 
-            createBuilding(30, 20, 20, 40, -10, 0xf5f5f5);
-            createBuilding(20, 30, 20, 40, -25, 0xffffff);
-
-            // Trees
-            const treePositions = [[-10, 30], [5, 45], [15, 35], [-20, 50], [-30, 40], [10, -5], [-15, -10], [-5, 15], [75, 30], [80, 50]];
-            treePositions.forEach(pos => createTree(pos[0], pos[1]));
-        }
-
-        function createBuilding(width, height, depth, x, z, color, hasWindows = false) {
-            const building = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), new THREE.MeshStandardMaterial({ color: color, roughness: 0.8 }));
-            building.position.set(x, height / 2, z);
-            building.castShadow = true; building.receiveShadow = true;
-            building.geometry.computeBoundingBox();
-            scene.add(building);
-            objects.push(building);
-            return building;
-        }
-
-        function createTree(x, z) {
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 3, 8), new THREE.MeshStandardMaterial({color: 0x8B4513}));
-            trunk.position.set(x, 1.5, z); trunk.castShadow = true; scene.add(trunk);
-            const leaves = new THREE.Mesh(new THREE.SphereGeometry(2.5, 8, 8), new THREE.MeshStandardMaterial({color: 0x32CD32, roughness: 0.9}));
-            leaves.position.set(x, 4, z); leaves.castShadow = true; scene.add(leaves);
-            objects.push(trunk);
+            });
         }
 
         function onWindowResize() {
@@ -519,10 +612,9 @@
         function checkCollision(nextPos) {
             const playerRadius = 1.5; 
             for (let i = 0; i < objects.length; i++) {
-                const box = new THREE.Box3().setFromObject(objects[i]);
-                box.min.x -= playerRadius; box.min.z -= playerRadius;
-                box.max.x += playerRadius; box.max.z += playerRadius;
-                if (nextPos.x > box.min.x && nextPos.x < box.max.x && nextPos.z > box.min.z && nextPos.z < box.max.z) {
+                const box = objects[i];
+                if (nextPos.x + playerRadius > box.min.x && nextPos.x - playerRadius < box.max.x && 
+                    nextPos.z + playerRadius > box.min.z && nextPos.z - playerRadius < box.max.z) {
                     if(playerGroup.position.y <= box.max.y) return true;
                 }
             }
@@ -531,7 +623,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if (!playerGroup) return; // Wait until char is selected
+            if (!playerGroup) return; 
 
             const time = performance.now();
             const delta = Math.min((time - prevTime) / 1000, 0.1); 
@@ -539,7 +631,6 @@
             let inputX = joyVector.x !== 0 ? joyVector.x : keyVector.x;
             let inputY = joyVector.y !== 0 ? joyVector.y : keyVector.y; 
 
-            // Physics & Movement
             velocity.x -= velocity.x * 10.0 * delta;
             velocity.z -= velocity.z * 10.0 * delta;
             velocity.y -= 9.8 * 5.0 * delta;
@@ -553,17 +644,12 @@
                 velocity.add(forward.multiplyScalar(inputY * speed * delta));
                 velocity.add(right.multiplyScalar(inputX * speed * delta));
                 
-                // Rotate player to face movement direction
                 playerGroup.rotation.y = Math.atan2(velocity.x, velocity.z);
 
-                // Animate limbs
                 walkTime += delta * 15;
-                limbs.leftArm.rotation.x = Math.sin(walkTime) * 0.5;
-                limbs.rightArm.rotation.x = -Math.sin(walkTime) * 0.5;
-                limbs.leftLeg.rotation.x = -Math.sin(walkTime) * 0.5;
-                limbs.rightLeg.rotation.x = Math.sin(walkTime) * 0.5;
+                limbs.leftArm.rotation.x = Math.sin(walkTime) * 0.5; limbs.rightArm.rotation.x = -Math.sin(walkTime) * 0.5;
+                limbs.leftLeg.rotation.x = -Math.sin(walkTime) * 0.5; limbs.rightLeg.rotation.x = Math.sin(walkTime) * 0.5;
             } else {
-                // Reset limbs
                 limbs.leftArm.rotation.x = 0; limbs.rightArm.rotation.x = 0;
                 limbs.leftLeg.rotation.x = 0; limbs.rightLeg.rotation.x = 0;
             }
@@ -584,15 +670,11 @@
                 canJump = true;
             }
 
-            // Smooth zoom transition
             currentCameraDist += (targetCameraDist - currentCameraDist) * 0.1;
-
-            // Third Person Camera Math
             camera.position.x = playerGroup.position.x - currentCameraDist * Math.sin(camYaw) * Math.cos(camPitch);
-            camera.position.y = playerGroup.position.y + 2 + currentCameraDist * Math.sin(camPitch); // +2 for height offset
+            camera.position.y = playerGroup.position.y + 2 + currentCameraDist * Math.sin(camPitch); 
             camera.position.z = playerGroup.position.z - currentCameraDist * Math.cos(camYaw) * Math.cos(camPitch);
-            
-            camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0, 2, 0))); // Look at player chest/head
+            camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0, 2, 0))); 
 
             prevTime = time;
             renderer.render(scene, camera);
