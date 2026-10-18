@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Campus Explorer 3D</title>
+    <title>童話城堡大偵探：誰動了我的水果？</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,671 +13,1165 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #87CEEB;
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+            font-family: 'PingFang HK', 'Microsoft JhengHei', 'Comic Sans MS', sans-serif;
+            background-color: #dcd0ff;
             touch-action: none;
         }
-        #game-canvas {
-            width: 100vw;
-            height: 100vh;
+        canvas {
             display: block;
         }
-        
-        /* Pastel Purple UI Theme */
-        #ui-layer {
+
+        /* 1. 開始選單 (粉彩紫童話風格) */
+        #startScreen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #fdfbfb 0%, #e6d5fa 50%, #cbb4d4 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, rgba(230, 230, 250, 0.95), rgba(216, 191, 216, 0.95));
-            color: #4B0082;
-            z-index: 10;
-            transition: opacity 0.5s;
-        }
-        
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
+            z-index: 50;
             text-align: center;
-            text-shadow: 3px 3px 0px #fff, 5px 5px 0px rgba(147, 112, 219, 0.5);
-            color: #9370DB;
+            padding: 20px;
         }
-        p {
-            font-size: 1.3rem;
+        .castle-badge {
+            font-size: 4rem;
+            margin-bottom: 5px;
+            animation: float 2.5s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        #startScreen h1 {
+            color: #6a1b9a;
+            font-size: 2.6rem;
+            text-shadow: 2px 3px 0px #ffffff, 0 5px 15px rgba(106,27,154,0.25);
+            margin: 10px 0;
+        }
+        #startScreen p {
+            font-size: 1.35rem;
+            color: #5e35b1;
             margin-bottom: 25px;
-            text-align: center;
             font-weight: bold;
-            color: #6A5ACD;
         }
-        
         .char-select {
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-
-        .btn {
-            padding: 20px 40px;
+        .char-card {
+            background: white;
+            border: 5px solid #b39ddb;
+            border-radius: 28px;
+            padding: 20px 35px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(106, 27, 154, 0.15);
+            transition: all 0.25s;
+        }
+        .char-card:hover, .char-card:active {
+            transform: translateY(-8px) scale(1.05);
+            border-color: #ec407a;
+            background-color: #fce4ec;
+        }
+        .char-icon {
+            font-size: 4.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .char-title {
             font-size: 1.5rem;
             font-weight: bold;
-            font-family: inherit;
-            color: white;
-            border: 4px solid #fff;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-        }
-        .btn-boy { background: linear-gradient(to bottom, #87CEFA, #4169E1); }
-        .btn-girl { background: linear-gradient(to bottom, #FFB6C1, #FF69B4); }
-        
-        .btn:active {
-            transform: scale(0.95) translateY(4px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            color: #4a148c;
         }
 
-        /* Virtual Joystick */
-        #joystick-container {
+        /* 2. 頂部任務提示欄 */
+        #hudTop {
             position: absolute;
-            bottom: 40px;
-            left: 40px;
-            width: 140px;
-            height: 140px;
-            background-color: rgba(230, 230, 250, 0.4);
-            border: 4px solid rgba(186, 85, 211, 0.6);
-            border-radius: 50%;
-            z-index: 20;
-            display: none;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        #joystick-knob {
-            position: absolute;
-            top: 36px;
-            left: 36px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #E6E6FA, #BA55D3);
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            pointer-events: none;
-            transition: transform 0.1s ease-out;
-        }
-
-        /* Action Buttons */
-        .action-btn {
-            position: absolute;
-            right: 40px;
-            background: linear-gradient(to bottom, #DDA0DD, #9370DB);
-            border: 4px solid white;
-            border-radius: 50%;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            color: white;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.92);
+            border: 4px solid #9575cd;
+            border-radius: 30px;
+            padding: 10px 28px;
+            font-size: 1.2rem;
             font-weight: bold;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            z-index: 20;
-            cursor: pointer;
+            color: #4a148c;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            z-index: 10;
+            display: none;
+            text-align: center;
+            white-space: nowrap;
         }
-        .action-btn:active {
-            transform: scale(0.9) translateY(4px);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        #zoom-out-btn { bottom: 220px; width: 60px; height: 60px; font-size: 2rem; }
-        #zoom-in-btn { bottom: 140px; width: 60px; height: 60px; font-size: 2rem; }
-        #jump-btn { bottom: 40px; width: 80px; height: 80px; font-size: 2rem; }
-
-        /* Touch Look Zone */
-        #look-zone {
+        #clueButton {
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 60%;
-            height: 100%;
+            top: 15px;
+            right: 20px;
+            background: #ff80ab;
+            color: white;
+            border: 3px solid white;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+            display: none;
+        }
+
+        /* 3. 虛擬方向桿 (左下) 與 跳躍鍵 (右下) */
+        #controlsUI {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
             z-index: 15;
             display: none;
         }
+        #joystickZone {
+            position: absolute;
+            bottom: 35px;
+            left: 35px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(179,157,219,0.5) 100%);
+            border: 5px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            pointer-events: auto;
+            touch-action: none;
+        }
+        #joystickKnob {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 64px; height: 64px;
+            margin-top: -32px; margin-left: -32px;
+            background: radial-gradient(circle at 30% 30%, #ba68c8, #7b1fa2);
+            border: 4px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        #jumpBtn {
+            position: absolute;
+            bottom: 45px;
+            right: 40px;
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle at 30% 30%, #ff8a80, #e53935);
+            border: 5px solid #ffffff;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+        #jumpBtn:active {
+            transform: scale(0.92);
+            background: #c62828;
+        }
 
-        @media (max-width: 768px) {
-            #joystick-container { bottom: 20px; left: 20px; width: 120px; height: 120px; }
-            #joystick-knob { top: 31px; left: 31px; width: 50px; height: 50px; }
-            .action-btn { right: 20px; }
-            #zoom-out-btn { bottom: 180px; width: 50px; height: 50px; }
-            #zoom-in-btn { bottom: 110px; width: 50px; height: 50px; }
-            #jump-btn { bottom: 20px; width: 70px; height: 70px; }
-            h1 { font-size: 2.5rem; }
-            .btn { padding: 15px 30px; font-size: 1.2rem; }
+        /* 4. 對話框 UI */
+        #dialogBox {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 720px;
+            background: rgba(255, 255, 255, 0.97);
+            border: 6px solid #ab47bc;
+            border-radius: 28px;
+            padding: 22px 28px;
+            z-index: 30;
+            display: none;
+            box-shadow: 0 12px 30px rgba(74, 20, 140, 0.35);
+        }
+        #dialogHeader {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        #dialogBadge {
+            background: #ab47bc;
+            color: white;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 1.35rem;
+            font-weight: bold;
+        }
+        #dialogText {
+            font-size: 1.35rem;
+            line-height: 1.6;
+            color: #2c2c2c;
+            margin-bottom: 16px;
+            white-space: pre-line;
+        }
+        .dialog-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: #7e57c2;
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .action-btn.accuse {
+            background: #ec407a;
+        }
+        .action-btn.restart {
+            background: #26a69a;
+        }
+        .action-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        /* 房間名牌提示 */
+        #roomBanner {
+            position: absolute;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(123, 31, 162, 0.85);
+            color: #fff;
+            padding: 6px 22px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            z-index: 8;
+            display: none;
+            pointer-events: none;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="ui-layer">
-        <h1>Campus Explorer</h1>
-        <p>Choose your character to start!</p>
+    <!-- 1. 角色選擇開始畫面 -->
+    <div id="startScreen">
+        <div class="castle-badge">🏰🔍🍎</div>
+        <h1>童話城堡大偵探：誰動了我的水果？</h1>
+        <p>請選擇你的 3D 動畫小偵探角色進入城堡：</p>
         <div class="char-select">
-            <button class="btn btn-boy" id="btn-boy">👦 Boy</button>
-            <button class="btn btn-girl" id="btn-girl">👧 Girl</button>
+            <div class="char-card" onclick="startGame('boy')">
+                <span class="char-icon">👦🏻</span>
+                <span class="char-title">小男孩偵探</span>
+            </div>
+            <div class="char-card" onclick="startGame('girl')">
+                <span class="char-icon">👧🏻</span>
+                <span class="char-title">小女孩偵探</span>
+            </div>
         </div>
     </div>
-    
-    <div id="joystick-container"><div id="joystick-knob"></div></div>
-    <div id="look-zone"></div>
-    
-    <div id="zoom-out-btn" class="action-btn">-</div>
-    <div id="zoom-in-btn" class="action-btn">+</div>
-    <div id="jump-btn" class="action-btn">⬆️</div>
 
+    <!-- 2. 頂部任務欄與線索卡按鈕 -->
+    <div id="hudTop">🎯 任務：推動左下角方向桿，走進左前方【書房】找大象爺爺報案！</div>
+    <button id="clueButton" onclick="showClueCard()">📜 查看挑戰紙條</button>
+    <div id="roomBanner">📍 中央皇家走廊</div>
+
+    <!-- 3. 對話框 -->
+    <div id="dialogBox">
+        <div id="dialogHeader">
+            <span id="dialogBadge">大象爺爺</span>
+        </div>
+        <div id="dialogText">對話內容</div>
+        <div class="dialog-actions" id="dialogButtons">
+            <button class="action-btn" onclick="closeDialog()">知道啦！</button>
+        </div>
+    </div>
+
+    <!-- 4. 虛擬搖桿與跳躍按鈕 -->
+    <div id="controlsUI">
+        <div id="joystickZone">
+            <div id="joystickKnob"></div>
+        </div>
+        <div id="jumpBtn" id="jumpButton">
+            <span>⬆️</span>
+            <span>跳躍</span>
+        </div>
+    </div>
+
+    <!-- 引入 Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let camera, scene, renderer;
+        // ================= 遊戲核心變數 =================
+        let scene, camera, renderer;
+        let playerGroup, leftArm, rightArm, leftLeg, rightLeg;
+        let elephantGroup, rabbitGroup, monkeyGroup, hedgehogGroup, appleGroup;
+        let suspectClickableMeshes = [];
+        let wallColliders = []; // 牆壁碰撞箱
+
+        let gameState = 'START'; // START, FIND_ELEPHANT, INVESTIGATE, ENDING
+        let playerGender = 'girl';
+        let hasAcceptedQuest = false;
+
+        // 角色物理與動畫
+        let playerVelocityY = 0;
+        let isGrounded = true;
+        const moveSpeed = 28;
+        const jumpForce = 42;
+        const gravity = 98;
+        let walkCycle = 0;
+
+        // 虛擬方向桿狀態
+        let joyInput = { x: 0, y: 0 }; // x: 左右轉向/移動, y: 前後移動
+        let cameraYaw = 0; // 鏡頭水平角度
+
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
         let prevTime = performance.now();
-        const velocity = new THREE.Vector3();
-        
-        let playerGroup;
-        let limbs = { leftArm: null, rightArm: null, leftLeg: null, rightLeg: null };
-        let walkTime = 0; 
 
-        // Inputs
-        let joyVector = { x: 0, y: 0 }; 
-        let keyVector = { x: 0, y: 0 };
-        let canJump = false;
-        
-        // Camera offsets & rotation
-        let camPitch = Math.PI / 8; 
-        let camYaw = Math.PI;   
-        
-        // Zoom Variables
-        let targetCameraDist = 25;
-        let currentCameraDist = 25;
-        const MIN_ZOOM = 10;
-        const MAX_ZOOM = 50;
+        // ================= 啟動遊戲 =================
+        function startGame(gender) {
+            playerGender = gender;
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('hudTop').style.display = 'block';
+            document.getElementById('roomBanner').style.display = 'block';
+            document.getElementById('controlsUI').style.display = 'block';
 
-        const objects = []; 
+            initScene();
+            initJoystickAndButtons();
+            gameState = 'FIND_ELEPHANT';
 
-        init();
-        animate();
+            showDialog(
+                "🏰 歡迎來到童話城堡",
+                `你好，勇敢的${gender === 'boy' ? '小男孩' : '小女孩'}偵探！\n請滑動左下角的【紫色方向桿】控制主角走動，先到左前方的【1號房：大象爺爺書房】找村長了解案情吧！`,
+                [{ text: "出發調查！", action: closeDialog }]
+            );
+        }
 
-        function init() {
+        // ================= 初始化 3D 場景與動畫材質 =================
+        function initScene() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB); 
-            scene.fog = new THREE.Fog(0x87CEEB, 100, 400);
+            scene.background = new THREE.Color(0xdcd0ff);
+            scene.fog = new THREE.FogExp2(0xdcd0ff, 0.0035);
 
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 500);
 
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(-100, 150, 100);
-            dirLight.castShadow = true;
-            dirLight.shadow.camera.top = 150;
-            dirLight.shadow.camera.bottom = -150;
-            dirLight.shadow.camera.left = -150;
-            dirLight.shadow.camera.right = 150;
-            dirLight.shadow.mapSize.width = 2048;
-            dirLight.shadow.mapSize.height = 2048;
-            scene.add(dirLight);
-
-            buildEnhancedEnvironment();
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.appendChild(renderer.domElement);
 
-            setupUI();
-            setupJoystick();
-            setupTouchLook();
-            setupKeyboard();
-            setupZoom();
+            // 溫暖的動畫風打光
+            const hemiLight = new THREE.HemisphereLight(0xfff8ff, 0xb39ddb, 0.75);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xfffdf0, 0.85);
+            dirLight.position.set(60, 120, 80);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            dirLight.shadow.camera.left = -120;
+            dirLight.shadow.camera.right = 120;
+            dirLight.shadow.camera.top = 120;
+            dirLight.shadow.camera.bottom = -120;
+            scene.add(dirLight);
+
+            // 建立整座城堡與 4 間房間佈置
+            buildCastleAndRooms();
+
+            // 建立 3D 動畫風主角
+            createAnimatedHero(playerGender);
+
+            // 建立大象爺爺與 3 位嫌疑犯 + 藏匿的大蘋果
+            createAllNPCs();
 
             window.addEventListener('resize', onWindowResize);
+            renderer.domElement.addEventListener('pointerdown', onPointerDownScene);
+
+            prevTime = performance.now();
+            animate();
         }
 
-        function setupUI() {
-            const uiLayer = document.getElementById('ui-layer');
-            document.getElementById('btn-boy').addEventListener('click', () => startGame('boy'));
-            document.getElementById('btn-girl').addEventListener('click', () => startGame('girl'));
+        // 輔助函式：卡通光滑材質
+        function toonMat(color) {
+            return new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.35,
+                metalness: 0.05
+            });
+        }
 
-            function startGame(charType) {
-                uiLayer.style.display = 'none';
-                document.getElementById('joystick-container').style.display = 'block';
-                document.getElementById('look-zone').style.display = 'block';
-                document.querySelectorAll('.action-btn').forEach(btn => btn.style.display = 'flex');
-                createCharacter(charType);
+        // 輔助函式：建立帶碰撞的牆壁
+        function addWall(w, h, d, x, y, z, color = 0xf3e5f5, hasCollision = true) {
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), toonMat(color));
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            if (hasCollision) {
+                const box = new THREE.Box3().setFromObject(mesh);
+                wallColliders.push(box);
             }
+            return mesh;
         }
 
-        function createCharacter(type) {
+        // ================= 建造城堡、走廊與 4 個主題房間 =================
+        function buildCastleAndRooms() {
+            // 城堡總地板 (寬 120 x 深 140)
+            const mainFloor = new THREE.Mesh(new THREE.PlaneGeometry(140, 160), toonMat(0xf5f0ff));
+            mainFloor.rotation.x = -Math.PI / 2;
+            mainFloor.receiveShadow = true;
+            scene.add(mainFloor);
+
+            // 中央皇家走廊紅紫地毯 (x: -14 ~ 14, z: -70 ~ 70)
+            const carpet = new THREE.Mesh(new THREE.BoxGeometry(16, 0.2, 136), toonMat(0xab47bc));
+            carpet.position.set(0, 0.1, 0);
+            carpet.receiveShadow = true;
+            scene.add(carpet);
+
+            const carpetGoldTrimL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.25, 136), toonMat(0xffd54f));
+            carpetGoldTrimL.position.set(-7.6, 0.12, 0);
+            scene.add(carpetGoldTrimL);
+            const carpetGoldTrimR = carpetGoldTrimL.clone();
+            carpetGoldTrimR.position.set(7.6, 0.12, 0);
+            scene.add(carpetGoldTrimR);
+
+            // 4 個房間的專屬彩色地板
+            const addRoomFloor = (x, z, color) => {
+                const rf = new THREE.Mesh(new THREE.BoxGeometry(44, 0.15, 56), toonMat(color));
+                rf.position.set(x, 0.08, z);
+                rf.receiveShadow = true;
+                scene.add(rf);
+            };
+            addRoomFloor(-38, 34, 0xfff9c4);  // 1. 左前：大象書房 (暖黃)
+            addRoomFloor(38, 34, 0xe1f5fe);   // 2. 右前：玩具遊戲室 (粉藍)
+            addRoomFloor(-38, -34, 0xe8f5e9); // 3. 左後：室內花園房 (粉綠)
+            addRoomFloor(38, -34, 0xfce4ec);  // 4. 右後：皇室客廳 (粉紅)
+
+            const wallH = 22;
+            const wallColor = 0xede7f6;
+            const pillarColor = 0xd1c4e9;
+
+            // 外圍城堡大牆
+            addWall(124, wallH, 4, 0, wallH/2, -66, wallColor); // 北牆
+            addWall(124, wallH, 4, 0, wallH/2, 66, wallColor);  // 南牆
+            addWall(4, wallH, 132, -62, wallH/2, 0, wallColor); // 西牆
+            addWall(4, wallH, 132, 62, wallH/2, 0, wallColor);  // 東牆
+
+            // 房間之間的中隔牆 (橫向 z = 0)
+            addWall(44, wallH, 3, -38, wallH/2, 0, 0xe1bee7);
+            addWall(44, wallH, 3, 38, wallH/2, 0, 0xe1bee7);
+
+            // 走廊與房間的隔牆 (留出寬敞拱門供進出)
+            // 左側隔牆 (x = -16)，門洞在 z=34 及 z=-34
+            addWall(3, wallH, 18, -16, wallH/2, 55, pillarColor);
+            addWall(3, wallH, 28, -16, wallH/2, 0, pillarColor);
+            addWall(3, wallH, 18, -16, wallH/2, -55, pillarColor);
+
+            // 右側隔牆 (x = 16)，門洞在 z=34 及 z=-34
+            addWall(3, wallH, 18, 16, wallH/2, 55, pillarColor);
+            addWall(3, wallH, 28, 16, wallH/2, 0, pillarColor);
+            addWall(3, wallH, 18, 16, wallH/2, -55, pillarColor);
+
+            // 門楣裝飾 (無碰撞，讓門看起來像城堡拱門)
+            const addDoorHeader = (x, z, badgeColor) => {
+                addWall(3.5, 6, 24, x, 19, z, badgeColor, false);
+            };
+            addDoorHeader(-16, 34, 0xffca28);
+            addDoorHeader(16, 34, 0x29b6f6);
+            addDoorHeader(-16, -34, 0x66bb6a);
+            addDoorHeader(16, -34, 0xec407a);
+
+            // 城堡四角童話高塔 (尖頂圓錐)
+            const createTower = (x, z) => {
+                const tower = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 36, 16), toonMat(0xd1c4e9));
+                tower.position.set(x, 18, z);
+                scene.add(tower);
+                const roof = new THREE.Mesh(new THREE.ConeGeometry(11, 16, 16), toonMat(0x8e24aa));
+                roof.position.set(x, 44, z);
+                scene.add(roof);
+            };
+            createTower(-62, -66);
+            createTower(62, -66);
+            createTower(-62, 66);
+            createTower(62, 66);
+
+            // -------- 佈置中央走廊 --------
+            for (let z = -45; z <= 45; z += 30) {
+                // 走廊金色壁畫與花瓶
+                const frameL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 7, 9), toonMat(0xffca28));
+                frameL.position.set(-14.2, 11, z);
+                scene.add(frameL);
+                const artL = new THREE.Mesh(new THREE.BoxGeometry(0.7, 5, 7), toonMat(0x80deea));
+                artL.position.set(-14.1, 11, z);
+                scene.add(artL);
+
+                const frameR = frameL.clone();
+                frameR.position.set(14.2, 11, z);
+                scene.add(frameR);
+                const artR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 5, 7), toonMat(0xf48fb1));
+                artR.position.set(14.1, 11, z);
+                scene.add(artR);
+
+                // 走廊羅馬花柱
+                const pedL = addWall(2.5, 4, 2.5, -12, 2, z + 10, 0xffffff, false);
+                const plantL = new THREE.Mesh(new THREE.SphereGeometry(2, 12, 12), toonMat(0x66bb6a));
+                plantL.position.set(-12, 5.2, z + 10);
+                scene.add(plantL);
+
+                const pedR = addWall(2.5, 4, 2.5, 12, 2, z + 10, 0xffffff, false);
+                const plantR = plantL.clone();
+                plantR.position.set(12, 5.2, z + 10);
+                scene.add(plantR);
+            }
+
+            // -------- 佈置房間 1：大象爺爺的書房 (左前: x=-38, z=34) --------
+            // 大木書桌
+            addWall(14, 4.5, 8, -42, 2.25, 34, 0x8d6e63);
+            // 桌上的粉紅色神祕挑戰信封
+            const noteCard = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.3, 1.8), toonMat(0xff80ab));
+            noteCard.position.set(-40, 4.7, 34);
+            scene.add(noteCard);
+            // 書櫃與彩色書本
+            addWall(4, 15, 22, -57, 7.5, 34, 0x6d4c41);
+            const bookColors = [0xef5350, 0x42a5f5, 0x66bb6a, 0xffca28, 0xab47bc];
+            for (let i = 0; i < 5; i++) {
+                const book = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 3), toonMat(bookColors[i]));
+                book.position.set(-55, 4 + i * 2.5, 28 + i * 2.5);
+                scene.add(book);
+            }
+            // 大地球儀裝飾
+            const globeStand = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 2, 4, 12), toonMat(0xffb300));
+            globeStand.position.set(-28, 2, 52);
+            scene.add(globeStand);
+            const globeSphere = new THREE.Mesh(new THREE.SphereGeometry(2.8, 16, 16), toonMat(0x29b6f6));
+            globeSphere.position.set(-28, 6, 52);
+            scene.add(globeSphere);
+
+            // -------- 佈置房間 2：玩具遊戲室 - 跳跳兔與小猴子 (右前: x=38, z=34) --------
+            // 彩色大積木塔
+            addWall(5, 5, 5, 50, 2.5, 50, 0xff7043);
+            addWall(5, 5, 5, 45, 2.5, 52, 0x42a5f5);
+            addWall(4.5, 4.5, 4.5, 47.5, 7.25, 51, 0xffca28);
+            // 小帳篷
+            const tent = new THREE.Mesh(new THREE.ConeGeometry(8, 12, 6), toonMat(0xff80ab));
+            tent.position.set(50, 6, 18);
+            scene.add(tent);
+            // 證物 1：跳跳兔旁的半截紅蘿蔔
+            const carrot = new THREE.Mesh(new THREE.ConeGeometry(1.2, 4.5, 12), toonMat(0xff5722));
+            carrot.rotation.z = Math.PI / 2.2;
+            carrot.position.set(27, 1, 47);
+            scene.add(carrot);
+            // 證物 2：小猴子旁的黃色香蕉皮
+            const banana = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.5, 8, 12, Math.PI), toonMat(0xffeb3b));
+            banana.rotation.x = Math.PI / 2;
+            banana.position.set(39, 0.6, 26);
+            scene.add(banana);
+
+            // -------- 佈置房間 3：室內自然花園 - 刺蝟弟弟 (左後: x=-38, z=-34) --------
+            // 巨大童話紅傘蘑菇
+            const createMushroom = (mx, mz, scale) => {
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(1.2*scale, 1.6*scale, 4*scale, 12), toonMat(0xfff9c4));
+                stem.position.set(mx, 2*scale, mz);
+                scene.add(stem);
+                const cap = new THREE.Mesh(new THREE.SphereGeometry(3.5*scale, 16, 12, 0, Math.PI*2, 0, Math.PI/2), toonMat(0xff5252));
+                cap.position.set(mx, 4*scale, mz);
+                scene.add(cap);
+            };
+            createMushroom(-52, -50, 1.3);
+            createMushroom(-46, -54, 0.9);
+            createMushroom(-26, -52, 1.1);
+            // 綠色花叢與樹木
+            for (let i = 0; i < 4; i++) {
+                const bush = new THREE.Mesh(new THREE.SphereGeometry(4, 14, 14), toonMat(0x4caf50));
+                bush.position.set(-54, 3, -15 - i * 8);
+                scene.add(bush);
+            }
+            // 證物 3：刺蝟掉落的深色刺毛
+            const quill = new THREE.Mesh(new THREE.ConeGeometry(0.5, 3.5, 8), toonMat(0x4e342e));
+            quill.rotation.z = Math.PI / 2;
+            quill.position.set(-34, 0.6, -28);
+            scene.add(quill);
+
+            // -------- 佈置房間 4：皇室客廳 - 藏著大蘋果 (右後: x=38, z=-34) --------
+            // 豪華粉紫大梳化 (大蘋果藏在梳化後面)
+            addWall(20, 5, 7, 42, 2.5, -42, 0xec407a); // 梳化底座
+            addWall(20, 9, 2.5, 42, 4.5, -45, 0xd81b60); // 梳化靠背
+            addWall(3, 7, 7, 32, 3.5, -42, 0xd81b60);  // 左扶手
+            addWall(3, 7, 7, 52, 3.5, -42, 0xd81b60);  // 右扶手
+            // 梳化上的圓形抱枕
+            const pillow = new THREE.Mesh(new THREE.SphereGeometry(2.2, 12, 12), toonMat(0xfff176));
+            pillow.position.set(36, 6, -42);
+            scene.add(pillow);
+            // 客廳白色圓茶几
+            const table = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 3, 20), toonMat(0xffffff));
+            table.position.set(42, 1.5, -28);
+            scene.add(table);
+        }
+
+        // ================= 建立 3D 動畫風主角 =================
+        function createAnimatedHero(gender) {
             playerGroup = new THREE.Group();
-            playerGroup.position.set(0, 0, 80); 
-            
-            const headMat = new THREE.MeshStandardMaterial({color: 0xFFDAB9}); 
-            const headGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 3.6;
-            head.castShadow = true;
-            playerGroup.add(head);
 
-            let bodyMat, legMat;
-            if(type === 'boy') {
-                bodyMat = new THREE.MeshStandardMaterial({color: 0x4169E1}); 
-                legMat = new THREE.MeshStandardMaterial({color: 0x333333});  
-            } else {
-                bodyMat = new THREE.MeshStandardMaterial({color: 0xFF69B4}); 
-                legMat = new THREE.MeshStandardMaterial({color: 0xFFFFFF});  
+            const skinMat = toonMat(0xffe0b2);
+            const outfitColor = gender === 'boy' ? 0x42a5f5 : 0xab47bc; // 男孩亮藍，女孩粉紫
+            const accentColor = gender === 'boy' ? 0x1976d2 : 0xf48fb1;
+            const hairColor = gender === 'boy' ? 0x3e2723 : 0x4e342e;
+
+            // 1. 身體 (女孩穿可愛喇叭裙，男孩穿偵探大衣)
+            const bodyGeo = gender === 'girl'
+                ? new THREE.CylinderGeometry(1.6, 2.8, 4.2, 16)
+                : new THREE.BoxGeometry(3.2, 4.2, 2.2);
+            const bodyMesh = new THREE.Mesh(bodyGeo, toonMat(outfitColor));
+            bodyMesh.position.y = 4.6;
+            bodyMesh.castShadow = true;
+            playerGroup.add(bodyMesh);
+
+            // 小書包 (背後)
+            const backpack = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.8, 1.2), toonMat(accentColor));
+            backpack.position.set(0, 4.8, 1.3);
+            playerGroup.add(backpack);
+
+            // 2. 大頭 (Q版比例)
+            const headMesh = new THREE.Mesh(new THREE.SphereGeometry(2.2, 20, 20), skinMat);
+            headMesh.position.y = 8.4;
+            headMesh.castShadow = true;
+            playerGroup.add(headMesh);
+
+            // 眼睛 (朝向 -Z 前方)
+            const eyeMat = toonMat(0x111111);
+            const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), eyeMat);
+            eyeL.position.set(-0.75, 8.6, -1.95);
+            const eyeR = eyeL.clone();
+            eyeR.position.set(0.75, 8.6, -1.95);
+            playerGroup.add(eyeL, eyeR);
+
+            // 粉紅臉頰
+            const cheekMat = toonMat(0xff8a80);
+            const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 8), cheekMat);
+            cheekL.position.set(-1.3, 8.1, -1.75);
+            const cheekR = cheekL.clone();
+            cheekR.position.set(1.3, 8.1, -1.75);
+            playerGroup.add(cheekL, cheekR);
+
+            // 頭髮與女孩雙馬尾
+            const hairCap = new THREE.Mesh(new THREE.SphereGeometry(2.3, 16, 12, 0, Math.PI * 2, 0, Math.PI / 1.8), toonMat(hairColor));
+            hairCap.position.y = 8.5;
+            playerGroup.add(hairCap);
+
+            if (gender === 'girl') {
+                const tailL = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 12), toonMat(hairColor));
+                tailL.position.set(-2.3, 8.2, 0.5);
+                const tailR = tailL.clone();
+                tailR.position.set(2.3, 8.2, 0.5);
+                playerGroup.add(tailL, tailR);
             }
 
-            const bodyGeo = new THREE.BoxGeometry(1.5, 2, 0.8);
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 2;
-            body.castShadow = true;
-            playerGroup.add(body);
+            // 偵探獵鹿帽 (卡其色)
+            const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.4, 16), toonMat(0xd7ccc8));
+            hatBrim.position.y = 10.1;
+            const hatTop = new THREE.Mesh(new THREE.SphereGeometry(2.0, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), toonMat(0xbcaaa4));
+            hatTop.position.y = 10.2;
+            playerGroup.add(hatBrim, hatTop);
 
-            const limbGeo = new THREE.BoxGeometry(0.5, 1.5, 0.5);
-            limbs.leftArm = new THREE.Mesh(limbGeo, bodyMat); limbs.leftArm.position.set(-1.1, 2.2, 0); limbs.leftArm.castShadow = true; playerGroup.add(limbs.leftArm);
-            limbs.rightArm = new THREE.Mesh(limbGeo, bodyMat); limbs.rightArm.position.set(1.1, 2.2, 0); limbs.rightArm.castShadow = true; playerGroup.add(limbs.rightArm);
-            limbs.leftLeg = new THREE.Mesh(limbGeo, legMat); limbs.leftLeg.position.set(-0.4, 0.5, 0); limbs.leftLeg.castShadow = true; playerGroup.add(limbs.leftLeg);
-            limbs.rightLeg = new THREE.Mesh(limbGeo, legMat); limbs.rightLeg.position.set(0.4, 0.5, 0); limbs.rightLeg.castShadow = true; playerGroup.add(limbs.rightLeg);
+            // 3. 手臂 (帶轉軸關節，走路會擺動)
+            leftArm = new THREE.Group();
+            leftArm.position.set(-2.1, 6.2, 0);
+            const armMeshL = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2.8, 10), toonMat(outfitColor));
+            armMeshL.position.y = -1.2;
+            leftArm.add(armMeshL);
+            playerGroup.add(leftArm);
 
+            rightArm = new THREE.Group();
+            rightArm.position.set(2.1, 6.2, 0);
+            const armMeshR = armMeshL.clone();
+            // 右手拿著紅色放大鏡
+            const magHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 1.5, 8), toonMat(0x5d4037));
+            magHandle.rotation.x = Math.PI / 2;
+            magHandle.position.set(0, -2.5, -0.8);
+            const magRing = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.2, 8, 16), toonMat(0xe53935));
+            magRing.position.set(0, -2.5, -2.0);
+            rightArm.add(armMeshR, magHandle, magRing);
+            playerGroup.add(rightArm);
+
+            // 4. 雙腿 (帶轉軸關節，走路會交替踏步)
+            leftLeg = new THREE.Group();
+            leftLeg.position.set(-0.9, 2.6, 0);
+            const legMeshL = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.5, 2.6, 10), skinMat);
+            legMeshL.position.y = -1.3;
+            const shoeL = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 1.8), toonMat(accentColor));
+            shoeL.position.set(0, -2.3, -0.3);
+            leftLeg.add(legMeshL, shoeL);
+            playerGroup.add(leftLeg);
+
+            rightLeg = new THREE.Group();
+            rightLeg.position.set(0.9, 2.6, 0);
+            const legMeshR = legMeshL.clone();
+            const shoeR = shoeL.clone();
+            rightLeg.add(legMeshR, shoeR);
+            playerGroup.add(rightLeg);
+
+            // 主角初始位置在走廊南端入口
+            playerGroup.position.set(0, 0, 56);
             scene.add(playerGroup);
         }
 
-        // --- Environment Building ---
-        function buildEnhancedEnvironment() {
-            // Ground
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: 0x8FBC8F, roughness: 1 }));
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
+        // ================= 建立所有 3D 動畫動物角色與大蘋果 =================
+        function createAllNPCs() {
+            // 1. 大象爺爺 (房間 1：左前書房 x=-36, z=38)
+            elephantGroup = new THREE.Group();
+            const eleMat = toonMat(0x90a4ae);
+            const eleBody = new THREE.Mesh(new THREE.SphereGeometry(4.2, 18, 18), eleMat);
+            eleBody.position.y = 4.5;
+            const eleHead = new THREE.Mesh(new THREE.SphereGeometry(3.4, 18, 18), eleMat);
+            eleHead.position.y = 9.5;
+            // 長鼻子
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.6, 4.5, 12), eleMat);
+            trunk.rotation.x = -Math.PI / 4;
+            trunk.position.set(0, 8.2, 3.2);
+            // 大耳朵
+            const earGeo = new THREE.BoxGeometry(3.5, 4.5, 0.6);
+            const earL = new THREE.Mesh(earGeo, toonMat(0xb0bec5));
+            earL.position.set(-4.2, 9.5, 0);
+            const earR = earL.clone();
+            earR.position.set(4.2, 9.5, 0);
+            // 金框老花眼鏡
+            const glassL = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.15, 8, 16), toonMat(0xffd54f));
+            glassL.position.set(-1.2, 10, 3.1);
+            const glassR = glassL.clone();
+            glassR.position.set(1.2, 10, 3.1);
+            elephantGroup.add(eleBody, eleHead, trunk, earL, earR, glassL, glassR);
+            elephantGroup.position.set(-34, 0, 42);
+            elephantGroup.rotation.y = Math.PI / 4;
+            scene.add(elephantGroup);
 
-            buildMainEntrance(0, -100);
-            buildCurvedWalkway(-80, -20);
-            buildWoodLouverBuilding(80, -40);
-            buildLibrary(-70, 60);
-            buildGymnasium(70, 70);
+            // 2. 嫌疑犯一號：跳跳兔 (房間 2：右前遊戲室 x=32, z=48)
+            rabbitGroup = new THREE.Group();
+            const rabMat = toonMat(0xffffff);
+            const rabBody = new THREE.Mesh(new THREE.SphereGeometry(2.4, 16, 16), rabMat);
+            rabBody.position.y = 2.4;
+            const rabHead = new THREE.Mesh(new THREE.SphereGeometry(2.0, 16, 16), rabMat);
+            rabHead.position.y = 5.6;
+            // 超長白兔耳
+            const rabEarGeo = new THREE.CylinderGeometry(0.5, 0.5, 4.8, 12);
+            const rabEarL = new THREE.Mesh(rabEarGeo, toonMat(0xf8bbd0));
+            rabEarL.position.set(-0.9, 9.2, 0);
+            const rabEarR = rabEarL.clone();
+            rabEarR.position.set(0.9, 9.2, 0);
+            rabbitGroup.add(rabBody, rabHead, rabEarL, rabEarR);
+            rabbitGroup.position.set(32, 0, 48);
+            rabbitGroup.rotation.y = -Math.PI / 3;
+            rabbitGroup.name = "Rabbit";
+            rabBody.name = "Rabbit"; rabHead.name = "Rabbit"; rabEarL.name = "Rabbit"; rabEarR.name = "Rabbit";
+            suspectClickableMeshes.push(rabBody, rabHead, rabEarL, rabEarR);
+            scene.add(rabbitGroup);
 
-            // Trees scattered around
-            const treePositions = [[-30, -50], [30, -50], [-90, -90], [90, -90], [-20, 30], [20, 30], [-100, 20], [100, 20], [0, 120], [-40, 120], [40, 120]];
-            treePositions.forEach(pos => createTree(pos[0], pos[1]));
-        }
+            // 3. 嫌疑犯二號：小猴子 (房間 2：右前遊戲室另一側 x=42, z=22)
+            monkeyGroup = new THREE.Group();
+            const monMat = toonMat(0x8d6e63);
+            const monBody = new THREE.Mesh(new THREE.SphereGeometry(2.3, 16, 16), monMat);
+            monBody.position.y = 2.3;
+            const monHead = new THREE.Mesh(new THREE.SphereGeometry(2.0, 16, 16), monMat);
+            monHead.position.y = 5.4;
+            const monFace = new THREE.Mesh(new THREE.SphereGeometry(1.5, 12, 12), toonMat(0xffe0b2));
+            monFace.position.set(0, 5.3, -0.8);
+            // 彎彎長尾巴
+            const monTail = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 5, 10), monMat);
+            monTail.rotation.z = Math.PI / 4;
+            monTail.position.set(2.2, 3.5, 1.5);
+            monkeyGroup.add(monBody, monHead, monFace, monTail);
+            monkeyGroup.position.set(42, 0, 22);
+            monkeyGroup.name = "Monkey";
+            monBody.name = "Monkey"; monHead.name = "Monkey"; monFace.name = "Monkey";
+            suspectClickableMeshes.push(monBody, monHead, monFace);
+            scene.add(monkeyGroup);
 
-        function buildMainEntrance(x, z) {
-            const group = new THREE.Group();
-            group.position.set(x, 0, z);
-
-            // Main Building Block
-            const mainBldg = new THREE.Mesh(new THREE.BoxGeometry(80, 60, 40), new THREE.MeshStandardMaterial({color: 0xffffff}));
-            mainBldg.position.set(0, 30, -20);
-            mainBldg.castShadow = true; mainBldg.receiveShadow = true;
-            group.add(mainBldg);
-            addCollider(mainBldg, x, z);
-
-            // Grand Staircase
-            const stairCount = 12;
-            for(let i=0; i<stairCount; i++) {
-                const step = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 3), new THREE.MeshStandardMaterial({color: 0xcccccc}));
-                step.position.set(0, i * 1, i * 3);
-                step.castShadow = true; step.receiveShadow = true;
-                group.add(step);
-                addCollider(step, x, z);
+            // 4. 嫌疑犯三號：刺蝟弟弟 (房間 3：左後室內花園 x=-38, z=-32)
+            hedgehogGroup = new THREE.Group();
+            const hedBody = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), toonMat(0xd7ccc8));
+            hedBody.position.y = 2.2;
+            const hedSpikes = new THREE.Mesh(new THREE.SphereGeometry(2.7, 12, 12), toonMat(0x5d4037));
+            hedSpikes.position.set(0, 2.8, 0.6);
+            // 背上的小尖刺
+            for (let i = -1; i <= 1; i++) {
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(0.7, 2.2, 8), toonMat(0x3e2723));
+                cone.rotation.x = Math.PI / 3;
+                cone.position.set(i * 1.2, 4.5, 1.5);
+                hedgehogGroup.add(cone);
             }
+            hedgehogGroup.add(hedBody, hedSpikes);
+            hedgehogGroup.position.set(-38, 0, -32);
+            hedgehogGroup.name = "Hedgehog";
+            hedBody.name = "Hedgehog"; hedSpikes.name = "Hedgehog";
+            suspectClickableMeshes.push(hedBody, hedSpikes);
+            scene.add(hedgehogGroup);
 
-            // Front Lawn
-            const lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshStandardMaterial({color: 0x7CFC00}));
-            lawn.rotation.x = -Math.PI / 2;
-            lawn.position.set(0, 0.1, 45);
-            lawn.receiveShadow = true;
-            group.add(lawn);
-
-            // Placeholder Sign
-            const sign = new THREE.Mesh(new THREE.BoxGeometry(30, 10, 2), new THREE.MeshStandardMaterial({color: 0x4682B4}));
-            sign.position.set(0, 45, 1);
-            group.add(sign);
-
-            scene.add(group);
+            // 5. 藏在房間 4 皇室客廳梳化後面的「巨無霸紅蘋果」 (x=42, z=-54)
+            appleGroup = new THREE.Group();
+            const appleMesh = new THREE.Mesh(new THREE.SphereGeometry(3.2, 24, 24), toonMat(0xff1744));
+            appleMesh.position.y = 3.2;
+            const appleStem = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 1.8, 8), toonMat(0x5d4037));
+            appleStem.position.y = 6.5;
+            const appleLeaf = new THREE.Mesh(new THREE.SphereGeometry(0.9, 8, 8), toonMat(0x00e676));
+            appleLeaf.scale.set(1.8, 0.4, 1);
+            appleLeaf.position.set(1.0, 6.4, 0);
+            appleGroup.add(appleMesh, appleStem, appleLeaf);
+            appleGroup.position.set(42, 0, -54); // 藏在粉紅大梳化後面
+            scene.add(appleGroup);
         }
 
-        function buildCurvedWalkway(x, z) {
-            const group = new THREE.Group();
-            group.position.set(x, 0, z);
+        // ================= 虛擬方向桿與跳躍按鈕邏輯 =================
+        function initJoystickAndButtons() {
+            const zone = document.getElementById('joystickZone');
+            const knob = document.getElementById('joystickKnob');
+            const maxRadius = 48;
+            let dragging = false;
+            let activePointerId = null;
 
-            // Simulate curve with segments
-            const radius = 30;
-            const segments = 6;
-            const angleStep = (Math.PI) / segments;
+            const updateJoystick = (clientX, clientY) => {
+                const rect = zone.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
 
-            for(let i=0; i<=segments; i++) {
-                const angle = i * angleStep;
-                const px = Math.cos(angle) * radius;
-                const pz = Math.sin(angle) * radius;
+                let dx = clientX - centerX;
+                let dy = clientY - centerY;
+                const dist = Math.hypot(dx, dy);
 
-                // Floors (2 levels)
-                [15, 30].forEach(y => {
-                    const floor = new THREE.Mesh(new THREE.BoxGeometry(12, 2, 10), new THREE.MeshStandardMaterial({color: 0xf0f0f0}));
-                    floor.position.set(px, y, pz);
-                    floor.rotation.y = -angle;
-                    floor.castShadow = true; floor.receiveShadow = true;
-                    group.add(floor);
-                    
-                    // Green planters
-                    const planter = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 2), new THREE.MeshStandardMaterial({color: 0x228B22}));
-                    planter.position.set(px + Math.cos(angle)*5, y+1.5, pz + Math.sin(angle)*5);
-                    planter.rotation.y = -angle;
-                    group.add(planter);
-                });
+                if (dist > maxRadius) {
+                    dx = (dx / dist) * maxRadius;
+                    dy = (dy / dist) * maxRadius;
+                }
 
-                // Pillars
-                const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 30), new THREE.MeshStandardMaterial({color: 0xffffff}));
-                pillar.position.set(px, 15, pz);
-                pillar.castShadow = true;
-                group.add(pillar);
-                addCollider(pillar, x, z);
-            }
-            scene.add(group);
-        }
-
-        function buildWoodLouverBuilding(x, z) {
-            const group = new THREE.Group();
-            group.position.set(x, 0, z);
-
-            // Dark Grey Base
-            const base = new THREE.Mesh(new THREE.BoxGeometry(50, 20, 30), new THREE.MeshStandardMaterial({color: 0x333333}));
-            base.position.set(0, 10, 0);
-            base.castShadow = true; base.receiveShadow = true;
-            group.add(base);
-            addCollider(base, x, z);
-
-            // Upper Level (Wood Louvers)
-            const upper = new THREE.Mesh(new THREE.BoxGeometry(54, 30, 34), new THREE.MeshStandardMaterial({color: 0x2a2a2a}));
-            upper.position.set(0, 35, 0);
-            upper.castShadow = true;
-            group.add(upper);
-            addCollider(upper, x, z);
-
-            // Add wooden slats
-            for(let lx = -26; lx <= 26; lx += 2) {
-                const slatFront = new THREE.Mesh(new THREE.BoxGeometry(0.5, 30, 0.5), new THREE.MeshStandardMaterial({color: 0x8B5A2B}));
-                slatFront.position.set(lx, 35, 17.5);
-                group.add(slatFront);
-            }
-
-            scene.add(group);
-        }
-
-        function buildLibrary(x, z) {
-            const group = new THREE.Group();
-            group.position.set(x, 0.5, z);
-
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({color: 0xe0e0e0}));
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            group.add(floor);
-
-            // Bookshelves (Orange)
-            for(let i=0; i<3; i++) {
-                const shelf = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 15), new THREE.MeshStandardMaterial({color: 0xFF8C00}));
-                shelf.position.set(-20 + (i*15), 4, -10);
-                shelf.castShadow = true;
-                group.add(shelf);
-                addCollider(shelf, x, z);
-            }
-
-            // Hexagonal Seating
-            const colors = [0xFFD700, 0x00CED1, 0x32CD32];
-            for(let i=0; i<5; i++) {
-                const hex = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 2, 6), new THREE.MeshStandardMaterial({color: colors[i%3]}));
-                hex.position.set(10 + Math.random()*15, 1, 5 + Math.random()*10);
-                hex.castShadow = true;
-                group.add(hex);
-                addCollider(hex, x, z);
-            }
-            scene.add(group);
-        }
-
-        function buildGymnasium(x, z) {
-            const group = new THREE.Group();
-            group.position.set(x, 0.5, z);
-
-            // Wood Floor
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 90), new THREE.MeshStandardMaterial({color: 0xDEB887}));
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            group.add(floor);
-
-            // Blue Lower Walls
-            const wallMat = new THREE.MeshStandardMaterial({color: 0x008B8B});
-            const w1 = new THREE.Mesh(new THREE.BoxGeometry(62, 10, 2), wallMat); w1.position.set(0, 5, -46); group.add(w1); addCollider(w1, x, z);
-            const w2 = new THREE.Mesh(new THREE.BoxGeometry(62, 10, 2), wallMat); w2.position.set(0, 5, 46); group.add(w2); addCollider(w2, x, z);
-            const w3 = new THREE.Mesh(new THREE.BoxGeometry(2, 10, 90), wallMat); w3.position.set(-31, 5, 0); group.add(w3); addCollider(w3, x, z);
-            const w4 = new THREE.Mesh(new THREE.BoxGeometry(2, 10, 90), wallMat); w4.position.set(31, 5, 0); group.add(w4); addCollider(w4, x, z);
-
-            // Elevated Blue Track (Rectangular Ring)
-            const trackMat = new THREE.MeshStandardMaterial({color: 0x1E90FF});
-            const t1 = new THREE.Mesh(new THREE.BoxGeometry(66, 2, 10), trackMat); t1.position.set(0, 15, -46); group.add(t1);
-            const t2 = new THREE.Mesh(new THREE.BoxGeometry(66, 2, 10), trackMat); t2.position.set(0, 15, 46); group.add(t2);
-            const t3 = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 82), trackMat); t3.position.set(-31, 15, 0); group.add(t3);
-            const t4 = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 82), trackMat); t4.position.set(31, 15, 0); group.add(t4);
-
-            // Basketball Hoops
-            const hoopGroup = new THREE.Group();
-            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 12), new THREE.MeshStandardMaterial({color: 0x888888})); pole.position.set(0, 6, 0); hoopGroup.add(pole);
-            const board = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 0.2), new THREE.MeshStandardMaterial({color: 0xffffff})); board.position.set(0, 10, 1); hoopGroup.add(board);
-            const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 4, 16), new THREE.MeshStandardMaterial({color: 0xff0000})); ring.rotation.x = Math.PI/2; ring.position.set(0, 9, 2); hoopGroup.add(ring);
-            
-            const hoop1 = hoopGroup.clone(); hoop1.position.set(0, 0, -40); group.add(hoop1); addCollider(pole, x, z - 40);
-            const hoop2 = hoopGroup.clone(); hoop2.rotation.y = Math.PI; hoop2.position.set(0, 0, 40); group.add(hoop2); addCollider(pole, x, z + 40);
-
-            scene.add(group);
-        }
-
-        function createTree(x, z) {
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.2, 5, 8), new THREE.MeshStandardMaterial({color: 0x8B4513}));
-            trunk.position.set(x, 2.5, z); trunk.castShadow = true; scene.add(trunk);
-            const leaves = new THREE.Mesh(new THREE.SphereGeometry(3.5, 8, 8), new THREE.MeshStandardMaterial({color: 0x32CD32, roughness: 0.9}));
-            leaves.position.set(x, 6, z); leaves.castShadow = true; scene.add(leaves);
-            addCollider(trunk, 0, 0); 
-        }
-
-        function addCollider(mesh, offsetX = 0, offsetZ = 0) {
-            const box = new THREE.Box3().setFromObject(mesh);
-            // Apply offset if object is inside a group
-            if(offsetX !== 0 || offsetZ !== 0) {
-                box.min.x += offsetX; box.max.x += offsetX;
-                box.min.z += offsetZ; box.max.z += offsetZ;
-            }
-            objects.push(box);
-        }
-
-        // --- Controls & Logic ---
-        function setupZoom() {
-            const zIn = document.getElementById('zoom-in-btn');
-            const zOut = document.getElementById('zoom-out-btn');
-            const jumpBtn = document.getElementById('jump-btn');
-
-            zIn.addEventListener('touchstart', (e) => { e.preventDefault(); targetCameraDist = Math.max(MIN_ZOOM, targetCameraDist - 5); });
-            zIn.addEventListener('mousedown', () => { targetCameraDist = Math.max(MIN_ZOOM, targetCameraDist - 5); });
-            zOut.addEventListener('touchstart', (e) => { e.preventDefault(); targetCameraDist = Math.min(MAX_ZOOM, targetCameraDist + 5); });
-            zOut.addEventListener('mousedown', () => { targetCameraDist = Math.min(MAX_ZOOM, targetCameraDist + 5); });
-            jumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); if (canJump) { velocity.y = 15; canJump = false; } });
-            jumpBtn.addEventListener('mousedown', () => { if (canJump) { velocity.y = 15; canJump = false; } });
-        }
-
-        function setupJoystick() {
-            const container = document.getElementById('joystick-container');
-            const knob = document.getElementById('joystick-knob');
-            let isDragging = false;
-            let center = { x: 0, y: 0 };
-            let maxRadius = 0;
-
-            const updateCenter = () => {
-                const rect = container.getBoundingClientRect();
-                center.x = rect.left + rect.width / 2;
-                center.y = rect.top + rect.height / 2;
-                maxRadius = (rect.width / 2) - 10;
+                knob.style.transform = `translate(${dx}px, ${dy}px)`;
+                joyInput.x = dx / maxRadius; // -1 (左) ~ +1 (右)
+                joyInput.y = dy / maxRadius; // -1 (前) ~ +1 (後)
             };
 
-            const startDrag = (e) => { e.preventDefault(); isDragging = true; updateCenter(); knob.style.transition = 'none'; moveDrag(e); };
-            const moveDrag = (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                let deltaX = clientX - center.x;
-                let deltaY = clientY - center.y;
-                let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                if (distance > maxRadius) { let ratio = maxRadius / distance; deltaX *= ratio; deltaY *= ratio; }
-                knob.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                joyVector.x = deltaX / maxRadius;
-                joyVector.y = deltaY / maxRadius;
+            const resetJoystick = () => {
+                dragging = false;
+                activePointerId = null;
+                knob.style.transform = `translate(0px, 0px)`;
+                joyInput.x = 0;
+                joyInput.y = 0;
             };
-            const endDrag = () => { isDragging = false; joyVector = { x: 0, y: 0 }; knob.style.transition = 'transform 0.2s'; knob.style.transform = `translate(0px, 0px)`; };
 
-            container.addEventListener('touchstart', startDrag, { passive: false });
-            container.addEventListener('touchmove', moveDrag, { passive: false });
-            container.addEventListener('touchend', endDrag);
-            container.addEventListener('mousedown', startDrag);
-            document.addEventListener('mousemove', moveDrag);
-            document.addEventListener('mouseup', endDrag);
-        }
+            zone.addEventListener('pointerdown', (e) => {
+                dragging = true;
+                activePointerId = e.pointerId;
+                zone.setPointerCapture(e.pointerId);
+                updateJoystick(e.clientX, e.clientY);
+            });
 
-        function setupTouchLook() {
-            const lookZone = document.getElementById('look-zone');
-            let lookTouchId = null; let lastTouchX = 0; let lastTouchY = 0;
-            const sensitivity = 0.005;
+            zone.addEventListener('pointermove', (e) => {
+                if (!dragging || e.pointerId !== activePointerId) return;
+                updateJoystick(e.clientX, e.clientY);
+            });
 
-            lookZone.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (lookTouchId === null) {
-                        lookTouchId = e.changedTouches[i].identifier;
-                        lastTouchX = e.changedTouches[i].pageX; lastTouchY = e.changedTouches[i].pageY;
-                        break;
-                    }
-                }
-            }, { passive: false });
+            zone.addEventListener('pointerup', resetJoystick);
+            zone.addEventListener('pointercancel', resetJoystick);
 
-            lookZone.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === lookTouchId) {
-                        const currentX = e.changedTouches[i].pageX; const currentY = e.changedTouches[i].pageY;
-                        camYaw -= (currentX - lastTouchX) * sensitivity;
-                        camPitch -= (currentY - lastTouchY) * sensitivity;
-                        camPitch = Math.max(0.1, Math.min(Math.PI / 2 - 0.1, camPitch));
-                        lastTouchX = currentX; lastTouchY = currentY;
-                    }
-                }
-            }, { passive: false });
-
-            const endLook = (e) => { for (let i = 0; i < e.changedTouches.length; i++) { if (e.changedTouches[i].identifier === lookTouchId) lookTouchId = null; } };
-            lookZone.addEventListener('touchend', endLook); lookZone.addEventListener('touchcancel', endLook);
-        }
-
-        function setupKeyboard() {
-            document.addEventListener('keydown', (e) => {
-                switch (e.code) {
-                    case 'ArrowUp': case 'KeyW': keyVector.y = -1; break;
-                    case 'ArrowDown': case 'KeyS': keyVector.y = 1; break;
-                    case 'ArrowLeft': case 'KeyA': keyVector.x = -1; break;
-                    case 'ArrowRight': case 'KeyD': keyVector.x = 1; break;
-                    case 'Space': if (canJump) { velocity.y = 15; canJump = false; } break;
+            // 跳躍按鈕
+            const jumpBtn = document.getElementById('jumpBtn');
+            jumpBtn.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                if (isGrounded && gameState !== 'ENDING') {
+                    playerVelocityY = jumpForce;
+                    isGrounded = false;
                 }
             });
-            document.addEventListener('keyup', (e) => {
-                switch (e.code) {
-                    case 'ArrowUp': case 'KeyW': keyVector.y = (keyVector.y === -1) ? 0 : keyVector.y; break;
-                    case 'ArrowDown': case 'KeyS': keyVector.y = (keyVector.y === 1) ? 0 : keyVector.y; break;
-                    case 'ArrowLeft': case 'KeyA': keyVector.x = (keyVector.x === -1) ? 0 : keyVector.x; break;
-                    case 'ArrowRight': case 'KeyD': keyVector.x = (keyVector.x === 1) ? 0 : keyVector.x; break;
-                }
+        }
+
+        // ================= 點擊嫌疑犯進行詢問或指認 =================
+        function onPointerDownScene(event) {
+            if (gameState !== 'INVESTIGATE') return;
+            // 若對話框正開著則忽略點擊
+            if (document.getElementById('dialogBox').style.display === 'block') return;
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(suspectClickableMeshes, true);
+
+            if (intersects.length > 0) {
+                const suspectName = intersects[0].object.name;
+                openSuspectDialog(suspectName);
+            }
+        }
+
+        function openSuspectDialog(suspectName) {
+            if (suspectName === "Rabbit") {
+                showDialog(
+                    "🐰 嫌疑犯一號：跳跳兔",
+                    "「我最喜歡在遊戲室蹦蹦跳跳！地上那半截【新鮮紅蘿蔔】是我的點心，水果太甜我才不常吃呢！你看我還有一對雪白的【長耳朵】！」",
+                    [
+                        { text: "👉 指認她是小偷！", style: "accuse", action: () => checkAnswer("Rabbit") },
+                        { text: "再去看看別人", action: closeDialog }
+                    ]
+                );
+            } else if (suspectName === "Monkey") {
+                showDialog(
+                    "🐵 嫌疑犯二號：小猴子",
+                    "「吱吱！我剛剛在玩具堆旁邊吃我最愛的【香噴噴黃色香蕉】，地上的香蕉皮是我丟的啦！我怎麼可能去偷蘋果？」",
+                    [
+                        { text: "👉 指認他是小偷！", style: "accuse", action: () => checkAnswer("Monkey") },
+                        { text: "再去看看別人", action: closeDialog }
+                    ]
+                );
+            } else if (suspectName === "Hedgehog") {
+                showDialog(
+                    "🦔 嫌疑犯三號：刺蝟弟弟",
+                    "「嗚……我背上全都是刺毛，剛才還不小心掉了一根【咖啡色刺毛】在花園地上。我不吃香蕉，也沒有長耳朵，而且我可以把身體縮成一團滾著走……」",
+                    [
+                        { text: "👉 指認他是小偷！", style: "accuse", action: () => checkAnswer("Hedgehog") },
+                        { text: "再去看看別人", action: closeDialog }
+                    ]
+                );
+            }
+        }
+
+        // ================= 推理判定邏輯 =================
+        function checkAnswer(suspect) {
+            if (suspect === "Rabbit") {
+                showDialog(
+                    "🐘 大象爺爺出來解釋",
+                    "「小偵探，不對喔！\n挑戰紙條第二條寫著：『犯人身上沒有長耳朵』。\n可是跳跳兔有一對超長的白耳朵，而且現場掉的是紅蘿蔔，她不是小偷！請再推理一次吧！」",
+                    [{ text: "重新調查", action: closeDialog }]
+                );
+            } else if (suspect === "Monkey") {
+                showDialog(
+                    "🐘 大象爺爺出來解釋",
+                    "「小偵探，猜錯囉！\n挑戰紙條第一條寫著：『犯人不吃香蕉』。\n但小猴子最愛吃香蕉，地上還有他剛吃完的香蕉皮呢！請再去問問其他嫌疑犯吧！」",
+                    [{ text: "重新調查", action: closeDialog }]
+                );
+            } else if (suspect === "Hedgehog") {
+                // 答對了！進入第四步結局動畫
+                gameState = 'ENDING';
+                document.getElementById('hudTop').innerText = "🎉 破案成功！跟隨大象爺爺前往【4號房：皇室客廳】梳化後面！";
+
+                showDialog(
+                    "🐘 大象爺爺大讚",
+                    "「太聰明了！小偵探推理完全正確！\n1. 刺蝟弟弟不吃香蕉 ✔️\n2. 刺蝟弟弟沒有長耳朵 ✔️\n3. 他是滾著離開現場的 ✔️\n來！大象爺爺這就帶你去【皇室客廳的梳化後面】找回大蘋果！」",
+                    [{ text: "跟著大象爺爺走 ➡️", style: "accuse", action: triggerStepFourEnding }]
+                );
+            }
+        }
+
+        // 第四步：大象爺爺帶著主角走到皇室客廳角落梳化後找到大蘋果
+        function triggerStepFourEnding() {
+            // 將主角、大象爺爺與刺蝟弟弟移到第 4 號房間（皇室客廳）的粉紅梳化旁
+            playerGroup.position.set(34, 0, -49);
+            playerGroup.rotation.y = -Math.PI / 3;
+            cameraYaw = Math.PI + Math.PI / 6;
+
+            elephantGroup.position.set(36, 0, -55);
+            elephantGroup.rotation.y = Math.PI / 4;
+
+            hedgehogGroup.position.set(46, 0, -52);
+            hedgehogGroup.rotation.y = -Math.PI / 4;
+
+            document.getElementById('roomBanner').innerText = "📍 4號房：皇室客廳（梳化角落後）";
+
+            showDialog(
+                "🦔 刺蝟弟弟羞澀道歉",
+                "（你們在粉紅大梳化和黃色抱枕後面，發現了藏起來的紅彤彤巨無霸大蘋果！）\n\n刺蝟弟弟紅著臉走出來說：\n「對不起大象爺爺……我只是覺得這顆大蘋果太漂亮了，想推到梳化後面跟它合照一張……」\n\n🎉 案件圓滿解決，小偵探挑戰成功！",
+                [{ text: "🔄 再玩一次", style: "restart", action: () => location.reload() }]
+            );
+        }
+
+        // 查看挑戰紙條
+        function showClueCard() {
+            showDialog(
+                "💌 粉紅心形神祕挑戰紙條",
+                "紙條上寫著三個關鍵線索：\n1️⃣ 真正的犯人【不吃香蕉】。\n2️⃣ 真正的犯人身上【沒有長耳朵】。\n3️⃣ 真正的犯人【不是走著路】離開現場的。\n\n💡 提示：走進各個房間，直接用手指或滑鼠【點擊動物】就能審問或指認喔！",
+                [{ text: "收起紙條", action: closeDialog }]
+            );
+        }
+
+        // ================= 對話框 UI 控制 =================
+        function showDialog(speaker, text, buttons) {
+            document.getElementById('dialogBadge').innerText = speaker;
+            document.getElementById('dialogText').innerText = text;
+            const btnContainer = document.getElementById('dialogButtons');
+            btnContainer.innerHTML = '';
+
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn ' + (b.style || '');
+                btn.innerText = b.text;
+                btn.onclick = b.action;
+                btnContainer.appendChild(btn);
             });
+
+            document.getElementById('dialogBox').style.display = 'block';
+        }
+
+        function closeDialog() {
+            document.getElementById('dialogBox').style.display = 'none';
+        }
+
+        // 更新主角所在房間名牌
+        function updateRoomName() {
+            const x = playerGroup.position.x;
+            const z = playerGroup.position.z;
+            const banner = document.getElementById('roomBanner');
+
+            if (Math.abs(x) <= 16) {
+                banner.innerText = "📍 中央皇家走廊";
+            } else if (x < -16 && z > 0) {
+                banner.innerText = "📍 1號房：大象爺爺的書房";
+            } else if (x > 16 && z > 0) {
+                banner.innerText = "📍 2號房：跳跳兔與小猴子的遊戲室";
+            } else if (x < -16 && z <= 0) {
+                banner.innerText = "📍 3號房：刺蝟弟弟的室內花園";
+            } else {
+                banner.innerText = "📍 4號房：皇室客廳";
+            }
+        }
+
+        // ================= 主迴圈：角色走動動畫與碰撞偵測 =================
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const now = performance.now();
+            const delta = Math.min((now - prevTime) / 1000, 0.1);
+            prevTime = now;
+
+            if (playerGroup && gameState !== 'START') {
+                const isDialogShowing = document.getElementById('dialogBox').style.display === 'block';
+
+                if (!isDialogShowing && gameState !== 'ENDING') {
+                    // 1. 根據虛擬方向桿旋轉視角與推進主角
+                    if (Math.abs(joyInput.x) > 0.08) {
+                        cameraYaw -= joyInput.x * 2.0 * delta;
+                    }
+
+                    const moveAmount = -joyInput.y; // 往上推為前進 (+1)
+                    const isMoving = Math.abs(moveAmount) > 0.08 || Math.abs(joyInput.x) > 0.25;
+
+                    if (Math.abs(moveAmount) > 0.08) {
+                        const forwardX = -Math.sin(cameraYaw) * moveAmount * moveSpeed * delta;
+                        const forwardZ = -Math.cos(cameraYaw) * moveAmount * moveSpeed * delta;
+
+                        const nextPos = playerGroup.position.clone();
+                        nextPos.x += forwardX;
+                        nextPos.z += forwardZ;
+
+                        // 簡易牆壁碰撞檢查
+                        const playerRadius = 2.4;
+                        let canMoveX = true, canMoveZ = true;
+
+                        const boxX = new THREE.Box3(
+                            new THREE.Vector3(playerGroup.position.x + forwardX - playerRadius, 1, playerGroup.position.z - playerRadius),
+                            new THREE.Vector3(playerGroup.position.x + forwardX + playerRadius, 10, playerGroup.position.z + playerRadius)
+                        );
+                        const boxZ = new THREE.Box3(
+                            new THREE.Vector3(playerGroup.position.x - playerRadius, 1, playerGroup.position.z + forwardZ - playerRadius),
+                            new THREE.Vector3(playerGroup.position.x + playerRadius, 10, playerGroup.position.z + forwardZ + playerRadius)
+                        );
+
+                        for (let collider of wallColliders) {
+                            if (collider.intersectsBox(boxX)) canMoveX = false;
+                            if (collider.intersectsBox(boxZ)) canMoveZ = false;
+                        }
+
+                        if (canMoveX) playerGroup.position.x += forwardX;
+                        if (canMoveZ) playerGroup.position.z += forwardZ;
+                    }
+
+                    // 讓主角面向前進方向
+                    playerGroup.rotation.y = cameraYaw;
+
+                    // 2. 主角手腳擺動動畫
+                    if (isMoving && isGrounded) {
+                        walkCycle += delta * 12;
+                        leftLeg.rotation.x = Math.sin(walkCycle) * 0.65;
+                        rightLeg.rotation.x = -Math.sin(walkCycle) * 0.65;
+                        leftArm.rotation.x = -Math.sin(walkCycle) * 0.55;
+                        rightArm.rotation.x = Math.sin(walkCycle) * 0.55;
+                    } else {
+                        leftLeg.rotation.x *= 0.85;
+                        rightLeg.rotation.x *= 0.85;
+                        leftArm.rotation.x *= 0.85;
+                        rightArm.rotation.x *= 0.85;
+                    }
+                }
+
+                // 3. 跳躍與重力物理
+                playerGroup.position.y += playerVelocityY * delta;
+                if (!isGrounded) {
+                    playerVelocityY -= gravity * delta;
+                    // 跳躍時雙手舉高
+                    leftArm.rotation.x = Math.PI * 0.7;
+                    rightArm.rotation.x = Math.PI * 0.7;
+                    if (playerGroup.position.y <= 0) {
+                        playerGroup.position.y = 0;
+                        playerVelocityY = 0;
+                        isGrounded = true;
+                    }
+                }
+
+                // 4. 過肩跟隨鏡頭 (可清楚看見 3D 主角在畫面中走動，同時保持身歷其境感)
+                const camDist = 17;
+                const camHeight = 12.5;
+                const targetCamX = playerGroup.position.x + Math.sin(cameraYaw) * camDist;
+                const targetCamZ = playerGroup.position.z + Math.cos(cameraYaw) * camDist;
+
+                camera.position.lerp(new THREE.Vector3(targetCamX, playerGroup.position.y + camHeight, targetCamZ), 0.18);
+                camera.lookAt(
+                    playerGroup.position.x - Math.sin(cameraYaw) * 8,
+                    playerGroup.position.y + 7.5,
+                    playerGroup.position.z - Math.cos(cameraYaw) * 8
+                );
+
+                updateRoomName();
+
+                // 5. 檢查是否走到大象爺爺身邊觸發報案對話
+                if (gameState === 'FIND_ELEPHANT' && !hasAcceptedQuest) {
+                    const distToElephant = playerGroup.position.distanceTo(elephantGroup.position);
+                    if (distToElephant < 14) {
+                        hasAcceptedQuest = true;
+                        gameState = 'INVESTIGATE';
+                        document.getElementById('clueButton').style.display = 'block';
+                        document.getElementById('hudTop').innerText = "🔍 任務：到各房間調查並【點擊嫌疑犯】找出誰偷了大蘋果！";
+
+                        showDialog(
+                            "🐘 大象爺爺（森林村長）",
+                            "「天啊！小偵探你終於來了！我準備在今晚派對分享的【巨無霸大蘋果】不見了，桌上只留下一張粉紅色的神祕挑戰紙條：\n\n1️⃣ 犯人【不吃香蕉】\n2️⃣ 犯人身上【沒有長耳朵】\n3️⃣ 犯人【不是走著路】離開的\n\n現在【跳跳兔】和【小猴子】在右前方的 2 號遊戲室，【刺蝟弟弟】在左後方的 3 號花園房。請你走過去點擊他們，幫我找出誰是小偷！」",
+                            [{ text: "開始搜查房間！", action: closeDialog }]
+                        );
+                    }
+                }
+
+                // 嫌疑犯待機微幅呼吸/跳動動畫
+                if (rabbitGroup) {
+                    rabbitGroup.position.y = Math.abs(Math.sin(now * 0.004)) * 1.2;
+                }
+                if (monkeyGroup) {
+                    monkeyGroup.rotation.y = Math.sin(now * 0.003) * 0.5;
+                }
+            }
+
+            renderer.render(scene, camera);
         }
 
         function onWindowResize() {
+            if (!camera || !renderer) return;
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function checkCollision(nextPos) {
-            const playerRadius = 1.5; 
-            for (let i = 0; i < objects.length; i++) {
-                const box = objects[i];
-                if (nextPos.x + playerRadius > box.min.x && nextPos.x - playerRadius < box.max.x && 
-                    nextPos.z + playerRadius > box.min.z && nextPos.z - playerRadius < box.max.z) {
-                    if(playerGroup.position.y <= box.max.y) return true;
-                }
-            }
-            return false;
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if (!playerGroup) return; 
-
-            const time = performance.now();
-            const delta = Math.min((time - prevTime) / 1000, 0.1); 
-
-            let inputX = joyVector.x !== 0 ? joyVector.x : keyVector.x;
-            let inputY = joyVector.y !== 0 ? joyVector.y : keyVector.y; 
-
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
-            velocity.y -= 9.8 * 5.0 * delta;
-
-            const speed = 40.0;
-            const isMoving = Math.abs(inputX) > 0.1 || Math.abs(inputY) > 0.1;
-
-            if (isMoving) {
-                const forward = new THREE.Vector3(-Math.sin(camYaw), 0, -Math.cos(camYaw)).normalize();
-                const right = new THREE.Vector3(-Math.cos(camYaw), 0, Math.sin(camYaw)).normalize();
-                velocity.add(forward.multiplyScalar(inputY * speed * delta));
-                velocity.add(right.multiplyScalar(inputX * speed * delta));
-                
-                playerGroup.rotation.y = Math.atan2(velocity.x, velocity.z);
-
-                walkTime += delta * 15;
-                limbs.leftArm.rotation.x = Math.sin(walkTime) * 0.5; limbs.rightArm.rotation.x = -Math.sin(walkTime) * 0.5;
-                limbs.leftLeg.rotation.x = -Math.sin(walkTime) * 0.5; limbs.rightLeg.rotation.x = Math.sin(walkTime) * 0.5;
-            } else {
-                limbs.leftArm.rotation.x = 0; limbs.rightArm.rotation.x = 0;
-                limbs.leftLeg.rotation.x = 0; limbs.rightLeg.rotation.x = 0;
-            }
-
-            const nextPos = playerGroup.position.clone();
-            nextPos.x += velocity.x * delta;
-            nextPos.z += velocity.z * delta;
-
-            if (!checkCollision(nextPos)) {
-                playerGroup.position.x = nextPos.x;
-                playerGroup.position.z = nextPos.z;
-            }
-
-            playerGroup.position.y += (velocity.y * delta); 
-            if (playerGroup.position.y < 0) {
-                velocity.y = 0;
-                playerGroup.position.y = 0;
-                canJump = true;
-            }
-
-            currentCameraDist += (targetCameraDist - currentCameraDist) * 0.1;
-            camera.position.x = playerGroup.position.x - currentCameraDist * Math.sin(camYaw) * Math.cos(camPitch);
-            camera.position.y = playerGroup.position.y + 2 + currentCameraDist * Math.sin(camPitch); 
-            camera.position.z = playerGroup.position.z - currentCameraDist * Math.cos(camYaw) * Math.cos(camPitch);
-            camera.lookAt(playerGroup.position.clone().add(new THREE.Vector3(0, 2, 0))); 
-
-            prevTime = time;
-            renderer.render(scene, camera);
         }
     </script>
 </body>
