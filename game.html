@@ -34,9 +34,7 @@
             touch-action: none;
         }
 
-        /* =================================================================
-           1. 首頁：完全移除白色半透明底框，直接透出 100% 3D 城堡全景！
-           ================================================================= */
+        /* 1. 首頁：無白色半透明底框，直接透出 100% 3D 城堡全景 */
         #startScreen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -47,7 +45,7 @@
             z-index: 100;
             text-align: center;
             padding: 24px 16px 38px 16px;
-            pointer-events: none; /* 讓中間 3D 畫面完全無阻擋 */
+            pointer-events: none;
         }
         .start-top-header {
             pointer-events: auto;
@@ -68,7 +66,6 @@
             font-size: clamp(1.8rem, 5vw, 3.2rem);
             font-weight: 900;
             margin: 4px 0 6px 0;
-            /* 超清晰彩色卡通立體描邊，不需底框也能在 3D 背景上超搶眼 */
             text-shadow: 
                 0 4px 0 #6a1b9a,
                 0 -2px 0 #6a1b9a,
@@ -129,9 +126,7 @@
             display: block;
         }
 
-        /* =================================================================
-           2. 頂部三層式 Flexbox 導航系統 (徹底解決按鈕 Overlap 重疊問題！)
-           ================================================================= */
+        /* 2. 頂部三層式 Flexbox 導航系統 (防重疊) */
         #topUIBar {
             position: absolute;
             top: 0; left: 0;
@@ -144,7 +139,6 @@
             z-index: 25;
             pointer-events: none;
         }
-        /* 第一層：左右工具列 */
         .top-row-1 {
             width: 100%;
             display: flex;
@@ -202,7 +196,6 @@
             flex-shrink: 0;
         }
 
-        /* 第二層：任務提示橫幅 (獨立一行，絕不與左右按鈕重疊) */
         #hudTop {
             pointer-events: auto;
             background: rgba(255, 255, 255, 0.94);
@@ -220,7 +213,6 @@
             text-overflow: ellipsis;
         }
 
-        /* 第三層：房間快速傳送列 (支援橫向滑動，不佔垂直空間) */
         #teleportBar {
             pointer-events: auto;
             display: flex;
@@ -257,14 +249,14 @@
             z-index: 25;
         }
         .zoom-btn {
-            width: 48px; height: 48px;
+            width: 52px; height: 52px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.96);
             border: 3.5px solid #7e57c2;
             color: #4a148c;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -272,7 +264,7 @@
             align-items: center;
             line-height: 1;
         }
-        .zoom-btn span { font-size: 0.62rem; margin-top: 2px; }
+        .zoom-btn span { font-size: 0.65rem; margin-top: 2px; }
         .zoom-btn:active { transform: scale(0.9); background: #ede7f6; }
 
         /* 4. 虛擬方向桿、加速跑與跳躍鍵 */
@@ -531,7 +523,6 @@
 
     <!-- 2. 頂部三層式防重疊導航系統 (#topUIBar) -->
     <div id="topUIBar">
-        <!-- 第一層：左工具列 + 右挑戰紙條 -->
         <div class="top-row-1">
             <div class="top-left-group">
                 <button class="icon-btn" id="bgmBtn" onclick="toggleBGM()" title="背景音樂">🎵</button>
@@ -541,10 +532,8 @@
             <button id="clueButton" onclick="showClueCard()">📜 挑戰紙條</button>
         </div>
 
-        <!-- 第二層：任務欄 (獨立一行，不重疊) -->
         <div id="hudTop">🎯 任務：點擊各房間散步的【動物】對話推理，或點擊【傢俱】學中英文！</div>
 
-        <!-- 第三層：房間快速傳送列 -->
         <div id="teleportBar">
             <button class="tp-btn" onclick="teleportTo(0, 120)">🏛️ 中央大道</button>
             <button class="tp-btn" onclick="teleportTo(-75, 85)">📚 1號書房(大象)</button>
@@ -811,7 +800,7 @@
         }
 
         // =========================================================================
-        // 🎮 Three.js 核心變數與 NPC 智慧自由漫遊系統
+        // 🎮 Three.js 核心變數與【大幅度 Zoom Out + 手機直向廣角補償】
         // =========================================================================
         let scene, camera, renderer;
         let playerGroup, leftArm, rightArm, leftLeg, rightLeg, heroHead;
@@ -824,7 +813,6 @@
 
         let npcRoamingList = [];
 
-        // 預設進入遊戲即可直接調查並觸發所有動物 NPC 的對話框！
         let gameState = 'START';
         let playerGender = 'girl';
         let hasAcceptedQuest = false;
@@ -832,10 +820,26 @@
         let cutsceneCamPos = null;
         let cutsceneLookTarget = null;
 
-        let cameraDistance = 18.0;
-        const minCamDist = 8.0;
-        const maxCamDist = 42.0;
+        // 【升級】大幅提高預設鏡頭距離與最大 Zoom Out 上限 (最高可拉遠至 80！)
+        let cameraDistance = 26.0;
+        const minCamDist = 9.0;
+        const maxCamDist = 80.0;
         let zoomDirection = 0;
+
+        // 【升級】智慧判斷手機直向 (Portrait) 的視野拉遠倍率
+        function getPortraitMultiplier() {
+            const aspect = window.innerWidth / window.innerHeight;
+            return aspect < 1.0 ? 1.45 : 1.0; // 直向螢幕時自動額外拉遠 1.45 倍！
+        }
+
+        function updateCameraFOV() {
+            if (!camera) return;
+            const aspect = window.innerWidth / window.innerHeight;
+            // 手機直向時自動使用 68 度大廣角，確保左右兩側角色都能完整入鏡
+            camera.fov = aspect < 1.0 ? 68 : 58;
+            camera.aspect = aspect;
+            camera.updateProjectionMatrix();
+        }
 
         let playerVelocityY = 0;
         let isGrounded = true;
@@ -872,10 +876,14 @@
             document.getElementById('zoomControls').style.display = 'flex';
             document.getElementById('controlsUI').style.display = 'block';
 
-            // 進入遊戲直接設為 INVESTIGATE 狀態，確保點擊任何一個動物 NPC 都會立即彈出偵探對話框！
             gameState = 'INVESTIGATE';
 
-            const initCamHeight = 7.0 + (cameraDistance * 0.38);
+            // 若是手機直向，起始距離自動調得更遠，讓小朋友一進去就看到開闊全景
+            if (window.innerWidth < window.innerHeight) {
+                cameraDistance = 34.0;
+            }
+
+            const initCamHeight = 8.0 + (cameraDistance * 0.45);
             camera.position.set(
                 playerGroup.position.x,
                 playerGroup.position.y + initCamHeight,
@@ -885,7 +893,7 @@
 
             showDialog(
                 "🏰 歡迎來到雙語童話城堡！",
-                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！大象爺爺的【巨無霸大蘋果】不見了！\n• 點擊任何散步中的【動物（大象、兔子、猴子、刺蝟）】都可以展開對話與推理！\n• 點擊沿途【傢俱佈置】可以打開中英文發音字卡！`,
+                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！大象爺爺的【巨無霸大蘋果】不見了！\n• 右邊【🔍- 拉遠】可以將畫面大幅縮小看清全景！\n• 點擊任何散步中的【動物】即可對話與推理！`,
                 [{ text: "出發調查！", action: closeDialog }]
             );
         }
@@ -920,7 +928,7 @@
                 openWordCard(vocabData);
             });
             document.getElementById('labelsContainer').appendChild(el);
-            floatingLabels.push({ el: el, group: group, offsetY: labelOffsetY, isNPC: false, maxDist: 90 });
+            floatingLabels.push({ el: el, group: group, offsetY: labelOffsetY, isNPC: false, maxDist: 105 });
         }
 
         function createSparkleEye(irisColor = 0x4e342e, scale = 1.0) {
@@ -944,9 +952,10 @@
         function initScene() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xdcd0ff);
-            scene.fog = new THREE.FogExp2(0xdcd0ff, 0.0008);
+            scene.fog = new THREE.FogExp2(0xdcd0ff, 0.0007);
 
-            camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.5, 1200);
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 1400);
+            updateCameraFOV();
 
             renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1524,7 +1533,7 @@
         }
 
         // =========================================================================
-        // 🐘🐰🐵🦔 建立 4 個可愛動物角色 + 確保點擊 100% 彈出偵探對話框！
+        // 🐘🐰🐵🦔 建立 4 個可愛動物角色 + 確保點擊 100% 彈出偵探對話框
         // =========================================================================
         function registerSuspectClickable(group, suspectName, labelText, offsetY, onClickFn) {
             group.traverse(child => {
@@ -1541,7 +1550,7 @@
                 onClickFn();
             });
             document.getElementById('labelsContainer').appendChild(el);
-            floatingLabels.push({ el: el, group: group, offsetY: offsetY, isNPC: true, maxDist: 155 });
+            floatingLabels.push({ el: el, group: group, offsetY: offsetY, isNPC: true, maxDist: 165 });
         }
 
         function registerFreeRoamNPC(group, minX, maxX, minZ, maxZ, speed, hopHeight, hopFreq) {
@@ -1689,7 +1698,7 @@
             });
             registerFreeRoamNPC(elephantGroup, -100, -52, 55, 130, 8.5, 0.8, 8);
 
-            // 2. 跳跳兔 (點擊必定彈出兔子推理對話框！)
+            // 2. 跳跳兔
             rabbitGroup = new THREE.Group();
             const furBrown = animMat(0xc68652);
             const furWhite = animMat(0xfffdf9);
@@ -1714,7 +1723,7 @@
             });
             registerFreeRoamNPC(rabbitGroup, 48, 105, 95, 140, 14.0, 2.2, 12);
 
-            // 3. 小猴子 (點擊必定彈出小猴子推理對話框！)
+            // 3. 小猴子
             monkeyGroup = new THREE.Group();
             const darkFur = animMat(0x4e2a14);
             const peachSkin = animMat(0xf5b086);
@@ -1733,7 +1742,7 @@
             });
             registerFreeRoamNPC(monkeyGroup, 50, 120, 22, 68, 16.0, 1.8, 14);
 
-            // 4. 刺蝟弟弟 (點擊必定彈出刺蝟推理對話框！)
+            // 4. 刺蝟弟弟
             hedgehogGroup = new THREE.Group();
             const hedBody = new THREE.Mesh(new THREE.SphereGeometry(2.8, 24, 24), animMat(0xf5e1c8)); hedBody.position.y = 2.8;
             const hedBack = new THREE.Mesh(new THREE.SphereGeometry(3.1, 24, 24), animMat(0x5d4037)); hedBack.position.set(0, 3.3, 0.9);
@@ -1883,13 +1892,14 @@
                 }
             });
 
+            // 【升級】加大每次點擊 Zoom Out / Zoom In 的幅度，並支援長按快速縮放
             const bindZoomBtn = (btnId, dir) => {
                 const btn = document.getElementById(btnId);
                 btn.addEventListener('pointerdown', (e) => {
                     e.stopPropagation();
                     SoundFX.pop();
                     zoomDirection = dir;
-                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + dir * 3.5, minCamDist, maxCamDist);
+                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + dir * 7.5, minCamDist, maxCamDist);
                 });
                 btn.addEventListener('pointerup', () => zoomDirection = 0);
                 btn.addEventListener('pointerleave', () => zoomDirection = 0);
@@ -1931,7 +1941,6 @@
             });
         }
 
-        // 點擊 3D 物件：動物一律開啟偵探對話框，傢俱一律開啟雙語單字卡！
         function checkTapOn3DObject(clientX, clientY) {
             mouse.x = (clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(clientY / window.innerHeight) * 2 + 1;
@@ -1954,7 +1963,7 @@
         }
 
         // =========================================================================
-        // 🎬 角色對話框（含推理按鈕 + 雙語學習按鈕）與無遮擋劇場過場動畫
+        // 🎬 【全面升級】觸發劇情時大幅度 Zoom Out + 手機直向廣角全景運鏡
         // =========================================================================
         function setTheaterMode(enabled) {
             document.getElementById('controlsUI').style.display = enabled ? 'none' : 'block';
@@ -2014,38 +2023,47 @@
             }
         }
 
+        // 【關鍵優化】觸發指認劇情時，大幅度 Zoom Out 拉遠鏡頭（特別針對手機直向自動拉遠至 62 單位），讓三人與走路過程 100% 完整呈現在螢幕中央！
         function startAnswerCutscene(suspectName) {
             closeDialog();
             closeWordCard();
             gameState = 'CUTSCENE';
             setTheaterMode(true);
+            updateCameraFOV();
 
             let targetSuspectGroup = rabbitGroup;
             if (suspectName === "Monkey") targetSuspectGroup = monkeyGroup;
             if (suspectName === "Hedgehog") targetSuspectGroup = hedgehogGroup;
 
-            if (suspectName === "Rabbit") targetSuspectGroup.position.set(70, 0, 118);
-            if (suspectName === "Monkey") targetSuspectGroup.position.set(88, 0, 48);
-            if (suspectName === "Hedgehog") targetSuspectGroup.position.set(-88, 0, -72);
+            // 將嫌疑犯固定在房間開闊中心點
+            if (suspectName === "Rabbit") targetSuspectGroup.position.set(75, 0, 115);
+            if (suspectName === "Monkey") targetSuspectGroup.position.set(85, 0, 52);
+            if (suspectName === "Hedgehog") targetSuspectGroup.position.set(-85, 0, -70);
 
             const sPos = targetSuspectGroup.position.clone();
             const dirSign = sPos.x > 0 ? -1 : 1;
 
-            playerGroup.position.set(sPos.x + dirSign * 9, 0, sPos.z - 2);
+            // 讓主角與大象爺爺站得更緊湊，確保手機直向窄螢幕也能一次拍到全部角色
+            playerGroup.position.set(sPos.x + dirSign * 7, 0, sPos.z - 1);
             playerGroup.lookAt(sPos.x, 0, sPos.z);
 
-            const startWalkPos = new THREE.Vector3(sPos.x + dirSign * 26, 0, sPos.z + 8);
-            const endWalkPos = new THREE.Vector3(sPos.x + dirSign * 8, 0, sPos.z + 6);
+            const startWalkPos = new THREE.Vector3(sPos.x + dirSign * 22, 0, sPos.z + 5);
+            const endWalkPos = new THREE.Vector3(sPos.x + dirSign * 6.5, 0, sPos.z + 4.5);
             elephantGroup.position.copy(startWalkPos);
 
-            const stageCenter = new THREE.Vector3(sPos.x + dirSign * 6, 4.5, sPos.z + 2);
-            cutsceneCamPos = new THREE.Vector3(sPos.x + dirSign * 6, 13, sPos.z + (sPos.z > 0 ? -24 : 24));
-            cutsceneLookTarget = new THREE.Vector3(stageCenter.x, 3.2, stageCenter.z);
+            // 計算手機直向補償倍率，大幅拉遠並拉高劇場鏡頭！
+            const pMult = getPortraitMultiplier();
+            const zDist = (sPos.z > 0 ? -44 : 44) * pMult;
+            const camY = 22 * pMult;
+
+            const stageCenter = new THREE.Vector3(sPos.x + dirSign * 5, 5.0, sPos.z + 2);
+            cutsceneCamPos = new THREE.Vector3(stageCenter.x, camY, sPos.z + zDist);
+            cutsceneLookTarget = new THREE.Vector3(stageCenter.x, 2.5, stageCenter.z);
 
             camera.position.copy(cutsceneCamPos);
             camera.lookAt(cutsceneLookTarget);
 
-            document.getElementById('hudTop').innerText = "🎬 劇場動畫：看！大象爺爺拄著拐杖走過來了……";
+            document.getElementById('hudTop').innerText = "🎬 劇場全景：看！大象爺爺拄著拐杖走過來了……";
 
             activeCutscene = {
                 type: suspectName === "Hedgehog" ? 'CORRECT_APPROACH' : 'WRONG_APPROACH',
@@ -2054,7 +2072,7 @@
                 startPos: startWalkPos,
                 endPos: endWalkPos,
                 progress: 0,
-                duration: 2.5
+                duration: 2.6
             };
         }
 
@@ -2062,6 +2080,7 @@
             if (cutscene.suspectGroup) {
                 elephantGroup.lookAt(camera.position.x, 0, camera.position.z);
                 cutscene.suspectGroup.lookAt(camera.position.x, 0, camera.position.z);
+                playerGroup.lookAt(camera.position.x, 0, camera.position.z);
             }
 
             if (cutscene.type === 'WRONG_APPROACH') {
@@ -2104,27 +2123,30 @@
             }
         }
 
+        // 【關鍵優化】第四步找回大蘋果劇情，同樣大幅 Zoom Out 拉遠升高鏡頭，手機直向也能完整看到梳化、大蘋果與所有角色！
         function startWalkToSofaCutscene() {
             closeDialog();
             gameState = 'CUTSCENE';
             setTheaterMode(true);
-            document.getElementById('hudTop').innerText = "🎬 劇場動畫：大象爺爺正帶著小偵探走向【皇室客廳】梳化後……";
+            updateCameraFOV();
+            document.getElementById('hudTop').innerText = "🎬 劇場全景：大象爺爺正帶著小偵探走向【皇室客廳】梳化後……";
 
-            hedgehogGroup.position.set(126, 0, -142);
+            hedgehogGroup.position.set(122, 0, -142);
 
-            cutsceneCamPos = new THREE.Vector3(105, 14, -172);
-            cutsceneLookTarget = new THREE.Vector3(105, 3.5, -142);
+            const pMult = getPortraitMultiplier();
+            cutsceneCamPos = new THREE.Vector3(105, 25 * pMult, -145 - (32 * pMult));
+            cutsceneLookTarget = new THREE.Vector3(105, 2.0, -142);
             camera.position.copy(cutsceneCamPos);
             camera.lookAt(cutsceneLookTarget);
 
             activeCutscene = {
                 type: 'WALK_TO_SOFA',
-                eleStart: new THREE.Vector3(82, 0, -135),
-                eleEnd: new THREE.Vector3(96, 0, -145),
-                heroStart: new THREE.Vector3(75, 0, -142),
-                heroEnd: new THREE.Vector3(89, 0, -147),
-                hedStart: new THREE.Vector3(126, 0, -142),
-                hedEnd: new THREE.Vector3(114, 0, -145),
+                eleStart: new THREE.Vector3(84, 0, -136),
+                eleEnd: new THREE.Vector3(97, 0, -145),
+                heroStart: new THREE.Vector3(78, 0, -142),
+                heroEnd: new THREE.Vector3(90, 0, -147),
+                hedStart: new THREE.Vector3(122, 0, -142),
+                hedEnd: new THREE.Vector3(113, 0, -145),
                 progress: 0,
                 duration: 2.8
             };
@@ -2212,13 +2234,13 @@
 
             updateNPCRoaming(delta, now);
 
-            // 狀態 0：首頁 3D 實時環繞全景展示模式 (完全無白色底框遮擋)
+            // 狀態 0：首頁 3D 實時環繞全景展示模式
             if (gameState === 'START') {
                 const orbitAngle = now * 0.00035;
-                const radius = 110;
+                const radius = 125 * getPortraitMultiplier();
                 camera.position.set(
                     Math.sin(orbitAngle) * radius,
-                    32 + Math.sin(now * 0.001) * 4,
+                    38 + Math.sin(now * 0.001) * 4,
                     Math.cos(orbitAngle) * radius
                 );
                 camera.lookAt(0, 10, 0);
@@ -2228,10 +2250,10 @@
 
             if (playerGroup) {
                 if (zoomDirection !== 0) {
-                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + zoomDirection * 18 * delta, minCamDist, maxCamDist);
+                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + zoomDirection * 28 * delta, minCamDist, maxCamDist);
                 }
 
-                // A. 劇場過場動畫模式
+                // A. 劇場過場動畫模式 (大幅 Zoom Out 無遮擋視角)
                 if (gameState === 'CUTSCENE' && activeCutscene) {
                     activeCutscene.progress += delta / activeCutscene.duration;
                     const t = Math.min(activeCutscene.progress, 1.0);
@@ -2348,7 +2370,7 @@
                     }
 
                     if (gameState !== 'ENDING') {
-                        const camHeight = 7.0 + (cameraDistance * 0.38);
+                        const camHeight = 7.0 + (cameraDistance * 0.45);
                         let targetCamX = playerGroup.position.x + Math.sin(cameraYaw) * cameraDistance;
                         let targetCamZ = playerGroup.position.z + Math.cos(cameraYaw) * cameraDistance;
 
@@ -2363,7 +2385,6 @@
                         );
                     }
 
-                    // 第一次走近大象爺爺時自動彈出報案說明
                     if (!hasAcceptedQuest && playerGroup.position.distanceTo(elephantGroup.position) < 20) {
                         triggerElephantQuest();
                     }
@@ -2377,8 +2398,7 @@
 
         function onWindowResize() {
             if (!camera || !renderer) return;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            updateCameraFOV();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
     </script>
