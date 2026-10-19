@@ -34,214 +34,222 @@
             touch-action: none;
         }
 
-        /* 1. 超吸睛 3D 實時背景首頁 (毛玻璃透視感) */
+        /* =================================================================
+           1. 首頁：完全移除白色半透明底框，直接透出 100% 3D 城堡全景！
+           ================================================================= */
         #startScreen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(106,27,154,0.38) 100%);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             z-index: 100;
             text-align: center;
-            padding: 16px;
+            padding: 24px 16px 38px 16px;
+            pointer-events: none; /* 讓中間 3D 畫面完全無阻擋 */
         }
-        .start-glass-card {
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 5px solid rgba(255, 255, 255, 0.95);
-            border-radius: 40px;
-            padding: 26px 36px;
-            max-width: 780px;
-            width: 94%;
-            box-shadow: 0 20px 50px rgba(74, 20, 140, 0.35), 0 0 30px rgba(255, 213, 79, 0.5);
-            animation: cardPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes cardPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .start-top-header {
+            pointer-events: auto;
+            margin-top: 8px;
         }
         .castle-badge {
-            font-size: clamp(2.8rem, 7vw, 4.4rem);
-            margin-bottom: 4px;
+            font-size: clamp(2.6rem, 6.5vw, 4.2rem);
             display: inline-block;
             animation: floatBounce 2.2s infinite ease-in-out;
-            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));
         }
         @keyframes floatBounce {
             0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-12px) rotate(2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
         }
         #startScreen h1 {
-            background: linear-gradient(135deg, #6a1b9a 0%, #d81b60 50%, #ff8f00 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: clamp(1.6rem, 4.4vw, 2.75rem);
+            color: #ffffff;
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
             font-weight: 900;
-            filter: drop-shadow(2px 3px 0px #ffffff);
-            margin: 6px 0 10px 0;
+            margin: 4px 0 6px 0;
+            /* 超清晰彩色卡通立體描邊，不需底框也能在 3D 背景上超搶眼 */
+            text-shadow: 
+                0 4px 0 #6a1b9a,
+                0 -2px 0 #6a1b9a,
+                3px 0 0 #6a1b9a,
+                -3px 0 0 #6a1b9a,
+                3px 4px 0 #6a1b9a,
+                -3px 4px 0 #6a1b9a,
+                0 10px 25px rgba(0,0,0,0.45);
         }
-        .live-tag {
+        .start-subtitle {
             display: inline-block;
-            background: linear-gradient(135deg, #ffd54f, #ff8f00);
-            color: #4a148c;
-            font-weight: 900;
-            padding: 5px 16px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            box-shadow: 0 3px 10px rgba(255,143,0,0.35);
-        }
-        #startScreen p {
-            font-size: clamp(0.95rem, 2.3vw, 1.2rem);
-            color: #4a148c;
-            margin: 0 auto 20px auto;
+            background: rgba(106, 27, 154, 0.78);
+            color: #fff59d;
+            padding: 6px 20px;
+            border-radius: 25px;
+            border: 2px solid #ffffff;
+            font-size: clamp(0.9rem, 2.2vw, 1.15rem);
             font-weight: bold;
-            max-width: 640px;
-            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
         }
         .char-select {
+            pointer-events: auto;
             display: flex;
-            gap: 22px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 10px;
         }
         .char-card {
-            background: linear-gradient(180deg, #ffffff 0%, #f3e5f5 100%);
-            border: 5px solid #ab47bc;
-            border-radius: 30px;
-            padding: 16px 32px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(243,229,245,0.95) 100%);
+            border: 4px solid #ab47bc;
+            border-radius: 28px;
+            padding: 12px 28px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(106, 27, 154, 0.22);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            min-width: 175px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, border-color 0.2s;
+            min-width: 160px;
         }
         .char-card:hover, .char-card:active {
             transform: translateY(-6px) scale(1.06);
             border-color: #ff4081;
-            box-shadow: 0 15px 30px rgba(236, 64, 122, 0.38);
-            background: linear-gradient(180deg, #ffffff 0%, #fce4ec 100%);
+            background: #ffffff;
         }
         .char-icon {
-            font-size: clamp(3.2rem, 6.5vw, 4.3rem);
+            font-size: clamp(2.6rem, 5.5vw, 3.6rem);
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
         }
         .char-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 900;
             color: #4a148c;
         }
         .char-sub {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #d81b60;
             font-weight: bold;
-            margin-top: 4px;
             display: block;
         }
 
-        /* 2. 頂部任務欄、雙語單字計數與快速傳送列 */
-        #hudTop {
+        /* =================================================================
+           2. 頂部三層式 Flexbox 導航系統 (徹底解決按鈕 Overlap 重疊問題！)
+           ================================================================= */
+        #topUIBar {
             position: absolute;
-            top: 8px; left: 50%;
-            transform: translateX(-50%);
+            top: 0; left: 0;
+            width: 100%;
+            padding: 8px 10px 0 10px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            z-index: 25;
+            pointer-events: none;
+        }
+        /* 第一層：左右工具列 */
+        .top-row-1 {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+        .top-left-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+        }
+        .icon-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 2.5px solid white;
+            background: #9575cd;
+            color: white;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .icon-btn:active { transform: scale(0.9); }
+
+        #wordCounter {
+            background: linear-gradient(135deg, #ffd54f, #ffb300);
+            color: #4a148c;
+            border: 2.5px solid white;
+            border-radius: 18px;
+            padding: 4px 10px;
+            font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        #clueButton {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #ff80ab, #ec407a);
+            color: white;
+            border: 2.5px solid white;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: clamp(0.78rem, 1.8vw, 0.92rem);
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* 第二層：任務提示橫幅 (獨立一行，絕不與左右按鈕重疊) */
+        #hudTop {
+            pointer-events: auto;
             background: rgba(255, 255, 255, 0.94);
-            border: 3px solid #9575cd;
-            border-radius: 25px;
-            padding: 6px 16px;
-            font-size: clamp(0.82rem, 1.9vw, 1.05rem);
+            border: 2.5px solid #9575cd;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: clamp(0.78rem, 1.8vw, 0.98rem);
             font-weight: bold;
             color: #4a148c;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 20;
-            display: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
             text-align: center;
-            max-width: 58%;
+            max-width: 96%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        /* 第三層：房間快速傳送列 (支援橫向滑動，不佔垂直空間) */
         #teleportBar {
-            position: absolute;
-            top: 48px; left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            gap: 6px;
-            z-index: 20;
-            flex-wrap: wrap;
+            pointer-events: auto;
+            display: flex;
+            gap: 5px;
             justify-content: center;
-            width: 92%;
-            max-width: 720px;
+            flex-wrap: wrap;
+            max-width: 98%;
         }
         .tp-btn {
             background: rgba(123, 31, 162, 0.88);
             color: #fff;
             border: 2px solid #fff;
-            padding: 4px 11px;
-            border-radius: 16px;
-            font-size: 0.82rem;
+            padding: 3px 9px;
+            border-radius: 14px;
+            font-size: clamp(0.72rem, 1.6vw, 0.82rem);
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
         .tp-btn:active {
             transform: scale(0.92);
             background: #ec407a;
         }
 
-        #topLeftBtns {
-            position: absolute;
-            top: 8px; left: 10px;
-            display: none;
-            gap: 8px;
-            z-index: 25;
-            align-items: center;
-        }
-        .icon-btn {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            border: 3px solid white;
-            background: #9575cd;
-            color: white;
-            font-size: 1.15rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-        #wordCounter {
-            background: linear-gradient(135deg, #ffd54f, #ffb300);
-            color: #4a148c;
-            border: 3px solid white;
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 0.88rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        #clueButton {
-            position: absolute;
-            top: 8px; right: 10px;
-            background: linear-gradient(135deg, #ff80ab, #ec407a);
-            color: white;
-            border: 3px solid white;
-            border-radius: 22px;
-            padding: 7px 14px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.22);
-            z-index: 25;
-            display: none;
-        }
-
         /* 3. Zoom In / Zoom Out 鏡頭縮放按鈕 */
         #zoomControls {
             position: absolute;
-            right: 14px; top: 44%;
+            right: 12px; top: 52%;
             transform: translateY(-50%);
             display: none;
             flex-direction: column;
@@ -249,14 +257,14 @@
             z-index: 25;
         }
         .zoom-btn {
-            width: 52px; height: 52px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.94);
-            border: 4px solid #7e57c2;
+            border: 3.5px solid #7e57c2;
             color: #4a148c;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.22);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.22);
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -264,7 +272,7 @@
             align-items: center;
             line-height: 1;
         }
-        .zoom-btn span { font-size: 0.65rem; margin-top: 2px; }
+        .zoom-btn span { font-size: 0.62rem; margin-top: 2px; }
         .zoom-btn:active { transform: scale(0.9); background: #ede7f6; }
 
         /* 4. 虛擬方向桿、加速跑與跳躍鍵 */
@@ -278,10 +286,10 @@
         }
         #joystickZone {
             position: absolute;
-            bottom: 24px; left: 24px;
-            width: 140px; height: 140px;
+            bottom: 22px; left: 22px;
+            width: 132px; height: 132px;
             background: radial-gradient(circle, rgba(255,255,255,0.68) 0%, rgba(179,157,219,0.58) 100%);
-            border: 5px solid rgba(255, 255, 255, 0.95);
+            border: 4px solid rgba(255, 255, 255, 0.95);
             border-radius: 50%;
             box-shadow: 0 6px 20px rgba(0,0,0,0.22);
             pointer-events: auto;
@@ -290,23 +298,23 @@
         #joystickKnob {
             position: absolute;
             top: 50%; left: 50%;
-            width: 58px; height: 58px;
-            margin-top: -29px; margin-left: -29px;
+            width: 54px; height: 54px;
+            margin-top: -27px; margin-left: -27px;
             background: radial-gradient(circle at 30% 30%, #ce93d8, #7b1fa2);
-            border: 4px solid #ffffff;
+            border: 3.5px solid #ffffff;
             border-radius: 50%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.35);
             pointer-events: none;
         }
         #jumpBtn {
             position: absolute;
-            bottom: 26px; right: 24px;
-            width: 92px; height: 92px;
+            bottom: 24px; right: 20px;
+            width: 86px; height: 86px;
             background: radial-gradient(circle at 30% 30%, #ff8a80, #e53935);
-            border: 5px solid #ffffff;
+            border: 4px solid #ffffff;
             border-radius: 50%;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.0rem;
             font-weight: bold;
             box-shadow: 0 6px 20px rgba(0,0,0,0.28);
             cursor: pointer;
@@ -319,13 +327,13 @@
         }
         #sprintBtn {
             position: absolute;
-            bottom: 30px; right: 130px;
-            width: 78px; height: 78px;
+            bottom: 28px; right: 118px;
+            width: 74px; height: 74px;
             background: radial-gradient(circle at 30% 30%, #ffd54f, #ff8f00);
             border: 4px solid #ffffff;
             border-radius: 50%;
             color: #4a148c;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: bold;
             box-shadow: 0 6px 18px rgba(0,0,0,0.25);
             cursor: pointer;
@@ -353,12 +361,12 @@
             background: rgba(255, 255, 255, 0.96);
             border: 3px solid #ab47bc;
             border-radius: 20px;
-            padding: 5px 14px;
-            font-size: 0.92rem;
+            padding: 5px 13px;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #4a148c;
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
             pointer-events: auto;
             cursor: pointer;
         }
@@ -366,10 +374,10 @@
             position: absolute;
             transform: translate(-50%, -100%);
             background: rgba(255, 253, 231, 0.95);
-            border: 3px solid #ffb300;
-            border-radius: 16px;
-            padding: 3px 10px;
-            font-size: 0.82rem;
+            border: 2.5px solid #ffb300;
+            border-radius: 15px;
+            padding: 3px 9px;
+            font-size: 0.8rem;
             font-weight: bold;
             color: #e65100;
             white-space: nowrap;
@@ -381,24 +389,24 @@
         /* 6. 雙語點讀學習字卡 */
         #wordCardModal {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 52%; left: 50%;
             transform: translate(-50%, -50%);
             width: 88%;
-            max-width: 480px;
+            max-width: 460px;
             background: linear-gradient(180deg, #ffffff 0%, #f3e5f5 100%);
-            border: 6px solid #ab47bc;
-            border-radius: 30px;
-            padding: 18px 22px;
+            border: 5px solid #ab47bc;
+            border-radius: 28px;
+            padding: 16px 20px;
             z-index: 75;
             display: none;
             text-align: center;
             box-shadow: 0 18px 45px rgba(74, 20, 140, 0.45);
         }
-        #wordCardEmoji { font-size: 3.6rem; margin-bottom: 2px; }
-        #wordCardZh { font-size: 2.0rem; font-weight: 900; color: #4a148c; margin: 2px 0; }
+        #wordCardEmoji { font-size: 3.4rem; margin-bottom: 2px; }
+        #wordCardZh { font-size: 1.9rem; font-weight: 900; color: #4a148c; margin: 2px 0; }
         #wordCardEn {
-            font-size: 1.65rem; font-weight: bold; color: #d81b60;
-            margin: 2px 0 10px 0;
+            font-size: 1.55rem; font-weight: bold; color: #d81b60;
+            margin: 2px 0 8px 0;
             font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
         }
         #wordCardDesc {
@@ -406,17 +414,17 @@
             border: 2px dashed #ba68c8;
             border-radius: 16px;
             padding: 8px 12px;
-            font-size: 1.0rem;
+            font-size: 0.96rem;
             color: #333;
-            margin-bottom: 14px;
-            line-height: 1.45;
+            margin-bottom: 12px;
+            line-height: 1.42;
         }
         .sound-btn-row {
-            display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;
+            display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;
         }
         .speak-lang-btn {
-            border: none; border-radius: 22px; padding: 10px 18px;
-            font-size: 1.02rem; font-weight: bold; cursor: pointer; color: white;
+            border: none; border-radius: 22px; padding: 9px 16px;
+            font-size: 0.98rem; font-weight: bold; cursor: pointer; color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             display: flex; align-items: center; gap: 5px;
         }
@@ -430,12 +438,12 @@
             transform: translateX(-50%);
             width: 94%;
             max-width: 780px;
-            max-height: 26vh;
-            background: rgba(255, 255, 255, 0.92);
+            max-height: 28vh;
+            background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(6px);
             border: 4px solid #ab47bc;
             border-radius: 22px;
-            padding: 10px 18px;
+            padding: 10px 16px;
             z-index: 60;
             display: none;
             box-shadow: 0 8px 25px rgba(74, 20, 140, 0.35);
@@ -453,7 +461,7 @@
             color: white;
             padding: 4px 14px;
             border-radius: 16px;
-            font-size: 1.05rem;
+            font-size: 1.02rem;
             font-weight: bold;
         }
         #speakBtn {
@@ -461,22 +469,23 @@
             color: #4a148c;
             border: 2px solid #fff;
             border-radius: 20px;
-            padding: 5px 14px;
-            font-size: 0.95rem;
+            padding: 4px 12px;
+            font-size: 0.92rem;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 8px rgba(0,0,0,0.18);
         }
         #dialogText {
-            font-size: clamp(0.95rem, 2.1vw, 1.15rem);
-            line-height: 1.42;
+            font-size: clamp(0.92rem, 2.0vw, 1.12rem);
+            line-height: 1.4;
             color: #222;
             margin-bottom: 8px;
             font-weight: 600;
+            white-space: pre-line;
         }
         .dialog-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
             flex-wrap: wrap;
         }
@@ -484,56 +493,66 @@
             background: #7e57c2;
             color: white;
             border: none;
-            padding: 7px 18px;
-            font-size: 0.98rem;
+            padding: 7px 15px;
+            font-size: 0.92rem;
             font-weight: bold;
-            border-radius: 20px;
+            border-radius: 18px;
             cursor: pointer;
             box-shadow: 0 3px 8px rgba(0,0,0,0.18);
         }
         .action-btn.accuse { background: #ec407a; }
+        .action-btn.vocab { background: #ff8f00; }
         .action-btn.restart { background: #26a69a; }
     </style>
 </head>
 <body>
 
-    <!-- 1. 3D 實時動態背景首頁 -->
+    <!-- 1. 首頁：完全無白色半透明框，直接呈現 100% 3D 實時童話城堡美景 -->
     <div id="startScreen">
-        <div class="start-glass-card">
-            <div class="live-tag">✨ 3D 實時童話城堡全景 ✨</div><br>
+        <div class="start-top-header">
             <div class="castle-badge">🏰🐘🐰🐵🍎</div>
             <h1>童話城堡雙語大偵探</h1>
-            <p>大象爺爺的大蘋果不見了！動物們正在城堡各處自由散步，快選出你的小偵探角色，一邊點讀傢俱學中英文，一邊找出真兇吧！</p>
-            <div class="char-select">
-                <div class="char-card" onclick="startGame('boy')">
-                    <span class="char-icon">👦🏻</span>
-                    <span class="char-title">小男孩偵探</span>
-                    <span class="char-sub">點擊出發 GO! ▶</span>
-                </div>
-                <div class="char-card" onclick="startGame('girl')">
-                    <span class="char-icon">👧🏻</span>
-                    <span class="char-title">小女孩偵探</span>
-                    <span class="char-sub">點擊出發 GO! ▶</span>
-                </div>
+            <div class="start-subtitle">✨ 點擊動物推理破案・點擊傢俱學中英文 ✨</div>
+        </div>
+
+        <div class="char-select">
+            <div class="char-card" onclick="startGame('boy')">
+                <span class="char-icon">👦🏻</span>
+                <span class="char-title">小男孩偵探</span>
+                <span class="char-sub">點擊出發 GO! ▶</span>
+            </div>
+            <div class="char-card" onclick="startGame('girl')">
+                <span class="char-icon">👧🏻</span>
+                <span class="char-title">小女孩偵探</span>
+                <span class="char-sub">點擊出發 GO! ▶</span>
             </div>
         </div>
     </div>
 
-    <!-- 2. 頂部工具列、任務欄與房間快速傳送 -->
-    <div id="topLeftBtns">
-        <button class="icon-btn" id="bgmBtn" onclick="toggleBGM()" title="背景音樂">🎵</button>
-        <button class="icon-btn" onclick="toggleFullScreen()" title="全螢幕">⛶</button>
-        <div id="wordCounter">🌟 雙語單字：0 / 22</div>
+    <!-- 2. 頂部三層式防重疊導航系統 (#topUIBar) -->
+    <div id="topUIBar">
+        <!-- 第一層：左工具列 + 右挑戰紙條 -->
+        <div class="top-row-1">
+            <div class="top-left-group">
+                <button class="icon-btn" id="bgmBtn" onclick="toggleBGM()" title="背景音樂">🎵</button>
+                <button class="icon-btn" onclick="toggleFullScreen()" title="全螢幕">⛶</button>
+                <div id="wordCounter">🌟 單字：0 / 22</div>
+            </div>
+            <button id="clueButton" onclick="showClueCard()">📜 挑戰紙條</button>
+        </div>
+
+        <!-- 第二層：任務欄 (獨立一行，不重疊) -->
+        <div id="hudTop">🎯 任務：點擊各房間散步的【動物】對話推理，或點擊【傢俱】學中英文！</div>
+
+        <!-- 第三層：房間快速傳送列 -->
+        <div id="teleportBar">
+            <button class="tp-btn" onclick="teleportTo(0, 120)">🏛️ 中央大道</button>
+            <button class="tp-btn" onclick="teleportTo(-75, 85)">📚 1號書房(大象)</button>
+            <button class="tp-btn" onclick="teleportTo(75, 85)">🚂 2號遊戲室(兔/猴)</button>
+            <button class="tp-btn" onclick="teleportTo(-75, -85)">🍄 3號花園(刺蝟)</button>
+            <button class="tp-btn" onclick="teleportTo(75, -85)">👑 4號皇室客廳</button>
+        </div>
     </div>
-    <div id="hudTop">🎯 任務：去左前方【1號書房】找正在散步的大象爺爺報案！</div>
-    <div id="teleportBar">
-        <button class="tp-btn" onclick="teleportTo(0, 120)">🏛️ 中央大道</button>
-        <button class="tp-btn" onclick="teleportTo(-75, 85)">📚 1號書房(大象)</button>
-        <button class="tp-btn" onclick="teleportTo(75, 85)">🚂 2號遊戲室(兔/猴)</button>
-        <button class="tp-btn" onclick="teleportTo(-75, -85)">🍄 3號花園(刺蝟)</button>
-        <button class="tp-btn" onclick="teleportTo(75, -85)">👑 4號皇室客廳</button>
-    </div>
-    <button id="clueButton" onclick="showClueCard()">📜 挑戰紙條</button>
 
     <!-- 3. Zoom In / Zoom Out 鏡頭縮放按鈕 -->
     <div id="zoomControls">
@@ -573,11 +592,11 @@
             <div id="joystickKnob"></div>
         </div>
         <div id="sprintBtn">
-            <span style="font-size:1.25rem">⚡</span>
+            <span style="font-size:1.2rem">⚡</span>
             <span>加速跑</span>
         </div>
         <div id="jumpBtn">
-            <span style="font-size:1.35rem">⬆️</span>
+            <span style="font-size:1.3rem">⬆️</span>
             <span>跳躍</span>
         </div>
     </div>
@@ -586,42 +605,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // =========================================================================
-        // 🛡️ iPad / 手機防誤觸強制縮放保護系統 (防止雙指捏合、Safari 手勢與雙擊放大)
+        // 🛡️ iPad / 手機防誤觸強制縮放保護系統
         // =========================================================================
-        // 1. 攔截 iOS Safari 專屬的兩指縮放手勢 (Gesture Events)
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        }, { passive: false });
-        document.addEventListener('gesturechange', function(e) {
-            e.preventDefault();
-        }, { passive: false });
-        document.addEventListener('gestureend', function(e) {
-            e.preventDefault();
-        }, { passive: false });
+        document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gestureend', e => e.preventDefault(), { passive: false });
 
-        // 2. 阻止雙指捏合縮放 (Pinch-to-zoom)，但保留「左指推搖桿 + 右指按跳躍/加速」的多點觸控遊戲體驗
         document.addEventListener('touchstart', function(event) {
             if (event.touches.length > 1) {
                 const t = event.target;
                 const isGameControl = t.closest && (t.closest('#joystickZone') || t.closest('#jumpBtn') || t.closest('#sprintBtn'));
-                if (!isGameControl) {
-                    event.preventDefault();
-                }
+                if (!isGameControl) event.preventDefault();
             }
         }, { passive: false });
 
         document.addEventListener('touchmove', function(event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
+            if (event.touches.length > 1) event.preventDefault();
         }, { passive: false });
 
-        // 3. 阻止連續快速點擊造成的原生瀏覽器放大 (Double-tap to zoom)
         let lastTouchEndTime = 0;
         document.addEventListener('touchend', function(event) {
             const now = Date.now();
             if (now - lastTouchEndTime <= 320) {
-                // 避免觸發瀏覽器原生雙擊縮放，同時若點在按鈕上仍正常觸發 click
                 event.preventDefault();
                 if (event.target && typeof event.target.click === 'function') {
                     event.target.click();
@@ -630,16 +635,8 @@
             lastTouchEndTime = now;
         }, { passive: false });
 
-        // 4. 阻止雙擊事件與 Ctrl+滾輪縮放
-        document.addEventListener('dblclick', function(event) {
-            event.preventDefault();
-        }, { passive: false });
-
-        window.addEventListener('wheel', function(event) {
-            if (event.ctrlKey) {
-                event.preventDefault();
-            }
-        }, { passive: false });
+        document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+        window.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
 
         // =========================================================================
         // 🗣️ 雙語語音朗讀系統 (支援廣東話 zh-HK / 國語 zh-TW 與 英語 en-US)
@@ -683,6 +680,7 @@
 
         function openWordCard(item) {
             if (gameState === 'CUTSCENE' || gameState === 'START') return;
+            closeDialog();
             SoundFX.pop();
             currentCardItem = item;
             document.getElementById('wordCardEmoji').innerText = item.emoji;
@@ -693,7 +691,7 @@
 
             if (!learnedWords.has(item.en)) {
                 learnedWords.add(item.en);
-                document.getElementById('wordCounter').innerText = `🌟 雙語單字：${learnedWords.size} / ${TOTAL_VOCAB_COUNT}`;
+                document.getElementById('wordCounter').innerText = `🌟 單字：${learnedWords.size} / ${TOTAL_VOCAB_COUNT}`;
             }
 
             speakText(`${item.zh}。`, 'zh');
@@ -826,6 +824,7 @@
 
         let npcRoamingList = [];
 
+        // 預設進入遊戲即可直接調查並觸發所有動物 NPC 的對話框！
         let gameState = 'START';
         let playerGender = 'girl';
         let hasAcceptedQuest = false;
@@ -854,7 +853,6 @@
         let mouse = new THREE.Vector2();
         let prevTime = performance.now();
 
-        // 網頁載入時立即啟動 3D 城堡全景渲染作為動態首頁背景
         window.addEventListener('DOMContentLoaded', () => {
             initScene();
             initTouchAndControls();
@@ -870,13 +868,12 @@
             createPixarStyleHero(playerGender);
 
             document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('topLeftBtns').style.display = 'flex';
-            document.getElementById('hudTop').style.display = 'block';
-            document.getElementById('teleportBar').style.display = 'flex';
+            document.getElementById('topUIBar').style.display = 'flex';
             document.getElementById('zoomControls').style.display = 'flex';
             document.getElementById('controlsUI').style.display = 'block';
 
-            gameState = 'FIND_ELEPHANT';
+            // 進入遊戲直接設為 INVESTIGATE 狀態，確保點擊任何一個動物 NPC 都會立即彈出偵探對話框！
+            gameState = 'INVESTIGATE';
 
             const initCamHeight = 7.0 + (cameraDistance * 0.38);
             camera.position.set(
@@ -888,8 +885,8 @@
 
             showDialog(
                 "🏰 歡迎來到雙語童話城堡！",
-                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！動物們正在房間裏自由散步呢！請先去左前方【1號書房】找戴眼鏡、拿拐杖的大象爺爺報案！（可按上方【📚 1號書房】直接傳送）`,
-                [{ text: "開始探索！", action: closeDialog }]
+                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！大象爺爺的【巨無霸大蘋果】不見了！\n• 點擊任何散步中的【動物（大象、兔子、猴子、刺蝟）】都可以展開對話與推理！\n• 點擊沿途【傢俱佈置】可以打開中英文發音字卡！`,
+                [{ text: "出發調查！", action: closeDialog }]
             );
         }
 
@@ -1527,7 +1524,7 @@
         }
 
         // =========================================================================
-        // 🐘🐰🐵🦔 建立 4 個可愛動物角色 + 註冊「NPC 自由漫遊 AI」
+        // 🐘🐰🐵🦔 建立 4 個可愛動物角色 + 確保點擊 100% 彈出偵探對話框！
         // =========================================================================
         function registerSuspectClickable(group, suspectName, labelText, offsetY, onClickFn) {
             group.traverse(child => {
@@ -1544,7 +1541,7 @@
                 onClickFn();
             });
             document.getElementById('labelsContainer').appendChild(el);
-            floatingLabels.push({ el: el, group: group, offsetY: offsetY, isNPC: true, maxDist: 150 });
+            floatingLabels.push({ el: el, group: group, offsetY: offsetY, isNPC: true, maxDist: 155 });
         }
 
         function registerFreeRoamNPC(group, minX, maxX, minZ, maxZ, speed, hopHeight, hopFreq) {
@@ -1688,12 +1685,11 @@
             elephantGroup.position.set(-75, 0, 95);
             scene.add(elephantGroup);
             registerSuspectClickable(elephantGroup, "Elephant", "🐘 大象爺爺 Elephant (點擊對話)", 18.0, () => {
-                if (!hasAcceptedQuest) triggerElephantQuest();
-                else showClueCard();
+                triggerElephantQuest();
             });
             registerFreeRoamNPC(elephantGroup, -100, -52, 55, 130, 8.5, 0.8, 8);
 
-            // 2. 跳跳兔
+            // 2. 跳跳兔 (點擊必定彈出兔子推理對話框！)
             rabbitGroup = new THREE.Group();
             const furBrown = animMat(0xc68652);
             const furWhite = animMat(0xfffdf9);
@@ -1714,12 +1710,11 @@
             rabbitGroup.position.set(68, 0, 118);
             scene.add(rabbitGroup);
             registerSuspectClickable(rabbitGroup, "Rabbit", "🐰 跳跳兔 Rabbit (點擊審問)", 14.5, () => {
-                if (gameState === 'INVESTIGATE') openSuspectDialog("Rabbit");
-                else openWordCard({ emoji: "🐰", zh: "跳跳兔", en: "Rabbit", descZh: "跳跳兔有一對長長的耳朵。", descEn: "The cute rabbit has two long ears." });
+                openSuspectDialog("Rabbit");
             });
             registerFreeRoamNPC(rabbitGroup, 48, 105, 95, 140, 14.0, 2.2, 12);
 
-            // 3. 小猴子
+            // 3. 小猴子 (點擊必定彈出小猴子推理對話框！)
             monkeyGroup = new THREE.Group();
             const darkFur = animMat(0x4e2a14);
             const peachSkin = animMat(0xf5b086);
@@ -1734,12 +1729,11 @@
             monkeyGroup.position.set(90, 0, 42);
             scene.add(monkeyGroup);
             registerSuspectClickable(monkeyGroup, "Monkey", "🐵 小猴子 Monkey (點擊審問)", 12.0, () => {
-                if (gameState === 'INVESTIGATE') openSuspectDialog("Monkey");
-                else openWordCard({ emoji: "🐵", zh: "小猴子", en: "Monkey", descZh: "調皮的小猴子最喜歡吃香蕉。", descEn: "The playful monkey loves eating bananas." });
+                openSuspectDialog("Monkey");
             });
             registerFreeRoamNPC(monkeyGroup, 50, 120, 22, 68, 16.0, 1.8, 14);
 
-            // 4. 刺蝟弟弟
+            // 4. 刺蝟弟弟 (點擊必定彈出刺蝟推理對話框！)
             hedgehogGroup = new THREE.Group();
             const hedBody = new THREE.Mesh(new THREE.SphereGeometry(2.8, 24, 24), animMat(0xf5e1c8)); hedBody.position.y = 2.8;
             const hedBack = new THREE.Mesh(new THREE.SphereGeometry(3.1, 24, 24), animMat(0x5d4037)); hedBack.position.set(0, 3.3, 0.9);
@@ -1749,8 +1743,7 @@
             hedgehogGroup.position.set(-90, 0, -70);
             scene.add(hedgehogGroup);
             registerSuspectClickable(hedgehogGroup, "Hedgehog", "🦔 刺蝟弟弟 Hedgehog (點擊審問)", 9.0, () => {
-                if (gameState === 'INVESTIGATE') openSuspectDialog("Hedgehog");
-                else openWordCard({ emoji: "🦔", zh: "刺蝟", en: "Hedgehog", descZh: "刺蝟背上長滿了保護自己的小刺。", descEn: "The hedgehog has sharp spines on its back." });
+                openSuspectDialog("Hedgehog");
             });
             registerFreeRoamNPC(hedgehogGroup, -120, -52, -95, -35, 10.5, 0.9, 15);
 
@@ -1834,7 +1827,7 @@
         function initTouchAndControls() {
             const zone = document.getElementById('joystickZone');
             const knob = document.getElementById('joystickKnob');
-            const maxRadius = 44;
+            const maxRadius = 42;
             let joyPointerId = null;
 
             const updateJoystick = (clientX, clientY) => {
@@ -1938,6 +1931,7 @@
             });
         }
 
+        // 點擊 3D 物件：動物一律開啟偵探對話框，傢俱一律開啟雙語單字卡！
         function checkTapOn3DObject(clientX, clientY) {
             mouse.x = (clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(clientY / window.innerHeight) * 2 + 1;
@@ -1946,24 +1940,21 @@
 
             if (hits.length > 0) {
                 const hitObj = hits[0].object;
-                if (hitObj.userData.vocab) {
-                    openWordCard(hitObj.userData.vocab);
-                } else if (hitObj.userData.suspectName) {
+                if (hitObj.userData.suspectName) {
                     const sName = hitObj.userData.suspectName;
                     if (sName === "Elephant") {
-                        if (!hasAcceptedQuest) triggerElephantQuest();
-                        else showClueCard();
-                    } else if (gameState === 'INVESTIGATE') {
-                        openSuspectDialog(sName);
+                        triggerElephantQuest();
                     } else {
-                        showDialog("💡 溫馨提示", "請先去【1號書房】找正在散步的大象爺爺領取偵探任務喔！（可按上方【📚 1號書房】直接傳送）", [{ text: "好！", action: closeDialog }]);
+                        openSuspectDialog(sName);
                     }
+                } else if (hitObj.userData.vocab) {
+                    openWordCard(hitObj.userData.vocab);
                 }
             }
         }
 
         // =========================================================================
-        // 🎬 無遮擋 3D 劇場模式與大象爺爺拐杖走路過場動畫
+        // 🎬 角色對話框（含推理按鈕 + 雙語學習按鈕）與無遮擋劇場過場動畫
         // =========================================================================
         function setTheaterMode(enabled) {
             document.getElementById('controlsUI').style.display = enabled ? 'none' : 'block';
@@ -1974,44 +1965,50 @@
         function triggerElephantQuest() {
             hasAcceptedQuest = true;
             gameState = 'INVESTIGATE';
+            closeWordCard();
             SoundFX.pop();
-            document.getElementById('clueButton').style.display = 'block';
-            document.getElementById('hudTop').innerText = "🔍 任務：到各房間找正在散步的【嫌疑犯】點擊審問破案！";
 
             showDialog(
-                "🐘 大象爺爺（森林村長）",
-                "「小偵探你終於來了！我準備在今晚派對分享的【巨無霸大蘋果】不見了！挑戰紙條寫著：\n1️⃣ 犯人【不吃香蕉】  2️⃣ 犯人【沒有長耳朵】  3️⃣ 犯人【不是走著路】離開的。\n快去 2號遊戲室（跳跳兔、小猴子）和 3號花園（刺蝟弟弟）點擊正在散步的他們找出真兇吧！」",
-                [{ text: "出發調查！", action: closeDialog }]
+                "🐘 大象爺爺 Grandpa Elephant（村長）",
+                "「小偵探你好！我準備在今晚派對分享的【巨無霸大蘋果】不見了！挑戰紙條寫著：\n1️⃣ 犯人【不吃香蕉 (No Bananas)】\n2️⃣ 犯人【沒有長耳朵 (No Long Ears)】\n3️⃣ 犯人【不是走著路】離開的。\n快去 2號遊戲室（跳跳兔、小猴子）和 3號花園（刺蝟弟弟）點擊他們審問破案吧！」",
+                [
+                    { text: "🔤 學大象英文 (Elephant)", style: "vocab", action: () => openWordCard({ emoji: "🐘", zh: "大象爺爺", en: "Elephant", descZh: "大象爺爺有長長的鼻子和金絲眼鏡。", descEn: "Grandpa Elephant has a long trunk and glasses." }) },
+                    { text: "出發調查！", action: closeDialog }
+                ]
             );
         }
 
         function openSuspectDialog(suspectName) {
+            closeWordCard();
             SoundFX.pop();
             if (suspectName === "Rabbit") {
                 showDialog(
                     "🐰 嫌疑犯一號：跳跳兔 (Rabbit)",
-                    "「我最喜歡一邊散步一邊吃【紅蘿蔔 (Carrot)】，而且我有一對毛茸茸的【長耳朵 (Long Ears)】！」",
+                    "「我最喜歡一邊散步一邊吃【紅蘿蔔 (Carrot)】，水果太甜我不常吃呢！而且你看我有一對毛茸茸的【長耳朵 (Long Ears)】！」",
                     [
                         { text: "👉 指認她是小偷！", style: "accuse", action: () => startAnswerCutscene("Rabbit") },
-                        { text: "再去看看別人", action: closeDialog }
+                        { text: "🔤 學兔子英文", style: "vocab", action: () => openWordCard({ emoji: "🐰", zh: "跳跳兔", en: "Rabbit", descZh: "跳跳兔有一對長長的耳朵。", descEn: "The cute rabbit has two long ears." }) },
+                        { text: "再去問問別人", action: closeDialog }
                     ]
                 );
             } else if (suspectName === "Monkey") {
                 showDialog(
                     "🐵 嫌疑犯二號：小猴子 (Monkey)",
-                    "「吱吱！我剛剛在玩具火車旁吃我最愛的【黃色香蕉 (Banana)】，我怎麼可能去偷蘋果？」",
+                    "「吱吱！我剛剛在玩具火車旁吃我最愛的【黃色香蕉 (Banana)】，地上的香蕉皮是我丟的啦！我怎麼可能去偷蘋果？」",
                     [
                         { text: "👉 指認他是小偷！", style: "accuse", action: () => startAnswerCutscene("Monkey") },
-                        { text: "再去看看別人", action: closeDialog }
+                        { text: "🔤 學猴子英文", style: "vocab", action: () => openWordCard({ emoji: "🐵", zh: "小猴子", en: "Monkey", descZh: "調皮的小猴子最喜歡吃香蕉。", descEn: "The playful monkey loves eating bananas." }) },
+                        { text: "再去問問別人", action: closeDialog }
                     ]
                 );
             } else if (suspectName === "Hedgehog") {
                 showDialog(
                     "🦔 嫌疑犯三號：刺蝟弟弟 (Hedgehog)",
-                    "「嗚……我背上全都是刺。我不吃香蕉，也沒有長耳朵，而且我可以把身體縮成一團滾著走……」",
+                    "「嗚……我背上全都是保護自己的小刺。我不吃香蕉，也沒有長耳朵，而且我可以把身體縮成一團滾著走……」",
                     [
                         { text: "👉 指認他是小偷！", style: "accuse", action: () => startAnswerCutscene("Hedgehog") },
-                        { text: "再去看看別人", action: closeDialog }
+                        { text: "🔤 學刺蝟英文", style: "vocab", action: () => openWordCard({ emoji: "🦔", zh: "刺蝟", en: "Hedgehog", descZh: "刺蝟背上長滿了保護自己的小刺。", descEn: "The hedgehog has sharp spines on its back." }) },
+                        { text: "再去問問別人", action: closeDialog }
                     ]
                 );
             }
@@ -2080,7 +2077,7 @@
                         setTheaterMode(false);
                         elephantGroup.position.set(-75, 0, 95);
                         gameState = 'INVESTIGATE';
-                        document.getElementById('hudTop').innerText = "🔍 任務：到各房間找正在散步的【嫌疑犯】點擊審問破案！";
+                        document.getElementById('hudTop').innerText = "🔍 任務：點擊各房間散步的【動物】對話推理，或點擊【傢俱】學中英文！";
                     }
                 }]);
             } else if (cutscene.type === 'CORRECT_APPROACH') {
@@ -2134,6 +2131,7 @@
         }
 
         function showClueCard() {
+            closeWordCard();
             SoundFX.pop();
             showDialog(
                 "💌 粉紅心形神祕挑戰紙條",
@@ -2192,7 +2190,7 @@
         }
 
         // =========================================================================
-        // 🔄 主迴圈：首頁 3D 環繞運鏡 + NPC 自由散步 + 玩家操控
+        // 🔄 主迴圈：首頁無遮擋 3D 環繞運鏡 + NPC 自由散步 + 玩家操控
         // =========================================================================
         function animate() {
             requestAnimationFrame(animate);
@@ -2214,16 +2212,16 @@
 
             updateNPCRoaming(delta, now);
 
-            // 狀態 0：首頁 3D 實時環繞全景展示模式
+            // 狀態 0：首頁 3D 實時環繞全景展示模式 (完全無白色底框遮擋)
             if (gameState === 'START') {
-                const orbitAngle = now * 0.00032;
-                const radius = 115;
+                const orbitAngle = now * 0.00035;
+                const radius = 110;
                 camera.position.set(
                     Math.sin(orbitAngle) * radius,
-                    38 + Math.sin(now * 0.001) * 5,
+                    32 + Math.sin(now * 0.001) * 4,
                     Math.cos(orbitAngle) * radius
                 );
-                camera.lookAt(0, 8, 15);
+                camera.lookAt(0, 10, 0);
                 renderer.render(scene, camera);
                 return;
             }
@@ -2365,10 +2363,9 @@
                         );
                     }
 
-                    if (gameState === 'FIND_ELEPHANT' && !hasAcceptedQuest) {
-                        if (playerGroup.position.distanceTo(elephantGroup.position) < 20) {
-                            triggerElephantQuest();
-                        }
+                    // 第一次走近大象爺爺時自動彈出報案說明
+                    if (!hasAcceptedQuest && playerGroup.position.distanceTo(elephantGroup.position) < 20) {
+                        triggerElephantQuest();
                     }
                 }
 
