@@ -423,78 +423,108 @@
         .speak-zh { background: linear-gradient(135deg, #ff8f00, #f57c00); }
         .speak-en { background: linear-gradient(135deg, #1e88e5, #1565c0); }
 
-        /* 7. 不遮擋畫面的緊湊置底字幕對話框 */
+        /* =================================================================
+           7. 【關鍵修復】對話框改為 Flex 固定頂底結構，確定按鈕永遠可見絕不消失！
+           ================================================================= */
         #dialogBox {
             position: absolute;
-            bottom: 10px; left: 50%;
+            bottom: 12px; left: 50%;
             transform: translateX(-50%);
             width: 94%;
-            max-width: 780px;
-            max-height: 28vh;
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(6px);
+            max-width: 760px;
+            max-height: 36vh;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
             border: 4px solid #ab47bc;
-            border-radius: 22px;
-            padding: 10px 16px;
-            z-index: 60;
+            border-radius: 24px;
+            padding: 12px 16px;
+            z-index: 80;
             display: none;
-            box-shadow: 0 8px 25px rgba(74, 20, 140, 0.35);
-            overflow-y: auto;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(74, 20, 140, 0.4);
         }
         .dialog-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 6px;
-            gap: 8px;
+            gap: 6px;
+            flex-shrink: 0;
         }
         #dialogBadge {
             background: linear-gradient(135deg, #ab47bc, #7b1fa2);
             color: white;
-            padding: 4px 14px;
+            padding: 4px 12px;
             border-radius: 16px;
-            font-size: 1.02rem;
+            font-size: clamp(0.9rem, 2.2vw, 1.05rem);
             font-weight: bold;
+        }
+        .dialog-top-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         #speakBtn {
             background: linear-gradient(135deg, #ffca28, #ffa000);
             color: #4a148c;
             border: 2px solid #fff;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.92rem;
+            border-radius: 18px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+        }
+        /* 右上角備用關閉 X 鍵，防止任何情況卡住 */
+        #closeXBtn {
+            background: #ef5350;
+            color: white;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         #dialogText {
-            font-size: clamp(0.92rem, 2.0vw, 1.12rem);
-            line-height: 1.4;
+            font-size: clamp(0.9rem, 2.1vw, 1.1rem);
+            line-height: 1.42;
             color: #222;
             margin-bottom: 8px;
             font-weight: 600;
             white-space: pre-line;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 36px;
         }
         .dialog-actions {
             display: flex;
             gap: 8px;
             justify-content: flex-end;
             flex-wrap: wrap;
+            flex-shrink: 0;
+            padding-top: 4px;
+            border-top: 1px solid #ede7f6;
         }
         .action-btn {
-            background: #7e57c2;
+            background: linear-gradient(135deg, #7e57c2, #5e35b1);
             color: white;
-            border: none;
-            padding: 7px 15px;
-            font-size: 0.92rem;
+            border: 2px solid #fff;
+            padding: 8px 18px;
+            font-size: 0.95rem;
             font-weight: bold;
-            border-radius: 18px;
+            border-radius: 20px;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.22);
         }
-        .action-btn.accuse { background: #ec407a; }
-        .action-btn.vocab { background: #ff8f00; }
-        .action-btn.restart { background: #26a69a; }
+        .action-btn:active { transform: scale(0.94); }
+        .action-btn.accuse { background: linear-gradient(135deg, #ec407a, #d81b60); }
+        .action-btn.vocab { background: linear-gradient(135deg, #ff9800, #f57c00); }
+        .action-btn.restart { background: linear-gradient(135deg, #26a69a, #00897b); }
     </style>
 </head>
 <body>
@@ -532,14 +562,14 @@
             <button id="clueButton" onclick="showClueCard()">📜 挑戰紙條</button>
         </div>
 
-        <div id="hudTop">🎯 任務：點擊各房間散步的【動物】對話推理，或點擊【傢俱】學中英文！</div>
+        <div id="hudTop">🎯 任務：點擊散步中的【動物】對話推理，或點擊【傢俱】學中英文！</div>
 
         <div id="teleportBar">
             <button class="tp-btn" onclick="teleportTo(0, 120)">🏛️ 中央大道</button>
-            <button class="tp-btn" onclick="teleportTo(-75, 85)">📚 1號書房(大象)</button>
-            <button class="tp-btn" onclick="teleportTo(75, 85)">🚂 2號遊戲室(兔/猴)</button>
-            <button class="tp-btn" onclick="teleportTo(-75, -85)">🍄 3號花園(刺蝟)</button>
-            <button class="tp-btn" onclick="teleportTo(75, -85)">👑 4號皇室客廳</button>
+            <button class="tp-btn" onclick="teleportTo(-75, 78)">📚 1號書房(大象)</button>
+            <button class="tp-btn" onclick="teleportTo(85, 82)">🚂 2號遊戲室(兔/猴)</button>
+            <button class="tp-btn" onclick="teleportTo(-85, -75)">🍄 3號花園(刺蝟)</button>
+            <button class="tp-btn" onclick="teleportTo(105, -85)">👑 4號皇室客廳</button>
         </div>
     </div>
 
@@ -562,14 +592,17 @@
             <button class="speak-lang-btn speak-zh" onclick="speakWordCard('zh')">🔊 讀中文 (粵/國)</button>
             <button class="speak-lang-btn speak-en" onclick="speakWordCard('en')">🔊 Read English</button>
         </div>
-        <button class="action-btn" onclick="closeWordCard()">👍 學會了！繼續探索</button>
+        <button class="action-btn" onclick="closeWordCard()">✅ 學會了！繼續探索</button>
     </div>
 
-    <!-- 6. 緊湊型置底字幕對話框 -->
+    <!-- 6. 【修復】永遠顯示確定按鈕的置底對話框 -->
     <div id="dialogBox">
         <div class="dialog-top-bar">
             <div id="dialogBadge">大象爺爺</div>
-            <button id="speakBtn" onclick="speakCurrentDialog()">🔊 聽語音朗讀</button>
+            <div class="dialog-top-right">
+                <button id="speakBtn" onclick="speakCurrentDialog()">🔊 聽發音</button>
+                <button id="closeXBtn" onclick="closeDialog()" title="關閉">✖</button>
+            </div>
         </div>
         <div id="dialogText">內容</div>
         <div class="dialog-actions" id="dialogButtons"></div>
@@ -639,7 +672,7 @@
             if (!('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
 
-            const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}✔️1️⃣2️⃣3️⃣•👉🔄➡️✨]/gu, '');
+            const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}✔️1️⃣2️⃣3️⃣•👉🔄➡️✨✅]/gu, '');
             const utter = new SpeechSynthesisUtterance(cleanText);
             const voices = window.speechSynthesis.getVoices();
 
@@ -800,7 +833,7 @@
         }
 
         // =========================================================================
-        // 🎮 Three.js 核心變數與【大幅度 Zoom Out + 手機直向廣角補償】
+        // 🎮 Three.js 核心變數與【正面朝向修正函式 faceTarget】
         // =========================================================================
         let scene, camera, renderer;
         let playerGroup, leftArm, rightArm, leftLeg, rightLeg, heroHead;
@@ -820,23 +853,27 @@
         let cutsceneCamPos = null;
         let cutsceneLookTarget = null;
 
-        // 【升級】大幅提高預設鏡頭距離與最大 Zoom Out 上限 (最高可拉遠至 80！)
-        let cameraDistance = 26.0;
+        let cameraDistance = 28.0;
         const minCamDist = 9.0;
-        const maxCamDist = 80.0;
+        const maxCamDist = 85.0;
         let zoomDirection = 0;
 
-        // 【升級】智慧判斷手機直向 (Portrait) 的視野拉遠倍率
+        // 【關鍵修復 2】因為所有動物與主角模型的五官正面皆朝向 -Z，使用此函式可讓角色 100% 正臉面向目標，絕不再背對著倒退走！
+        function faceTarget(group, targetPos) {
+            const dx = targetPos.x - group.position.x;
+            const dz = targetPos.z - group.position.z;
+            group.rotation.y = Math.atan2(dx, dz) + Math.PI;
+        }
+
         function getPortraitMultiplier() {
             const aspect = window.innerWidth / window.innerHeight;
-            return aspect < 1.0 ? 1.45 : 1.0; // 直向螢幕時自動額外拉遠 1.45 倍！
+            return aspect < 1.0 ? 1.48 : 1.0;
         }
 
         function updateCameraFOV() {
             if (!camera) return;
             const aspect = window.innerWidth / window.innerHeight;
-            // 手機直向時自動使用 68 度大廣角，確保左右兩側角色都能完整入鏡
-            camera.fov = aspect < 1.0 ? 68 : 58;
+            camera.fov = aspect < 1.0 ? 70 : 60;
             camera.aspect = aspect;
             camera.updateProjectionMatrix();
         }
@@ -878,9 +915,8 @@
 
             gameState = 'INVESTIGATE';
 
-            // 若是手機直向，起始距離自動調得更遠，讓小朋友一進去就看到開闊全景
             if (window.innerWidth < window.innerHeight) {
-                cameraDistance = 34.0;
+                cameraDistance = 36.0;
             }
 
             const initCamHeight = 8.0 + (cameraDistance * 0.45);
@@ -893,8 +929,8 @@
 
             showDialog(
                 "🏰 歡迎來到雙語童話城堡！",
-                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！大象爺爺的【巨無霸大蘋果】不見了！\n• 右邊【🔍- 拉遠】可以將畫面大幅縮小看清全景！\n• 點擊任何散步中的【動物】即可對話與推理！`,
-                [{ text: "出發調查！", action: closeDialog }]
+                `你好，${gender === 'boy' ? '小男孩' : '小女孩'}偵探！大象爺爺的【巨無霸大蘋果】不見了！\n• 點擊散步中的【動物】即可對話與推理破案！\n• 點擊沿途【傢俱佈置】可學習中英文單字！`,
+                [{ text: "✅ 確定出發！", action: closeDialog }]
             );
         }
 
@@ -1018,7 +1054,7 @@
         }
 
         // =========================================================================
-        // 🏰 建造 10 倍超大皇室城堡與 22 組雙語點讀佈置
+        // 🏰 建造 10 倍超大皇室城堡與 22 組雙語點讀佈置 (預留寬敞無遮擋劇場舞台)
         // =========================================================================
         function build10xGiantCastleAndProps() {
             const mainFloor = new THREE.Mesh(new THREE.PlaneGeometry(400, 440), animMat(0xf5f0ff, 0.6));
@@ -1227,7 +1263,7 @@
                 descEn: "The fire in the fireplace keeps the room warm."
             }, 20);
 
-            // 11. 旋轉木馬
+            // 11. 旋轉木馬 (移至東北角，讓2號遊戲室中央舞台完全開闊無遮擋)
             carouselGroup = new THREE.Group();
             const cPlat = new THREE.Mesh(new THREE.CylinderGeometry(16, 16, 1.5, 28), animMat(0xfff176)); cPlat.position.y = 0.75;
             const cPole = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 18, 16), animMat(0xffca28)); cPole.position.y = 9;
@@ -1242,7 +1278,7 @@
                 horse.position.set(Math.cos(a) * 11, 6, Math.sin(a) * 11);
                 carouselGroup.add(pole, horse);
             }
-            carouselGroup.position.set(140, 0, 135);
+            carouselGroup.position.set(148, 0, 145);
             scene.add(carouselGroup);
             wallColliders.push(new THREE.Box3().setFromObject(cPlat));
             registerBilingualProp(carouselGroup, {
@@ -1253,12 +1289,12 @@
 
             // 12. 玩具火車
             const trainGroup = new THREE.Group();
-            const trackRing = new THREE.Mesh(new THREE.TorusGeometry(16, 0.7, 10, 36), animMat(0xd7ccc8));
+            const trackRing = new THREE.Mesh(new THREE.TorusGeometry(14, 0.7, 10, 36), animMat(0xd7ccc8));
             trackRing.rotation.x = Math.PI / 2; trackRing.position.y = 0.4;
-            const tEngine = new THREE.Mesh(new THREE.BoxGeometry(7, 5, 4.5), animMat(0xe53935)); tEngine.position.set(0, 3, -16);
-            const tCab = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 4.5), animMat(0x1e88e5)); tCab.position.set(-6.5, 3.5, -16);
+            const tEngine = new THREE.Mesh(new THREE.BoxGeometry(7, 5, 4.5), animMat(0xe53935)); tEngine.position.set(0, 3, -14);
+            const tCab = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 4.5), animMat(0x1e88e5)); tCab.position.set(-6.5, 3.5, -14);
             trainGroup.add(trackRing, tEngine, tCab);
-            trainGroup.position.set(110, 0, 75);
+            trainGroup.position.set(142, 0, 82);
             scene.add(trainGroup);
             registerBilingualProp(trainGroup, {
                 emoji: "🚂", zh: "玩具火車", en: "Toy Train",
@@ -1272,7 +1308,7 @@
             const sChute = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 5), animMat(0xff4081));
             sChute.rotation.z = -Math.PI / 4; sChute.position.set(2, 6, 0);
             slideGroup.add(sSteps, sChute);
-            slideGroup.position.set(148, 0, 32);
+            slideGroup.position.set(148, 0, 28);
             scene.add(slideGroup);
             wallColliders.push(new THREE.Box3().setFromObject(slideGroup));
             registerBilingualProp(slideGroup, {
@@ -1288,7 +1324,7 @@
             const b3 = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), animMat(0xffca28)); b3.position.set(0, 12, 0);
             const bRoof = new THREE.Mesh(new THREE.ConeGeometry(6.5, 8, 16), animMat(0xab47bc)); bRoof.position.set(0, 20, 0);
             blockGroup.add(b1, b2, b3, bRoof);
-            blockGroup.position.set(58, 0, 152);
+            blockGroup.position.set(55, 0, 162);
             scene.add(blockGroup);
             wallColliders.push(new THREE.Box3().setFromObject(blockGroup));
             registerBilingualProp(blockGroup, {
@@ -1306,7 +1342,7 @@
                 cLeaf.position.set((i - 2) * 4, 7.0, (i % 2) * 3);
                 carrotGroup.add(cBody, cLeaf);
             }
-            carrotGroup.position.set(58, 0, 108);
+            carrotGroup.position.set(95, 0, 152);
             scene.add(carrotGroup);
             registerBilingualProp(carrotGroup, {
                 emoji: "🥕", zh: "紅蘿蔔", en: "Carrot",
@@ -1323,7 +1359,7 @@
                 ban.rotation.x = Math.PI / 2; ban.position.set((b - 1.5) * 1.8, 3.2, 0);
                 bananaGroup.add(ban);
             }
-            bananaGroup.position.set(82, 0, 24);
+            bananaGroup.position.set(82, 0, 22);
             scene.add(bananaGroup);
             registerBilingualProp(bananaGroup, {
                 emoji: "🍌", zh: "香蕉", en: "Banana",
@@ -1333,10 +1369,10 @@
 
             // 17. 池塘與小橋
             const pondGroup = new THREE.Group();
-            const water = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 0.4, 32), animMat(0x4fc3f7, 0.1)); water.position.y = 0.2;
-            const bridge = new THREE.Mesh(new THREE.TorusGeometry(16, 2.5, 12, 24, Math.PI), animMat(0xff7043)); bridge.position.y = 0;
+            const water = new THREE.Mesh(new THREE.CylinderGeometry(22, 22, 0.4, 32), animMat(0x4fc3f7, 0.1)); water.position.y = 0.2;
+            const bridge = new THREE.Mesh(new THREE.TorusGeometry(15, 2.2, 12, 24, Math.PI), animMat(0xff7043)); bridge.position.y = 0;
             pondGroup.add(water, bridge);
-            pondGroup.position.set(-85, 0, -130);
+            pondGroup.position.set(-85, 0, -142);
             scene.add(pondGroup);
             registerBilingualProp(pondGroup, {
                 emoji: "🏞️", zh: "池塘與小橋", en: "Pond and Bridge",
@@ -1350,7 +1386,7 @@
             const mCap = new THREE.Mesh(new THREE.SphereGeometry(14, 24, 18, 0, Math.PI*2, 0, Math.PI/2), animMat(0xff5252)); mCap.position.y = 14;
             const mDoor = new THREE.Mesh(new THREE.BoxGeometry(4, 7, 1.5), animMat(0x8d6e63)); mDoor.position.set(0, 3.5, 7);
             mushGroup.add(mStem, mCap, mDoor);
-            mushGroup.position.set(-148, 0, -132);
+            mushGroup.position.set(-148, 0, -135);
             scene.add(mushGroup);
             wallColliders.push(new THREE.Box3().setFromObject(mStem));
             registerBilingualProp(mushGroup, {
@@ -1368,7 +1404,7 @@
                 const center = new THREE.Mesh(new THREE.SphereGeometry(1.8, 12, 12), animMat(0x5d4037)); center.position.set((s - 2) * 5, 10.8, 1.4);
                 sunGroup.add(stem, petals, center);
             }
-            sunGroup.position.set(-142, 0, -42);
+            sunGroup.position.set(-148, 0, -45);
             scene.add(sunGroup);
             registerBilingualProp(sunGroup, {
                 emoji: "🌻", zh: "向日葵", en: "Sunflower",
@@ -1376,16 +1412,16 @@
                 descEn: "Golden sunflowers always smile at the bright sun!"
             }, 15);
 
-            // 20. 皇室梳化
+            // 20. 皇室梳化 (放在 4號房北側 x=105, z=-135，預留前方寬敞地毯供結局拍大蘋果！)
             const sofaGroup = new THREE.Group();
-            const sBase = new THREE.Mesh(new THREE.BoxGeometry(38, 6, 12), animMat(0xec407a)); sBase.position.y = 3;
-            const sBack = new THREE.Mesh(new THREE.BoxGeometry(38, 13, 4), animMat(0xd81b60)); sBack.position.set(0, 6.5, -5);
-            const sArmL = new THREE.Mesh(new THREE.BoxGeometry(5, 9, 12), animMat(0xd81b60)); sArmL.position.set(-17, 4.5, 0);
-            const sArmR = sArmL.clone(); sArmR.position.set(17, 4.5, 0);
-            const pil1 = new THREE.Mesh(new THREE.SphereGeometry(3.5, 16, 16), animMat(0xfff176)); pil1.position.set(-9, 8, 0);
-            const pil2 = new THREE.Mesh(new THREE.SphereGeometry(3.5, 16, 16), animMat(0x80deea)); pil2.position.set(9, 8, 0);
+            const sBase = new THREE.Mesh(new THREE.BoxGeometry(36, 6, 12), animMat(0xec407a)); sBase.position.y = 3;
+            const sBack = new THREE.Mesh(new THREE.BoxGeometry(36, 13, 4), animMat(0xd81b60)); sBack.position.set(0, 6.5, -5);
+            const sArmL = new THREE.Mesh(new THREE.BoxGeometry(5, 9, 12), animMat(0xd81b60)); sArmL.position.set(-16, 4.5, 0);
+            const sArmR = sArmL.clone(); sArmR.position.set(16, 4.5, 0);
+            const pil1 = new THREE.Mesh(new THREE.SphereGeometry(3.5, 16, 16), animMat(0xfff176)); pil1.position.set(-8, 8, 0);
+            const pil2 = new THREE.Mesh(new THREE.SphereGeometry(3.5, 16, 16), animMat(0x80deea)); pil2.position.set(8, 8, 0);
             sofaGroup.add(sBase, sBack, sArmL, sArmR, pil1, pil2);
-            sofaGroup.position.set(105, 0, -125);
+            sofaGroup.position.set(105, 0, -135);
             scene.add(sofaGroup);
             wallColliders.push(new THREE.Box3().setFromObject(sofaGroup));
             registerBilingualProp(sofaGroup, {
@@ -1394,14 +1430,14 @@
                 descEn: "Soft colorful pillows rest on the big pink royal sofa."
             }, 16);
 
-            // 21. 草莓蛋糕
+            // 21. 草莓蛋糕 (移至西側 x=62, z=-45，避免擋住結局拍向梳化與大蘋果的鏡頭)
             const cakeGroup = new THREE.Group();
-            const dTable = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 5, 28), animMat(0xffffff)); dTable.position.y = 2.5;
+            const dTable = new THREE.Mesh(new THREE.CylinderGeometry(12, 12, 5, 28), animMat(0xffffff)); dTable.position.y = 2.5;
             const cTier1 = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 3, 20), animMat(0xff80ab)); cTier1.position.y = 6.5;
             const cTier2 = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 2.8, 20), animMat(0xfff9c4)); cTier2.position.y = 9.4;
             const cCherry = new THREE.Mesh(new THREE.SphereGeometry(1.0, 12, 12), animMat(0xff1744)); cCherry.position.y = 11.4;
             cakeGroup.add(dTable, cTier1, cTier2, cCherry);
-            cakeGroup.position.set(105, 0, -65);
+            cakeGroup.position.set(62, 0, -45);
             scene.add(cakeGroup);
             wallColliders.push(new THREE.Box3().setFromObject(dTable));
             registerBilingualProp(cakeGroup, {
@@ -1415,7 +1451,7 @@
             const hPed = new THREE.Mesh(new THREE.CylinderGeometry(4, 5, 3, 16), animMat(0xffd54f)); hPed.position.y = 1.5;
             const hFrame = new THREE.Mesh(new THREE.TorusGeometry(6, 0.9, 12, 24, Math.PI * 1.3), animMat(0xffca28)); hFrame.position.y = 9;
             harpGroup.add(hPed, hFrame);
-            harpGroup.position.set(150, 0, -85);
+            harpGroup.position.set(152, 0, -75);
             scene.add(harpGroup);
             wallColliders.push(new THREE.Box3().setFromObject(harpGroup));
             registerBilingualProp(harpGroup, {
@@ -1533,7 +1569,7 @@
         }
 
         // =========================================================================
-        // 🐘🐰🐵🦔 建立 4 個可愛動物角色 + 確保點擊 100% 彈出偵探對話框
+        // 🐘🐰🐵🦔 建立 4 個可愛動物角色
         // =========================================================================
         function registerSuspectClickable(group, suspectName, labelText, offsetY, onClickFn) {
             group.traverse(child => {
@@ -1696,7 +1732,7 @@
             registerSuspectClickable(elephantGroup, "Elephant", "🐘 大象爺爺 Elephant (點擊對話)", 18.0, () => {
                 triggerElephantQuest();
             });
-            registerFreeRoamNPC(elephantGroup, -100, -52, 55, 130, 8.5, 0.8, 8);
+            registerFreeRoamNPC(elephantGroup, -95, -55, 60, 125, 8.5, 0.8, 8);
 
             // 2. 跳跳兔
             rabbitGroup = new THREE.Group();
@@ -1716,12 +1752,12 @@
             const rabEyeL = createSparkleEye(0x4e342e, 1.5); rabEyeL.position.set(-1.1, 7.4, -2.5);
             const rabEyeR = createSparkleEye(0x4e342e, 1.5); rabEyeR.position.set(1.1, 7.4, -2.5);
             rabbitGroup.add(rabBody, rabHead, cheekL, cheekR, makeRabEar(-1), makeRabEar(1), rabEyeL, rabEyeR);
-            rabbitGroup.position.set(68, 0, 118);
+            rabbitGroup.position.set(75, 0, 115);
             scene.add(rabbitGroup);
             registerSuspectClickable(rabbitGroup, "Rabbit", "🐰 跳跳兔 Rabbit (點擊審問)", 14.5, () => {
                 openSuspectDialog("Rabbit");
             });
-            registerFreeRoamNPC(rabbitGroup, 48, 105, 95, 140, 14.0, 2.2, 12);
+            registerFreeRoamNPC(rabbitGroup, 55, 105, 95, 135, 13.0, 2.0, 12);
 
             // 3. 小猴子
             monkeyGroup = new THREE.Group();
@@ -1735,12 +1771,12 @@
             const monEyeL = createSparkleEye(0x6d4c41, 1.5); monEyeL.position.set(-0.95, 7.2, -2.55);
             const monEyeR = createSparkleEye(0x6d4c41, 1.5); monEyeR.position.set(0.95, 7.2, -2.55);
             monkeyGroup.add(monBody, monHead, muzzle, monEarL, monEarR, monEyeL, monEyeR);
-            monkeyGroup.position.set(90, 0, 42);
+            monkeyGroup.position.set(85, 0, 55);
             scene.add(monkeyGroup);
             registerSuspectClickable(monkeyGroup, "Monkey", "🐵 小猴子 Monkey (點擊審問)", 12.0, () => {
                 openSuspectDialog("Monkey");
             });
-            registerFreeRoamNPC(monkeyGroup, 50, 120, 22, 68, 16.0, 1.8, 14);
+            registerFreeRoamNPC(monkeyGroup, 55, 108, 35, 72, 15.0, 1.8, 14);
 
             // 4. 刺蝟弟弟
             hedgehogGroup = new THREE.Group();
@@ -1749,27 +1785,29 @@
             const hedEyeL = createSparkleEye(0x212121, 1.25); hedEyeL.position.set(-0.9, 3.6, -2.4);
             const hedEyeR = createSparkleEye(0x212121, 1.25); hedEyeR.position.set(0.9, 3.6, -2.4);
             hedgehogGroup.add(hedBody, hedBack, hedEyeL, hedEyeR);
-            hedgehogGroup.position.set(-90, 0, -70);
+            hedgehogGroup.position.set(-85, 0, -70);
             scene.add(hedgehogGroup);
             registerSuspectClickable(hedgehogGroup, "Hedgehog", "🦔 刺蝟弟弟 Hedgehog (點擊審問)", 9.0, () => {
                 openSuspectDialog("Hedgehog");
             });
-            registerFreeRoamNPC(hedgehogGroup, -120, -52, -95, -35, 10.5, 0.9, 15);
+            registerFreeRoamNPC(hedgehogGroup, -115, -55, -90, -40, 10.5, 0.9, 15);
 
-            // 5. 藏在 4號房皇室梳化後面的巨無霸紅蘋果
+            // 5. 【關鍵修復 4】巨無霸紅蘋果放在 4號房皇室梳化右前方開闊處 (x=116, z=-118)，讓結局鏡頭 100% 拍得清楚，不再被牆壁擋成灰畫面！
             appleGroup = new THREE.Group();
-            const appleMesh = new THREE.Mesh(new THREE.SphereGeometry(4.2, 28, 28), animMat(0xff1744, 0.15));
-            appleMesh.position.y = 4.2;
-            const appleLeaf = new THREE.Mesh(new THREE.SphereGeometry(1.3, 12, 12), animMat(0x00e676));
-            appleLeaf.scale.set(1.8, 0.4, 1); appleLeaf.position.set(1.2, 8.4, 0);
-            appleGroup.add(appleMesh, appleLeaf);
-            appleGroup.position.set(105, 0, -145);
+            const appleMesh = new THREE.Mesh(new THREE.SphereGeometry(4.5, 28, 28), animMat(0xff1744, 0.15));
+            appleMesh.position.y = 4.5;
+            const appleStem = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 2.2, 10), animMat(0x5d4037));
+            appleStem.position.y = 9.0;
+            const appleLeaf = new THREE.Mesh(new THREE.SphereGeometry(1.4, 12, 12), animMat(0x00e676));
+            appleLeaf.scale.set(1.8, 0.4, 1); appleLeaf.position.set(1.3, 8.8, 0);
+            appleGroup.add(appleMesh, appleStem, appleLeaf);
+            appleGroup.position.set(116, 0, -118);
             scene.add(appleGroup);
             registerBilingualProp(appleGroup, {
                 emoji: "🍎", zh: "巨無霸紅蘋果", en: "Giant Red Apple",
-                descZh: "又紅又甜的大蘋果藏在梳化後面！",
-                descEn: "The big sweet red apple is hidden behind the sofa!"
-            }, 10);
+                descZh: "又紅又甜的大蘋果就在皇室梳化旁邊！",
+                descEn: "The big sweet red apple is right next to the royal sofa!"
+            }, 11);
         }
 
         // =========================================================================
@@ -1778,17 +1816,14 @@
         function updateNPCRoaming(delta, now) {
             if (gameState === 'CUTSCENE' || gameState === 'ENDING') return;
 
-            const isDialogShowing = document.getElementById('dialogBox').style.display === 'block';
+            const isDialogShowing = document.getElementById('dialogBox').style.display === 'flex';
 
             npcRoamingList.forEach(npc => {
                 if (gameState !== 'START' && playerGroup) {
                     const distToPlayer = npc.group.position.distanceTo(playerGroup.position);
-                    if (distToPlayer < 16 || isDialogShowing) {
+                    if (distToPlayer < 18 || isDialogShowing) {
                         npc.group.position.y = 0;
-                        const dx = playerGroup.position.x - npc.group.position.x;
-                        const dz = playerGroup.position.z - npc.group.position.z;
-                        const targetAngle = Math.atan2(dx, dz) + Math.PI;
-                        npc.group.rotation.y = THREE.MathUtils.lerp(npc.group.rotation.y, targetAngle, 0.1);
+                        faceTarget(npc.group, playerGroup.position);
                         return;
                     }
                 }
@@ -1815,8 +1850,8 @@
                     npc.group.position.x += dir.x * npc.speed * delta;
                     npc.group.position.z += dir.z * npc.speed * delta;
 
-                    const moveAngle = Math.atan2(dir.x, dir.z) + Math.PI;
-                    npc.group.rotation.y = moveAngle;
+                    // 使用正確的正臉朝向公式
+                    faceTarget(npc.group, npc.target);
 
                     npc.walkPhase += delta * npc.hopFreq;
                     npc.group.position.y = Math.abs(Math.sin(npc.walkPhase)) * npc.hopHeight;
@@ -1892,14 +1927,13 @@
                 }
             });
 
-            // 【升級】加大每次點擊 Zoom Out / Zoom In 的幅度，並支援長按快速縮放
             const bindZoomBtn = (btnId, dir) => {
                 const btn = document.getElementById(btnId);
                 btn.addEventListener('pointerdown', (e) => {
                     e.stopPropagation();
                     SoundFX.pop();
                     zoomDirection = dir;
-                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + dir * 7.5, minCamDist, maxCamDist);
+                    cameraDistance = THREE.MathUtils.clamp(cameraDistance + dir * 8.0, minCamDist, maxCamDist);
                 });
                 btn.addEventListener('pointerup', () => zoomDirection = 0);
                 btn.addEventListener('pointerleave', () => zoomDirection = 0);
@@ -1914,7 +1948,7 @@
 
             renderer.domElement.addEventListener('pointerdown', (e) => {
                 if (gameState === 'START') return;
-                if (document.getElementById('dialogBox').style.display === 'block') return;
+                if (document.getElementById('dialogBox').style.display === 'flex') return;
                 if (document.getElementById('wordCardModal').style.display === 'block') return;
                 lookPointerId = e.pointerId;
                 startTouchX = lastTouchX = e.clientX;
@@ -1963,7 +1997,7 @@
         }
 
         // =========================================================================
-        // 🎬 【全面升級】觸發劇情時大幅度 Zoom Out + 手機直向廣角全景運鏡
+        // 🎬 【全面修復】大象爺爺對話框確定鈕 + 正面走向嫌疑犯的無遮擋開闊劇場運鏡
         // =========================================================================
         function setTheaterMode(enabled) {
             document.getElementById('controlsUI').style.display = enabled ? 'none' : 'block';
@@ -1977,12 +2011,15 @@
             closeWordCard();
             SoundFX.pop();
 
+            // 讓大象爺爺正臉面對主角
+            faceTarget(elephantGroup, playerGroup.position);
+
             showDialog(
                 "🐘 大象爺爺 Grandpa Elephant（村長）",
-                "「小偵探你好！我準備在今晚派對分享的【巨無霸大蘋果】不見了！挑戰紙條寫著：\n1️⃣ 犯人【不吃香蕉 (No Bananas)】\n2️⃣ 犯人【沒有長耳朵 (No Long Ears)】\n3️⃣ 犯人【不是走著路】離開的。\n快去 2號遊戲室（跳跳兔、小猴子）和 3號花園（刺蝟弟弟）點擊他們審問破案吧！」",
+                "「小偵探你好！我的【巨無霸大蘋果】不見了！挑戰紙條寫著：\n1️⃣ 犯人【不吃香蕉】  2️⃣ 犯人【沒有長耳朵】  3️⃣ 犯人【不是走著路】離開的。\n快去 2號遊戲室（跳跳兔、小猴子）和 3號花園（刺蝟弟弟）點擊他們破案吧！」",
                 [
-                    { text: "🔤 學大象英文 (Elephant)", style: "vocab", action: () => openWordCard({ emoji: "🐘", zh: "大象爺爺", en: "Elephant", descZh: "大象爺爺有長長的鼻子和金絲眼鏡。", descEn: "Grandpa Elephant has a long trunk and glasses." }) },
-                    { text: "出發調查！", action: closeDialog }
+                    { text: "✅ 確定！出發調查", style: "accuse", action: closeDialog },
+                    { text: "🔤 學大象英文", style: "vocab", action: () => openWordCard({ emoji: "🐘", zh: "大象爺爺", en: "Elephant", descZh: "大象爺爺有長長的鼻子和金絲眼鏡。", descEn: "Grandpa Elephant has a long trunk and glasses." }) }
                 ]
             );
         }
@@ -1991,39 +2028,42 @@
             closeWordCard();
             SoundFX.pop();
             if (suspectName === "Rabbit") {
+                faceTarget(rabbitGroup, playerGroup.position);
                 showDialog(
                     "🐰 嫌疑犯一號：跳跳兔 (Rabbit)",
-                    "「我最喜歡一邊散步一邊吃【紅蘿蔔 (Carrot)】，水果太甜我不常吃呢！而且你看我有一對毛茸茸的【長耳朵 (Long Ears)】！」",
+                    "「我最喜歡一邊散步一邊吃【紅蘿蔔 (Carrot)】，而且你看我有一對毛茸茸的【長耳朵 (Long Ears)】！」",
                     [
                         { text: "👉 指認她是小偷！", style: "accuse", action: () => startAnswerCutscene("Rabbit") },
                         { text: "🔤 學兔子英文", style: "vocab", action: () => openWordCard({ emoji: "🐰", zh: "跳跳兔", en: "Rabbit", descZh: "跳跳兔有一對長長的耳朵。", descEn: "The cute rabbit has two long ears." }) },
-                        { text: "再去問問別人", action: closeDialog }
+                        { text: "✅ 再去問別人", action: closeDialog }
                     ]
                 );
             } else if (suspectName === "Monkey") {
+                faceTarget(monkeyGroup, playerGroup.position);
                 showDialog(
                     "🐵 嫌疑犯二號：小猴子 (Monkey)",
-                    "「吱吱！我剛剛在玩具火車旁吃我最愛的【黃色香蕉 (Banana)】，地上的香蕉皮是我丟的啦！我怎麼可能去偷蘋果？」",
+                    "「吱吱！我剛剛在吃我最愛的【黃色香蕉 (Banana)】，地上的香蕉皮是我丟的啦！我怎麼可能去偷蘋果？」",
                     [
                         { text: "👉 指認他是小偷！", style: "accuse", action: () => startAnswerCutscene("Monkey") },
                         { text: "🔤 學猴子英文", style: "vocab", action: () => openWordCard({ emoji: "🐵", zh: "小猴子", en: "Monkey", descZh: "調皮的小猴子最喜歡吃香蕉。", descEn: "The playful monkey loves eating bananas." }) },
-                        { text: "再去問問別人", action: closeDialog }
+                        { text: "✅ 再去問別人", action: closeDialog }
                     ]
                 );
             } else if (suspectName === "Hedgehog") {
+                faceTarget(hedgehogGroup, playerGroup.position);
                 showDialog(
                     "🦔 嫌疑犯三號：刺蝟弟弟 (Hedgehog)",
                     "「嗚……我背上全都是保護自己的小刺。我不吃香蕉，也沒有長耳朵，而且我可以把身體縮成一團滾著走……」",
                     [
                         { text: "👉 指認他是小偷！", style: "accuse", action: () => startAnswerCutscene("Hedgehog") },
                         { text: "🔤 學刺蝟英文", style: "vocab", action: () => openWordCard({ emoji: "🦔", zh: "刺蝟", en: "Hedgehog", descZh: "刺蝟背上長滿了保護自己的小刺。", descEn: "The hedgehog has sharp spines on its back." }) },
-                        { text: "再去問問別人", action: closeDialog }
+                        { text: "✅ 再去問別人", action: closeDialog }
                     ]
                 );
             }
         }
 
-        // 【關鍵優化】觸發指認劇情時，大幅度 Zoom Out 拉遠鏡頭（特別針對手機直向自動拉遠至 62 單位），讓三人與走路過程 100% 完整呈現在螢幕中央！
+        // 【關鍵修復 3】每個嫌疑犯都安排在房間最空曠的「無障礙舞台區」，鏡頭從正南面開闊處往北拍（大幅 Zoom Out），大象爺爺從左往右正臉走過來！
         function startAnswerCutscene(suspectName) {
             closeDialog();
             closeWordCard();
@@ -2032,36 +2072,38 @@
             updateCameraFOV();
 
             let targetSuspectGroup = rabbitGroup;
-            if (suspectName === "Monkey") targetSuspectGroup = monkeyGroup;
-            if (suspectName === "Hedgehog") targetSuspectGroup = hedgehogGroup;
+            let stageCenter = new THREE.Vector3(85, 0, 100); // 2號遊戲室中央開闊舞台
 
-            // 將嫌疑犯固定在房間開闊中心點
-            if (suspectName === "Rabbit") targetSuspectGroup.position.set(75, 0, 115);
-            if (suspectName === "Monkey") targetSuspectGroup.position.set(85, 0, 52);
-            if (suspectName === "Hedgehog") targetSuspectGroup.position.set(-85, 0, -70);
+            if (suspectName === "Monkey") {
+                targetSuspectGroup = monkeyGroup;
+                stageCenter.set(85, 0, 72); // 2號遊戲室偏南開闊舞台
+            } else if (suspectName === "Hedgehog") {
+                targetSuspectGroup = hedgehogGroup;
+                stageCenter.set(-85, 0, -68); // 3號花園廳中央開闊舞台
+            }
 
-            const sPos = targetSuspectGroup.position.clone();
-            const dirSign = sPos.x > 0 ? -1 : 1;
+            // 1. 嫌疑犯站在舞台右側，正臉朝向鏡頭偏左
+            targetSuspectGroup.position.set(stageCenter.x + 8, 0, stageCenter.z);
 
-            // 讓主角與大象爺爺站得更緊湊，確保手機直向窄螢幕也能一次拍到全部角色
-            playerGroup.position.set(sPos.x + dirSign * 7, 0, sPos.z - 1);
-            playerGroup.lookAt(sPos.x, 0, sPos.z);
+            // 2. 主角站在舞台後方中間，正臉朝向鏡頭
+            playerGroup.position.set(stageCenter.x, 0, stageCenter.z - 6);
 
-            const startWalkPos = new THREE.Vector3(sPos.x + dirSign * 22, 0, sPos.z + 5);
-            const endWalkPos = new THREE.Vector3(sPos.x + dirSign * 6.5, 0, sPos.z + 4.5);
+            // 3. 大象爺爺從舞台左側 (x - 24) 正臉邁步走向舞台左中 (x - 7)
+            const startWalkPos = new THREE.Vector3(stageCenter.x - 24, 0, stageCenter.z);
+            const endWalkPos = new THREE.Vector3(stageCenter.x - 7, 0, stageCenter.z);
             elephantGroup.position.copy(startWalkPos);
 
-            // 計算手機直向補償倍率，大幅拉遠並拉高劇場鏡頭！
+            // 4. 鏡頭架設在舞台正前方（南側 z + 42 * 直向倍率），中間完全沒有任何牆壁或傢俱遮擋！
             const pMult = getPortraitMultiplier();
-            const zDist = (sPos.z > 0 ? -44 : 44) * pMult;
-            const camY = 22 * pMult;
-
-            const stageCenter = new THREE.Vector3(sPos.x + dirSign * 5, 5.0, sPos.z + 2);
-            cutsceneCamPos = new THREE.Vector3(stageCenter.x, camY, sPos.z + zDist);
-            cutsceneLookTarget = new THREE.Vector3(stageCenter.x, 2.5, stageCenter.z);
+            cutsceneCamPos = new THREE.Vector3(stageCenter.x, 22 * pMult, stageCenter.z + (38 * pMult));
+            cutsceneLookTarget = new THREE.Vector3(stageCenter.x, 4.0, stageCenter.z);
 
             camera.position.copy(cutsceneCamPos);
             camera.lookAt(cutsceneLookTarget);
+
+            // 讓主角與嫌疑犯一開始就正臉面向大象爺爺走來的方向
+            faceTarget(playerGroup, startWalkPos);
+            faceTarget(targetSuspectGroup, startWalkPos);
 
             document.getElementById('hudTop').innerText = "🎬 劇場全景：看！大象爺爺拄著拐杖走過來了……";
 
@@ -2072,15 +2114,16 @@
                 startPos: startWalkPos,
                 endPos: endWalkPos,
                 progress: 0,
-                duration: 2.6
+                duration: 2.5
             };
         }
 
         function onCutsceneArrived(cutscene) {
+            // 到達定位後，讓大象爺爺、主角與嫌疑犯全部轉過身來「正臉面向攝影機」，讓小朋友清楚看到表情、長鼻子與眼鏡！
             if (cutscene.suspectGroup) {
-                elephantGroup.lookAt(camera.position.x, 0, camera.position.z);
-                cutscene.suspectGroup.lookAt(camera.position.x, 0, camera.position.z);
-                playerGroup.lookAt(camera.position.x, 0, camera.position.z);
+                faceTarget(elephantGroup, camera.position);
+                faceTarget(cutscene.suspectGroup, camera.position);
+                faceTarget(playerGroup, camera.position);
             }
 
             if (cutscene.type === 'WRONG_APPROACH') {
@@ -2090,20 +2133,20 @@
                     : "大象爺爺拄著紅寶石拐杖搖搖頭說：\n「小偵探，不對喔！挑戰紙條說『犯人不吃香蕉』，但小猴子最愛吃香蕉了！我們再去問問別人吧！」";
 
                 showDialog("🐘 大象爺爺走過來解釋", explanation, [{
-                    text: "知道啦，繼續調查！",
+                    text: "✅ 知道啦，繼續調查！",
                     action: () => {
                         closeDialog();
                         setTheaterMode(false);
                         elephantGroup.position.set(-75, 0, 95);
                         gameState = 'INVESTIGATE';
-                        document.getElementById('hudTop').innerText = "🔍 任務：點擊各房間散步的【動物】對話推理，或點擊【傢俱】學中英文！";
+                        document.getElementById('hudTop').innerText = "🔍 任務：點擊散步中的【動物】對話推理，或點擊【傢俱】學中英文！";
                     }
                 }]);
             } else if (cutscene.type === 'CORRECT_APPROACH') {
                 SoundFX.win();
                 showDialog(
                     "🐘 大象爺爺開心地走過來！",
-                    "大象爺爺高興地舉起拐杖稱讚你：\n「太聰明了！刺蝟弟弟不吃香蕉、沒有長耳朵，而且是滾著離開的！來，跟著大象爺爺一起去【4號皇室客廳的粉紅梳化後面】找回大蘋果吧！」",
+                    "大象爺爺高興地舉起拐杖稱讚你：\n「太聰明了！刺蝟弟弟不吃香蕉、沒有長耳朵，而且是滾著離開的！來，跟著大象爺爺一起去【4號皇室客廳的粉紅梳化旁】找回大蘋果吧！」",
                     [{ text: "跟著大象爺爺去找大蘋果 ➡️", style: "accuse", action: startWalkToSofaCutscene }]
                 );
             } else if (cutscene.type === 'WALK_TO_SOFA') {
@@ -2111,44 +2154,44 @@
                 gameState = 'ENDING';
                 document.getElementById('hudTop').innerText = "🎉 案件圓滿破案！恭喜雙語小偵探挑戰成功！";
 
-                elephantGroup.lookAt(camera.position.x, 0, camera.position.z);
-                playerGroup.lookAt(camera.position.x, 0, camera.position.z);
-                hedgehogGroup.lookAt(camera.position.x, 0, camera.position.z);
+                // 讓所有角色正臉面向鏡頭大合照
+                faceTarget(elephantGroup, camera.position);
+                faceTarget(playerGroup, camera.position);
+                faceTarget(hedgehogGroup, camera.position);
 
                 showDialog(
                     "🦔 刺蝟弟弟走出來羞澀道歉",
-                    "（你們在粉紅大梳化後面，找到了紅彤彤的巨無霸大蘋果！）\n刺蝟弟弟紅著臉走出來說：「對不起大象爺爺……我只是想跟大蘋果合照一張……」\n🎉 案件圓滿解決，小偵探挑戰成功！",
+                    "（你們在粉紅大梳化旁，找到了紅彤彤的巨無霸大蘋果！）\n刺蝟弟弟紅著臉走出來說：「對不起大象爺爺……我只是想跟大蘋果合照一張……」\n🎉 案件圓滿解決，小偵探挑戰成功！",
                     [{ text: "🔄 再玩一次", style: "restart", action: () => location.reload() }]
                 );
             }
         }
 
-        // 【關鍵優化】第四步找回大蘋果劇情，同樣大幅 Zoom Out 拉遠升高鏡頭，手機直向也能完整看到梳化、大蘋果與所有角色！
+        // 【關鍵修復 4】第四步找回大蘋果：鏡頭架在 4號皇室客廳正前方開闊處 (z = -65) 往北拍向粉紅梳化 (z = -135) 與大蘋果 (z = -118)，完全不會穿進北牆，絕不出現灰畫面！
         function startWalkToSofaCutscene() {
             closeDialog();
             gameState = 'CUTSCENE';
             setTheaterMode(true);
             updateCameraFOV();
-            document.getElementById('hudTop').innerText = "🎬 劇場全景：大象爺爺正帶著小偵探走向【皇室客廳】梳化後……";
-
-            hedgehogGroup.position.set(122, 0, -142);
+            document.getElementById('hudTop').innerText = "🎬 劇場全景：大象爺爺帶著小偵探來到【皇室客廳】找回大蘋果！";
 
             const pMult = getPortraitMultiplier();
-            cutsceneCamPos = new THREE.Vector3(105, 25 * pMult, -145 - (32 * pMult));
-            cutsceneLookTarget = new THREE.Vector3(105, 2.0, -142);
+            // 鏡頭位於房間內南側開闊處 (105, 25, -72)，往北看向粉紅梳化與大蘋果 (105, 4, -120)
+            cutsceneCamPos = new THREE.Vector3(105, 24 * pMult, -118 + (42 * pMult));
+            cutsceneLookTarget = new THREE.Vector3(105, 4.0, -120);
             camera.position.copy(cutsceneCamPos);
             camera.lookAt(cutsceneLookTarget);
 
             activeCutscene = {
                 type: 'WALK_TO_SOFA',
-                eleStart: new THREE.Vector3(84, 0, -136),
-                eleEnd: new THREE.Vector3(97, 0, -145),
-                heroStart: new THREE.Vector3(78, 0, -142),
-                heroEnd: new THREE.Vector3(90, 0, -147),
-                hedStart: new THREE.Vector3(122, 0, -142),
-                hedEnd: new THREE.Vector3(113, 0, -145),
+                eleStart: new THREE.Vector3(80, 0, -105),
+                eleEnd: new THREE.Vector3(95, 0, -116),
+                heroStart: new THREE.Vector3(88, 0, -100),
+                heroEnd: new THREE.Vector3(104, 0, -114),
+                hedStart: new THREE.Vector3(135, 0, -115),
+                hedEnd: new THREE.Vector3(124, 0, -116),
                 progress: 0,
-                duration: 2.8
+                duration: 2.6
             };
         }
 
@@ -2158,7 +2201,7 @@
             showDialog(
                 "💌 粉紅心形神祕挑戰紙條",
                 "1️⃣ 真正的犯人【不吃香蕉 (No Bananas)】。\n2️⃣ 真正的犯人身上【沒有長耳朵 (No Long Ears)】。\n3️⃣ 真正的犯人【不是走著路】離開現場的。",
-                [{ text: "收起紙條", action: closeDialog }]
+                [{ text: "✅ 收起紙條", action: closeDialog }]
             );
         }
 
@@ -2169,14 +2212,17 @@
 
             const btnContainer = document.getElementById('dialogButtons');
             btnContainer.innerHTML = '';
-            buttons.forEach(b => {
+
+            // 確保永遠至少有一顆確定/關閉按鈕
+            const actionList = (buttons && buttons.length > 0) ? buttons : [{ text: "✅ 確定", action: closeDialog }];
+            actionList.forEach(b => {
                 const btn = document.createElement('button');
                 btn.className = 'action-btn ' + (b.style || '');
                 btn.innerText = b.text;
                 btn.onclick = b.action;
                 btnContainer.appendChild(btn);
             });
-            document.getElementById('dialogBox').style.display = 'block';
+            document.getElementById('dialogBox').style.display = 'flex';
         }
 
         function closeDialog() {
@@ -2212,7 +2258,7 @@
         }
 
         // =========================================================================
-        // 🔄 主迴圈：首頁無遮擋 3D 環繞運鏡 + NPC 自由散步 + 玩家操控
+        // 🔄 主迴圈：首頁無遮擋 3D 環繞運鏡 + NPC 自由散步 + 正面劇場動畫
         // =========================================================================
         function animate() {
             requestAnimationFrame(animate);
@@ -2253,7 +2299,7 @@
                     cameraDistance = THREE.MathUtils.clamp(cameraDistance + zoomDirection * 28 * delta, minCamDist, maxCamDist);
                 }
 
-                // A. 劇場過場動畫模式 (大幅 Zoom Out 無遮擋視角)
+                // A. 劇場過場動畫模式 (使用 faceTarget 確保大象爺爺與所有角色 100% 正臉朝向目標行進！)
                 if (gameState === 'CUTSCENE' && activeCutscene) {
                     activeCutscene.progress += delta / activeCutscene.duration;
                     const t = Math.min(activeCutscene.progress, 1.0);
@@ -2263,7 +2309,8 @@
 
                     if (activeCutscene.type === 'WRONG_APPROACH' || activeCutscene.type === 'CORRECT_APPROACH') {
                         elephantGroup.position.lerpVectors(activeCutscene.startPos, activeCutscene.endPos, t);
-                        elephantGroup.lookAt(activeCutscene.suspectGroup.position);
+                        // 正臉面向嫌疑犯走過去！
+                        faceTarget(elephantGroup, activeCutscene.endPos);
 
                         elephantGroup.position.y = Math.abs(Math.sin(now * 0.012)) * 1.1;
                         eleCaneArmPivot.rotation.x = Math.sin(now * 0.012) * 0.45;
@@ -2275,12 +2322,12 @@
 
                     } else if (activeCutscene.type === 'WALK_TO_SOFA') {
                         elephantGroup.position.lerpVectors(activeCutscene.eleStart, activeCutscene.eleEnd, t);
-                        elephantGroup.lookAt(appleGroup.position);
+                        faceTarget(elephantGroup, activeCutscene.eleEnd);
                         elephantGroup.position.y = Math.abs(Math.sin(now * 0.012)) * 1.0;
                         eleCaneArmPivot.rotation.x = Math.sin(now * 0.012) * 0.45;
 
                         playerGroup.position.lerpVectors(activeCutscene.heroStart, activeCutscene.heroEnd, t);
-                        playerGroup.lookAt(appleGroup.position);
+                        faceTarget(playerGroup, activeCutscene.heroEnd);
 
                         walkCycle += delta * 14;
                         leftLeg.rotation.x = Math.sin(walkCycle) * 0.65;
@@ -2288,7 +2335,7 @@
                         SoundFX.footstep(delta);
 
                         hedgehogGroup.position.lerpVectors(activeCutscene.hedStart, activeCutscene.hedEnd, t);
-                        hedgehogGroup.lookAt(appleGroup.position);
+                        faceTarget(hedgehogGroup, activeCutscene.hedEnd);
                         hedgehogGroup.position.y = Math.abs(Math.sin(now * 0.015)) * 1.0;
                     }
 
@@ -2305,7 +2352,7 @@
                 }
                 // B. 自由探索模式
                 else {
-                    const isModalOpen = document.getElementById('dialogBox').style.display === 'block' ||
+                    const isModalOpen = document.getElementById('dialogBox').style.display === 'flex' ||
                                         document.getElementById('wordCardModal').style.display === 'block';
 
                     if (!isModalOpen && gameState !== 'ENDING') {
@@ -2374,8 +2421,8 @@
                         let targetCamX = playerGroup.position.x + Math.sin(cameraYaw) * cameraDistance;
                         let targetCamZ = playerGroup.position.z + Math.cos(cameraYaw) * cameraDistance;
 
-                        targetCamX = THREE.MathUtils.clamp(targetCamX, -174, 174);
-                        targetCamZ = THREE.MathUtils.clamp(targetCamZ, -174, 188);
+                        targetCamX = THREE.MathUtils.clamp(targetCamX, -172, 172);
+                        targetCamZ = THREE.MathUtils.clamp(targetCamZ, -172, 186);
 
                         camera.position.lerp(new THREE.Vector3(targetCamX, playerGroup.position.y + camHeight, targetCamZ), 0.22);
                         camera.lookAt(
@@ -2385,7 +2432,8 @@
                         );
                     }
 
-                    if (!hasAcceptedQuest && playerGroup.position.distanceTo(elephantGroup.position) < 20) {
+                    // 第一次走近大象爺爺時自動彈出報案任務（僅觸發一次）
+                    if (!hasAcceptedQuest && !isModalOpen && playerGroup.position.distanceTo(elephantGroup.position) < 20) {
                         triggerElephantQuest();
                     }
                 }
