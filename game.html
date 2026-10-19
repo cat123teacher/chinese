@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>童話城堡雙語大偵探：誰動了我的水果？</title>
     <style>
         * {
@@ -10,11 +10,17 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
+            -webkit-text-size-adjust: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
         }
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
+            position: fixed;
+            top: 0; left: 0;
             overflow: hidden;
+            overscroll-behavior: none;
             font-family: 'PingFang HK', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
             background-color: #dcd0ff;
             touch-action: none;
@@ -25,6 +31,7 @@
             position: absolute;
             top: 0; left: 0;
             z-index: 1;
+            touch-action: none;
         }
 
         /* 1. 超吸睛 3D 實時背景首頁 (毛玻璃透視感) */
@@ -579,6 +586,62 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // =========================================================================
+        // 🛡️ iPad / 手機防誤觸強制縮放保護系統 (防止雙指捏合、Safari 手勢與雙擊放大)
+        // =========================================================================
+        // 1. 攔截 iOS Safari 專屬的兩指縮放手勢 (Gesture Events)
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+        document.addEventListener('gesturechange', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+        document.addEventListener('gestureend', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // 2. 阻止雙指捏合縮放 (Pinch-to-zoom)，但保留「左指推搖桿 + 右指按跳躍/加速」的多點觸控遊戲體驗
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                const t = event.target;
+                const isGameControl = t.closest && (t.closest('#joystickZone') || t.closest('#jumpBtn') || t.closest('#sprintBtn'));
+                if (!isGameControl) {
+                    event.preventDefault();
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // 3. 阻止連續快速點擊造成的原生瀏覽器放大 (Double-tap to zoom)
+        let lastTouchEndTime = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEndTime <= 320) {
+                // 避免觸發瀏覽器原生雙擊縮放，同時若點在按鈕上仍正常觸發 click
+                event.preventDefault();
+                if (event.target && typeof event.target.click === 'function') {
+                    event.target.click();
+                }
+            }
+            lastTouchEndTime = now;
+        }, { passive: false });
+
+        // 4. 阻止雙擊事件與 Ctrl+滾輪縮放
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('wheel', function(event) {
+            if (event.ctrlKey) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // =========================================================================
         // 🗣️ 雙語語音朗讀系統 (支援廣東話 zh-HK / 國語 zh-TW 與 英語 en-US)
         // =========================================================================
         let currentSpeechText = "";
@@ -761,7 +824,6 @@
         let wallColliders = [];
         let floatingLabels = [];
 
-        // NPC 自由漫遊 AI 控制器陣列
         let npcRoamingList = [];
 
         let gameState = 'START';
@@ -792,7 +854,7 @@
         let mouse = new THREE.Vector2();
         let prevTime = performance.now();
 
-        // 【升級 1】網頁載入時立即啟動 3D 城堡全景渲染，作為超吸睛動態首頁背景！
+        // 網頁載入時立即啟動 3D 城堡全景渲染作為動態首頁背景
         window.addEventListener('DOMContentLoaded', () => {
             initScene();
             initTouchAndControls();
@@ -804,7 +866,6 @@
             SoundFX.startBGM();
 
             playerGender = gender;
-            // 依據玩家選擇的性別更新 3D 主角外觀
             if (playerGroup) scene.remove(playerGroup);
             createPixarStyleHero(playerGender);
 
@@ -817,7 +878,6 @@
 
             gameState = 'FIND_ELEPHANT';
 
-            // 瞬間將鏡頭切換至主角背後安全位置
             const initCamHeight = 7.0 + (cameraDistance * 0.38);
             camera.position.set(
                 playerGroup.position.x,
@@ -914,7 +974,7 @@
 
             build10xGiantCastleAndProps();
             createMagicSparkles();
-            createPixarStyleHero('girl'); // 首頁預設展示小偵探在城堡中
+            createPixarStyleHero('girl');
             createPixarStyleAnimals();
 
             window.addEventListener('resize', onWindowResize);
@@ -922,7 +982,6 @@
             animate();
         }
 
-        // 建立城堡空中的七彩飄浮魔法光點 (增加首頁與遊戲夢幻感)
         function createMagicSparkles() {
             magicParticles = new THREE.Group();
             const sparkCols = [0xfff59d, 0xff80ab, 0x80deea, 0xea80fc, 0xb9f6ca];
@@ -1488,7 +1547,6 @@
             floatingLabels.push({ el: el, group: group, offsetY: offsetY, isNPC: true, maxDist: 150 });
         }
 
-        // 【升級 2】註冊 NPC 在專屬房間範圍內自由散步漫遊
         function registerFreeRoamNPC(group, minX, maxX, minZ, maxZ, speed, hopHeight, hopFreq) {
             npcRoamingList.push({
                 group: group,
@@ -1512,9 +1570,7 @@
         function createPixarStyleAnimals() {
             const pinkMat = animMat(0xff80ab);
 
-            // -----------------------------------------------------------------
-            // 🐘 1. 大象爺爺 (彎曲長象鼻、白象牙、金絲老花眼鏡、紳士禮帽、拿著黃金紅寶石拐杖)
-            // -----------------------------------------------------------------
+            // 1. 大象爺爺
             elephantGroup = new THREE.Group();
             const eleBlue = animMat(0x78909c, 0.35);
             const eleLightBlue = animMat(0xb0bec5, 0.3);
@@ -1566,7 +1622,6 @@
             };
             elephantGroup.add(makeEleEar(-1), makeEleEar(1));
 
-            // 星空眼 + 金絲老花眼鏡
             const eleEyeL = createSparkleEye(0x263238, 1.45); eleEyeL.position.set(-1.35, 11.6, -3.45);
             const eleEyeR = createSparkleEye(0x263238, 1.45); eleEyeR.position.set(1.35, 11.6, -3.45);
             const glassRimL = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.16, 14, 28), goldMat); glassRimL.position.set(-1.35, 11.6, -3.75);
@@ -1579,7 +1634,6 @@
             const templeR = templeL.clone(); templeR.position.set(2.4, 11.6, -2.2);
             elephantGroup.add(eleEyeL, eleEyeR, glassRimL, glassRimR, lensL, lensR, glassBridge, templeL, templeR);
 
-            // 多節彎曲長象鼻
             eleTrunkPivot = new THREE.Group();
             eleTrunkPivot.position.set(0, 10.4, -3.4);
             const trunkCoords = [
@@ -1618,7 +1672,6 @@
             eleLeftArmPivot.add(armL);
             elephantGroup.add(eleLeftArmPivot);
 
-            // 右手握黃金紅寶石拐杖
             eleCaneArmPivot = new THREE.Group();
             eleCaneArmPivot.position.set(4.3, 7.6, 0);
             const armR = armL.clone(); armR.rotation.x = -0.45; armR.position.set(0, -1.3, -1.0);
@@ -1638,12 +1691,9 @@
                 if (!hasAcceptedQuest) triggerElephantQuest();
                 else showClueCard();
             });
-            // 大象爺爺在 1號書房自由散步
             registerFreeRoamNPC(elephantGroup, -100, -52, 55, 130, 8.5, 0.8, 8);
 
-            // -----------------------------------------------------------------
-            // 🐰 2. 跳跳兔 (在 2號遊戲室北區自由蹦跳散步)
-            // -----------------------------------------------------------------
+            // 2. 跳跳兔
             rabbitGroup = new THREE.Group();
             const furBrown = animMat(0xc68652);
             const furWhite = animMat(0xfffdf9);
@@ -1667,12 +1717,9 @@
                 if (gameState === 'INVESTIGATE') openSuspectDialog("Rabbit");
                 else openWordCard({ emoji: "🐰", zh: "跳跳兔", en: "Rabbit", descZh: "跳跳兔有一對長長的耳朵。", descEn: "The cute rabbit has two long ears." });
             });
-            // 跳跳兔在 2號遊戲室自由蹦跳漫遊
             registerFreeRoamNPC(rabbitGroup, 48, 105, 95, 140, 14.0, 2.2, 12);
 
-            // -----------------------------------------------------------------
-            // 🐵 3. 小猴子 (在 2號遊戲室南區自由蹦跳玩耍)
-            // -----------------------------------------------------------------
+            // 3. 小猴子
             monkeyGroup = new THREE.Group();
             const darkFur = animMat(0x4e2a14);
             const peachSkin = animMat(0xf5b086);
@@ -1690,12 +1737,9 @@
                 if (gameState === 'INVESTIGATE') openSuspectDialog("Monkey");
                 else openWordCard({ emoji: "🐵", zh: "小猴子", en: "Monkey", descZh: "調皮的小猴子最喜歡吃香蕉。", descEn: "The playful monkey loves eating bananas." });
             });
-            // 小猴子在 2號遊戲室南側自由跑動
             registerFreeRoamNPC(monkeyGroup, 50, 120, 22, 68, 16.0, 1.8, 14);
 
-            // -----------------------------------------------------------------
-            // 🦔 4. 刺蝟弟弟 (在 3號花園廳自由散步)
-            // -----------------------------------------------------------------
+            // 4. 刺蝟弟弟
             hedgehogGroup = new THREE.Group();
             const hedBody = new THREE.Mesh(new THREE.SphereGeometry(2.8, 24, 24), animMat(0xf5e1c8)); hedBody.position.y = 2.8;
             const hedBack = new THREE.Mesh(new THREE.SphereGeometry(3.1, 24, 24), animMat(0x5d4037)); hedBack.position.set(0, 3.3, 0.9);
@@ -1708,7 +1752,6 @@
                 if (gameState === 'INVESTIGATE') openSuspectDialog("Hedgehog");
                 else openWordCard({ emoji: "🦔", zh: "刺蝟", en: "Hedgehog", descZh: "刺蝟背上長滿了保護自己的小刺。", descEn: "The hedgehog has sharp spines on its back." });
             });
-            // 刺蝟弟弟在 3號花園廳自由散步
             registerFreeRoamNPC(hedgehogGroup, -120, -52, -95, -35, 10.5, 0.9, 15);
 
             // 5. 藏在 4號房皇室梳化後面的巨無霸紅蘋果
@@ -1731,18 +1774,15 @@
         // 🔄 更新 NPC 自由漫遊 AI 邏輯
         // =========================================================================
         function updateNPCRoaming(delta, now) {
-            // 在首頁展示 (START)、尋找大象 (FIND_ELEPHANT) 與調查階段 (INVESTIGATE) 讓所有動物自由走來走去
             if (gameState === 'CUTSCENE' || gameState === 'ENDING') return;
 
             const isDialogShowing = document.getElementById('dialogBox').style.display === 'block';
 
             npcRoamingList.forEach(npc => {
-                // 如果玩家走得很近且正在對話，讓動物停下來面向玩家
                 if (gameState !== 'START' && playerGroup) {
                     const distToPlayer = npc.group.position.distanceTo(playerGroup.position);
                     if (distToPlayer < 16 || isDialogShowing) {
                         npc.group.position.y = 0;
-                        // 溫和轉向面對主角
                         const dx = playerGroup.position.x - npc.group.position.x;
                         const dz = playerGroup.position.z - npc.group.position.z;
                         const targetAngle = Math.atan2(dx, dz) + Math.PI;
@@ -1751,20 +1791,17 @@
                     }
                 }
 
-                // 休息計時器
                 if (npc.waitTimer > 0) {
                     npc.waitTimer -= delta;
                     npc.group.position.y = Math.abs(Math.sin(now * 0.003 + npc.walkPhase)) * 0.4;
                     return;
                 }
 
-                // 計算往目標點移動的方向
                 const dir = new THREE.Vector3().subVectors(npc.target, npc.group.position);
                 dir.y = 0;
                 const dist = dir.length();
 
                 if (dist < 3.0) {
-                    // 抵達目標點，隨機休息 1.2 ~ 3.0 秒後挑選下一個漫遊點
                     npc.waitTimer = 1.2 + Math.random() * 1.8;
                     npc.target.set(
                         npc.minX + Math.random() * (npc.maxX - npc.minX),
@@ -1776,16 +1813,13 @@
                     npc.group.position.x += dir.x * npc.speed * delta;
                     npc.group.position.z += dir.z * npc.speed * delta;
 
-                    // 讓角色平滑轉向行走方向 (模型正面朝向 -Z，故加 Math.PI)
                     const moveAngle = Math.atan2(dir.x, dir.z) + Math.PI;
                     npc.group.rotation.y = moveAngle;
 
-                    // 活潑的上下彈跳步態與左右微擺
                     npc.walkPhase += delta * npc.hopFreq;
                     npc.group.position.y = Math.abs(Math.sin(npc.walkPhase)) * npc.hopHeight;
                     npc.group.rotation.z = Math.sin(npc.walkPhase * 0.5) * 0.06;
 
-                    // 如果是大象爺爺在散步，同步揮動他的寶石拐杖與左手
                     if (npc.group === elephantGroup && eleCaneArmPivot && eleLeftArmPivot) {
                         eleCaneArmPivot.rotation.x = Math.sin(npc.walkPhase) * 0.35;
                         eleLeftArmPivot.rotation.x = -Math.sin(npc.walkPhase) * 0.35;
@@ -1993,7 +2027,6 @@
             if (suspectName === "Monkey") targetSuspectGroup = monkeyGroup;
             if (suspectName === "Hedgehog") targetSuspectGroup = hedgehogGroup;
 
-            // 將嫌疑犯固定在房間開闊舞台點，避免散步到牆角影響視線
             if (suspectName === "Rabbit") targetSuspectGroup.position.set(70, 0, 118);
             if (suspectName === "Monkey") targetSuspectGroup.position.set(88, 0, 48);
             if (suspectName === "Hedgehog") targetSuspectGroup.position.set(-88, 0, -72);
@@ -2168,7 +2201,6 @@
             const delta = Math.min((now - prevTime) / 1000, 0.1);
             prevTime = now;
 
-            // 旋轉木馬與空中魔法星光粒子動畫
             if (carouselGroup) carouselGroup.rotation.y += delta * 0.7;
             if (magicParticles) {
                 magicParticles.children.forEach(sp => {
@@ -2176,17 +2208,13 @@
                 });
             }
 
-            // 大象爺爺長鼻子呼吸擺動
             if (eleTrunkPivot) {
                 eleTrunkPivot.rotation.x = Math.sin(now * 0.0035) * 0.14;
             }
 
-            // 更新所有 NPC 自由散步漫遊 AI
             updateNPCRoaming(delta, now);
 
-            // -----------------------------------------------------------------
-            // 🌟 狀態 0：首頁 3D 實時環繞全景展示模式 (START)
-            // -----------------------------------------------------------------
+            // 狀態 0：首頁 3D 實時環繞全景展示模式
             if (gameState === 'START') {
                 const orbitAngle = now * 0.00032;
                 const radius = 115;
@@ -2200,9 +2228,6 @@
                 return;
             }
 
-            // -----------------------------------------------------------------
-            // 🎮 遊戲進行中
-            // -----------------------------------------------------------------
             if (playerGroup) {
                 if (zoomDirection !== 0) {
                     cameraDistance = THREE.MathUtils.clamp(cameraDistance + zoomDirection * 18 * delta, minCamDist, maxCamDist);
@@ -2340,7 +2365,6 @@
                         );
                     }
 
-                    // 走近正在散步的大象爺爺自動觸發報案任務
                     if (gameState === 'FIND_ELEPHANT' && !hasAcceptedQuest) {
                         if (playerGroup.position.distanceTo(elephantGroup.position) < 20) {
                             triggerElephantQuest();
