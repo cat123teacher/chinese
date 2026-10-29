@@ -204,8 +204,41 @@
                 老師出題例子：<span class="bg-yellow-100 text-orange-700 px-2 py-0.5 rounded-lg border border-orange-300">＿＿的月亮</span> ➔ 答題紙寫上：<span class="bg-green-100 text-green-800 px-2 py-0.5 rounded-lg border border-green-400">彎彎的月亮</span>
             </p>
 
+            <!-- Prominent Start Game Button at Top -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full justify-center items-center mb-4">
+                <button onclick="startNewGame()" class="btn-3d btn-orange text-white font-black text-xl sm:text-2xl py-3.5 px-8 rounded-full w-full sm:w-auto min-w-[280px] flex items-center justify-center gap-3 shadow-xl">
+                    <span>🚀</span>
+                    <span>開始默書挑戰！(12題)</span>
+                </button>
+            </div>
+
+            <!-- Live Cloud Leaderboard Directly on Home Screen -->
+            <div class="w-full bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50 border-3 border-amber-400 rounded-2xl p-3 sm:p-4 mb-4 shadow-md text-left">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2 pb-1.5 border-b-2 border-amber-200">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-2xl">🏆</span>
+                        <div>
+                            <h2 class="font-black text-amber-950 text-base sm:text-lg leading-tight">1B 雲端即時龍虎榜</h2>
+                            <p class="text-[11px] sm:text-xs font-bold text-amber-700">電腦、手機、iPad 成績即時同步！快來挑戰破紀錄！</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="cloudSyncBadgeHome" class="text-xs font-black bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>雲端連線中...</span>
+                        </span>
+                        <button onclick="openLeaderboardModal()" class="text-xs bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-2.5 py-1 rounded-xl border border-amber-600 shadow-2xs active:scale-95">
+                            🔍 完整榜單
+                        </button>
+                    </div>
+                </div>
+                <div id="homeLeaderboardList" class="max-h-52 overflow-y-auto space-y-1.5 pr-1">
+                    <!-- Populated dynamically by real-time cloud listener -->
+                </div>
+            </div>
+
             <!-- 12 Adjectives Review Grid -->
-            <div class="w-full bg-gradient-to-b from-blue-50 to-purple-50 rounded-2xl p-3 sm:p-4 border-2 border-blue-200 mb-4 shadow-inner">
+            <div class="w-full bg-gradient-to-b from-blue-50 to-purple-50 rounded-2xl p-3 sm:p-4 border-2 border-blue-200 mb-3 shadow-inner">
                 <div class="flex flex-wrap items-center justify-between gap-1 mb-2 px-1">
                     <span class="text-xs sm:text-sm font-black text-blue-800 flex items-center gap-1">
                         📖 溫習範圍（12 個形容詞 × 10 個例子 = 120 題）：
@@ -221,7 +254,7 @@
             </div>
 
             <!-- Selected Adjective Preview Box (Shows 10 examples when a badge is clicked) -->
-            <div id="vocabPreviewBox" class="w-full bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 mb-4 transition-all duration-300">
+            <div id="vocabPreviewBox" class="w-full bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 transition-all duration-300">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
                         <span id="previewAdjBadge" class="bg-orange-500 text-white font-black px-3 py-1 rounded-xl text-base sm:text-lg shadow-sm">彎彎</span>
@@ -234,18 +267,6 @@
                 <div id="previewExamplesList" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center">
                     <!-- Populated dynamically -->
                 </div>
-            </div>
-
-            <!-- Start Game & Leaderboard Buttons -->
-            <div class="flex flex-col sm:flex-row gap-3 w-full justify-center items-center">
-                <button onclick="startNewGame()" class="btn-3d btn-orange text-white font-black text-xl sm:text-2xl py-3.5 px-8 rounded-full w-full sm:w-auto min-w-[260px] flex items-center justify-center gap-3">
-                    <span>🚀</span>
-                    <span>開始默書挑戰！(12題)</span>
-                </button>
-                <button onclick="openLeaderboardModal()" class="btn-3d btn-purple text-white font-black text-lg sm:text-xl py-3.5 px-6 rounded-full w-full sm:w-auto flex items-center justify-center gap-2">
-                    <span>🏆</span>
-                    <span>查看龍虎榜</span>
-                </button>
             </div>
         </section>
 
@@ -401,10 +422,10 @@
             <div class="w-full bg-amber-50/70 border-2 border-amber-300 rounded-2xl p-3 sm:p-4 mb-4 text-left">
                 <div class="flex items-center justify-between mb-2">
                     <span class="font-black text-amber-900 text-sm sm:text-base flex items-center gap-1">
-                        🏆 默書龍虎榜（先按答對題數，再按最快時間排名）
+                        🏆 1B 雲端即時龍虎榜（先按答對題數，再按最快時間）
                     </span>
                     <button onclick="confirmClearLeaderboard()" class="text-xs text-rose-600 hover:underline font-bold">
-                        🗑️ 清除紀錄
+                        🗑️ 清除雲端紀錄
                     </button>
                 </div>
                 <div id="inlineLeaderboardList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
@@ -710,7 +731,7 @@
         /* =========================================================================
          * 2. STATE, TIMER, LEADERBOARD & MANDARIN AUDIO SYSTEM
          * ========================================================================= */
-        const LEADERBOARD_STORAGE_KEY = 'mandarin_adjective_dictation_leaderboard_v1';
+        let leaderboardEntries = []; // Live cloud leaderboard array synced across all devices
         let currentQuestions = []; // Array of 12 question objects for the current session
         let currentIndex = 0;      // 0 to 11
         let soundEnabled = true;
@@ -903,21 +924,18 @@
         }
 
         function getLeaderboardData() {
-            try {
-                const raw = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
-                if (!raw) return [];
-                const parsed = JSON.parse(raw);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
+            return leaderboardEntries;
         }
 
-        function saveLeaderboardData(list) {
-            try {
-                localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list));
-            } catch (e) {
-                // Ignore storage quota errors
+        function setCloudSyncStatus(isOnline, text) {
+            const badge = document.getElementById('cloudSyncBadgeHome');
+            if (!badge) return;
+            if (isOnline) {
+                badge.className = "text-xs font-black bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full border border-emerald-300 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>${text || '🟢 雲端即時同步中'}</span>`;
+            } else {
+                badge.className = "text-xs font-black bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full border border-amber-300 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>${text || '連線中...'}</span>`;
             }
         }
 
@@ -934,13 +952,19 @@
             });
         }
 
-        function submitScoreToLeaderboard() {
+        async function submitScoreToLeaderboard() {
             if (hasSubmittedCurrentScore) return;
 
             const input = document.getElementById('playerNameInput');
+            const submitBtn = document.getElementById('submitScoreBtn');
             let playerName = (input.value || '').trim();
             if (!playerName) {
                 playerName = "小達人";
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "⏳ 雲端登錄中...";
             }
 
             const total = currentQuestions.length;
@@ -956,16 +980,24 @@
                 timestamp: Date.now()
             };
 
-            const existing = getLeaderboardData();
-            existing.push(newEntry);
-            const sorted = sortLeaderboard(existing).slice(0, 50); // Keep top 50
-            saveLeaderboardData(sorted);
-
             hasSubmittedCurrentScore = true;
             lastSubmittedEntryId = entryId;
 
-            const rankIndex = sorted.findIndex(item => item.id === entryId);
-            const rankNumber = rankIndex !== -1 ? rankIndex + 1 : sorted.length;
+            // Optimistically update local array so rank displays immediately
+            const existingIdx = leaderboardEntries.findIndex(item => item.id === entryId);
+            if (existingIdx === -1) {
+                leaderboardEntries.push(newEntry);
+            }
+            const sorted = sortLeaderboard(leaderboardEntries);
+
+            // Save to Firebase Cloud Firestore so PC, Mobile & iPad all see it in real time
+            if (typeof window.saveCloudLeaderboardEntry === 'function') {
+                await window.saveCloudLeaderboardEntry(newEntry);
+            }
+
+            const finalSorted = sortLeaderboard(leaderboardEntries);
+            const rankIndex = finalSorted.findIndex(item => item.id === entryId);
+            const rankNumber = rankIndex !== -1 ? rankIndex + 1 : finalSorted.length;
 
             playEffect('fanfare');
             speakText(`恭喜${playerName}，你排在第${rankNumber}名！`);
@@ -974,7 +1006,12 @@
             document.getElementById('submitFormRow').classList.add('hidden');
             const announce = document.getElementById('rankAnnouncement');
             announce.classList.remove('hidden');
-            announce.innerHTML = `🎉 恭喜 <span class="text-pink-600 underline">${escapeHtml(playerName)}</span>！答對 ${correctCount} 題（用時 ${formatTime(elapsedSeconds)}），榮登龍虎榜 <span class="text-orange-600 text-lg sm:text-xl">第 ${rankNumber} 名</span>！`;
+            announce.innerHTML = `🎉 恭喜 <span class="text-pink-600 underline">${escapeHtml(playerName)}</span>！答對 ${correctCount} 題（用時 ${formatTime(elapsedSeconds)}），榮登全班雲端龍虎榜 <span class="text-orange-600 text-lg sm:text-xl">第 ${rankNumber} 名</span>！`;
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "🏆 登錄成績";
+            }
 
             renderLeaderboardLists();
         }
@@ -992,8 +1029,8 @@
             const sorted = sortLeaderboard(getLeaderboardData());
             if (sorted.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-6 text-gray-500 font-bold text-sm">
-                        🌟 暫時還沒有紀錄，快來完成默書成為第 1 名吧！
+                    <div class="text-center py-5 text-gray-500 font-bold text-sm">
+                        🌟 雲端龍虎榜暫時還沒有紀錄，快來完成默書成為全班第 1 名吧！
                     </div>
                 `;
                 return;
@@ -1027,11 +1064,11 @@
                                 ${isCurrentPlayer ? '<span class="ml-1 text-xs bg-pink-500 text-white px-2 py-0.5 rounded-full font-bold">你</span>' : ''}
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 shrink-0">
-                            <span class="bg-emerald-100 text-emerald-800 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-emerald-300">
+                        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                            <span class="bg-emerald-100 text-emerald-800 font-black px-2 sm:px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-emerald-300">
                                 ✅ ${item.correctCount}/${item.total || 12} 題
                             </span>
-                            <span class="bg-blue-100 text-blue-800 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-blue-300 min-w-[4.2rem] text-center">
+                            <span class="bg-blue-100 text-blue-800 font-black px-2 sm:px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-blue-300 min-w-[4.2rem] text-center">
                                 ⏱️ ${formatTime(item.timeSeconds)}
                             </span>
                         </div>
@@ -1041,6 +1078,7 @@
         }
 
         function renderLeaderboardLists() {
+            renderLeaderboardHTML('homeLeaderboardList');
             renderLeaderboardHTML('inlineLeaderboardList');
             renderLeaderboardHTML('modalLeaderboardList');
         }
@@ -1064,8 +1102,8 @@
             playEffect('click');
             showModal({
                 emoji: "🗑️",
-                title: "確定要清除龍虎榜紀錄嗎？",
-                message: "清除後，所有小朋友的排名紀錄都會被刪除喔！",
+                title: "確定要清除雲端龍虎榜嗎？",
+                message: "清除後，電腦、手機及 iPad 上的所有排名紀錄都會同步刪除喔！",
                 buttons: [
                     {
                         text: "保留紀錄",
@@ -1075,11 +1113,14 @@
                     {
                         text: "確定清除",
                         style: "btn-3d btn-orange text-white font-black py-2.5 px-5 rounded-xl text-sm sm:text-base",
-                        action: () => {
-                            localStorage.removeItem(LEADERBOARD_STORAGE_KEY);
+                        action: async () => {
+                            closeModal();
+                            if (typeof window.clearCloudLeaderboard === 'function') {
+                                await window.clearCloudLeaderboard();
+                            }
+                            leaderboardEntries = [];
                             lastSubmittedEntryId = null;
                             renderLeaderboardLists();
-                            closeModal();
                         }
                     }
                 ]
@@ -1152,6 +1193,7 @@
             });
 
             renderVocabPreview();
+            renderLeaderboardLists();
         }
 
         function renderVocabPreview() {
@@ -1607,6 +1649,119 @@
             }
             renderHomeScreen();
         };
+    </script>
+
+    <!-- Real-time Cloud Leaderboard Sync Module (Cross-Device PC, Mobile & iPad) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-1b-dictation-app';
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        const COLLECTION_NAME = 'leaderboard_1b_dictation_v1';
+
+        async function initCloudSync() {
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    setCloudSyncStatus(false, '本機模式');
+                    return;
+                }
+
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // RULE 3: Authenticate FIRST before any queries
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        subscribeToLeaderboard();
+                    }
+                });
+            } catch (err) {
+                console.error("Cloud sync initialization error:", err);
+                setCloudSyncStatus(false, '離線模式');
+            }
+        }
+
+        function subscribeToLeaderboard() {
+            if (!currentUser || !db) return;
+
+            // RULE 1 & RULE 2: Strict public path & simple collection query without complex orderBy/where
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME);
+
+            onSnapshot(
+                colRef,
+                (snapshot) => {
+                    const items = [];
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        if (data && typeof data.correctCount === 'number') {
+                            items.push({
+                                id: docSnap.id,
+                                name: data.name || '小達人',
+                                correctCount: data.correctCount,
+                                total: data.total || 12,
+                                timeSeconds: typeof data.timeSeconds === 'number' ? data.timeSeconds : 999,
+                                timestamp: data.timestamp || 0
+                            });
+                        }
+                    });
+
+                    leaderboardEntries = items;
+                    setCloudSyncStatus(true, '🟢 雲端即時同步中');
+                    renderLeaderboardLists();
+                },
+                (error) => {
+                    console.error("Leaderboard snapshot error:", error);
+                    setCloudSyncStatus(false, '同步重試中...');
+                }
+            );
+        }
+
+        window.saveCloudLeaderboardEntry = async function (entry) {
+            if (!currentUser || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME, entry.id);
+                await setDoc(docRef, {
+                    name: entry.name,
+                    correctCount: entry.correctCount,
+                    total: entry.total,
+                    timeSeconds: entry.timeSeconds,
+                    timestamp: entry.timestamp,
+                    userId: currentUser.uid
+                });
+            } catch (err) {
+                console.error("Failed to save score to cloud:", err);
+            }
+        };
+
+        window.clearCloudLeaderboard = async function () {
+            if (!currentUser || !db) return;
+            try {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME);
+                const snap = await getDocs(colRef);
+                const deletePromises = [];
+                snap.forEach((d) => {
+                    deletePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', COLLECTION_NAME, d.id)));
+                });
+                await Promise.all(deletePromises);
+            } catch (err) {
+                console.error("Failed to clear cloud leaderboard:", err);
+            }
+        };
+
+        initCloudSync();
     </script>
 </body>
 </html>
