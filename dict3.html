@@ -5,319 +5,217 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>1B默書三(趣味默書)練習</title>
     <style>
-        :root {
-            --primary: #FF6B6B;
-            --secondary: #4ECDC4;
-            --accent: #FFE66D;
-            --bg: #F7FFF7;
-            --text: #2D3047;
-        }
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        /* ================= 基礎設定 ================= */
         body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
-            background-color: var(--bg);
-            background-image: radial-gradient(#4ECDC4 1.5px, transparent 1.5px), radial-gradient(#FF6B6B 1.5px, var(--bg) 1.5px);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px;
-            color: var(--text);
             margin: 0;
             padding: 0;
+            font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            touch-action: manipulation;
+            touch-action: manipulation; /* 適合平板與手機觸控 */
+            color: #333;
         }
         .container {
             width: 100%;
-            max-width: 620px;
-            padding: 20px;
-            box-sizing: border-box;
+            max-width: 600px;
+            flex: 1;
             display: none;
+            flex-direction: column;
+            padding: 15px;
+            box-sizing: border-box;
         }
         .active {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.4s ease-in-out;
+            animation: fadeIn 0.3s ease-out;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        h1, h2 {
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= 漸層立體 3D 大按鈕 ================= */
+        .btn-3d {
+            background: linear-gradient(to bottom, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 16px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 8px 0 #d2536b, 0 15px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
             text-align: center;
-            color: var(--primary);
-            text-shadow: 2px 2px 0px var(--accent);
-            margin-top: 5px;
-            margin-bottom: 12px;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .top-status-bar {
+        .btn-3d:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 transparent;
+        }
+        .btn-3d.green {
+            background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 8px 0 #28a745, 0 15px 15px rgba(0,0,0,0.1);
+        }
+
+        /* ================= 田字格答題紙與題目 ================= */
+        .q-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
-        .progress-pill {
-            font-size: 1.25em;
-            font-weight: bold;
-            color: white;
-            background: #FF6B6B;
-            padding: 6px 16px;
-            border-radius: 20px;
-            box-shadow: 0 4px 0 #D93838;
-        }
-        .timer {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #FF9F1C;
-            background: white;
+        .badge {
+            background: #ffeaa7;
+            color: #d63031;
             padding: 5px 15px;
             border-radius: 20px;
-            border: 3px solid #FF9F1C;
-            box-shadow: 0 4px 0 #FFE66D;
-        }
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 18px;
-            padding: 15px 30px;
-            font-size: 1.3em;
             font-weight: bold;
-            margin: 10px 0;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #D93838;
-            transition: all 0.1s;
-            width: 85%;
-            max-width: 340px;
+            font-size: 1.1rem;
+            border: 2px solid #fdcb6e;
+        }
+        .q-box {
             text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d3436;
         }
-        .btn:active {
-            transform: translateY(6px);
-            box-shadow: none;
-        }
-        .btn:disabled {
-            background-color: #ccc;
-            box-shadow: 0 4px 0 #999;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background-color: var(--secondary);
-            box-shadow: 0 6px 0 #2B938B;
-        }
-        .btn-secondary:active {
-            transform: translateY(6px);
-            box-shadow: none;
-        }
-        .question-box {
-            background: white;
-            border-radius: 22px;
-            padding: 20px;
+        .tian-zi-ge {
             width: 100%;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 18px;
-            font-size: 1.6em;
-            font-weight: bold;
-            border: 4px solid var(--secondary);
-            position: relative;
-        }
-        .speak-icon-btn {
-            background: var(--accent);
-            border: 3px solid #FF9F1C;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            font-size: 0.75em;
-            cursor: pointer;
-            vertical-align: middle;
-            margin-left: 8px;
-            box-shadow: 0 3px 0 #FF9F1C;
-        }
-        .speak-icon-btn:active {
-            transform: translateY(3px);
-            box-shadow: none;
-        }
-        /* 田字格答題紙 */
-        .writing-paper-label {
-            font-size: 1em;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 6px;
-            align-self: flex-start;
-            padding-left: 5px;
-        }
-        .writing-paper {
-            background: white;
-            width: 100%;
-            padding: 18px;
-            border-radius: 15px;
-            border: 3px solid #FF9F1C;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 2.1em;
-            font-weight: bold;
-            letter-spacing: 5px;
-            min-height: 75px;
+            height: 90px;
+            margin: 0 auto 25px auto;
+            border: 4px solid #ff7675;
+            border-radius: 10px;
+            background-color: #fff;
+            /* 模擬田字格的十字虛線與實線 */
+            background-image: 
+                linear-gradient(to right, rgba(255,118,117,0.6) 2px, transparent 2px),
+                linear-gradient(to bottom, rgba(255,118,117,0.6) 2px, transparent 2px),
+                linear-gradient(to right, rgba(255,118,117,0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,118,117,0.2) 1px, transparent 1px);
+            background-size: 90px 90px, 90px 90px, 45px 45px, 45px 45px;
+            background-position: center top;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: linear-gradient(#ffe8cc 1px, transparent 1px), linear-gradient(90deg, #ffe8cc 1px, transparent 1px);
-            background-size: 36px 36px;
-            background-position: center top;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+            font-size: 2.8rem;
+            letter-spacing: 15px;
+            font-family: 'Kaiti', 'STKaiti', 'BiauKai', serif;
+            color: #0984e3;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
         }
-        .answer-grid {
+
+        /* ================= 4 個選項按鈕 ================= */
+        .grid-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            width: 100%;
-            margin-bottom: 22px;
+            margin-bottom: 25px;
         }
-        .option-btn {
-            background: white;
-            color: var(--text);
-            border: 3px solid var(--secondary);
+        .opt-btn {
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
             border-radius: 18px;
             padding: 20px 10px;
-            font-size: 1.5em;
+            font-size: 1.6rem;
             font-weight: bold;
+            box-shadow: 0 8px 0 #00a4b3;
             cursor: pointer;
-            box-shadow: 0 6px 0 var(--secondary);
-            transition: all 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .option-btn:active {
-            transform: translateY(5px);
-            box-shadow: none;
+        .opt-btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 transparent;
         }
-        .option-btn.selected {
-            background-color: var(--accent);
-            border-color: #FF9F1C;
-            box-shadow: 0 6px 0 #FF9F1C;
-            color: #D93838;
+        .opt-btn.selected {
+            background: linear-gradient(to bottom, #f6d365 0%, #fda085 100%);
+            box-shadow: 0 8px 0 #d97d62;
         }
+
+        /* ================= 底部導航 ================= */
         .nav-bar {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            gap: 10px;
             margin-top: auto;
+            gap: 10px;
         }
         .nav-btn {
             flex: 1;
-            background: white;
-            border: 3px solid #ccc;
-            padding: 12px 15px;
-            border-radius: 14px;
-            font-size: 1.1em;
+            padding: 15px 5px;
+            border-radius: 15px;
+            border: none;
+            background: #dfe6e9;
+            color: #2d3436;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: var(--text);
+            box-shadow: 0 6px 0 #b2bec3;
             cursor: pointer;
-            box-shadow: 0 4px 0 #ccc;
         }
         .nav-btn:active {
-            transform: translateY(4px);
-            box-shadow: none;
+            transform: translateY(6px);
+            box-shadow: 0 0 0 transparent;
         }
-        /* 龍虎榜與溫習卡 */
-        .leaderboard {
+
+        /* ================= 結算頁溫習清單與龍虎榜 ================= */
+        .card {
             background: white;
             border-radius: 20px;
             padding: 20px;
-            width: 100%;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            margin-top: 15px;
-            border: 4px solid #FFD166;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
+            border: 3px solid #ffeaa7;
+            text-align: center;
         }
-        .leaderboard-item {
+        .review-list {
+            text-align: left;
+            margin-top: 15px;
+        }
+        .review-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            border-bottom: 2px dashed #eee;
-            font-size: 1.15em;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+            font-size: 1.1rem;
             font-weight: bold;
         }
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-        .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: #06D6A0;
+        .speak-btn {
+            background: #ffeaa7;
+            border: 2px solid #fdcb6e;
             border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(6, 214, 160, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
-        }
-        .vocab-card {
-            background: white;
-            border-radius: 20px;
-            padding: 18px;
-            width: 100%;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-            margin-top: 18px;
-            border: 4px solid var(--secondary);
-            text-align: center;
-        }
-        .vocab-tags {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 12px;
-        }
-        .vocab-tag {
-            background: #F7FFF7;
-            border: 2px solid var(--secondary);
-            border-radius: 12px;
-            padding: 10px 5px;
-            font-size: 1.15em;
-            font-weight: bold;
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 3px 0 var(--secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 #e1b12c;
         }
-        .vocab-tag:active {
+        .speak-btn:active {
             transform: translateY(3px);
             box-shadow: none;
-            background: var(--accent);
         }
         input[type="text"] {
-            padding: 12px;
-            font-size: 1.3em;
-            border-radius: 12px;
-            border: 3px solid var(--secondary);
-            width: 85%;
-            max-width: 300px;
+            padding: 15px;
+            font-size: 1.3rem;
+            border-radius: 15px;
+            border: 2px solid #74b9ff;
+            width: 90%;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
-        .review-box {
-            background: white;
-            border-radius: 20px;
-            padding: 18px;
-            width: 100%;
-            margin-top: 15px;
-            border: 4px solid var(--accent);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-        }
-        .review-row {
+        
+        /* 龍虎榜樣式 */
+        .leaderboard-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 8px 5px;
-            border-bottom: 1px dashed #ddd;
-            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
             font-weight: bold;
         }
     </style>
@@ -326,46 +224,42 @@
 
 <!-- 主頁 -->
 <div id="home" class="container active">
-    <h1>📝 1B默書三(趣味默書)練習</h1>
-    <button class="btn" onclick="startGame()">🚀 開始默書挑戰！(12題)</button>
+    <h1 style="text-align: center; color: #ff7675; margin-bottom: 5px; font-size: 1.8rem;">📝 1B默書三(趣味默書)</h1>
+    <p style="text-align: center; color: #636e72; font-weight: bold; margin-top: 0;">點擊下方按鈕開始挑戰 12 題</p>
     
-    <!-- 首頁龍虎榜 -->
-    <div class="leaderboard">
-        <h2>🏆 1B 雲端即時龍虎榜</h2>
-        <div style="text-align: center; margin-bottom: 10px; font-size: 0.95em; color: #555; font-weight: bold;">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="syncStatusText">雲端即時同步中</span>
+    <button class="btn-3d" onclick="startGame()">🚀 開始默書挑戰！</button>
+    
+    <div class="card" style="border-color: #74b9ff;">
+        <h2 style="margin-top: 0; color: #0984e3; font-size: 1.4rem;">🏆 雲端即時龍虎榜</h2>
+        <div style="font-size: 0.9rem; color: #00b894; margin-bottom: 10px; font-weight: bold;" id="syncStatus">🟢 雲端同步中...</div>
+        <div id="leaderboardList">
+            <div style="color: #999;">載入排名中...</div>
         </div>
-        <div id="leaderboard-list">
-            <div style="text-align:center; padding: 15px;">載入中...</div>
-        </div>
-    </div>
-
-    <!-- 12個溫習形容詞點讀區 -->
-    <div class="vocab-card">
-        <h2 style="font-size: 1.3em; margin-top: 0;">🔊 溫習範圍 (點擊聽普通話及例子)</h2>
-        <div class="vocab-tags" id="vocabTags"></div>
-        <div id="examplePreview" style="margin-top: 12px; font-size: 1.05em; color: #D93838; font-weight: bold; min-height: 26px;"></div>
     </div>
 </div>
 
-<!-- 遊戲答題頁 -->
+<!-- 遊戲作答頁 -->
 <div id="game" class="container">
-    <div class="top-status-bar">
-        <div class="progress-pill" id="progressDisplay">第 1 / 12 題</div>
-        <div class="timer" id="timerDisplay">⏱️ 00:00</div>
+    <div class="q-header">
+        <div class="badge" id="progressText">第 1 / 12 題</div>
+        <div class="badge" id="timerText" style="background:#81ecec; border-color:#00cec9; color:#00b894;">⏱️ 00:00</div>
     </div>
 
-    <div class="question-box">
-        <span id="questionBox">載入中...</span>
-        <button class="speak-icon-btn" onclick="speakCurrentQuestion()" title="再聽一次">🔊</button>
+    <!-- 老師題目 -->
+    <div style="color: #636e72; font-weight: bold; font-size: 1rem; margin-bottom: 5px;">聽普通話，看題目：</div>
+    <div class="q-box">
+        <span id="questionText">🌙 ＿＿的月亮</span>
+        <button class="speak-btn" onclick="speakCurrentQuestion()" style="margin-left: 10px;">🔊</button>
     </div>
 
-    <div class="writing-paper-label">✏️ 小朋友答題紙：</div>
-    <div class="writing-paper" id="writingPaper"></div>
+    <!-- 田字格答題紙 -->
+    <div style="color: #636e72; font-weight: bold; font-size: 1rem; margin-bottom: 5px;">✍️ 你的答題紙：</div>
+    <div class="tian-zi-ge" id="writingPaper">＿＿的月亮</div>
 
-    <div class="answer-grid" id="answerGrid"></div>
-    
+    <!-- 4 個選項 -->
+    <div class="grid-options" id="optionsGrid"></div>
+
+    <!-- 底部導航 -->
     <div class="nav-bar">
         <button class="nav-btn" onclick="prevQuestion()" id="prevBtn" style="visibility: hidden;">⬅️ 上一頁</button>
         <button class="nav-btn" onclick="goHome()">🏠 回主頁</button>
@@ -373,432 +267,242 @@
     </div>
 </div>
 
-<!-- 成績與結算頁 -->
+<!-- 結算頁 -->
 <div id="result" class="container">
-    <h1>🎉 挑戰完成！</h1>
-    <div class="question-box">
-        <div id="starDisplay" style="font-size: 1.3em; margin-bottom: 5px;">⭐⭐⭐</div>
-        <p style="margin: 8px 0;">答對題數：<span id="scoreText" style="color: var(--primary); font-size: 1.3em;"></span> / 12</p>
-        <p style="margin: 8px 0; font-size: 0.85em; color: #FF9F1C;">所需時間：<span id="finalTimeText"></span></p>
-    </div>
+    <h1 style="text-align: center; color: #ff7675; margin-bottom: 10px;">🎉 挑戰完成！</h1>
     
-    <div id="submitRecordDiv" class="leaderboard" style="text-align: center; margin-top: 0; margin-bottom: 15px;">
-        <h2 style="margin-top: 0;">📝 登錄龍虎榜</h2>
-        <input type="text" id="playerName" placeholder="請輸入你的名字 (例如: 林煒晴)" maxlength="10">
-        <br>
-        <button class="btn btn-secondary" id="submitBtn" onclick="submitScore()">🚀 提交成績</button>
+    <div class="card">
+        <div id="starsDisplay" style="font-size: 2rem; margin-bottom: 10px;">⭐⭐⭐</div>
+        <div style="font-size: 1.5rem; font-weight: bold;">答對題數：<span id="scoreText" style="color: #d63031; font-size: 2rem;">0</span> / 12</div>
+        <div style="font-size: 1.2rem; color: #0984e3; margin-top: 10px; font-weight: bold;">所需時間：<span id="timeText">00:00</span></div>
     </div>
 
-    <button class="btn" onclick="startGame()">🔄 再玩一次</button>
-    <button class="btn btn-secondary" onclick="goHome()">🏠 回主頁</button>
+    <div class="card" id="submitBox" style="border-color: #00b894; background: #f3fff9;">
+        <h3 style="margin-top: 0; color: #00b894;">📝 登錄排名</h3>
+        <input type="text" id="playerName" placeholder="輸入名字 (如: 林煒晴)" maxlength="12">
+        <button class="btn-3d green" id="submitBtn" onclick="submitScore()">🚀 提交成績看排名</button>
+    </div>
 
-    <!-- 全卷12題重溫清單 -->
-    <div class="review-box">
-        <h2>📖 題目溫習清單 (點擊 🔊 聽普通話)</h2>
-        <div id="reviewList"></div>
+    <button class="btn-3d" onclick="startGame()">🔄 再玩一次</button>
+    <button class="btn-3d" style="background: linear-gradient(to bottom, #74b9ff 0%, #0984e3 100%); box-shadow: 0 8px 0 #005f9e;" onclick="goHome()">🏠 看龍虎榜</button>
+
+    <div class="card">
+        <h3 style="margin-top: 0; color: #6c5ce7;">📖 全卷 12 題溫習清單</h3>
+        <div class="review-list" id="reviewList"></div>
     </div>
 </div>
 
-<script>
-    // 題庫資料 (12 個形容詞 x 10 個例子 = 120 題，附 Emoji)
+<!-- ================= 遊戲邏輯與 Firebase 整合 ================= -->
+<script type="module">
+    // --- 題庫資料 (保留了您擴充的 120 個豐富例子，確保每次玩都不一樣) ---
     const dictationData = {
-        "香甜": [
-            { n: "的蘋果", e: "🍎" }, { n: "的芒果", e: "🥭" }, { n: "的草莓", e: "🍓" }, { n: "的果汁", e: "🧃" }, { n: "的西瓜", e: "🍉" },
-            { n: "的蜜糖", e: "🍯" }, { n: "的雪糕", e: "🍦" }, { n: "的蛋糕", e: "🍰" }, { n: "的菠蘿", e: "🍍" }, { n: "的水蜜桃", e: "🍑" }
-        ],
-        "尖尖": [
-            { n: "的鉛筆", e: "✏️" }, { n: "的牙齒", e: "🦷" }, { n: "的指甲", e: "💅" }, { n: "的刀子", e: "🔪" }, { n: "的樹枝", e: "🌿" },
-            { n: "的針", e: "🪡" }, { n: "的屋頂", e: "🏠" }, { n: "的山峰", e: "⛰️" }, { n: "的剪刀", e: "✂️" }, { n: "的角", e: "🦄" }
-        ],
-        "閃亮": [
-            { n: "的星星", e: "🌟" }, { n: "的鑽石", e: "💎" }, { n: "的眼睛", e: "👀" }, { n: "的燈光", e: "💡" }, { n: "的寶石", e: "💍" },
-            { n: "的皇冠", e: "👑" }, { n: "的鏡子", e: "🪞" }, { n: "的戒指", e: "💍" }, { n: "的項鍊", e: "📿" }, { n: "的陽光", e: "☀️" }
-        ],
-        "高高": [
-            { n: "的大廈", e: "🏢" }, { n: "的山", e: "🏔️" }, { n: "的樹木", e: "🌳" }, { n: "的長頸鹿", e: "🦒" }, { n: "的塔", e: "🗼" },
-            { n: "的圍牆", e: "🧱" }, { n: "的雲", e: "☁️" }, { n: "的梯子", e: "🪜" }, { n: "的摩天輪", e: "🎡" }, { n: "的橋", e: "🌉" }
-        ],
-        "潔白": [
-            { n: "的牙齒", e: "😁" }, { n: "的雪", e: "❄️" }, { n: "的雲", e: "☁️" }, { n: "的紙", e: "📄" }, { n: "的羽毛", e: "🪶" },
-            { n: "的天鵝", e: "🦢" }, { n: "的牆壁", e: "⬜" }, { n: "的裙子", e: "👗" }, { n: "的襯衫", e: "👔" }, { n: "的花朵", e: "🌼" }
-        ],
-        "彎彎": [
-            { n: "的月亮", e: "🌙" }, { n: "的小河", e: "🏞️" }, { n: "的香蕉", e: "🍌" }, { n: "的小路", e: "🛣️" }, { n: "的眉毛", e: "🤨" },
-            { n: "的橋", e: "🌉" }, { n: "的彩虹", e: "🌈" }, { n: "的梳子", e: "🪮" }, { n: "的微笑", e: "😊" }, { n: "的弓", e: "🏹" }
-        ],
-        "明亮": [
-            { n: "的教室", e: "🏫" }, { n: "的眼睛", e: "👁️" }, { n: "的房間", e: "🛋️" }, { n: "的月光", e: "🌕" }, { n: "的燈泡", e: "💡" },
-            { n: "的星空", e: "🌌" }, { n: "的早上", e: "🌅" }, { n: "的窗戶", e: "🪟" }, { n: "的火光", e: "🔥" }, { n: "的太陽", e: "☀️" }
-        ],
-        "美麗": [
-            { n: "的花朵", e: "🌸" }, { n: "的公主", e: "👸" }, { n: "的風景", e: "🏞️" }, { n: "的蝴蝶", e: "🦋" }, { n: "的衣服", e: "👚" },
-            { n: "的彩虹", e: "🌈" }, { n: "的天空", e: "🌤️" }, { n: "的圖畫", e: "🖼️" }, { n: "的故事", e: "📖" }, { n: "的香港", e: "🇭🇰" }
-        ],
-        "好看": [
-            { n: "的圖書", e: "📚" }, { n: "的電影", e: "🎬" }, { n: "的電視", e: "📺" }, { n: "的表演", e: "🎪" }, { n: "的衣服", e: "👕" },
-            { n: "的裙子", e: "👗" }, { n: "的鞋子", e: "👟" }, { n: "的卡通", e: "🧸" }, { n: "的漫畫", e: "📙" }, { n: "的顏色", e: "🎨" }
-        ],
-        "圓圓": [
-            { n: "的皮球", e: "⚽" }, { n: "的西瓜", e: "🍉" }, { n: "的臉蛋", e: "👶" }, { n: "的月亮", e: "🌕" }, { n: "的太陽", e: "☀️" },
-            { n: "的車輪", e: "🛞" }, { n: "的眼睛", e: "👀" }, { n: "的餅乾", e: "🍪" }, { n: "的雞蛋", e: "🥚" }, { n: "的硬幣", e: "🪙" }
-        ],
-        "甜甜": [
-            { n: "的糖果", e: "🍬" }, { n: "的笑容", e: "😄" }, { n: "的巧克力", e: "🍫" }, { n: "的草莓", e: "🍓" }, { n: "的果汁", e: "🍹" },
-            { n: "的雪糕", e: "🍨" }, { n: "的蛋糕", e: "🎂" }, { n: "的夢", e: "💭" }, { n: "的聲音", e: "🎵" }, { n: "的蜜糖", e: "🍯" }
-        ],
-        "香香": [
-            { n: "的花朵", e: "🌺" }, { n: "的飯菜", e: "🍱" }, { n: "的麵包", e: "🍞" }, { n: "的香水", e: "🧴" }, { n: "的洗頭水", e: "🫧" },
-            { n: "的番皂", e: "🧼" }, { n: "的餅乾", e: "🍪" }, { n: "的烤肉", e: "🍖" }, { n: "的茶", e: "🍵" }, { n: "的草地", e: "🌱" }
-        ]
+        "香甜": [{n:"的蘋果",e:"🍎"},{n:"的芒果",e:"🥭"},{n:"的草莓",e:"🍓"},{n:"的果汁",e:"🧃"},{n:"的西瓜",e:"🍉"},{n:"的蜜糖",e:"🍯"},{n:"的雪糕",e:"🍦"},{n:"的蛋糕",e:"🍰"},{n:"的菠蘿",e:"🍍"},{n:"的水蜜桃",e:"🍑"}],
+        "尖尖": [{n:"的鉛筆",e:"✏️"},{n:"的牙齒",e:"🦷"},{n:"的指甲",e:"💅"},{n:"的刀子",e:"🔪"},{n:"的樹枝",e:"🌿"},{n:"的針",e:"🪡"},{n:"的屋頂",e:"🏠"},{n:"的山峰",e:"⛰️"},{n:"的剪刀",e:"✂️"},{n:"的角",e:"🦄"}],
+        "閃亮": [{n:"的星星",e:"🌟"},{n:"的鑽石",e:"💎"},{n:"的眼睛",e:"👀"},{n:"的燈光",e:"💡"},{n:"的寶石",e:"💍"},{n:"的皇冠",e:"👑"},{n:"的鏡子",e:"🪞"},{n:"的戒指",e:"💍"},{n:"的項鍊",e:"📿"},{n:"的陽光",e:"☀️"}],
+        "高高": [{n:"的大廈",e:"🏢"},{n:"的山",e:"🏔️"},{n:"的樹木",e:"🌳"},{n:"的長頸鹿",e:"🦒"},{n:"的塔",e:"🗼"},{n:"的圍牆",e:"🧱"},{n:"的雲",e:"☁️"},{n:"的梯子",e:"🪜"},{n:"的摩天輪",e:"🎡"},{n:"的橋",e:"🌉"}],
+        "潔白": [{n:"的牙齒",e:"😁"},{n:"的雪",e:"❄️"},{n:"的雲",e:"☁️"},{n:"的紙",e:"📄"},{n:"的羽毛",e:"🪶"},{n:"的天鵝",e:"🦢"},{n:"的牆壁",e:"⬜"},{n:"的裙子",e:"👗"},{n:"的襯衫",e:"👔"},{n:"的花朵",e:"🌼"}],
+        "彎彎": [{n:"的月亮",e:"🌙"},{n:"的小河",e:"🏞️"},{n:"的香蕉",e:"🍌"},{n:"的小路",e:"🛣️"},{n:"的眉毛",e:"🤨"},{n:"的橋",e:"🌉"},{n:"的彩虹",e:"🌈"},{n:"的梳子",e:"🪮"},{n:"的微笑",e:"😊"},{n:"的弓",e:"🏹"}],
+        "明亮": [{n:"的教室",e:"🏫"},{n:"的眼睛",e:"👁️"},{n:"的房間",e:"🛋️"},{n:"的月光",e:"🌕"},{n:"的燈泡",e:"💡"},{n:"的星空",e:"🌌"},{n:"的早上",e:"🌅"},{n:"的窗戶",e:"🪟"},{n:"的火光",e:"🔥"},{n:"的太陽",e:"☀️"}],
+        "美麗": [{n:"的花朵",e:"🌸"},{n:"的公主",e:"👸"},{n:"的風景",e:"🏞️"},{n:"的蝴蝶",e:"🦋"},{n:"的衣服",e:"👚"},{n:"的彩虹",e:"🌈"},{n:"的天空",e:"🌤️"},{n:"的圖畫",e:"🖼️"},{n:"的故事",e:"📖"},{n:"的香港",e:"🇭🇰"}],
+        "好看": [{n:"的圖書",e:"📚"},{n:"的電影",e:"🎬"},{n:"的電視",e:"📺"},{n:"的表演",e:"🎪"},{n:"的衣服",e:"👕"},{n:"的裙子",e:"👗"},{n:"的鞋子",e:"👟"},{n:"的卡通",e:"🧸"},{n:"的漫畫",e:"📙"},{n:"的顏色",e:"🎨"}],
+        "圓圓": [{n:"的皮球",e:"⚽"},{n:"的西瓜",e:"🍉"},{n:"的臉蛋",e:"👶"},{n:"的月亮",e:"🌕"},{n:"的太陽",e:"☀️"},{n:"的車輪",e:"🛞"},{n:"的眼睛",e:"👀"},{n:"的餅乾",e:"🍪"},{n:"的雞蛋",e:"🥚"},{n:"的硬幣",e:"🪙"}],
+        "甜甜": [{n:"的糖果",e:"🍬"},{n:"的笑容",e:"😄"},{n:"的巧克力",e:"🍫"},{n:"的草莓",e:"🍓"},{n:"的果汁",e:"🍹"},{n:"的雪糕",e:"🍨"},{n:"的蛋糕",e:"🎂"},{n:"的夢",e:"💭"},{n:"的聲音",e:"🎵"},{n:"的蜜糖",e:"🍯"}],
+        "香香": [{n:"的花朵",e:"🌺"},{n:"的飯菜",e:"🍱"},{n:"的麵包",e:"🍞"},{n:"的香水",e:"🧴"},{n:"的洗頭水",e:"🫧"},{n:"的番皂",e:"🧼"},{n:"的餅乾",e:"🍪"},{n:"的烤肉",e:"🍖"},{n:"的茶",e:"🍵"},{n:"的草地",e:"🌱"}]
+    };
+    const adjectives = Object.keys(dictationData);
+
+    // --- 遊戲狀態變數 ---
+    let questions = [], currentQ = 0, answers = [], timer, startTime, totalSec = 0, score = 0;
+
+    // --- 普通話語音設定 ---
+    window.speak = function(text) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        const mandarin = voices.find(v => (v.lang.includes('zh-CN') || v.lang.includes('cmn') || v.lang.includes('zh-TW')) && !v.lang.includes('HK') && !v.name.includes('Cantonese') && !v.name.includes('粵'));
+        if (mandarin) u.voice = mandarin;
+        u.lang = 'zh-CN';
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
     };
 
-    const adjectives = Object.keys(dictationData);
-    let currentQuestions = [];
-    let currentQIndex = 0;
-    let userAnswers = [];
-    let timerInterval;
-    let startTime;
-    let totalSeconds = 0;
-    let currentScore = 0;
-
-    // 語音功能 (強制普通話發音)
-    function speak(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            const voices = window.speechSynthesis.getVoices();
-            const mandarinVoice = voices.find(v =>
-                (v.lang.includes('zh-CN') || v.lang.includes('cmn') || v.lang.includes('zh-TW')) &&
-                !v.lang.includes('HK') && !v.name.includes('Cantonese') && !v.name.includes('粵')
-            );
-            if (mandarinVoice) utterance.voice = mandarinVoice;
-            utterance.lang = 'zh-CN';
-            utterance.rate = 0.92;
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    // 建立首頁溫習詞語按鈕
-    function initVocabTags() {
-        const container = document.getElementById('vocabTags');
-        const preview = document.getElementById('examplePreview');
-        container.innerHTML = '';
-        adjectives.forEach(adj => {
-            const btn = document.createElement('div');
-            btn.className = 'vocab-tag';
-            btn.innerText = adj;
-            btn.onclick = () => {
-                const arr = dictationData[adj];
-                const item = arr[Math.floor(Math.random() * arr.length)];
-                speak(adj + "，" + adj + item.n);
-                preview.innerText = `${item.e} 例子：${arr.slice(0, 4).map(x => adj + x.n).join('、')}...`;
-            };
-            container.appendChild(btn);
-        });
-    }
-    initVocabTags();
-
-    function generateQuestions() {
-        let shuffledAdjs = [...adjectives].sort(() => 0.5 - Math.random());
-        currentQuestions = shuffledAdjs.map(adj => {
-            let item = dictationData[adj][Math.floor(Math.random() * dictationData[adj].length)];
-            let noun = item.n;
-            let emoji = item.e;
-            
-            let options = [adj];
-            let otherAdjs = adjectives.filter(a => a !== adj).sort(() => 0.5 - Math.random());
-            options.push(otherAdjs[0], otherAdjs[1], otherAdjs[2]);
-            options.sort(() => 0.5 - Math.random());
-
-            return { adj, noun, emoji, options, answer: adj + noun, qText: "＿＿" + noun };
-        });
-    }
-
-    function showPage(pageId) {
+    // --- 遊戲流程 ---
+    window.showPage = id => {
         document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
+        document.getElementById(id).classList.add('active');
         window.scrollTo(0, 0);
+    };
+    window.goHome = () => { clearInterval(timer); showPage('home'); };
+
+    function formatTime(s) {
+        return String(Math.floor(s/60)).padStart(2,'0') + ":" + String(s%60).padStart(2,'0');
     }
 
-    function goHome() {
-        clearInterval(timerInterval);
-        showPage('home');
-    }
+    window.startGame = () => {
+        // 隨機抽 12 題 (每次組合不同)
+        let shuffled = [...adjectives].sort(() => 0.5 - Math.random());
+        questions = shuffled.map(adj => {
+            let item = dictationData[adj][Math.floor(Math.random() * dictationData[adj].length)];
+            let otherAdjs = adjectives.filter(a => a !== adj).sort(() => 0.5 - Math.random());
+            let options = [adj, otherAdjs[0], otherAdjs[1], otherAdjs[2]].sort(() => 0.5 - Math.random());
+            return { adj, noun: item.n, emoji: item.e, options, qText: "＿＿" + item.n };
+        });
 
-    function startTimer() {
-        clearInterval(timerInterval);
+        currentQ = 0; answers = new Array(12).fill(null); totalSec = 0;
+        
+        // 重設結算頁 UI
+        document.getElementById('submitBox').style.display = 'block';
+        if(document.getElementById('submitBtn')) document.getElementById('submitBtn').disabled = false;
+
+        clearInterval(timer);
         startTime = Date.now();
-        document.getElementById('timerDisplay').innerText = `⏱️ 00:00`;
-        timerInterval = setInterval(() => {
-            totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timerDisplay').innerText = `⏱️ ${formatTime(totalSeconds)}`;
+        document.getElementById('timerText').innerText = `⏱️ 00:00`;
+        timer = setInterval(() => {
+            totalSec = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timerText').innerText = `⏱️ ${formatTime(totalSec)}`;
         }, 500);
-    }
 
-    function formatTime(seconds) {
-        let m = String(Math.floor(seconds / 60)).padStart(2, '0');
-        let s = String(seconds % 60).padStart(2, '0');
-        return `${m}:${s}`;
-    }
-
-    function startGame() {
-        generateQuestions();
-        currentQIndex = 0;
-        userAnswers = new Array(12).fill(null);
-        totalSeconds = 0;
-        
-        // 重置龍虎榜輸入框
-        document.getElementById('submitRecordDiv').innerHTML = `
-            <h2 style="margin-top: 0;">📝 登錄龍虎榜</h2>
-            <input type="text" id="playerName" placeholder="請輸入你的名字 (例如: 林煒晴)" maxlength="10">
-            <br>
-            <button class="btn btn-secondary" id="submitBtn" onclick="submitScore()">🚀 提交成績</button>
-        `;
-        
-        startTimer();
         renderQuestion();
         showPage('game');
-    }
+    };
 
-    function speakCurrentQuestion() {
-        let q = currentQuestions[currentQIndex];
-        if (userAnswers[currentQIndex]) {
-            speak(userAnswers[currentQIndex] + q.noun);
-        } else {
-            speak(q.qText.replace("＿＿", "甚麼"));
-        }
-    }
+    window.speakCurrentQuestion = () => {
+        let q = questions[currentQ];
+        speak(answers[currentQ] ? answers[currentQ] + q.noun : "甚麼" + q.noun);
+    };
 
     function renderQuestion() {
-        let q = currentQuestions[currentQIndex];
-        document.getElementById('progressDisplay').innerText = `第 ${currentQIndex + 1} / 12 題`;
-        document.getElementById('questionBox').innerText = `${q.emoji} ${q.qText}`;
-        speak(q.qText.replace("＿＿", "甚麼"));
+        let q = questions[currentQ];
+        document.getElementById('progressText').innerText = `第 ${currentQ + 1} / 12 題`;
+        document.getElementById('questionText').innerText = `${q.emoji} ${q.qText}`;
+        speak("甚麼" + q.noun);
         
         let paper = document.getElementById('writingPaper');
-        if (userAnswers[currentQIndex]) {
-            paper.innerText = userAnswers[currentQIndex] + q.noun;
-            paper.style.color = 'var(--primary)';
-        } else {
-            paper.innerText = "＿＿" + q.noun;
-            paper.style.color = '#ccc';
-        }
+        paper.innerText = answers[currentQ] ? answers[currentQ] + q.noun : "＿＿" + q.noun;
+        paper.style.color = answers[currentQ] ? '#0984e3' : '#b2bec3'; // 填入後變色
 
-        let grid = document.getElementById('answerGrid');
+        let grid = document.getElementById('optionsGrid');
         grid.innerHTML = '';
         q.options.forEach(opt => {
             let btn = document.createElement('button');
-            btn.className = 'option-btn' + (userAnswers[currentQIndex] === opt ? ' selected' : '');
+            btn.className = 'opt-btn' + (answers[currentQ] === opt ? ' selected' : '');
             btn.innerText = opt;
-            btn.onclick = () => selectAnswer(opt, q.noun);
+            btn.onclick = () => {
+                answers[currentQ] = opt;
+                speak(opt + q.noun);
+                paper.innerText = opt + q.noun;
+                paper.style.color = '#0984e3';
+                Array.from(grid.children).forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                setTimeout(() => { if(currentQ < 11) { currentQ++; renderQuestion(); } else { finishGame(); } }, 400);
+            };
             grid.appendChild(btn);
         });
 
-        document.getElementById('prevBtn').style.visibility = currentQIndex > 0 ? 'visible' : 'hidden';
-        
+        document.getElementById('prevBtn').style.visibility = currentQ > 0 ? 'visible' : 'hidden';
         let nextBtn = document.getElementById('nextBtn');
-        if (currentQIndex === 11) {
+        if (currentQ === 11) {
             nextBtn.innerText = "交卷 🏁";
-            nextBtn.style.backgroundColor = "#06D6A0";
-            nextBtn.style.color = "white";
-            nextBtn.style.borderColor = "#059669";
+            nextBtn.style.background = "#55efc4"; nextBtn.style.boxShadow = "0 6px 0 #00b894";
         } else {
             nextBtn.innerText = "下一頁 ➡️";
-            nextBtn.style.backgroundColor = "white";
-            nextBtn.style.color = "var(--text)";
-            nextBtn.style.borderColor = "#ccc";
+            nextBtn.style.background = "#dfe6e9"; nextBtn.style.boxShadow = "0 6px 0 #b2bec3";
         }
     }
 
-    function selectAnswer(adj, noun) {
-        speak(adj + noun);
-        userAnswers[currentQIndex] = adj;
-        
-        let paper = document.getElementById('writingPaper');
-        paper.innerText = adj + noun;
-        paper.style.color = 'var(--primary)';
-
-        let btns = document.querySelectorAll('.option-btn');
-        btns.forEach(b => {
-            b.classList.toggle('selected', b.innerText === adj);
-        });
-        
-        setTimeout(() => {
-            if(currentQIndex < 11) {
-                nextQuestion();
-            }
-        }, 550);
-    }
-
-    function prevQuestion() {
-        if (currentQIndex > 0) {
-            currentQIndex--;
-            renderQuestion();
-        }
-    }
-
-    function nextQuestion() {
-        if (currentQIndex < 11) {
-            currentQIndex++;
-            renderQuestion();
-        } else {
-            finishGame();
-        }
-    }
+    window.prevQuestion = () => { if(currentQ > 0){ currentQ--; renderQuestion(); } };
+    window.nextQuestion = () => { if(currentQ < 11){ currentQ++; renderQuestion(); } else { finishGame(); } };
 
     function finishGame() {
-        clearInterval(timerInterval);
-        currentScore = 0;
-        const reviewList = document.getElementById('reviewList');
-        reviewList.innerHTML = '';
-
-        for(let i = 0; i < 12; i++) {
-            const q = currentQuestions[i];
-            const isCorrect = userAnswers[i] === q.adj;
-            if(isCorrect) currentScore++;
-
-            const row = document.createElement('div');
-            row.className = 'review-row';
-            const fullAnswer = q.adj + q.noun;
-            row.innerHTML = `
-                <span>${i+1}. ${q.emoji} ${fullAnswer} ${isCorrect ? '✅' : `❌(選了:${userAnswers[i] || '未答'})`}</span>
-                <button class="speak-icon-btn" style="width:36px;height:36px;font-size:0.9em;" onclick="speak('${fullAnswer}')">🔊</button>
+        clearInterval(timer);
+        score = 0;
+        let listHtml = '';
+        questions.forEach((q, i) => {
+            let isCorrect = answers[i] === q.adj;
+            if(isCorrect) score++;
+            let fullAns = q.adj + q.noun;
+            listHtml += `
+                <div class="review-item">
+                    <span>${i+1}. ${q.emoji} ${fullAns} ${isCorrect ? '✅' : `❌(選:${answers[i]||'無'})`}</span>
+                    <button class="speak-btn" onclick="speak('${fullAns}')">🔊</button>
+                </div>
             `;
-            reviewList.appendChild(row);
-        }
-
-        document.getElementById('scoreText').innerText = currentScore;
-        document.getElementById('finalTimeText').innerText = formatTime(totalSeconds);
-        document.getElementById('starDisplay').innerText =
-            currentScore === 12 ? "🏆🌟🌟🌟🏆" :
-            currentScore >= 9 ? "⭐⭐⭐" :
-            currentScore >= 6 ? "⭐⭐" : "⭐";
-
-        speak(`挑戰完成，你答對了${currentScore}題，用了${Math.floor(totalSeconds/60)}分${totalSeconds%60}秒`);
+        });
+        
+        document.getElementById('reviewList').innerHTML = listHtml;
+        document.getElementById('scoreText').innerText = score;
+        document.getElementById('timeText').innerText = formatTime(totalSec);
+        document.getElementById('starsDisplay').innerText = score === 12 ? "🏆🌟🌟🌟🏆" : score >= 9 ? "⭐⭐⭐" : score >= 6 ? "⭐⭐" : "⭐";
+        
+        speak(`挑戰完成，你答對了${score}題，用了${Math.floor(totalSec/60)}分${totalSec%60}秒`);
         showPage('result');
     }
-</script>
 
-<!-- Firebase 雲端即時同步模組 -->
-<script type="module">
+    // --- Firebase 雲端龍虎榜整合 ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-        initializeFirestore,
-        collection,
-        addDoc,
-        onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const app = initializeApp({
         apiKey: "AIzaSyBdzlMQ57R0M-JYUlhA3hsSPP5k_-Ictq4",
         authDomain: "hkbuas-1b-games.firebaseapp.com",
         projectId: "hkbuas-1b-games",
         storageBucket: "hkbuas-1b-games.firebasestorage.app",
         messagingSenderId: "667373437790",
         appId: "1:667373437790:web:8117960182c15969a585cf"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    // 防卡死長輪詢設定，確保手機、iPad 與電腦秒速上傳
-    const db = initializeFirestore(app, {
-        experimentalForceLongPolling: true
     });
-
+    
+    // 開啟強制長輪詢，防止香港地區學校或手機網路卡死
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const colRef = collection(db, "leaderboard");
-    let cachedList = [];
+    let rankData = [];
 
-    function renderLeaderboard(list) {
-        const listDiv = document.getElementById('leaderboard-list');
-        if (!listDiv) return;
-
-        if (list.length === 0) {
-            listDiv.innerHTML = '<div style="text-align:center; padding: 20px;">快來成為第一個挑戰者吧！🚀</div>';
-            return;
+    // 即時自動拉取雲端成績
+    onSnapshot(colRef, snap => {
+        let arr = [];
+        snap.forEach(doc => {
+            let d = doc.data();
+            if(d && d.name) arr.push({ name: d.name, score: Number(d.score), time: Number(d.time) });
+        });
+        // 排序：先比分數(高至低)，同分比時間(快至慢)
+        arr.sort((a,b) => b.score !== a.score ? b.score - a.score : a.time - b.time);
+        rankData = arr;
+        
+        let html = '';
+        if(arr.length === 0) { html = '<div style="color:#666;">快來成為第一名吧！</div>'; }
+        else {
+            arr.slice(0, 15).forEach((d, i) => {
+                let medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.';
+                html += `<div class="leaderboard-row"><span>${medal} ${d.name}</span> <span>✅ ${d.score}題 ⏱️ ${formatTime(d.time)}</span></div>`;
+            });
         }
-
-        listDiv.innerHTML = '';
-        list.slice(0, 15).forEach((data, idx) => {
-            const rank = idx + 1;
-            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ` ${rank}. `;
-            const item = document.createElement('div');
-            item.className = 'leaderboard-item';
-            if (rank === 1) item.style.backgroundColor = '#FFF9DB';
-            item.innerHTML = `
-                <span>${medal} ${data.name}</span>
-                <span>✅ ${data.score}題 ⏱️ ${formatTime(data.time)}</span>
-            `;
-            listDiv.appendChild(item);
-        });
-    }
-
-    // 即時監聽雲端排行榜，電腦與手機同步自動更新
-    onSnapshot(colRef, (snapshot) => {
-        const statusText = document.getElementById('syncStatusText');
-        if (statusText) statusText.innerText = "雲端即時同步中 (電腦/手機/iPad)";
-
-        const arr = [];
-        snapshot.forEach(doc => {
-            const d = doc.data();
-            if (d && d.name) {
-                arr.push({
-                    name: String(d.name),
-                    score: Number(d.score || 0),
-                    time: Number(d.time || 999)
-                });
-            }
-        });
-
-        // 先按答對題數由高至低，再按時間由快至慢排序
-        arr.sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return a.time - b.time;
-        });
-
-        cachedList = arr;
-        renderLeaderboard(cachedList);
-    }, (error) => {
-        console.error("讀取失敗:", error);
-        const listDiv = document.getElementById('leaderboard-list');
-        if (listDiv) listDiv.innerHTML = '<div style="color:red; text-align:center;">讀取失敗，請確認網路連線。</div>';
+        document.getElementById('leaderboardList').innerHTML = html;
     });
 
-    // 提交成績
-    window.submitScore = async function() {
-        const nameInput = document.getElementById('playerName');
-        const submitBtn = document.getElementById('submitBtn');
-        const name = nameInput ? nameInput.value.trim() : "";
-
-        if (!name) {
-            alert("請輸入名字喔！");
-            return;
-        }
-
-        submitBtn.innerText = "上傳中...";
-        submitBtn.disabled = true;
+    // 提交成績上雲端
+    window.submitScore = async () => {
+        let name = document.getElementById('playerName').value.trim();
+        if(!name) return alert("請輸入名字喔！");
+        
+        let btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "⏳ 上傳中...";
 
         try {
-            await addDoc(colRef, {
-                name: name,
-                score: currentScore,
-                time: totalSeconds,
-                timestamp: Date.now()
-            });
-
-            const rankIdx = cachedList.findIndex(
-                x => x.name === name && x.score === currentScore && x.time === totalSeconds
-            );
-            const myRank = rankIdx !== -1 ? rankIdx + 1 : 1;
-
-            document.getElementById('submitRecordDiv').innerHTML = `
-                <h2 style="color:#06D6A0; margin: 10px 0;">✅ 成績已上傳到雲端！</h2>
-                <div style="font-size: 1.3em; font-weight: bold;">🎉 恭喜 ${name}，目前排第 <span style="color:var(--primary); font-size:1.4em;">${myRank}</span> 名！</div>
+            await addDoc(colRef, { name: name, score: score, time: totalSec, timestamp: Date.now() });
+            
+            // 找出最新名次
+            let rank = rankData.findIndex(x => x.name===name && x.score===score && x.time===totalSec) + 1 || 1;
+            
+            document.getElementById('submitBox').innerHTML = `
+                <h3 style="color:#00b894; margin-top:0;">✅ 成功上傳雲端！</h3>
+                <div style="font-size:1.4rem; font-weight:bold;">🎉 恭喜 ${name}！</div>
+                <div style="font-size:1.2rem; margin-top:10px;">目前排名：第 <span style="color:#d63031; font-size:1.8rem;">${rank}</span> 名</div>
             `;
-            speak(`恭喜${name}，你目前排第${myRank}名`);
-        } catch (e) {
-            console.error("Error adding document: ", e);
-            alert("上傳失敗，請稍後再試。");
-            submitBtn.innerText = "🚀 提交成績";
-            submitBtn.disabled = false;
+            speak(`成績已上傳！恭喜${name}排第${rank}名！`);
+        } catch(e) {
+            alert("上傳失敗，請重試！");
+            btn.disabled = false; btn.innerText = "🚀 提交成績看排名";
         }
     };
 </script>
