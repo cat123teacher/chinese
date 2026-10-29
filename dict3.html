@@ -78,7 +78,7 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* ================= 英雄標題卡 (大量免費線上圖案與Emoji) ================= */
+        /* ================= 英雄標題卡 ================= */
         .hero-card {
             background: linear-gradient(135deg, #ffffff 0%, #fff9fb 100%);
             border-radius: 26px;
@@ -269,7 +269,7 @@
             color: #C2410C;
         }
 
-        /* ================= 遊戲作答頁 (單頁無須捲動設計) ================= */
+        /* ================= 遊戲作答頁 ================= */
         .q-header {
             display: flex;
             justify-content: space-between;
@@ -293,7 +293,7 @@
             box-shadow: 0 4px 0 #FCC419;
         }
 
-        /* 老師題目卡 (含巨型圖案) */
+        /* 老師題目卡 */
         .teacher-card {
             background: white;
             border-radius: 24px;
@@ -378,7 +378,6 @@
             color: #1971C2;
             border-radius: 6px;
         }
-        /* 田字格十字虛線 */
         .tzg-cell::before {
             content: "";
             position: absolute;
@@ -409,7 +408,7 @@
             animation: popIn 0.25s ease;
         }
 
-        /* 4 個彩色立體選項按鈕 */
+        /* 4 個彩色立體選項按鈕 (純文字，無圖案) */
         .grid-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -420,7 +419,7 @@
             border: 3px solid #FFF;
             border-radius: 20px;
             padding: 16px 10px;
-            font-size: 1.65rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: white;
             cursor: pointer;
@@ -428,7 +427,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
         .opt-btn:nth-child(1) {
             background: linear-gradient(180deg, #FF85A1 0%, #FF477E 100%);
@@ -534,7 +532,7 @@
 </head>
 <body>
 
-<!-- 頂部鮮艷橫幅 (配免費動態插畫圖示) -->
+<!-- 頂部鮮艷橫幅 -->
 <div class="top-banner">
     <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31f/512.gif" alt="star">
     <span>1B默書三(趣味默書)練習</span>
@@ -557,7 +555,6 @@
         <span>🚀 開始默書挑戰！(12題)</span>
     </button>
 
-    <!-- 12個形容詞繽紛圖案溫習卡 -->
     <div class="card" style="border-color: #FFE066;">
         <h3 style="margin: 0; color: #D9480F; font-size: 1.3rem;">🔊 12個形容詞圖案溫習屋</h3>
         <div style="font-size: 0.9rem; color: #666; font-weight: bold; margin-top: 4px;">點擊下方詞語，聽普通話發音及 10 個圖案例子！</div>
@@ -567,7 +564,6 @@
         </div>
     </div>
 
-    <!-- 雲端即時龍虎榜 (只顯示前 10 名) -->
     <div class="card" style="border-color: #74C0FC;">
         <div class="leaderboard-header">
             <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3c6/512.gif" alt="trophy">
@@ -589,7 +585,6 @@
         <div class="badge timer-badge" id="timerText">⏱️ 00:00</div>
     </div>
 
-    <!-- 老師題目卡 -->
     <div class="teacher-card">
         <div class="teacher-label">👩‍🏫 老師題目（普通話）：</div>
         <div class="q-main-display">
@@ -599,7 +594,6 @@
         </div>
     </div>
 
-    <!-- 一格一字擬真田字格答題紙 -->
     <div class="paper-container">
         <div class="paper-label">
             <span>✍️ 小朋友答題紙（請選擇下方形容詞填入空格）：</span>
@@ -607,10 +601,9 @@
         <div class="tianzige-row" id="writingPaperRow"></div>
     </div>
 
-    <!-- 4 個鮮艷選項按鈕 -->
+    <!-- 4 個選項按鈕區域 (已設定為純文字) -->
     <div class="grid-options" id="optionsGrid"></div>
 
-    <!-- 底部導航 -->
     <div class="nav-bar">
         <button class="nav-btn" onclick="prevQuestion()" id="prevBtn" style="visibility: hidden;">⬅️ 上一頁</button>
         <button class="nav-btn" onclick="goHome()">🏠 回主頁</button>
@@ -636,7 +629,6 @@
         </div>
     </div>
 
-    <!-- 動態判定：只有成績進入龍虎榜前 10 名才可輸入名字 -->
     <div class="card" id="submitBox" style="border-color: #06D6A0; background: #F3FFF9;"></div>
 
     <button class="btn-3d" onclick="startGame()">🔄 再玩一次</button>
@@ -650,7 +642,6 @@
 
 <!-- ================= 遊戲核心邏輯與雲端同步 ================= -->
 <script type="module">
-    // 12 個形容詞代表圖案 + 每個形容詞 10 個豐富圖案例子 (共 120 題)
     const vocabMeta = {
         "香甜": "🍎", "尖尖": "✏️", "閃亮": "💎", "高高": "🦒",
         "潔白": "🦢", "彎彎": "🌙", "明亮": "💡", "美麗": "🦋",
@@ -673,7 +664,6 @@
     };
     const adjectives = Object.keys(dictationData);
 
-    // 建立首頁 12 個形容詞圖案按鈕與 10 個例子展示
     function initVocab() {
         const grid = document.getElementById('vocabGrid');
         const preview = document.getElementById('vocabPreview');
@@ -695,9 +685,8 @@
     initVocab();
 
     let questions = [], currentQ = 0, answers = [], timer, startTime, totalSec = 0, score = 0;
-    let rankData = []; // 儲存雲端排行榜資料
+    let rankData = [];
 
-    // 普通話語音合成
     window.speak = function(text) {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
@@ -724,7 +713,6 @@
         return String(Math.floor(s / 60)).padStart(2, '0') + ":" + String(s % 60).padStart(2, '0');
     }
 
-    // 渲染一格一字田字格答題紙
     function renderTianZiGe(adjOrNull, nounStr) {
         const row = document.getElementById('writingPaperRow');
         row.innerHTML = '';
@@ -790,7 +778,10 @@
         q.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn' + (answers[currentQ] === opt ? ' selected' : '');
-            btn.innerHTML = `<span>${vocabMeta[opt]}</span><span>${opt}</span>`;
+            
+            // 已修改：移除 emoji 圖案，按鈕內只顯示純文字形容詞
+            btn.innerText = opt;
+            
             btn.onclick = () => {
                 answers[currentQ] = opt;
                 speak(opt + q.noun);
@@ -827,11 +818,9 @@
     window.prevQuestion = () => { if (currentQ > 0) { currentQ--; renderQuestion(); } };
     window.nextQuestion = () => { if (currentQ < 11) { currentQ++; renderQuestion(); } else { finishGame(); } };
 
-    // 判斷是否進入龍虎榜前 10 名
     function checkTop10Qualification(myScore, myTime) {
         const top10 = rankData.slice(0, 10);
         if (top10.length < 10) {
-            // 榜上不足 10 人，直接估算名次
             let pos = 1;
             for (const r of top10) {
                 if (myScore > r.score || (myScore === r.score && myTime < r.time)) break;
@@ -839,7 +828,6 @@
             }
             return { qualifies: true, estimatedRank: pos };
         }
-        // 已滿 10 人，與第 10 名比對（分數更高，或同分但時間更快/相同）
         const tenth = top10[9];
         const canEnter = (myScore > tenth.score) || (myScore === tenth.score && myTime <= tenth.time);
         if (!canEnter) {
@@ -875,7 +863,6 @@
         document.getElementById('starsDisplay').innerText =
             score === 12 ? "🏆🌟🌟🌟🏆" : score >= 9 ? "⭐⭐⭐" : score >= 6 ? "⭐⭐" : "⭐";
 
-        // 檢查是否進入前 10 名，動態生成名字輸入框（完全空白，無預設名字）
         const submitBox = document.getElementById('submitBox');
         const check = checkTop10Qualification(score, totalSec);
 
@@ -911,7 +898,6 @@
         showPage('result');
     }
 
-    // ================= Firebase 雲端即時龍虎榜 (前10名) =================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { initializeFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -941,7 +927,6 @@
             }
         });
 
-        // 排序：1. 答對題數由高至低  2. 完成時間由快至慢
         arr.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
             if (a.time !== b.time) return a.time - b.time;
@@ -953,7 +938,6 @@
         if (arr.length === 0) {
             html = '<div style="color:#666; padding:12px; font-weight:bold;">🚀 目前還沒有紀錄，快來成為第一名吧！</div>';
         } else {
-            // 只顯示前 10 名
             arr.slice(0, 10).forEach((d, i) => {
                 const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `🎖️ ${i + 1}.`;
                 const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
