@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌟 1B默書三(趣味默書)練習 🌟</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Rounded & Child-Friendly Chinese Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 50%, #FFF6B7 100%);
+            background-size: 300% 300%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Bubbly 3D Button Effects */
+        .btn-3d {
+            transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .btn-3d:active:not(:disabled) {
+            transform: translateY(4px);
+        }
+
+        .btn-orange {
+            background: linear-gradient(180deg, #FF9F43 0%, #FF7F00 100%);
+            box-shadow: 0 6px 0 #CC5500, 0 10px 15px rgba(0,0,0,0.15);
+        }
+        .btn-orange:active:not(:disabled) {
+            box-shadow: 0 2px 0 #CC5500, 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-green {
+            background: linear-gradient(180deg, #2ECC71 0%, #27AE60 100%);
+            box-shadow: 0 6px 0 #1E8449, 0 10px 15px rgba(0,0,0,0.15);
+        }
+        .btn-green:active:not(:disabled) {
+            box-shadow: 0 2px 0 #1E8449, 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-blue {
+            background: linear-gradient(180deg, #54A0FF 0%, #2E86DE 100%);
+            box-shadow: 0 6px 0 #1B4F72, 0 8px 12px rgba(0,0,0,0.12);
+        }
+        .btn-blue:active:not(:disabled) {
+            box-shadow: 0 2px 0 #1B4F72, 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-purple {
+            background: linear-gradient(180deg, #A29BFE 0%, #6C5CE7 100%);
+            box-shadow: 0 6px 0 #4834D4, 0 8px 12px rgba(0,0,0,0.12);
+        }
+        .btn-purple:active:not(:disabled) {
+            box-shadow: 0 2px 0 #4834D4, 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Option Cards */
+        .option-btn {
+            transition: all 0.15s ease;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.15), 0 8px 15px rgba(0,0,0,0.08);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.08);
+        }
+
+        /* Chinese Grid Paper Box (田字格/米字格風格答題紙) */
+        .answer-sheet-paper {
+            background-color: #FFFDF7;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px),
+                              linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+            border: 3px dashed #F59E0B;
+        }
+
+        .char-box {
+            width: 3rem;
+            height: 3rem;
+            border: 2px solid #EF4444;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        @media (min-width: 640px) {
+            .char-box {
+                width: 3.6rem;
+                height: 3.6rem;
+            }
+        }
+        .char-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed #FCA5A5;
+            pointer-events: none;
+        }
+        .char-box::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            border-left: 1px dashed #FCA5A5;
+            pointer-events: none;
+        }
+
+        /* Floating & Bounce Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: floatSlow 3s ease-in-out infinite;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Custom Scrollbar for Modal/Results */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #F59E0B;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-2 sm:p-4 md:p-6 min-h-dvh">
+
+    <!-- Top Floating Audio / Sound Controls -->
+    <div class="w-full max-w-3xl flex justify-between items-center mb-2 px-2">
+        <div class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border-2 border-yellow-300">
+            <span class="text-xl">🎒</span>
+            <span class="font-bold text-pink-600 text-sm sm:text-base">1B默書三(趣味默書)練習</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openLeaderboardModal()" class="bg-amber-400/90 hover:bg-amber-400 px-3 py-1.5 rounded-full shadow-sm border-2 border-amber-600 text-sm sm:text-base font-black text-amber-950 flex items-center gap-1 active:scale-95 transition">
+                <span>🏆</span> <span>龍虎榜</span>
+            </button>
+            <button id="soundToggleBtn" onclick="toggleSound()" class="bg-white/90 hover:bg-white px-3 py-1.5 rounded-full shadow-sm border-2 border-blue-300 text-sm sm:text-base font-bold text-blue-700 flex items-center gap-1 active:scale-95 transition">
+                <span id="soundIcon">🔊</span> <span id="soundText" class="hidden sm:inline">普通話開啟</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container Card -->
+    <main class="w-full max-w-3xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-yellow-400 overflow-hidden flex flex-col justify-between relative">
+
+        <!-- ==================== 1. HOME SCREEN (主頁) ==================== -->
+        <section id="homeScreen" class="p-4 sm:p-6 md:p-8 flex flex-col items-center text-center">
+            <!-- Header Banner -->
+            <div class="inline-block bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-400 p-1 rounded-3xl shadow-lg mb-3">
+                <div class="bg-white px-5 py-2 rounded-[20px]">
+                    <h1 class="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-orange-500 to-purple-600 tracking-wide">
+                        🌟 1B默書三(趣味默書)練習 🌟
+                    </h1>
+                </div>
+            </div>
+
+            <p class="text-gray-700 font-bold text-sm sm:text-base mb-3 max-w-xl">
+                老師出題例子：<span class="bg-yellow-100 text-orange-700 px-2 py-0.5 rounded-lg border border-orange-300">＿＿的月亮</span> ➔ 答題紙寫上：<span class="bg-green-100 text-green-800 px-2 py-0.5 rounded-lg border border-green-400">彎彎的月亮</span>
+            </p>
+
+            <!-- 12 Adjectives Review Grid -->
+            <div class="w-full bg-gradient-to-b from-blue-50 to-purple-50 rounded-2xl p-3 sm:p-4 border-2 border-blue-200 mb-4 shadow-inner">
+                <div class="flex flex-wrap items-center justify-between gap-1 mb-2 px-1">
+                    <span class="text-xs sm:text-sm font-black text-blue-800 flex items-center gap-1">
+                        📖 溫習範圍（12 個形容詞 × 10 個例子 = 120 題）：
+                    </span>
+                    <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                        💡 點擊詞語聽普通話發音及看 10 個例子
+                    </span>
+                </div>
+
+                <div id="vocabGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- Selected Adjective Preview Box (Shows 10 examples when a badge is clicked) -->
+            <div id="vocabPreviewBox" class="w-full bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 mb-4 transition-all duration-300">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span id="previewAdjBadge" class="bg-orange-500 text-white font-black px-3 py-1 rounded-xl text-base sm:text-lg shadow-sm">彎彎</span>
+                        <span class="text-xs sm:text-sm font-bold text-amber-900">的 10 個默書例子（點擊單個例子可聽普通話）：</span>
+                    </div>
+                    <button onclick="speakCurrentPreview()" class="text-xs sm:text-sm bg-white hover:bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-xl border border-amber-300 shadow-sm flex items-center gap-1 active:scale-95 shrink-0">
+                        🔊 全部朗讀
+                    </button>
+                </div>
+                <div id="previewExamplesList" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Start Game & Leaderboard Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full justify-center items-center">
+                <button onclick="startNewGame()" class="btn-3d btn-orange text-white font-black text-xl sm:text-2xl py-3.5 px-8 rounded-full w-full sm:w-auto min-w-[260px] flex items-center justify-center gap-3">
+                    <span>🚀</span>
+                    <span>開始默書挑戰！(12題)</span>
+                </button>
+                <button onclick="openLeaderboardModal()" class="btn-3d btn-purple text-white font-black text-lg sm:text-xl py-3.5 px-6 rounded-full w-full sm:w-auto flex items-center justify-center gap-2">
+                    <span>🏆</span>
+                    <span>查看龍虎榜</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== 2. GAMEPLAY SCREEN (答題頁面) ==================== -->
+        <section id="gameScreen" class="hidden p-3 sm:p-6 flex flex-col justify-between">
+            <!-- Top Progress & Info Bar -->
+            <div>
+                <div class="flex items-center justify-between gap-1.5 mb-2 flex-wrap">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <span id="questionCounterBadge" class="bg-gradient-to-r from-pink-500 to-orange-500 text-white font-black px-3 py-1 rounded-full text-xs sm:text-base shadow">
+                            第 1 / 12 題
+                        </span>
+                        <span id="answeredCountBadge" class="bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full text-xs sm:text-sm border border-blue-300">
+                            已完成: 0/12
+                        </span>
+                        <span id="timerBadge" class="bg-amber-100 text-amber-900 font-black px-2.5 py-1 rounded-full text-xs sm:text-sm border border-amber-300 flex items-center gap-1">
+                            ⏱️ <span id="timerText">00:00</span>
+                        </span>
+                    </div>
+
+                    <!-- Quick Jump Dots for iPad/Mobile -->
+                    <div id="questionDots" class="hidden md:flex items-center gap-1">
+                        <!-- 12 mini status dots -->
+                    </div>
+
+                    <button onclick="speakCurrentQuestion()" class="bg-yellow-400 hover:bg-yellow-300 text-yellow-950 font-black px-3 py-1 rounded-full text-xs sm:text-sm shadow border-2 border-yellow-500 flex items-center gap-1 active:scale-95">
+                        <span>🔊</span> <span>普通話讀題</span>
+                    </button>
+                </div>
+
+                <!-- Animated Progress Bar -->
+                <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden p-0.5 border border-gray-300 mb-3">
+                    <div id="progressBar" class="bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 h-full rounded-full transition-all duration-300" style="width: 8.33%"></div>
+                </div>
+            </div>
+
+            <!-- Question & Simulated Answer Sheet Area -->
+            <div class="my-1 flex flex-col items-center">
+                <!-- Teacher Prompt Card -->
+                <div class="w-full bg-gradient-to-b from-sky-50 to-indigo-50 border-3 border-sky-300 rounded-3xl p-3 sm:p-5 shadow-md flex flex-col items-center relative mb-3">
+                    <span class="absolute top-2.5 left-3 bg-sky-200 text-sky-900 text-xs font-black px-2.5 py-0.5 rounded-full">
+                        👩‍🏫 老師題目（普通話）
+                    </span>
+
+                    <!-- Emoji Visual -->
+                    <div id="questionEmoji" class="text-6xl sm:text-7xl my-1 animate-float select-none">
+                        🌙
+                    </div>
+
+                    <!-- Blank Prompt: ＿＿的月亮 -->
+                    <div class="flex items-center justify-center flex-wrap gap-1 sm:gap-2 mt-1">
+                        <span id="blankSlot" class="inline-flex items-center justify-center min-w-[5.5rem] sm:min-w-[7rem] h-12 sm:h-14 px-3 rounded-2xl border-4 border-dashed border-pink-400 bg-white text-pink-600 font-black text-2xl sm:text-3xl shadow-inner transition-all">
+                            ＿＿
+                        </span>
+                        <span class="text-2xl sm:text-4xl font-black text-slate-700">的</span>
+                        <span id="questionNoun" class="text-2xl sm:text-4xl font-black text-indigo-900">月亮</span>
+                    </div>
+                </div>
+
+                <!-- Simulated Student Answer Sheet (答題紙寫上：彎彎的月亮) -->
+                <div class="w-full answer-sheet-paper rounded-2xl p-2.5 sm:p-3.5 shadow-inner flex flex-col items-center">
+                    <div class="w-full flex items-center justify-between mb-1.5 px-1 flex-wrap gap-1">
+                        <span class="text-xs sm:text-sm font-black text-amber-900 flex items-center gap-1">
+                            📝 小朋友答題紙（請選擇正確形容詞填寫完整句子）：
+                        </span>
+                        <span id="feedbackStatusTag" class="text-xs font-black px-2.5 py-0.5 rounded-full hidden"></span>
+                    </div>
+
+                    <!-- Chinese Handwriting Boxes (田字格) -->
+                    <div id="handwritingBoxes" class="flex items-center justify-center flex-wrap gap-1 sm:gap-1.5 py-1">
+                        <!-- Dynamically rendered character boxes e.g. [彎][彎][的][月][亮] -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Multiple Choice Buttons (2x2 Grid for Mobile & iPad) -->
+            <div class="my-3">
+                <div id="optionsGrid" class="grid grid-cols-2 gap-3 sm:gap-4">
+                    <!-- 4 colorful buttons injected here -->
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar: 上一頁 | 回主頁 | 下一頁 -->
+            <div class="pt-2 border-t-2 border-dashed border-gray-200 grid grid-cols-3 gap-2 sm:gap-4">
+                <button id="prevBtn" onclick="prevQuestion()" class="btn-3d btn-blue text-white font-black py-3 px-3 rounded-2xl text-sm sm:text-lg flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-40 disabled:pointer-events-none">
+                    <span>⬅️</span>
+                    <span>上一頁</span>
+                </button>
+
+                <button onclick="requestGoHome()" class="btn-3d btn-purple text-white font-black py-3 px-3 rounded-2xl text-sm sm:text-lg flex items-center justify-center gap-1 sm:gap-2">
+                    <span>🏠</span>
+                    <span>回主頁</span>
+                </button>
+
+                <button id="nextBtn" onclick="nextQuestion()" class="btn-3d btn-green text-white font-black py-3 px-3 rounded-2xl text-sm sm:text-lg flex items-center justify-center gap-1 sm:gap-2">
+                    <span id="nextBtnText">下一頁</span>
+                    <span id="nextBtnIcon">➡️</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== 3. RESULTS SCREEN (成績單及龍虎榜登錄頁面) ==================== -->
+        <section id="resultScreen" class="hidden p-4 sm:p-6 md:p-8 flex flex-col items-center text-center">
+            <div id="resultTrophy" class="text-5xl sm:text-6xl mb-1 animate-bounce">
+                🏆
+            </div>
+
+            <h2 id="resultTitle" class="text-2xl sm:text-3xl font-black text-pink-600 mb-1">
+                太棒了！默書挑戰完成！
+            </h2>
+            <p id="resultSubtitle" class="text-gray-600 font-bold text-xs sm:text-sm mb-3">
+                來看看你的默書成績單吧！
+            </p>
+
+            <!-- Score & Time Banner -->
+            <div class="w-full max-w-xl bg-gradient-to-r from-yellow-100 via-orange-100 to-pink-100 border-4 border-yellow-400 rounded-3xl p-3 sm:p-4 mb-4 shadow-md grid grid-cols-4 gap-1 items-center">
+                <div class="flex flex-col items-center">
+                    <span class="text-xs font-bold text-gray-600">答對題數</span>
+                    <span id="scoreFraction" class="text-xl sm:text-3xl font-black text-emerald-600">12 / 12</span>
+                </div>
+                <div class="flex flex-col items-center border-l-2 border-yellow-300">
+                    <span class="text-xs font-bold text-gray-600">所需時間</span>
+                    <span id="scoreTime" class="text-xl sm:text-3xl font-black text-blue-600">00:45</span>
+                </div>
+                <div class="flex flex-col items-center border-l-2 border-yellow-300">
+                    <span class="text-xs font-bold text-gray-600">總成績</span>
+                    <span id="scorePoints" class="text-xl sm:text-3xl font-black text-orange-600">100分</span>
+                </div>
+                <div class="flex flex-col items-center border-l-2 border-yellow-300">
+                    <span class="text-xs font-bold text-gray-600">星級獎勵</span>
+                    <span id="scoreStars" class="text-lg sm:text-2xl">⭐⭐⭐</span>
+                </div>
+            </div>
+
+            <!-- Leaderboard Name Registration Box -->
+            <div id="leaderboardSubmitBox" class="w-full max-w-xl bg-gradient-to-r from-amber-50 to-yellow-50 border-3 border-amber-400 rounded-2xl p-3 sm:p-4 mb-4 shadow-sm">
+                <div class="text-sm sm:text-base font-black text-amber-900 mb-2 flex items-center justify-center gap-1">
+                    <span>👑</span> <span>登錄「默書龍虎榜」看看你排第幾名！</span>
+                </div>
+                <div id="submitFormRow" class="flex flex-col sm:flex-row gap-2 justify-center items-center">
+                    <input id="playerNameInput" type="text" maxlength="12" placeholder="請輸入你的名字（如：小明）"
+                        class="w-full sm:w-64 px-4 py-2.5 rounded-xl border-2 border-amber-400 font-black text-slate-800 text-center sm:text-left focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-base" />
+                    <button id="submitScoreBtn" onclick="submitScoreToLeaderboard()" class="btn-3d btn-orange text-white font-black py-2.5 px-6 rounded-xl text-base w-full sm:w-auto shrink-0">
+                        🏆 登錄成績
+                    </button>
+                </div>
+                <div id="rankAnnouncement" class="hidden mt-2 p-2 bg-emerald-100 border-2 border-emerald-400 rounded-xl text-emerald-900 font-black text-sm sm:text-base animate-pop">
+                    <!-- Populated after submitting score -->
+                </div>
+            </div>
+
+            <!-- Inline Leaderboard Table in Results Screen -->
+            <div class="w-full bg-amber-50/70 border-2 border-amber-300 rounded-2xl p-3 sm:p-4 mb-4 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-black text-amber-900 text-sm sm:text-base flex items-center gap-1">
+                        🏆 默書龍虎榜（先按答對題數，再按最快時間排名）
+                    </span>
+                    <button onclick="confirmClearLeaderboard()" class="text-xs text-rose-600 hover:underline font-bold">
+                        🗑️ 清除紀錄
+                    </button>
+                </div>
+                <div id="inlineLeaderboardList" class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Detailed 12-Question Answer Sheet Review -->
+            <div class="w-full bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 sm:p-4 mb-5 text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-black text-slate-700 text-sm sm:text-base">📋 本局 12 題默書答題紙總覽：</span>
+                    <span class="text-xs text-slate-500 font-bold">點擊任一題可聽普通話發音 🔊</span>
+                </div>
+                <div id="reviewList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Play Again & Home Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                <button onclick="startNewGame()" class="btn-3d btn-orange text-white font-black text-lg sm:text-xl py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2">
+                    <span>🔄</span>
+                    <span>再玩一次（隨機新題目）</span>
+                </button>
+                <button onclick="showHomeScreen()" class="btn-3d btn-purple text-white font-black text-lg sm:text-xl py-3.5 px-8 rounded-2xl flex items-center justify-center gap-2">
+                    <span>🏠</span>
+                    <span>回主頁溫習</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Leaderboard Popup Modal (Accessible from Home & Top Bar) -->
+    <div id="leaderboardModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div class="bg-white rounded-3xl border-4 border-amber-400 max-w-lg w-full p-4 sm:p-6 text-center shadow-2xl animate-pop flex flex-col max-h-[85dvh]">
+            <div class="flex items-center justify-between border-b-2 border-amber-200 pb-2 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl">🏆</span>
+                    <div class="text-left">
+                        <h3 class="text-lg sm:text-xl font-black text-amber-900">普通話默書龍虎榜</h3>
+                        <p class="text-xs font-bold text-gray-500">排名規則：1.答對題數最多 ➔ 2.所需時間最快</p>
+                    </div>
+                </div>
+                <button onclick="closeLeaderboardModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-black w-8 h-8 rounded-full flex items-center justify-center">
+                    ✕
+                </button>
+            </div>
+
+            <div id="modalLeaderboardList" class="flex-1 overflow-y-auto space-y-2 pr-1 text-left my-1">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="pt-3 mt-2 border-t-2 border-amber-100 flex justify-between items-center">
+                <button onclick="confirmClearLeaderboard()" class="text-xs sm:text-sm text-rose-600 hover:bg-rose-50 font-bold px-3 py-1.5 rounded-xl border border-rose-200">
+                    🗑️ 清除所有紀錄
+                </button>
+                <button onclick="closeLeaderboardModal()" class="btn-3d btn-orange text-white font-black py-2 px-6 rounded-xl text-sm sm:text-base">
+                    關閉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal Dialog (For Unanswered Questions or Return Home Confirmation) -->
+    <div id="customModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl border-4 border-amber-400 max-w-sm w-full p-6 text-center shadow-2xl animate-pop">
+            <div id="modalEmoji" class="text-5xl mb-2">🤔</div>
+            <h3 id="modalTitle" class="text-xl font-black text-gray-800 mb-2">提示</h3>
+            <p id="modalMessage" class="text-gray-600 font-bold text-sm sm:text-base mb-5">
+                你還有題目未完成喔！
+            </p>
+            <div id="modalActions" class="flex gap-3 justify-center">
+                <!-- Dynamic Modal Buttons -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================================
+         * 1. QUESTION BANK (12 個形容詞 x 10 個例子 = 120 道精選題目)
+         * 每個例子均設有語意清晰、不會造成歧義的干擾選項池 (safeDistractors)
+         * ========================================================================= */
+        const VOCAB_BANK = [
+            {
+                adjective: "香甜",
+                color: "bg-pink-500 border-pink-700 text-white",
+                lightColor: "bg-pink-100 text-pink-800 border-pink-300",
+                examples: [
+                    { noun: "果汁", emoji: "🍹" },
+                    { noun: "哈密瓜", emoji: "🍈" },
+                    { noun: "水蜜桃", emoji: "🍑" },
+                    { noun: "雪梨", emoji: "🍐" },
+                    { noun: "芒果汁", emoji: "🥭" },
+                    { noun: "木瓜", emoji: "🧡" },
+                    { noun: "草莓", emoji: "🍓" },
+                    { noun: "菠蘿", emoji: "🍍" },
+                    { noun: "蘋果汁", emoji: "🧃" },
+                    { noun: "荔枝", emoji: "🍒" }
+                ],
+                safeDistractors: ["尖尖", "高高", "彎彎", "閃亮", "明亮", "潔白"]
+            },
+            {
+                adjective: "尖尖",
+                color: "bg-orange-500 border-orange-700 text-white",
+                lightColor: "bg-orange-100 text-orange-800 border-orange-300",
+                examples: [
+                    { noun: "鉛筆", emoji: "✏️" },
+                    { noun: "牙齒", emoji: "🦷" },
+                    { noun: "屋頂", emoji: "🏠" },
+                    { noun: "樹葉", emoji: "🍃" },
+                    { noun: "鳥嘴", emoji: "🐦" },
+                    { noun: "竹筍", emoji: "🎍" },
+                    { noun: "小草", emoji: "🌱" },
+                    { noun: "針頭", emoji: "🪡" },
+                    { noun: "山峰", emoji: "🏔️" },
+                    { noun: "羊角", emoji: "🐏" }
+                ],
+                safeDistractors: ["圓圓", "香甜", "甜甜", "香香", "彎彎", "明亮"]
+            },
+            {
+                adjective: "閃亮",
+                color: "bg-amber-500 border-amber-700 text-white",
+                lightColor: "bg-amber-100 text-amber-800 border-amber-300",
+                examples: [
+                    { noun: "星星", emoji: "⭐" },
+                    { noun: "寶石", emoji: "💎" },
+                    { noun: "皇冠", emoji: "👑" },
+                    { noun: "獎盃", emoji: "🏆" },
+                    { noun: "金幣", emoji: "🪙" },
+                    { noun: "鑽石", emoji: "💍" },
+                    { noun: "獎牌", emoji: "🏅" },
+                    { noun: "煙花", emoji: "🎆" },
+                    { noun: "螢火蟲", emoji: "✨" },
+                    { noun: "仙女棒", emoji: "🪄" }
+                ],
+                safeDistractors: ["香甜", "彎彎", "高高", "潔白", "甜甜", "香香"]
+            },
+            {
+                adjective: "高高",
+                color: "bg-emerald-500 border-emerald-700 text-white",
+                lightColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
+                examples: [
+                    { noun: "大樹", emoji: "🌳" },
+                    { noun: "高山", emoji: "⛰️" },
+                    { noun: "大廈", emoji: "🏢" },
+                    { noun: "長頸鹿", emoji: "🦒" },
+                    { noun: "燈塔", emoji: "🗼" },
+                    { noun: "竹子", emoji: "🎋" },
+                    { noun: "城牆", emoji: "🏯" },
+                    { noun: "摩天輪", emoji: "🎡" },
+                    { noun: "電線桿", emoji: "💈" },
+                    { noun: "籃球架", emoji: "🏀" }
+                ],
+                safeDistractors: ["圓圓", "香甜", "甜甜", "彎彎", "潔白", "香香"]
+            },
+            {
+                adjective: "潔白",
+                color: "bg-sky-500 border-sky-700 text-white",
+                lightColor: "bg-sky-100 text-sky-800 border-sky-300",
+                examples: [
+                    { noun: "雲朵", emoji: "☁️" },
+                    { noun: "雪花", emoji: "❄️" },
+                    { noun: "羽毛", emoji: "🪶" },
+                    { noun: "浪花", emoji: "🌊" },
+                    { noun: "小兔", emoji: "🐰" },
+                    { noun: "天鵝", emoji: "🦢" },
+                    { noun: "棉花", emoji: "💭" },
+                    { noun: "白紙", emoji: "📄" },
+                    { noun: "珍珠", emoji: "🦪" },
+                    { noun: "婚紗", emoji: "👰" }
+                ],
+                safeDistractors: ["高高", "彎彎", "香甜", "尖尖", "甜甜", "香香"]
+            },
+            {
+                adjective: "彎彎",
+                color: "bg-indigo-500 border-indigo-700 text-white",
+                lightColor: "bg-indigo-100 text-indigo-800 border-indigo-300",
+                examples: [
+                    { noun: "月亮", emoji: "🌙" },
+                    { noun: "小河", emoji: "🏞️" },
+                    { noun: "香蕉", emoji: "🍌" },
+                    { noun: "彩虹", emoji: "🌈" },
+                    { noun: "眉毛", emoji: "👀" },
+                    { noun: "小路", emoji: "🛤️" },
+                    { noun: "石橋", emoji: "🌉" },
+                    { noun: "牛角", emoji: "🐂" },
+                    { noun: "鐮刀", emoji: "🌾" },
+                    { noun: "船兒", emoji: "🛶" }
+                ],
+                safeDistractors: ["高高", "圓圓", "潔白", "尖尖", "明亮", "閃亮"]
+            },
+            {
+                adjective: "明亮",
+                color: "bg-yellow-500 border-yellow-700 text-white",
+                lightColor: "bg-yellow-100 text-yellow-900 border-yellow-400",
+                examples: [
+                    { noun: "眼睛", emoji: "👁️" },
+                    { noun: "燈光", emoji: "💡" },
+                    { noun: "課室", emoji: "🏫" },
+                    { noun: "窗戶", emoji: "🪟" },
+                    { noun: "鏡子", emoji: "🪞" },
+                    { noun: "月光", emoji: "🌕" },
+                    { noun: "車燈", emoji: "🚗" },
+                    { noun: "大廳", emoji: "🏛️" },
+                    { noun: "路燈", emoji: "🏮" },
+                    { noun: "手電筒", emoji: "🔦" }
+                ],
+                safeDistractors: ["彎彎", "尖尖", "香甜", "甜甜", "香香", "高高"]
+            },
+            {
+                adjective: "美麗",
+                color: "bg-rose-500 border-rose-700 text-white",
+                lightColor: "bg-rose-100 text-rose-800 border-rose-300",
+                examples: [
+                    { noun: "花朵", emoji: "🌸" },
+                    { noun: "蝴蝶", emoji: "🦋" },
+                    { noun: "風景", emoji: "🏞️" },
+                    { noun: "孔雀", emoji: "🦚" },
+                    { noun: "公主", emoji: "👸" },
+                    { noun: "花園", emoji: "🏡" },
+                    { noun: "晚霞", emoji: "🌇" },
+                    { noun: "彩虹橋", emoji: "🌈" },
+                    { noun: "星空", emoji: "🌌" },
+                    { noun: "珊瑚", emoji: "🪸" }
+                ],
+                safeDistractors: ["尖尖", "彎彎", "圓圓", "高高", "甜甜", "香甜"]
+            },
+            {
+                adjective: "好看",
+                color: "bg-purple-500 border-purple-700 text-white",
+                lightColor: "bg-purple-100 text-purple-800 border-purple-300",
+                examples: [
+                    { noun: "圖書", emoji: "📚" },
+                    { noun: "電影", emoji: "🎬" },
+                    { noun: "衣服", emoji: "👗" },
+                    { noun: "故事書", emoji: "📖" },
+                    { noun: "卡通片", emoji: "📺" },
+                    { noun: "表演", emoji: "🎪" },
+                    { noun: "圖畫", emoji: "🖼️" },
+                    { noun: "舞蹈", emoji: "💃" },
+                    { noun: "木偶戲", emoji: "🎭" },
+                    { noun: "魔術", emoji: "🎩" }
+                ],
+                safeDistractors: ["尖尖", "彎彎", "圓圓", "香甜", "潔白", "高高"]
+            },
+            {
+                adjective: "圓圓",
+                color: "bg-teal-500 border-teal-700 text-white",
+                lightColor: "bg-teal-100 text-teal-800 border-teal-300",
+                examples: [
+                    { noun: "皮球", emoji: "⚽" },
+                    { noun: "西瓜", emoji: "🍉" },
+                    { noun: "氣球", emoji: "🎈" },
+                    { noun: "太陽", emoji: "☀️" },
+                    { noun: "車輪", emoji: "🛞" },
+                    { noun: "鐘面", emoji: "🕓" },
+                    { noun: "盤子", emoji: "🍽️" },
+                    { noun: "鈕扣", emoji: "🔘" },
+                    { noun: "湯圓", emoji: "🥣" },
+                    { noun: "臉蛋", emoji: "👶" }
+                ],
+                safeDistractors: ["尖尖", "彎彎", "高高", "潔白", "香香", "好看"]
+            },
+            {
+                adjective: "甜甜",
+                color: "bg-fuchsia-500 border-fuchsia-700 text-white",
+                lightColor: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300",
+                examples: [
+                    { noun: "糖果", emoji: "🍬" },
+                    { noun: "朱古力", emoji: "🍫" },
+                    { noun: "雪糕", emoji: "🍦" },
+                    { noun: "笑容", emoji: "😊" },
+                    { noun: "蜂蜜", emoji: "🍯" },
+                    { noun: "棒棒糖", emoji: "🍭" },
+                    { noun: "棉花糖", emoji: "🍡" },
+                    { noun: "紅豆沙", emoji: "🫘" },
+                    { noun: "布丁", emoji: "🍮" },
+                    { noun: "美夢", emoji: "😴" }
+                ],
+                safeDistractors: ["尖尖", "高高", "彎彎", "潔白", "明亮", "閃亮"]
+            },
+            {
+                adjective: "香香",
+                color: "bg-amber-600 border-amber-800 text-white",
+                lightColor: "bg-amber-100 text-amber-900 border-amber-300",
+                examples: [
+                    { noun: "白飯", emoji: "🍚" },
+                    { noun: "麵包", emoji: "🍞" },
+                    { noun: "烤雞", emoji: "🍗" },
+                    { noun: "爆谷", emoji: "🍿" },
+                    { noun: "曲奇餅", emoji: "🍪" },
+                    { noun: "雞蛋仔", emoji: "🧇" },
+                    { noun: "薯條", emoji: "🍟" },
+                    { noun: "披薩", emoji: "🍕" },
+                    { noun: "烤肉", emoji: "🍖" },
+                    { noun: "芝麻糊", emoji: "🥣" }
+                ],
+                safeDistractors: ["尖尖", "高高", "彎彎", "明亮", "閃亮", "美麗"]
+            }
+        ];
+
+        /* =========================================================================
+         * 2. STATE, TIMER, LEADERBOARD & MANDARIN AUDIO SYSTEM
+         * ========================================================================= */
+        const LEADERBOARD_STORAGE_KEY = 'mandarin_adjective_dictation_leaderboard_v1';
+        let currentQuestions = []; // Array of 12 question objects for the current session
+        let currentIndex = 0;      // 0 to 11
+        let soundEnabled = true;
+        let currentPreviewIndex = 5; // Default preview "彎彎" (index 5) on home page
+        let audioCtx = null;
+
+        // Timer variables
+        let timerInterval = null;
+        let startTimeMs = 0;
+        let elapsedSeconds = 0;
+        let hasSubmittedCurrentScore = false;
+        let lastSubmittedEntryId = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playEffect(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                if (type === 'correct') {
+                    // Cheerful ascending chime
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.25);
+                    });
+                } else if (type === 'wrong') {
+                    // Gentle low boop
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(240, now);
+                    osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'fanfare') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
+                    const times = [0, 0.12, 0.24, 0.36, 0.52, 0.68];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + times[idx]);
+                        gain.gain.setValueAtTime(0.22, now + times[idx]);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + times[idx] + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + times[idx]);
+                        osc.stop(now + times[idx] + 0.3);
+                    });
+                }
+            } catch (e) {
+                // Ignore audio errors on restricted devices
+            }
+        }
+
+        // Force Putonghua / Mandarin (zh-CN / cmn / zh-TW) voice selection, strictly avoiding Cantonese (zh-HK / yue)
+        function getMandarinVoice() {
+            if (!('speechSynthesis' in window)) return null;
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices || voices.length === 0) return null;
+
+            // Filter out any Cantonese voices
+            const nonCantoneseChinese = voices.filter(v => {
+                const lang = (v.lang || '').toLowerCase();
+                const name = (v.name || '').toLowerCase();
+                const isCantonese = lang.includes('hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('粵') || name.includes('粤') || name.includes('hong kong');
+                const isChinese = lang.startsWith('zh') || lang.includes('cmn') || name.includes('chinese') || name.includes('mandarin') || name.includes('普通話') || name.includes('普通话') || name.includes('國語') || name.includes('国语');
+                return isChinese && !isCantonese;
+            });
+
+            // Priority 1: zh-CN or cmn-Hans-CN (Standard Putonghua)
+            const cnVoice = nonCantoneseChinese.find(v => {
+                const lang = v.lang.toLowerCase();
+                return lang === 'zh-cn' || lang === 'zh_cn' || lang.includes('cmn-hans') || lang.includes('zh-hans');
+            });
+            if (cnVoice) return cnVoice;
+
+            // Priority 2: zh-TW (Guoyu / Mandarin)
+            const twVoice = nonCantoneseChinese.find(v => {
+                const lang = v.lang.toLowerCase();
+                return lang === 'zh-tw' || lang === 'zh_tw' || lang.includes('cmn-hant') || lang.includes('zh-hant');
+            });
+            if (twVoice) return twVoice;
+
+            // Priority 3: Any non-Cantonese Chinese voice
+            if (nonCantoneseChinese.length > 0) return nonCantoneseChinese[0];
+
+            return null;
+        }
+
+        function speakText(text) {
+            if (!soundEnabled || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                const mandarinVoice = getMandarinVoice();
+
+                if (mandarinVoice) {
+                    utter.voice = mandarinVoice;
+                    utter.lang = mandarinVoice.lang;
+                } else {
+                    utter.lang = 'zh-CN';
+                }
+
+                utter.rate = 0.92;
+                utter.pitch = 1.05;
+                window.speechSynthesis.speak(utter);
+            } catch (e) {
+                // Ignore speech errors
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').textContent = soundEnabled ? '🔊' : '🔇';
+            document.getElementById('soundText').textContent = soundEnabled ? '普通話開啟' : '普通話關閉';
+            if (!soundEnabled && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            } else {
+                playEffect('click');
+                speakText('普通話發音已開啟');
+            }
+        }
+
+        /* =========================================================================
+         * 3. TIMER & LEADERBOARD SYSTEM
+         * ========================================================================= */
+        function formatTime(totalSec) {
+            const mins = Math.floor(totalSec / 60);
+            const secs = totalSec % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            stopTimer();
+            startTimeMs = Date.now();
+            elapsedSeconds = 0;
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                elapsedSeconds = Math.floor((Date.now() - startTimeMs) / 1000);
+                updateTimerUI();
+            }, 500);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerUI() {
+            const el = document.getElementById('timerText');
+            if (el) el.textContent = formatTime(elapsedSeconds);
+        }
+
+        function getLeaderboardData() {
+            try {
+                const raw = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLeaderboardData(list) {
+            try {
+                localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list));
+            } catch (e) {
+                // Ignore storage quota errors
+            }
+        }
+
+        // Sort strictly: 1) Most correct answers (DESC), 2) Fastest time (ASC), 3) Earliest timestamp
+        function sortLeaderboard(list) {
+            return [...list].sort((a, b) => {
+                if (b.correctCount !== a.correctCount) {
+                    return b.correctCount - a.correctCount;
+                }
+                if (a.timeSeconds !== b.timeSeconds) {
+                    return a.timeSeconds - b.timeSeconds;
+                }
+                return (a.timestamp || 0) - (b.timestamp || 0);
+            });
+        }
+
+        function submitScoreToLeaderboard() {
+            if (hasSubmittedCurrentScore) return;
+
+            const input = document.getElementById('playerNameInput');
+            let playerName = (input.value || '').trim();
+            if (!playerName) {
+                playerName = "小達人";
+            }
+
+            const total = currentQuestions.length;
+            const correctCount = currentQuestions.filter(q => q.isCorrect).length;
+            const entryId = 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+
+            const newEntry = {
+                id: entryId,
+                name: playerName,
+                correctCount: correctCount,
+                total: total,
+                timeSeconds: elapsedSeconds,
+                timestamp: Date.now()
+            };
+
+            const existing = getLeaderboardData();
+            existing.push(newEntry);
+            const sorted = sortLeaderboard(existing).slice(0, 50); // Keep top 50
+            saveLeaderboardData(sorted);
+
+            hasSubmittedCurrentScore = true;
+            lastSubmittedEntryId = entryId;
+
+            const rankIndex = sorted.findIndex(item => item.id === entryId);
+            const rankNumber = rankIndex !== -1 ? rankIndex + 1 : sorted.length;
+
+            playEffect('fanfare');
+            speakText(`恭喜${playerName}，你排在第${rankNumber}名！`);
+
+            // Update UI in results page
+            document.getElementById('submitFormRow').classList.add('hidden');
+            const announce = document.getElementById('rankAnnouncement');
+            announce.classList.remove('hidden');
+            announce.innerHTML = `🎉 恭喜 <span class="text-pink-600 underline">${escapeHtml(playerName)}</span>！答對 ${correctCount} 題（用時 ${formatTime(elapsedSeconds)}），榮登龍虎榜 <span class="text-orange-600 text-lg sm:text-xl">第 ${rankNumber} 名</span>！`;
+
+            renderLeaderboardLists();
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
+        }
+
+        function renderLeaderboardHTML(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const sorted = sortLeaderboard(getLeaderboardData());
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-gray-500 font-bold text-sm">
+                        🌟 暫時還沒有紀錄，快來完成默書成為第 1 名吧！
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = sorted.map((item, idx) => {
+                const rank = idx + 1;
+                let rankBadge = `<span class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center">${rank}</span>`;
+                let rowBg = "bg-white border-slate-200";
+
+                if (rank === 1) {
+                    rankBadge = `<span class="text-2xl" title="第1名">🥇</span>`;
+                    rowBg = "bg-gradient-to-r from-yellow-100 to-amber-50 border-yellow-400";
+                } else if (rank === 2) {
+                    rankBadge = `<span class="text-2xl" title="第2名">🥈</span>`;
+                    rowBg = "bg-gradient-to-r from-slate-100 to-gray-50 border-slate-300";
+                } else if (rank === 3) {
+                    rankBadge = `<span class="text-2xl" title="第3名">🥉</span>`;
+                    rowBg = "bg-gradient-to-r from-orange-100 to-amber-50 border-orange-300";
+                }
+
+                const isCurrentPlayer = item.id === lastSubmittedEntryId;
+                const highlightRing = isCurrentPlayer ? "ring-2 ring-pink-500 bg-pink-50/90" : "";
+
+                return `
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl border-2 ${rowBg} ${highlightRing} shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-8 flex justify-center shrink-0">${rankBadge}</div>
+                            <div class="truncate">
+                                <span class="font-black text-slate-800 text-sm sm:text-base">${escapeHtml(item.name)}</span>
+                                ${isCurrentPlayer ? '<span class="ml-1 text-xs bg-pink-500 text-white px-2 py-0.5 rounded-full font-bold">你</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0">
+                            <span class="bg-emerald-100 text-emerald-800 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-emerald-300">
+                                ✅ ${item.correctCount}/${item.total || 12} 題
+                            </span>
+                            <span class="bg-blue-100 text-blue-800 font-black px-2.5 py-0.5 rounded-lg text-xs sm:text-sm border border-blue-300 min-w-[4.2rem] text-center">
+                                ⏱️ ${formatTime(item.timeSeconds)}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLeaderboardLists() {
+            renderLeaderboardHTML('inlineLeaderboardList');
+            renderLeaderboardHTML('modalLeaderboardList');
+        }
+
+        function openLeaderboardModal() {
+            playEffect('click');
+            renderLeaderboardLists();
+            const modal = document.getElementById('leaderboardModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLeaderboardModal() {
+            playEffect('click');
+            const modal = document.getElementById('leaderboardModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmClearLeaderboard() {
+            playEffect('click');
+            showModal({
+                emoji: "🗑️",
+                title: "確定要清除龍虎榜紀錄嗎？",
+                message: "清除後，所有小朋友的排名紀錄都會被刪除喔！",
+                buttons: [
+                    {
+                        text: "保留紀錄",
+                        style: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 px-5 rounded-xl text-sm sm:text-base",
+                        action: () => closeModal()
+                    },
+                    {
+                        text: "確定清除",
+                        style: "btn-3d btn-orange text-white font-black py-2.5 px-5 rounded-xl text-sm sm:text-base",
+                        action: () => {
+                            localStorage.removeItem(LEADERBOARD_STORAGE_KEY);
+                            lastSubmittedEntryId = null;
+                            renderLeaderboardLists();
+                            closeModal();
+                        }
+                    }
+                ]
+            });
+        }
+
+        /* =========================================================================
+         * 4. UTILITY FUNCTIONS (Shuffle & Question Generator)
+         * ========================================================================= */
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        // Generates 12 randomized questions (1 for each of the 12 adjectives, picking 1 of its 10 examples)
+        function generateGameSession() {
+            const shuffledVocab = shuffleArray(VOCAB_BANK);
+
+            return shuffledVocab.map((item, idx) => {
+                // Pick 1 random example out of the 10 examples for this adjective
+                const chosenExample = item.examples[Math.floor(Math.random() * item.examples.length)];
+                // Pick 3 random non-conflicting distractors
+                const distractors = shuffleArray(item.safeDistractors).slice(0, 3);
+                // Combine and shuffle the 4 choices
+                const options = shuffleArray([item.adjective, ...distractors]);
+
+                return {
+                    id: idx + 1,
+                    adjective: item.adjective,
+                    noun: chosenExample.noun,
+                    emoji: chosenExample.emoji,
+                    fullPhrase: `${item.adjective}的${chosenExample.noun}`,
+                    options: options,
+                    selectedOption: null,
+                    isCorrect: false
+                };
+            });
+        }
+
+        /* =========================================================================
+         * 5. HOME SCREEN RENDERING
+         * ========================================================================= */
+        function renderHomeScreen() {
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = '';
+
+            VOCAB_BANK.forEach((item, index) => {
+                const isSelected = index === currentPreviewIndex;
+                const btn = document.createElement('button');
+                btn.className = `btn-3d py-2.5 px-2 rounded-2xl font-black text-base sm:text-xl border-b-4 transition flex items-center justify-center gap-1 shadow-sm ${
+                    isSelected
+                        ? `${item.color} ring-4 ring-yellow-300 scale-105`
+                        : 'bg-white hover:bg-yellow-50 text-slate-800 border-slate-300'
+                }`;
+                btn.innerHTML = `
+                    <span>${item.examples[0].emoji}</span>
+                    <span>${item.adjective}</span>
+                `;
+                btn.onclick = () => {
+                    playEffect('click');
+                    currentPreviewIndex = index;
+                    renderHomeScreen();
+                    speakText(item.adjective);
+                };
+                grid.appendChild(btn);
+            });
+
+            renderVocabPreview();
+        }
+
+        function renderVocabPreview() {
+            const item = VOCAB_BANK[currentPreviewIndex];
+            const badge = document.getElementById('previewAdjBadge');
+            badge.textContent = item.adjective;
+            badge.className = `${item.color} font-black px-3 py-1 rounded-xl text-base sm:text-lg shadow-sm`;
+
+            const list = document.getElementById('previewExamplesList');
+            list.innerHTML = '';
+
+            item.examples.forEach(ex => {
+                const full = `${item.adjective}的${ex.noun}`;
+                const card = document.createElement('button');
+                card.className = "bg-white hover:bg-amber-100/80 border border-amber-200 rounded-xl p-1.5 sm:p-2 flex flex-col items-center justify-center shadow-xs active:scale-95 transition";
+                card.innerHTML = `
+                    <span class="text-xl sm:text-2xl mb-0.5">${ex.emoji}</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-800">${full}</span>
+                `;
+                card.onclick = () => {
+                    playEffect('click');
+                    speakText(full);
+                };
+                list.appendChild(card);
+            });
+        }
+
+        function speakCurrentPreview() {
+            const item = VOCAB_BANK[currentPreviewIndex];
+            const phrases = item.examples.map(e => `${item.adjective}的${e.noun}`).join('，');
+            speakText(`${item.adjective}。${phrases}`);
+        }
+
+        /* =========================================================================
+         * 6. GAMEPLAY LOGIC & QUESTION RENDERING
+         * ========================================================================= */
+        function startNewGame() {
+            playEffect('click');
+            currentQuestions = generateGameSession();
+            currentIndex = 0;
+            hasSubmittedCurrentScore = false;
+            lastSubmittedEntryId = null;
+
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            startTimer();
+            renderQuestion(true);
+        }
+
+        function renderQuestion(shouldSpeakPrompt = false) {
+            const q = currentQuestions[currentIndex];
+            const total = currentQuestions.length;
+            const answeredCount = currentQuestions.filter(item => item.selectedOption !== null).length;
+
+            // Top Counters & Progress Bar
+            document.getElementById('questionCounterBadge').textContent = `第 ${currentIndex + 1} / ${total} 題`;
+            document.getElementById('answeredCountBadge').textContent = `已完成: ${answeredCount}/${total}`;
+            document.getElementById('progressBar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+            // Render Mini Status Dots (for larger screens / iPad)
+            const dotsContainer = document.getElementById('questionDots');
+            dotsContainer.innerHTML = '';
+            currentQuestions.forEach((item, idx) => {
+                const dot = document.createElement('button');
+                let dotStyle = "bg-gray-300";
+                if (item.selectedOption !== null) {
+                    dotStyle = item.isCorrect ? "bg-emerald-500" : "bg-rose-400";
+                }
+                const activeRing = idx === currentIndex ? "ring-2 ring-offset-1 ring-pink-500 scale-125" : "opacity-75";
+                dot.className = `w-3 h-3 rounded-full transition-all ${dotStyle} ${activeRing}`;
+                dot.onclick = () => {
+                    playEffect('click');
+                    currentIndex = idx;
+                    renderQuestion(true);
+                };
+                dotsContainer.appendChild(dot);
+            });
+
+            // Prompt Card Emoji & Noun
+            const emojiEl = document.getElementById('questionEmoji');
+            emojiEl.textContent = q.emoji;
+            document.getElementById('questionNoun').textContent = q.noun;
+
+            // Blank Slot Display
+            const blankSlot = document.getElementById('blankSlot');
+            if (q.selectedOption) {
+                blankSlot.textContent = q.selectedOption;
+                if (q.isCorrect) {
+                    blankSlot.className = "inline-flex items-center justify-center min-w-[5.5rem] sm:min-w-[7rem] h-12 sm:h-14 px-3 rounded-2xl border-4 border-emerald-500 bg-emerald-100 text-emerald-800 font-black text-2xl sm:text-3xl shadow animate-pop";
+                } else {
+                    blankSlot.className = "inline-flex items-center justify-center min-w-[5.5rem] sm:min-w-[7rem] h-12 sm:h-14 px-3 rounded-2xl border-4 border-rose-500 bg-rose-100 text-rose-800 font-black text-2xl sm:text-3xl shadow animate-shake";
+                }
+            } else {
+                blankSlot.textContent = "＿＿";
+                blankSlot.className = "inline-flex items-center justify-center min-w-[5.5rem] sm:min-w-[7rem] h-12 sm:h-14 px-3 rounded-2xl border-4 border-dashed border-pink-400 bg-white text-pink-500 font-black text-2xl sm:text-3xl shadow-inner";
+            }
+
+            // Render Chinese Handwriting Answer Sheet Boxes (e.g., [彎][彎][的][月][亮])
+            renderHandwritingSheet(q);
+
+            // Render 4 Multiple-Choice Option Buttons
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+
+            const buttonThemes = [
+                "from-pink-400 to-rose-500 border-rose-700 text-white",
+                "from-amber-400 to-orange-500 border-orange-700 text-white",
+                "from-sky-400 to-blue-500 border-blue-700 text-white",
+                "from-purple-400 to-indigo-500 border-indigo-700 text-white"
+            ];
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                const isSelected = q.selectedOption === opt;
+                const isCorrectAnswer = opt === q.adjective;
+
+                let btnStyle = `bg-gradient-to-b ${buttonThemes[idx]} border-b-4`;
+                let statusIcon = '';
+
+                if (q.selectedOption !== null) {
+                    if (isSelected && q.isCorrect) {
+                        btnStyle = "bg-gradient-to-b from-emerald-400 to-green-600 border-b-4 border-green-800 text-white ring-4 ring-emerald-300 scale-[1.02]";
+                        statusIcon = '<span class="ml-1 text-xl sm:text-2xl">⭕</span>';
+                    } else if (isSelected && !q.isCorrect) {
+                        btnStyle = "bg-gradient-to-b from-rose-400 to-red-600 border-b-4 border-red-800 text-white ring-4 ring-rose-300";
+                        statusIcon = '<span class="ml-1 text-xl sm:text-2xl">❌</span>';
+                    } else if (isCorrectAnswer) {
+                        btnStyle = "bg-gradient-to-b from-emerald-400 to-green-600 border-b-4 border-green-800 text-white ring-2 ring-emerald-300";
+                        statusIcon = '<span class="ml-1 text-lg sm:text-xl">✨</span>';
+                    } else {
+                        btnStyle = "bg-gray-200 border-b-4 border-gray-300 text-gray-500 opacity-75";
+                    }
+                }
+
+                btn.className = `option-btn rounded-2xl py-3.5 sm:py-5 px-4 font-black text-2xl sm:text-3xl flex items-center justify-center select-none ${btnStyle}`;
+                btn.innerHTML = `<span>${opt}</span>${statusIcon}`;
+                btn.onclick = () => selectOption(opt);
+                optionsGrid.appendChild(btn);
+            });
+
+            // Update Bottom Navigation Buttons ("上一頁", "回主頁", "下一頁")
+            const prevBtn = document.getElementById('prevBtn');
+            prevBtn.disabled = currentIndex === 0;
+
+            const nextBtnText = document.getElementById('nextBtnText');
+            const nextBtnIcon = document.getElementById('nextBtnIcon');
+            if (currentIndex === total - 1) {
+                nextBtnText.textContent = "完成看成績";
+                nextBtnIcon.textContent = "🏁";
+            } else {
+                nextBtnText.textContent = "下一頁";
+                nextBtnIcon.textContent = "➡️";
+            }
+
+            if (shouldSpeakPrompt) {
+                speakCurrentQuestion();
+            }
+        }
+
+        function renderHandwritingSheet(q) {
+            const container = document.getElementById('handwritingBoxes');
+            const statusTag = document.getElementById('feedbackStatusTag');
+            container.innerHTML = '';
+
+            const adjChars = q.selectedOption ? q.selectedOption.split('') : ['？', '？'];
+            const nounChars = q.noun.split('');
+            const allChars = [...adjChars, '的', ...nounChars];
+
+            allChars.forEach((ch, idx) => {
+                const box = document.createElement('div');
+                const isAdjPart = idx < 2;
+
+                let textStyle = "text-slate-800";
+                if (isAdjPart) {
+                    if (!q.selectedOption) {
+                        textStyle = "text-gray-300";
+                    } else if (q.isCorrect) {
+                        textStyle = "text-emerald-700 animate-pop";
+                    } else {
+                        textStyle = "text-rose-600";
+                    }
+                }
+
+                box.className = `char-box rounded-lg shadow-xs`;
+                box.innerHTML = `<span class="relative z-10 text-2xl sm:text-3xl font-black ${textStyle}">${ch}</span>`;
+                container.appendChild(box);
+            });
+
+            // Status Feedback Tag
+            if (!q.selectedOption) {
+                statusTag.className = "hidden";
+            } else if (q.isCorrect) {
+                statusTag.className = "text-xs sm:text-sm font-black px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-400 inline-block animate-pop";
+                statusTag.textContent = `✅ 答對了！寫上：${q.fullPhrase}`;
+            } else {
+                statusTag.className = "text-xs sm:text-sm font-black px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-400 inline-block animate-pop";
+                statusTag.textContent = `💡 正確寫法是：${q.fullPhrase}（可再點擊更改）`;
+            }
+        }
+
+        function selectOption(chosenAdj) {
+            const q = currentQuestions[currentIndex];
+            q.selectedOption = chosenAdj;
+            q.isCorrect = (chosenAdj === q.adjective);
+
+            if (q.isCorrect) {
+                playEffect('correct');
+                speakText(`${chosenAdj}的${q.noun}`);
+            } else {
+                playEffect('wrong');
+                speakText(chosenAdj);
+            }
+
+            renderQuestion(false);
+        }
+
+        function speakCurrentQuestion() {
+            const q = currentQuestions[currentIndex];
+            if (q.selectedOption && q.isCorrect) {
+                speakText(q.fullPhrase);
+            } else {
+                speakText(`什麼的${q.noun}？`);
+            }
+        }
+
+        /* =========================================================================
+         * 7. NAVIGATION CONTROLS (上一頁 / 回主頁 / 下一頁)
+         * ========================================================================= */
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                playEffect('click');
+                currentIndex--;
+                renderQuestion(true);
+            }
+        }
+
+        function nextQuestion() {
+            playEffect('click');
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion(true);
+            } else {
+                // On Question 12, check if all questions are answered before showing results
+                const unansweredIndex = currentQuestions.findIndex(q => q.selectedOption === null);
+                if (unansweredIndex !== -1) {
+                    showModal({
+                        emoji: "📝",
+                        title: "還有題目未填寫喔！",
+                        message: `你還有第 ${unansweredIndex + 1} 題未作答，要去完成它，還是現在直接看成績？`,
+                        buttons: [
+                            {
+                                text: `去答第 ${unansweredIndex + 1} 題`,
+                                style: "btn-3d btn-orange text-white font-black py-2.5 px-5 rounded-xl text-sm sm:text-base",
+                                action: () => {
+                                    closeModal();
+                                    currentIndex = unansweredIndex;
+                                    renderQuestion(true);
+                                }
+                            },
+                            {
+                                text: "直接交卷",
+                                style: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 px-4 rounded-xl text-sm sm:text-base",
+                                action: () => {
+                                    closeModal();
+                                    showResultsScreen();
+                                }
+                            }
+                        ]
+                    });
+                } else {
+                    showResultsScreen();
+                }
+            }
+        }
+
+        function requestGoHome() {
+            playEffect('click');
+            showModal({
+                emoji: "🏠",
+                title: "確定要回主頁嗎？",
+                message: "返回主頁後，目前的答題進度將會重新開始喔！",
+                buttons: [
+                    {
+                        text: "繼續答題",
+                        style: "btn-3d btn-green text-white font-black py-2.5 px-5 rounded-xl text-sm sm:text-base",
+                        action: () => closeModal()
+                    },
+                    {
+                        text: "確定回主頁",
+                        style: "btn-3d btn-purple text-white font-black py-2.5 px-5 rounded-xl text-sm sm:text-base",
+                        action: () => {
+                            closeModal();
+                            showHomeScreen();
+                        }
+                    }
+                ]
+            });
+        }
+
+        function showHomeScreen() {
+            stopTimer();
+            playEffect('click');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.remove('hidden');
+            renderHomeScreen();
+        }
+
+        /* =========================================================================
+         * 8. RESULTS SCREEN & CONFETTI CELEBRATION
+         * ========================================================================= */
+        function showResultsScreen() {
+            stopTimer();
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            const total = currentQuestions.length;
+            const correctCount = currentQuestions.filter(q => q.isCorrect).length;
+            const score = Math.round((correctCount / total) * 100);
+
+            document.getElementById('scoreFraction').textContent = `${correctCount} / ${total}`;
+            document.getElementById('scoreTime').textContent = formatTime(elapsedSeconds);
+            document.getElementById('scorePoints').textContent = `${score}分`;
+
+            // Reset leaderboard registration UI for this new game session
+            document.getElementById('submitFormRow').classList.remove('hidden');
+            document.getElementById('rankAnnouncement').classList.add('hidden');
+            document.getElementById('playerNameInput').value = '';
+
+            const trophyEl = document.getElementById('resultTrophy');
+            const titleEl = document.getElementById('resultTitle');
+            const subtitleEl = document.getElementById('resultSubtitle');
+            const starsEl = document.getElementById('scoreStars');
+
+            if (correctCount === total) {
+                trophyEl.textContent = "🏆";
+                titleEl.textContent = "滿分默書小狀元！太厲害了！";
+                subtitleEl.textContent = "12個形容詞全部答對，快輸入名字登錄龍虎榜吧！";
+                starsEl.textContent = "⭐⭐⭐";
+            } else if (correctCount >= 9) {
+                trophyEl.textContent = "🥇";
+                titleEl.textContent = "表現超棒！差一點就滿分啦！";
+                subtitleEl.textContent = "已經掌握了大部分形容詞，快輸入名字看看你的排名！";
+                starsEl.textContent = "⭐⭐🌟";
+            } else if (correctCount >= 6) {
+                trophyEl.textContent = "🎖️";
+                titleEl.textContent = "做得不錯！繼續加油喔！";
+                subtitleEl.textContent = "看看下面哪些詞語需要多讀幾次，再挑戰一次吧！";
+                starsEl.textContent = "⭐⭐";
+            } else {
+                trophyEl.textContent = "🌱";
+                titleEl.textContent = "別氣餒！多練習就會進步！";
+                subtitleEl.textContent = "點擊下面的答案聽聽普通話發音，再玩一次一定會更好！";
+                starsEl.textContent = "⭐";
+            }
+
+            // Render Leaderboard List
+            renderLeaderboardLists();
+
+            // Render 12-question review cards
+            const reviewList = document.getElementById('reviewList');
+            reviewList.innerHTML = '';
+
+            currentQuestions.forEach((q, idx) => {
+                const item = document.createElement('button');
+                const isRight = q.isCorrect;
+
+                item.className = `w-full text-left p-2.5 rounded-xl border-2 flex items-center justify-between transition active:scale-98 ${
+                    isRight
+                        ? "bg-emerald-50 border-emerald-300 hover:bg-emerald-100"
+                        : "bg-rose-50 border-rose-300 hover:bg-rose-100"
+                }`;
+
+                const userChoiceNote = (!isRight && q.selectedOption)
+                    ? `<span class="text-xs text-rose-600 font-bold block">（你選了：${q.selectedOption}）</span>`
+                    : (!isRight && !q.selectedOption)
+                        ? `<span class="text-xs text-rose-600 font-bold block">（未作答）</span>`
+                        : '';
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">${q.emoji}</span>
+                        <div>
+                            <div class="text-xs font-bold text-gray-500">第 ${idx + 1} 題</div>
+                            <div class="text-base sm:text-lg font-black text-slate-800">
+                                <span class="text-pink-600 underline decoration-2 underline-offset-4">${q.adjective}</span>的${q.noun}
+                            </div>
+                            ${userChoiceNote}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs bg-white px-2 py-1 rounded-lg border font-bold text-slate-600">🔊 普通話</span>
+                        <span class="text-xl">${isRight ? '✅' : '💪'}</span>
+                    </div>
+                `;
+                item.onclick = () => {
+                    playEffect('click');
+                    speakText(q.fullPhrase);
+                };
+                reviewList.appendChild(item);
+            });
+
+            playEffect('fanfare');
+            if (correctCount >= 8 && typeof confetti === 'function') {
+                confetti({
+                    particleCount: 90,
+                    spread: 75,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        /* =========================================================================
+         * 9. MODAL HELPER
+         * ========================================================================= */
+        function showModal({ emoji, title, message, buttons }) {
+            document.getElementById('modalEmoji').textContent = emoji || '💡';
+            document.getElementById('modalTitle').textContent = title || '提示';
+            document.getElementById('modalMessage').textContent = message || '';
+
+            const actions = document.getElementById('modalActions');
+            actions.innerHTML = '';
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = b.style;
+                btn.textContent = b.text;
+                btn.onclick = b.action;
+                actions.appendChild(btn);
+            });
+
+            const modal = document.getElementById('customModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            playEffect('click');
+            const modal = document.getElementById('customModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Initialize on window load
+        window.onload = function () {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+                window.speechSynthesis.onvoiceschanged = () => {
+                    window.speechSynthesis.getVoices();
+                };
+            }
+            renderHomeScreen();
+        };
+    </script>
+</body>
+</html>
