@@ -7,13 +7,9 @@
     <style>
         :root {
             --primary: #FF6B6B;
-            --primary-dark: #D93838;
             --secondary: #4ECDC4;
-            --secondary-dark: #2B938B;
             --accent: #FFE66D;
-            --accent-dark: #F4C430;
-            --purple: #845EC2;
-            --bg: #F4F9F9;
+            --bg: #F7FFF7;
             --text: #2D3047;
         }
         * {
@@ -21,8 +17,11 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
-            background: linear-gradient(135deg, #FFF5F5 0%, #E8F8F5 100%);
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#4ECDC4 1.5px, transparent 1.5px), radial-gradient(#FF6B6B 1.5px, var(--bg) 1.5px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
             color: var(--text);
             margin: 0;
             padding: 0;
@@ -32,89 +31,220 @@
             min-height: 100vh;
             touch-action: manipulation;
         }
-        .header-bar {
-            width: 100%;
-            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
-            color: white;
-            text-align: center;
-            padding: 12px 15px;
-            font-size: 1.35rem;
-            font-weight: 900;
-            box-shadow: 0 4px 10px rgba(255,107,107,0.3);
-            letter-spacing: 1px;
-        }
         .container {
             width: 100%;
-            max-width: 650px;
-            padding: 15px;
+            max-width: 620px;
+            padding: 20px;
+            box-sizing: border-box;
             display: none;
+        }
+        .active {
+            display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
-        }
-        .container.active {
-            display: flex;
-            animation: fadeIn 0.35s ease-out;
+            animation: fadeIn 0.4s ease-in-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary);
+            text-shadow: 2px 2px 0px var(--accent);
+            margin-top: 5px;
+            margin-bottom: 12px;
+        }
+        .top-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .progress-pill {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: white;
+            background: #FF6B6B;
+            padding: 6px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 0 #D93838;
+        }
+        .timer {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #FF9F1C;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 3px solid #FF9F1C;
+            box-shadow: 0 4px 0 #FFE66D;
+        }
         .btn {
-            background: linear-gradient(180deg, #FF6B6B 0%, #EE5253 100%);
+            background-color: var(--primary);
             color: white;
             border: none;
             border-radius: 18px;
-            padding: 16px 28px;
-            font-size: 1.3rem;
-            font-weight: 900;
-            margin: 8px 0;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 10px 0;
             cursor: pointer;
-            box-shadow: 0 6px 0 var(--primary-dark), 0 8px 15px rgba(0,0,0,0.12);
-            transition: transform 0.1s, box-shadow 0.1s;
-            width: 100%;
-            max-width: 360px;
+            box-shadow: 0 6px 0 #D93838;
+            transition: all 0.1s;
+            width: 85%;
+            max-width: 340px;
             text-align: center;
         }
         .btn:active {
-            transform: translateY(5px);
-            box-shadow: 0 1px 0 var(--primary-dark);
+            transform: translateY(6px);
+            box-shadow: none;
         }
         .btn:disabled {
-            background: #ccc;
+            background-color: #ccc;
             box-shadow: 0 4px 0 #999;
             cursor: not-allowed;
         }
         .btn-secondary {
-            background: linear-gradient(180deg, #4ECDC4 0%, #38B2AC 100%);
-            box-shadow: 0 6px 0 var(--secondary-dark), 0 8px 15px rgba(0,0,0,0.12);
+            background-color: var(--secondary);
+            box-shadow: 0 6px 0 #2B938B;
         }
         .btn-secondary:active {
-            box-shadow: 0 1px 0 var(--secondary-dark);
+            transform: translateY(6px);
+            box-shadow: none;
         }
-
-        /* 龍虎榜樣式 */
+        .question-box {
+            background: white;
+            border-radius: 22px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 18px;
+            font-size: 1.6em;
+            font-weight: bold;
+            border: 4px solid var(--secondary);
+            position: relative;
+        }
+        .speak-icon-btn {
+            background: var(--accent);
+            border: 3px solid #FF9F1C;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 0.75em;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-left: 8px;
+            box-shadow: 0 3px 0 #FF9F1C;
+        }
+        .speak-icon-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+        /* 田字格答題紙 */
+        .writing-paper-label {
+            font-size: 1em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 6px;
+            align-self: flex-start;
+            padding-left: 5px;
+        }
+        .writing-paper {
+            background: white;
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: 3px solid #FF9F1C;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2.1em;
+            font-weight: bold;
+            letter-spacing: 5px;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(#ffe8cc 1px, transparent 1px), linear-gradient(90deg, #ffe8cc 1px, transparent 1px);
+            background-size: 36px 36px;
+            background-position: center top;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 22px;
+        }
+        .option-btn {
+            background: white;
+            color: var(--text);
+            border: 3px solid var(--secondary);
+            border-radius: 18px;
+            padding: 20px 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--secondary);
+            transition: all 0.1s;
+        }
+        .option-btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+        .option-btn.selected {
+            background-color: var(--accent);
+            border-color: #FF9F1C;
+            box-shadow: 0 6px 0 #FF9F1C;
+            color: #D93838;
+        }
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .nav-btn {
+            flex: 1;
+            background: white;
+            border: 3px solid #ccc;
+            padding: 12px 15px;
+            border-radius: 14px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--text);
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ccc;
+        }
+        .nav-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        /* 龍虎榜與溫習卡 */
         .leaderboard {
             background: white;
             border-radius: 20px;
-            padding: 16px;
+            padding: 20px;
             width: 100%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            margin-top: 12px;
-            border: 3px solid #FFD166;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            margin-top: 15px;
+            border: 4px solid #FFD166;
         }
-        .leaderboard h2 {
-            margin: 0 0 6px 0;
-            color: #E07A5F;
-            font-size: 1.35rem;
-            text-align: center;
-        }
-        .sync-status {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            color: #555;
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 2px dashed #eee;
+            font-size: 1.15em;
             font-weight: bold;
+        }
+        .leaderboard-item:last-child {
+            border-bottom: none;
         }
         .status-dot {
             display: inline-block;
@@ -123,346 +253,154 @@
             background-color: #06D6A0;
             border-radius: 50%;
             margin-right: 6px;
-            animation: pulse 1.8s infinite;
+            animation: pulse 2s infinite;
         }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(6, 214, 160, 0); }
+            70% { box-shadow: 0 0 0 10px rgba(6, 214, 160, 0); }
             100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
         }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            border-bottom: 1px dashed #eee;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-        .leaderboard-item.top1 { background: #FFF9DB; border-radius: 10px; }
-        .leaderboard-item.top2 { background: #F8F9FA; border-radius: 10px; }
-        .leaderboard-item.top3 { background: #FFF4E6; border-radius: 10px; }
-
-        /* 溫習範圍詞語卡 */
-        .vocab-section {
+        .vocab-card {
             background: white;
             border-radius: 20px;
-            padding: 15px;
+            padding: 18px;
             width: 100%;
-            margin-top: 15px;
-            border: 3px solid var(--secondary);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+            margin-top: 18px;
+            border: 4px solid var(--secondary);
+            text-align: center;
         }
-        .vocab-grid {
+        .vocab-tags {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 12px;
         }
-        .vocab-chip {
-            background: #E6FFFA;
-            border: 2px solid #4ECDC4;
+        .vocab-tag {
+            background: #F7FFF7;
+            border: 2px solid var(--secondary);
             border-radius: 12px;
-            padding: 8px 4px;
-            text-align: center;
-            font-weight: 900;
-            font-size: 1.05rem;
-            color: #234E52;
-            cursor: pointer;
-        }
-        .vocab-chip:active {
-            background: #4ECDC4;
-            color: white;
-        }
-
-        /* 遊戲頂部狀態列 */
-        .game-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .progress-badge {
-            background: var(--purple);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 1.05rem;
-        }
-        .timer {
-            font-size: 1.2rem;
-            font-weight: 900;
-            color: #D97706;
-            background: #FEF3C7;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 2px solid #F59E0B;
-        }
-
-        /* 題目與田字格答題紙 */
-        .question-box {
-            background: white;
-            border-radius: 20px;
-            padding: 18px 15px;
-            width: 100%;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            text-align: center;
-            margin-bottom: 14px;
-            border: 4px solid var(--secondary);
-        }
-        .question-label {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 6px;
+            padding: 10px 5px;
+            font-size: 1.15em;
             font-weight: bold;
-        }
-        .question-text {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .speak-btn {
-            background: #FFE66D;
-            border: 2px solid #F4C430;
-            border-radius: 50%;
-            width: 42px;
-            height: 42px;
-            font-size: 1.2rem;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 3px 0 var(--secondary);
         }
-        .writing-paper-wrapper {
-            width: 100%;
-            background: #FFFDF7;
-            border: 3px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 15px;
-            text-align: center;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
-        }
-        .paper-title {
-            font-size: 0.85rem;
-            color: #718096;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-        .writing-paper {
-            font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 4px;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #2B6CB0;
-            background-image: linear-gradient(#CBD5E0 1px, transparent 1px), linear-gradient(90deg, #CBD5E0 1px, transparent 1px);
-            background-size: 28px 28px;
-            border-radius: 8px;
-            padding: 8px;
-        }
-
-        /* 4 個選項按鈕 */
-        .answer-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            width: 100%;
-            margin-bottom: 18px;
-        }
-        .option-btn {
-            background: white;
-            color: var(--text);
-            border: 3px solid #CBD5E0;
-            border-radius: 18px;
-            padding: 18px 10px;
-            font-size: 1.5rem;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 5px 0 #CBD5E0;
-            transition: all 0.1s;
-        }
-        .option-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #CBD5E0;
-        }
-        .option-btn.selected {
-            background: #FFE66D;
-            border-color: #F59E0B;
-            box-shadow: 0 5px 0 #D97706;
-            color: #92400E;
-        }
-
-        /* 底部導航列 */
-        .nav-bar {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            width: 100%;
-            margin-top: auto;
-            padding-top: 8px;
-        }
-        .nav-btn {
-            flex: 1;
-            background: white;
-            border: 2px solid #CBD5E0;
-            padding: 12px 8px;
-            border-radius: 14px;
-            font-size: 1.05rem;
-            font-weight: 900;
-            color: var(--text);
-            cursor: pointer;
-            box-shadow: 0 4px 0 #CBD5E0;
-        }
-        .nav-btn:active {
+        .vocab-tag:active {
             transform: translateY(3px);
-            box-shadow: 0 1px 0 #CBD5E0;
-        }
-        .nav-btn.finish-btn {
-            background: #06D6A0;
-            color: white;
-            border-color: #059669;
-            box-shadow: 0 4px 0 #059669;
-        }
-
-        /* 結算與溫習清單 */
-        .submit-card {
-            background: white;
-            border-radius: 20px;
-            padding: 16px;
-            width: 100%;
-            border: 3px solid #FFD166;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            box-shadow: none;
+            background: var(--accent);
         }
         input[type="text"] {
             padding: 12px;
-            font-size: 1.2rem;
+            font-size: 1.3em;
             border-radius: 12px;
-            border: 2px solid var(--secondary);
-            width: 90%;
+            border: 3px solid var(--secondary);
+            width: 85%;
             max-width: 300px;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: bold;
         }
-        .review-list {
-            width: 100%;
+        .review-box {
             background: white;
             border-radius: 20px;
-            padding: 15px;
-            margin-top: 12px;
-            border: 3px solid #E2E8F0;
+            padding: 18px;
+            width: 100%;
+            margin-top: 15px;
+            border: 4px solid var(--accent);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
         }
-        .review-item {
+        .review-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 6px;
-            border-bottom: 1px solid #EDF2F7;
-            font-size: 1.05rem;
+            padding: 8px 5px;
+            border-bottom: 1px dashed #ddd;
+            font-size: 1.1em;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="header-bar">🌟 1B默書三(趣味默書)練習 🌟</div>
-
 <!-- 主頁 -->
 <div id="home" class="container active">
+    <h1>📝 1B默書三(趣味默書)練習</h1>
     <button class="btn" onclick="startGame()">🚀 開始默書挑戰！(12題)</button>
-
-    <!-- 首頁即時龍虎榜 -->
+    
+    <!-- 首頁龍虎榜 -->
     <div class="leaderboard">
         <h2>🏆 1B 雲端即時龍虎榜</h2>
-        <div class="sync-status">
+        <div style="text-align: center; margin-bottom: 10px; font-size: 0.95em; color: #555; font-weight: bold;">
             <span class="status-dot" id="statusDot"></span>
-            <span id="syncStatusText">正在連接雲端龍虎榜...</span>
+            <span id="syncStatusText">雲端即時同步中</span>
         </div>
         <div id="leaderboard-list">
-            <div style="text-align:center; padding: 15px; color:#666;">載入排名中...</div>
+            <div style="text-align:center; padding: 15px;">載入中...</div>
         </div>
     </div>
 
-    <!-- 12 個形容詞預覽 (點擊可聽普通話發音與例子) -->
-    <div class="vocab-section">
-        <div style="text-align:center; font-weight:900; color:#2B938B; font-size:1.1rem;">
-            🔊 點擊形容詞聽普通話發音及例子
-        </div>
-        <div class="vocab-grid" id="vocabGrid"></div>
-        <div id="vocabPreviewBox" style="margin-top:10px; font-size:0.95rem; color:#4A5568; text-align:center; min-height:24px; font-weight:bold;"></div>
+    <!-- 12個溫習形容詞點讀區 -->
+    <div class="vocab-card">
+        <h2 style="font-size: 1.3em; margin-top: 0;">🔊 溫習範圍 (點擊聽普通話及例子)</h2>
+        <div class="vocab-tags" id="vocabTags"></div>
+        <div id="examplePreview" style="margin-top: 12px; font-size: 1.05em; color: #D93838; font-weight: bold; min-height: 26px;"></div>
     </div>
 </div>
 
-<!-- 答題頁 -->
+<!-- 遊戲答題頁 -->
 <div id="game" class="container">
-    <div class="game-top-bar">
-        <div class="progress-badge" id="progressBadge">第 1 / 12 題</div>
+    <div class="top-status-bar">
+        <div class="progress-pill" id="progressDisplay">第 1 / 12 題</div>
         <div class="timer" id="timerDisplay">⏱️ 00:00</div>
     </div>
 
     <div class="question-box">
-        <div class="question-label">老師題目：</div>
-        <div class="question-text">
-            <span id="questionEmoji">🌙</span>
-            <span id="questionText">＿＿的月亮</span>
-            <button class="speak-btn" onclick="speakCurrentQuestion()" title="聽普通話讀題">🔊</button>
-        </div>
+        <span id="questionBox">載入中...</span>
+        <button class="speak-icon-btn" onclick="speakCurrentQuestion()" title="再聽一次">🔊</button>
     </div>
 
-    <div class="writing-paper-wrapper">
-        <div class="paper-title">✏️ 小朋友答題紙（請選擇下方形容詞填入）：</div>
-        <div class="writing-paper" id="writingPaper">＿＿的月亮</div>
-    </div>
+    <div class="writing-paper-label">✏️ 小朋友答題紙：</div>
+    <div class="writing-paper" id="writingPaper"></div>
 
     <div class="answer-grid" id="answerGrid"></div>
-
+    
     <div class="nav-bar">
-        <button class="nav-btn" onclick="prevQuestion()" id="prevBtn">⬅️ 上一頁</button>
+        <button class="nav-btn" onclick="prevQuestion()" id="prevBtn" style="visibility: hidden;">⬅️ 上一頁</button>
         <button class="nav-btn" onclick="goHome()">🏠 回主頁</button>
         <button class="nav-btn" onclick="nextQuestion()" id="nextBtn">下一頁 ➡️</button>
     </div>
 </div>
 
-<!-- 成績結算頁 -->
+<!-- 成績與結算頁 -->
 <div id="result" class="container">
-    <div class="question-box" style="border-color: #FFD166;">
-        <div style="font-size: 1.8rem; font-weight: 900; color: var(--primary); margin-bottom: 6px;" id="resultStars">⭐⭐⭐</div>
-        <div style="font-size: 1.4rem; font-weight: 900;">答對題數：<span id="scoreText" style="color:#E53E3E; font-size:1.7rem;">0</span> / 12</div>
-        <div style="font-size: 1.15rem; font-weight: bold; color: #D97706; margin-top: 4px;">所需時間：<span id="finalTimeText">00:00</span></div>
+    <h1>🎉 挑戰完成！</h1>
+    <div class="question-box">
+        <div id="starDisplay" style="font-size: 1.3em; margin-bottom: 5px;">⭐⭐⭐</div>
+        <p style="margin: 8px 0;">答對題數：<span id="scoreText" style="color: var(--primary); font-size: 1.3em;"></span> / 12</p>
+        <p style="margin: 8px 0; font-size: 0.85em; color: #FF9F1C;">所需時間：<span id="finalTimeText"></span></p>
     </div>
-
-    <div class="submit-card" id="submitRecordDiv">
-        <div style="font-size: 1.2rem; font-weight: 900; color: var(--text); margin-bottom: 10px;">🏆 登錄 1B 雲端龍虎榜</div>
-        <input type="text" id="playerName" placeholder="請輸入你的名字 (例如: 林煒晴)" maxlength="12">
+    
+    <div id="submitRecordDiv" class="leaderboard" style="text-align: center; margin-top: 0; margin-bottom: 15px;">
+        <h2 style="margin-top: 0;">📝 登錄龍虎榜</h2>
+        <input type="text" id="playerName" placeholder="請輸入你的名字 (例如: 林煒晴)" maxlength="10">
         <br>
-        <button class="btn btn-secondary" id="submitBtn" onclick="submitScore()">🚀 提交成績看排名</button>
+        <button class="btn btn-secondary" id="submitBtn" onclick="submitScore()">🚀 提交成績</button>
     </div>
 
     <button class="btn" onclick="startGame()">🔄 再玩一次</button>
-    <button class="btn btn-secondary" onclick="goHome()">🏠 回主頁看龍虎榜</button>
+    <button class="btn btn-secondary" onclick="goHome()">🏠 回主頁</button>
 
-    <div class="review-list">
-        <div style="text-align:center; font-weight:900; font-size:1.15rem; margin-bottom:8px; color:var(--purple);">📖 本局 12 題溫習清單 (點擊 🔊 聽普通話)</div>
-        <div id="reviewContainer"></div>
+    <!-- 全卷12題重溫清單 -->
+    <div class="review-box">
+        <h2>📖 題目溫習清單 (點擊 🔊 聽普通話)</h2>
+        <div id="reviewList"></div>
     </div>
 </div>
 
-<!-- 遊戲主邏輯與題庫 (12個形容詞 x 10個例子 = 120題) -->
 <script>
+    // 題庫資料 (12 個形容詞 x 10 個例子 = 120 題，附 Emoji)
     const dictationData = {
         "香甜": [
             { n: "的蘋果", e: "🍎" }, { n: "的芒果", e: "🥭" }, { n: "的草莓", e: "🍓" }, { n: "的果汁", e: "🧃" }, { n: "的西瓜", e: "🍉" },
@@ -518,53 +456,62 @@
     let currentQuestions = [];
     let currentQIndex = 0;
     let userAnswers = [];
-    let timerInterval = null;
-    let startTime = 0;
+    let timerInterval;
+    let startTime;
     let totalSeconds = 0;
     let currentScore = 0;
 
-    // 普通話語音合成 (優先選擇普通話/國語，排除粵語)
+    // 語音功能 (強制普通話發音)
     function speak(text) {
-        if (!('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        const mandarinVoice = voices.find(v =>
-            (v.lang.includes('zh-CN') || v.lang.includes('cmn') || v.lang.includes('zh-TW')) &&
-            !v.lang.includes('HK') && !v.name.includes('Cantonese') && !v.name.includes('粵')
-        );
-        if (mandarinVoice) {
-            u.voice = mandarinVoice;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const mandarinVoice = voices.find(v =>
+                (v.lang.includes('zh-CN') || v.lang.includes('cmn') || v.lang.includes('zh-TW')) &&
+                !v.lang.includes('HK') && !v.name.includes('Cantonese') && !v.name.includes('粵')
+            );
+            if (mandarinVoice) utterance.voice = mandarinVoice;
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.92;
+            window.speechSynthesis.speak(utterance);
         }
-        u.lang = 'zh-CN';
-        u.rate = 0.92;
-        window.speechSynthesis.speak(u);
     }
 
-    // 初始化主頁 12 個形容詞預覽按鈕
-    function initVocabChips() {
-        const grid = document.getElementById('vocabGrid');
-        const preview = document.getElementById('vocabPreviewBox');
-        grid.innerHTML = '';
+    // 建立首頁溫習詞語按鈕
+    function initVocabTags() {
+        const container = document.getElementById('vocabTags');
+        const preview = document.getElementById('examplePreview');
+        container.innerHTML = '';
         adjectives.forEach(adj => {
-            const chip = document.createElement('div');
-            chip.className = 'vocab-chip';
-            chip.innerText = adj;
-            chip.onclick = () => {
-                const list = dictationData[adj];
-                const sample = list[Math.floor(Math.random() * list.length)];
-                speak(adj + "，例如：" + adj + sample.n);
-                preview.innerText = `${sample.e} ${adj}：${list.map(x => adj + x.n).slice(0, 5).join('、')}...`;
+            const btn = document.createElement('div');
+            btn.className = 'vocab-tag';
+            btn.innerText = adj;
+            btn.onclick = () => {
+                const arr = dictationData[adj];
+                const item = arr[Math.floor(Math.random() * arr.length)];
+                speak(adj + "，" + adj + item.n);
+                preview.innerText = `${item.e} 例子：${arr.slice(0, 4).map(x => adj + x.n).join('、')}...`;
             };
-            grid.appendChild(chip);
+            container.appendChild(btn);
         });
     }
-    initVocabChips();
+    initVocabTags();
 
-    function formatTime(seconds) {
-        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-        const s = String(seconds % 60).padStart(2, '0');
-        return `${m}:${s}`;
+    function generateQuestions() {
+        let shuffledAdjs = [...adjectives].sort(() => 0.5 - Math.random());
+        currentQuestions = shuffledAdjs.map(adj => {
+            let item = dictationData[adj][Math.floor(Math.random() * dictationData[adj].length)];
+            let noun = item.n;
+            let emoji = item.e;
+            
+            let options = [adj];
+            let otherAdjs = adjectives.filter(a => a !== adj).sort(() => 0.5 - Math.random());
+            options.push(otherAdjs[0], otherAdjs[1], otherAdjs[2]);
+            options.sort(() => 0.5 - Math.random());
+
+            return { adj, noun, emoji, options, answer: adj + noun, qText: "＿＿" + noun };
+        });
     }
 
     function showPage(pageId) {
@@ -578,23 +525,6 @@
         showPage('home');
     }
 
-    function generateQuestions() {
-        const shuffledAdjs = [...adjectives].sort(() => 0.5 - Math.random());
-        currentQuestions = shuffledAdjs.map(adj => {
-            const items = dictationData[adj];
-            const item = items[Math.floor(Math.random() * items.length)];
-            const otherAdjs = adjectives.filter(a => a !== adj).sort(() => 0.5 - Math.random());
-            const options = [adj, otherAdjs[0], otherAdjs[1], otherAdjs[2]].sort(() => 0.5 - Math.random());
-            return {
-                adj: adj,
-                noun: item.n,
-                emoji: item.e,
-                options: options,
-                qText: "＿＿" + item.n
-            };
-        });
-    }
-
     function startTimer() {
         clearInterval(timerInterval);
         startTime = Date.now();
@@ -605,53 +535,59 @@
         }, 500);
     }
 
+    function formatTime(seconds) {
+        let m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        let s = String(seconds % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
     function startGame() {
         generateQuestions();
         currentQIndex = 0;
         userAnswers = new Array(12).fill(null);
         totalSeconds = 0;
-
-        // 重設提交區
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "🚀 提交成績看排名";
-        }
-        document.getElementById('submitRecordDiv').style.display = 'block';
-
+        
+        // 重置龍虎榜輸入框
+        document.getElementById('submitRecordDiv').innerHTML = `
+            <h2 style="margin-top: 0;">📝 登錄龍虎榜</h2>
+            <input type="text" id="playerName" placeholder="請輸入你的名字 (例如: 林煒晴)" maxlength="10">
+            <br>
+            <button class="btn btn-secondary" id="submitBtn" onclick="submitScore()">🚀 提交成績</button>
+        `;
+        
         startTimer();
         renderQuestion();
         showPage('game');
     }
 
     function speakCurrentQuestion() {
-        const q = currentQuestions[currentQIndex];
+        let q = currentQuestions[currentQIndex];
         if (userAnswers[currentQIndex]) {
             speak(userAnswers[currentQIndex] + q.noun);
         } else {
-            speak("甚麼" + q.noun);
+            speak(q.qText.replace("＿＿", "甚麼"));
         }
     }
 
     function renderQuestion() {
-        const q = currentQuestions[currentQIndex];
-        document.getElementById('progressBadge').innerText = `第 ${currentQIndex + 1} / 12 題`;
-        document.getElementById('questionEmoji').innerText = q.emoji;
-        document.getElementById('questionText').innerText = q.qText;
-
-        const paper = document.getElementById('writingPaper');
+        let q = currentQuestions[currentQIndex];
+        document.getElementById('progressDisplay').innerText = `第 ${currentQIndex + 1} / 12 題`;
+        document.getElementById('questionBox').innerText = `${q.emoji} ${q.qText}`;
+        speak(q.qText.replace("＿＿", "甚麼"));
+        
+        let paper = document.getElementById('writingPaper');
         if (userAnswers[currentQIndex]) {
             paper.innerText = userAnswers[currentQIndex] + q.noun;
-            paper.style.color = '#2B6CB0';
+            paper.style.color = 'var(--primary)';
         } else {
             paper.innerText = "＿＿" + q.noun;
-            paper.style.color = '#A0AEC0';
+            paper.style.color = '#ccc';
         }
 
-        const grid = document.getElementById('answerGrid');
+        let grid = document.getElementById('answerGrid');
         grid.innerHTML = '';
         q.options.forEach(opt => {
-            const btn = document.createElement('button');
+            let btn = document.createElement('button');
             btn.className = 'option-btn' + (userAnswers[currentQIndex] === opt ? ' selected' : '');
             btn.innerText = opt;
             btn.onclick = () => selectAnswer(opt, q.noun);
@@ -659,35 +595,37 @@
         });
 
         document.getElementById('prevBtn').style.visibility = currentQIndex > 0 ? 'visible' : 'hidden';
-
-        const nextBtn = document.getElementById('nextBtn');
+        
+        let nextBtn = document.getElementById('nextBtn');
         if (currentQIndex === 11) {
             nextBtn.innerText = "交卷 🏁";
-            nextBtn.className = "nav-btn finish-btn";
+            nextBtn.style.backgroundColor = "#06D6A0";
+            nextBtn.style.color = "white";
+            nextBtn.style.borderColor = "#059669";
         } else {
             nextBtn.innerText = "下一頁 ➡️";
-            nextBtn.className = "nav-btn";
+            nextBtn.style.backgroundColor = "white";
+            nextBtn.style.color = "var(--text)";
+            nextBtn.style.borderColor = "#ccc";
         }
-
-        speak("甚麼" + q.noun);
     }
 
     function selectAnswer(adj, noun) {
-        userAnswers[currentQIndex] = adj;
         speak(adj + noun);
-
-        const paper = document.getElementById('writingPaper');
+        userAnswers[currentQIndex] = adj;
+        
+        let paper = document.getElementById('writingPaper');
         paper.innerText = adj + noun;
-        paper.style.color = '#2B6CB0';
+        paper.style.color = 'var(--primary)';
 
-        document.querySelectorAll('.option-btn').forEach(b => {
+        let btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => {
             b.classList.toggle('selected', b.innerText === adj);
         });
-
+        
         setTimeout(() => {
-            if (currentQIndex < 11) {
-                currentQIndex++;
-                renderQuestion();
+            if(currentQIndex < 11) {
+                nextQuestion();
             }
         }, 550);
     }
@@ -711,37 +649,37 @@
     function finishGame() {
         clearInterval(timerInterval);
         currentScore = 0;
-        const reviewContainer = document.getElementById('reviewContainer');
-        reviewContainer.innerHTML = '';
+        const reviewList = document.getElementById('reviewList');
+        reviewList.innerHTML = '';
 
-        currentQuestions.forEach((q, idx) => {
-            const userAns = userAnswers[idx];
-            const isCorrect = userAns === q.adj;
-            if (isCorrect) currentScore++;
+        for(let i = 0; i < 12; i++) {
+            const q = currentQuestions[i];
+            const isCorrect = userAnswers[i] === q.adj;
+            if(isCorrect) currentScore++;
 
             const row = document.createElement('div');
-            row.className = 'review-item';
-            const correctPhrase = q.adj + q.noun;
+            row.className = 'review-row';
+            const fullAnswer = q.adj + q.noun;
             row.innerHTML = `
-                <span>${idx + 1}. ${q.emoji} <b>${correctPhrase}</b> ${isCorrect ? '✅' : `❌ (你選: ${userAns || '未答'})`}</span>
-                <button class="speak-btn" style="width:34px;height:34px;font-size:1rem;" onclick="speak('${correctPhrase}')">🔊</button>
+                <span>${i+1}. ${q.emoji} ${fullAnswer} ${isCorrect ? '✅' : `❌(選了:${userAnswers[i] || '未答'})`}</span>
+                <button class="speak-icon-btn" style="width:36px;height:36px;font-size:0.9em;" onclick="speak('${fullAnswer}')">🔊</button>
             `;
-            reviewContainer.appendChild(row);
-        });
+            reviewList.appendChild(row);
+        }
 
         document.getElementById('scoreText').innerText = currentScore;
         document.getElementById('finalTimeText').innerText = formatTime(totalSeconds);
-        document.getElementById('resultStars').innerText =
+        document.getElementById('starDisplay').innerText =
             currentScore === 12 ? "🏆🌟🌟🌟🏆" :
             currentScore >= 9 ? "⭐⭐⭐" :
             currentScore >= 6 ? "⭐⭐" : "⭐";
 
-        speak(`挑戰完成！你答對了${currentScore}題，用了${totalSeconds}秒`);
+        speak(`挑戰完成，你答對了${currentScore}題，用了${Math.floor(totalSeconds/60)}分${totalSeconds%60}秒`);
         showPage('result');
     }
 </script>
 
-<!-- Firebase 雲端即時龍虎榜模組 (解決複合索引與連線卡住問題) -->
+<!-- Firebase 雲端即時同步模組 -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -761,116 +699,106 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    // 開啟 experimentalForceLongPolling 確保香港各家電訊商、手機及學校網路都不會卡在「上傳中」
+    // 防卡死長輪詢設定，確保手機、iPad 與電腦秒速上傳
     const db = initializeFirestore(app, {
         experimentalForceLongPolling: true
     });
 
-    const colRef = collection(db, "leaderboard_1b_dict3");
-    let cachedRecords = [];
+    const colRef = collection(db, "leaderboard");
+    let cachedList = [];
 
-    function renderLeaderboardUI(records) {
+    function renderLeaderboard(list) {
         const listDiv = document.getElementById('leaderboard-list');
         if (!listDiv) return;
 
-        if (records.length === 0) {
-            listDiv.innerHTML = '<div style="text-align:center; padding: 18px; color:#666;">快來成為第一個上榜的小達人吧！🚀</div>';
+        if (list.length === 0) {
+            listDiv.innerHTML = '<div style="text-align:center; padding: 20px;">快來成為第一個挑戰者吧！🚀</div>';
             return;
         }
 
         listDiv.innerHTML = '';
-        records.slice(0, 15).forEach((data, idx) => {
+        list.slice(0, 15).forEach((data, idx) => {
             const rank = idx + 1;
-            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-            const topClass = rank <= 3 ? `top${rank}` : '';
+            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ` ${rank}. `;
             const item = document.createElement('div');
-            item.className = `leaderboard-item ${topClass}`;
+            item.className = 'leaderboard-item';
+            if (rank === 1) item.style.backgroundColor = '#FFF9DB';
             item.innerHTML = `
                 <span>${medal} ${data.name}</span>
-                <span>✅ ${data.score}/12 &nbsp;⏱️ ${formatTime(data.time)}</span>
+                <span>✅ ${data.score}題 ⏱️ ${formatTime(data.time)}</span>
             `;
             listDiv.appendChild(item);
         });
     }
 
-    // 即時監聽雲端資料庫 (不帶雙重 orderBy，避免 Firebase 要求建立複合索引而報錯)
+    // 即時監聽雲端排行榜，電腦與手機同步自動更新
     onSnapshot(colRef, (snapshot) => {
-        const dot = document.getElementById('statusDot');
         const statusText = document.getElementById('syncStatusText');
-        if (dot) dot.style.backgroundColor = '#06D6A0';
-        if (statusText) statusText.innerText = '🟢 雲端即時同步中（電腦、手機、iPad 同步）';
+        if (statusText) statusText.innerText = "雲端即時同步中 (電腦/手機/iPad)";
 
-        const list = [];
+        const arr = [];
         snapshot.forEach(doc => {
             const d = doc.data();
-            if (d && d.name !== undefined) {
-                list.push({
+            if (d && d.name) {
+                arr.push({
                     name: String(d.name),
                     score: Number(d.score || 0),
-                    time: Number(d.time || 999),
-                    ts: Number(d.ts || 0)
+                    time: Number(d.time || 999)
                 });
             }
         });
 
-        // 在本地端執行精準排序：1. 答對題數由高至低  2. 所需時間由少至多
-        list.sort((a, b) => {
+        // 先按答對題數由高至低，再按時間由快至慢排序
+        arr.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score;
-            if (a.time !== b.time) return a.time - b.time;
-            return a.ts - b.ts;
+            return a.time - b.time;
         });
 
-        cachedRecords = list;
-        renderLeaderboardUI(cachedRecords);
+        cachedList = arr;
+        renderLeaderboard(cachedList);
     }, (error) => {
-        console.error("Firestore 監聽錯誤:", error);
-        const dot = document.getElementById('statusDot');
-        const statusText = document.getElementById('syncStatusText');
-        if (dot) dot.style.backgroundColor = '#EF4444';
-        if (statusText) statusText.innerText = '⚠️ 雲端連線異常：' + error.code;
+        console.error("讀取失敗:", error);
+        const listDiv = document.getElementById('leaderboard-list');
+        if (listDiv) listDiv.innerHTML = '<div style="color:red; text-align:center;">讀取失敗，請確認網路連線。</div>';
     });
 
-    // 提交成績至雲端並即時播報排名
+    // 提交成績
     window.submitScore = async function() {
         const nameInput = document.getElementById('playerName');
         const submitBtn = document.getElementById('submitBtn');
-        const name = nameInput.value.trim();
+        const name = nameInput ? nameInput.value.trim() : "";
 
         if (!name) {
-            alert("請先輸入你的名字喔！");
-            nameInput.focus();
+            alert("請輸入名字喔！");
             return;
         }
 
+        submitBtn.innerText = "上傳中...";
         submitBtn.disabled = true;
-        submitBtn.innerText = "⏳ 正在上傳雲端...";
 
         try {
             await addDoc(colRef, {
                 name: name,
                 score: currentScore,
                 time: totalSeconds,
-                ts: Date.now()
+                timestamp: Date.now()
             });
 
-            // 計算最新名次
-            const rankIndex = cachedRecords.findIndex(
-                r => r.name === name && r.score === currentScore && r.time === totalSeconds
+            const rankIdx = cachedList.findIndex(
+                x => x.name === name && x.score === currentScore && x.time === totalSeconds
             );
-            const rankNum = rankIndex !== -1 ? rankIndex + 1 : 1;
+            const myRank = rankIdx !== -1 ? rankIdx + 1 : 1;
 
             document.getElementById('submitRecordDiv').innerHTML = `
-                <div style="font-size:1.3rem; font-weight:900; color:#059669; padding:8px;">
-                    🎉 恭喜 ${name}！成績已同步上榜！<br>
-                    目前排第 <span style="font-size:1.7rem; color:#E53E3E;">${rankNum}</span> 名！
-                </div>
+                <h2 style="color:#06D6A0; margin: 10px 0;">✅ 成績已上傳到雲端！</h2>
+                <div style="font-size: 1.3em; font-weight: bold;">🎉 恭喜 ${name}，目前排第 <span style="color:var(--primary); font-size:1.4em;">${myRank}</span> 名！</div>
             `;
-            speak(`恭喜${name}，你目前排第${rankNum}名！`);
-        } catch (err) {
-            console.error("上傳失敗:", err);
-            alert("上傳失敗：" + err.message);
+            speak(`恭喜${name}，你目前排第${myRank}名`);
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            alert("上傳失敗，請稍後再試。");
+            submitBtn.innerText = "🚀 提交成績";
             submitBtn.disabled = false;
-            submitBtn.innerText = "🚀 重新提交成績";
         }
     };
 </script>
