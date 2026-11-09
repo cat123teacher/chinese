@@ -10,6 +10,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <style>
+    :root {
+      --app-height: 100dvh;
+      --safari-bottom-pad: 68px;
+    }
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -19,7 +23,7 @@
       margin: 0;
       padding: 0;
       width: 100%;
-      height: 100%;
+      height: var(--app-height, 100dvh);
       overflow: hidden;
       font-family: 'Noto Sans TC', sans-serif;
       background-color: #0b1120;
@@ -28,6 +32,21 @@
     .mono {
       font-family: 'JetBrains Mono', monospace;
     }
+    #app-shell {
+      position: relative;
+      width: 100vw;
+      height: var(--app-height, 100dvh);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #viewport-stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 180px;
+      min-width: 200px;
+      overflow: hidden;
+    }
     #canvas-container {
       position: absolute;
       inset: 0;
@@ -35,6 +54,61 @@
       height: 100%;
       touch-action: none;
       z-index: 1;
+    }
+    #design-drawer {
+      position: relative;
+      z-index: 25;
+      width: 100%;
+      height: 44%;
+      max-height: 480px;
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(16px);
+      border-top: 2px solid rgba(245, 158, 11, 0.55);
+      display: flex;
+      flex-direction: column;
+      transition: height 0.25s ease, width 0.25s ease;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+    }
+    #design-drawer.drawer-collapsed-portrait {
+      height: 62px !important;
+    }
+    /* Safe bottom padding inside scrollable panels so iOS Safari floating URL bar never blocks last items */
+    .safari-safe-scroll {
+      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + var(--safari-bottom-pad, 68px)) !important;
+    }
+    /* Dedicated Mobile Landscape Left-Right Split Layout */
+    @media (orientation: landscape) and (max-height: 640px) {
+      #app-shell {
+        flex-direction: row !important;
+      }
+      #viewport-stage {
+        flex: 1 1 56%;
+        height: 100% !important;
+      }
+      #design-drawer {
+        width: 44%;
+        max-width: 460px;
+        height: 100% !important;
+        max-height: none !important;
+        border-top: none;
+        border-left: 2px solid rgba(245, 158, 11, 0.55);
+      }
+      #design-drawer.drawer-collapsed-landscape {
+        width: 58px !important;
+      }
+      #design-drawer.drawer-collapsed-landscape .drawer-body-area,
+      #design-drawer.drawer-collapsed-landscape .drawer-subbar {
+        display: none !important;
+      }
+      #design-drawer.drawer-collapsed-landscape #primary-dock-nav {
+        flex-direction: column !important;
+        display: flex !important;
+        height: 100%;
+        overflow-y: auto;
+      }
+      .safari-safe-scroll {
+        padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 28px) !important;
+      }
     }
     .custom-scroll::-webkit-scrollbar {
       width: 5px;
@@ -58,114 +132,227 @@
       accent-color: #f59e0b;
     }
     .dock-btn-active {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
       color: #0f172a !important;
       font-weight: 900;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 3px 12px rgba(245, 158, 11, 0.45);
+      border-color: #fbbf24 !important;
     }
   </style>
 </head>
-<body class="relative w-screen h-screen overflow-hidden select-none">
+<body class="select-none">
 
-  <!-- 1. Full-Screen 3D / 2D Interactive Canvas -->
-  <div id="canvas-container"></div>
+  <!-- Responsive Split Shell: Top/Bottom in Portrait, Left/Right in Mobile Landscape -->
+  <div id="app-shell">
 
-  <!-- 2. Compact Mobile-Friendly Top Bar -->
-  <header class="absolute top-0 left-0 right-0 z-20 p-2 md:px-4 md:py-2.5 pointer-events-none flex items-center justify-between gap-1.5 flex-wrap">
-    <!-- Brand Title -->
-    <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl px-2.5 py-1.5 shadow-xl flex items-center gap-2">
-      <div class="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex flex-col items-center justify-center shrink-0 font-black shadow">
-        <span class="text-[7px] tracking-widest leading-none">UNIT</span>
-        <span class="text-sm mono leading-none">10</span>
-      </div>
-      <div>
-        <div class="flex items-center gap-1.5">
-          <h1 class="text-sm md:text-base font-black tracking-tight text-white">影輝10室設計平面</h1>
-          <span id="active-template-badge" class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
-            01. 原裝清水房
-          </span>
+    <!-- A. 3D / 2D Interactive Stage Area -->
+    <div id="viewport-stage">
+      <div id="canvas-container"></div>
+
+      <!-- Compact Top Floating Header inside 3D Stage -->
+      <header class="absolute top-0 left-0 right-0 z-20 p-1.5 md:px-3 md:py-2 pointer-events-none flex items-center justify-between gap-1.5 flex-wrap">
+        <!-- Brand Title -->
+        <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-2.5 py-1 shadow-xl flex items-center gap-2">
+          <div class="w-7 h-7 rounded-xl bg-amber-500 text-slate-950 flex flex-col items-center justify-center shrink-0 font-black shadow">
+            <span class="text-[6px] tracking-widest leading-none">UNIT</span>
+            <span class="text-xs mono leading-none">10</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-xs md:text-sm font-black tracking-tight text-white">影輝10室設計平面</h1>
+              <span id="active-template-badge" class="px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 truncate max-w-[110px] sm:max-w-none">
+                01. 原裝清水房
+              </span>
+            </div>
+          </div>
         </div>
-        <p class="text-[10px] text-slate-400 hidden md:block">
-          直接點擊3D地板/牆身可換24款高清木紋雲石・單指拖拉傢俬・20款全屋範本
-        </p>
-      </div>
-    </div>
 
-    <!-- Camera & Environment Quick Controls -->
-    <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-1 shadow-xl flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full">
-      <button onclick="setCameraView('2d')" id="btn-view-2d" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition shrink-0">
-        📐 平面
-      </button>
-      <button onclick="setCameraView('3d')" id="btn-view-3d" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-amber-500 text-slate-950 shadow transition shrink-0">
-        🧊 3D立體
-      </button>
-      <button onclick="setCameraView('sea')" id="btn-view-sea" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 text-sky-300 hover:bg-slate-700 transition shrink-0">
-        🌊 望海景
-      </button>
-      <button onclick="cycleWallHeight()" id="btn-wall-height" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition shrink-0">
-        🧱 半高牆
-      </button>
-      <button onclick="toggleLightingMode()" id="btn-light-mode" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800 text-amber-300 hover:bg-slate-700 transition shrink-0">
-        ☀️ 日間
-      </button>
-      <button onclick="toggleDimensions()" id="btn-dims" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-red-500/20 text-red-300 border border-red-400/30 transition shrink-0">
-        📏 尺寸
-      </button>
-      <button onclick="takeSnapshot()" class="px-2 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition shrink-0">
-        📸 截圖
-      </button>
-    </div>
-  </header>
-
-  <!-- 3. Mobile-Friendly Floating Quick Action Bar (Appears at Top-Center when any furniture/appliance/lamp is selected) -->
-  <div id="floating-action-bar" class="hidden absolute top-14 md:top-16 left-1/2 -translate-x-1/2 z-30 w-[96vw] max-w-xl pointer-events-auto">
-    <div class="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500 rounded-2xl p-2 shadow-2xl flex flex-col gap-1.5">
-      <!-- Top Row: Item Name + Quick Transform Buttons -->
-      <div class="flex items-center justify-between gap-1.5 flex-wrap">
-        <div class="flex items-center gap-1.5 min-w-0">
-          <span class="px-1.5 py-0.5 text-[10px] font-black rounded bg-amber-500 text-slate-950 shrink-0">已選取</span>
-          <span id="fab-item-name" class="text-xs font-black text-white truncate">傢俬名稱</span>
-          <span id="fab-item-dims" class="text-[10px] mono text-amber-300 shrink-0">1200×600mm</span>
-        </div>
-        <div class="flex items-center gap-1 ml-auto">
-          <button onclick="openInspectorModal()" class="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 text-xs font-black hover:bg-amber-500/30">
-            📏 改尺寸/顏色
+        <!-- Camera & Environment Quick Controls -->
+        <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl p-1 shadow-xl flex items-center gap-1 overflow-x-auto no-scrollbar max-w-full">
+          <button onclick="setCameraView('2d')" id="btn-view-2d" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition shrink-0">
+            📐 平面
           </button>
-          <button onclick="deselectItem()" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-bold">
-            ✕
+          <button onclick="setCameraView('3d')" id="btn-view-3d" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-amber-500 text-slate-950 shadow transition shrink-0">
+            🧊 3D立體
+          </button>
+          <button onclick="setCameraView('sea')" id="btn-view-sea" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-slate-800 text-sky-300 hover:bg-slate-700 transition shrink-0">
+            🌊 望海景
+          </button>
+          <button onclick="cycleWallHeight()" id="btn-wall-height" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition shrink-0">
+            🧱 半高牆
+          </button>
+          <button onclick="toggleLightingMode()" id="btn-light-mode" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-slate-800 text-amber-300 hover:bg-slate-700 transition shrink-0">
+            ☀️ 日間
+          </button>
+          <button onclick="toggleDimensions()" id="btn-dims" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-red-500/20 text-red-300 border border-red-400/30 transition shrink-0">
+            📏 尺寸
+          </button>
+          <button onclick="takeSnapshot()" class="px-2 py-1 rounded-xl text-[11px] font-bold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition shrink-0">
+            📸 截圖
           </button>
         </div>
+      </header>
+
+      <!-- Mobile-Friendly Floating Quick Action Bar (Appears when any furniture/appliance/lamp is selected) -->
+      <div id="floating-action-bar" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-30 w-[95%] max-w-lg pointer-events-auto">
+        <div class="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500 rounded-2xl p-2 shadow-2xl flex flex-col gap-1.5">
+          <div class="flex items-center justify-between gap-1.5 flex-wrap">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="px-1.5 py-0.5 text-[10px] font-black rounded bg-amber-500 text-slate-950 shrink-0">已選取</span>
+              <span id="fab-item-name" class="text-xs font-black text-white truncate">傢俬名稱</span>
+              <span id="fab-item-dims" class="text-[10px] mono text-amber-300 shrink-0">1200×600mm</span>
+            </div>
+            <div class="flex items-center gap-1 ml-auto">
+              <button onclick="openInspectorModal()" class="px-2 py-1 rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 text-[11px] font-black">
+                📏 改尺寸/色
+              </button>
+              <button onclick="deselectItem()" class="px-2 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-bold">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-8 gap-1 text-center">
+            <button onclick="rotateSelected(90)" class="col-span-2 py-1 rounded-xl bg-amber-500 text-slate-950 font-black text-xs shadow active:scale-95 transition">
+              ↻ 轉90°
+            </button>
+            <button onclick="rotateSelected(45)" class="py-1 rounded-xl bg-slate-800 text-slate-200 font-bold text-xs active:scale-95">
+              45°
+            </button>
+            <button onclick="nudgeSelected(-50, 0)" class="py-1 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
+              ◀
+            </button>
+            <button onclick="nudgeSelected(0, -50)" class="py-1 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
+              ▲
+            </button>
+            <button onclick="nudgeSelected(0, 50)" class="py-1 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
+              ▼
+            </button>
+            <button onclick="nudgeSelected(50, 0)" class="py-1 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
+              ▶
+            </button>
+            <button onclick="deleteSelected()" class="py-1 rounded-xl bg-red-500/30 border border-red-400/50 text-red-200 font-bold text-xs active:scale-95">
+              🗑️
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- Bottom Row: Big Touch-Friendly Buttons for Mobile Single-Hand Use -->
-      <div class="grid grid-cols-8 gap-1 text-center">
-        <button onclick="rotateSelected(90)" class="col-span-2 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-black text-xs shadow active:scale-95 transition">
-          ↻ 轉90°
-        </button>
-        <button onclick="rotateSelected(45)" class=" py-1.5 rounded-xl bg-slate-800 text-slate-200 font-bold text-xs active:scale-95">
-          45°
-        </button>
-        <button onclick="nudgeSelected(-50, 0)" class="py-1.5 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
-          ◀
-        </button>
-        <button onclick="nudgeSelected(0, -50)" class="py-1.5 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
-          ▲
-        </button>
-        <button onclick="nudgeSelected(0, 50)" class="py-1.5 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
-          ▼
-        </button>
-        <button onclick="nudgeSelected(50, 0)" class="py-1.5 rounded-xl bg-slate-800 text-white font-bold text-xs active:scale-95">
-          ▶
-        </button>
-        <button onclick="deleteSelected()" class="py-1.5 rounded-xl bg-red-500/30 border border-red-400/50 text-red-200 font-bold text-xs active:scale-95">
-          🗑️
-        </button>
+      <!-- Toast Status Pill (Floating cleanly at bottom of 3D stage, above menu bar) -->
+      <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-[94%] max-w-xl flex justify-center">
+        <div id="status-toast" class="pointer-events-auto bg-slate-950/90 backdrop-blur-md border border-slate-700 px-3 py-1 rounded-full text-[11px] text-amber-300 font-bold shadow-lg truncate">
+          ✨ 點選下方「20款範本」、「地板(24)」或「牆身(24)」即可開始設計
+        </div>
       </div>
     </div>
+
+    <!-- B. Ergonomic Design Drawer (Bottom in Portrait with TOP-PINNED Menu Bar, Right Side in Landscape) -->
+    <section id="design-drawer">
+      
+      <!-- 1. PRIMARY 7-TAB MENU BAR PINNED AT THE TOP OF THE DRAWER (Never blocked by bottom Safari URL bar & always visible in Landscape!) -->
+      <nav id="primary-dock-nav" class="bg-slate-950 px-1.5 py-1.5 border-b border-slate-800 grid grid-cols-7 gap-1 shrink-0">
+        <button onclick="activateMainDock('templates')" id="dock-templates" class="py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">📋</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">20款範本</span>
+        </button>
+        <button onclick="activateMainDock('floors')" id="dock-floors" class="dock-btn-active py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">🪵</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">地板(24)</span>
+        </button>
+        <button onclick="activateMainDock('walls')" id="dock-walls" class="py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">🎨</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">牆身(24)</span>
+        </button>
+        <button onclick="activateMainDock('furniture')" id="dock-furniture" class="py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">🛋️</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">間牆/傢俬</span>
+        </button>
+        <button onclick="activateMainDock('appliances')" id="dock-appliances" class="py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">⚡</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">家電/浴缸</span>
+        </button>
+        <button onclick="activateMainDock('lighting')" id="dock-lighting" class="py-1.5 px-0.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">💡</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">燈具(20)</span>
+        </button>
+        <button onclick="openBomModal()" id="dock-bom" class="py-1.5 px-0.5 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 hover:bg-sky-500/30 transition flex flex-col items-center justify-center gap-0.5">
+          <span class="text-sm md:text-base leading-none">📦</span>
+          <span class="text-[10px] font-bold leading-tight truncate max-w-full">清單(<span id="item-count-badge">0</span>)</span>
+        </button>
+      </nav>
+
+      <!-- 2. Sub-Header with Current Section Title + Expand/Collapse Toggle -->
+      <div class="drawer-subbar px-3 py-1.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="sheet-title" class="text-xs font-black text-amber-400 truncate">🪵 分區地板設計 (24款私樓高清材質)</span>
+          <span id="sheet-subtitle" class="text-[10px] text-slate-400 hidden xl:inline truncate">點擊3D地面或下方按鈕先選區域，再點選材質縮圖</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="cycleSafariSafePad()" id="btn-safari-pad" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold" title="調整底部預留高度，避開手機瀏覽器網址欄">
+            ⬆️ 避開底欄: 高
+          </button>
+          <button onclick="toggleBottomSheet()" id="btn-sheet-toggle" class="px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[11px] font-black">
+            ▼ 收起面板
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Scrollable Drawer Body Area (With generous bottom safe clearance so last items scroll cleanly above Safari URL bar) -->
+      <div class="drawer-body-area flex-1 flex flex-col min-h-0 overflow-hidden">
+
+        <!-- TAB PANEL 1: 20 TEMPLATES -->
+        <div id="tab-panel-templates" class="hidden flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5">
+          <div id="templates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- TAB PANEL 2: 24 ZONED FLOOR MATERIALS -->
+        <div id="tab-panel-floors" class="flex-1 flex flex-col min-h-0">
+          <div class="px-2.5 py-1.5 bg-slate-950/60 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[10px] font-bold text-amber-300 shrink-0">📍 區域：</span>
+            <div id="floor-zones-bar" class="flex items-center gap-1"></div>
+          </div>
+          <div id="floor-swatches-grid" class="flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 content-start">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- TAB PANEL 3: 24 ZONED WALL MATERIALS -->
+        <div id="tab-panel-walls" class="hidden flex-1 flex flex-col min-h-0">
+          <div class="px-2.5 py-1.5 bg-slate-950/60 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[10px] font-bold text-sky-300 shrink-0">📍 牆區：</span>
+            <div id="wall-zones-bar" class="flex items-center gap-1"></div>
+          </div>
+          <div id="wall-swatches-grid" class="flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 content-start">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- TAB PANEL 4: PARTITIONS & FURNITURE -->
+        <div id="tab-panel-furniture" class="hidden flex-1 flex flex-col min-h-0">
+          <div class="px-2.5 py-1.5 bg-slate-950/60 border-b border-slate-800 flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <button onclick="filterFurnitureSubcat('partition')" id="subcat-partition" class="subcat-pill px-2.5 py-1 rounded-lg text-[11px] font-black bg-amber-500 text-slate-950 shrink-0">🧱 間牆及趟門</button>
+            <button onclick="filterFurnitureSubcat('bed')" id="subcat-bed" class="subcat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 shrink-0">🛏️ 床及地台</button>
+            <button onclick="filterFurnitureSubcat('storage')" id="subcat-storage" class="subcat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 shrink-0">🚪 衣櫃及鞋櫃</button>
+            <button onclick="filterFurnitureSubcat('living')" id="subcat-living" class="subcat-pill px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 shrink-0">🛋️ 梳化/餐枱/書枱</button>
+          </div>
+          <div id="furniture-catalog-grid" class="flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 content-start"></div>
+        </div>
+
+        <!-- TAB PANEL 5: 18 HOME APPLIANCES & SANITARYWARE -->
+        <div id="tab-panel-appliances" class="hidden flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 content-start"></div>
+
+        <!-- TAB PANEL 6: 20 PRIVATE HOUSING LIGHTING FIXTURES -->
+        <div id="tab-panel-lighting" class="hidden flex-1 overflow-y-auto custom-scroll safari-safe-scroll p-2.5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 content-start"></div>
+
+      </div>
+    </section>
+
   </div>
 
-  <!-- 4. Detailed Size & Color Modal (Opened when clicking "改尺寸/顏色" on mobile or desktop) -->
-  <div id="inspector-modal" class="hidden fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-3 pointer-events-auto">
+  <!-- 4. Detailed Size & Color Modal (Opened when clicking "改尺寸/色" on mobile or desktop) -->
+  <div id="inspector-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-3 pointer-events-auto">
     <div class="bg-slate-900 border-2 border-amber-500/80 rounded-2xl w-full max-w-md p-4 shadow-2xl space-y-3 max-h-[85vh] overflow-y-auto custom-scroll">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2">
         <div>
@@ -229,114 +416,6 @@
         </button>
       </div>
     </div>
-  </div>
-
-  <!-- 5. Bottom Ergonomic Mobile & Desktop Design Sheet + 7-Tab Primary Dock -->
-  <div class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex flex-col items-center">
-    
-    <!-- Toast Status Pill -->
-    <div id="status-toast" class="pointer-events-auto mb-1.5 bg-slate-950/90 backdrop-blur-md border border-slate-700 px-3.5 py-1 rounded-full text-[11px] text-amber-300 font-bold shadow-lg max-w-[95vw] truncate">
-      ✨ 歡迎！點選下方「20款範本」、「地板(24)」或「牆身(24)」即可開始設計
-    </div>
-
-    <!-- Collapsible Content Sheet (Takes ~36vh on mobile so 3D view stays big and clear) -->
-    <section id="bottom-sheet" class="pointer-events-auto w-full max-w-6xl bg-slate-900/95 backdrop-blur-xl border-t-2 border-x border-slate-700/90 rounded-t-3xl shadow-2xl transition-all duration-300 flex flex-col h-[38vh] md:h-[34vh]">
-      
-      <!-- Sheet Header with Collapse Button -->
-      <div class="px-3.5 py-2 bg-slate-950/80 rounded-t-3xl border-b border-slate-800 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2 min-w-0">
-          <span id="sheet-title" class="text-xs md:text-sm font-black text-amber-400 truncate">🪵 分區地板設計 (24款私樓高清材質)</span>
-          <span id="sheet-subtitle" class="text-[11px] text-slate-400 hidden sm:inline">點擊3D地面或下方按鈕先選區域，再點選材質縮圖即時鋪設</span>
-        </div>
-        <button onclick="toggleBottomSheet()" id="btn-sheet-toggle" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold shrink-0">
-          ▼ 收起面板看全屏
-        </button>
-      </div>
-
-      <!-- TAB PANEL 1: 20 TEMPLATES (20個完整參考範本) -->
-      <div id="tab-panel-templates" class="hidden flex-1 overflow-y-auto custom-scroll p-3">
-        <div id="templates-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- TAB PANEL 2: 24 ZONED FLOOR MATERIALS (分區地板 + 24款真實紋理縮圖) -->
-      <div id="tab-panel-floors" class="flex-1 flex flex-col min-h-0">
-        <!-- 7 Floor Zones Selector Bar -->
-        <div class="px-3 py-2 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-          <span class="text-[11px] font-bold text-amber-300 shrink-0">📍 1. 選擇要換地板的區域：</span>
-          <div id="floor-zones-bar" class="flex items-center gap-1.5"></div>
-        </div>
-        <!-- 24 High-Res Floor Swatches with Real Canvas Texture Thumbnails -->
-        <div id="floor-swatches-grid" class="flex-1 overflow-y-auto custom-scroll p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 content-start">
-          <!-- Populated by JS with real <canvas> wood/marble textures -->
-        </div>
-      </div>
-
-      <!-- TAB PANEL 3: 24 ZONED WALL MATERIALS (分區牆身 + 24款藝術漆/雲石/斜鋪木紋/格柵) -->
-      <div id="tab-panel-walls" class="hidden flex-1 flex flex-col min-h-0">
-        <!-- 8 Wall Zones Selector Bar -->
-        <div class="px-3 py-2 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-          <span class="text-[11px] font-bold text-sky-300 shrink-0">📍 1. 選擇要換顏色的牆身區域：</span>
-          <div id="wall-zones-bar" class="flex items-center gap-1.5"></div>
-        </div>
-        <!-- 24 High-Res Wall Swatches with Real Canvas Texture Thumbnails -->
-        <div id="wall-swatches-grid" class="flex-1 overflow-y-auto custom-scroll p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 content-start">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- TAB PANEL 4: PARTITIONS & FURNITURE (間牆、床具地台、衣櫃儲物、梳化餐枱) -->
-      <div id="tab-panel-furniture" class="hidden flex-1 flex flex-col min-h-0">
-        <div class="px-3 py-1.5 bg-slate-950/50 border-b border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-          <button onclick="filterFurnitureSubcat('partition')" id="subcat-partition" class="subcat-pill px-2.5 py-1 rounded-lg text-xs font-black bg-amber-500 text-slate-950 shrink-0">🧱 間牆及趟門</button>
-          <button onclick="filterFurnitureSubcat('bed')" id="subcat-bed" class="subcat-pill px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 shrink-0">🛏️ 香港尺數床及地台</button>
-          <button onclick="filterFurnitureSubcat('storage')" id="subcat-storage" class="subcat-pill px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 shrink-0">🚪 到頂衣櫃及鞋櫃</button>
-          <button onclick="filterFurnitureSubcat('living')" id="subcat-living" class="subcat-pill px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 shrink-0">🛋️ 梳化/餐枱/書枱</button>
-        </div>
-        <div id="furniture-catalog-grid" class="flex-1 overflow-y-auto custom-scroll p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 content-start"></div>
-      </div>
-
-      <!-- TAB PANEL 5: 18 HOME APPLIANCES & SANITARYWARE (雪櫃、洗衣機、乾衣機、洗碗機、抽油煙機、浴缸等) -->
-      <div id="tab-panel-appliances" class="hidden flex-1 overflow-y-auto custom-scroll p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 content-start"></div>
-
-      <!-- TAB PANEL 6: 20 PRIVATE HOUSING LIGHTING FIXTURES (20款私樓常見燈具) -->
-      <div id="tab-panel-lighting" class="hidden flex-1 overflow-y-auto custom-scroll p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 content-start"></div>
-
-    </section>
-
-    <!-- Primary 7-Button Thumb Dock (Always visible at bottom of mobile & desktop screen) -->
-    <nav class="pointer-events-auto w-full max-w-6xl bg-slate-950 border-t border-slate-800 px-1.5 py-1.5 grid grid-cols-7 gap-1 shadow-2xl">
-      <button onclick="activateMainDock('templates')" id="dock-templates" class="py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">📋</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">20款範本</span>
-      </button>
-      <button onclick="activateMainDock('floors')" id="dock-floors" class="dock-btn-active py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">🪵</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">地板(24)</span>
-      </button>
-      <button onclick="activateMainDock('walls')" id="dock-walls" class="py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">🎨</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">牆身(24)</span>
-      </button>
-      <button onclick="activateMainDock('furniture')" id="dock-furniture" class="py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">🛋️</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">間牆/傢俬</span>
-      </button>
-      <button onclick="activateMainDock('appliances')" id="dock-appliances" class="py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">⚡</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">家電/浴缸</span>
-      </button>
-      <button onclick="activateMainDock('lighting')" id="dock-lighting" class="py-2 px-1 rounded-2xl text-slate-300 hover:bg-slate-800 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">💡</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">燈具(20)</span>
-      </button>
-      <button onclick="openBomModal()" id="dock-bom" class="py-2 px-1 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-300 hover:bg-sky-500/30 transition flex flex-col items-center justify-center gap-0.5">
-        <span class="text-base leading-none">📦</span>
-        <span class="text-[10px] md:text-xs font-bold leading-tight">清單(<span id="item-count-badge">0</span>)</span>
-      </button>
-    </nav>
-
   </div>
 
   <!-- 6. BOM (全屋分區地板牆身＋傢俬家電燈具報價清單) Modal -->
@@ -1334,11 +1413,37 @@
       domEl.addEventListener('pointermove', onPointerMove);
       window.addEventListener('pointerup', onPointerUp);
       window.addEventListener('resize', onWindowResize);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', syncVisualViewportHeight);
+        window.visualViewport.addEventListener('scroll', syncVisualViewportHeight);
+      }
+      syncVisualViewportHeight();
 
       // Load saved design if available
       loadDesignFromLocal();
 
       animate();
+    }
+
+    function syncVisualViewportHeight() {
+      const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', `${vh}px`);
+      setTimeout(onWindowResize, 40);
+    }
+
+    let safariPadLevel = 'high';
+    function cycleSafariSafePad() {
+      const order = ['high', 'extra', 'std'];
+      safariPadLevel = order[(order.indexOf(safariPadLevel) + 1) % order.length];
+      const map = {
+        high: { px: '72px', label: '⬆️ 避開底欄: 高' },
+        extra: { px: '115px', label: '⬆️ 避開底欄: 特高' },
+        std: { px: '28px', label: '⬆️ 避開底欄: 標準' }
+      };
+      document.documentElement.style.setProperty('--safari-bottom-pad', map[safariPadLevel].px);
+      const btn = document.getElementById('btn-safari-pad');
+      if (btn) btn.textContent = map[safariPadLevel].label;
+      showToast(`已調整底部防遮擋緩衝高度為：${map[safariPadLevel].label}`);
     }
 
     // ============================================================================
@@ -2006,19 +2111,28 @@
         document.getElementById('sheet-title').textContent = titles[tabName][0];
         document.getElementById('sheet-subtitle').textContent = titles[tabName][1];
       }
+      setTimeout(onWindowResize, 60);
     }
 
     function toggleBottomSheet() {
-      const sheet = document.getElementById('bottom-sheet');
+      const drawer = document.getElementById('design-drawer');
       const btn = document.getElementById('btn-sheet-toggle');
+      const isLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 640;
+
       sheetCollapsed = !sheetCollapsed;
       if (sheetCollapsed) {
-        sheet.style.height = '40px';
-        btn.textContent = '▲ 展開設計面板';
+        if (isLandscape) {
+          drawer.classList.add('drawer-collapsed-landscape');
+          btn.textContent = '◀ 展開';
+        } else {
+          drawer.classList.add('drawer-collapsed-portrait');
+          btn.textContent = '▲ 展開選單';
+        }
       } else {
-        sheet.style.height = '';
-        btn.textContent = '▼ 收起面板看全屏';
+        drawer.classList.remove('drawer-collapsed-landscape', 'drawer-collapsed-portrait');
+        btn.textContent = isLandscape ? '▶ 收起面板' : '▼ 收起面板';
       }
+      setTimeout(onWindowResize, 260);
     }
 
     function renderTemplatesPanel() {
@@ -2457,9 +2571,12 @@
 
     function onWindowResize() {
       const container = document.getElementById('canvas-container');
-      camera.aspect = container.clientWidth / container.clientHeight;
+      if (!container || !renderer || !camera) return;
+      const w = Math.max(100, container.clientWidth);
+      const h = Math.max(100, container.clientHeight);
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(w, h);
     }
 
     function animate() {
