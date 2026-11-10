@@ -1,85 +1,71 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>影輝苑A,B座設計DIY</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-  <!-- Three.js r128 & OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <style>
     :root {
-      --app-height: 100dvh;
-      --safari-bottom-pad: 68px;
-    }
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
+      --app-height: 100vh;
+      --safari-bottom-pad: 72px;
     }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
-      height: var(--app-height, 100dvh);
+      height: var(--app-height);
       overflow: hidden;
-      font-family: 'Noto Sans TC', sans-serif;
-      background-color: #0b1120;
+      background: #0b1120;
       color: #f8fafc;
+      font-family: "Noto Sans TC", "PingFang HK", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .mono {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     }
     #app-shell {
-      position: relative;
-      width: 100vw;
-      height: var(--app-height, 100dvh);
       display: flex;
       flex-direction: column;
+      width: 100%;
+      height: var(--app-height);
       overflow: hidden;
     }
     #viewport-stage {
       position: relative;
-      flex: 1 1 auto;
-      min-height: 180px;
-      min-width: 200px;
+      flex: 1 1 58%;
+      width: 100%;
+      min-height: 220px;
       overflow: hidden;
     }
     #canvas-container {
-      position: absolute;
-      inset: 0;
       width: 100%;
       height: 100%;
-      touch-action: none;
-      z-index: 1;
     }
     #design-drawer {
-      position: relative;
-      z-index: 25;
-      width: 100%;
-      height: 44%;
-      max-height: 480px;
-      background: rgba(15, 23, 42, 0.97);
-      backdrop-filter: blur(16px);
-      border-top: 2px solid rgba(245, 158, 11, 0.55);
       display: flex;
       flex-direction: column;
-      transition: height 0.25s ease, width 0.25s ease;
-      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+      width: 100%;
+      height: 42%;
+      max-height: 460px;
+      background: #0f172a;
+      border-top: 2px solid rgba(245, 158, 11, 0.55);
+      z-index: 30;
+      transition: height 0.22s ease, width 0.22s ease;
     }
     #design-drawer.drawer-collapsed-portrait {
-      height: 62px !important;
+      height: 82px !important;
     }
-    /* Safe bottom padding inside scrollable panels so iOS Safari floating URL bar never blocks last items */
+    #design-drawer.drawer-collapsed-portrait .drawer-body-area {
+      display: none !important;
+    }
     .safari-safe-scroll {
-      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + var(--safari-bottom-pad, 68px)) !important;
+      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + var(--safari-bottom-pad)) !important;
     }
-    /* Dedicated Mobile Landscape Left-Right Split Layout */
-    @media (orientation: landscape) and (max-height: 640px) {
+    @media (orientation: landscape) and (max-height: 620px) {
       #app-shell {
-        flex-direction: row !important;
+        flex-direction: row;
       }
       #viewport-stage {
         flex: 1 1 56%;
@@ -157,7 +143,7 @@
             <span class="text-[6px] tracking-widest leading-none">UNIT</span>
             <span id="unit-badge-num" class="text-[11px] mono leading-none">B10</span>
           </div>
-          <h1 id="main-app-title" onclick="openUnitPickerModal()" class="cursor-pointer text-xs md:text-sm font-black tracking-tight text-white shrink-0">影輝B10室設計平面</h1>
+          <h1 id="main-app-title" onclick="openUnitPickerModal()" class="cursor-pointer text-xs md:text-sm font-black tracking-tight text-white shrink-0">影輝苑A,B座設計DIY (B10室)</h1>
 
           <!-- Touch-Friendly Big Unit Picker Trigger Button (Best for Phone & iPad) -->
           <button onclick="openUnitPickerModal()" class="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] shadow-md flex items-center gap-1 shrink-0 active:scale-95 transition">
@@ -540,6 +526,534 @@
 
   <script>
     // ============================================================================
+    // 0. UNIT METADATA & 20 TEMPLATES DEFINITIONS
+    // ============================================================================
+    const UNIT_META = {
+      'B10': { block: 'B', type: '3BR', label: '影輝B10室｜三房大單位·直望海景' },
+      'B9':  { block: 'B', type: '3BR', label: '影輝B9室｜三房大單位·鏡像對稱' },
+      'B1':  { block: 'B', type: '3BR', label: '影輝B1室｜三房大單位·頂窗則' },
+      'B3':  { block: 'B', type: '3BR', label: '影輝B3室｜兩房闊廳則 (4525闊廳)' },
+      'B4':  { block: 'B', type: '3BR', label: '影輝B4室｜兩房闊廳則 (上下對稱)' },
+      'B6':  { block: 'B', type: '3BR', label: '影輝B6室｜兩房闊廳則 (標準)' },
+      'B11': { block: 'B', type: '2BR', label: '影輝B11室｜4900闊廳連900凸窗' },
+      'B13': { block: 'B', type: '2BR', label: '影輝B13室｜4900闊廳 (左側廚廁)' },
+      'B14': { block: 'B', type: '2BR', label: '影輝B14室｜4900闊廳 (右側廚廁)' },
+      'B15': { block: 'B', type: '3BR', label: '影輝B15室｜加長左牆三房則' },
+      'B16': { block: 'B', type: '3BR', label: '影輝B16室｜闊廳左側廚廁則' },
+      'B18': { block: 'B', type: '3BR', label: '影輝B18室｜闊廳標準三房則' },
+      'B21': { block: 'B', type: '2BR', label: '影輝B21室｜橫向大廳則 (左面大窗)' },
+      'B22': { block: 'B', type: '2BR', label: '影輝B22室｜橫向三房則 (右面大窗)' },
+      'B2':  { block: 'B', type: '1BR', label: '影輝B2室｜精巧開放式/一房則' },
+      'B5':  { block: 'B', type: '1BR', label: '影輝B5室｜精巧一房則 (上下對稱)' },
+      'B12': { block: 'B', type: '1BR', label: '影輝B12室｜精巧一房則 (左右鏡像)' },
+      'B17': { block: 'B', type: '1BR', label: '影輝B17室｜精巧一房則 (頂窗)' },
+      'A1':  { block: 'A', type: '3BR', label: '影輝A1室｜闊廳三房則' },
+      'A2':  { block: 'A', type: '3BR', label: '影輝A2室｜橫向三房大則 (頂部側房)' },
+      'A3':  { block: 'A', type: '3BR', label: '影輝A3室｜橫向三房大則 (底部側房)' },
+      'A4':  { block: 'A', type: '3BR', label: '影輝A4室｜闊廳三房則 (對稱)' },
+      'A7':  { block: 'A', type: '3BR', label: '影輝A7室｜橫向三房則 (頂部側房)' },
+      'A8':  { block: 'A', type: '3BR', label: '影輝A8室｜橫向三房則 (左下側房)' },
+      'A9':  { block: 'A', type: '3BR', label: '影輝A9室｜橫向三房則 (右下側房)' },
+      'A10': { block: 'A', type: '2BR', label: '影輝A10室｜橫向兩房則 (頂直牆)' },
+      'A11': { block: 'A', type: '3BR', label: '影輝A11室｜闊廳三房則' },
+      'A12': { block: 'A', type: '1BR', label: '影輝A12室｜精巧一房則' },
+      'A13': { block: 'A', type: '3BR', label: '影輝A13室｜闊廳三房則' },
+      'A14': { block: 'A', type: '3BR', label: '影輝A14室｜闊廳三房則' },
+      'A15': { block: 'A', type: '1BR', label: '影輝A15室｜精巧一房則' },
+      'A16': { block: 'A', type: '3BR', label: '影輝A16室｜闊廳三房則' },
+      'A19': { block: 'A', type: '2BR', label: '影輝A19室｜橫向兩房則' },
+      'A20': { block: 'A', type: '2BR', label: '影輝A20室｜橫向兩房則' },
+      'A21': { block: 'A', type: '2BR', label: '影輝A21室｜減音窗兩房則' },
+      'A22': { block: 'A', type: '3BR', label: '影輝A22室｜下中側房三房則' }
+    };
+
+    const DEFAULT_3BR_ITEMS = [
+      { id: 'wall_brick_100', x: 1275, z: 2450, w: 2550, d: 100, h: 2550, rot: 0 },
+      { id: 'wall_brick_100', x: 2500, z: 1225, w: 100, d: 2450, h: 2550, rot: 0 },
+      { id: 'wall_brick_100', x: 2480, z: 6520, w: 100, d: 2885, h: 2550, rot: 0 },
+      { id: 'wall_brick_100', x: -50, z: 4225, w: 100, d: 1150, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 2500, z: 1850, w: 110, d: 800, h: 2100, rot: 0 },
+      { id: 'door_wood_room', x: 2480, z: 5600, w: 110, d: 800, h: 2100, rot: 0 },
+      { id: 'door_slide_wood', x: -50, z: 4225, w: 70, d: 850, h: 2150, rot: 0 },
+      { id: 'foyer_c_1200', x: 3550, z: 250, w: 1200, d: 380, h: 2500, rot: 0 },
+      { id: 'sofa_3seat', x: 480, z: 6450, w: 850, d: 2100, h: 820, rot: 0 },
+      { id: 'tv_console', x: 2220, z: 6450, w: 380, d: 1800, h: 450, rot: 0 },
+      { id: 'app_tv_65', x: 2380, z: 6450, w: 80, d: 1450, h: 840, y: 850, rot: 0 },
+      { id: 'dining_fold_5p', x: 1850, z: 4250, w: 1250, d: 800, h: 750, rot: 0 },
+      { id: 'bed_single_3ft', x: -1150, z: 3650, w: 1900, d: 910, h: 520, rot: 0 },
+      { id: 'wardrobe_compact_900', x: -1700, z: 4950, w: 900, d: 550, h: 2450, rot: 0 },
+      { id: 'bed_bunk_stairs', x: 520, z: 1150, w: 980, d: 2150, h: 1750, rot: 0 },
+      { id: 'desk_double_1600', x: 1750, z: 320, w: 1600, d: 550, h: 750, rot: 0 },
+      { id: 'platform_storage', x: 3525, z: 6520, w: 1950, d: 2800, h: 400, rot: 0 },
+      { id: 'bed_double_45ft', x: 3550, z: 6850, w: 1900, d: 1370, h: 520, y: 400, rot: 0 },
+      { id: 'wardrobe_slide_1500', x: 3550, z: 5380, w: 1500, d: 580, h: 2050, y: 400, rot: 0 }
+    ];
+
+    const TWENTY_TEMPLATES = [
+      { id: 'tpl_01', name: '01. 原裝清水房 (無傢俬)', tag: '清水房', desc: '保留原裝結構牆及廚廁，準業主從零開始自由規劃。', floors: { liv: 'fl_muji_oak', foyer: 'fl_muji_oak', rm_left: 'fl_muji_oak', rm_top: 'fl_muji_oak', rm_bot: 'fl_muji_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_paint_ivory', w_rm_top: 'wl_paint_ivory', w_rm_left: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' }, items: [] },
+      { id: 'tpl_02', name: '02. 實心磚牆三房 + 全海景廳 + 全套廚廁', tag: '五口首選', desc: '全屋100mm實心磚牆間三房，連一體式廚櫃及乾濕分離浴室。', floors: { liv: 'fl_muji_oak', foyer: 'fl_muji_oak', rm_left: 'fl_muji_oak', rm_top: 'fl_muji_oak', rm_bot: 'fl_muji_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_almond', w_tv: 'wl_slat_oak', w_rm_top: 'wl_paint_almond', w_rm_left: 'wl_paint_almond', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_03', name: '03. 三連動玻璃主人房 + 雙童房 + 全套廚廁', tag: '海景通透', desc: '主人房改用黑框長虹玻璃趟門，日間打開可將4525mm全幅海景完全引入客廳。', floors: { liv: 'fl_nordic_ash', foyer: 'fl_nordic_ash', rm_left: 'fl_nordic_ash', rm_top: 'fl_nordic_ash', rm_bot: 'fl_nordic_ash', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_art_cement', w_tv: 'wl_marble_gold', w_rm_top: 'wl_paint_almond', w_rm_left: 'wl_paint_almond', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS.map(it => (it.id === 'wall_brick_100' && it.x === 2480) ? { ...it, id: 'door_glass_3', w: 90, h: 2450, color: '#7dd3fc' } : it) },
+      { id: 'tpl_04', name: '04. 四口之家：二孩成長雙人房 + 海景大主人房', tag: '四口首選', desc: '雙人上下格床配1.6米雙人長書枱，側房改為獨立衣帽儲物間。', floors: { liv: 'fl_honey_maple', foyer: 'fl_honey_maple', rm_left: 'fl_honey_maple', rm_top: 'fl_honey_maple', rm_bot: 'fl_honey_maple', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_almond', w_tv: 'wl_slat_oak', w_rm_top: 'wl_paint_mistblue', w_rm_left: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_05', name: '05. 四口之家：一人一房 (三獨立睡房)', tag: '獨立私隱', desc: '兩名子女各自擁有獨立單人睡房與書枱，互不干擾。', floors: { liv: 'fl_muji_oak', foyer: 'fl_muji_oak', rm_left: 'fl_muji_oak', rm_top: 'fl_muji_oak', rm_bot: 'fl_muji_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_wood_oak', w_rm_top: 'wl_paint_sage', w_rm_left: 'wl_paint_mistblue', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_06', name: '06. 三口之家：闊落兩房 + 步入式衣帽間', tag: '闊落兩房', desc: '打通大門旁房間成為巨型飯廳連Coffee Bar餐邊櫃，保留兩間大睡房。', floors: { liv: 'fl_chevron_fr', foyer: 'fl_chevron_fr', rm_left: 'fl_chevron_fr', rm_top: 'fl_chevron_fr', rm_bot: 'fl_chevron_fr', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_art_sand', w_tv: 'wl_marble_carrara', w_rm_top: 'wl_art_sand', w_rm_left: 'wl_art_sand', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_art_sand' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_07', name: '07. 二人世界：4.5米巨型海景廳 + 半透光書房', tag: '新婚首選', desc: '全開放式4525mm海景巨廳配L型貴妃梳化及中島吧枱。', floors: { liv: 'fl_diag_walnut', foyer: 'fl_diag_walnut', rm_left: 'fl_diag_walnut', rm_top: 'fl_diag_walnut', rm_bot: 'fl_diag_walnut', kit: 'fl_dark_basalt', bath: 'fl_dark_basalt' }, walls: { w_liv: 'wl_art_cement', w_tv: 'wl_slat_walnut', w_rm_top: 'wl_art_cement', w_rm_left: 'wl_art_cement', w_kit: 'wl_tile_grey', w_bath: 'wl_tile_grey', w_part: 'wl_art_cement' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_08', name: '08. 長輩無障礙孝親版 (全屋零地台 + 日式浸浴缸)', tag: '長輩安全', desc: '全屋地面零高差防絆倒，側房最近廁所並升級日式深型坐泡浸浴缸。', floors: { liv: 'fl_warm_teak', foyer: 'fl_warm_teak', rm_left: 'fl_warm_teak', rm_top: 'fl_warm_teak', rm_bot: 'fl_warm_teak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_almond', w_tv: 'wl_wood_oak', w_rm_top: 'wl_paint_almond', w_rm_left: 'wl_paint_almond', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS.filter(it => it.id !== 'platform_storage') },
+      { id: 'tpl_09', name: '09. 日式無印原木風 (Muji Natural Oak)', tag: '日式無印', desc: '全屋採用無印自然橡木地板配白橡木格柵電視牆及百褶宣紙吊燈。', floors: { liv: 'fl_muji_oak', foyer: 'fl_muji_oak', rm_left: 'fl_muji_oak', rm_top: 'fl_muji_oak', rm_bot: 'fl_muji_oak', kit: 'fl_wabi_cement', bath: 'fl_wabi_cement' }, walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_slat_oak', w_rm_top: 'wl_paint_ivory', w_rm_left: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_10', name: '10. 2026大熱奶油侘寂風 (Creamy Wabi-Sabi)', tag: '奶油侘寂', desc: '微水泥無縫地面配杏仁奶油白藝術漆與圓潤布藝梳化。', floors: { liv: 'fl_wabi_cement', foyer: 'fl_wabi_cement', rm_left: 'fl_herring_ash', rm_top: 'fl_herring_ash', rm_bot: 'fl_herring_ash', kit: 'fl_wabi_cement', bath: 'fl_wabi_cement' }, walls: { w_liv: 'wl_art_sand', w_tv: 'wl_art_travertine', w_rm_top: 'wl_paint_almond', w_rm_left: 'wl_paint_almond', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_11', name: '11. 意式輕奢雲石水晶吊燈風 (Luxury Marble)', tag: '私樓輕奢', desc: '魚肚白金絲雲石大板磚配勞倫黑金電視牆及K9水晶環形吊燈。', floors: { liv: 'fl_calacatta_gold', foyer: 'fl_palace_inlay', rm_left: 'fl_chevron_wal', rm_top: 'fl_chevron_wal', rm_bot: 'fl_chevron_wal', kit: 'fl_dark_basalt', bath: 'fl_carrara' }, walls: { w_liv: 'wl_art_velvet_w', w_tv: 'wl_marble_dark', w_rm_top: 'wl_art_velvet_w', w_rm_left: 'wl_art_velvet_w', w_kit: 'wl_marble_carrara', w_bath: 'wl_marble_gold', w_part: 'wl_art_velvet_w' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_12', name: '12. 法式45°魚骨拼奶油輕法風 (French Chevron)', tag: '法式魚骨', desc: '全屋鋪設45°法式魚骨拼淺橡木地板，優雅浪漫。', floors: { liv: 'fl_chevron_fr', foyer: 'fl_moroccan_hex', rm_left: 'fl_chevron_fr', rm_top: 'fl_chevron_fr', rm_bot: 'fl_chevron_fr', kit: 'fl_moroccan_hex', bath: 'fl_carrara' }, walls: { w_liv: 'wl_paint_almond', w_tv: 'wl_marble_gold', w_rm_top: 'wl_paint_rose', w_rm_left: 'wl_paint_sage', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_13', name: '13. 45°斜鋪深胡桃木復古風 (Mid-Century Modern)', tag: '斜鋪木紋', desc: '45°斜鋪復古深胡桃木地板配焦糖真皮單椅及深海藍絲絨牆。', floors: { liv: 'fl_diag_walnut', foyer: 'fl_diag_walnut', rm_left: 'fl_amer_walnut', rm_top: 'fl_amer_walnut', rm_bot: 'fl_amer_walnut', kit: 'fl_dark_basalt', bath: 'fl_dark_basalt' }, walls: { w_liv: 'wl_art_sand', w_tv: 'wl_art_navy', w_rm_top: 'wl_art_sand', w_rm_left: 'wl_art_emerald', w_kit: 'wl_tile_grey', w_bath: 'wl_tile_grey', w_part: 'wl_art_sand' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_14', name: '14. 極限儲物地台王 (全屋雙地台櫃 + 滿牆C字櫃)', tag: '海量收納', desc: '主人房及童房均設400mm上掀式儲物地台，收納量激增12立方米。', floors: { liv: 'fl_nordic_ash', foyer: 'fl_nordic_ash', rm_left: 'fl_nordic_ash', rm_top: 'fl_nordic_ash', rm_bot: 'fl_nordic_ash', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_wood_diag', w_rm_top: 'wl_paint_ivory', w_rm_left: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_15', name: '15. 雙人WFH在家工作 + 雙書房配置', tag: '在家工作', desc: '專為需要安靜視像會議及雙電腦書枱的專業人士設計。', floors: { liv: 'fl_grey_oak', foyer: 'fl_grey_oak', rm_left: 'fl_grey_oak', rm_top: 'fl_grey_oak', rm_bot: 'fl_grey_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_art_velvet_b', w_tv: 'wl_slat_walnut', w_rm_top: 'wl_paint_mistblue', w_rm_left: 'wl_paint_sage', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_grey', w_part: 'wl_art_velvet_b' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_16', name: '16. 音樂琴房版 (客廳直立式鋼琴 + 隔音磚牆)', tag: '鋼琴家庭', desc: '預留Yamaha 1號直立式鋼琴專屬位置，三房實心磚牆加強隔音。', floors: { liv: 'fl_herring_oak', foyer: 'fl_herring_oak', rm_left: 'fl_herring_oak', rm_top: 'fl_herring_oak', rm_bot: 'fl_herring_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_paint_almond', w_tv: 'wl_slat_oak', w_rm_top: 'wl_paint_almond', w_rm_left: 'wl_paint_almond', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_almond' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_17', name: '17. 酒店行政套房風 (黑金奢石 + 雙枕浴缸)', tag: '酒店套房', desc: '如五星級酒店套房般的深色木飾面、磁吸軌道燈與豪華浸浴配置。', floors: { liv: 'fl_hermes_grey', foyer: 'fl_laurent_black', rm_left: 'fl_amer_walnut', rm_top: 'fl_amer_walnut', rm_bot: 'fl_amer_walnut', kit: 'fl_dark_basalt', bath: 'fl_laurent_black' }, walls: { w_liv: 'wl_art_cement', w_tv: 'wl_marble_dark', w_rm_top: 'wl_slat_walnut', w_rm_left: 'wl_art_cement', w_kit: 'wl_tile_grey', w_bath: 'wl_marble_dark', w_part: 'wl_art_cement' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_18', name: '18. 北歐莫蘭迪撞色兒童成長樂園', tag: '親子樂園', desc: '水磨石拼花磚配鼠尾草綠與霧霾藍牆身，充滿童趣活力。', floors: { liv: 'fl_nordic_ash', foyer: 'fl_terrazzo', rm_left: 'fl_nordic_ash', rm_top: 'fl_nordic_ash', rm_bot: 'fl_nordic_ash', kit: 'fl_terrazzo', bath: 'fl_terrazzo' }, walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_paint_sage', w_rm_top: 'wl_paint_mistblue', w_rm_left: 'wl_paint_rose', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_19', name: '19. 廚神烘焙Coffee Bar版 (蒸焗爐高櫃 + 意式咖啡角)', tag: '下廚愛啡', desc: '玄關及飯廳增設Coffee Bar餐邊櫃連雙頭咖啡機，廚房齊備蒸焗爐及微波爐。', floors: { liv: 'fl_diag_oak', foyer: 'fl_travertine', rm_left: 'fl_diag_oak', rm_top: 'fl_diag_oak', rm_bot: 'fl_diag_oak', kit: 'fl_travertine', bath: 'fl_travertine' }, walls: { w_liv: 'wl_art_sand', w_tv: 'wl_marble_onyx', w_rm_top: 'wl_art_sand', w_rm_left: 'wl_art_sand', w_kit: 'wl_marble_carrara', w_bath: 'wl_art_travertine', w_part: 'wl_art_sand' }, items: DEFAULT_3BR_ITEMS },
+      { id: 'tpl_20', name: '20. 貓狗寵物友善耐刮防水版 (防滑岩石磚 + 掃拖基站)', tag: '寵物家庭', desc: '全屋選用耐刮防滑SPC及岩石磚，預留掃拖機械人基站與貓爬架位。', floors: { liv: 'fl_nordic_ash', foyer: 'fl_light_slate', rm_left: 'fl_nordic_ash', rm_top: 'fl_nordic_ash', rm_bot: 'fl_nordic_ash', kit: 'fl_light_slate', bath: 'fl_light_slate' }, walls: { w_liv: 'wl_art_cement', w_tv: 'wl_slat_oak', w_rm_top: 'wl_paint_sage', w_rm_left: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_art_cement' }, items: DEFAULT_3BR_ITEMS }
+    ];
+
+    // Base room coordinate datasets & geometric transformation helpers for all 36 units
+    const BASE_B10_3BR = DEFAULT_3BR_ITEMS;
+    const BASE_B1_3BR = DEFAULT_3BR_ITEMS.map(it => ({ ...it, z: Math.round(7965 - it.z) }));
+    const BASE_A2_3BR = DEFAULT_3BR_ITEMS.map(it => ({ ...it, x: it.z, z: Math.round(4525 - it.x), w: it.d, d: it.w }));
+    const BASE_A7_3BR = [
+      { id: 'wall_brick_100', x: 3280, z: 1000, w: 100, d: 2000, h: 2550, rot: 0 },
+      { id: 'wall_brick_100', x: 3425, z: 0, w: 1150, d: 100, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 3280, z: 1600, w: 110, d: 800, h: 2100, rot: 0 },
+      { id: 'door_slide_wood', x: 3425, z: 0, w: 850, d: 70, h: 2150, rot: 0 },
+      { id: 'foyer_c_1200', x: 900, z: 3400, w: 1200, d: 380, h: 2500, rot: 0 },
+      { id: 'sofa_3seat', x: 4800, z: 450, w: 2100, d: 850, h: 820, rot: 0 },
+      { id: 'tv_console', x: 4800, z: 2150, w: 1800, d: 380, h: 450, rot: 0 },
+      { id: 'dining_fold_5p', x: 2400, z: 1650, w: 1250, d: 800, h: 750, rot: 0 },
+      { id: 'bed_single_3ft', x: 3425, z: -1200, w: 1900, d: 910, h: 520, rot: 0 },
+      { id: 'bed_bunk_stairs', x: 1100, z: 950, w: 2150, d: 980, h: 1750, rot: 0 },
+      { id: 'platform_storage', x: 4720, z: 3525, w: 2800, d: 1950, h: 400, rot: 0 },
+      { id: 'bed_double_45ft', x: 4950, z: 3525, w: 1370, d: 1900, h: 520, y: 400, rot: 0 }
+    ];
+    const BASE_A8_3BR = BASE_A7_3BR.map(it => ({ ...it, z: Math.round(4525 - it.z) }));
+    const BASE_A22_3BR = BASE_A8_3BR;
+    const BASE_B15_3BR = BASE_B1_3BR;
+    const BASE_B21_2BR = [
+      { id: 'wall_brick_100', x: 1442, z: 2040, w: 2885, d: 100, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 2300, z: 2040, w: 800, d: 110, h: 2100, rot: 0 },
+      { id: 'foyer_c_1200', x: 5250, z: 2300, w: 1200, d: 380, h: 2500, rot: 0 },
+      { id: 'sofa_3seat', x: 1650, z: 4050, w: 2100, d: 850, h: 820, rot: 0 },
+      { id: 'tv_console', x: 1650, z: 2300, w: 1800, d: 380, h: 450, rot: 0 },
+      { id: 'dining_fold_5p', x: 3550, z: 3350, w: 1250, d: 800, h: 750, rot: 0 },
+      { id: 'platform_storage', x: 1440, z: 1000, w: 2800, d: 1950, h: 400, rot: 0 },
+      { id: 'bed_double_45ft', x: 1150, z: 1000, w: 1900, d: 1370, h: 520, y: 400, rot: 0 },
+      { id: 'wardrobe_slide_1500', x: 2450, z: 1000, w: 580, d: 1500, h: 2050, y: 400, rot: 0 },
+      { id: 'bed_bunk_stairs', x: 4950, z: 3850, w: 2150, d: 980, h: 1750, rot: 0 }
+    ];
+    const BASE_B4_B6_2BR = [
+      { id: 'wall_brick_100', x: 2480, z: 4722, w: 100, d: 2885, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 2480, z: 3850, w: 110, d: 800, h: 2100, rot: 0 },
+      { id: 'wall_brick_100', x: 1100, z: 2200, w: 2200, d: 100, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 1850, z: 2200, w: 800, d: 110, h: 2100, rot: 0 },
+      { id: 'foyer_c_1200', x: 3150, z: 240, w: 1200, d: 380, h: 2500, rot: 0 },
+      { id: 'sofa_3seat', x: 480, z: 4850, w: 850, d: 2100, h: 820, rot: 0 },
+      { id: 'tv_console', x: 2220, z: 4850, w: 380, d: 1800, h: 450, rot: 0 },
+      { id: 'dining_fold_5p', x: 1450, z: 3150, w: 1250, d: 800, h: 750, rot: 0 },
+      { id: 'bed_bunk_stairs', x: 520, z: 1100, w: 980, d: 2100, h: 1750, rot: 0 },
+      { id: 'platform_storage', x: 3500, z: 4720, w: 1950, d: 2800, h: 400, rot: 0 },
+      { id: 'bed_double_45ft', x: 3500, z: 5050, w: 1900, d: 1370, h: 520, y: 400, rot: 0 }
+    ];
+    const BASE_B13_2BR = [
+      { id: 'wall_brick_100', x: 2040, z: 4750, w: 100, d: 2945, h: 2550, rot: 0 },
+      { id: 'door_wood_room', x: 2040, z: 3850, w: 110, d: 800, h: 2100, rot: 0 },
+      { id: 'foyer_c_1200', x: 1450, z: 240, w: 1200, d: 380, h: 2500, rot: 0 },
+      { id: 'sofa_3seat', x: 4400, z: 4100, w: 850, d: 2100, h: 820, rot: 0 },
+      { id: 'tv_console', x: 2300, z: 4100, w: 380, d: 1800, h: 450, rot: 0 },
+      { id: 'dining_fold_5p', x: 3450, z: 2550, w: 1250, d: 800, h: 750, rot: 0 },
+      { id: 'platform_storage', x: 1000, z: 4750, w: 1950, d: 2850, h: 400, rot: 0 },
+      { id: 'bed_double_45ft', x: 1000, z: 5100, w: 1900, d: 1370, h: 520, y: 400, rot: 0 },
+      { id: 'bed_bunk_stairs', x: 4350, z: 1150, w: 980, d: 2150, h: 1750, rot: 0 }
+    ];
+    const BASE_B5_COMPACT_1BR = [
+      { id: 'door_glass_3', x: 1175, z: 3650, w: 2350, d: 90, h: 2450, rot: 0, color: '#7dd3fc' },
+      { id: 'foyer_c_900', x: 1850, z: 850, w: 360, d: 900, h: 2500, rot: 0 },
+      { id: 'sofa_2seat', x: 1880, z: 2650, w: 800, d: 1650, h: 800, rot: 0 },
+      { id: 'tv_console', x: 220, z: 2650, w: 360, d: 1500, h: 450, rot: 0 },
+      { id: 'platform_storage', x: 1175, z: 4950, w: 2300, d: 2350, h: 400, rot: 0 },
+      { id: 'bed_double_4ft', x: 1175, z: 5250, w: 1900, d: 1220, h: 520, y: 400, rot: 0 },
+      { id: 'wardrobe_slide_1500', x: 320, z: 4450, w: 580, d: 1400, h: 2050, y: 400, rot: 0 }
+    ];
+
+    function flipA2ItemsToA3(list) { return list.map(it => ({ ...it, z: Math.round(4525 - it.z) })); }
+    function mirrorA8ItemsToA9(list) { return list.map(it => ({ ...it, x: Math.round(6165 - it.x) })); }
+    function mirrorB21ItemsToB22(list) { return list.map(it => ({ ...it, x: Math.round(6165 - it.x) })); }
+    function flipB21ItemsToA10(list) { return list.map(it => ({ ...it, z: Math.round(4525 - it.z) })); }
+    function rotateB21ItemsToA21(list) { return list.map(it => ({ ...it, x: Math.round(6165 - it.x), z: Math.round(4525 - it.z) })); }
+    function mirrorB13ItemsToB14(list) { return list.map(it => ({ ...it, x: Math.round(4900 - it.x) })); }
+    function flipB4ItemsToB3(list) { return list.map(it => ({ ...it, z: Math.round(6165 - it.z) })); }
+    function flipB5ItemsToB2(list) { return list.map(it => ({ ...it, z: Math.round(6165 - it.z) })); }
+    function mirrorB5ItemsToB12(list) { return list.map(it => ({ ...it, x: Math.round(2350 - it.x) })); }
+    function mirrorB10ItemsToB9(list) { return list.map(it => ({ ...it, x: Math.round(4525 - it.x) })); }
+
+    // ============================================================================
+    // STRUCTURE & DIMENSION BUILDERS FOR 36 UNITS
+    // ============================================================================
+    function addFloorZoneSlabCommon(zoneId, w, d, x, z, repeat = 2.5) {
+      const st = FLOOR_STYLES.find(s => s.id === zoneFloorAssignment[zoneId]) || FLOOR_STYLES[0];
+      const tex = getThreeMaterialTexture(st, repeat);
+      const geom = new THREE.PlaneGeometry(w, d);
+      geom.rotateX(-Math.PI / 2);
+      const mat = new THREE.MeshStandardMaterial({ map: tex, bumpMap: tex, bumpScale: 0.02, roughness: st.rough || 0.4 });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.set(x + w / 2, -160, z + d / 2);
+      mesh.receiveShadow = true;
+      mesh.userData = { isFloorZone: true, zoneId };
+      structureRootGroup.add(mesh);
+      if (!floorZoneMeshes[zoneId]) floorZoneMeshes[zoneId] = [];
+      floorZoneMeshes[zoneId].push({ mesh, repeatCount: repeat });
+    }
+
+    function addZonedStructWallCommon(wallZoneId, x, z, w, d, normalVec = null) {
+      const st = WALL_STYLES.find(s => s.id === zoneWallAssignment[wallZoneId]) || WALL_STYLES[0];
+      const tex = getThreeMaterialTexture(st, 2);
+      const mat = new THREE.MeshStandardMaterial({ map: tex, bumpMap: tex, bumpScale: 0.015, roughness: 0.55 });
+      const mesh = createBoxWithEdges(w, 2550, d, x, 0, z, mat, 0x1e293b, structureRootGroup);
+      mesh.userData = { isWallZone: true, wallZoneId };
+      if (!wallZoneMeshes[wallZoneId]) wallZoneMeshes[wallZoneId] = [];
+      wallZoneMeshes[wallZoneId].push(mesh);
+      structuralWalls.push({ mesh, maxH: 2550 });
+    }
+
+    function addWinSegCommon(wallZoneId, x, z, w, d, sillH = 500, fullWinH = 1550) {
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.6 });
+      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.38, roughness: 0.1 });
+      createBoxWithEdges(w, sillH, d, x, 0, z, frameMat, 0x0f172a, structureRootGroup);
+      const gBox = createBoxWithEdges(w, fullWinH, Math.max(20, d * 0.4), x, sillH, z, glassMat, 0x0284c7, structureRootGroup);
+      glassMeshes.push({ mesh: gBox, sillH, fullWinH });
+    }
+
+    function addDimLabelsList(arr) {
+      arr.forEach(item => {
+        const s = createDimensionSprite(item.text);
+        s.position.set(item.x, 2750, item.z);
+        dimensionGroup.add(s);
+      });
+    }
+
+    function buildFlat10ZonedStructure() {
+      addFloorZoneSlabCommon('rm_top', 2550, 2500, 0, 0, 2.5);
+      addFloorZoneSlabCommon('foyer', 1650, 3450, 2550, 0, 2.5);
+      addFloorZoneSlabCommon('foyer', 2525, 2580, 0, 2500, 2.5);
+      addFloorZoneSlabCommon('rm_left', 2000, 2150, -2000, 3150, 2.5);
+      addFloorZoneSlabCommon('liv', 2525, 2885, 0, 5080, 3);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2885, 2525, 5080, 2.5);
+      addFloorZoneSlabCommon('kit', 2065, 1650, 4200, 1800, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 3535, 2);
+
+      // Top Wall (4200mm) & Left Upper Wall (3650mm with 2 windows)
+      addZonedStructWallCommon('w_rm_top', -200, -200, 4600, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_rm_top', -200, 0, 200, 550, new THREE.Vector3(-1, 0, 0));
+      addWinSegCommon('w_rm_top', -200, 550, 200, 700);
+      addZonedStructWallCommon('w_rm_top', -200, 1250, 200, 300, new THREE.Vector3(-1, 0, 0));
+      addWinSegCommon('w_rm_top', -200, 1550, 200, 700);
+      addZonedStructWallCommon('w_rm_top', -200, 2250, 200, 900, new THREE.Vector3(-1, 0, 0));
+
+      // Left Protruding Room (2000 x 2150mm: X=-2000..0, Z=3150..5300, 1150mm opening)
+      addZonedStructWallCommon('w_rm_left', -200, 3150, 200, 900, null);
+      addZonedStructWallCommon('w_rm_left', -200, 5200, 200, 100, null);
+      addZonedStructWallCommon('w_rm_left', -2200, 2950, 2000, 200, new THREE.Vector3(0, 0, -1));
+      addWinSegCommon('w_rm_left', -2200, 3150, 200, 2150);
+      addWinSegCommon('w_rm_left', -1750, 5300, 1300, 200);
+
+      // Lower-Left Living Wall (3165mm) & Bottom Full-Height 4525mm Sea-View Window
+      addZonedStructWallCommon('w_liv', -200, 5300, 200, 900, new THREE.Vector3(-1, 0, 0));
+      addWinSegCommon('w_liv', -200, 6200, 200, 900);
+      addZonedStructWallCommon('w_liv', -200, 7100, 200, 865, new THREE.Vector3(-1, 0, 0));
+
+      addWinSegCommon('w_liv', 0, 7965, 2450, 200, 520, 1750);
+      addWinSegCommon('w_tv', 2450, 7965, 2075, 200, 520, 1750);
+
+      // Right Wall (2885mm + Bath + Kit + Entrance)
+      addZonedStructWallCommon('w_tv', 4525, 5080, 200, 1000, new THREE.Vector3(1, 0, 0));
+      addWinSegCommon('w_tv', 4525, 6080, 200, 900);
+      addZonedStructWallCommon('w_tv', 4525, 6980, 200, 985, new THREE.Vector3(1, 0, 0));
+
+      addZonedStructWallCommon('w_bath', 2440, 3450, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2440, 3535, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 2440, 5005, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 4525, 3450, 200, 1630, new THREE.Vector3(1, 0, 0));
+
+      addZonedStructWallCommon('w_kit', 4200, 1600, 2265, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', 6265, 1600, 200, 2050, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 4525, 3450, 1940, 200, new THREE.Vector3(0, 0, 1));
+      addZonedStructWallCommon('w_kit', 4115, 1800, 85, 700, null);
+
+      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
+      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
+      const dMain = createBoxWithEdges(70, 1, 850, 4200, 0, 650, doorMat, 0x78350f);
+      const dKit = createBoxWithEdges(60, 1, 720, 4130, 0, 2500, bathDoorMat, 0x475569);
+      const dBath = createBoxWithEdges(660, 1, 60, 2740, 0, 3465, bathDoorMat, 0x475569);
+      [dMain, dKit, dBath].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
+    }
+
+    function buildOriginalDimensionLabels() {
+      addDimLabelsList([
+        { text: 'B10室 頂部大門區 4200mm', x: 2100, z: -550 },
+        { text: '左上長 3650mm', x: -750, z: 1600 },
+        { text: '左中側房 2000×2150mm', x: -1200, z: 4225 },
+        { text: '左下廳長 3165mm', x: -750, z: 6600 },
+        { text: '底部全幅海景大窗 4525mm', x: 2260, z: 8550 },
+        { text: '右下長 2885mm', x: 5250, z: 6500 },
+        { text: '浴室 2000×1470mm', x: 3525, z: 4270 },
+        { text: '廚房 2065×1650mm', x: 5230, z: 2625 }
+      ]);
+    }
+
+    function buildFlat9ZonedStructure() {
+      buildFlat10ZonedStructure();
+    }
+    function buildFlat1ZonedStructure() {
+      addFloorZoneSlabCommon('liv', 2440, 2885, 0, 0, 2.5);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2885, 2525, 0, 2.5);
+      addFloorZoneSlabCommon('rm_left', 2000, 2150, -2000, 2515, 2.5);
+      addFloorZoneSlabCommon('foyer', 2440, 3280, 0, 2885, 2.5);
+      addFloorZoneSlabCommon('rm_top', 1400, 1640, 2440, 4525, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 2970, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 4515, 2);
+
+      addWinSegCommon('w_liv', 0, -200, 2440, 200, 520, 1750);
+      addWinSegCommon('w_tv', 2440, -200, 2085, 200, 520, 1750);
+      addZonedStructWallCommon('w_liv', -200, 0, 200, 2615, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_tv', 4525, 0, 200, 2885, new THREE.Vector3(1, 0, 0));
+
+      addZonedStructWallCommon('w_rm_left', -2200, 2315, 2000, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_rm_left', -2200, 2515, 200, 2150, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_rm_left', -2200, 4665, 2000, 200, new THREE.Vector3(0, 0, 1));
+      addZonedStructWallCommon('w_rm_left', -200, 3765, 200, 900, null);
+
+      addZonedStructWallCommon('w_rm_top', -200, 4665, 200, 1500, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_rm_top', -200, 6165, 4040, 200, new THREE.Vector3(0, 0, 1));
+
+      addZonedStructWallCommon('w_bath', 2440, 2885, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2440, 2970, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 2440, 4440, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 4525, 2885, 200, 1630, new THREE.Vector3(1, 0, 0));
+
+      addZonedStructWallCommon('w_kit', 3840, 4440, 2265, 85, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', 5905, 4440, 200, 1925, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 3840, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
+    }
+
+    function buildFlat1DimensionLabels() {
+      addDimLabelsList([
+        { text: 'B1室 頂部景觀大窗 4525mm', x: 2260, z: -550 },
+        { text: '左上廳長 2615mm', x: -750, z: 1300 },
+        { text: '左中側房 2000×2150mm', x: -1200, z: 3590 },
+        { text: '左下長 2400mm', x: -750, z: 5400 },
+        { text: '底部大門區 3840mm', x: 1920, z: 6680 },
+        { text: '右上長 2885mm', x: 5250, z: 1440 },
+        { text: '浴室 2000×1470mm', x: 3525, z: 3700 },
+        { text: '廚房 2065×1650mm', x: 4870, z: 5340 }
+      ]);
+    }
+
+    function buildFlat15ZonedStructure() {
+      buildFlat1ZonedStructure();
+      addDimLabelsList([{ text: 'B15室 加長左牆 4115mm + 左下側房', x: -850, z: 2050 }]);
+    }
+
+    function buildFlat3ZonedStructure() {
+      addFloorZoneSlabCommon('liv', 2440, 2885, 0, 0, 2.5);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2885, 2525, 0, 2.5);
+      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 2885, 2.5);
+      addFloorZoneSlabCommon('foyer', 1400, 1640, 2440, 4525, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 2970, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 4515, 2);
+
+      addWinSegCommon('w_liv', 0, -200, 2440, 200, 520, 1750);
+      addWinSegCommon('w_tv', 2440, -200, 2085, 200, 520, 1750);
+      addZonedStructWallCommon('w_liv', -200, 0, 200, 6165, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_tv', 4525, 0, 200, 2885, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_rm_top', -200, 6165, 4040, 200, new THREE.Vector3(0, 0, 1));
+      addZonedStructWallCommon('w_bath', 2440, 2885, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2440, 2970, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 2440, 4440, 2085, 85, null);
+      addZonedStructWallCommon('w_kit', 3840, 4440, 2265, 85, null);
+      addZonedStructWallCommon('w_kit', 5905, 4440, 200, 1925, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 3840, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: 'B3室 頂部大窗 4525mm', x: 2260, z: -550 },
+        { text: '左側直牆 6165mm', x: -750, z: 3100 },
+        { text: '底部大門區 3840mm', x: 1920, z: 6680 }
+      ]);
+    }
+
+    function buildFlat4And6ZonedStructure(unitCode = 'B4') {
+      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 0, 2.5);
+      addFloorZoneSlabCommon('foyer', 1400, 1810, 2440, 0, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 0, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 1810, 2);
+      addFloorZoneSlabCommon('liv', 2440, 2885, 0, 3280, 2.5);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2885, 2525, 3280, 2.5);
+
+      addZonedStructWallCommon('w_rm_top', -200, -200, 4040, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_liv', -200, 0, 200, 6165, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_tv', 4525, 3280, 200, 2885, new THREE.Vector3(1, 0, 0));
+      addWinSegCommon('w_liv', 0, 6165, 2440, 200, 520, 1750);
+      addWinSegCommon('w_tv', 2440, 6165, 2085, 200, 520, 1750);
+      addZonedStructWallCommon('w_bath', 2440, 1725, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2440, 1810, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 2440, 3280, 2085, 85, null);
+      addZonedStructWallCommon('w_kit', 3840, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', 5905, 0, 200, 1850, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 3840, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: `${unitCode}室 頂部大門區 3840mm`, x: 1920, z: -550 },
+        { text: '左側直牆 6165mm', x: -750, z: 3100 },
+        { text: '底部景觀大窗 4525mm', x: 2260, z: 6680 }
+      ]);
+    }
+
+    function buildFlat16And18ZonedStructure(unitCode = 'B16') {
+      addFloorZoneSlabCommon('rm_bot', 2000, 2885, 0, 0, 2.5);
+      addFloorZoneSlabCommon('liv', 2440, 2885, 2085, 0, 2.5);
+      addFloorZoneSlabCommon('rm_top', 2440, 3280, 2085, 2885, 2.5);
+      addFloorZoneSlabCommon('foyer', 1400, 1640, 685, 4525, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 0, 2970, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, -1380, 4515, 2);
+
+      addWinSegCommon('w_tv', 0, -200, 2085, 200, 520, 1750);
+      addWinSegCommon('w_liv', 2085, -200, 2440, 200, 520, 1750);
+      addZonedStructWallCommon('w_tv', -200, 0, 200, 2885, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_liv', 4525, 0, 200, 6165, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_rm_top', 685, 6165, 4040, 200, new THREE.Vector3(0, 0, 1));
+      addZonedStructWallCommon('w_bath', 0, 2885, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2000, 2970, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 0, 4440, 2085, 85, null);
+      addZonedStructWallCommon('w_kit', -1580, 4440, 2265, 85, null);
+      addZonedStructWallCommon('w_kit', -1580, 4440, 200, 1925, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_kit', -1580, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: `${unitCode}室 頂部大窗 4525mm`, x: 2260, z: -550 },
+        { text: '右側直牆 6165mm', x: 5250, z: 3100 },
+        { text: '底部大門區 3840mm', x: 2600, z: 6680 }
+      ]);
+    }
+
+    function buildFlat11And13ZonedStructure(unitCode = 'B11') {
+      addFloorZoneSlabCommon('rm_top', 2815, 2440, 2085, 0, 2.5);
+      addFloorZoneSlabCommon('foyer', 1400, 1810, 685, 0, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, -1380, 0, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 0, 1810, 2);
+      addFloorZoneSlabCommon('liv', 2815, 2885, 2085, 2440, 2.5);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2945, 0, 3280, 2.5);
+
+      addZonedStructWallCommon('w_rm_top', 685, -200, 4415, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_liv', 4900, 0, 200, 5325, new THREE.Vector3(1, 0, 0));
+      addWinSegCommon('w_liv', 2000, 5325, 2900, 200, 520, 1750);
+      addZonedStructWallCommon('w_tv', 2000, 5325, 200, 900, null);
+      addWinSegCommon('w_tv', 0, 6225, 2000, 200, 520, 1750);
+      addZonedStructWallCommon('w_tv', -200, 3280, 200, 2945, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_bath', 0, 1725, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2000, 1810, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 0, 3280, 2085, 85, null);
+      addZonedStructWallCommon('w_kit', -1580, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', -1580, 0, 200, 1850, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_kit', -1580, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: `${unitCode}室 闊廳 4900mm (連900凸窗)`, x: 2450, z: 6780 },
+        { text: '右側長牆 5325mm', x: 5600, z: 2660 }
+      ]);
+    }
+
+    function buildFlat14ZonedStructure() {
+      addFloorZoneSlabCommon('rm_top', 2815, 2440, 0, 0, 2.5);
+      addFloorZoneSlabCommon('foyer', 1400, 1810, 2815, 0, 2);
+      addFloorZoneSlabCommon('kit', 2065, 1650, 4215, 0, 2);
+      addFloorZoneSlabCommon('bath', 2000, 1470, 2900, 1810, 2);
+      addFloorZoneSlabCommon('liv', 2815, 2885, 0, 2440, 2.5);
+      addFloorZoneSlabCommon('rm_bot', 2000, 2945, 2900, 3280, 2.5);
+
+      addZonedStructWallCommon('w_rm_top', -200, -200, 4415, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_liv', -200, 0, 200, 5325, new THREE.Vector3(-1, 0, 0));
+      addWinSegCommon('w_liv', 0, 5325, 2900, 200, 520, 1750);
+      addZonedStructWallCommon('w_tv', 2700, 5325, 200, 900, null);
+      addWinSegCommon('w_tv', 2900, 6225, 2000, 200, 520, 1750);
+      addZonedStructWallCommon('w_tv', 4900, 3280, 200, 2945, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_bath', 2815, 1725, 2085, 85, null);
+      addZonedStructWallCommon('w_bath', 2815, 1810, 85, 1470, null);
+      addZonedStructWallCommon('w_bath', 2815, 3280, 2085, 85, null);
+      addZonedStructWallCommon('w_kit', 4215, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', 6280, 0, 200, 1850, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 4215, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: 'B14室 闊廳 4900mm (右下900凸窗)', x: 2450, z: 6780 },
+        { text: '左側長牆 5325mm', x: -850, z: 2660 }
+      ]);
+    }
+
+    function buildFlat2ZonedStructure() {
+      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 0, 2);
+      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 2675, 2);
+      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 4525, 2);
+      addFloorZoneSlabCommon('kit', 1415, 1765, -1415, 2675, 2);
+      addFloorZoneSlabCommon('bath', 1580, 1650, -1580, 4515, 2);
+
+      addWinSegCommon('w_tv', 0, -200, 2350, 200, 520, 1750);
+      addZonedStructWallCommon('w_liv', 2350, 0, 200, 6165, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_tv', -200, 0, 200, 2675, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_rm_top', 0, 6165, 2550, 200, new THREE.Vector3(0, 0, 1));
+      addZonedStructWallCommon('w_kit', -1615, 2475, 1615, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_kit', -1615, 2675, 200, 1765, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_bath', -1780, 4440, 1780, 85, null);
+      addZonedStructWallCommon('w_bath', -1780, 4525, 200, 1640, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_bath', -1780, 6165, 1780, 200, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: 'B2室 頂窗闊 2350mm', x: 1175, z: -550 },
+        { text: '右側直牆 6165mm', x: 3100, z: 3100 }
+      ]);
+    }
+
+    function buildFlat5ZonedStructure() {
+      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 0, 2);
+      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 1640, 2);
+      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 3490, 2);
+      addFloorZoneSlabCommon('bath', 1580, 1650, -1580, 0, 2);
+      addFloorZoneSlabCommon('kit', 1415, 1765, -1415, 1725, 2);
+
+      addZonedStructWallCommon('w_rm_top', 0, -200, 2550, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_liv', 2350, 0, 200, 6165, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_tv', -200, 3490, 200, 2675, new THREE.Vector3(-1, 0, 0));
+      addWinSegCommon('w_tv', 0, 6165, 2350, 200, 520, 1750);
+      addZonedStructWallCommon('w_bath', -1780, -200, 1780, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_bath', -1780, 0, 200, 1650, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_bath', -1780, 1650, 1780, 85, null);
+      addZonedStructWallCommon('w_kit', -1615, 1725, 200, 1765, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_kit', -1615, 3490, 1615, 200, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: 'B5室 底窗闊 2350mm', x: 1175, z: 6680 },
+        { text: '右側直牆 6165mm', x: 3100, z: 3100 }
+      ]);
+    }
+
+    function buildFlat12ZonedStructure(unitCode = 'B12') {
+      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 0, 2);
+      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 1640, 2);
+      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 3490, 2);
+      addFloorZoneSlabCommon('bath', 1580, 1650, 2350, 0, 2);
+      addFloorZoneSlabCommon('kit', 1415, 1765, 2350, 1725, 2);
+
+      addZonedStructWallCommon('w_rm_top', -200, -200, 2550, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_liv', -200, 0, 200, 6165, new THREE.Vector3(-1, 0, 0));
+      addZonedStructWallCommon('w_tv', 2350, 3490, 200, 2675, new THREE.Vector3(1, 0, 0));
+      addWinSegCommon('w_tv', 0, 6165, 2350, 200, 520, 1750);
+      addZonedStructWallCommon('w_bath', 2350, -200, 1780, 200, new THREE.Vector3(0, 0, -1));
+      addZonedStructWallCommon('w_bath', 3930, 0, 200, 1650, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_bath', 2350, 1650, 1780, 85, null);
+      addZonedStructWallCommon('w_kit', 3765, 1725, 200, 1765, new THREE.Vector3(1, 0, 0));
+      addZonedStructWallCommon('w_kit', 2350, 3490, 1615, 200, new THREE.Vector3(0, 0, 1));
+      addDimLabelsList([
+        { text: `${unitCode}室 底窗闊 2350mm`, x: 1175, z: 6680 },
+        { text: '左側直牆 6165mm', x: -750, z: 3100 }
+      ]);
+    }
+
+    // ============================================================================
     // 1. PROCEDURAL TEXTURE ENGINE + 24 FLOOR STYLES + 24 WALL STYLES + 120 ITEMS
     // ============================================================================
     const FLOOR_ZONES = [
@@ -801,7 +1315,7 @@
       { id: 'furn_coffee_machine', cat: 'kit_bath_furn', type: 'coffee_maker', name: '28. 意式雙頭半自動 Coffee 機 (連雙瓷杯)', sub: '配備沖煮手把、壓力錶、蒸氣管及咖啡杯', w: 360, d: 350, h: 390, color: '#94a3b8' },
       { id: 'furn_coffee_bar_1200', cat: 'kit_bath_furn', type: 'coffee_bar_combo', name: '29. 1.2米 Coffee Bar 餐邊櫃連咖啡機組合', sub: '一鍵配置胡桃木餐邊櫃+意式Coffee機', w: 1200, d: 420, h: 2400, slotY: 920, color: '#d4a373' },
       { id: 'furn_tall_oven_micro', cat: 'kit_bath_furn', type: 'tall_oven_combo', name: '30. 600mm 嵌入式蒸焗爐+微波爐電器高櫃', sub: '私樓最愛雙爐高櫃組合', w: 600, d: 600, h: 2450, color: '#334155' },
-      { id: 'furn_kit_sink_1600', cat: 'kit_bath_furn', type: 'kitchen_sink_unit', name: '31. 1.6米 石英石廚櫃連大單槽及鵝頸龍頭', sub: '連立體不鏽鋼星盆、高彎水龍頭及預留洗衣機位', w: 1600, d: 600, h: 880, slotY: 0, slotH: 840, topY: 880, color: '#f8fafc' },
+      { id: 'furn_kit_all_in_one', cat: 'kit_bath_furn', type: 'kitchen_all_in_one', name: '31. 一體式全套廚櫃組合 (含洗衣機/微波爐/煮食爐/抽油煙機/星盆/吊櫃)', sub: '居屋及私樓最實用一字型全套廚櫃，一鍵齊備所有廚房電器！', w: 1550, d: 600, h: 2350, topY: 880, color: '#f8fafc' },
       { id: 'furn_kit_island_1400', cat: 'kit_bath_furn', type: 'kitchen_sink_unit', name: '32. 1.4米 開放式廚房雲石中島吧枱', sub: '連吧枱洗手盆及儲物櫃', w: 1400, d: 750, h: 900, topY: 900, color: '#f8fafc' },
       { id: 'furn_bathtub_jp_real', cat: 'kit_bath_furn', type: 'bathtub', name: '33. 日式深型坐泡浸浴缸 (1150mm真凹槽水面)', sub: '專為居屋1470/2000mm浴室設計，連水龍頭及軟枕', w: 1150, d: 680, h: 600, color: '#ffffff' },
       { id: 'furn_bathtub_oval_real', cat: 'kit_bath_furn', type: 'bathtub_oval', name: '34. 1.45米 獨立式鵝蛋形貴妃浴缸 (連龍頭)', sub: '四面立體弧形缸壁+碧藍水面+高彎落地龍頭', w: 1450, d: 720, h: 580, color: '#ffffff' },
@@ -871,10 +1385,10 @@
       { id: 'app_robot_vac', cat: 'appliances', type: 'box', name: '32. 全自動集塵上下水掃拖機械人基站', sub: '解放雙手自動洗拖布', w: 420, d: 450, h: 520, color: '#f8fafc' },
       { id: 'app_bathtub_jp', cat: 'appliances', type: 'bathtub', name: '33. 日式深型浸浴缸 (1150×680mm)', sub: '真實立體凹槽+碧藍水面+龍頭軟枕', w: 1150, d: 680, h: 600, color: '#ffffff' },
       { id: 'app_bathtub_oval', cat: 'appliances', type: 'bathtub_oval', name: '34. 豪華鵝蛋形獨立貴妃浴缸 (1450mm)', sub: '四面立體缸壁+水面+落地水龍頭', w: 1450, d: 720, h: 580, color: '#ffffff' },
-      { id: 'app_shower_glass', cat: 'appliances', type: 'glass_slider', name: '35. 乾濕分離黑框玻璃淋浴屏企缸', sub: '配頂噴雨淋花灑柱', w: 900, d: 900, h: 2000, color: '#7dd3fc' },
+      { id: 'app_shower_glass', cat: 'appliances', type: 'shower_zone_full', name: '35. 乾濕分離黑框玻璃浴屏連雨淋花灑區', sub: '含防滑石基、黑框玻璃趟門、頂噴雨淋花灑柱及置物架', w: 880, d: 880, h: 2050, color: '#7dd3fc' },
       { id: 'app_toilet_smart', cat: 'appliances', type: 'smart_toilet', name: '36. 智能感應自動開蓋座廁', sub: '連水箱、水面及溫水洗淨遙控', w: 410, d: 680, h: 750, color: '#ffffff' },
       { id: 'app_vanity_800', cat: 'appliances', type: 'vanity_unit', name: '37. 800mm 浴室洗手盆櫃連LED防霧鏡櫃', sub: '收納五口之家洗漱用品', w: 800, d: 480, h: 1950, color: '#f8fafc' },
-      { id: 'app_towel_warmer', cat: 'appliances', type: 'box', name: '38. 智能恆溫電熱毛巾架 (掛牆)', sub: '回南天保持毛巾乾爽防霉', w: 500, d: 110, h: 750, y: 1100, color: '#1e293b' },
+      { id: 'app_towel_warmer', cat: 'appliances', type: 'towel_rack_pro', name: '38. 浴室掛牆毛巾架連掛衣鈎工具組合', sub: '多層掛毛巾桿+浴袍掛衣鈎+置物層板', w: 520, d: 120, h: 680, y: 1150, color: '#1e293b' },
       { id: 'app_thermo_vent', cat: 'appliances', type: 'box', name: '39. 浴室寶 (天花式暖風乾衣換氣扇)', sub: '冬天沖涼長輩小孩唔怕凍', w: 400, d: 300, h: 180, y: 2420, color: '#f8fafc' },
       { id: 'app_dehumidifier', cat: 'appliances', type: 'box', name: '40. 28公升抽濕機 (連乾衣功能)', sub: '香港海景單位防潮必備', w: 380, d: 280, h: 600, color: '#f8fafc' },
 
@@ -902,1168 +1416,174 @@
     ];
 
     // ============================================================================
-    // 3. 20 COMPLETE TEMPLATES (FOR ALL 36 UNITS IN BLOCK A & BLOCK B)
+    // 4C. DEDICATED KITCHEN & BATHROOM FULL EQUIPMENT GENERATOR FOR ALL 36 UNITS
     // ============================================================================
-    const BASE_B10_3BR = [
-      // 1. 左中 63歲長輩房 (2000x2150mm, 封 1150mm 缺口 Z=3650..4800)
-      { id: 'wall_brick_100', x: -50, z: 4225, w: 100, d: 1150, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 30, z: 4225, w: 70, d: 850, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: -1020, z: 3620, w: 1900, d: 910, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: -1680, z: 4720, w: 550, d: 900, h: 2450, rot: 0, color: '#d4a373' },
-      { id: 'lt_foot_sensor', x: 40, z: 4820, w: 40, d: 86, h: 86, y: 250, rot: 0, color: '#fef08a' },
+    function getUnitKitchenAndBathroomPackage(unitId, tplNum = 2) {
+      // Cabinet color theme follows template style
+      const cabColor = (tplNum === 9 || tplNum === 12) ? '#e6ccb2'
+                     : (tplNum === 7 || tplNum === 13 || tplNum === 17) ? '#7f5539'
+                     : (tplNum === 11) ? '#cbd5e1' : '#f8fafc';
 
-      // 2. 左上 9歲+6歲雙童房 (2550x2450mm)
-      { id: 'wall_brick_100', x: 2550, z: 1225, w: 100, d: 2450, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1275, z: 2450, w: 2550, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1920, z: 2450, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 1220, z: 540, w: 2250, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_double_1600', x: 360, z: 1680, w: 550, d: 1450, h: 750, rot: 0, color: '#e6ccb2' },
+      // Helper to build standard full Kitchen (Integrated cabinet with Washer + Microwave + Cooktop + Hood + Sink + Fridge)
+      // and full Bathroom (Shower zone with glass screen + Smart Toilet + Vanity cabinet with mirror + Towel/Clothes hanging rack + Thermo ventilator)
+      switch (unitId) {
+        case 'B10':
+          return [
+            // Kitchen (X: 4200..6265, Z: 1800..3450, door at X=4130, Z=2500)
+            { id: 'furn_kit_all_in_one', x: 5950, z: 2625, w: 600, d: 1580, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 4650, z: 2130, w: 600, d: 620, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 2525..4525, Z: 3535..5005, door at X=2740, Z=3465)
+            { id: 'app_shower_glass', x: 4065, z: 3985, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 3950, z: 4655, w: 420, d: 650, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 3020, z: 4745, w: 780, d: 460, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 2595, z: 4250, w: 110, d: 520, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 3525, z: 4270, w: 400, d: 300, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B9':
+          return getUnitKitchenAndBathroomPackage('B10', tplNum).map(it => ({ ...it, x: Math.round(4525 - it.x) }));
 
-      // 3. 右下 父母海景主人房 (2000x2885mm，順延浴室左牆 X=2480 向下至底窗 Z=5080..7965)
-      { id: 'wall_brick_100', x: 2480, z: 6522, w: 100, d: 2885, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2480, z: 5520, w: 110, d: 780, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 3525, z: 6522, w: 2000, d: 2850, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 3550, z: 6420, w: 1900, d: 1370, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 3550, z: 7620, w: 1850, d: 580, h: 2050, y: 400, rot: 0, color: '#f8fafc' },
+        case 'B1':
+        case 'B3':
+          return [
+            // Kitchen (X: 3840..5905, Z: 4515..6165, door at X=3840, Z=4620)
+            { id: 'furn_kit_all_in_one', x: 5590, z: 5340, w: 600, d: 1580, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 4320, z: 5830, w: 600, d: 620, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 2525..4525, Z: 2970..4440, door at X=2750, Z=4440)
+            { id: 'app_shower_glass', x: 4065, z: 3980, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 3950, z: 3310, w: 420, d: 650, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 3020, z: 3220, w: 780, d: 460, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 2595, z: 3700, w: 110, d: 520, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 3525, z: 3700, w: 400, d: 300, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B15':
+          return [
+            // Kitchen (X: 3750..5815, Z: 4515..6165)
+            { id: 'furn_kit_all_in_one', x: 5500, z: 5340, w: 600, d: 1580, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 4230, z: 5830, w: 600, d: 620, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 2525..4525, Z: 2970..4440)
+            { id: 'app_shower_glass', x: 4065, z: 3980, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 3950, z: 3310, w: 420, d: 650, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 3020, z: 3220, w: 780, d: 460, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 2595, z: 3700, w: 110, d: 520, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 3525, z: 3700, w: 400, d: 300, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B4':
+        case 'B6':
+          return getUnitKitchenAndBathroomPackage('B3', tplNum).map(it => ({ ...it, z: Math.round(6165 - it.z) }));
 
-      // 4. 左下 2525mm 海景客飯廳 + 玄關 C字櫃 + Coffee機 + 家電
-      { id: 'bay_window_bench', x: 1220, z: 7720, w: 2150, d: 450, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 450, z: 6450, w: 850, d: 2050, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 2220, z: 6450, w: 360, d: 1750, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 2390, z: 6450, w: 80, d: 1450, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 1550, z: 3950, w: 1150, d: 800, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 3350, z: 220, w: 1200, d: 380, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 3350, z: 240, w: 350, d: 350, h: 390, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'app_fridge_2d', x: 3750, z: 1250, w: 680, d: 650, h: 1820, rot: 0, color: '#475569' },
-      { id: 'lt_mag_track', x: 1250, z: 6450, w: 80, d: 1800, h: 45, y: 2480, rot: 0, color: '#1e293b' }
-    ];
+        case 'B16':
+        case 'B18':
+        case 'A1':
+        case 'A14':
+        case 'A16':
+          return getUnitKitchenAndBathroomPackage('B3', tplNum).map(it => ({ ...it, x: Math.round(4525 - it.x) }));
 
-    const BASE_B1_3BR = [
-      // 1. 左中獨立房 (2000x2150mm, 封 1150mm 缺口 Z=2615..3765)
-      { id: 'wall_brick_100', x: -50, z: 3190, w: 100, d: 1150, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 30, z: 3190, w: 70, d: 850, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: -1020, z: 4220, w: 1900, d: 910, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: -1680, z: 3120, w: 550, d: 900, h: 2450, rot: 0, color: '#d4a373' },
+        case 'A4':
+        case 'A11':
+        case 'A13':
+          return getUnitKitchenAndBathroomPackage('B4', tplNum).map(it => ({ ...it, x: Math.round(4525 - it.x) }));
 
-      // 2. 左下雙童房 (利用左下 2400mm 牆段 X:0..1750, Z:3850..6165，避開底部 X=1920 大門)
-      { id: 'wall_brick_100', x: 1750, z: 5000, w: 100, d: 2300, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 875, z: 3850, w: 1750, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1280, z: 3850, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 520, z: 5020, w: 980, d: 2100, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 1320, z: 5820, w: 680, d: 500, h: 750, rot: 0, color: '#e6ccb2' },
+        case 'B11':
+        case 'B13':
+          return [
+            // Kitchen (X: -1380..685, Z: 0..1650)
+            { id: 'furn_kit_all_in_one', x: -1065, z: 825, w: 600, d: 1580, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 210, z: 330, w: 600, d: 620, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 0..2000, Z: 1810..3280)
+            { id: 'app_shower_glass', x: 460, z: 2260, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 575, z: 2930, w: 420, d: 650, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 1505, z: 3020, w: 780, d: 460, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 1930, z: 2545, w: 110, d: 520, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 1000, z: 2545, w: 400, d: 300, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B14':
+          return getUnitKitchenAndBathroomPackage('B13', tplNum).map(it => ({ ...it, x: Math.round(4900 - it.x) }));
 
-      // 3. 右上景觀主人房 (2000x2885mm，順延浴室左牆 X=2480 向上至頂窗 Z=0..2885)
-      { id: 'wall_brick_100', x: 2480, z: 1442, w: 100, d: 2885, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2480, z: 2420, w: 110, d: 780, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 3525, z: 1442, w: 2000, d: 2850, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 3550, z: 1550, w: 1900, d: 1370, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 3550, z: 340, w: 1850, d: 580, h: 2050, y: 400, rot: 0, color: '#f8fafc' },
+        case 'B21':
+        case 'A19':
+          return [
+            // Kitchen (X: 4515..6165, Z: -1380..685)
+            { id: 'furn_kit_all_in_one', x: 5340, z: -1065, w: 1580, d: 600, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 5830, z: 210, w: 620, d: 600, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 2885..4355, Z: 0..2000)
+            { id: 'app_shower_glass', x: 3900, z: 460, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 3225, z: 575, w: 650, d: 420, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 3135, z: 1505, w: 460, d: 780, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 3620, z: 1930, w: 520, d: 110, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 3620, z: 1000, w: 300, d: 400, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B22':
+        case 'A8':
+        case 'A22':
+          return getUnitKitchenAndBathroomPackage('B21', tplNum).map(it => ({ ...it, x: Math.round(6165 - it.x) }));
 
-      // 4. 左上景觀客廳 + 玄關
-      { id: 'bay_window_bench', x: 1200, z: 260, w: 2150, d: 450, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 450, z: 1450, w: 850, d: 1950, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 2220, z: 1450, w: 360, d: 1650, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 2390, z: 1450, w: 80, d: 1400, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 1450, z: 3150, w: 1100, d: 780, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 3250, z: 5940, w: 950, d: 380, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 3250, z: 5920, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'lt_mag_track', x: 1250, z: 1450, w: 80, d: 1750, h: 45, y: 2480, rot: 0, color: '#1e293b' }
-    ];
+        case 'A9':
+          return getUnitKitchenAndBathroomPackage('B21', tplNum);
 
-    const BASE_B5_COMPACT_1BR = [
-      // 精巧 2350x6165mm 1-Bedroom / Studio (B5 bottom window)
-      { id: 'door_glass_3', x: 1175, z: 3650, w: 2350, d: 90, h: 2450, rot: 0, color: '#7dd3fc' },
-      { id: 'platform_storage', x: 1175, z: 4900, w: 2300, d: 2400, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_4ft', x: 1650, z: 4950, w: 1220, d: 1900, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 320, z: 4950, w: 550, d: 1800, h: 2050, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'sofa_2seat', x: 1900, z: 2550, w: 800, d: 1550, h: 800, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 240, z: 2550, w: 350, d: 1400, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 80, z: 2550, w: 80, d: 1250, h: 780, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'foyer_c_900', x: 1950, z: 950, w: 360, d: 900, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 1950, z: 950, w: 320, d: 320, h: 360, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'lt_mag_track', x: 1175, z: 2550, w: 80, d: 1500, h: 45, y: 2480, rot: 0, color: '#1e293b' }
-    ];
+        case 'A10':
+        case 'A20':
+          return getUnitKitchenAndBathroomPackage('B21', tplNum).map(it => ({ ...it, z: Math.round(4525 - it.z) }));
 
-    function flipB5ItemsToB2(items) {
-      return items.map(it => ({ ...it, z: Math.round(6165 - it.z) }));
-    }
-    function mirrorB5ItemsToB12(items) {
-      return items.map(it => ({ ...it, x: Math.round(2350 - it.x) }));
-    }
-    function mirrorB13ItemsToB14(items) {
-      return items.map(it => ({ ...it, x: Math.round(4900 - it.x) }));
-    }
+        case 'A7':
+        case 'A21':
+          return getUnitKitchenAndBathroomPackage('B21', tplNum).map(it => ({
+            ...it,
+            x: Math.round(6165 - it.x),
+            z: Math.round(4525 - it.z)
+          }));
 
-    function makeTplVariant(num, tag, name, desc, flMain, flSub, wlMain, wlSub, customizeFn) {
-      let b10 = JSON.parse(JSON.stringify(BASE_B10_3BR));
-      let b1 = JSON.parse(JSON.stringify(BASE_B1_3BR));
-      if (customizeFn) {
-        b10 = customizeFn(b10, 'B10');
-        b1 = customizeFn(b1, 'B1');
+        case 'A2':
+          return [
+            // Kitchen (X: 1800..3450, Z: 4200..6265)
+            { id: 'furn_kit_all_in_one', x: 2625, z: 5950, w: 1580, d: 600, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: 2130, z: 4650, w: 620, d: 600, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Bathroom (X: 3535..5005, Z: 2525..4525)
+            { id: 'app_shower_glass', x: 3985, z: 4065, w: 880, d: 880, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: 4655, z: 3950, w: 650, d: 420, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: 4745, z: 3020, w: 460, d: 780, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: 4270, z: 2595, w: 520, d: 110, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: 4270, z: 3525, w: 300, d: 400, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'A3':
+          return getUnitKitchenAndBathroomPackage('A2', tplNum).map(it => ({ ...it, z: Math.round(4525 - it.z) }));
+
+        case 'B5':
+          return [
+            // Compact Kitchen (X: -1415..0, Z: 1725..3490)
+            { id: 'furn_kit_all_in_one', x: -1100, z: 2600, w: 580, d: 1620, h: 2350, rot: 0, color: cabColor },
+            { id: 'app_fridge_3d', x: -350, z: 3150, w: 580, d: 580, h: 1780, rot: 0, color: '#cbd5e1' },
+            // Compact Bathroom (X: -1580..0, Z: 0..1650)
+            { id: 'app_shower_glass', x: -1120, z: 460, w: 840, d: 840, h: 2050, rot: 0, color: '#7dd3fc' },
+            { id: 'app_toilet_smart', x: -1150, z: 1280, w: 640, d: 410, h: 750, rot: 0, color: '#ffffff' },
+            { id: 'app_vanity_800', x: -420, z: 1360, w: 720, d: 450, h: 1950, rot: 0, color: cabColor },
+            { id: 'app_towel_warmer', x: -550, z: 95, w: 500, d: 110, h: 680, y: 1150, rot: 0, color: '#1e293b' },
+            { id: 'app_thermo_vent', x: -790, z: 825, w: 380, d: 300, h: 180, y: 2420, rot: 0, color: '#f8fafc' }
+          ];
+        case 'B2':
+          return getUnitKitchenAndBathroomPackage('B5', tplNum).map(it => ({ ...it, z: Math.round(6165 - it.z) }));
+
+        case 'B12':
+        case 'A12':
+          return getUnitKitchenAndBathroomPackage('B5', tplNum).map(it => ({ ...it, x: Math.round(2350 - it.x) }));
+
+        case 'B17':
+        case 'A15':
+          return getUnitKitchenAndBathroomPackage('B2', tplNum).map(it => ({ ...it, x: Math.round(2350 - it.x) }));
+
+        default:
+          return [];
       }
-      return {
-        id: `tpl_${String(num).padStart(2, '0')}`,
-        tag,
-        name,
-        desc,
-        floors: { liv: flMain, foyer: flMain, rm_left: flSub, rm_top: flSub, rm_bot: flSub, kit: 'fl_light_slate', bath: 'fl_light_slate' },
-        walls: { w_liv: wlMain, w_tv: wlSub, w_rm_left: wlMain, w_rm_top: wlMain, w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: wlMain },
-        items: b10,
-        itemsB1: b1
-      };
     }
 
-    const TWENTY_TEMPLATES = [
-      {
-        id: 'tpl_01',
-        tag: '零傢俬清水房',
-        name: '01. 原裝100%清水房結構 (自由從零設計)',
-        desc: '完全清空所有間牆與傢俬，只保留原裝結構牆、廚廁及窗戶，供準業主100%自由擺放設計。',
-        floors: { liv: 'fl_muji_oak', foyer: 'fl_muji_oak', rm_left: 'fl_muji_oak', rm_top: 'fl_muji_oak', rm_bot: 'fl_muji_oak', kit: 'fl_light_slate', bath: 'fl_light_slate' },
-        walls: { w_liv: 'wl_paint_ivory', w_tv: 'wl_paint_ivory', w_rm_left: 'wl_paint_ivory', w_rm_top: 'wl_paint_ivory', w_kit: 'wl_tile_subway', w_bath: 'wl_tile_terrazzo', w_part: 'wl_paint_ivory' },
-        items: [],
-        itemsB1: []
-      },
-      makeTplVariant(2, '五口之家首選', '02. 五口之家：100mm實心磚牆三房＋全海景廳', '夫婦＋9歲/6歲雙童＋63歲長輩：全屋100mm實心磚牆三房，長輩房零地台近廁所，客飯廳直望海景。', 'fl_muji_oak', 'fl_muji_oak', 'wl_paint_almond', 'wl_slat_oak'),
-      makeTplVariant(3, '4525mm全海景', '03. 五口之家：三連動玻璃趟門主人房＋雙童房＋長輩房', '主人房改用黑框三連動長虹玻璃趟門，日間打開將4525mm全幅海景徹底引入客飯廳！', 'fl_nordic_ash', 'fl_muji_oak', 'wl_paint_ivory', 'wl_marble_carrara', (arr) =>
-        arr.map(it => (it.id === 'wall_brick_100' && it.x === 2480) ? { ...it, id: 'door_glass_3', w: 90, h: 2450, color: '#7dd3fc' } : it)
-      ),
-      makeTplVariant(4, '四口雙孩首選', '04. 四口之家：二孩成長雙人房＋海景主人房＋獨立衣帽間', '雙童房配上下格床及1.6米雙人書枱，側房改為女主人步入式衣帽間及書房。', 'fl_chevron_fr', 'fl_muji_oak', 'wl_paint_almond', 'wl_art_sand'),
-      makeTplVariant(5, '四口一人一房', '05. 四口之家：三間獨立私隱睡房 (兄妹/姐弟分房)', '大仔/大女住側房，細仔/細女住大門旁房，父母住海景主人房，各自擁有獨立書枱與衣櫃。', 'fl_warm_teak', 'fl_muji_oak', 'wl_paint_ivory', 'wl_slat_walnut'),
-      makeTplVariant(6, '三口闊落巨廳', '06. 三口之家：闊落兩房＋步入式衣帽間＋巨型海景廳', '打通大門旁房擴大客飯廳，保留兩間大睡房，空間感媲美私樓千尺大宅。', 'fl_carrara', 'fl_muji_oak', 'wl_art_velvet_w', 'wl_marble_gold', (arr) =>
-        arr.filter(it => it.id !== 'bed_bunk_stairs')
-      ),
-      makeTplVariant(7, '二人世界奢華', '07. 二人世界：海景主人套房＋半開放玻璃書房＋Coffee Bar', '年輕夫婦或新婚首選：全屋通透玻璃隔斷，設專屬意式Coffee Bar及健身閱讀區。', 'fl_chevron_wal', 'fl_amer_walnut', 'wl_art_cement', 'wl_slat_walnut'),
-      makeTplVariant(8, '長輩無障礙', '08. 退休長輩同住：全屋零地台無障礙＋日式深型浸浴缸', '完全取消升高地台防絆倒，走廊加設感應夜燈，浴室配置日式坐泡浸浴缸。', 'fl_warm_teak', 'fl_warm_teak', 'wl_paint_almond', 'wl_wood_oak', (arr) =>
-        arr.filter(it => it.id !== 'platform_storage').concat([{ id: 'furn_bathtub_jp_real', x: 3500, z: 4250, w: 1150, d: 680, h: 600, rot: 0, color: '#ffffff' }])
-      ),
-      makeTplVariant(9, '日式無印原木', '09. 日式Muji無印風：全屋溫潤白橡木＋海量儲物地台', '全屋採用無印自然橡木地板及原木訂造櫃，視覺溫暖治癒。', 'fl_muji_oak', 'fl_honey_maple', 'wl_paint_ivory', 'wl_wood_oak'),
-      makeTplVariant(10, '2026奶油侘寂', '10. 網紅奶油侘寂風：無縫微水泥地板＋奶白弧形傢俬', '全屋採用侘寂風暖灰微水泥地面配搭奶油杏仁白藝術漆，溫柔高級。', 'fl_wabi_cement', 'fl_nordic_ash', 'wl_art_cement', 'wl_art_sand', (arr) =>
-        arr.map(it => ({ ...it, color: '#f8fafc' }))
-      ),
-      makeTplVariant(11, '私樓輕奢雲石', '11. 意式輕奢雲石風：魚肚白金絲雲石廳＋水晶環形吊燈', '客飯廳鋪設魚肚白連紋金絲雲石大板磚，配搭勞倫黑金電視牆及水晶燈。', 'fl_calacatta_gold', 'fl_herring_oak', 'wl_marble_carrara', 'wl_marble_dark'),
-      makeTplVariant(12, '法式魚骨拼風', '12. 法式優雅風：45°法式魚骨拼木地板＋莫蘭迪霧藍牆', '客飯廳及睡房通鋪法式45°魚骨拼淺橡木地板，浪漫高貴。', 'fl_chevron_fr', 'fl_chevron_fr', 'wl_paint_mistblue', 'wl_marble_carrara'),
-      makeTplVariant(13, '45°斜鋪木紋', '13. 現代木系：全屋45°斜鋪北美胡桃木＋木格柵隱形門', '透過45°斜鋪木紋延伸走廊與海景廳視覺闊度。', 'fl_diag_walnut', 'fl_diag_oak', 'wl_paint_almond', 'wl_slat_walnut'),
-      makeTplVariant(14, '極限儲物地台', '14. 收納狂人版：全屋雙房升高400mm儲物地台＋滿牆到頂櫃', '總儲物量提升180%，行李箱、換季被鋪及大型雜物輕鬆收納。', 'fl_herring_ash', 'fl_muji_oak', 'wl_paint_ivory', 'wl_slat_oak'),
-      makeTplVariant(15, '雙人WFH在家工作', '15. 在家工作WFH專版：雙獨立電腦工作站＋隔音玻璃會議室', '專為需要視像會議及雙人電腦工作的專業人士度身設計。', 'fl_grey_oak', 'fl_nordic_ash', 'wl_paint_sage', 'wl_art_cement'),
-      makeTplVariant(16, '音樂鋼琴世家', '16. 鋼琴音樂家庭：客廳預留Yamaha直立鋼琴位＋吸音木格柵牆', '精準預留1520mm直立鋼琴擺位，配搭木條子格柵牆優化室內聲學。', 'fl_herring_oak', 'fl_muji_oak', 'wl_paint_almond', 'wl_slat_oak', (arr) =>
-        arr.concat([{ id: 'piano_upright', x: 350, z: 3150, w: 620, d: 1520, h: 1210, rot: 0, color: '#0f172a' }])
-      ),
-      makeTplVariant(17, '開放式中島吧枱', '17. 社交派對大廳：雲石中島吧枱＋紅酒櫃＋意式Coffee機', '玄關飯廳增設輕食中島吧枱及恆溫紅酒櫃，朋友聚會一流。', 'fl_hermes_grey', 'fl_amer_walnut', 'wl_art_cement', 'wl_marble_dark'),
-      makeTplVariant(18, '北歐森林灰綠', '18. 北歐自然風：鼠尾草灰綠牆身＋北歐白蠟木SPC防水地板', '清新自然配色，讓海景與室內綠意融為一體。', 'fl_nordic_ash', 'fl_nordic_ash', 'wl_paint_sage', 'wl_wood_oak'),
-      makeTplVariant(19, '智能家電滿配', '19. 旗艦家電滿配版：嵌入式蒸焗爐高櫃＋洗乾衣塔＋洗碗機', '預先配置中空電器高櫃、嵌入式蒸焗爐、微波爐、Coffee機及洗乾衣機塔。', 'fl_carrara', 'fl_diag_oak', 'wl_paint_ivory', 'wl_marble_gold', (arr) =>
-        arr.concat([{ id: 'furn_tall_oven_micro', x: 3750, z: 1820, w: 600, d: 600, h: 2450, rot: 0, color: '#334155' }])
-      ),
-      makeTplVariant(20, '毛孩貓狗樂園', '20. 寵物友善設計：防刮防滑石紋地板＋貓跳台高空吊櫃動線', '全屋採用零甲醛防刮防滑地板，配搭高低錯落吊櫃供貓咪走動。', 'fl_travertine', 'fl_nordic_ash', 'wl_art_sand', 'wl_slat_oak')
-    ];
-
-    // ============================================================================
-    // 4. SHARED FLOOR & WALL ZONE MESH BUILDERS + B10, B1..B18 STRUCTURE BUILDERS
-    // ============================================================================
-    function addFloorZoneSlabCommon(zoneId, w, d, x, z, repeatCount = 2.5) {
-      const st = FLOOR_STYLES.find(s => s.id === zoneFloorAssignment[zoneId]) || FLOOR_STYLES[0];
-      const tex = getThreeMaterialTexture(st, repeatCount);
-      const mat = new THREE.MeshStandardMaterial({
-        map: tex,
-        bumpMap: tex,
-        bumpScale: 0.015,
-        roughness: st.rough || 0.4,
-        metalness: 0.05
-      });
-      const geom = new THREE.BoxGeometry(w, 150, d);
-      geom.translate(w / 2, -75, d / 2);
-      const mesh = new THREE.Mesh(geom, mat);
-      mesh.position.set(x, 0, z);
-      mesh.receiveShadow = true;
-      mesh.userData = { isFloorZone: true, zoneId };
-      structureRootGroup.add(mesh);
-      if (!floorZoneMeshes[zoneId]) floorZoneMeshes[zoneId] = [];
-      floorZoneMeshes[zoneId].push({ mesh, repeatCount });
-      return mesh;
-    }
-
-    function addZonedStructWallCommon(wallZoneId, x, z, w, d, extNormal = null, maxH = 2550) {
-      const st = WALL_STYLES.find(s => s.id === zoneWallAssignment[wallZoneId]) || WALL_STYLES[0];
-      const tex = getThreeMaterialTexture(st, 2);
-      const mat = new THREE.MeshStandardMaterial({
-        map: tex,
-        bumpMap: tex,
-        bumpScale: 0.01,
-        roughness: 0.55
-      });
-      const mesh = createBoxWithEdges(w, 1, d, x, 0, z, mat, 0x1e293b, structureRootGroup);
-      mesh.scale.y = 1300;
-      mesh.userData = { isWallZone: true, wallZoneId };
-      if (!wallZoneMeshes[wallZoneId]) wallZoneMeshes[wallZoneId] = [];
-      wallZoneMeshes[wallZoneId].push(mesh);
-      structuralWalls.push({ mesh, extNormal, maxH });
-      return mesh;
-    }
-
-    function addWinSegCommon(wallZoneId, x, z, w, d, sillH = 850, fullWinH = 1450) {
-      addZonedStructWallCommon(wallZoneId, x, z, w, d, null, sillH);
-      const glassMat = new THREE.MeshPhysicalMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.36,
-        roughness: 0.08
-      });
-      const gm = createBoxWithEdges(w, 1, d, x, sillH, z, glassMat, 0x0284c7, structureRootGroup);
-      gm.scale.y = 450;
-      glassMeshes.push({ mesh: gm, sillH, fullWinH });
-    }
-
-    function addDimLabelsList(list) {
-      list.forEach(item => {
-        const sp = createDimensionSprite(item.text, item.color || '#dc2626');
-        sp.position.set(item.x, 120, item.z);
-        dimensionGroup.add(sp);
-      });
-    }
-
-    // --- B10室 Structure (4200 top wall, 2000x2150 left-mid room, 4525 bottom sea window) ---
-    function buildFlat10ZonedStructure() {
-      addFloorZoneSlabCommon('rm_top', 2550, 2450, 0, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 1650, 3440, 2550, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 2480, 2630, 0, 2450, 2.5);
-      addFloorZoneSlabCommon('rm_left', 2000, 2150, -2000, 3150, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 4200, 1800, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 3535, 2);
-      addFloorZoneSlabCommon('liv', 2480, 2885, 0, 5080, 3);
-      addFloorZoneSlabCommon('rm_bot', 2045, 2885, 2480, 5080, 2.5);
-
-      // Top Wall (4200mm) & Upper-Left Wall (3650mm with 2 windows)
-      addZonedStructWallCommon('w_rm_top', -200, -200, 4600, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', -200, 0, 200, 550, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_rm_top', -200, 550, 200, 700);
-      addZonedStructWallCommon('w_rm_top', -200, 1250, 200, 300, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_rm_top', -200, 1550, 200, 700);
-      addZonedStructWallCommon('w_rm_top', -200, 2250, 200, 900, new THREE.Vector3(-1, 0, 0));
-
-      // Left-Mid Protruding Room (2000x2150mm: X=-2000..0, Z=3150..5300, 1150mm opening Z=3650..4800)
-      addZonedStructWallCommon('w_rm_left', -200, 3150, 200, 500, null);
-      addZonedStructWallCommon('w_rm_left', -200, 4800, 200, 500, null);
-      addZonedStructWallCommon('w_rm_left', -2200, 2950, 2200, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_left', -2200, 3150, 200, 450, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_rm_left', -2200, 3600, 200, 1250);
-      addZonedStructWallCommon('w_rm_left', -2200, 4850, 200, 450, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_rm_left', -1750, 5300, 1350, 200);
-      addZonedStructWallCommon('w_rm_left', -400, 5300, 400, 200, new THREE.Vector3(0, 0, 1));
-
-      // Lower-Left Wall (3165mm with window)
-      addZonedStructWallCommon('w_liv', -200, 5300, 200, 850, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_liv', -200, 6150, 200, 950);
-      addZonedStructWallCommon('w_liv', -200, 7100, 200, 865, new THREE.Vector3(-1, 0, 0));
-
-      // Right Entrance, Kitchen (2065x1650mm) & Bathroom (2000x1470mm)
-      addZonedStructWallCommon('w_rm_top', 4200, 0, 200, 650, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_rm_top', 4200, 1500, 200, 300, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 4200, 1600, 2265, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 6265, 1600, 200, 2050, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 4525, 3450, 1940, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_kit', 4115, 1800, 85, 700, null);
-
-      addZonedStructWallCommon('w_bath', 2440, 3450, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2440, 3535, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2440, 5005, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4525, 3450, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      // Lower-Right Wall (2885mm with window) & Bottom Full-Height 4525mm Sea Window
-      addZonedStructWallCommon('w_tv', 4525, 5080, 200, 950, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 4525, 6030, 200, 900);
-      addZonedStructWallCommon('w_tv', 4525, 6930, 200, 1035, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_liv', -200, 7965, 250, 200, new THREE.Vector3(0, 0, 1));
-      addWinSegCommon('w_liv', 50, 7965, 2375, 200, 520, 1750);
-      addZonedStructWallCommon('w_tv', 2425, 7965, 125, 200, new THREE.Vector3(0, 0, 1));
-      addWinSegCommon('w_tv', 2550, 7965, 1925, 200, 520, 1750);
-      addZonedStructWallCommon('w_tv', 4475, 7965, 250, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const d1 = createBoxWithEdges(70, 1, 850, 4200, 0, 650, doorMat, 0x78350f);
-      const d2 = createBoxWithEdges(60, 1, 720, 4130, 0, 2500, bathDoorMat, 0x475569);
-      const d3 = createBoxWithEdges(660, 1, 60, 2740, 0, 3465, bathDoorMat, 0x475569);
-      [d1, d2, d3].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-    }
-
-    function buildOriginalDimensionLabels() {
-      addDimLabelsList([
-        { text: 'B10室 頂牆闊 4200mm', x: 2100, z: -550 },
-        { text: '左上長 3650mm', x: -750, z: 1600 },
-        { text: '側房 2000×2150mm', x: -1100, z: 4225 },
-        { text: '房口通道 1150mm', x: 450, z: 4225 },
-        { text: '左下廳長 3165mm', x: -750, z: 6600 },
-        { text: '底部海景大窗 4525mm', x: 2260, z: 8550 },
-        { text: '右下長 2885mm', x: 5250, z: 6500 },
-        { text: '浴室 2000×1470mm', x: 3525, z: 4270 },
-        { text: '廚房 2065×1650mm', x: 5250, z: 2625 }
-      ]);
-    }
-
-    // --- B9室 Structure (Exact Horizontal Mirror of B10室 around X = 4525) ---
-    function buildFlat9ZonedStructure() {
-      addFloorZoneSlabCommon('rm_top', 2550, 2450, 1975, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 1650, 3440, 325, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 2480, 2630, 2045, 2450, 2.5);
-      addFloorZoneSlabCommon('rm_left', 2000, 2150, 4525, 3150, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, -1740, 1800, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 0, 3535, 2);
-      addFloorZoneSlabCommon('liv', 2480, 2885, 2045, 5080, 3);
-      addFloorZoneSlabCommon('rm_bot', 2045, 2885, 0, 5080, 2.5);
-
-      addZonedStructWallCommon('w_rm_top', 125, -200, 4600, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 4525, 0, 200, 550, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_rm_top', 4525, 550, 200, 700);
-      addZonedStructWallCommon('w_rm_top', 4525, 1250, 200, 300, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_rm_top', 4525, 1550, 200, 700);
-      addZonedStructWallCommon('w_rm_top', 4525, 2250, 200, 900, new THREE.Vector3(1, 0, 0));
-
-      // Right-Mid Protruding Room (2000x2150mm: X=4525..6525, Z=3150..5300)
-      addZonedStructWallCommon('w_rm_left', 4525, 3150, 200, 500, null);
-      addZonedStructWallCommon('w_rm_left', 4525, 4800, 200, 500, null);
-      addZonedStructWallCommon('w_rm_left', 4525, 2950, 2200, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_left', 6525, 3150, 200, 2150, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_rm_left', 4925, 5300, 1350, 200);
-
-      // Lower-Right Wall (3165mm) & Left Kitchen/Bath
-      addZonedStructWallCommon('w_liv', 4525, 5300, 200, 850, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_liv', 4525, 6150, 200, 950);
-      addZonedStructWallCommon('w_liv', 4525, 7100, 200, 865, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_rm_top', 125, 0, 200, 650, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_kit', -1940, 1600, 2265, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', -1940, 1600, 200, 2050, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_kit', -1940, 3450, 1940, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_bath', 0, 3450, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2000, 3535, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 0, 5005, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', -200, 3450, 200, 1630, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_tv', -200, 5080, 200, 950, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_tv', -200, 6030, 200, 900);
-      addZonedStructWallCommon('w_tv', -200, 6930, 200, 1035, new THREE.Vector3(-1, 0, 0));
-
-      addWinSegCommon('w_tv', 50, 7965, 1925, 200, 520, 1750);
-      addWinSegCommon('w_liv', 2100, 7965, 2375, 200, 520, 1750);
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const d1 = createBoxWithEdges(70, 1, 850, 325, 0, 650, doorMat, 0x78350f);
-      const d2 = createBoxWithEdges(60, 1, 720, 325, 0, 2500, bathDoorMat, 0x475569);
-      const d3 = createBoxWithEdges(660, 1, 60, 1125, 0, 3465, bathDoorMat, 0x475569);
-      [d1, d2, d3].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B9室 頂牆闊 4200mm', x: 2400, z: -550 },
-        { text: '右上長 3650mm', x: 5300, z: 1600 },
-        { text: '右側房 2000×2150mm', x: 5525, z: 4225 },
-        { text: '底部減音大窗 4525mm', x: 2260, z: 8550 },
-        { text: '左下長 2885mm', x: -750, z: 6500 },
-        { text: '浴室 2000×1470mm', x: 1000, z: 4270 },
-        { text: '廚房 2065×1650mm', x: -700, z: 2625 }
-      ]);
-    }
-
-    // --- B1室 & B15室 Structure ---
-    function buildFlat1ZonedStructure() {
-      addFloorZoneSlabCommon('liv', 2480, 2885, 0, 0, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2045, 2885, 2480, 0, 2.5);
-      addFloorZoneSlabCommon('rm_left', 2000, 2150, -2000, 2515, 2);
-      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 2885, 2.5);
-      addFloorZoneSlabCommon('foyer', 1400, 1640, 2440, 4525, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 2970, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 4515, 2);
-
-      // Top 4525mm Window Wall & Upper-Left (2615mm) / Upper-Right (2885mm)
-      addWinSegCommon('w_liv', 50, -200, 2375, 200, 520, 1750);
-      addWinSegCommon('w_tv', 2550, -200, 1925, 200, 520, 1750);
-      addZonedStructWallCommon('w_liv', -200, 0, 200, 2515, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_tv', 4525, 0, 200, 950, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 4525, 950, 200, 900);
-      addZonedStructWallCommon('w_tv', 4525, 1850, 200, 1035, new THREE.Vector3(1, 0, 0));
-
-      // Left-Mid Protruding Room (2000x2150mm: X=-2000..0, Z=2515..4665)
-      addZonedStructWallCommon('w_rm_left', -200, 2515, 200, 100, null);
-      addZonedStructWallCommon('w_rm_left', -200, 3765, 200, 900, null);
-      addWinSegCommon('w_rm_left', -1750, 2315, 1350, 200);
-      addZonedStructWallCommon('w_rm_left', -2200, 2315, 200, 2550, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_rm_left', -2000, 4665, 2000, 200, new THREE.Vector3(0, 0, 1));
-
-      // Lower-Left Wall (2400mm) & Bottom Entrance (3840mm)
-      addZonedStructWallCommon('w_rm_top', -200, 4665, 200, 1500, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_rm_top', 0, 6165, 1900, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_rm_top', 2750, 6165, 1090, 200, new THREE.Vector3(0, 0, 1));
-
-      // Bathroom (2000x1470mm) & Kitchen (2065x1650mm)
-      addZonedStructWallCommon('w_bath', 2440, 2885, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2440, 2970, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2440, 4440, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4525, 2885, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_kit', 3840, 4440, 2265, 160, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 5905, 4515, 200, 1850, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 3840, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const d1 = createBoxWithEdges(850, 1, 70, 1900, 0, 6165, doorMat, 0x78350f);
-      const d2 = createBoxWithEdges(700, 1, 60, 2750, 0, 4440, bathDoorMat, 0x475569);
-      const d3 = createBoxWithEdges(60, 1, 720, 3840, 0, 4620, bathDoorMat, 0x475569);
-      [d1, d2, d3].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-    }
-
-    function buildFlat1DimensionLabels() {
-      addDimLabelsList([
-        { text: 'B1室 頂部大窗 4525mm', x: 2260, z: -550 },
-        { text: '左上長 2615mm', x: -750, z: 1300 },
-        { text: '右上長 2885mm', x: 5250, z: 1440 },
-        { text: '側房 2000×2150mm', x: -1100, z: 3590 },
-        { text: '左下牆 2400mm', x: -750, z: 5400 },
-        { text: '底部大門區 3840mm', x: 1920, z: 6680 },
-        { text: '浴室 2000×1470mm', x: 3525, z: 3700 },
-        { text: '廚房 2065×1650mm', x: 4870, z: 5340 }
-      ]);
-    }
-
-    function buildFlat15ZonedStructure() {
-      addFloorZoneSlabCommon('liv', 2480, 2885, 0, 0, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2045, 2885, 2480, 0, 2.5);
-      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 2885, 2.5);
-      addFloorZoneSlabCommon('rm_left', 2000, 2150, -2000, 4015, 2);
-      addFloorZoneSlabCommon('foyer', 1310, 1640, 2440, 4525, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 2970, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 3750, 4515, 2);
-
-      addWinSegCommon('w_liv', 50, -200, 2375, 200, 520, 1750);
-      addWinSegCommon('w_tv', 2550, -200, 1925, 200, 520, 1750);
-      addZonedStructWallCommon('w_liv', -200, 0, 200, 4015, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_tv', 4525, 0, 200, 950, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 4525, 950, 200, 900);
-      addZonedStructWallCommon('w_tv', 4525, 1850, 200, 1035, new THREE.Vector3(1, 0, 0));
-
-      // Lower-Left Protruding Room (2000x2150mm: X=-2000..0, Z=4015..6165)
-      addZonedStructWallCommon('w_rm_left', -200, 4015, 200, 100, null);
-      addZonedStructWallCommon('w_rm_left', -200, 5265, 200, 900, null);
-      addWinSegCommon('w_rm_left', -1750, 3815, 1350, 200);
-      addZonedStructWallCommon('w_rm_left', -2200, 3815, 200, 2550, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_rm_left', -2000, 6165, 2000, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_rm_top', 0, 6165, 1850, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_rm_top', 2700, 6165, 1050, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_bath', 2440, 2885, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2440, 2970, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2440, 4440, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4525, 2885, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_kit', 3750, 4440, 2265, 160, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 5815, 4515, 200, 1850, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 3750, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const d1 = createBoxWithEdges(850, 1, 70, 1850, 0, 6165, doorMat, 0x78350f);
-      const d2 = createBoxWithEdges(700, 1, 60, 2750, 0, 4440, bathDoorMat, 0x475569);
-      const d3 = createBoxWithEdges(60, 1, 720, 3750, 0, 4620, bathDoorMat, 0x475569);
-      [d1, d2, d3].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B15室 頂部大窗 4525mm', x: 2260, z: -550 },
-        { text: '左上長牆 4115mm', x: -750, z: 2050 },
-        { text: '左下側房 2000×2150mm', x: -1100, z: 5190 },
-        { text: '底部大門區 3750mm', x: 1875, z: 6680 },
-        { text: '浴室 2000×1470mm', x: 3525, z: 3700 },
-        { text: '廚房 2065×1650mm', x: 4870, z: 5340 }
-      ]);
-    }
-
-    // --- B3, B4, B6, B16, B18, A1, A14, A16 (4525 x 6165mm 2-Bedroom / 1-Bedroom Series) ---
-    function buildFlat4And6ZonedStructure(unitCode = 'B4') {
-      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 1400, 1810, 2440, 0, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 0, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 1810, 2);
-      addFloorZoneSlabCommon('liv', 2440, 2885, 0, 3280, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2085, 2885, 2440, 3280, 2.5);
-
-      addZonedStructWallCommon('w_rm_top', 0, -200, 1900, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 2750, -200, 1090, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 3840, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 5905, 0, 200, 1850, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 3840, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_rm_top', -200, 0, 200, 3080, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_liv', -200, 3080, 200, 3085, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_bath', 2440, 1725, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2440, 1810, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2440, 3280, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4525, 1725, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_tv', 4525, 3280, 200, 950, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 4525, 4230, 200, 900);
-      addZonedStructWallCommon('w_tv', 4525, 5130, 200, 1035, new THREE.Vector3(1, 0, 0));
-
-      addWinSegCommon('w_liv', 50, 6165, 2375, 200, 520, 1750);
-      addWinSegCommon('w_tv', 2550, 6165, 1925, 200, 520, 1750);
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 1900, 0, 0, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(700, 1, 60, 2750, 0, 1725, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 720, 3840, 0, 920, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: `${unitCode}室 頂部大門區 3840mm`, x: 1920, z: -550 },
-        { text: '左側直牆 6165mm', x: -750, z: 3100 },
-        { text: '底部景觀大窗 4525mm', x: 2260, z: 6680 },
-        { text: '右下長 2885mm', x: 5250, z: 4720 },
-        { text: '浴室 2000×1470mm', x: 3525, z: 2545 },
-        { text: '廚房 2065×1650mm', x: 4870, z: 825 }
-      ]);
-    }
-
-    function buildFlat3ZonedStructure() {
-      addFloorZoneSlabCommon('liv', 2440, 2885, 0, 0, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2085, 2885, 2440, 0, 2.5);
-      addFloorZoneSlabCommon('rm_top', 2440, 3280, 0, 2885, 2.5);
-      addFloorZoneSlabCommon('foyer', 1400, 1640, 2440, 4525, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2525, 2970, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 3840, 4515, 2);
-
-      addWinSegCommon('w_liv', 50, -200, 2375, 200, 520, 1750);
-      addWinSegCommon('w_tv', 2550, -200, 1925, 200, 520, 1750);
-      addZonedStructWallCommon('w_liv', -200, 0, 200, 3080, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_rm_top', -200, 3080, 200, 3085, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_tv', 4525, 0, 200, 950, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 4525, 950, 200, 900);
-      addZonedStructWallCommon('w_tv', 4525, 1850, 200, 1035, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_bath', 2440, 2885, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2440, 2970, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2440, 4440, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4525, 2885, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_rm_top', 0, 6165, 1900, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_rm_top', 2750, 6165, 1090, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_kit', 3840, 4440, 2265, 160, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 5905, 4515, 200, 1850, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 3840, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 1900, 0, 6165, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(700, 1, 60, 2750, 0, 4440, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 720, 3840, 0, 4620, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B3室 頂部大窗 4525mm', x: 2260, z: -550 },
-        { text: '左側直牆 6165mm', x: -750, z: 3100 },
-        { text: '右上長 2885mm', x: 5250, z: 1440 },
-        { text: '底部大門區 3840mm', x: 1920, z: 6680 },
-        { text: '浴室 2000×1470mm', x: 3525, z: 3700 },
-        { text: '廚房 2065×1650mm', x: 4870, z: 5340 }
-      ]);
-    }
-
-    function buildFlat16And18ZonedStructure(unitCode = 'B16') {
-      // Top 4525mm Window, Right 6165mm Straight Wall, Mid-Left Bath (2000x1470), Bottom-Left Kitchen (2065x1650)
-      const corridorW = unitCode === 'B16' ? 1310 : 1400;
-      const botDoorW = unitCode === 'B16' ? 3750 : 3840;
-      addFloorZoneSlabCommon('rm_bot', 2085, 2885, 0, 0, 2.5);
-      addFloorZoneSlabCommon('liv', 2440, 2885, 2085, 0, 2.5);
-      addFloorZoneSlabCommon('rm_top', 2440, 3280, 2085, 2885, 2.5);
-      addFloorZoneSlabCommon('foyer', corridorW, 1640, 2085 - corridorW, 4525, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 0, 2970, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, -1380, 4515, 2);
-
-      addWinSegCommon('w_tv', 50, -200, 1925, 200, 520, 1750);
-      addWinSegCommon('w_liv', 2100, -200, 2375, 200, 520, 1750);
-
-      addZonedStructWallCommon('w_tv', -200, 0, 200, 950, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_tv', -200, 950, 200, 900);
-      addZonedStructWallCommon('w_tv', -200, 1850, 200, 1035, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_liv', 4525, 0, 200, 3080, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_rm_top', 4525, 3080, 200, 3085, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_bath', 0, 2885, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2000, 2970, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 0, 4440, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', -200, 2885, 200, 1630, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_kit', -1580, 4440, 2265, 160, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', -1580, 4515, 200, 1850, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_kit', -1580, 6165, 2265, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_rm_top', 685, 6165, 1100, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_rm_top', 2635, 6165, 1890, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 1785, 0, 6165, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(700, 1, 60, 1030, 0, 4440, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 720, 685, 0, 4620, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: `${unitCode}室 頂部大窗 4525mm`, x: 2260, z: -550 },
-        { text: '右側直牆 6165mm', x: 5250, z: 3100 },
-        { text: '左上長 2885mm', x: -750, z: 1440 },
-        { text: `底部大門區 ${botDoorW}mm`, x: 2600, z: 6680 },
-        { text: '浴室 2000×1470mm', x: 1000, z: 3700 },
-        { text: '廚房 2065×1650mm', x: -350, z: 5340 }
-      ]);
-    }
-
-    // --- B11, B13, B14 (4900mm wide hall + 2000x900 bottom alcove) ---
-    function buildFlat11And13ZonedStructure(unitCode = 'B11') {
-      const topW = unitCode === 'B11' ? 4215 : 4125;
-      addFloorZoneSlabCommon('rm_top', 2815, 3280, 2085, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 1400, 1810, 685, 0, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, -1380, 0, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 0, 1810, 2);
-      addFloorZoneSlabCommon('liv', 2815, 2045, 2085, 3280, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2085, 2945, 0, 3280, 2.5);
-
-      addZonedStructWallCommon('w_rm_top', 685, -200, 1200, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 2735, -200, 2165, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', -1580, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', -1580, 0, 200, 1850, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_kit', -1580, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_bath', 0, 1725, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2000, 1810, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 0, 3280, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', -200, 1725, 200, 1630, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_rm_top', 4900, 0, 200, 2660, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_liv', 4900, 2660, 200, 2665, new THREE.Vector3(1, 0, 0));
-
-      // Bottom-Left 2000x900mm Alcove + Bottom-Right 2690mm Acoustic Window
-      addWinSegCommon('w_tv', -200, 4200, 200, 950);
-      addZonedStructWallCommon('w_tv', -200, 3280, 200, 920, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_tv', -200, 5150, 200, 1075, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_tv', 50, 6225, 1950, 200, 520, 1750);
-      addZonedStructWallCommon('w_tv', 2000, 5325, 210, 900, null);
-      addWinSegCommon('w_liv', 2210, 5325, 2690, 200, 520, 1750);
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 1885, 0, 0, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(700, 1, 60, 1030, 0, 1725, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 720, 685, 0, 920, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: `${unitCode}室 頂牆 ${topW}mm`, x: 2500, z: -550 },
-        { text: '右側長牆 5325mm', x: 5650, z: 2660 },
-        { text: '廳總闊 4900mm', x: 2450, z: 4850 },
-        { text: '左下凸窗 2000×2945mm', x: 1000, z: 6750 },
-        { text: '右下減音窗 2690mm', x: 3550, z: 5850 },
-        { text: '浴室 2000×1470mm', x: 1000, z: 2545 },
-        { text: '廚房 2065×1650mm', x: -350, z: 825 }
-      ]);
-    }
-
-    function buildFlat14ZonedStructure() {
-      // Horizontal Mirror of B13 around X = 4900
-      addFloorZoneSlabCommon('rm_top', 2815, 3280, 0, 0, 2.5);
-      addFloorZoneSlabCommon('foyer', 1400, 1810, 2815, 0, 2);
-      addFloorZoneSlabCommon('kit', 2065, 1650, 4215, 0, 2);
-      addFloorZoneSlabCommon('bath', 2000, 1470, 2900, 1810, 2);
-      addFloorZoneSlabCommon('liv', 2815, 2045, 0, 3280, 2.5);
-      addFloorZoneSlabCommon('rm_bot', 2085, 2945, 2815, 3280, 2.5);
-
-      addZonedStructWallCommon('w_rm_top', 0, -200, 2165, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 3015, -200, 1200, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 4215, -200, 2265, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', 6280, 0, 200, 1850, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 4215, 1650, 2265, 160, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_bath', 2815, 1725, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 2815, 1810, 85, 1470, null);
-      addZonedStructWallCommon('w_bath', 2815, 3280, 2085, 85, null);
-      addZonedStructWallCommon('w_bath', 4900, 1725, 200, 1630, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_rm_top', -200, 0, 200, 2660, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_liv', -200, 2660, 200, 2665, new THREE.Vector3(-1, 0, 0));
-
-      addWinSegCommon('w_liv', 0, 5325, 2690, 200, 520, 1750);
-      addZonedStructWallCommon('w_tv', 2690, 5325, 210, 900, null);
-      addWinSegCommon('w_tv', 2900, 6225, 1950, 200, 520, 1750);
-      addWinSegCommon('w_tv', 4900, 4200, 200, 950);
-      addZonedStructWallCommon('w_tv', 4900, 3280, 200, 920, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_tv', 4900, 5150, 200, 1075, new THREE.Vector3(1, 0, 0));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 2165, 0, 0, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(700, 1, 60, 3150, 0, 1725, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 720, 4215, 0, 920, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B14室 頂牆 4125mm', x: 2400, z: -550 },
-        { text: '左側長牆 5325mm', x: -750, z: 2660 },
-        { text: '廳總闊 4900mm', x: 2450, z: 4850 },
-        { text: '右下凸窗 2000×2945mm', x: 3900, z: 6750 },
-        { text: '左下減音窗 2690mm', x: 1350, z: 5850 },
-        { text: '浴室 2000×1470mm', x: 3900, z: 2545 },
-        { text: '廚房 2065×1650mm', x: 5250, z: 825 }
-      ]);
-    }
-
-    // --- B2, B5, B12, A12 (Compact 2350x6165mm Series) ---
-    function buildFlat2ZonedStructure() {
-      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 0, 2);
-      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 2675, 2);
-      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 4525, 2);
-      addFloorZoneSlabCommon('kit', 1415, 1765, -1415, 2675, 2);
-      addFloorZoneSlabCommon('bath', 1580, 1650, -1580, 4515, 2);
-
-      addWinSegCommon('w_tv', 0, -200, 2350, 200, 520, 1750);
-      addWinSegCommon('w_tv', -200, 150, 200, 840);
-      addZonedStructWallCommon('w_tv', -200, 990, 200, 1685, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_liv', 2350, 0, 200, 6165, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_rm_top', 0, 6165, 450, 200, new THREE.Vector3(0, 0, 1));
-      addZonedStructWallCommon('w_rm_top', 1300, 6165, 1250, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_kit', -1615, 2475, 1615, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_kit', -1615, 2675, 200, 1765, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_bath', -1780, 4440, 1780, 85, null);
-      addZonedStructWallCommon('w_bath', -1780, 4525, 200, 1640, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_bath', -1780, 6165, 1780, 200, new THREE.Vector3(0, 0, 1));
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 450, 0, 6165, doorMat, 0x78350f);
-      const dKit = createBoxWithEdges(60, 1, 680, 0, 0, 3725, bathDoorMat, 0x475569);
-      const dBath = createBoxWithEdges(60, 1, 680, 0, 0, 5425, bathDoorMat, 0x475569);
-      [dMain, dKit, dBath].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B2室 頂窗闊 2350mm', x: 1175, z: -550 },
-        { text: '右側總長 6165mm', x: 3100, z: 3100 },
-        { text: '廚房 1415×1765mm', x: -700, z: 3550 },
-        { text: '浴室 1580×1650mm', x: -790, z: 5340 }
-      ]);
-    }
-
-    function buildFlat5ZonedStructure() {
-      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 0, 2);
-      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 1640, 2);
-      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 3490, 2);
-      addFloorZoneSlabCommon('bath', 1580, 1650, -1580, 0, 2);
-      addFloorZoneSlabCommon('kit', 1415, 1765, -1415, 1725, 2);
-
-      addZonedStructWallCommon('w_rm_top', 0, -200, 450, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 1300, -200, 1250, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_liv', 2350, 0, 200, 6165, new THREE.Vector3(1, 0, 0));
-
-      addZonedStructWallCommon('w_bath', -1780, -200, 1780, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_bath', -1780, 0, 200, 1640, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_bath', -1780, 1640, 1780, 85, null);
-      addZonedStructWallCommon('w_kit', -1615, 1725, 200, 1765, new THREE.Vector3(-1, 0, 0));
-      addZonedStructWallCommon('w_kit', -1615, 3490, 1615, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_tv', -200, 3490, 200, 1685, new THREE.Vector3(-1, 0, 0));
-      addWinSegCommon('w_tv', -200, 5175, 200, 840);
-      addWinSegCommon('w_tv', 0, 6165, 2350, 200, 520, 1750);
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 450, 0, 0, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(60, 1, 680, 0, 0, 150, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 680, 0, 0, 1760, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: 'B5室 底窗闊 2350mm', x: 1175, z: 6680 },
-        { text: '右側總長 6165mm', x: 3100, z: 3100 },
-        { text: '廚房 1415×1765mm', x: -700, z: 2600 },
-        { text: '浴室 1580×1650mm', x: -790, z: 825 }
-      ]);
-    }
-
-    function buildFlat12ZonedStructure(unitCode = 'B12') {
-      const lenLabel = unitCode === 'B12' ? '6000mm' : '6165mm';
-      addFloorZoneSlabCommon('foyer', 2350, 1640, 0, 0, 2);
-      addFloorZoneSlabCommon('liv', 2350, 1850, 0, 1640, 2);
-      addFloorZoneSlabCommon('rm_bot', 2350, 2675, 0, 3490, 2);
-      addFloorZoneSlabCommon('bath', 1580, 1650, 2350, 0, 2);
-      addFloorZoneSlabCommon('kit', 1415, 1765, 2350, 1725, 2);
-
-      addZonedStructWallCommon('w_rm_top', -200, -200, 1250, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_rm_top', 1900, -200, 450, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_liv', -200, 0, 200, 6165, new THREE.Vector3(-1, 0, 0));
-
-      addZonedStructWallCommon('w_bath', 2350, -200, 1780, 200, new THREE.Vector3(0, 0, -1));
-      addZonedStructWallCommon('w_bath', 3930, 0, 200, 1640, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_bath', 2350, 1640, 1780, 85, null);
-      addZonedStructWallCommon('w_kit', 3765, 1725, 200, 1765, new THREE.Vector3(1, 0, 0));
-      addZonedStructWallCommon('w_kit', 2350, 3490, 1615, 200, new THREE.Vector3(0, 0, 1));
-
-      addZonedStructWallCommon('w_tv', 2350, 3490, 200, 1685, new THREE.Vector3(1, 0, 0));
-      addWinSegCommon('w_tv', 2350, 5175, 200, 840);
-      addWinSegCommon('w_tv', 0, 6165, 2350, 200, 520, 1750);
-
-      const doorMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.5 });
-      const bathDoorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4 });
-      const dMain = createBoxWithEdges(850, 1, 70, 1050, 0, 0, doorMat, 0x78350f);
-      const dBath = createBoxWithEdges(60, 1, 680, 2350, 0, 150, bathDoorMat, 0x475569);
-      const dKit = createBoxWithEdges(60, 1, 680, 2350, 0, 1760, bathDoorMat, 0x475569);
-      [dMain, dBath, dKit].forEach(d => { d.scale.y = 1200; fixedDoors.push(d); });
-
-      addDimLabelsList([
-        { text: `${unitCode}室 底窗闊 2350mm`, x: 1175, z: 6680 },
-        { text: `左側總長 ${lenLabel}`, x: -750, z: 3100 },
-        { text: '廚房 1415×1765mm', x: 3050, z: 2600 },
-        { text: '浴室 1580×1650mm', x: 3140, z: 825 }
-      ]);
-    }
-
-    // ============================================================================
-    // 4B. MULTI-UNIT ARCHETYPE TEMPLATE GENERATOR (TAILORED 20 TEMPLATES FOR ALL 36 UNITS: Block A 18 Units + Block B 18 Units)
-    // ============================================================================
-    const UNIT_META = {
-      // Block A (18 Units: A1..A4, A7..A16, A19..A22)
-      A1:  { block: 'A', type: '2BR', group: 'MID_4525', label: 'A1室｜兩房/大一房 (4525×6165mm 頂窗+左廚廁)' },
-      A2:  { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A2室｜橫向三房大單位 (右窗4525+頂凸房2150×2000)' },
-      A3:  { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A3室｜橫向三房大單位 (右窗4525+底凸房2150×2000)' },
-      A4:  { block: 'A', type: '2BR', group: 'MID_4525', label: 'A4室｜兩房/大一房 (4525×6165mm 底窗+左廚廁)' },
-      A7:  { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A7室｜橫向三房單位 (右窗4525+頂凸房+左大門)' },
-      A8:  { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A8室｜橫向三房單位 (右窗4525+左下凸房2150×2000)' },
-      A9:  { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A9室｜橫向三房單位 (左窗4525+右下凸房2150×2000)' },
-      A10: { block: 'A', type: '2BR', group: 'HORIZ_6165', label: 'A10室｜橫向兩房/大一房 (左窗4525×頂牆6165mm)' },
-      A11: { block: 'A', type: '2BR', group: 'MID_4525', label: 'A11室｜兩房/大一房 (4525×6165mm 底窗+左廚廁)' },
-      A12: { block: 'A', type: '1BR', group: 'COMPACT',  label: 'A12室｜精巧開放式/一房 (2350×6165mm 底窗+右廚廁)' },
-      A13: { block: 'A', type: '2BR', group: 'MID_4525', label: 'A13室｜兩房/大一房 (4525×6165mm 底窗+左廚廁)' },
-      A14: { block: 'A', type: '2BR', group: 'MID_4525', label: 'A14室｜兩房/大一房 (4525×6165mm 頂窗+左廚廁)' },
-      A15: { block: 'A', type: '1BR', group: 'COMPACT',  label: 'A15室｜精巧開放式/一房 (2350×6165mm 頂窗+右廚廁)' },
-      A16: { block: 'A', type: '2BR', group: 'MID_4525', label: 'A16室｜兩房/大一房 (4525×6165mm 頂窗+左廚廁)' },
-      A19: { block: 'A', type: '2BR', group: 'HORIZ_6165', label: 'A19室｜橫向兩房/大一房 (左窗4525×底牆6165mm+1310玄關)' },
-      A20: { block: 'A', type: '2BR', group: 'HORIZ_6165', label: 'A20室｜橫向兩房/大一房 (左窗4525×頂牆6165mm+1310玄關)' },
-      A21: { block: 'A', type: '2BR', group: 'HORIZ_6165', label: 'A21室｜橫向兩房/大一房 (右減音窗4525×頂牆6165mm)' },
-      A22: { block: 'A', type: '3BR', group: 'HORIZ_3BR_A', label: 'A22室｜橫向三房單位 (右窗4525+下中凸房2150×2000)' },
-
-      // Block B (18 Units)
-      B1:  { block: 'B', type: '3BR', group: '3BR_L',    label: 'B1室｜三房大單位 (4525mm頂窗+左中凸房)' },
-      B2:  { block: 'B', type: '1BR', group: 'COMPACT',  label: 'B2室｜精巧開放式/一房 (2350×6165mm 頂窗)' },
-      B3:  { block: 'B', type: '2BR', group: 'MID_4525', label: 'B3室｜兩房/大一房 (4525×6165mm 頂窗)' },
-      B4:  { block: 'B', type: '2BR', group: 'MID_4525', label: 'B4室｜兩房/大一房 (4525×6165mm 底窗)' },
-      B5:  { block: 'B', type: '1BR', group: 'COMPACT',  label: 'B5室｜精巧開放式/一房 (2350×6165mm 底窗)' },
-      B6:  { block: 'B', type: '2BR', group: 'MID_4525', label: 'B6室｜兩房/大一房 (4525×6165mm 底窗)' },
-      B9:  { block: 'B', type: '3BR', group: '3BR_L',    label: 'B9室｜三房大單位 (4525mm底窗+右中凸房)' },
-      B10: { block: 'B', type: '3BR', group: '3BR_L',    label: 'B10室｜三房大單位 (4525mm底窗+左中凸房)' },
-      B11: { block: 'B', type: '2BR', group: 'MID_4900', label: 'B11室｜兩房連凸窗台 (4900×5325mm 減音窗)' },
-      B12: { block: 'B', type: '1BR', group: 'COMPACT',  label: 'B12室｜精巧開放式/一房 (2350×6000mm 減音窗)' },
-      B13: { block: 'B', type: '2BR', group: 'MID_4900', label: 'B13室｜兩房連凸窗台 (4900×5325mm 減音窗)' },
-      B14: { block: 'B', type: '2BR', group: 'MID_4900', label: 'B14室｜兩房連凸窗台 (4900×5325mm 右凸窗)' },
-      B15: { block: 'B', type: '3BR', group: '3BR_L',    label: 'B15室｜三房大單位 (4525mm頂窗+4115左牆+左下凸房)' },
-      B16: { block: 'B', type: '2BR', group: 'MID_4525', label: 'B16室｜兩房/大一房 (4525×6165mm 頂窗+左廚廁)' },
-      B17: { block: 'B', type: '1BR', group: 'COMPACT',  label: 'B17室｜精巧開放式/一房 (2350×6165mm 頂窗+右廚廁)' },
-      B18: { block: 'B', type: '2BR', group: 'MID_4525', label: 'B18室｜兩房/大一房 (4525×6165mm 頂窗+1400玄關)' },
-      B21: { block: 'B', type: '2BR', group: 'HORIZ_6165', label: 'B21室｜橫向兩房/大一房 (左窗4525×底牆6165mm)' },
-      B22: { block: 'B', type: '2BR', group: 'HORIZ_6165', label: 'B22室｜橫向兩房/大一房 (右窗4525×底牆6165mm)' }
-    };
-
-    // Helper to mirror B10 items horizontally around X = 4525 for B9室 (exact mirror twin of B10)
-    function mirrorB10ItemsToB9(items) {
-      return items.map(it => ({
-        ...it,
-        x: Math.round(4525 - it.x)
-      }));
-    }
-
-    // --- B15室 專屬三房基準配置 (上方4525mm大窗、左牆長4115mm、左下凸出2000×2150側房、下方3750mm大門、中右浴室、右下廚房) ---
-    const BASE_B15_3BR = [
-      // 1. 左下獨立側房 (2000x2150mm: X=-2000..0, Z=4115..6265, 封 1150mm 房口 Z=4115..5265)
-      { id: 'wall_brick_100', x: -50, z: 4690, w: 100, d: 1150, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 30, z: 4690, w: 70, d: 850, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: -1020, z: 5650, w: 1900, d: 910, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: -1680, z: 4550, w: 550, d: 900, h: 2450, rot: 0, color: '#d4a373' },
-
-      // 2. 左中兒童房 (利用 B15 加長至 4115mm 的左牆中段 X:0..2150, Z:2200..4050，保留左上 2200mm 景觀大廳！)
-      { id: 'wall_brick_100', x: 2150, z: 3125, w: 100, d: 1850, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1075, z: 2200, w: 2150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1075, z: 4050, w: 2150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1650, z: 4050, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 520, z: 3125, w: 980, d: 1750, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 1580, z: 2550, w: 750, d: 500, h: 750, rot: 0, color: '#e6ccb2' },
-
-      // 3. 右上景觀主人房 (2000x2885mm，順延浴室左牆 X=2480 由 Z=0 至 Z=2885)
-      { id: 'wall_brick_100', x: 2480, z: 1442, w: 100, d: 2885, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2480, z: 2420, w: 110, d: 780, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 3525, z: 1442, w: 2000, d: 2850, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 3550, z: 1550, w: 1900, d: 1370, h: 520, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 3550, z: 340, w: 1850, d: 580, h: 2450, rot: 0, color: '#f8fafc' },
-
-      // 4. 左上景觀客廳 + 下方玄關飯廳 + Coffee機/蒸焗爐
-      { id: 'bay_window_bench', x: 1200, z: 260, w: 2150, d: 450, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_2seat', x: 450, z: 1250, w: 820, d: 1650, h: 800, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 2220, z: 1250, w: 360, d: 1550, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 2390, z: 1250, w: 80, d: 1400, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 1150, z: 5150, w: 1150, d: 800, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 3150, z: 5940, w: 950, d: 380, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 3150, z: 5920, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a373' },
-      { id: 'app_fridge_2d', x: 3380, z: 4880, w: 680, d: 650, h: 1820, rot: 0, color: '#475569' },
-      { id: 'lt_mag_track', x: 1250, z: 1250, w: 80, d: 1650, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    // --- B21室 (左窗4525mm × 底牆6165mm，右上凸出廚房，中上浴室，右牆大門) 專屬兩房基準配置 ---
-    const BASE_B21_2BR = [
-      // 1. 左上景觀主人房 (2885 x 2000mm，順延浴室下牆 Z=2040 向左至左窗 X:0..2885, Z:0..2000)
-      { id: 'wall_brick_100', x: 1442, z: 2040, w: 2885, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2420, z: 2040, w: 780, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 1442, z: 1000, w: 2840, d: 1980, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 1550, z: 980, w: 1370, d: 1900, h: 520, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 340, z: 980, w: 580, d: 1850, h: 2450, rot: 0, color: '#f8fafc' },
-
-      // 2. 右下兒童房 / 多功能房 (利用底部 6165mm 長牆右段 X:3850..6165, Z:2800..4525，避開右上 X=6165, Z=2300 大門！)
-      { id: 'wall_brick_100', x: 3850, z: 3660, w: 100, d: 1725, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 5000, z: 2800, w: 2300, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 4350, z: 2800, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 5050, z: 3980, w: 2150, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 5820, z: 3180, w: 500, d: 680, h: 750, rot: 0, color: '#e6ccb2' },
-
-      // 3. 左下景觀客飯廳 (X:0..3800, Z:2085..4525) + 玄關 Coffee Bar
-      { id: 'bay_window_bench', x: 260, z: 3300, w: 450, d: 2150, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 1650, z: 4050, w: 2050, d: 850, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 1650, z: 2260, w: 1750, d: 360, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 1650, z: 2110, w: 1450, d: 80, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 3150, z: 3350, w: 850, d: 1200, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 5940, z: 1250, w: 380, d: 950, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 5920, z: 1250, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'lt_mag_track', x: 1650, z: 3250, w: 1900, d: 80, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    function mirrorB21ItemsToB22(items) {
-      return items.map(it => ({
-        ...it,
-        x: Math.round(6165 - it.x)
-      }));
-    }
-
-    // --- A2室 (右窗4525mm，頂部凸出側房2150×2000mm，左牆5555mm，左下大門，中下廚廁) 專屬三房基準配置 ---
-    const BASE_A2_3BR = [
-      // 1. 頂部凸出獨立側房 (2150 x 2000mm: X=3650..5800, Z=-2000..0，封 1150mm 房口 X=3650..4800)
-      { id: 'wall_brick_100', x: 4225, z: -50, w: 1150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 4225, z: 30, w: 850, d: 70, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: 4300, z: -1020, w: 910, d: 1900, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: 5300, z: -1680, w: 900, d: 550, h: 2450, rot: 0, color: '#d4a373' },
-
-      // 2. 左上兒童房 (利用左上 3650mm 窗牆區 X:0..2450, Z:0..2400，避開左下大門通道)
-      { id: 'wall_brick_100', x: 2450, z: 1200, w: 100, d: 2400, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1225, z: 2400, w: 2450, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1850, z: 2400, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 1180, z: 550, w: 2200, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_double_1600', x: 350, z: 1650, w: 550, d: 1350, h: 750, rot: 0, color: '#e6ccb2' },
-
-      // 3. 右下景觀主人房 (2885 x 2000mm，順延浴室上牆 Z=2480 向右至右窗 X=5080..7965, Z=2525..4525)
-      { id: 'wall_brick_100', x: 6520, z: 2480, w: 2885, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 5520, z: 2480, w: 780, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 6520, z: 3525, w: 2850, d: 2000, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 6420, z: 3550, w: 1370, d: 1900, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 7620, z: 3550, w: 580, d: 1850, h: 2100, y: 400, rot: 0, color: '#f8fafc' },
-
-      // 4. 右上景觀客廳 (X:5080..7965, Z:0..2440) + 中央飯廳 + 玄關 Coffee Bar
-      { id: 'bay_window_bench', x: 7720, z: 1220, w: 450, d: 2150, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 6550, z: 450, w: 2000, d: 850, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 6550, z: 2220, w: 1750, d: 360, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 6550, z: 2390, w: 1450, d: 80, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 3950, z: 1550, w: 800, d: 1250, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 220, z: 3380, w: 400, d: 1200, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 240, z: 3380, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'lt_mag_track', x: 6550, z: 1250, w: 1900, d: 80, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    function flipA2ItemsToA3(items) {
-      return items.map(it => ({ ...it, z: Math.round(4525 - it.z) }));
-    }
-
-    // --- A7室 (右窗4525mm，頂部凸出側房2150×2000mm，頂左2350+房口1150+頂右2665=6165，左牆大門3750mm) 專屬三房基準配置 ---
-    const BASE_A7_3BR = [
-      // 1. 頂部凸出側房 (X=2350..4500, Z=-2000..0，封 1150mm 房口 X=2350..3500)
-      { id: 'wall_brick_100', x: 2925, z: -50, w: 1150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 2925, z: 30, w: 850, d: 70, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: 3000, z: -1020, w: 910, d: 1900, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: 4000, z: -1680, w: 900, d: 550, h: 2450, rot: 0, color: '#d4a373' },
-
-      // 2. 左上房 (利用左上 2350mm 牆段 X:0..2100, Z:0..1750，避開左牆 Z=2100 大門)
-      { id: 'wall_brick_100', x: 2100, z: 875, w: 100, d: 1750, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1050, z: 1750, w: 2100, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1550, z: 1750, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 1050, z: 520, w: 2000, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-
-      // 3. 右下景觀主人房 (2885 x 2000mm: X=3280..6165, Z=2525..4525)
-      { id: 'wall_brick_100', x: 4722, z: 2480, w: 2885, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 3720, z: 2480, w: 780, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 4722, z: 3525, w: 2850, d: 2000, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 4620, z: 3550, w: 1370, d: 1900, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 5820, z: 3550, w: 580, d: 1850, h: 2100, y: 400, rot: 0, color: '#f8fafc' },
-
-      // 4. 右上景觀客飯廳 (X:3280..6165, Z:0..2440)
-      { id: 'bay_window_bench', x: 5900, z: 1220, w: 450, d: 2150, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 4750, z: 450, w: 2000, d: 850, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 4750, z: 2220, w: 1700, d: 360, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 4750, z: 2390, w: 1450, d: 80, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 2750, z: 1250, w: 800, d: 1150, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 220, z: 3150, w: 380, d: 950, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'lt_mag_track', x: 4750, z: 1250, w: 1850, d: 80, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    // --- A8室 & A9室 (A8: 右窗4525mm + 左下凸出側房2150×2000 + 底右4115mm；A9為左右鏡像) 專屬三房基準配置 ---
-    const BASE_A8_3BR = [
-      // 1. 左下凸出側房 (X=0..2150, Z=4525..6525，封 1150mm 房口 X=900..2050)
-      { id: 'wall_brick_100', x: 1475, z: 4575, w: 1150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 1475, z: 4495, w: 850, d: 70, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: 520, z: 5525, w: 910, d: 1900, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: 1620, z: 6180, w: 900, d: 550, h: 2450, rot: 0, color: '#d4a373' },
-
-      // 2. 下中兒童房 (利用底部 4115mm 長牆中段 X:2150..3950, Z:2400..4525)
-      { id: 'wall_brick_100', x: 2150, z: 3460, w: 100, d: 2125, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 3950, z: 3460, w: 100, d: 2125, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 3050, z: 2400, w: 1800, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2600, z: 2400, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 3050, z: 3980, w: 1700, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-
-      // 3. 右上景觀主人房 (2885 x 2000mm: X=3280..6165, Z=0..2000)
-      { id: 'wall_brick_100', x: 4722, z: 2040, w: 2885, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 3720, z: 2040, w: 780, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 4722, z: 1000, w: 2850, d: 1980, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 4620, z: 980, w: 1370, d: 1900, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 5820, z: 980, w: 580, d: 1850, h: 2100, y: 400, rot: 0, color: '#f8fafc' },
-
-      // 4. 右下景觀客飯廳 (X:4000..6165, Z:2085..4525) + 玄關
-      { id: 'bay_window_bench', x: 5900, z: 3300, w: 450, d: 2150, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_2seat', x: 4950, z: 4050, w: 1650, d: 820, h: 800, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 4950, z: 2260, w: 1550, d: 360, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 4950, z: 2110, w: 1400, d: 80, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 1050, z: 3350, w: 800, d: 1150, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 220, z: 1250, w: 380, d: 950, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'lt_mag_track', x: 4950, z: 3250, w: 1650, d: 80, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    // --- A22室 (右窗4525mm + 下中偏左凸出側房2150×2000 [底左2700+房口1150+底右2315=6165] + 左上廚房 + 中上浴室 + 左牆大門3750mm) 專屬三房基準配置 ---
-    const BASE_A22_3BR = [
-      // 1. 下中凸出獨立側房 (2150 x 2000mm: X=1800..3950, Z=4525..6525，封 1150mm 房口 X=2700..3850)
-      { id: 'wall_brick_100', x: 3275, z: 4575, w: 1150, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_slide_wood', x: 3275, z: 4495, w: 850, d: 70, h: 2150, rot: 0, color: '#b45309' },
-      { id: 'bed_single_3ft', x: 2320, z: 5525, w: 910, d: 1900, h: 520, rot: 0, color: '#e6ccb2' },
-      { id: 'wardrobe_compact_900', x: 3420, z: 6180, w: 900, d: 550, h: 2450, rot: 0, color: '#d4a373' },
-
-      // 2. 左下兒童房 (利用左下 2700mm 牆段 X:0..2400, Z:2800..4525，避開左牆 Z=1825 大門及 X=2700 側房口！)
-      { id: 'wall_brick_100', x: 2400, z: 3660, w: 100, d: 1725, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 1200, z: 2800, w: 2400, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1850, z: 2800, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 1150, z: 3980, w: 2100, d: 980, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 350, z: 3200, w: 500, d: 680, h: 750, rot: 0, color: '#e6ccb2' },
-
-      // 3. 右上景觀主人房 (2885 x 2000mm: X=3280..6165, Z=0..2000)
-      { id: 'wall_brick_100', x: 4722, z: 2040, w: 2885, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 3720, z: 2040, w: 780, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 4722, z: 1000, w: 2850, d: 1980, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 4620, z: 980, w: 1370, d: 1900, h: 520, y: 400, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 5820, z: 980, w: 580, d: 1850, h: 2100, y: 400, rot: 0, color: '#f8fafc' },
-
-      // 4. 右下景觀客飯廳 (X:3900..6165, Z:2085..4525) + 玄關
-      { id: 'bay_window_bench', x: 5900, z: 3300, w: 450, d: 2150, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_2seat', x: 4950, z: 4050, w: 1650, d: 820, h: 800, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 4950, z: 2260, w: 1550, d: 360, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 4950, z: 2110, w: 1400, d: 80, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 3250, z: 2850, w: 800, d: 1150, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 220, z: 1250, w: 380, d: 950, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'furn_coffee_machine', x: 240, z: 1250, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a3b8' },
-      { id: 'lt_mag_track', x: 4950, z: 3250, w: 1650, d: 80, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    function mirrorA8ItemsToA9(items) {
-      return items.map(it => ({ ...it, x: Math.round(6165 - it.x) }));
-    }
-    function flipB21ItemsToA10(items) {
-      return items.map(it => ({ ...it, z: Math.round(4525 - it.z) }));
-    }
-    function rotateB21ItemsToA21(items) {
-      return items.map(it => ({
-        ...it,
-        x: Math.round(6165 - it.x),
-        z: Math.round(4525 - it.z)
-      }));
-    }
-
-    // Base 2-Bedroom / 1-Bedroom templates for B3 (Top Window 4525x6165), B4 & B6 (Bottom Window 4525x6165)
-    const BASE_B4_B6_2BR = [
-      // 右下景觀主人房 (2000 x 2885mm, 順延浴室左牆 X=2480 向下至底窗 Z=3280..6165)
-      { id: 'wall_brick_100', x: 2480, z: 4722, w: 100, d: 2885, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2480, z: 3720, w: 110, d: 780, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 3500, z: 4722, w: 1980, d: 2840, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 3520, z: 4550, w: 1900, d: 1370, h: 520, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 3520, z: 5820, w: 1850, d: 580, h: 2450, rot: 0, color: '#f8fafc' },
-      // 左上多功能房 / 童房 (利用左上 2400mm 牆段 X:0..1750, Z:0..2250，避開 X=1900 大門)
-      { id: 'wall_brick_100', x: 1750, z: 1125, w: 100, d: 2250, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 875, z: 2250, w: 1750, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 1300, z: 2250, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 520, z: 1120, w: 980, d: 2100, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 1360, z: 320, w: 650, d: 500, h: 750, rot: 0, color: '#e6ccb2' },
-      // 左下景觀客飯廳 (X:0..2440, Z:2350..6165) + 玄關
-      { id: 'foyer_c_1200', x: 3250, z: 220, w: 950, d: 380, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'app_fridge_2d', x: 3420, z: 1250, w: 680, d: 650, h: 1820, rot: 0, color: '#475569' },
-      { id: 'dining_fold_5p', x: 1850, z: 2950, w: 850, d: 1150, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'sofa_3seat', x: 450, z: 4750, w: 850, d: 2000, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 2220, z: 4750, w: 360, d: 1700, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 2390, z: 4750, w: 80, d: 1450, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'bay_window_bench', x: 1200, z: 5900, w: 2150, d: 450, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'lt_mag_track', x: 1250, z: 4750, w: 80, d: 1900, h: 45, y: 2450, rot: 0, color: '#1e293b' },
-      { id: 'lt_dining_linear', x: 1850, z: 2950, w: 120, d: 950, h: 350, y: 1950, rot: 0, color: '#d97706' }
-    ];
-
-    function flipB4ItemsToB3(items) {
-      return items.map(it => ({
-        ...it,
-        z: Math.round(6165 - it.z)
-      }));
-    }
-
-    // Base 2-Bedroom / 1-Bedroom templates for B11 & B13 (4900mm wide hall, bottom-left 2000x900 alcove, right wall 5325mm)
-    const BASE_B11_B13_2BR = [
-      // 1. 左下凸窗主人房 (2000 x 2945mm，順延浴室右牆 X=2040 向下至凸窗底 Z=3280..6225)
-      { id: 'wall_brick_100', x: 2040, z: 4750, w: 100, d: 2945, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 2040, z: 3720, w: 110, d: 780, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'platform_storage', x: 1000, z: 4750, w: 1980, d: 2900, h: 400, rot: 0, color: '#d4a373' },
-      { id: 'bed_double_45ft', x: 980, z: 4650, w: 1900, d: 1370, h: 520, rot: 0, color: '#f8fafc' },
-      { id: 'wardrobe_slide_1500', x: 980, z: 5900, w: 1800, d: 580, h: 2450, rot: 0, color: '#f8fafc' },
-      // 2. 右上兒童房 / 多功能房 (X:3050..4900, Z:0..2350，避開頂部中央大門 X=2200)
-      { id: 'wall_brick_100', x: 3050, z: 1175, w: 100, d: 2350, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'wall_brick_100', x: 3975, z: 2350, w: 1850, d: 100, h: 2550, rot: 0, color: '#ea580c' },
-      { id: 'door_wood_room', x: 3500, z: 2350, w: 750, d: 110, h: 2100, rot: 0, color: '#d97706' },
-      { id: 'bed_bunk_stairs', x: 4350, z: 1175, w: 980, d: 2100, h: 1750, rot: 0, color: '#60a5fa' },
-      { id: 'desk_single_1000', x: 3500, z: 320, w: 680, d: 500, h: 750, rot: 0, color: '#e6ccb2' },
-      // 3. 右下 2690mm 減音大窗客飯廳 + 玄關
-      { id: 'bay_window_bench', x: 3550, z: 5080, w: 2200, d: 450, h: 450, rot: 0, color: '#e6ccb2' },
-      { id: 'sofa_3seat', x: 4450, z: 3950, w: 850, d: 1950, h: 820, rot: 0, color: '#f8fafc' },
-      { id: 'tv_console', x: 2300, z: 3950, w: 360, d: 1650, h: 450, rot: 0, color: '#7f5539' },
-      { id: 'app_tv_65', x: 2130, z: 3950, w: 80, d: 1400, h: 840, y: 850, rot: 0, color: '#0f172a' },
-      { id: 'dining_fold_5p', x: 2850, z: 2800, w: 800, d: 1150, h: 750, rot: 0, color: '#d4a373' },
-      { id: 'foyer_c_1200', x: 1650, z: 220, w: 950, d: 380, h: 2500, rot: 0, color: '#f8fafc' },
-      { id: 'lt_mag_track', x: 3450, z: 3950, w: 80, d: 1800, h: 45, y: 2450, rot: 0, color: '#1e293b' }
-    ];
-
-    // Dynamically resolves the 20 tailored items for ANY of the 28 units (Block A 10 Units + Block B 18 Units) and template index (tpl_01..tpl_20)
+    // Dynamically resolves the 20 tailored items for ANY of the 36 units (Block A 18 Units + Block B 18 Units) and template index (tpl_01..tpl_20), ALWAYS including full Kitchen & Bathroom!
     function getItemsForUnitAndTemplate(unitId, tpl) {
       if (tpl.id === 'tpl_01') return [];
-      if (unitId === 'B10') return tpl.items || [];
-      if (unitId === 'B1') return tpl.itemsB1 || [];
-      if (unitId === 'B9') return mirrorB10ItemsToB9(tpl.items || []);
-
       const tplNum = parseInt(tpl.id.replace('tpl_', ''), 10) || 2;
+      const kitBathItems = getUnitKitchenAndBathroomPackage(unitId, tplNum);
+
+      if (unitId === 'B10') return (tpl.items || []).concat(kitBathItems);
+      if (unitId === 'B1') return (tpl.itemsB1 || []).concat(kitBathItems);
+      if (unitId === 'B9') return mirrorB10ItemsToB9(tpl.items || []).concat(kitBathItems);
 
       // A2室, A3室, A7室, A8室, A9室, A22室 (Block A Horizontal 3-Bedroom Layouts)
       if (unitId === 'A2' || unitId === 'A3' || unitId === 'A7' || unitId === 'A8' || unitId === 'A9' || unitId === 'A22') {
@@ -2085,9 +1605,9 @@
         }
         if (tplNum === 10) list = list.map(it => ({ ...it, color: '#f8fafc' }));
         if (tplNum === 11) list.push({ id: 'lt_crystal_ring', x: 5200, z: 1400, w: 850, d: 850, h: 420, y: 2050, rot: 0, color: '#fbbf24' });
-        if (unitId === 'A3') return flipA2ItemsToA3(list);
-        if (unitId === 'A9') return mirrorA8ItemsToA9(list);
-        return list;
+        if (unitId === 'A3') return flipA2ItemsToA3(list).concat(kitBathItems);
+        if (unitId === 'A9') return mirrorA8ItemsToA9(list).concat(kitBathItems);
+        return list.concat(kitBathItems);
       }
 
       // B15室 (Top 4525 window + 4115 left wall + lower-left 2000x2150 side room)
@@ -2113,7 +1633,7 @@
         if (tplNum === 19) {
           list.push({ id: 'furn_tall_oven_micro', x: 3380, z: 5450, w: 600, d: 600, h: 2400, rot: 0, color: '#475569' });
         }
-        return list;
+        return list.concat(kitBathItems);
       }
       // B21室, B22室, A10室, A19室, A20室, A21室 (Horizontal 6165x4525 layout with Left/Right 4525mm full window)
       if (unitId === 'B21' || unitId === 'B22' || unitId === 'A10' || unitId === 'A19' || unitId === 'A20' || unitId === 'A21') {
@@ -2135,10 +1655,10 @@
         if (tplNum === 10) list = list.map(it => ({ ...it, color: '#f8fafc' }));
         if (tplNum === 11) list.push({ id: 'lt_crystal_ring', x: 1650, z: 3250, w: 850, d: 850, h: 420, y: 2050, rot: 0, color: '#fbbf24' });
         if (tplNum === 19) list.push({ id: 'furn_tall_oven_micro', x: 4850, z: 320, w: 600, d: 600, h: 2400, rot: 0, color: '#475569' });
-        if (unitId === 'B22') return mirrorB21ItemsToB22(list);
-        if (unitId === 'A10' || unitId === 'A20') return flipB21ItemsToA10(list);
-        if (unitId === 'A21') return rotateB21ItemsToA21(list);
-        return list;
+        if (unitId === 'B22') return mirrorB21ItemsToB22(list).concat(kitBathItems);
+        if (unitId === 'A10' || unitId === 'A20') return flipB21ItemsToA10(list).concat(kitBathItems);
+        if (unitId === 'A21') return rotateB21ItemsToA21(list).concat(kitBathItems);
+        return list.concat(kitBathItems);
       }
 
       if (unitId === 'B4' || unitId === 'B6' || unitId === 'B3' || unitId === 'B16' || unitId === 'B18' || unitId === 'A1' || unitId === 'A4' || unitId === 'A11' || unitId === 'A13' || unitId === 'A14' || unitId === 'A16') {
@@ -2175,42 +1695,34 @@
         if (tplNum === 19) {
           list.push({ id: 'furn_coffee_machine', x: 3250, z: 240, w: 340, d: 340, h: 380, y: 900, rot: 0, color: '#94a3b8' });
         }
-        if (unitId === 'B3') return flipB4ItemsToB3(list);
+        if (unitId === 'B3') return flipB4ItemsToB3(list).concat(kitBathItems);
         if (unitId === 'B16' || unitId === 'B18' || unitId === 'A1' || unitId === 'A14' || unitId === 'A16') {
-          return flipB4ItemsToB3(list).map(it => ({ ...it, x: Math.round(4525 - it.x) }));
+          return flipB4ItemsToB3(list).map(it => ({ ...it, x: Math.round(4525 - it.x) })).concat(kitBathItems);
         }
         if (unitId === 'A4' || unitId === 'A11' || unitId === 'A13') {
-          return list.map(it => ({ ...it, x: Math.round(4525 - it.x) }));
+          return list.map(it => ({ ...it, x: Math.round(4525 - it.x) })).concat(kitBathItems);
         }
-        return list;
+        return list.concat(kitBathItems);
       }
 
       if (unitId === 'B11' || unitId === 'B13' || unitId === 'B14') {
-        let list = JSON.parse(JSON.stringify(BASE_B11_B13_2BR));
+        let list = JSON.parse(JSON.stringify(BASE_B13_2BR));
         if (tplNum === 3 || tplNum === 7 || tplNum === 17) {
           list = list.map(it => (it.id === 'wall_brick_100' && it.x === 2040)
             ? { id: 'door_glass_3', x: 2040, z: 4750, w: 90, d: 2945, h: 2450, rot: 0, color: '#7dd3fc' }
             : it
           ).filter(it => !(it.id === 'door_wood_room' && it.x === 2040));
         }
-        if (tplNum === 6 || tplNum === 7 || tplNum === 17) {
-          list = list.filter(it => !(it.z <= 2360 && (it.id === 'wall_brick_100' || it.id === 'door_wood_room' || it.id === 'bed_bunk_stairs')));
-          list.push({ id: 'wardrobe_wall_600', x: 4550, z: 1200, w: 600, d: 2050, h: 2550, rot: 0, color: '#f8fafc' });
-        }
         if (tplNum === 8) {
           list = list.filter(it => it.id !== 'platform_storage');
-          list.push({ id: 'app_bathtub_jp', x: 1050, z: 2450, w: 1150, d: 680, h: 600, rot: 0, color: '#ffffff' });
         }
         if (tplNum === 10) {
           list = list.map(it => ({ ...it, color: '#f8fafc' }));
         }
-        if (tplNum === 11) {
-          list.push({ id: 'lt_crystal_ring', x: 3450, z: 3950, w: 850, d: 850, h: 420, y: 2050, rot: 0, color: '#fbbf24' });
-        }
         if (tplNum === 14) {
           list.push({ id: 'platform_storage', x: 3975, z: 1175, w: 1800, d: 2250, h: 400, rot: 0, color: '#e6ccb2' });
         }
-        return unitId === 'B14' ? mirrorB13ItemsToB14(list) : list;
+        return (unitId === 'B14' ? mirrorB13ItemsToB14(list) : list).concat(kitBathItems);
       }
       if (unitId === 'B2' || unitId === 'B5' || unitId === 'B12' || unitId === 'B17' || unitId === 'A12' || unitId === 'A15') {
         let list = JSON.parse(JSON.stringify(BASE_B5_COMPACT_1BR));
@@ -2242,13 +1754,13 @@
         if (tplNum === 10) {
           list = list.map(it => ({ ...it, color: '#f8fafc' }));
         }
-        if (unitId === 'B2') return flipB5ItemsToB2(list);
-        if (unitId === 'B12' || unitId === 'A12') return mirrorB5ItemsToB12(list);
-        if (unitId === 'B17' || unitId === 'A15') return flipB5ItemsToB2(list).map(it => ({ ...it, x: Math.round(2350 - it.x) }));
-        return list;
+        if (unitId === 'B2') return flipB5ItemsToB2(list).concat(kitBathItems);
+        if (unitId === 'B12' || unitId === 'A12') return mirrorB5ItemsToB12(list).concat(kitBathItems);
+        if (unitId === 'B17' || unitId === 'A15') return flipB5ItemsToB2(list).map(it => ({ ...it, x: Math.round(2350 - it.x) })).concat(kitBathItems);
+        return list.concat(kitBathItems);
       }
 
-      return tpl.items || [];
+      return (tpl.items || []).concat(kitBathItems);
     }
 
     // ============================================================================
@@ -2777,7 +2289,7 @@
 
       // Update Header UI Badges & Block Quick Bar
       document.getElementById('unit-badge-num').textContent = unitId;
-      document.getElementById('main-app-title').textContent = `影輝${unitId}室設計平面`;
+      document.getElementById('main-app-title').textContent = `影輝苑A,B座設計DIY (${unitId}室)`;
       setQuickBlockFilter(quickBlockFilter);
 
       // Update Rebuild 3D structure for the selected unit
@@ -3776,6 +3288,101 @@
         addPart(Math.min(680, w * 0.45), 18, d * 0.65, -w * 0.18, h - 2, 0, darkMat); // Sink basin
         addPart(24, 220, 24, -w * 0.18, h, -d * 0.28, chromeMat); // High-arc faucet
         addPart(24, 24, 140, -w * 0.18, h + 196, -d * 0.16, chromeMat);
+      } else if (type === 'kitchen_all_in_one') {
+        // Complete All-In-One Hong Kong Kitchen Unit:
+        // Base cabinet + Quartz worktop + Sink & Faucet + Built-in Front Washer + 2-Burner IH/Gas Cooktop + T-Shape Range Hood + Built-in Microwave/Steam Oven + Upper Wall Cabinets
+        const isLongX = w >= d;
+        const L = Math.max(w, d);
+        const D = Math.min(w, d);
+        const subGroup = new THREE.Group();
+        const whiteAppMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.1 });
+        const redBurnerMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+
+        function addSubBox(bw, bh, bd, bx, by, bz, mat = mainMat) {
+          const g = new THREE.BoxGeometry(bw, bh, bd);
+          const m = new THREE.Mesh(g, mat);
+          m.position.set(bx, by + bh / 2, bz);
+          m.castShadow = true;
+          m.receiveShadow = true;
+          m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.28 })));
+          subGroup.add(m);
+          return m;
+        }
+
+        // 1. Base cabinet right half (sink cabinet) & left washer housing
+        addSubBox(L * 0.56, 840, D - 20, L * 0.22, 0, 0, mainMat);
+        addSubBox(L * 0.42, 825, D - 10, -L * 0.28, 0, 5, whiteAppMat); // Slotted Front-Load Washer
+        const drum = new THREE.Mesh(new THREE.CylinderGeometry(185, 185, 36, 22), chromeMat);
+        drum.rotation.x = Math.PI / 2;
+        drum.position.set(-L * 0.28, 410, D / 2 + 6);
+        subGroup.add(drum);
+        const innerDrum = new THREE.Mesh(new THREE.CylinderGeometry(135, 135, 40, 22), darkMat);
+        innerDrum.rotation.x = Math.PI / 2;
+        innerDrum.position.set(-L * 0.28, 410, D / 2 + 8);
+        subGroup.add(innerDrum);
+
+        // 2. Full-length Quartz Countertop (Y=840..880)
+        addSubBox(L, 42, D + 15, 0, 840, 5, chromeMat);
+
+        // 3. Stainless Steel Sink & High-Arc Faucet on Right Side
+        addSubBox(L * 0.34, 18, D * 0.65, L * 0.25, 880, 0, darkMat);
+        addSubBox(24, 210, 24, L * 0.25, 882, -D * 0.25, chromeMat);
+        addSubBox(24, 24, 130, L * 0.25, 1070, -D * 0.14, chromeMat);
+
+        // 4. Built-in 2-Burner Cooktop on Left Side (above washer)
+        addSubBox(L * 0.38, 22, D * 0.65, -L * 0.25, 880, 0, darkMat);
+        [-L * 0.33, -L * 0.17].forEach(bx => {
+          const burner = new THREE.Mesh(new THREE.CylinderGeometry(75, 75, 14, 20), redBurnerMat);
+          burner.position.set(bx, 904, 0);
+          subGroup.add(burner);
+        });
+
+        // 5. Built-in Microwave / Steam Oven in Mid-Height Shelf (Y=1320..1620)
+        addSubBox(L * 0.36, 290, D * 0.65, L * 0.25, 1320, -D * 0.14, darkMat);
+        addSubBox(L * 0.28, 180, 18, L * 0.25, 1365, D * 0.19, warmGlowMat); // Glowing microwave window
+
+        // 6. T-Shape Range Hood above Cooktop (Y=1560..1950) + Upper Wall Cabinets (Y=1640..2350)
+        addSubBox(L * 0.42, 65, D * 0.78, -L * 0.25, 1560, -D * 0.06, chromeMat);
+        addSubBox(180, 350, 180, -L * 0.25, 1625, -D * 0.18, chromeMat);
+        addSubBox(L * 0.54, 700, D * 0.62, L * 0.22, 1640, -D * 0.16, mainMat);
+        addSubBox(L * 0.44, 380, D * 0.62, -L * 0.26, 1960, -D * 0.16, mainMat);
+
+        if (!isLongX) subGroup.rotation.y = Math.PI / 2;
+        group.add(subGroup);
+      } else if (type === 'shower_zone_full') {
+        // Dry-Wet Separated Shower Cubicle: Curb base + Black-framed glass screen + Overhead Rain Shower Column + Hand Shower + Soap Caddy
+        addPart(w, 55, d, 0, 0, 0, chromeMat); // Anti-slip stone shower curb
+        addPart(w, h - 55, 24, 0, 55, d / 2 - 12, glassMat); // Front glass screen
+        addPart(24, h - 55, d, -w / 2 + 12, 55, 0, glassMat); // Side glass screen
+        addPart(w, 35, 30, 0, h - 35, d / 2 - 12, darkMat); // Top black frame rail
+        addPart(30, 35, d, -w / 2 + 12, h - 35, 0, darkMat);
+        addPart(22, 520, 38, 0, 950, d / 2 + 6, darkMat); // Door handle
+        // Rain shower column & top head
+        addPart(26, 1150, 26, w * 0.22, 850, -d / 2 + 45, chromeMat);
+        addPart(26, 26, 280, w * 0.22, 1980, -d / 2 + 170, chromeMat);
+        const rainHead = new THREE.Mesh(new THREE.CylinderGeometry(130, 130, 18, 24), chromeMat);
+        rainHead.position.set(w * 0.22, 1965, -d / 2 + 290);
+        group.add(rainHead);
+        addPart(220, 35, 110, -w * 0.18, 1250, -d / 2 + 60, darkMat); // Shampoo & body wash shelf
+      } else if (type === 'towel_rack_pro') {
+        // Heated Towel Rack & Clothes Hanging Hooks
+        const isLongX = w >= d;
+        const rw = Math.max(w, d);
+        const rd = Math.min(w, d);
+        const rg = new THREE.Group();
+        const bar1 = new THREE.Mesh(new THREE.BoxGeometry(rw, 24, rd), darkMat);
+        bar1.position.set(0, h * 0.82, 0);
+        rg.add(bar1);
+        const bar2 = new THREE.Mesh(new THREE.BoxGeometry(rw, 24, rd), darkMat);
+        bar2.position.set(0, h * 0.48, 0);
+        rg.add(bar2);
+        // Folded white bath towel hanging on bar
+        const towelMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.65 });
+        const towel = new THREE.Mesh(new THREE.BoxGeometry(rw * 0.55, h * 0.52, rd * 0.65), towelMat);
+        towel.position.set(-rw * 0.12, h * 0.42, 0);
+        rg.add(towel);
+        if (!isLongX) rg.rotation.y = Math.PI / 2;
+        group.add(rg);
       } else if (type === 'tv_wall') {
         addPart(w, h, d, 0, 0, 0, darkMat);
         const screenMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
