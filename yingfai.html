@@ -145,9 +145,23 @@
         </div>
       </div>
 
-      <!-- Selected Item Floating Quick Action Bar -->
+      <!-- 3D Floating Zone Zoom-In Badges Container -->
+      <div id="zone-3d-pins-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
+
+      <!-- On-Screen Zoom In / Zoom Out / Orbit Direction Controls -->
+      <div class="absolute right-2 top-1/2 -translate-y-1/2 z-20 glass-pill p-1 rounded-2xl flex flex-col gap-1 shadow-xl pointer-events-auto border border-slate-700/70">
+        <button onclick="zoomCameraStep(-1400)" title="放大 Zoom In" class="w-8 h-8 rounded-xl bg-slate-800/95 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-sm flex items-center justify-center shadow active:scale-90 transition">➕</button>
+        <button onclick="zoomCameraStep(1400)" title="縮小 Zoom Out" class="w-8 h-8 rounded-xl bg-slate-800/95 hover:bg-amber-500 hover:text-slate-950 text-white font-black text-sm flex items-center justify-center shadow active:scale-90 transition">➖</button>
+        <div class="h-px bg-slate-700 my-0.5"></div>
+        <button onclick="orbitCameraAngle(-Math.PI/4)" title="向左轉視角" class="w-8 h-8 rounded-xl bg-slate-800/95 hover:bg-sky-500 hover:text-slate-950 text-sky-300 font-black text-xs flex items-center justify-center shadow active:scale-90 transition">⟲</button>
+        <button onclick="orbitCameraAngle(Math.PI/4)" title="向右轉視角" class="w-8 h-8 rounded-xl bg-slate-800/95 hover:bg-sky-500 hover:text-slate-950 text-sky-300 font-black text-xs flex items-center justify-center shadow active:scale-90 transition">⟳</button>
+        <button onclick="fitFullLayoutTopView()" title="俯視全屋" class="w-8 h-8 rounded-xl bg-cyan-950/90 hover:bg-cyan-400 hover:text-slate-950 text-cyan-300 font-black text-[10px] flex items-center justify-center shadow active:scale-90 transition">俯視</button>
+      </div>
+
+      <!-- Selected Item Floating Quick Action Bar (With Move Lock Toggle to prevent accidental dragging) -->
       <div id="selected-floating-bar" class="hidden absolute bottom-2 left-1/2 -translate-x-1/2 z-30 glass-pill px-2 py-1 rounded-xl flex items-center gap-1 shadow-2xl border border-amber-400/60 max-w-[96vw] overflow-x-auto no-scrollbar">
-        <span id="sel-bar-name" class="text-[10px] font-extrabold text-amber-300 truncate max-w-[85px]">物件</span>
+        <span id="sel-bar-name" class="text-[10px] font-extrabold text-amber-300 truncate max-w-[80px]">物件</span>
+        <button onclick="toggleMoveSelectedMode()" id="btn-move-toggle" class="px-2 py-0.5 rounded bg-slate-700 text-slate-200 text-[10px] font-black shrink-0 border border-slate-500">✥移動:關</button>
         <button onclick="rotateSelected(90)" class="px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px] font-bold shrink-0">↻90°</button>
         <button onclick="rotateSelected(45)" class="px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px] font-bold shrink-0">↺45°</button>
         <button onclick="nudgeSelected(-50,0)" class="px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px] font-bold shrink-0">◀</button>
@@ -411,12 +425,13 @@
     let floorZoneMeshes = [], wallZoneMeshes = [], structuralWalls = [];
     let placedFurniture = [];
     let selectedItem = null;
+    let isMoveModeArmed = false; // Must click "✥移動" before dragging to prevent accidental moves
     let isDraggingItem = false;
     let dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     let dragOffset = new THREE.Vector3();
     let raycaster = new THREE.Raycaster();
     let pointerNDC = new THREE.Vector2();
-
+    let zonePinElements = [];
     let currentUnitId = 'B10';
     let currentTemplateId = 'tpl_01';
     let currentFocusZone = 'all';
@@ -800,6 +815,7 @@
 
     // =========================================================================
     // 8. PARAMETRIC UNIT STRUCTURE BUILDER FOR ALL 36 UNITS (A1-A22, B1-B22)
+    //    FIXED: ZERO OVERLAP BETWEEN KITCHEN & BATHROOM + DOOR SWING SHADOW ARCS
     // =========================================================================
     function getUnitGeometryProfile(unitId) {
       const is1BR = ['B2', 'B5', 'B12', 'B17', 'A12', 'A15'].includes(unitId);
@@ -808,6 +824,57 @@
       const mirrorX = ['B9', 'B11', 'B12', 'B13', 'B16', 'B17', 'B18', 'B21', 'A1', 'A4', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16', 'A19', 'A20'].includes(unitId);
       const mirrorZ = ['B1', 'B2', 'B3', 'B15', 'B16', 'B17', 'B18', 'A1', 'A2', 'A7', 'A14', 'A15', 'A16', 'A20'].includes(unitId);
       return { is1BR, isBay4900, is2BR, mirrorX, mirrorZ };
+    }
+
+    // Helper to draw dark semi-transparent door swing shadow on floor + leaf panel
+    function addDoorSwingShadowToStructure(hingeX, hingeZ, radius, startAngleDeg, sweepAngleDeg, zoneId = 'main_hall', doorColor = 0x8b5a2b) {
+      const group = new THREE.Group();
+      const startRad = THREE.MathUtils.degToRad(startAngleDeg);
+      const sweepRad = THREE.MathUtils.degToRad(sweepAngleDeg);
+
+      // Dark translucent floor sector shadow showing door swing clearance area
+      const absSweep = Math.abs(sweepRad);
+      const thetaStart = sweepRad >= 0 ? startRad : startRad + sweepRad;
+      const sectorGeo = new THREE.CircleGeometry(radius, 28, thetaStart, absSweep);
+      sectorGeo.rotateX(-Math.PI / 2);
+      const sectorMat = new THREE.MeshBasicMaterial({
+        color: 0x0f172a,
+        transparent: true,
+        opacity: 0.36,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const sectorMesh = new THREE.Mesh(sectorGeo, sectorMat);
+      sectorMesh.position.y = 6;
+      group.add(sectorMesh);
+
+      // Dashed / Glowing arc border on floor so user clearly sees door swing boundary
+      const arcPts = [];
+      const steps = 24;
+      for (let i = 0; i <= steps; i++) {
+        const ang = startRad + (sweepRad * i) / steps;
+        arcPts.push(new THREE.Vector3(Math.cos(ang) * radius, 8, -Math.sin(ang) * radius));
+      }
+      arcPts.push(new THREE.Vector3(0, 8, 0));
+      const arcGeo = new THREE.BufferGeometry().setFromPoints(arcPts);
+      const arcLine = new THREE.Line(arcGeo, new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.85 }));
+      group.add(arcLine);
+
+      // Semi-open physical door leaf (opened at 75% of swing)
+      const openAng = startRad + sweepRad * 0.85;
+      const leafH = 2100;
+      const leafGeo = new THREE.BoxGeometry(radius, leafH, 42);
+      leafGeo.translate(radius / 2, leafH / 2, 0);
+      const leafMat = new THREE.MeshStandardMaterial({ color: doorColor, roughness: 0.55, transparent: true, opacity: 0.78 });
+      const leafMesh = new THREE.Mesh(leafGeo, leafMat);
+      leafMesh.rotation.y = openAng;
+      leafMesh.userData = { zoneId, maxH: leafH, baseH: leafH };
+      group.add(leafMesh);
+      structuralWalls.push(leafMesh);
+
+      group.position.set(hingeX, 0, hingeZ);
+      group.userData = { zoneId };
+      structureGroup.add(group);
     }
 
     function clearAndBuildUnitStructure(unitId) {
@@ -854,7 +921,6 @@
           sill.castShadow = true;
           sill.receiveShadow = true;
           sill.userData = { zoneId, maxH: sillH, baseH: sillH };
-          // Subtle top border edge so walls are crisp in top view
           const sEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(ww, sillH, wd)), new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.5 }));
           sill.add(sEdge);
           structureGroup.add(sill);
@@ -904,85 +970,127 @@
         dimensionGroup.add(sp);
       };
 
-      // Build Zoned Floors & Walls by Unit Type
+      const sX = prof.mirrorX ? -1 : 1;
+      const sZ = prof.mirrorZ ? -1 : 1;
+
+      // Build Zoned Floors, Non-Overlapping Kitchen/Bathroom & Door Swing Shadows
       if (prof.is1BR) {
-        addFloorSlab('main_hall', 0, 0, 2350, 3490);
-        addFloorSlab('hall_1',    0, 3490, 2350, 6165);
+        // 1BR: Bathroom Z=0..1650, Kitchen Z=1650..3415 (Strictly adjacent at Z=1650, ZERO overlap)
+        addFloorSlab('main_hall', 0, 0, 2350, 3415);
+        addFloorSlab('hall_1',    0, 3415, 2350, 6165);
         addFloorSlab('kitchen',  -1415, 1650, 0, 3415);
         addFloorSlab('bathroom', -1580, 0, 0, 1650);
 
         addWallSeg('main_hall', 0, -100, 2350, 0, 2550, false);
-        addWallSeg('main_hall', 2350, 0, 2470, 6165, 2550, false);
-        addWallSeg('hall_1',    0, 6165, 2350, 6285, 2550, true);
-        addWallSeg('hall_1',   -120, 3415, 0, 6165, 2550, false);
-        addWallSeg('kitchen',  -1520, 1650, -1415, 3415, 2550, true);
-        addWallSeg('kitchen',  -1415, 3415, 0, 3515, 2550, false);
+        addWallSeg('main_hall', 2350, 0, 2450, 6165, 2550, false);
+        addWallSeg('hall_1',    0, 6165, 2350, 6265, 2550, true);
+        addWallSeg('hall_1',   -100, 3415, 0, 6165, 2550, false);
+        addWallSeg('kitchen',  -1515, 1650, -1415, 3415, 2550, true);
+        addWallSeg('kitchen',  -1415, 3415, 0, 3500, 2550, false);
+        // Shared divider wall between Bathroom and Kitchen at Z=1650
+        addWallSeg('bathroom', -1580, 1605, 0, 1690, 2550, false);
         addWallSeg('bathroom', -1680, 0, -1580, 1650, 2550, false);
-        addWallSeg('bathroom', -1580, 1600, 0, 1700, 2550, false);
+        addWallSeg('bathroom', -1580, -100, 0, 0, 2550, false);
+
+        // Main Entrance Door, Kitchen Door & Bathroom Door Swing Shadows
+        addDoorSwingShadowToStructure(mx(350), mz(80), 860, prof.mirrorX ? 180 : 0, -90 * sX * sZ, 'main_hall', 0x78350f);
+        addDoorSwingShadowToStructure(mx(-40), mz(1800), 750, prof.mirrorX ? 0 : 180, 90 * sX * sZ, 'kitchen', 0x9a5b25);
+        addDoorSwingShadowToStructure(mx(-40), mz(920), 720, prof.mirrorX ? 0 : 180, -90 * sX * sZ, 'bathroom', 0x9a5b25);
 
         addDimLabel('闊 2350mm', 1175, 5800, '#38bdf8');
         addDimLabel('總長 6165mm', 1850, 3100, '#fb7185');
         addDimLabel('廚房 1415×1765', -700, 2550, '#fbbf24');
         addDimLabel('廁所 1580×1650', -780, 820, '#34d399');
       } else if (prof.is2BR) {
+        // 2BR: Kitchen Z=0..1650 (X=2860..4925), Bathroom Z=1650..3120 (X=2525..4525)
+        // Strictly separated at Z=1650! Hall_2 starts at Z=3120..6165. Zero overlap!
         const wHall = prof.isBay4900 ? 4900 : 4525;
-        addFloorSlab('main_hall', 0, 0, 2525, 3300);
-        addFloorSlab('hall_1',    0, 3300, 2440, 6165);
-        addFloorSlab('hall_2',    2440, 3220, wHall, 6165);
+        addFloorSlab('main_hall', 0, 0, 2525, 3120);
+        addFloorSlab('main_hall', 2525, 0, 2860, 1650); // Foyer corridor outside kitchen
+        addFloorSlab('hall_1',    0, 3120, 2440, 6165);
+        addFloorSlab('hall_2',    2440, 3120, wHall, 6165);
         addFloorSlab('kitchen',   2860, 0, 4925, 1650);
-        addFloorSlab('bathroom',  2525, 1750, 4525, 3220);
+        addFloorSlab('bathroom',  2525, 1650, 4525, 3120);
 
-        addWallSeg('main_hall', 0, -120, 2860, 0, 2550, false);
-        addWallSeg('main_hall', -120, 0, 0, 6165, 2550, false);
-        addWallSeg('hall_1',    0, 6165, 2440, 6285, 2550, true);
-        addWallSeg('hall_2',    2440, 6165, wHall, 6285, 2550, true);
-        addWallSeg('hall_2',    wHall, 3220, wHall + 120, 6165, 2550, true);
-        addWallSeg('bathroom',  2440, 1750, 2540, 3220, 2550, false);
-        addWallSeg('bathroom',  2525, 3140, 4525, 3240, 2550, false);
-        addWallSeg('bathroom',  4525, 1750, 4625, 3220, 2550, false);
-        addWallSeg('kitchen',   2860, 1600, 4925, 1700, 2550, false);
-        addWallSeg('kitchen',   4925, 0, 5025, 1650, 2550, true);
+        addWallSeg('main_hall', 0, -100, 2860, 0, 2550, false);
+        addWallSeg('main_hall', -100, 0, 0, 6165, 2550, false);
+        addWallSeg('hall_1',    0, 6165, 2440, 6265, 2550, true);
+        addWallSeg('hall_2',    2440, 6165, wHall, 6265, 2550, true);
+        addWallSeg('hall_2',    wHall, 3120, wHall + 100, 6165, 2550, true);
+        // Bathroom walls (Z=1650..3120)
+        addWallSeg('bathroom',  2440, 1650, 2525, 3120, 2550, false);
+        addWallSeg('bathroom',  2525, 3075, 4525, 3160, 2550, false);
+        addWallSeg('bathroom',  4525, 1650, 4610, 3120, 2550, false);
+        // Shared partition wall at Z=1650 between Kitchen (Z=0..1650) and Bathroom (Z=1650..3120)
+        addWallSeg('kitchen',   2525, 1605, 4925, 1690, 2550, false);
+        addWallSeg('kitchen',   2815, 0, 2900, 1650, 2550, false);
+        addWallSeg('kitchen',   4925, 0, 5010, 1650, 2550, true);
+        addWallSeg('kitchen',   2860, -100, 4925, 0, 2550, false);
+
+        // Main Entrance Door, Kitchen Door & Bathroom Door Swing Shadows
+        addDoorSwingShadowToStructure(mx(1650), mz(80), 880, prof.mirrorX ? 180 : 0, -90 * sX * sZ, 'main_hall', 0x78350f);
+        addDoorSwingShadowToStructure(mx(2900), mz(720), 760, prof.mirrorX ? 180 : 0, -90 * sX * sZ, 'kitchen', 0x9a5b25);
+        addDoorSwingShadowToStructure(mx(3350), mz(1690), 720, prof.mirrorX ? 0 : 180, -90 * sX * sZ, 'bathroom', 0x9a5b25);
 
         addDimLabel(`大窗闊 ${wHall}mm`, wHall / 2, 5900, '#38bdf8');
         addDimLabel('長牆 6165mm', 450, 3100, '#fb7185');
         addDimLabel('廳2 2000×2885', 3480, 4800, '#f59e0b');
-        addDimLabel('廁所 2000×1470', 3525, 2480, '#34d399');
-        addDimLabel('廚房 2065×1650', 3880, 820, '#fbbf24');
+        addDimLabel('廁所 2000×1470', 3525, 2385, '#34d399');
+        addDimLabel('廚房 2065×1650', 3890, 825, '#fbbf24');
       } else {
-        // 3BR Units (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
-        addFloorSlab('main_hall', 0, 0, 4200, 3650);
+        // 3BR Units (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22):
+        // FIXED: Main Hall Z=0..3650 (X=0..2525), Foyer Z=0..1600 (X=2525..4200), Corridor Z=1600..3250 (X=2525..3135)
+        // Kitchen: X=3135..5200, Z=1600..3250 (1650mm deep)
+        // Bathroom: X=2525..4525, Z=3250..4720 (1470mm deep, strictly starts at Z=3250 after Kitchen!)
+        // Hall_2: X=2440..4525, Z=4720..6815
+        // ZERO OVERLAP between Kitchen and Bathroom!
+        addFloorSlab('main_hall', 0, 0, 2525, 3650);
+        addFloorSlab('main_hall', 2525, 0, 4200, 1600);
+        addFloorSlab('main_hall', 2525, 1600, 3135, 3250);
         addFloorSlab('side_room', -2000, 2500, 0, 4650);
         addFloorSlab('hall_1',    0, 3650, 2440, 6815);
-        addFloorSlab('hall_2',    2440, 3930, 4525, 6815);
+        addFloorSlab('hall_2',    2440, 4720, 4525, 6815);
         addFloorSlab('kitchen',   3135, 1600, 5200, 3250);
-        addFloorSlab('bathroom',  2525, 2375, 4525, 3845);
+        addFloorSlab('bathroom',  2525, 3250, 4525, 4720);
 
-        addWallSeg('main_hall', 0, -120, 4200, 0, 2550, false);
-        addWallSeg('main_hall', -120, 0, 0, 2500, 2550, true);
-        addWallSeg('main_hall', 4200, 0, 4320, 1600, 2550, false);
-        addWallSeg('side_room', -2000, 2380, 0, 2500, 2550, false);
-        addWallSeg('side_room', -2120, 2500, -2000, 4650, 2550, true);
-        addWallSeg('side_room', -2000, 4650, 0, 4770, 2550, true);
-        addWallSeg('side_room', -100, 2500, 0, 3400, 2550, false);
-        addWallSeg('hall_1',    -120, 4650, 0, 6815, 2550, true);
-        addWallSeg('hall_1',    0, 6815, 2440, 6935, 2550, true);
-        addWallSeg('hall_2',    2440, 6815, 4525, 6935, 2550, true);
-        addWallSeg('hall_2',    4525, 3930, 4645, 6815, 2550, true);
-        addWallSeg('bathroom',  2440, 2375, 2540, 3845, 2550, false);
-        addWallSeg('bathroom',  2525, 3845, 4525, 3945, 2550, false);
-        addWallSeg('bathroom',  4525, 2375, 4625, 3845, 2550, false);
-        addWallSeg('kitchen',   3135, 1520, 5200, 1620, 2550, false);
-        addWallSeg('kitchen',   5200, 1600, 5320, 3250, 2550, true);
+        addWallSeg('main_hall', 0, -100, 4200, 0, 2550, false);
+        addWallSeg('main_hall', -100, 0, 0, 2500, 2550, true);
+        addWallSeg('main_hall', 4200, 0, 4300, 1600, 2550, false);
+        addWallSeg('side_room', -2000, 2400, 0, 2500, 2550, false);
+        addWallSeg('side_room', -2100, 2500, -2000, 4650, 2550, true);
+        addWallSeg('side_room', -2000, 4650, 0, 4750, 2550, true);
+        addWallSeg('side_room', -90, 2500, 0, 3400, 2550, false);
+        addWallSeg('hall_1',    -100, 4650, 0, 6815, 2550, true);
+        addWallSeg('hall_1',    0, 6815, 2440, 6915, 2550, true);
+        addWallSeg('hall_2',    2440, 6815, 4525, 6915, 2550, true);
+        addWallSeg('hall_2',    4525, 4720, 4625, 6815, 2550, true);
+        // Bathroom walls (Z=3250..4720, X=2525..4525)
+        addWallSeg('bathroom',  2440, 3250, 2525, 4720, 2550, false);
+        addWallSeg('bathroom',  2525, 4675, 4525, 4760, 2550, false);
+        addWallSeg('bathroom',  4525, 3250, 4610, 4720, 2550, false);
+        // Shared wall at Z=3250 separating Kitchen (Z=1600..3250) and Bathroom (Z=3250..4720)
+        addWallSeg('kitchen',   2525, 3205, 5200, 3290, 2550, false);
+        addWallSeg('kitchen',   3090, 1600, 3175, 3250, 2550, false);
+        addWallSeg('kitchen',   3135, 1555, 5200, 1640, 2550, false);
+        addWallSeg('kitchen',   5200, 1600, 5290, 3250, 2550, true);
+
+        // Main Entrance Door (At right wall X=4200, Z=250..1130 swinging inward to X=3320..4200)
+        addDoorSwingShadowToStructure(mx(4150), mz(250), 880, prof.mirrorZ ? 90 : -90, -90 * sX * sZ, 'main_hall', 0x78350f);
+        // Kitchen Door (At X=3135, Z=2450 swinging into Kitchen)
+        addDoorSwingShadowToStructure(mx(3175), mz(2350), 760, prof.mirrorX ? 180 : 0, -90 * sX * sZ, 'kitchen', 0x9a5b25);
+        // Bathroom Door (At Z=3250, X=2950 swinging into Bathroom)
+        addDoorSwingShadowToStructure(mx(3250), mz(3290), 720, prof.mirrorX ? 0 : 180, -90 * sX * sZ, 'bathroom', 0x9a5b25);
 
         addDimLabel('頂闊 4200mm', 2100, 350, '#fb7185');
         addDimLabel('側房 2000×2150', -1000, 3575, '#a855f7');
         addDimLabel('海景大窗 4525mm', 2260, 6500, '#38bdf8');
-        addDimLabel('廳2 2000×2885', 3500, 5350, '#f59e0b');
-        addDimLabel('廁所 2000×1470', 3525, 3110, '#34d399');
+        addDimLabel('廳2 2000×2095', 3500, 5750, '#f59e0b');
+        addDimLabel('廁所 2000×1470', 3525, 3985, '#34d399');
         addDimLabel('廚房 2065×1650', 4160, 2425, '#fbbf24');
       }
 
       applyCurrentWallHeightToStructure();
+      createZone3DPins();
     }
 
     // =========================================================================
@@ -1393,14 +1501,194 @@
         addCabinetDoorsAndHandles(group, w, h * 0.38, h * 0.6, d / 2 - 12, 2, baseMat, darkMat, false, null);
         addCabinetDoorsAndHandles(group, w, 20, h * 0.35, d / 2 - 12, 1, baseMat, darkMat, false, null);
       }
-      // 13. LIGHTING FIXTURES
+      // 13. ULTRA-REALISTIC 3D LIGHTING FIXTURES (CHANDELIERS, MAGNETIC TRACKS, ARC LAMPS, PENDANTS)
       else if (cat === 'lighting') {
-        const glowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-        const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), glowMat);
-        body.position.set(0, h / 2, 0);
-        group.add(body);
+        const warmGlowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+        const crystalMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.78, roughness: 0.05, metalness: 0.2 });
+
+        if (id === 'light_chandelier') {
+          // Canopy & suspension wires
+          const canopy = new THREE.Mesh(new THREE.CylinderGeometry(110, 110, 30, 20), brassMat);
+          canopy.position.set(0, h - 15, 0);
+          canopy.userData.noEdge = true;
+          group.add(canopy);
+
+          for (let c = 0; c < 3; c++) {
+            const ang = (c * Math.PI * 2) / 3;
+            const wire = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, h - 40, 8), chromeMat);
+            wire.position.set(Math.cos(ang) * 180, h / 2, Math.sin(ang) * 180);
+            wire.userData.noEdge = true;
+            group.add(wire);
+          }
+
+          // Outer & Inner Golden Rings + Crystal Prisms
+          const r1 = w * 0.46;
+          const ring1 = new THREE.Mesh(new THREE.TorusGeometry(r1, 18, 14, 36), brassMat);
+          ring1.rotation.x = Math.PI / 2;
+          ring1.position.set(0, 110, 0);
+          ring1.userData.noEdge = true;
+          group.add(ring1);
+
+          const glowRing1 = new THREE.Mesh(new THREE.TorusGeometry(r1 - 12, 10, 10, 36), warmGlowMat);
+          glowRing1.rotation.x = Math.PI / 2;
+          glowRing1.position.set(0, 96, 0);
+          glowRing1.userData.noEdge = true;
+          group.add(glowRing1);
+
+          const r2 = w * 0.28;
+          const ring2 = new THREE.Mesh(new THREE.TorusGeometry(r2, 15, 14, 32), brassMat);
+          ring2.rotation.x = Math.PI / 2;
+          ring2.position.set(0, 35, 0);
+          ring2.userData.noEdge = true;
+          group.add(ring2);
+
+          const glowRing2 = new THREE.Mesh(new THREE.TorusGeometry(r2 - 10, 9, 10, 32), warmGlowMat);
+          glowRing2.rotation.x = Math.PI / 2;
+          glowRing2.position.set(0, 22, 0);
+          glowRing2.userData.noEdge = true;
+          group.add(glowRing2);
+
+          for (let k = 0; k < 16; k++) {
+            const ang = (k * Math.PI * 2) / 16;
+            const crys = new THREE.Mesh(new THREE.CylinderGeometry(10, 6, 65, 8), crystalMat);
+            crys.position.set(Math.cos(ang) * r1, 88, Math.sin(ang) * r1);
+            crys.userData.noEdge = true;
+            group.add(crys);
+          }
+        } else if (id === 'light_mag_track') {
+          // Matte black recessed track rail + 4 cylindrical spotlight heads
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(w, 28, 52), darkMat);
+          rail.position.set(0, h - 14, 0);
+          group.add(rail);
+
+          const ledLine = new THREE.Mesh(new THREE.BoxGeometry(w * 0.45, 8, 22), warmGlowMat);
+          ledLine.position.set(0, h - 29, 0);
+          group.add(ledLine);
+
+          [-w * 0.38, -w * 0.16, w * 0.16, w * 0.38].forEach(sx => {
+            const stem = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 35, 10), darkMat);
+            stem.position.set(sx, h - 38, 0);
+            stem.userData.noEdge = true;
+            group.add(stem);
+
+            const spotHead = new THREE.Mesh(new THREE.CylinderGeometry(28, 28, 75, 16), darkMat);
+            spotHead.rotation.z = sx < 0 ? 0.22 : -0.22;
+            spotHead.position.set(sx, h - 75, 0);
+            spotHead.userData.noEdge = true;
+            group.add(spotHead);
+
+            const lens = new THREE.Mesh(new THREE.CylinderGeometry(22, 22, 6, 16), warmGlowMat);
+            lens.rotation.z = sx < 0 ? 0.22 : -0.22;
+            lens.position.set(sx, h - 112, 0);
+            lens.userData.noEdge = true;
+            group.add(lens);
+          });
+        } else if (id === 'light_dining_bar') {
+          // Minimalist linear tubular pendant with brass endcaps & twin cords
+          const topPlate = new THREE.Mesh(new THREE.BoxGeometry(280, 22, 65), brassMat);
+          topPlate.position.set(0, h - 11, 0);
+          group.add(topPlate);
+
+          [-w * 0.32, w * 0.32].forEach(cx => {
+            const cord = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, h - 55, 8), darkMat);
+            cord.position.set(cx, h / 2 + 10, 0);
+            cord.userData.noEdge = true;
+            group.add(cord);
+          });
+
+          const barHousing = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, w, 18), brassMat);
+          barHousing.rotation.z = Math.PI / 2;
+          barHousing.position.set(0, 42, 0);
+          barHousing.userData.noEdge = true;
+          group.add(barHousing);
+
+          const diffuser = new THREE.Mesh(new THREE.BoxGeometry(w - 40, 16, 26), warmGlowMat);
+          diffuser.position.set(0, 26, 0);
+          group.add(diffuser);
+        } else if (id === 'light_ceiling_led') {
+          // Round flush-mount modern LED ceiling dome
+          const rad = w / 2;
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad, h, 32), darkMat);
+          rim.position.set(0, h / 2, 0);
+          rim.userData.noEdge = true;
+          group.add(rim);
+
+          const goldBand = new THREE.Mesh(new THREE.CylinderGeometry(rad + 4, rad + 4, h * 0.45, 32), brassMat);
+          goldBand.position.set(0, h * 0.5, 0);
+          goldBand.userData.noEdge = true;
+          group.add(goldBand);
+
+          const dome = new THREE.Mesh(new THREE.CylinderGeometry(rad - 22, rad - 28, 18, 32), warmGlowMat);
+          dome.position.set(0, 12, 0);
+          dome.userData.noEdge = true;
+          group.add(dome);
+        } else if (id === 'light_floor_arc') {
+          // Designer Arco floor lamp: Marble cylinder base + tall curved stem + dome shade
+          const mBase = new THREE.Mesh(new THREE.CylinderGeometry(140, 150, 180, 24), stoneMat);
+          mBase.position.set(-w * 0.25, 90, 0);
+          mBase.userData.noEdge = true;
+          group.add(mBase);
+
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(14, 18, h - 280, 14), brassMat);
+          pole.position.set(-w * 0.25, (h - 280) / 2 + 180, 0);
+          pole.userData.noEdge = true;
+          group.add(pole);
+
+          const arm = new THREE.Mesh(new THREE.CylinderGeometry(10, 12, w * 0.75, 12), brassMat);
+          arm.rotation.z = -Math.PI / 3;
+          arm.position.set(0, h - 180, 0);
+          arm.userData.noEdge = true;
+          group.add(arm);
+
+          const domeShade = new THREE.Mesh(new THREE.SphereGeometry(145, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), brassMat);
+          domeShade.position.set(w * 0.24, h - 260, 0);
+          domeShade.userData.noEdge = true;
+          group.add(domeShade);
+
+          const bulb = new THREE.Mesh(new THREE.SphereGeometry(55, 16, 16), warmGlowMat);
+          bulb.position.set(w * 0.24, h - 295, 0);
+          bulb.userData.noEdge = true;
+          group.add(bulb);
+        }
       }
-      // 14. DEFAULT APPLIANCES & PARTITIONS
+      // 14. ROOM DOORS WITH FLOOR SWING SHADOW ARC + PARTITIONS
+      else if (id === 'door_wood_room' || id === 'door_pocket_slide') {
+        const framePostL = new THREE.Mesh(new THREE.BoxGeometry(45, h, d + 20), darkMat);
+        framePostL.position.set(-w / 2 + 22, h / 2, 0);
+        group.add(framePostL);
+        const framePostR = new THREE.Mesh(new THREE.BoxGeometry(45, h, d + 20), darkMat);
+        framePostR.position.set(w / 2 - 22, h / 2, 0);
+        group.add(framePostR);
+
+        if (id === 'door_wood_room') {
+          // Swing door leaf opened at 75 deg + dark floor swing shadow sector
+          const leafRadius = w - 70;
+          const sectorGeo = new THREE.CircleGeometry(leafRadius, 24, 0, Math.PI / 2);
+          sectorGeo.rotateX(-Math.PI / 2);
+          const sectorMat = new THREE.MeshBasicMaterial({
+            color: 0x0f172a,
+            transparent: true,
+            opacity: 0.35,
+            side: THREE.DoubleSide,
+            depthWrite: false
+          });
+          const sector = new THREE.Mesh(sectorGeo, sectorMat);
+          sector.position.set(-w / 2 + 35, 8, 0);
+          sector.userData.noEdge = true;
+          group.add(sector);
+
+          const leafGeo = new THREE.BoxGeometry(leafRadius, h - 40, 42);
+          leafGeo.translate(leafRadius / 2, (h - 40) / 2, 0);
+          const leaf = new THREE.Mesh(leafGeo, baseMat);
+          leaf.position.set(-w / 2 + 35, 0, 0);
+          leaf.rotation.y = Math.PI * 0.42;
+          group.add(leaf);
+        } else {
+          const slideLeaf = new THREE.Mesh(new THREE.BoxGeometry(w - 60, h - 40, 45), baseMat);
+          slideLeaf.position.set(0, h / 2, 0);
+          group.add(slideLeaf);
+        }
+      }
       else {
         const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), baseMat);
         box.position.set(0, h / 2, 0);
@@ -1470,24 +1758,27 @@
       // A. DOOR-AWARE KITCHEN & BATHROOM (INCLUDED IN ALL 30 TEMPLATES)
       // Rule 1: Opening Kitchen Door immediately reveals the long side of the L-shaped kitchen cabinet.
       // Rule 2: Opening Bathroom Door strictly follows: 1st Vanity Cabinet -> 2nd Middle Toilet -> 3rd Far Bathtub.
+      // Rule 3: Updated to non-overlapping coordinates!
       if (prof.is1BR) {
-        pushItem('kit_l_combo_photo', -750, 2450, 90, 1680, 1280, 2350, '#e8d8c0');
-        pushItem('app_fridge_3door',  -360, 1960, 0);
-        pushItem('bath_vanity_photo', -380, 320, 0, 680, 460, 2100);
-        pushItem('bath_toilet_ledge', -920, 350, 0, 540, 650, 880);
-        pushItem('bath_low_tub_photo', -1240, 825, 90, 1550, 650, 2050);
+        pushItem('kit_l_combo_photo', -750, 2550, 90, 1650, 1250, 2350, '#c9b18c');
+        pushItem('app_fridge_3door',  -360, 1980, 0);
+        pushItem('bath_vanity_photo', -450, 320, 0, 680, 460, 2100);
+        pushItem('bath_toilet_ledge', -980, 350, 0, 540, 650, 880);
+        pushItem('bath_low_tub_photo', -1260, 825, 90, 1550, 620, 2050);
       } else if (prof.is2BR) {
-        pushItem('kit_l_combo_photo', 4180, 825, -90, 1600, 1380, 2380, '#e8d8c0');
-        pushItem('app_fridge_3door',  3220, 350, 0);
-        pushItem('bath_vanity_photo', 2920, 2940, 180, 760, 480, 2150);
-        pushItem('bath_toilet_ledge', 3550, 2880, 180, 560, 660, 880);
-        pushItem('bath_low_tub_photo', 4180, 2485, -90, 1420, 660, 2050);
+        // 2BR: Kitchen Z=0..1650, Bathroom Z=1650..3120 (Zero overlap)
+        pushItem('kit_l_combo_photo', 4180, 825, -90, 1580, 1320, 2380, '#c9b18c');
+        pushItem('app_fridge_3door',  3240, 330, 0);
+        pushItem('bath_vanity_photo', 2920, 2820, 180, 740, 460, 2150);
+        pushItem('bath_toilet_ledge', 3550, 2760, 180, 560, 650, 880);
+        pushItem('bath_low_tub_photo', 4180, 2385, -90, 1420, 640, 2050);
       } else {
-        pushItem('kit_l_combo_photo', 4450, 2425, -90, 1600, 1420, 2380, '#e8d8c0');
-        pushItem('app_fridge_3door',  3480, 1950, 0);
-        pushItem('bath_vanity_photo', 2920, 3560, 180, 760, 480, 2150);
-        pushItem('bath_toilet_ledge', 3550, 3500, 180, 560, 660, 880);
-        pushItem('bath_low_tub_photo', 4180, 3110, -90, 1420, 660, 2050);
+        // 3BR: Kitchen Z=1600..3250, Bathroom Z=3250..4720 (Zero overlap)
+        pushItem('kit_l_combo_photo', 4450, 2425, -90, 1580, 1360, 2380, '#c9b18c');
+        pushItem('app_fridge_3door',  3500, 1930, 0);
+        pushItem('bath_vanity_photo', 2920, 4420, 180, 740, 460, 2150);
+        pushItem('bath_toilet_ledge', 3550, 4360, 180, 560, 650, 880);
+        pushItem('bath_low_tub_photo', 4180, 3985, -90, 1420, 640, 2050);
       }
 
       if (tplId === 'tpl_00') return items;
@@ -1497,87 +1788,372 @@
       const isFamilyBunk = [3, 4, 21, 26].includes(idx);
 
       if (prof.is1BR) {
-        pushItem('cab_c_foyer_1200', 1950, 750, -90, 1300, 360, 2450);
-        pushItem('table_fold_5p', 1750, 2350, -90, 1200, 750, 750);
+        // Place C-cabinet at Z=1350 along right wall, completely clear of Main Door swing at Z=0..900
+        pushItem('cab_c_foyer_1200', 2140, 1450, -90, 1200, 360, 2450);
+        pushItem('table_fold_5p', 1750, 2550, -90, 1200, 750, 750);
         pushItem(isGlassPart ? 'part_glass_3slide' : 'part_wood_slat', 1175, 4250, 0, 2250, 80, 2500);
         if (isFamilyBunk) {
           pushItem('bed_bunk_family_3p', 680, 5200, 0, 1240, 2100, 1800);
           pushItem('desk_study_single', 1800, 5600, 180, 1050, 520, 750);
         } else {
           pushItem('plat_storage_2000', 1175, 5200, 0, 2250, 1800, 380);
-          pushItem('bed_double_4ft', 750, 5250, 0, 1220, 1880, 900, '#f5efe6', 380);
-          pushItem('cab_wardrobe_1200', 1850, 5250, -90, 1200, 580, 2050, '#f5efe6', 380);
+          pushItem('bed_double_4ft', 750, 5250, 0, 1220, 1880, 900, '#d4be9e', 380);
+          pushItem('cab_wardrobe_1200', 1850, 5250, -90, 1200, 580, 2050, '#d4be9e', 380);
         }
-        pushItem('sofa_2seat_1600', 1750, 3450, -90, 1550, 780, 820);
-        pushItem('app_tv_65', 120, 3450, 90, 1300, 70, 780, '#0f172a', 980);
+        pushItem('sofa_2seat_1600', 1750, 3550, -90, 1550, 780, 820);
+        pushItem('app_tv_65', 120, 3550, 90, 1300, 70, 780, '#0f172a', 980);
       } else if (prof.is2BR) {
-        pushItem('cab_c_foyer_1200', 2100, 550, 0, 1250, 380, 2450);
-        pushItem('table_fold_5p', 1850, 2250, -90, 1300, 780, 750);
+        // Place C-cabinet along foyer side wall (X=2620, Z=1250), completely clear of entrance door at X=1650..2530, Z=0..880
+        pushItem('cab_c_foyer_1200', 2300, 1220, -90, 1100, 350, 2450);
+        pushItem('table_fold_5p', 1950, 2450, -90, 1250, 750, 750);
 
-        pushItem('part_brick_100', 775, 2950, 0, 1550, 100, 2550);
-        pushItem('part_brick_100', 1550, 1850, 90, 1300, 100, 2550);
-        pushItem('door_wood_room', 1550, 2550, 90, 820, 100, 2150);
+        pushItem('part_brick_100', 725, 2950, 0, 1450, 100, 2550);
+        pushItem('part_brick_100', 1450, 1100, 90, 2100, 100, 2550);
+        pushItem('door_wood_room', 1450, 2520, 90, 820, 100, 2150);
 
         if (isFamilyBunk) {
-          pushItem('bed_bunk_family_3p', 660, 1180, 0, 1240, 2180, 1800);
-          pushItem('desk_study_single', 950, 2580, 180, 1050, 520, 750);
+          pushItem('bed_bunk_family_3p', 640, 1150, 0, 1220, 2120, 1800);
+          pushItem('desk_study_single', 620, 2580, 180, 1000, 500, 750);
         } else {
-          pushItem('bed_bunk_kids', 550, 1180, 0, 1000, 2150, 1780);
-          pushItem('desk_study_single', 1020, 2580, 180, 950, 500, 750);
+          pushItem('bed_bunk_kids', 540, 1150, 0, 1000, 2100, 1780);
+          pushItem('desk_study_single', 620, 2580, 180, 950, 500, 750);
         }
 
         pushItem(isGlassPart ? 'part_glass_3slide' : 'part_brick_100', 2480, 5050, 90, 2100, 100, 2550);
-        if (!isGlassPart) pushItem('door_wood_room', 2480, 3650, 90, 820, 100, 2150);
+        if (!isGlassPart) pushItem('door_wood_room', 2480, 3580, 90, 820, 100, 2150);
         pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380);
-        pushItem('bed_queen_45ft', 3550, 5050, -90, 1370, 1900, 920, '#e2d5c1', 380);
-        pushItem('cab_wardrobe_1800', 3500, 3580, 0, 1800, 580, 2050, '#f5efe6', 380);
+        pushItem('bed_queen_45ft', 3550, 5150, -90, 1370, 1900, 920, '#d4be9e', 380);
+        pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1650, 560, 2050, '#d4be9e', 380);
 
         pushItem('sofa_3seat_2100', 480, 4750, 90, 2100, 850, 840);
         pushItem('cab_tv_full_2400', 2220, 4750, -90, 2100, 360, 2400);
         pushItem('cab_bay_window', 1200, 5920, 180, 1900, 450, 420);
-        pushItem('light_chandelier', 1200, 4750, 0, 750, 750, 350, '#fbbf24', 2180);
+        pushItem('light_chandelier', 1200, 4750, 0, 750, 750, 350, '#d97706', 2180);
       } else {
-        pushItem('cab_c_foyer_1600', 3350, 240, 0, 1500, 380, 2450);
+        // 3BR (B10, B9, B1, etc.):
+        // FIXED #2: Main entrance door is at X=4200, Z=250..1130 (opening into X=3320..4200, Z=250..1130).
+        // C-cabinet is now placed at X=3450, Z=1420 facing North (away from the door swing), leaving the entrance 100% unobstructed!
+        pushItem('cab_c_foyer_1200', 3550, 1400, 180, 1200, 360, 2450);
 
-        pushItem('part_brick_100', -50, 2950, 90, 350, 100, 2550);
-        pushItem('door_wood_room', -50, 3550, 90, 820, 100, 2150);
-        pushItem('bed_single_3ft', -1000, 2980, -90, 920, 1880, 850);
-        pushItem('cab_wardrobe_1200', -1350, 4320, 180, 1200, 580, 2400);
+        // Side Room (X=-2000..0, Z=2500..4650): Door at X=-50, Z=3850; Bed & Wardrobe clear of door swing
+        pushItem('part_brick_100', -50, 3150, 90, 450, 100, 2550);
+        pushItem('door_wood_room', -50, 3850, 90, 820, 100, 2150);
+        pushItem('bed_single_3ft', -1050, 2980, -90, 920, 1880, 850);
+        pushItem('cab_wardrobe_1200', -1380, 4340, 180, 1150, 560, 2400);
 
-        pushItem('part_brick_100', 1250, 2380, 0, 2500, 100, 2550);
-        pushItem('part_brick_100', 2500, 850, 90, 1700, 100, 2550);
-        pushItem('door_wood_room', 2500, 1950, 90, 820, 100, 2150);
+        // Top-Left Bedroom (X=0..2350, Z=0..2380): Door at X=2350, Z=1880 swinging inward cleanly
+        pushItem('part_brick_100', 1175, 2380, 0, 2350, 100, 2550);
+        pushItem('part_brick_100', 2350, 750, 90, 1450, 100, 2550);
+        pushItem('door_wood_room', 2350, 1880, 90, 820, 100, 2150);
         if (isFamilyBunk) {
-          pushItem('bed_bunk_family_3p', 680, 1180, 0, 1240, 2180, 1800);
+          pushItem('bed_bunk_family_3p', 660, 1150, 0, 1220, 2120, 1800);
         } else {
-          pushItem('bed_bunk_kids', 560, 1180, 0, 1020, 2180, 1780);
+          pushItem('bed_bunk_kids', 550, 1150, 0, 1000, 2120, 1780);
         }
-        pushItem('desk_study_double', 1750, 350, 0, 1450, 550, 750);
-        pushItem('cab_wall_hang_1200', 1750, 220, 0, 1350, 350, 600, '#f5efe6', 1750);
+        pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750);
+        pushItem('cab_wall_hang_1200', 1650, 220, 0, 1250, 350, 600, '#d4be9e', 1750);
 
-        pushItem(isGlassPart ? 'part_glass_3slide' : 'part_brick_100', 2480, 5750, 90, 2100, 100, 2550);
-        if (!isGlassPart) pushItem('door_wood_room', 2480, 4350, 90, 820, 100, 2150);
-        pushItem('plat_storage_2000', 3500, 5380, 0, 1950, 2800, 380);
-        pushItem('bed_queen_45ft', 3550, 5650, -90, 1370, 1900, 920, '#e2d5c1', 380);
-        pushItem('cab_wardrobe_1800', 3500, 4250, 0, 1800, 580, 2050, '#f5efe6', 380);
+        // Master Bedroom in Hall_2 (X=2480..4525, Z=4720..6815):
+        // Door at X=2480, Z=5150, Wardrobe at Z=4980..5550 (X=3650), Queen Bed at Z=5950
+        pushItem(isGlassPart ? 'part_glass_3slide' : 'part_brick_100', 2480, 6150, 90, 1350, 100, 2550);
+        if (!isGlassPart) pushItem('door_wood_room', 2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380);
+        pushItem('bed_queen_45ft', 3550, 6050, -90, 1370, 1880, 920, '#d4be9e', 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, '#d4be9e', 380);
 
-        pushItem('table_fold_5p', 1950, 3150, -90, 1350, 800, 750);
-        pushItem('sofa_3seat_2100', 480, 5450, 90, 2150, 860, 840);
-        pushItem('cab_tv_full_2400', 2220, 5450, -90, 2200, 360, 2400);
-        pushItem('cab_bay_window', 1200, 6550, 180, 2000, 460, 420);
-        pushItem('light_chandelier', 1200, 5450, 0, 780, 780, 360, '#fbbf24', 2180);
+        // Dining & Living in Hall_1
+        pushItem('table_fold_5p', 1750, 3100, -90, 1300, 780, 750);
+        pushItem('sofa_3seat_2100', 480, 5550, 90, 2050, 840, 840);
+        pushItem('cab_tv_full_2400', 2220, 5650, -90, 1950, 360, 2400);
+        pushItem('cab_bay_window', 1200, 6550, 180, 1950, 450, 420);
+        pushItem('light_chandelier', 1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+        pushItem('light_dining_bar', 1750, 3100, 0, 1050, 120, 280, '#ca8a04', 2150);
       }
 
       return items;
     }
 
     // =========================================================================
-    // 11. WALL HEIGHT SYNC (STRUCTURAL WALLS + USER PARTITION WALLS)
+    // 11. UNIT SWITCHING, TEMPLATE APPLICATION & FURNITURE SPAWNING
     // =========================================================================
     function getTargetWallHeightMM() {
-      if (wallHeightMode === 'low') return 450;
-      if (wallHeightMode === 'mid') return 1300;
-      return 2550;
+      if (wallHeightMode === 'full') return 2550;
+      if (wallHeightMode === 'low') return 420;
+      return 1250;
+    }
+
+    function spawnFurnitureMesh(itemData) {
+      const mesh = buildDetailedItemMesh(itemData);
+      mesh.position.set(itemData.x, itemData.y || 0, itemData.z);
+      mesh.rotation.y = THREE.MathUtils.degToRad(itemData.rot || 0);
+      mesh.userData = { isFurnitureRoot: true, uid: itemData.uid };
+      furnitureGroup.add(mesh);
+      const entry = { uid: itemData.uid, data: itemData, mesh };
+      placedFurniture.push(entry);
+      return entry;
+    }
+
+    function addCatalogItemToScene(catId) {
+      const base = CATALOG_ITEMS.find(c => c.id === catId);
+      if (!base) return;
+      const b = getZoneBounds(currentFocusZone === 'all' ? 'main_hall' : currentFocusZone);
+      const newItem = {
+        uid: 'it_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+        id: base.id,
+        name: base.name,
+        cat: base.cat,
+        w: base.w,
+        d: base.d,
+        h: base.h,
+        x: Math.round(b.cx / 50) * 50,
+        y: base.defaultY || 0,
+        z: Math.round(b.cz / 50) * 50,
+        rot: 0,
+        color: base.color
+      };
+      const entry = spawnFurnitureMesh(newItem);
+      applyCurrentWallHeightToStructure();
+      applyZoneIsolationVisuals();
+      selectItem(entry, true); // Newly added item comes with move mode armed for convenience
+      updateBomList();
+      showToast(`✅ 已新增「${base.name.replace(/^\d+\.\s*/, '')}」(可直接拖動擺位)`);
+    }
+
+    function applyTemplate(tplId) {
+      currentTemplateId = tplId;
+      const tpl = THIRTY_TEMPLATES.find(t => t.id === tplId) || THIRTY_TEMPLATES[0];
+
+      ['main_hall', 'hall_1', 'hall_2', 'side_room'].forEach(z => {
+        zoneFloorAssignment[z] = tpl.floor;
+        zoneWallAssignment[z] = tpl.wall;
+      });
+      zoneFloorAssignment.kitchen = 'f_slate_dk';
+      zoneFloorAssignment.bathroom = 'f_slate_dk';
+      zoneWallAssignment.kitchen = 'w_tile_kit';
+      zoneWallAssignment.bathroom = 'w_tile_bath';
+
+      clearAndBuildUnitStructure(currentUnitId);
+
+      deselectItem();
+      while (furnitureGroup.children.length) furnitureGroup.remove(furnitureGroup.children[0]);
+      placedFurniture = [];
+
+      const items = getItemsForUnitAndTemplate(currentUnitId, tplId);
+      items.forEach(it => spawnFurnitureMesh(it));
+
+      applyCurrentWallHeightToStructure();
+      applyZoneIsolationVisuals();
+      renderTemplatesGrid();
+      updateBomList();
+      showToast(`✨ 已套用「${tpl.name}」至 ${UNIT_META[currentUnitId].name}`);
+    }
+
+    function switchUnit(unitId) {
+      if (!UNIT_META[unitId]) unitId = 'B10';
+      currentUnitId = unitId;
+      const meta = UNIT_META[unitId];
+      const lbl = document.getElementById('current-unit-label');
+      if (lbl) lbl.textContent = meta.name;
+      const badge = document.getElementById('current-unit-type-badge');
+      if (badge) badge.textContent = meta.badge;
+
+      currentFocusZone = 'all';
+      ['all', 'main_hall', 'hall_1', 'hall_2', 'side_room', 'kitchen', 'bathroom'].forEach(id => {
+        const btn = document.getElementById('zbtn-' + id);
+        if (btn) btn.classList.toggle('zone-btn-active', id === 'all');
+      });
+
+      applyTemplate(currentTemplateId);
+      setCameraView('iso3d');
+    }
+
+    function toggleIsolateZone() {
+      isolateZoneMode = !isolateZoneMode;
+      const btn = document.getElementById('btn-isolate');
+      if (btn) btn.textContent = isolateZoneMode ? '🔍專注:開' : '🔍專注:關';
+      applyZoneIsolationVisuals();
+    }
+
+    function applyZoneIsolationVisuals() {
+      const isFocusing = (currentFocusZone !== 'all' && isolateZoneMode);
+      const b = isFocusing ? getZoneBounds(currentFocusZone) : null;
+
+      floorZoneMeshes.forEach(m => {
+        const match = !isFocusing || m.userData.zoneId === currentFocusZone;
+        m.material.transparent = !match;
+        m.material.opacity = match ? 1.0 : 0.14;
+        m.material.needsUpdate = true;
+      });
+
+      wallZoneMeshes.forEach(w => {
+        const match = !isFocusing || w.userData.zoneId === currentFocusZone;
+        w.material.transparent = !match;
+        w.material.opacity = match ? 1.0 : 0.12;
+        w.material.needsUpdate = true;
+      });
+
+      structureGroup.children.forEach(ch => {
+        if (ch.userData && ch.userData.zoneId && !ch.userData.isFloorZone && !wallZoneMeshes.includes(ch)) {
+          const match = !isFocusing || ch.userData.zoneId === currentFocusZone;
+          ch.visible = match;
+        }
+      });
+
+      placedFurniture.forEach(entry => {
+        if (!isFocusing) {
+          entry.mesh.visible = true;
+          return;
+        }
+        const x = entry.data.x, z = entry.data.z;
+        const inZone = (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ);
+        entry.mesh.visible = inZone;
+      });
+    }
+
+    // =========================================================================
+    // 12. 6-ZONE FOCUS, 3D FLOATING ZOOM BADGES & ISOLATION SYSTEM
+    // =========================================================================
+    function getZoneBounds(zoneId) {
+      const prof = getUnitGeometryProfile(currentUnitId);
+      const W_TOTAL = prof.is1BR ? 2350 : (prof.isBay4900 ? 4900 : 4525);
+      const Z_TOTAL = 6815;
+      const mx = x => prof.mirrorX ? (W_TOTAL - x) : x;
+      const mz = z => prof.mirrorZ ? (Z_TOTAL - z) : z;
+      const box = (x1, z1, x2, z2) => ({
+        minX: Math.min(mx(x1), mx(x2)) - 200,
+        maxX: Math.max(mx(x1), mx(x2)) + 200,
+        minZ: Math.min(mz(z1), mz(z2)) - 200,
+        maxZ: Math.max(mz(z1), mz(z2)) + 200,
+        cx: (mx(x1) + mx(x2)) / 2,
+        cz: (mz(z1) + mz(z2)) / 2
+      });
+
+      if (prof.is1BR) {
+        if (zoneId === 'main_hall') return box(0, 0, 2350, 3415);
+        if (zoneId === 'hall_1' || zoneId === 'hall_2' || zoneId === 'side_room') return box(0, 3415, 2350, 6165);
+        if (zoneId === 'kitchen') return box(-1415, 1650, 0, 3415);
+        if (zoneId === 'bathroom') return box(-1580, 0, 0, 1650);
+      } else if (prof.is2BR) {
+        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(0, 0, 2525, 3120);
+        if (zoneId === 'hall_1') return box(0, 3120, 2440, 6165);
+        if (zoneId === 'hall_2') return box(2440, 3120, W_TOTAL, 6165);
+        if (zoneId === 'kitchen') return box(2860, 0, 4925, 1650);
+        if (zoneId === 'bathroom') return box(2525, 1650, 4525, 3120);
+      } else {
+        if (zoneId === 'main_hall') return box(0, 0, 3135, 3250);
+        if (zoneId === 'side_room') return box(-2000, 2500, 0, 4650);
+        if (zoneId === 'hall_1') return box(0, 3650, 2440, 6815);
+        if (zoneId === 'hall_2') return box(2440, 4720, 4525, 6815);
+        if (zoneId === 'kitchen') return box(3135, 1600, 5200, 3250);
+        if (zoneId === 'bathroom') return box(2525, 3250, 4525, 4720);
+      }
+      return { minX: -3000, maxX: 6000, minZ: -500, maxZ: 7500, cx: 1800, cz: 3200 };
+    }
+
+    // Create clickable 3D floating "🔍 Zoom In" badges directly above each zone in the layout
+    function createZone3DPins() {
+      const container = document.getElementById('zone-3d-pins-container');
+      if (!container) return;
+      container.innerHTML = '';
+      zonePinElements = [];
+
+      const prof = getUnitGeometryProfile(currentUnitId);
+      const zonesToShow = prof.is1BR
+        ? [
+            { id: 'main_hall', label: '🔍主廳' },
+            { id: 'hall_1',    label: '🔍廳1' },
+            { id: 'kitchen',   label: '🔍廚房' },
+            { id: 'bathroom',  label: '🔍廁所' }
+          ]
+        : (prof.is2BR
+          ? [
+              { id: 'main_hall', label: '🔍主廳' },
+              { id: 'hall_1',    label: '🔍廳1' },
+              { id: 'hall_2',    label: '🔍廳2' },
+              { id: 'kitchen',   label: '🔍廚房' },
+              { id: 'bathroom',  label: '🔍廁所' }
+            ]
+          : [
+              { id: 'main_hall', label: '🔍主廳' },
+              { id: 'hall_1',    label: '🔍廳1' },
+              { id: 'hall_2',    label: '🔍廳2' },
+              { id: 'side_room', label: '🔍側房' },
+              { id: 'kitchen',   label: '🔍廚房' },
+              { id: 'bathroom',  label: '🔍廁所' }
+            ]);
+
+      zonesToShow.forEach(z => {
+        const b = getZoneBounds(z.id);
+        const btn = document.createElement('button');
+        btn.className = 'pointer-events-auto absolute -translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full text-[10px] font-black shadow-lg border transition active:scale-90 flex items-center gap-0.5 ' +
+          (currentFocusZone === z.id
+            ? 'bg-amber-500 text-slate-950 border-white ring-2 ring-amber-300'
+            : 'bg-slate-900/85 text-amber-300 border-amber-400/50 hover:bg-amber-500 hover:text-slate-950');
+        btn.innerHTML = `<span>${z.label}</span>`;
+        btn.onclick = (ev) => {
+          ev.stopPropagation();
+          if (currentFocusZone === z.id) {
+            focusZone('all');
+          } else {
+            isolateZoneMode = true;
+            document.getElementById('btn-isolate').textContent = '🔍專注:開';
+            focusZone(z.id);
+          }
+        };
+        container.appendChild(btn);
+        zonePinElements.push({ id: z.id, el: btn, worldPos: new THREE.Vector3(b.cx, 1650, b.cz) });
+      });
+    }
+
+    function updateZone3DPinsPosition() {
+      if (!camera || !renderer || !zonePinElements.length) return;
+      const stage = document.getElementById('viewport-stage');
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+
+      zonePinElements.forEach(pin => {
+        const v = pin.worldPos.clone().project(camera);
+        if (v.z > 1) {
+          pin.el.style.display = 'none';
+          return;
+        }
+        const x = (v.x * 0.5 + 0.5) * w;
+        const y = (-(v.y * 0.5) + 0.5) * h;
+        if (x < 30 || x > w - 30 || y < 55 || y > h - 30) {
+          pin.el.style.display = 'none';
+        } else {
+          pin.el.style.display = 'flex';
+          pin.el.style.left = `${x}px`;
+          pin.el.style.top = `${y}px`;
+        }
+      });
+    }
+
+    function focusZone(zoneId) {
+      currentFocusZone = zoneId;
+      ['all', 'main_hall', 'hall_1', 'hall_2', 'side_room', 'kitchen', 'bathroom'].forEach(id => {
+        const btn = document.getElementById('zbtn-' + id);
+        if (btn) btn.classList.toggle('zone-btn-active', id === zoneId);
+      });
+
+      if (zoneId !== 'all') {
+        selectedFloorZone = zoneId;
+        selectedWallZone = zoneId;
+        renderFloorZonePills();
+        renderWallZonePills();
+      }
+
+      const b = getZoneBounds(zoneId);
+      if (zoneId === 'all') {
+        controls.target.set(1800, 300, 3300);
+        camera.position.set(1800, 7800, 8200);
+      } else {
+        controls.target.set(b.cx, 350, b.cz);
+        camera.position.set(b.cx + 350, 3200, b.cz + 2300);
+      }
+      controls.update();
+      applyZoneIsolationVisuals();
+      createZone3DPins();
     }
 
     function applyCurrentWallHeightToStructure() {
@@ -1616,183 +2192,7 @@
     }
 
     // =========================================================================
-    // 12. 6-ZONE FOCUS & ISOLATION SYSTEM
-    // =========================================================================
-    function getZoneBounds(zoneId) {
-      const prof = getUnitGeometryProfile(currentUnitId);
-      const W_TOTAL = prof.is1BR ? 2350 : (prof.isBay4900 ? 4900 : 4525);
-      const Z_TOTAL = 6815;
-      const mx = x => prof.mirrorX ? (W_TOTAL - x) : x;
-      const mz = z => prof.mirrorZ ? (Z_TOTAL - z) : z;
-      const box = (x1, z1, x2, z2) => ({
-        minX: Math.min(mx(x1), mx(x2)) - 250,
-        maxX: Math.max(mx(x1), mx(x2)) + 250,
-        minZ: Math.min(mz(z1), mz(z2)) - 250,
-        maxZ: Math.max(mz(z1), mz(z2)) + 250,
-        cx: (mx(x1) + mx(x2)) / 2,
-        cz: (mz(z1) + mz(z2)) / 2
-      });
-
-      if (prof.is1BR) {
-        if (zoneId === 'main_hall') return box(0, 0, 2350, 3490);
-        if (zoneId === 'hall_1' || zoneId === 'hall_2' || zoneId === 'side_room') return box(0, 3490, 2350, 6165);
-        if (zoneId === 'kitchen') return box(-1415, 1650, 0, 3415);
-        if (zoneId === 'bathroom') return box(-1580, 0, 0, 1650);
-      } else if (prof.is2BR) {
-        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(0, 0, 2525, 3300);
-        if (zoneId === 'hall_1') return box(0, 3300, 2440, 6165);
-        if (zoneId === 'hall_2') return box(2440, 3220, W_TOTAL, 6165);
-        if (zoneId === 'kitchen') return box(2860, 0, 4925, 1650);
-        if (zoneId === 'bathroom') return box(2525, 1750, 4525, 3220);
-      } else {
-        if (zoneId === 'main_hall') return box(0, 0, 4200, 3650);
-        if (zoneId === 'side_room') return box(-2000, 2500, 0, 4650);
-        if (zoneId === 'hall_1') return box(0, 3650, 2440, 6815);
-        if (zoneId === 'hall_2') return box(2440, 3930, 4525, 6815);
-        if (zoneId === 'kitchen') return box(3135, 1600, 5200, 3250);
-        if (zoneId === 'bathroom') return box(2525, 2375, 4525, 3845);
-      }
-      return { minX: -3000, maxX: 6000, minZ: -500, maxZ: 7500, cx: 1800, cz: 3200 };
-    }
-
-    function focusZone(zoneId) {
-      currentFocusZone = zoneId;
-      ['all', 'main_hall', 'hall_1', 'hall_2', 'side_room', 'kitchen', 'bathroom'].forEach(id => {
-        const btn = document.getElementById('zbtn-' + id);
-        if (btn) btn.classList.toggle('zone-btn-active', id === zoneId);
-      });
-
-      if (zoneId !== 'all') {
-        selectedFloorZone = zoneId;
-        selectedWallZone = zoneId;
-        renderFloorZonePills();
-        renderWallZonePills();
-      }
-
-      const b = getZoneBounds(zoneId);
-      if (zoneId === 'all') {
-        controls.target.set(1800, 300, 3300);
-        camera.position.set(1800, 7800, 8200);
-      } else {
-        controls.target.set(b.cx, 400, b.cz);
-        camera.position.set(b.cx + 600, 3900, b.cz + 3200);
-      }
-      controls.update();
-      applyZoneIsolationVisuals();
-    }
-
-    function toggleIsolateZone() {
-      isolateZoneMode = !isolateZoneMode;
-      const btn = document.getElementById('btn-isolate');
-      btn.textContent = isolateZoneMode ? '🔍專注:開' : '🔍專注:關';
-      applyZoneIsolationVisuals();
-    }
-
-    function applyZoneIsolationVisuals() {
-      const active = (currentFocusZone !== 'all' && isolateZoneMode);
-      const b = getZoneBounds(currentFocusZone);
-
-      floorZoneMeshes.forEach(m => {
-        const match = !active || m.userData.zoneId === currentFocusZone;
-        m.material.transparent = !match;
-        m.material.opacity = match ? 1.0 : 0.14;
-      });
-      wallZoneMeshes.forEach(m => {
-        const match = !active || m.userData.zoneId === currentFocusZone;
-        m.material.transparent = !match;
-        m.material.opacity = match ? 1.0 : 0.12;
-      });
-      placedFurniture.forEach(entry => {
-        if (!active) {
-          entry.mesh.visible = true;
-        } else {
-          const { x, z } = entry.data;
-          entry.mesh.visible = (x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ);
-        }
-      });
-    }
-
-    // =========================================================================
-    // 13. SWITCH UNIT, TEMPLATE & MANAGE PLACED ITEMS
-    // =========================================================================
-    function switchUnit(unitId) {
-      currentUnitId = unitId;
-      const meta = UNIT_META[unitId] || UNIT_META.B10;
-      document.getElementById('current-unit-label').textContent = meta.name;
-      document.getElementById('current-unit-type-badge').textContent = meta.badge;
-      clearAndBuildUnitStructure(unitId);
-      applyTemplate(currentTemplateId);
-      focusZone('all');
-      showToast(`🏢 已切換至 ${meta.name} (${meta.badge})`);
-    }
-
-    function applyTemplate(tplId) {
-      currentTemplateId = tplId;
-      const tpl = THIRTY_TEMPLATES.find(t => t.id === tplId) || THIRTY_TEMPLATES[0];
-
-      ['main_hall', 'hall_1', 'hall_2', 'side_room'].forEach(z => {
-        zoneFloorAssignment[z] = tpl.floor;
-        zoneWallAssignment[z] = tpl.wall;
-      });
-      zoneFloorAssignment.kitchen = 'f_slate_dk';
-      zoneFloorAssignment.bathroom = 'f_slate_dk';
-      zoneWallAssignment.kitchen = 'w_tile_kit';
-      zoneWallAssignment.bathroom = 'w_tile_bath';
-
-      clearAndBuildUnitStructure(currentUnitId);
-
-      deselectItem();
-      while (furnitureGroup.children.length) furnitureGroup.remove(furnitureGroup.children[0]);
-      placedFurniture = [];
-
-      const items = getItemsForUnitAndTemplate(currentUnitId, tplId);
-      items.forEach(itemData => spawnFurnitureMesh(itemData));
-
-      applyCurrentWallHeightToStructure();
-      applyZoneIsolationVisuals();
-      renderTemplatesGrid();
-      updateBomList();
-      showToast(`✨ 已套用「${tpl.name}」`);
-    }
-
-    function spawnFurnitureMesh(itemData) {
-      const mesh = buildDetailedItemMesh(itemData);
-      mesh.position.set(itemData.x, itemData.y || 0, itemData.z);
-      mesh.rotation.y = THREE.MathUtils.degToRad(itemData.rot || 0);
-      mesh.userData = { isFurnitureRoot: true, uid: itemData.uid };
-      furnitureGroup.add(mesh);
-      const entry = { uid: itemData.uid, data: itemData, mesh };
-      placedFurniture.push(entry);
-      return entry;
-    }
-
-    function addCatalogItemToScene(catId) {
-      const base = CATALOG_ITEMS.find(c => c.id === catId);
-      if (!base) return;
-      const b = getZoneBounds(currentFocusZone);
-      const newItem = {
-        uid: 'it_' + Date.now() + '_' + Math.floor(Math.random() * 999),
-        id: base.id,
-        name: base.name,
-        cat: base.cat,
-        w: base.w,
-        d: base.d,
-        h: base.h,
-        x: b.cx,
-        y: base.defaultY || 0,
-        z: b.cz,
-        rot: 0,
-        color: base.color
-      };
-      const entry = spawnFurnitureMesh(newItem);
-      applyCurrentWallHeightToStructure();
-      selectItem(entry);
-      updateBomList();
-      showToast(`➕ 已加入「${base.name}」，可單指拖動擺位`);
-    }
-
-    // =========================================================================
-    // 14. TOUCH / MOUSE DRAGGING & STACKING LOGIC
+    // 14. SAFE TOUCH / MOUSE SELECTION & LOCKED MOVE MODE (NO ACCIDENTAL DRAGGING)
     // =========================================================================
     function updatePointerNDC(e) {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -1813,13 +2213,20 @@
         if (obj) {
           const entry = placedFurniture.find(f => f.uid === obj.userData.uid);
           if (entry) {
-            selectItem(entry);
-            isDraggingItem = true;
-            controls.enabled = false;
-            dragPlane.constant = -(entry.data.y || 0);
-            const pt = new THREE.Vector3();
-            raycaster.ray.intersectPlane(dragPlane, pt);
-            dragOffset.set(entry.data.x - pt.x, 0, entry.data.z - pt.z);
+            const wasSameItem = (selectedItem && selectedItem.uid === entry.uid);
+            selectItem(entry, wasSameItem ? isMoveModeArmed : false);
+
+            // Only start dragging if user explicitly enabled "✥移動:開" for this selected item!
+            if (wasSameItem && isMoveModeArmed) {
+              isDraggingItem = true;
+              controls.enabled = false;
+              dragPlane.constant = -(entry.data.y || 0);
+              const pt = new THREE.Vector3();
+              raycaster.ray.intersectPlane(dragPlane, pt);
+              dragOffset.set(entry.data.x - pt.x, 0, entry.data.z - pt.z);
+            } else {
+              showToast('💡 已選中物件！如需拖動位置，請按下方「✥移動」按鈕');
+            }
             return;
           }
         }
@@ -1827,7 +2234,7 @@
     }
 
     function onPointerMove(e) {
-      if (!isDraggingItem || !selectedItem) return;
+      if (!isDraggingItem || !selectedItem || !isMoveModeArmed) return;
       updatePointerNDC(e);
       raycaster.setFromCamera(pointerNDC, camera);
       const pt = new THREE.Vector3();
@@ -1863,14 +2270,42 @@
       }
     }
 
-    function selectItem(entry) {
+    function updateMoveButtonUI() {
+      const btn = document.getElementById('btn-move-toggle');
+      if (!btn) return;
+      if (isMoveModeArmed) {
+        btn.textContent = '✥移動:開(可拖拉)';
+        btn.className = 'px-2 py-0.5 rounded bg-emerald-500 text-slate-950 text-[10px] font-black shrink-0 border border-emerald-300 shadow';
+      } else {
+        btn.textContent = '✥移動:關';
+        btn.className = 'px-2 py-0.5 rounded bg-slate-700 text-slate-200 text-[10px] font-black shrink-0 border border-slate-500';
+      }
+    }
+
+    function toggleMoveSelectedMode() {
+      if (!selectedItem) return;
+      isMoveModeArmed = !isMoveModeArmed;
+      updateMoveButtonUI();
+      if (isMoveModeArmed) {
+        showToast('✥ 移動模式已開啟：現在可直接用手指拖動此物件！');
+      } else {
+        showToast('🔒 移動模式已鎖定：防止誤觸移動');
+      }
+    }
+
+    function selectItem(entry, keepMoveArmed = false) {
       selectedItem = entry;
+      isMoveModeArmed = keepMoveArmed;
+      updateMoveButtonUI();
       document.getElementById('selected-floating-bar').classList.remove('hidden');
       document.getElementById('sel-bar-name').textContent = entry.data.name.replace(/^\d+\.\s*/, '');
     }
 
     function deselectItem() {
       selectedItem = null;
+      isMoveModeArmed = false;
+      isDraggingItem = false;
+      if (controls) controls.enabled = true;
       document.getElementById('selected-floating-bar').classList.add('hidden');
     }
 
@@ -2169,15 +2604,14 @@
     // One-click Zoom Out & Top-Down Full Layout Overview
     function fitFullLayoutTopView() {
       if (!camera || !controls) return;
-      // Ensure all zones are visible
       currentFocusZone = 'all';
       ['all', 'main_hall', 'hall_1', 'hall_2', 'side_room', 'kitchen', 'bathroom'].forEach(id => {
         const btn = document.getElementById('zbtn-' + id);
         if (btn) btn.classList.toggle('zone-btn-active', id === 'all');
       });
       applyZoneIsolationVisuals();
+      createZone3DPins();
 
-      // Calculate exact bounding box of the entire unit structure
       const box = new THREE.Box3().setFromObject(structureGroup);
       const center = new THREE.Vector3();
       const size = new THREE.Vector3();
@@ -2193,6 +2627,30 @@
       camera.position.set(center.x, Math.max(9600, fitDist), center.z + 10);
       controls.update();
       showToast('🗺️ 已縮細並俯視全屋完整 Layout');
+    }
+
+    // Zoom In / Zoom Out & Rotate Camera View Direction Buttons
+    function zoomCameraStep(deltaDist) {
+      if (!camera || !controls) return;
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      const curLen = offset.length();
+      const newLen = THREE.MathUtils.clamp(curLen + deltaDist, 1100, 20000);
+      offset.setLength(newLen);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    }
+
+    function orbitCameraAngle(deltaAngleRad) {
+      if (!camera || !controls) return;
+      const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+      const cosA = Math.cos(deltaAngleRad);
+      const sinA = Math.sin(deltaAngleRad);
+      const nx = offset.x * cosA - offset.z * sinA;
+      const nz = offset.x * sinA + offset.z * cosA;
+      offset.x = nx;
+      offset.z = nz;
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
     }
 
     function setCameraView(mode) {
@@ -2246,6 +2704,7 @@
     function animate() {
       requestAnimationFrame(animate);
       if (controls) controls.update();
+      updateZone3DPinsPosition();
       if (renderer && scene && camera) renderer.render(scene, camera);
     }
 
