@@ -120,6 +120,7 @@
 
           <!-- Simple Icon + Short Text Toolbar (No Day/Night Toggle - Pure Vibrant Color) -->
           <div class="glass-pill px-1 py-0.5 rounded-xl flex items-center gap-0.5 pointer-events-auto overflow-x-auto no-scrollbar shadow-lg">
+            <button onclick="fitFullLayoutTopView()" id="cam-fitall" class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🗺️全景俯視</button>
             <button onclick="setCameraView('top2d')" id="cam-top2d" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 text-slate-200 text-[10px] font-bold shrink-0">📐2D</button>
             <button onclick="setCameraView('iso3d')" id="cam-iso3d" class="px-1.5 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0">🧊3D</button>
             <button onclick="setCameraView('seaview')" id="cam-seaview" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 text-sky-300 text-[10px] font-bold shrink-0">🌊景</button>
@@ -310,47 +311,45 @@
 
   <script>
     // =========================================================================
-    // 1. ALL 36 UNITS METADATA (A座 18室 + B座 18室)
+    // 1. ALL 36 UNITS METADATA (A1-A22 & B1-B22), ZONES, TEMPLATES & GLOBALS
     // =========================================================================
     const UNIT_META = {
-      // B座 (18室)
-      B1:  { id: 'B1',  block: 'B', name: 'B1室',  badge: '三房大則(頂大窗)', type: '3br' },
-      B2:  { id: 'B2',  block: 'B', name: 'B2室',  badge: '精巧一房(頂窗左廚)', type: '1br' },
-      B3:  { id: 'B3',  block: 'B', name: 'B3室',  badge: '兩房闊廳(頂窗右廚)', type: '2br' },
-      B4:  { id: 'B4',  block: 'B', name: 'B4室',  badge: '兩房闊廳(底窗右廚)', type: '2br' },
-      B5:  { id: 'B5',  block: 'B', name: 'B5室',  badge: '精巧一房(底窗左廚)', type: '1br' },
-      B6:  { id: 'B6',  block: 'B', name: 'B6室',  badge: '兩房闊廳(底窗右廚)', type: '2br' },
-      B9:  { id: 'B9',  block: 'B', name: 'B9室',  badge: '三房海景(右側房)',   type: '3br' },
-      B10: { id: 'B10', block: 'B', name: 'B10室', badge: '三房海景(左側房)',   type: '3br' },
-      B11: { id: 'B11', block: 'B', name: 'B11室', badge: '兩房凸窗(4900闊廳)', type: '2br' },
-      B12: { id: 'B12', block: 'B', name: 'B12室', badge: '精巧一房(底窗右廚)', type: '1br' },
-      B13: { id: 'B13', block: 'B', name: 'B13室', badge: '兩房凸窗(4900闊廳)', type: '2br' },
-      B14: { id: 'B14', block: 'B', name: 'B14室', badge: '兩房凸窗(右凸窗)',   type: '2br' },
-      B15: { id: 'B15', block: 'B', name: 'B15室', badge: '三房大則(左下側房)', type: '3br' },
-      B16: { id: 'B16', block: 'B', name: 'B16室', badge: '兩房闊廳(頂窗左廚)', type: '2br' },
-      B17: { id: 'B17', block: 'B', name: 'B17室', badge: '精巧一房(頂窗右廚)', type: '1br' },
-      B18: { id: 'B18', block: 'B', name: 'B18室', badge: '兩房闊廳(頂窗左廚)', type: '2br' },
-      B21: { id: 'B21', block: 'B', name: 'B21室', badge: '橫向兩房(左大窗)',   type: '2br' },
-      B22: { id: 'B22', block: 'B', name: 'B22室', badge: '橫向兩房(右大窗)',   type: '2br' },
-      // A座 (18室)
-      A1:  { id: 'A1',  block: 'A', name: 'A1室',  badge: '兩房闊廳(頂窗左廚)', type: '2br' },
-      A2:  { id: 'A2',  block: 'A', name: 'A2室',  badge: '橫向三房(頂凸側房)', type: '3br' },
-      A3:  { id: 'A3',  block: 'A', name: 'A3室',  badge: '橫向三房(底凸側房)', type: '3br' },
-      A4:  { id: 'A4',  block: 'A', name: 'A4室',  badge: '兩房闊廳(底窗左廚)', type: '2br' },
-      A7:  { id: 'A7',  block: 'A', name: 'A7室',  badge: '橫向三房(頂側房)',   type: '3br' },
-      A8:  { id: 'A8',  block: 'A', name: 'A8室',  badge: '橫向三房(左下側房)', type: '3br' },
-      A9:  { id: 'A9',  block: 'A', name: 'A9室',  badge: '橫向三房(右下側房)', type: '3br' },
-      A10: { id: 'A10', block: 'A', name: 'A10室', badge: '橫向兩房(左大窗)',   type: '2br' },
-      A11: { id: 'A11', block: 'A', name: 'A11室', badge: '兩房闊廳(底窗左廚)', type: '2br' },
-      A12: { id: 'A12', block: 'A', name: 'A12室', badge: '精巧一房(底窗右廚)', type: '1br' },
-      A13: { id: 'A13', block: 'A', name: 'A13室', badge: '兩房闊廳(底窗左廚)', type: '2br' },
-      A14: { id: 'A14', block: 'A', name: 'A14室', badge: '兩房闊廳(頂窗左廚)', type: '2br' },
-      A15: { id: 'A15', block: 'A', name: 'A15室', badge: '精巧一房(頂窗右廚)', type: '1br' },
-      A16: { id: 'A16', block: 'A', name: 'A16室', badge: '兩房闊廳(頂窗左廚)', type: '2br' },
-      A19: { id: 'A19', block: 'A', name: 'A19室', badge: '橫向兩房(左窗右上廚)', type: '2br' },
-      A20: { id: 'A20', block: 'A', name: 'A20室', badge: '橫向兩房(左窗右下廚)', type: '2br' },
-      A21: { id: 'A21', block: 'A', name: 'A21室', badge: '橫向兩房(右減音窗)', type: '2br' },
-      A22: { id: 'A22', block: 'A', name: 'A22室', badge: '橫向三房(下中側房)', type: '3br' }
+      B1:  { id: 'B1',  name: 'B1室',  block: 'B', badge: '三房大則 (頂部大窗)' },
+      B2:  { id: 'B2',  name: 'B2室',  block: 'B', badge: '精巧一房 (頂窗左廚廁)' },
+      B3:  { id: 'B3',  name: 'B3室',  block: 'B', badge: '兩房闊廳 (頂窗右廚廁)' },
+      B4:  { id: 'B4',  name: 'B4室',  block: 'B', badge: '兩房闊廳 (底窗右廚廁)' },
+      B5:  { id: 'B5',  name: 'B5室',  block: 'B', badge: '精巧一房 (底窗左廚廁)' },
+      B6:  { id: 'B6',  name: 'B6室',  block: 'B', badge: '兩房闊廳 (底窗右廚廁)' },
+      B9:  { id: 'B9',  name: 'B9室',  block: 'B', badge: '三房大則 (右凸房左廚廁)' },
+      B10: { id: 'B10', name: 'B10室', block: 'B', badge: '三房大則 (左凸房右廚廁)' },
+      B11: { id: 'B11', name: 'B11室', block: 'B', badge: '兩房4.9m闊廳 (連凸窗)' },
+      B12: { id: 'B12', name: 'B12室', block: 'B', badge: '精巧一房 (底窗右廚廁)' },
+      B13: { id: 'B13', name: 'B13室', block: 'B', badge: '兩房4.9m闊廳 (連凸窗)' },
+      B14: { id: 'B14', name: 'B14室', block: 'B', badge: '兩房4.9m闊廳 (右廚廁)' },
+      B15: { id: 'B15', name: 'B15室', block: 'B', badge: '三房大則 (左下凸房)' },
+      B16: { id: 'B16', name: 'B16室', block: 'B', badge: '兩房闊廳 (頂窗左廚廁)' },
+      B17: { id: 'B17', name: 'B17室', block: 'B', badge: '精巧一房 (頂窗右廚廁)' },
+      B18: { id: 'B18', name: 'B18室', block: 'B', badge: '兩房闊廳 (頂窗左廚廁)' },
+      B21: { id: 'B21', name: 'B21室', block: 'B', badge: '橫向兩房 (左窗右上廚)' },
+      B22: { id: 'B22', name: 'B22室', block: 'B', badge: '橫向兩房 (右窗左上廚)' },
+      A1:  { id: 'A1',  name: 'A1室',  block: 'A', badge: '兩房闊廳 (頂窗左廚廁)' },
+      A2:  { id: 'A2',  name: 'A2室',  block: 'A', badge: '橫向三房 (右窗頂凸房)' },
+      A3:  { id: 'A3',  name: 'A3室',  block: 'A', badge: '橫向三房 (右窗底凸房)' },
+      A4:  { id: 'A4',  name: 'A4室',  block: 'A', badge: '兩房闊廳 (底窗左廚廁)' },
+      A7:  { id: 'A7',  name: 'A7室',  block: 'A', badge: '橫向三房 (右窗頂凸房)' },
+      A8:  { id: 'A8',  name: 'A8室',  block: 'A', badge: '橫向三房 (右窗左下凸房)' },
+      A9:  { id: 'A9',  name: 'A9室',  block: 'A', badge: '橫向三房 (左窗右下凸房)' },
+      A10: { id: 'A10', name: 'A10室', block: 'A', badge: '橫向兩房 (左窗右下廚)' },
+      A11: { id: 'A11', name: 'A11室', block: 'A', badge: '兩房闊廳 (底窗左廚廁)' },
+      A12: { id: 'A12', name: 'A12室', block: 'A', badge: '精巧一房 (底窗右廚廁)' },
+      A13: { id: 'A13', name: 'A13室', block: 'A', badge: '兩房闊廳 (底窗左廚廁)' },
+      A14: { id: 'A14', name: 'A14室', block: 'A', badge: '兩房闊廳 (頂窗左廚廁)' },
+      A15: { id: 'A15', name: 'A15室', block: 'A', badge: '精巧一房 (頂窗右廚廁)' },
+      A16: { id: 'A16', name: 'A16室', block: 'A', badge: '兩房闊廳 (頂窗左廚廁)' },
+      A19: { id: 'A19', name: 'A19室', block: 'A', badge: '橫向兩房 (左窗右上廚)' },
+      A20: { id: 'A20', name: 'A20室', block: 'A', badge: '橫向兩房 (左窗右下廚)' },
+      A21: { id: 'A21', name: 'A21室', block: 'A', badge: '橫向兩房 (右減音窗)' },
+      A22: { id: 'A22', name: 'A22室', block: 'A', badge: '橫向三房 (右窗下中凸房)' }
     };
 
     const FLOOR_ZONES = [
@@ -373,76 +372,139 @@
       { id: 'bathroom',  name: '🚿廁所牆' }
     ];
 
+    const THIRTY_TEMPLATES = [
+      { id: 'tpl_00', name: '00. 交樓標準清水房 (連L廚櫃+浴缸廁所)', badge: '原裝交樓', floor: 'f_oak_nat',   wall: 'w_ivory' },
+      { id: 'tpl_01', name: '01. 日式無印暖木家庭設計',             badge: '無印人氣', floor: 'f_oak_nat',   wall: 'w_cream' },
+      { id: 'tpl_02', name: '02. 北歐奶油風長虹玻璃通透設計',       badge: '採光首選', floor: 'f_oak_white', wall: 'w_cream' },
+      { id: 'tpl_03', name: '03. 五人家庭子母雙層床實用方案',       badge: '5人家庭',  floor: 'f_oak_nat',   wall: 'w_ivory' },
+      { id: 'tpl_04', name: '04. 四人家庭雙童雙書枱溫習方案',       badge: '4人雙書枱',floor: 'f_maple_cr',  wall: 'w_sage' },
+      { id: 'tpl_05', name: '05. 現代輕奢魚肚白雲石高定設計',       badge: '輕奢雲石', floor: 'f_marb_cal',  wall: 'w_marb_cal' },
+      { id: 'tpl_06', name: '06. 2026全屋儲物地台極致收納王',       badge: '收納冠軍', floor: 'f_chev_fr',   wall: 'w_cream' },
+      { id: 'tpl_07', name: '07. 京都侘寂微水泥靜謐居停',           badge: '侘寂美學', floor: 'f_wabi_cem',  wall: 'w_art_wabi' },
+      { id: 'tpl_08', name: '08. 胡桃木大班雙書房在家工作設計',     badge: '雙書房WFH',floor: 'f_walnut_dk', wall: 'w_london_fog' },
+      { id: 'tpl_09', name: '09. 三代同堂長輩安全無地台平地設計',   badge: '長輩友善', floor: 'f_teak_warm', wall: 'w_ivory' },
+      { id: 'tpl_10', name: '10. 法式魚骨拼木浪漫拱門輕法設計',     badge: '法式優雅', floor: 'f_chev_wh',   wall: 'w_rose_grey' },
+      { id: 'tpl_11', name: '11. 莫蘭迪晴空藍海景呼應主題設計',     badge: '海景主題', floor: 'f_ash_grey',  wall: 'w_morandi_bl' },
+      { id: 'tpl_12', name: '12. 黑金型格工業勞倫黑雲石設計',       badge: '型格黑金', floor: 'f_marb_blk',  wall: 'w_art_wabi' },
+      { id: 'tpl_13', name: '13. 以櫃代牆零浪費通道極簡設計',       badge: '以櫃代牆', floor: 'f_herr_cl',   wall: 'w_ivory' },
+      { id: 'tpl_14', name: '14. 意式愛馬仕灰石酒店總統套房風',     badge: '酒店精品', floor: 'f_marb_her',  wall: 'w_marb_grey' },
+      { id: 'tpl_15', name: '15. 二人世界超大橫廳衣帽間設計',       badge: '二人世界', floor: 'f_diag_oak',  wall: 'w_cream' },
+      { id: 'tpl_16', name: '16. 鼠尾草綠自然森林系減壓家居',       badge: '森林療癒', floor: 'f_oak_nat',   wall: 'w_sage' },
+      { id: 'tpl_17', name: '17. 南洋復古緬甸柚木渡假風設計',       badge: '南洋渡假', floor: 'f_teak_warm', wall: 'w_art_sand' },
+      { id: 'tpl_18', name: '18. 意式水磨石繽紛藝術親子樂園',       badge: '親子互動', floor: 'f_terrazzo',  wall: 'w_cream' },
+      { id: 'tpl_19', name: '19. 羅馬洞石藝術漆博物館級質感宅',     badge: '洞石藝術', floor: 'f_trav_rom',  wall: 'w_art_trav' },
+      { id: 'tpl_20', name: '20. 歐式宮廷拼花雲石古典大宅',         badge: '歐式古典', floor: 'f_palace',    wall: 'w_art_vel_wh' },
+      { id: 'tpl_21', name: '21. 五口之家子母床+L型轉角書枱方案',   badge: '5人升級',  floor: 'f_oak_white', wall: 'w_ivory' },
+      { id: 'tpl_22', name: '22. 深海藍天鵝絨配胡桃木紳士格調',     badge: '紳士格調', floor: 'f_diag_wal',  wall: 'w_art_vel_bl' },
+      { id: 'tpl_23', name: '23. 翡翠綠復古電影感高雅家居',         badge: '復古翡翠', floor: 'f_herr_dk',   wall: 'w_art_vel_gr' },
+      { id: 'tpl_24', name: '24. 卡拉拉白雲石配木條子格柵設計',     badge: '雲石木格', floor: 'f_marb_car',  wall: 'w_wood_slat' },
+      { id: 'tpl_25', name: '25. 爵士白雅柏石配玻璃書房設計',       badge: '書香通透', floor: 'f_marb_jaz',  wall: 'w_ivory' },
+      { id: 'tpl_26', name: '26. 多孩家庭雙層床+玩具儲物地台',      badge: '多孩收納', floor: 'f_maple_cr',  wall: 'w_cream' },
+      { id: 'tpl_27', name: '27. 45°斜鋪原木配C字玻璃展示玄關',     badge: '斜鋪原木', floor: 'f_diag_oak',  wall: 'w_wood_oak' },
+      { id: 'tpl_28', name: '28. 暖沙微水泥配胡桃木護牆板設計',     badge: '微水泥木', floor: 'f_sand_warm', wall: 'w_wood_wal' },
+      { id: 'tpl_29', name: '29. 鋼琴音樂家隔音練習室專屬方案',     badge: '隔音琴房', floor: 'f_herr_cl',   wall: 'w_wood_slat_dk' }
+    ];
+
+    // Global 3D Scene & Application State Variables
+    let scene, camera, renderer, controls, hemiLight, ambientLight, dirLight;
+    let structureGroup, furnitureGroup, dimensionGroup;
+    let floorZoneMeshes = [], wallZoneMeshes = [], structuralWalls = [];
+    let placedFurniture = [];
+    let selectedItem = null;
+    let isDraggingItem = false;
+    let dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    let dragOffset = new THREE.Vector3();
+    let raycaster = new THREE.Raycaster();
+    let pointerNDC = new THREE.Vector2();
+
+    let currentUnitId = 'B10';
+    let currentTemplateId = 'tpl_01';
+    let currentFocusZone = 'all';
+    let isolateZoneMode = true;
+    let wallHeightMode = 'mid';
+    let showDimensions = true;
+    let selectedFloorZone = 'all';
+    let selectedWallZone = 'all';
+
+    let zoneFloorAssignment = {
+      main_hall: 'f_oak_nat', hall_1: 'f_oak_nat', hall_2: 'f_oak_nat',
+      side_room: 'f_oak_nat', kitchen: 'f_slate_dk', bathroom: 'f_slate_dk'
+    };
+    let zoneWallAssignment = {
+      main_hall: 'w_cream', hall_1: 'w_cream', hall_2: 'w_cream',
+      side_room: 'w_cream', kitchen: 'w_tile_kit', bathroom: 'w_tile_bath'
+    };
+
     // =========================================================================
-    // 2. 24 FLOOR STYLES & 24 WALL STYLES (VIBRANT TRUE-COLOR PALETTE)
+    // 2. 24 FLOOR STYLES & 24 WALL STYLES (RICH SOLID MATTE PALETTE - NO GLARE)
     // =========================================================================
     const FLOOR_STYLES = [
-      { id: 'f_oak_nat',    cat: 'wood',    name: '無印自然橡木',   type: 'plank',       c1: '#eab676', c2: '#cf924e', knot: '#945b1f' },
-      { id: 'f_oak_white',  cat: 'wood',    name: '北歐白橡木SPC', type: 'plank',       c1: '#f7ecda', c2: '#e3d0b4', knot: '#baa17e' },
-      { id: 'f_walnut_dk',  cat: 'wood',    name: '美式深胡桃木',   type: 'plank',       c1: '#854d27', c2: '#633516', knot: '#3b1c07' },
-      { id: 'f_teak_warm',  cat: 'wood',    name: '緬甸暖柚木',     type: 'plank',       c1: '#d97b29', c2: '#b55e14', knot: '#783804' },
-      { id: 'f_ash_grey',   cat: 'wood',    name: '莫蘭迪灰橡木',   type: 'plank',       c1: '#c7c1b6', c2: '#a69f92', knot: '#787165' },
-      { id: 'f_maple_cr',   cat: 'wood',    name: '奶油楓木直鋪',   type: 'plank',       c1: '#f7dec1', c2: '#e3c39e', knot: '#bd976d' },
-      { id: 'f_diag_oak',   cat: 'chevron', name: '45°斜鋪淺橡木',  type: 'diag_wood',   c1: '#edb877', c2: '#cf9551', knot: '#996022' },
-      { id: 'f_diag_wal',   cat: 'chevron', name: '45°斜鋪胡桃木',  type: 'diag_wood',   c1: '#8c522d', c2: '#6b3919', knot: '#42200a' },
-      { id: 'f_chev_fr',    cat: 'chevron', name: '法式魚骨拼橡木', type: 'chevron',     c1: '#e8b372', c2: '#c78e4c', knot: '#915c20' },
-      { id: 'f_chev_wh',    cat: 'chevron', name: '法式魚骨奶油木', type: 'chevron',     c1: '#faeee1', c2: '#e6d4c1', knot: '#bda68e' },
-      { id: 'f_herr_cl',    cat: 'chevron', name: '經典人字拼原木', type: 'herringbone', c1: '#e0a45e', c2: '#bf813b', knot: '#875216' },
-      { id: 'f_herr_dk',    cat: 'chevron', name: '人字拼煙燻木',   type: 'herringbone', c1: '#704d35', c2: '#543521', knot: '#331c0e' },
-      { id: 'f_marb_car',   cat: 'marble',  name: '卡拉拉白雲石',   type: 'marble',      c1: '#ffffff', c2: '#acb8c9', gold: '#475569' },
-      { id: 'f_marb_cal',   cat: 'marble',  name: '魚肚白金絲石',   type: 'marble',      c1: '#ffffff', c2: '#cbd5e1', gold: '#f59e0b' },
-      { id: 'f_marb_jaz',   cat: 'marble',  name: '爵士白雅柏石',   type: 'marble',      c1: '#f8fafc', c2: '#94a3b8', gold: '#cbd5e1' },
-      { id: 'f_marb_her',   cat: 'marble',  name: '愛馬仕高定灰石', type: 'marble',      c1: '#64748b', c2: '#475569', gold: '#f8fafc' },
-      { id: 'f_marb_blk',   cat: 'marble',  name: '勞倫黑金奢石',   type: 'marble',      c1: '#1e293b', c2: '#0f172a', gold: '#fbbf24' },
-      { id: 'f_trav_rom',   cat: 'marble',  name: '羅馬米白洞石',   type: 'marble',      c1: '#f2e5cb', c2: '#d6c39e', gold: '#b39868' },
-      { id: 'f_terrazzo',   cat: 'marble',  name: '意式水磨石磚',   type: 'terrazzo',    c1: '#f7f1e8', c2: '#f97316', gold: '#0284c7' },
-      { id: 'f_palace',     cat: 'marble',  name: '歐式宮廷拼花石', type: 'palace',      c1: '#fcf6eb', c2: '#d6b37e', gold: '#9c6d2b' },
-      { id: 'f_wabi_cem',   cat: 'tile',    name: '侘寂灰微水泥',   type: 'cement',      c1: '#d5dde8', c2: '#9aa8b8', gold: '#64748b' },
-      { id: 'f_sand_warm',  cat: 'tile',    name: '暖沙米微水泥',   type: 'cement',      c1: '#f2e7d5', c2: '#d9c7ab', gold: '#b59e7a' },
-      { id: 'f_slate_dk',   cat: 'tile',    name: '廚廁防滑深灰石', type: 'tile_grid',   c1: '#52627a', c2: '#3b495e', gold: '#cbd5e1' },
-      { id: 'f_hex_nord',   cat: 'tile',    name: '北歐淺灰防滑磚', type: 'tile_grid',   c1: '#dce4ee', c2: '#94a3b8', gold: '#ffffff' }
+      { id: 'f_oak_nat',    cat: 'wood',    name: '無印自然橡木',   type: 'plank',       c1: '#c88d48', c2: '#a86e2c', knot: '#6e3f0d' },
+      { id: 'f_oak_white',  cat: 'wood',    name: '北歐白橡木SPC', type: 'plank',       c1: '#d8c3a5', c2: '#bda482', knot: '#8c7250' },
+      { id: 'f_walnut_dk',  cat: 'wood',    name: '美式深胡桃木',   type: 'plank',       c1: '#6e3d1c', c2: '#4f2910', knot: '#2e1505' },
+      { id: 'f_teak_warm',  cat: 'wood',    name: '緬甸暖柚木',     type: 'plank',       c1: '#b86118', c2: '#94480b', knot: '#5e2a02' },
+      { id: 'f_ash_grey',   cat: 'wood',    name: '莫蘭迪灰橡木',   type: 'plank',       c1: '#9e9689', c2: '#827a6d', knot: '#595247' },
+      { id: 'f_maple_cr',   cat: 'wood',    name: '奶油楓木直鋪',   type: 'plank',       c1: '#d4b48c', c2: '#b8966c', knot: '#876842' },
+      { id: 'f_diag_oak',   cat: 'chevron', name: '45°斜鋪淺橡木',  type: 'diag_wood',   c1: '#c9904b', c2: '#a66f2e', knot: '#704412' },
+      { id: 'f_diag_wal',   cat: 'chevron', name: '45°斜鋪胡桃木',  type: 'diag_wood',   c1: '#73401f', c2: '#542b11', knot: '#331706' },
+      { id: 'f_chev_fr',    cat: 'chevron', name: '法式魚骨拼橡木', type: 'chevron',     c1: '#c48b47', c2: '#a16a2a', knot: '#6b4110' },
+      { id: 'f_chev_wh',    cat: 'chevron', name: '法式魚骨奶油木', type: 'chevron',     c1: '#d6bfa3', c2: '#baa082', knot: '#8a7256' },
+      { id: 'f_herr_cl',    cat: 'chevron', name: '經典人字拼原木', type: 'herringbone', c1: '#bd803a', c2: '#996020', knot: '#663b0b' },
+      { id: 'f_herr_dk',    cat: 'chevron', name: '人字拼煙燻木',   type: 'herringbone', c1: '#5c3d28', c2: '#422918', knot: '#26150a' },
+      { id: 'f_marb_car',   cat: 'marble',  name: '卡拉拉白雲石',   type: 'marble',      c1: '#d5dde6', c2: '#8b9bb0', gold: '#475569' },
+      { id: 'f_marb_cal',   cat: 'marble',  name: '魚肚白金絲石',   type: 'marble',      c1: '#dbd7cf', c2: '#9ca3af', gold: '#b45309' },
+      { id: 'f_marb_jaz',   cat: 'marble',  name: '爵士白雅柏石',   type: 'marble',      c1: '#cfd6df', c2: '#7d8b9e', gold: '#64748b' },
+      { id: 'f_marb_her',   cat: 'marble',  name: '愛馬仕高定灰石', type: 'marble',      c1: '#526073', c2: '#394454', gold: '#cbd5e1' },
+      { id: 'f_marb_blk',   cat: 'marble',  name: '勞倫黑金奢石',   type: 'marble',      c1: '#1e293b', c2: '#0f172a', gold: '#d97706' },
+      { id: 'f_trav_rom',   cat: 'marble',  name: '羅馬米白洞石',   type: 'marble',      c1: '#cfc0a3', c2: '#b09d7c', gold: '#85704c' },
+      { id: 'f_terrazzo',   cat: 'marble',  name: '意式水磨石磚',   type: 'terrazzo',    c1: '#d6cec2', c2: '#c2590a', gold: '#0369a1' },
+      { id: 'f_palace',     cat: 'marble',  name: '歐式宮廷拼花石', type: 'palace',      c1: '#d9ccb8', c2: '#b38f58', gold: '#785019' },
+      { id: 'f_wabi_cem',   cat: 'tile',    name: '侘寂灰微水泥',   type: 'cement',      c1: '#adb8c4', c2: '#7c8999', gold: '#475569' },
+      { id: 'f_sand_warm',  cat: 'tile',    name: '暖沙米微水泥',   type: 'cement',      c1: '#cfc1ab', c2: '#b09f84', gold: '#857356' },
+      { id: 'f_slate_dk',   cat: 'tile',    name: '廚廁防滑深灰石', type: 'tile_grid',   c1: '#435166', c2: '#2f3b4d', gold: '#94a3b8' },
+      { id: 'f_hex_nord',   cat: 'tile',    name: '北歐淺灰防滑磚', type: 'tile_grid',   c1: '#b2bfcf', c2: '#7c8ca1', gold: '#cbd5e1' }
     ];
 
     const WALL_STYLES = [
-      { id: 'w_ivory',      cat: 'paint',  name: '純淨象牙白',     type: 'paint',      c1: '#fffdf9', c2: '#f7f2e8' },
-      { id: 'w_cream',      cat: 'paint',  name: '2026奶油杏仁白', type: 'paint',      c1: '#ffedd1', c2: '#f5dab0' },
-      { id: 'w_sage',       cat: 'paint',  name: '鼠尾草翠灰綠',   type: 'paint',      c1: '#bfe0ab', c2: '#9ec787' },
-      { id: 'w_morandi_bl', cat: 'paint',  name: '莫蘭迪晴空藍',   type: 'paint',      c1: '#a0cbf0', c2: '#7fb3e0' },
-      { id: 'w_rose_grey',  cat: 'paint',  name: '乾燥玫瑰粉紅',   type: 'paint',      c1: '#f5c1bb', c2: '#e3a39b' },
-      { id: 'w_london_fog', cat: 'paint',  name: '倫敦暖霧灰',     type: 'paint',      c1: '#dedad2', c2: '#c7c1b6' },
-      { id: 'w_art_wabi',   cat: 'art',    name: '侘寂微水泥藝術漆', type: 'cement',   c1: '#e0dcd3', c2: '#c4beb2' },
-      { id: 'w_art_sand',   cat: 'art',    name: '威尼斯暖沙灰泥', type: 'cement',     c1: '#f5e3c6', c2: '#dec49d' },
-      { id: 'w_art_vel_wh', cat: 'art',    name: '珍珠白天鵝絨漆', type: 'cement',     c1: '#fcfaf5', c2: '#ebe5d9' },
+      { id: 'w_ivory',      cat: 'paint',  name: '純淨象牙白',     type: 'paint',      c1: '#dfd9ce', c2: '#cbc2b3' },
+      { id: 'w_cream',      cat: 'paint',  name: '2026奶油杏仁白', type: 'paint',      c1: '#dec8a6', c2: '#c9af87' },
+      { id: 'w_sage',       cat: 'paint',  name: '鼠尾草翠灰綠',   type: 'paint',      c1: '#95b882', c2: '#799e66' },
+      { id: 'w_morandi_bl', cat: 'paint',  name: '莫蘭迪晴空藍',   type: 'paint',      c1: '#7da6cc', c2: '#5f8cb5' },
+      { id: 'w_rose_grey',  cat: 'paint',  name: '乾燥玫瑰粉紅',   type: 'paint',      c1: '#d19992', c2: '#b87d76' },
+      { id: 'w_london_fog', cat: 'paint',  name: '倫敦暖霧灰',     type: 'paint',      c1: '#b8b2a6', c2: '#9c9588' },
+      { id: 'w_art_wabi',   cat: 'art',    name: '侘寂微水泥藝術漆', type: 'cement',   c1: '#bdb7ac', c2: '#9e978b' },
+      { id: 'w_art_sand',   cat: 'art',    name: '威尼斯暖沙灰泥', type: 'cement',     c1: '#d4be9c', c2: '#b89f7a' },
+      { id: 'w_art_vel_wh', cat: 'art',    name: '珍珠白天鵝絨漆', type: 'cement',     c1: '#d9d3c7', c2: '#bfb7a8' },
       { id: 'w_art_vel_bl', cat: 'art',    name: '深海藍天鵝絨漆', type: 'cement',     c1: '#234a78', c2: '#163254' },
       { id: 'w_art_vel_gr', cat: 'art',    name: '翡翠綠藝術漆',   type: 'cement',     c1: '#23634f', c2: '#154536' },
-      { id: 'w_art_trav',   cat: 'art',    name: '米白洞石藝術漆', type: 'marble',     c1: '#f5ebd6', c2: '#dbcca9', gold: '#b8a276' },
-      { id: 'w_marb_cal',   cat: 'marble', name: '連紋魚肚白背景牆', type: 'marble',   c1: '#ffffff', c2: '#cbd5e1', gold: '#f59e0b' },
-      { id: 'w_marb_car',   cat: 'marble', name: '卡拉拉白雲石牆', type: 'marble',     c1: '#ffffff', c2: '#94a3b8', gold: '#64748b' },
-      { id: 'w_marb_blk',   cat: 'marble', name: '勞倫黑金雲石牆', type: 'marble',     c1: '#1e293b', c2: '#0f172a', gold: '#fbbf24' },
-      { id: 'w_marb_grey',  cat: 'marble', name: '高定愛馬仕灰石牆', type: 'marble',   c1: '#64748b', c2: '#475569', gold: '#f1f5f9' },
-      { id: 'w_tile_kit',   cat: 'marble', name: '廚房防油污亮白磚', type: 'tile_grid',c1: '#ffffff', c2: '#cbd5e1', gold: '#94a3b8' },
-      { id: 'w_tile_bath',  cat: 'marble', name: '廁所酒店深灰石磚', type: 'tile_grid',c1: '#64748b', c2: '#475569', gold: '#334155' },
-      { id: 'w_wood_oak',   cat: 'wood',   name: '原木護牆板飾面', type: 'plank',      c1: '#edb877', c2: '#cf9551', knot: '#996022' },
-      { id: 'w_wood_wal',   cat: 'wood',   name: '胡桃木護牆板',   type: 'plank',      c1: '#87512f', c2: '#66381c', knot: '#42200c' },
-      { id: 'w_wood_slat',  cat: 'wood',   name: '日式木條子格柵牆', type: 'slat',     c1: '#eab475', c2: '#7a4b1e', knot: '#4a2b0d' },
-      { id: 'w_wood_slat_dk',cat:'wood',   name: '胡桃木條子格柵牆', type: 'slat',     c1: '#855030', c2: '#2e190c', knot: '#1c0e06' },
-      { id: 'w_diag_oak',   cat: 'wood',   name: '45°斜鋪木紋特色牆',type: 'diag_wood',c1: '#edb877', c2: '#cf9551', knot: '#996022' },
-      { id: 'w_diag_wal',   cat: 'wood',   name: '45°斜鋪胡桃木牆',  type: 'diag_wood',c1: '#855030', c2: '#63381f', knot: '#3d200e' }
+      { id: 'w_art_trav',   cat: 'art',    name: '米白洞石藝術漆', type: 'marble',     c1: '#d4c6ad', c2: '#b5a588', gold: '#8c7956' },
+      { id: 'w_marb_cal',   cat: 'marble', name: '連紋魚肚白背景牆', type: 'marble',   c1: '#dad6ce', c2: '#9ca3af', gold: '#b45309' },
+      { id: 'w_marb_car',   cat: 'marble', name: '卡拉拉白雲石牆', type: 'marble',     c1: '#d4dce6', c2: '#8999ad', gold: '#475569' },
+      { id: 'w_marb_blk',   cat: 'marble', name: '勞倫黑金雲石牆', type: 'marble',     c1: '#1e293b', c2: '#0f172a', gold: '#d97706' },
+      { id: 'w_marb_grey',  cat: 'marble', name: '高定愛馬仕灰石牆', type: 'marble',   c1: '#556378', c2: '#3b4657', gold: '#cbd5e1' },
+      { id: 'w_tile_kit',   cat: 'marble', name: '廚房防油污亮白磚', type: 'tile_grid',c1: '#cfd8e3', c2: '#94a3b8', gold: '#64748b' },
+      { id: 'w_tile_bath',  cat: 'marble', name: '廁所酒店深灰石磚', type: 'tile_grid',c1: '#526075', c2: '#3b4759', gold: '#1e293b' },
+      { id: 'w_wood_oak',   cat: 'wood',   name: '原木護牆板飾面', type: 'plank',      c1: '#c9904b', c2: '#a66f2e', knot: '#704412' },
+      { id: 'w_wood_wal',   cat: 'wood',   name: '胡桃木護牆板',   type: 'plank',      c1: '#754322', c2: '#572e13', knot: '#361907' },
+      { id: 'w_wood_slat',  cat: 'wood',   name: '日式木條子格柵牆', type: 'slat',     c1: '#c78f4c', c2: '#693f16', knot: '#3b2108' },
+      { id: 'w_wood_slat_dk',cat:'wood',   name: '胡桃木條子格柵牆', type: 'slat',     c1: '#734224', c2: '#2b1609', knot: '#170b04' },
+      { id: 'w_diag_oak',   cat: 'wood',   name: '45°斜鋪木紋特色牆',type: 'diag_wood',c1: '#c9904b', c2: '#a66f2e', knot: '#704412' },
+      { id: 'w_diag_wal',   cat: 'wood',   name: '45°斜鋪胡桃木牆',  type: 'diag_wood',c1: '#734224', c2: '#542d15', knot: '#331808' }
     ];
 
     const FURNITURE_COLORS = [
-      { name: '無印原木', hex: '#e6b373' },
-      { name: '北美白橡', hex: '#f5ead8' },
-      { name: '深胡桃木', hex: '#704225' },
-      { name: '奶油烤漆', hex: '#fffdf7' },
-      { name: '莫蘭迪灰', hex: '#94a3b8' },
-      { name: '侘寂暖沙', hex: '#e5d9c5' },
-      { name: '晴空灰藍', hex: '#5282ad' },
-      { name: '鼠尾草綠', hex: '#74a678' },
-      { name: '焦糖真皮', hex: '#c75b0a' },
-      { name: '愛馬仕橙', hex: '#f97316' },
+      { name: '無印原木', hex: '#c78d46' },
+      { name: '北美白橡', hex: '#d4be9e' },
+      { name: '深胡桃木', hex: '#5e3419' },
+      { name: '暖杏烤漆', hex: '#d6cbb9' },
+      { name: '莫蘭迪灰', hex: '#78879c' },
+      { name: '侘寂暖沙', hex: '#bfa98a' },
+      { name: '晴空灰藍', hex: '#43719c' },
+      { name: '鼠尾草綠', hex: '#5c8f60' },
+      { name: '焦糖真皮', hex: '#ad4b05' },
+      { name: '愛馬仕橙', hex: '#d95f0e' },
       { name: '曜石啞黑', hex: '#1e293b' },
-      { name: '香檳拉絲金', hex: '#eab308' }
+      { name: '香檳拉絲金', hex: '#c79306' }
     ];
 
     // =========================================================================
@@ -581,146 +643,74 @@
     // =========================================================================
     const CATALOG_ITEMS = [
       // --- PARTITIONS & DOORS (Sync with Wall Height Button) ---
-      { id: 'part_brick_100',   cat: 'partition', name: '01. 100mm 新造實心磚牆', w: 1500, d: 100, h: 2550, color: '#d97757' },
-      { id: 'part_light_75',    cat: 'partition', name: '02. 75mm 隔音輕質間牆', w: 1500, d: 75,  h: 2550, color: '#cbd5e1' },
-      { id: 'part_glass_3slide',cat: 'partition', name: '03. 黑框長虹玻璃三連動趟門', w: 2000, d: 80, h: 2500, color: '#38bdf8' },
-      { id: 'part_wood_slat',   cat: 'partition', name: '04. 日式原木條子透光屏風', w: 1200, d: 80, h: 2500, color: '#d4a373' },
-      { id: 'door_wood_room',   cat: 'partition', name: '05. 實木隔音掩門 (連金屬門鎖)', w: 820, d: 100, h: 2150, color: '#b47b48' },
-      { id: 'door_pocket_slide',cat: 'partition', name: '06. 慳位木紋暗趟門', w: 850, d: 90, h: 2150, color: '#d4a373' },
+      { id: 'part_brick_100',   cat: 'partition', name: '01. 100mm 新造實心磚牆', w: 1500, d: 100, h: 2550, color: '#c45d3a' },
+      { id: 'part_light_75',    cat: 'partition', name: '02. 75mm 隔音輕質間牆', w: 1500, d: 75,  h: 2550, color: '#94a3b8' },
+      { id: 'part_glass_3slide',cat: 'partition', name: '03. 黑框長虹玻璃三連動趟門', w: 2000, d: 80, h: 2500, color: '#0284c7' },
+      { id: 'part_wood_slat',   cat: 'partition', name: '04. 日式原木條子透光屏風', w: 1200, d: 80, h: 2500, color: '#b57c43' },
+      { id: 'door_wood_room',   cat: 'partition', name: '05. 實木隔音掩門 (連金屬門鎖)', w: 820, d: 100, h: 2150, color: '#9c6334' },
+      { id: 'door_pocket_slide',cat: 'partition', name: '06. 慳位木紋暗趟門', w: 850, d: 90, h: 2150, color: '#b57c43' },
 
       // --- STORAGE, C-CABINETS, GLASS DISPLAY CABINETS, TV WALLS, PLATFORMS ---
-      { id: 'cab_c_foyer_1200', cat: 'storage', name: '07. 1.2米 C字玄關玻璃Display鞋櫃', w: 1200, d: 380, h: 2450, color: '#f5efe6' },
-      { id: 'cab_c_foyer_1600', cat: 'storage', name: '08. 1.6米 C字到頂玻璃Display餐邊櫃', w: 1600, d: 400, h: 2450, color: '#e6dac8' },
-      { id: 'cab_tv_low_1800',  cat: 'storage', name: '09. 1.8米 抽屜門板電視地櫃', w: 1800, d: 400, h: 450, color: '#e6b373' },
-      { id: 'cab_tv_full_2400', cat: 'storage', name: '10. 2.4米 滿牆C字玻璃Display電視櫃', w: 2400, d: 380, h: 2450, color: '#f3efe8' },
-      { id: 'cab_wardrobe_1200',cat: 'storage', name: '11. 1.2米 雙開門到頂衣櫃 (連長拉手)', w: 1200, d: 600, h: 2450, color: '#f5f2eb' },
-      { id: 'cab_wardrobe_1800',cat: 'storage', name: '12. 1.8米 四門連玻璃Display大衣櫃', w: 1800, d: 600, h: 2450, color: '#eae0d0' },
-      { id: 'cab_wardrobe_wall',cat: 'storage', name: '13. 2.0米 以櫃代牆雙面到頂大衣櫃', w: 2000, d: 600, h: 2500, color: '#e2d5c1' },
-      { id: 'cab_wall_hang_1200',cat:'storage', name: '14. 1.2米 黑框玻璃門高空吊櫃', w: 1200, d: 350, h: 650, defaultY: 1750, color: '#f5efe6' },
-      { id: 'cab_wall_hang_1800',cat:'storage', name: '15. 1.8米 雙門書房長吊櫃', w: 1800, d: 350, h: 650, defaultY: 1750, color: '#eae0d0' },
-      { id: 'cab_bay_window',   cat: 'storage', name: '16. 海景窗台抽屜坐墊矮櫃', w: 2000, d: 480, h: 420, color: '#e6b373' },
-      { id: 'cab_tall_oven',    cat: 'storage', name: '17. 650mm 玻璃Display中空電器高櫃', w: 650, d: 600, h: 2350, color: '#f3efe6' },
-      { id: 'plat_storage_2000',cat: 'bed',     name: '18. 2.0×2.0米 上掀儲物地台櫃(400高)', w: 2000, d: 2000, h: 400, color: '#d4a373' },
-      { id: 'plat_storage_1500',cat: 'bed',     name: '19. 1.5×2.0米 上掀儲物地台櫃(350高)', w: 1500, d: 2000, h: 350, color: '#deab76' },
+      { id: 'cab_c_foyer_1200', cat: 'storage', name: '07. 1.2米 C字玄關玻璃Display鞋櫃', w: 1200, d: 380, h: 2450, color: '#d4c3aa' },
+      { id: 'cab_c_foyer_1600', cat: 'storage', name: '08. 1.6米 C字到頂玻璃Display餐邊櫃', w: 1600, d: 400, h: 2450, color: '#c7b295' },
+      { id: 'cab_tv_low_1800',  cat: 'storage', name: '09. 1.8米 抽屜門板電視地櫃', w: 1800, d: 400, h: 450, color: '#c48a45' },
+      { id: 'cab_tv_full_2400', cat: 'storage', name: '10. 2.4米 滿牆C字玻璃Display電視櫃', w: 2400, d: 380, h: 2450, color: '#cfc0a8' },
+      { id: 'cab_wardrobe_1200',cat: 'storage', name: '11. 1.2米 雙開門到頂衣櫃 (連長拉手)', w: 1200, d: 600, h: 2450, color: '#d1c2ab' },
+      { id: 'cab_wardrobe_1800',cat: 'storage', name: '12. 1.8米 四門連玻璃Display大衣櫃', w: 1800, d: 600, h: 2450, color: '#c7b59b' },
+      { id: 'cab_wardrobe_wall',cat: 'storage', name: '13. 2.0米 以櫃代牆雙面到頂大衣櫃', w: 2000, d: 600, h: 2500, color: '#bda88a' },
+      { id: 'cab_wall_hang_1200',cat:'storage', name: '14. 1.2米 黑框玻璃門高空吊櫃', w: 1200, d: 350, h: 650, defaultY: 1750, color: '#d1c2ab' },
+      { id: 'cab_wall_hang_1800',cat:'storage', name: '15. 1.8米 雙門書房長吊櫃', w: 1800, d: 350, h: 650, defaultY: 1750, color: '#c7b59b' },
+      { id: 'cab_bay_window',   cat: 'storage', name: '16. 海景窗台抽屜坐墊矮櫃', w: 2000, d: 480, h: 420, color: '#c48a45' },
+      { id: 'cab_tall_oven',    cat: 'storage', name: '17. 650mm 玻璃Display中空電器高櫃', w: 650, d: 600, h: 2350, color: '#cfc0a8' },
+      { id: 'plat_storage_2000',cat: 'bed',     name: '18. 2.0×2.0米 上掀儲物地台櫃(400高)', w: 2000, d: 2000, h: 400, color: '#b57e42' },
+      { id: 'plat_storage_1500',cat: 'bed',     name: '19. 1.5×2.0米 上掀儲物地台櫃(350高)', w: 1500, d: 2000, h: 350, color: '#bd8548' },
 
       // --- BEDS (INCLUDING 5-PERSON FAMILY BUNK BED) ---
-      { id: 'bed_single_3ft',   cat: 'bed', name: '20. 3尺單人儲物抽屜床 (長輩平地首選)', w: 920,  d: 1920, h: 850, color: '#e2d5c1' },
-      { id: 'bed_double_4ft',   cat: 'bed', name: '21. 4尺油壓雙人床 (1220×1920mm)', w: 1220, d: 1920, h: 920, color: '#d6c7b2' },
-      { id: 'bed_queen_45ft',   cat: 'bed', name: '22. 4.5尺主人房雙人床 (1370×1920mm)', w: 1370, d: 1920, h: 950, color: '#cbd5e1' },
-      { id: 'bed_king_5ft',     cat: 'bed', name: '23. 5尺豪華大雙人床 (1520×1980mm)', w: 1520, d: 1980, h: 980, color: '#94a3b8' },
-      { id: 'bed_bunk_kids',    cat: 'bed', name: '24. 兒童雙層上下格床 (連抽屜梯級櫃)', w: 1020, d: 2250, h: 1780, color: '#e6b373' },
-      { id: 'bed_bunk_family_3p',cat:'bed', name: '25. 五人家庭子母床 (下4尺雙人+上3尺單人)', w: 1260, d: 2280, h: 1820, color: '#d4a373' },
-      { id: 'bed_loft_study',   cat: 'bed', name: '26. 上床下書枱衣櫃組合高架床', w: 1020, d: 2000, h: 1850, color: '#e2d5c1' },
+      { id: 'bed_single_3ft',   cat: 'bed', name: '20. 3尺單人儲物抽屜床 (長輩平地首選)', w: 920,  d: 1920, h: 850, color: '#c2ab8c' },
+      { id: 'bed_double_4ft',   cat: 'bed', name: '21. 4尺油壓雙人床 (1220×1920mm)', w: 1220, d: 1920, h: 920, color: '#b89f7d' },
+      { id: 'bed_queen_45ft',   cat: 'bed', name: '22. 4.5尺主人房雙人床 (1370×1920mm)', w: 1370, d: 1920, h: 950, color: '#8f9eb2' },
+      { id: 'bed_king_5ft',     cat: 'bed', name: '23. 5尺豪華大雙人床 (1520×1980mm)', w: 1520, d: 1980, h: 980, color: '#728296' },
+      { id: 'bed_bunk_kids',    cat: 'bed', name: '24. 兒童雙層上下格床 (連抽屜梯級櫃)', w: 1020, d: 2250, h: 1780, color: '#c48a45' },
+      { id: 'bed_bunk_family_3p',cat:'bed', name: '25. 五人家庭子母床 (下4尺雙人+上3尺單人)', w: 1260, d: 2280, h: 1820, color: '#b57e42' },
+      { id: 'bed_loft_study',   cat: 'bed', name: '26. 上床下書枱衣櫃組合高架床', w: 1020, d: 2000, h: 1850, color: '#bfa888' },
 
       // --- SOFAS, DINING TABLES & KIDS STUDY DESKS ---
-      { id: 'sofa_2seat_1600',  cat: 'living', name: '27. 1.6米 北歐雙人布藝梳化', w: 1600, d: 820, h: 820, color: '#94a3b8' },
-      { id: 'sofa_3seat_2100',  cat: 'living', name: '28. 2.1米 三人焦糖真皮梳化', w: 2100, d: 860, h: 840, color: '#c75b0a' },
-      { id: 'sofa_l_shape_2400',cat: 'living', name: '29. 2.4米 L型貴妃大梳化', w: 2400, d: 1450, h: 840, color: '#e2d5c1' },
-      { id: 'table_fold_5p',    cat: 'living', name: '30. 五人伸縮摺疊餐枱連餐椅', w: 1350, d: 800, h: 750, color: '#e6b373' },
-      { id: 'table_marble_6p',  cat: 'living', name: '31. 1.5米 雲石六人餐枱連餐椅', w: 1500, d: 850, h: 750, color: '#f8fafc' },
-      { id: 'desk_study_single',cat: 'living', name: '32. 1.1米 學童單人溫習書枱連椅', w: 1100, d: 550, h: 750, color: '#f4e9d8' },
-      { id: 'desk_study_double',cat: 'living', name: '33. 1.65米 雙人連體長書枱連雙椅', w: 1650, d: 560, h: 750, color: '#e6b373' },
+      { id: 'sofa_2seat_1600',  cat: 'living', name: '27. 1.6米 北歐雙人布藝梳化', w: 1600, d: 820, h: 820, color: '#64748b' },
+      { id: 'sofa_3seat_2100',  cat: 'living', name: '28. 2.1米 三人焦糖真皮梳化', w: 2100, d: 860, h: 840, color: '#b04b07' },
+      { id: 'sofa_l_shape_2400',cat: 'living', name: '29. 2.4米 L型貴妃大梳化', w: 2400, d: 1450, h: 840, color: '#b59d7e' },
+      { id: 'table_fold_5p',    cat: 'living', name: '30. 五人伸縮摺疊餐枱連餐椅', w: 1350, d: 800, h: 750, color: '#c48a45' },
+      { id: 'table_marble_6p',  cat: 'living', name: '31. 1.5米 雲石六人餐枱連餐椅', w: 1500, d: 850, h: 750, color: '#cbd5e1' },
+      { id: 'desk_study_single',cat: 'living', name: '32. 1.1米 學童單人溫習書枱連椅', w: 1100, d: 550, h: 750, color: '#cfb897' },
+      { id: 'desk_study_double',cat: 'living', name: '33. 1.65米 雙人連體長書枱連雙椅', w: 1650, d: 560, h: 750, color: '#c48a45' },
 
       // --- PHOTO-ACCURATE KITCHEN & BATHROOM MODULES (Attachments 1-4) ---
-      { id: 'kit_l_combo_photo',cat: 'kitbath', name: '34. 實景L型一體式全套廚櫃(連洗衣機/洗碗盤/蒸焗爐/煙機)', w: 1620, d: 1380, h: 2380, color: '#e8d8c0' },
-      { id: 'kit_i_combo_full', cat: 'kitbath', name: '35. 一字型全套廚櫃(連滾筒洗衣機/黑星盆/蒸焗爐)', w: 1620, d: 600, h: 2350, color: '#f5efe6' },
-      { id: 'bath_low_tub_photo',cat:'kitbath', name: '36. 實景矮身石基浴缸(460高)連清玻璃趟門浴屏及花灑', w: 1420, d: 660, h: 2050, color: '#ffffff' },
-      { id: 'bath_toilet_ledge',cat: 'kitbath', name: '37. 實景中間智能座廁(連入牆沖水掣及延伸石檯面)', w: 560, d: 660, h: 880, color: '#ffffff' },
-      { id: 'bath_vanity_photo',cat: 'kitbath', name: '38. 實景胡桃木圓角一體式廁櫃(連洗手盆/鏡櫃/開放格)', w: 760, d: 480, h: 2150, color: '#78472a' },
+      { id: 'kit_l_combo_photo',cat: 'kitbath', name: '34. 實景L型一體式全套廚櫃(連洗衣機/洗碗盤/蒸焗爐/煙機)', w: 1620, d: 1380, h: 2380, color: '#c9b18c' },
+      { id: 'kit_i_combo_full', cat: 'kitbath', name: '35. 一字型全套廚櫃(連滾筒洗衣機/黑星盆/蒸焗爐)', w: 1620, d: 600, h: 2350, color: '#cfc0a8' },
+      { id: 'bath_low_tub_photo',cat:'kitbath', name: '36. 實景矮身石基浴缸(460高)連清玻璃趟門浴屏及花灑', w: 1420, d: 660, h: 2050, color: '#cbd5e1' },
+      { id: 'bath_toilet_ledge',cat: 'kitbath', name: '37. 實景中間智能座廁(連入牆沖水掣及延伸石檯面)', w: 560, d: 660, h: 880, color: '#cbd5e1' },
+      { id: 'bath_vanity_photo',cat: 'kitbath', name: '38. 實景胡桃木圓角一體式廁櫃(連洗手盆/鏡櫃/開放格)', w: 760, d: 480, h: 2150, color: '#693c21' },
 
       // --- APPLIANCES ---
-      { id: 'app_fridge_3door', cat: 'appliance', name: '39. 日式超薄三門變頻雪櫃', w: 600, d: 650, h: 1820, color: '#e2e8f0' },
+      { id: 'app_fridge_3door', cat: 'appliance', name: '39. 日式超薄三門變頻雪櫃', w: 600, d: 650, h: 1820, color: '#94a3b8' },
       { id: 'app_fridge_side',  cat: 'appliance', name: '40. 對門式製冰大雪櫃', w: 900, d: 700, h: 1850, color: '#475569' },
-      { id: 'app_washer_drum',  cat: 'appliance', name: '41. 前置式大眼仔滾筒洗衣機', w: 600, d: 580, h: 840, color: '#ffffff' },
-      { id: 'app_dryer_pump',   cat: 'appliance', name: '42. 熱泵式乾衣機', w: 600, d: 600, h: 840, color: '#f8fafc' },
+      { id: 'app_washer_drum',  cat: 'appliance', name: '41. 前置式大眼仔滾筒洗衣機', w: 600, d: 580, h: 840, color: '#cbd5e1' },
+      { id: 'app_dryer_pump',   cat: 'appliance', name: '42. 熱泵式乾衣機', w: 600, d: 600, h: 840, color: '#cbd5e1' },
       { id: 'app_steam_oven',   cat: 'appliance', name: '43. 檯面透視水波爐/蒸焗爐', w: 500, d: 430, h: 360, defaultY: 880, color: '#1e293b' },
-      { id: 'app_coffee_pro',   cat: 'appliance', name: '44. 意式雙頭Coffee機連雙瓷杯', w: 420, d: 380, h: 380, defaultY: 880, color: '#cbd5e1' },
+      { id: 'app_coffee_pro',   cat: 'appliance', name: '44. 意式雙頭Coffee機連雙瓷杯', w: 420, d: 380, h: 380, defaultY: 880, color: '#94a3b8' },
       { id: 'app_tv_65',        cat: 'appliance', name: '45. 65吋超薄4K掛牆大電視', w: 1450, d: 70, h: 840, defaultY: 980, color: '#0f172a' },
-      { id: 'app_ac_split',     cat: 'appliance', name: '46. 變頻分體式冷氣機', w: 880, d: 240, h: 290, defaultY: 2120, color: '#ffffff' },
+      { id: 'app_ac_split',     cat: 'appliance', name: '46. 變頻分體式冷氣機', w: 880, d: 240, h: 290, defaultY: 2120, color: '#cbd5e1' },
       { id: 'app_bath_heater',  cat: 'appliance', name: '47. 掛牆電熱毛巾架', w: 520, d: 110, h: 750, defaultY: 1150, color: '#334155' },
 
       // --- LIGHTING ---
       { id: 'light_mag_track',  cat: 'lighting', name: '48. 無主燈磁吸軌道射燈 (2米)', w: 2000, d: 80, h: 50, defaultY: 2520, color: '#1e293b' },
-      { id: 'light_chandelier', cat: 'lighting', name: '49. 意式雙環水晶吊燈', w: 780, d: 780, h: 360, defaultY: 2180, color: '#fbbf24' },
-      { id: 'light_dining_bar', cat: 'lighting', name: '50. 飯廳極簡一字長吊燈', w: 1050, d: 120, h: 280, defaultY: 2150, color: '#eab308' },
-      { id: 'light_ceiling_led',cat: 'lighting', name: '51. 超薄現代吸頂燈', w: 550, d: 550, h: 65, defaultY: 2480, color: '#ffffff' },
-      { id: 'light_floor_arc',  cat: 'lighting', name: '52. 設計師大弧形釣魚落地燈', w: 450, d: 450, h: 1850, defaultY: 0, color: '#eab308' }
+      { id: 'light_chandelier', cat: 'lighting', name: '49. 意式雙環水晶吊燈', w: 780, d: 780, h: 360, defaultY: 2180, color: '#d97706' },
+      { id: 'light_dining_bar', cat: 'lighting', name: '50. 飯廳極簡一字長吊燈', w: 1050, d: 120, h: 280, defaultY: 2150, color: '#ca8a04' },
+      { id: 'light_ceiling_led',cat: 'lighting', name: '51. 超薄現代吸頂燈', w: 550, d: 550, h: 65, defaultY: 2480, color: '#cbd5e1' },
+      { id: 'light_floor_arc',  cat: 'lighting', name: '52. 設計師大弧形釣魚落地燈', w: 450, d: 450, h: 1850, defaultY: 0, color: '#ca8a04' }
     ];
 
     // =========================================================================
-    // 5. 30 TEMPLATES (ALL 30 INCLUDE DOOR-ALIGNED L-KITCHEN & VANITY->TOILET->TUB)
-    // =========================================================================
-    const THIRTY_TEMPLATES = [
-      { id: 'tpl_00', badge: '原裝結構+實景廚廁', name: '01. 清水房＋實景L型廚房＋矮身浴缸廁所', floor: 'f_oak_nat', wall: 'w_ivory' },
-      { id: 'tpl_01', badge: '五口實心磚牆三房', name: '02. 五口之家：磚牆三房＋雙童房＋長輩平地房', floor: 'f_oak_nat', wall: 'w_cream' },
-      { id: 'tpl_02', badge: '五口玻璃趟門三房', name: '03. 五口之家：三連動玻璃主人房＋4525全海景廳', floor: 'f_chev_fr', wall: 'w_ivory' },
-      { id: 'tpl_03', badge: '五口子母床雙房',   name: '04. 五口之家(兩房/一房適用)：下雙上單子母床＋雙書枱', floor: 'f_oak_white', wall: 'w_cream' },
-      { id: 'tpl_04', badge: '四口成長雙房',     name: '05. 四口之家：上下格床連梯櫃＋雙人長書枱＋大主臥', floor: 'f_maple_cr', wall: 'w_sage' },
-      { id: 'tpl_05', badge: '四口一人一房',     name: '06. 四口之家：三間獨立私隱睡房＋C字玻璃餐邊櫃', floor: 'f_diag_oak', wall: 'w_ivory' },
-      { id: 'tpl_06', badge: '三口衣帽間方案',   name: '07. 三口之家：闊落兩房＋步入式玻璃衣帽間', floor: 'f_herr_cl', wall: 'w_art_sand' },
-      { id: 'tpl_07', badge: '三口半開放書房',   name: '08. 三口之家：主人房＋兒童房＋長虹玻璃書房', floor: 'f_oak_nat', wall: 'w_morandi_bl' },
-      { id: 'tpl_08', badge: '二人世界巨廳',     name: '09. 二人世界：4.5米橫廳＋5尺大主臥＋中島吧枱', floor: 'f_marb_cal', wall: 'w_art_vel_wh' },
-      { id: 'tpl_09', badge: '退休長輩無障礙',   name: '10. 長輩無障礙：全屋零地台＋雙平地床＋闊走廊', floor: 'f_teak_warm', wall: 'w_cream' },
-      { id: 'tpl_10', badge: '日式無印原木風',   name: '11. 日式無印風：原木格柵屏風＋儲物地台＋L廚櫃', floor: 'f_oak_nat', wall: 'w_wood_oak' },
-      { id: 'tpl_11', badge: '2026奶油侘寂風',   name: '12. 奶油侘寂風：微水泥地面＋弧形梳化＋玻璃展示櫃', floor: 'f_sand_warm', wall: 'w_art_wabi' },
-      { id: 'tpl_12', badge: '輕奢魚肚白雲石',   name: '13. 現代輕奢風：魚肚白金絲雲石＋黑框玻璃大衣櫃', floor: 'f_marb_cal', wall: 'w_marb_cal' },
-      { id: 'tpl_13', badge: '法式魚骨拼奶油',   name: '14. 法式優雅風：魚骨拼木地板＋純白C字展示櫃', floor: 'f_chev_wh', wall: 'w_ivory' },
-      { id: 'tpl_14', badge: '45°斜鋪淺橡木',    name: '15. 視覺延伸風：全屋45°斜鋪淺橡木＋通透玻璃間房', floor: 'f_diag_oak', wall: 'w_cream' },
-      { id: 'tpl_15', badge: '美式復古胡桃木',   name: '16. 復古胡桃木：45°斜鋪胡桃木＋焦糖真皮梳化', floor: 'f_diag_wal', wall: 'w_art_sand' },
-      { id: 'tpl_16', badge: '極限儲物地台王',   name: '17. 極限儲物王：全屋高地台＋滿牆C字玻璃電視櫃', floor: 'f_oak_white', wall: 'w_ivory' },
-      { id: 'tpl_17', badge: '雙書房在家工作',   name: '18. 雙人WFH工作室：獨立雙書房＋意式Coffee吧', floor: 'f_ash_grey', wall: 'w_london_fog' },
-      { id: 'tpl_18', badge: '莫蘭迪霧霾藍調',   name: '19. 北歐莫蘭迪：霧霾藍特色牆＋白橡木直鋪', floor: 'f_oak_white', wall: 'w_morandi_bl' },
-      { id: 'tpl_19', badge: '鼠尾草森林綠意',   name: '20. 自然療癒風：鼠尾草綠牆＋藤編原木傢俬', floor: 'f_oak_nat', wall: 'w_sage' },
-      { id: 'tpl_20', badge: '高定愛馬仕灰石',   name: '21. 酒店行政套房：愛馬仕灰雲石＋勞倫黑金背景牆', floor: 'f_marb_her', wall: 'w_marb_grey' },
-      { id: 'tpl_21', badge: '三代同堂雙主臥',   name: '22. 三代同堂孝親版：雙大床房＋兒童高架床書枱', floor: 'f_herr_cl', wall: 'w_cream' },
-      { id: 'tpl_22', badge: '音樂鋼琴才藝宅',   name: '23. 琴童才藝家庭：客廳預留鋼琴位＋雙人溫習書枱', floor: 'f_chev_fr', wall: 'w_ivory' },
-      { id: 'tpl_23', badge: '意式水磨石活力',   name: '24. 意式水磨石：彩色水磨石磚＋乾燥玫瑰粉灰牆', floor: 'f_terrazzo', wall: 'w_rose_grey' },
-      { id: 'tpl_24', badge: '羅馬洞石藝術宅',   name: '25. 羅馬洞石風：米白洞石地磚＋木條子格柵電視牆', floor: 'f_trav_rom', wall: 'w_art_trav' },
-      { id: 'tpl_25', badge: '深海藍天鵝絨奢華', name: '26. 藝術畫廊風：深海藍天鵝絨漆＋人字拼煙燻木', floor: 'f_herr_dk', wall: 'w_art_vel_bl' },
-      { id: 'tpl_26', badge: '二孩對坐溫習室',   name: '27. 學霸雙童家庭：超長雙人書枱連吊櫃＋子母床', floor: 'f_maple_cr', wall: 'w_ivory' },
-      { id: 'tpl_27', badge: '開放式Studio巨廳', name: '28. 單身貴族/新婚：全開放式Studio＋玻璃衣帽櫃', floor: 'f_wabi_cem', wall: 'w_art_wabi' },
-      { id: 'tpl_28', badge: '歐式宮廷拼花奢石', name: '29. 歐式古典輕奢：宮廷拼花石＋雙環水晶大吊燈', floor: 'f_palace', wall: 'w_art_vel_wh' },
-      { id: 'tpl_29', badge: '翡翠綠復古精品',   name: '30. 翡翠綠精品宅：翡翠綠藝術漆＋胡桃木條子格柵', floor: 'f_walnut_dk', wall: 'w_art_vel_gr' }
-    ];
-
-    // =========================================================================
-    // 6. GLOBAL STATE VARIABLES
-    // =========================================================================
-    let scene, camera, renderer, controls;
-    let hemiLight, dirLight, ambientLight;
-    let structureGroup, furnitureGroup, dimensionGroup;
-
-    let currentUnitId = 'B10';
-    let currentTemplateId = 'tpl_01';
-    let currentFocusZone = 'all';
-    let isolateZoneMode = true;
-    let wallHeightMode = 'mid'; // 'mid' (1300mm), 'full' (2550mm), 'low' (450mm)
-    let showDimensions = true;
-
-    let selectedFloorZone = 'all';
-    let selectedWallZone = 'all';
-    let zoneFloorAssignment = {
-      main_hall: 'f_oak_nat', hall_1: 'f_oak_nat', hall_2: 'f_oak_nat',
-      side_room: 'f_oak_nat', kitchen: 'f_slate_dk', bathroom: 'f_slate_dk'
-    };
-    let zoneWallAssignment = {
-      main_hall: 'w_ivory', hall_1: 'w_ivory', hall_2: 'w_ivory',
-      side_room: 'w_ivory', kitchen: 'w_tile_kit', bathroom: 'w_tile_bath'
-    };
-
-    let floorZoneMeshes = [];
-    let wallZoneMeshes = [];
-    let structuralWalls = [];
-    let placedFurniture = [];
-    let selectedItem = null;
-    let isDraggingItem = false;
-    let raycaster = new THREE.Raycaster();
-    let pointerNDC = new THREE.Vector2();
-    let dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    let dragOffset = new THREE.Vector3();
-
-    // =========================================================================
-    // 7. INITIALIZE 3D SCENE & EVENT LISTENERS (VIBRANT TRUE-COLOR LIGHTING)
+    // 7. INITIALIZE 3D SCENE & EVENT LISTENERS (COMFORTABLE MATTE ARCHITECTURAL LIGHTING)
     // =========================================================================
     function initApp() {
       const container = document.getElementById('canvas-container');
@@ -740,27 +730,28 @@
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.25;
+      // Reduced exposure so colors look solid, rich and never washed-out or glaring
+      renderer.toneMappingExposure = 0.86;
       container.innerHTML = '';
       container.appendChild(renderer.domElement);
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
-      controls.maxPolarAngle = Math.PI / 2 - 0.03;
-      controls.minDistance = 1100;
-      controls.maxDistance = 19000;
+      controls.maxPolarAngle = Math.PI / 2 - 0.01;
+      controls.minDistance = 900;
+      controls.maxDistance = 24000;
       controls.target.set(2000, 300, 3200);
 
-      // Pure white balanced studio lighting for vibrant true colors
-      hemiLight = new THREE.HemisphereLight(0xffffff, 0xe2e8f0, 0.95);
+      // Balanced studio lighting with clear depth contrast (no overexposure)
+      hemiLight = new THREE.HemisphereLight(0xf8fafc, 0x334155, 0.45);
       scene.add(hemiLight);
 
-      ambientLight = new THREE.AmbientLight(0xffffff, 0.68);
+      ambientLight = new THREE.AmbientLight(0xf1f5f9, 0.28);
       scene.add(ambientLight);
 
-      dirLight = new THREE.DirectionalLight(0xffffff, 0.82);
-      dirLight.position.set(4500, 9000, 5500);
+      dirLight = new THREE.DirectionalLight(0xfffbeb, 0.58);
+      dirLight.position.set(4200, 8800, 5200);
       dirLight.castShadow = true;
       dirLight.shadow.mapSize.width = 2048;
       dirLight.shadow.mapSize.height = 2048;
@@ -838,7 +829,7 @@
         const fw = ax2 - ax1, fd = az2 - az1;
         const styleId = zoneFloorAssignment[zoneId] || 'f_oak_nat';
         const tex = getThreeTextureForStyle(styleId, true);
-        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.35, metalness: 0.05 });
+        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.72, metalness: 0.02 });
         const geo = new THREE.BoxGeometry(fw, 30, fd);
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(ax1 + fw / 2, -15, az1 + fd / 2);
@@ -854,7 +845,7 @@
         const ww = Math.max(80, ax2 - ax1), wd = Math.max(80, az2 - az1);
         const styleId = zoneWallAssignment[zoneId] || 'w_ivory';
         const tex = getThreeTextureForStyle(styleId, false);
-        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5, metalness: 0.04 });
+        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.78, metalness: 0.02 });
 
         if (isWindowWall) {
           const sillH = 850;
@@ -863,13 +854,16 @@
           sill.castShadow = true;
           sill.receiveShadow = true;
           sill.userData = { zoneId, maxH: sillH, baseH: sillH };
+          // Subtle top border edge so walls are crisp in top view
+          const sEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(ww, sillH, wd)), new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.5 }));
+          sill.add(sEdge);
           structureGroup.add(sill);
           wallZoneMeshes.push(sill);
           structuralWalls.push(sill);
 
           const glassH = maxH - sillH - 200;
           const glassMat = new THREE.MeshPhysicalMaterial({
-            color: 0x7dd3fc, transparent: true, opacity: 0.32, roughness: 0.05, metalness: 0.1
+            color: 0x38bdf8, transparent: true, opacity: 0.35, roughness: 0.15, metalness: 0.05
           });
           const glass = new THREE.Mesh(new THREE.BoxGeometry(ww * 0.96, glassH, Math.min(40, wd * 0.5)), glassMat);
           glass.position.set(ax1 + ww / 2, sillH + glassH / 2, az1 + wd / 2);
@@ -881,6 +875,8 @@
           wall.castShadow = true;
           wall.receiveShadow = true;
           wall.userData = { zoneId, maxH, baseH: maxH };
+          const wEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(ww, maxH, wd)), new THREE.LineBasicMaterial({ color: 0x1e293b, transparent: true, opacity: 0.55 }));
+          wall.add(wEdge);
           structureGroup.add(wall);
           wallZoneMeshes.push(wall);
           structuralWalls.push(wall);
@@ -1041,13 +1037,13 @@
     function buildDetailedItemMesh(itemData) {
       const group = new THREE.Group();
       const { id, cat, w, d, h, color } = itemData;
-      const mainColor = new THREE.Color(color || '#e6b373');
-      const baseMat = new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.36, metalness: 0.06 });
-      const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.25, metalness: 0.55 });
-      const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.22, metalness: 0.85 });
-      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.12, metalness: 0.9 });
-      const stoneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, metalness: 0.05 });
-      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, transparent: true, opacity: 0.38, roughness: 0.08 });
+      const mainColor = new THREE.Color(color || '#c48a45');
+      const baseMat = new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.62, metalness: 0.05 });
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.45 });
+      const brassMat = new THREE.MeshStandardMaterial({ color: 0xc79306, roughness: 0.35, metalness: 0.72 });
+      const chromeMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.25, metalness: 0.75 });
+      const stoneMat = new THREE.MeshStandardMaterial({ color: 0xdad6ce, roughness: 0.45, metalness: 0.04 });
+      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.42, roughness: 0.12 });
 
       // 1. PHOTO-ACCURATE L-SHAPED KITCHEN COMBO (Attachments 3 & 4)
       if (id === 'kit_l_combo_photo' || id === 'kit_i_combo_full') {
@@ -1068,7 +1064,7 @@
 
         // Front-load Drum Washer embedded under right side of main counter
         const washerX = w / 2 - 320;
-        const washerBody = new THREE.Mesh(new THREE.BoxGeometry(590, 815, 575), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.18 }));
+        const washerBody = new THREE.Mesh(new THREE.BoxGeometry(590, 815, 575), new THREE.MeshStandardMaterial({ color: 0xdbe2ea, roughness: 0.35 }));
         washerBody.position.set(washerX, 408, zBack + 12);
         group.add(washerBody);
         const drumOuter = new THREE.Mesh(new THREE.CylinderGeometry(205, 205, 34, 28), darkMat);
@@ -1184,7 +1180,7 @@
       }
       // 3. PHOTO-ACCURATE SMART TOILET WITH CONCEALED CISTERN LEDGE (Attachments 1 & 2)
       else if (id === 'bath_toilet_ledge') {
-        const ledgeWall = new THREE.Mesh(new THREE.BoxGeometry(w, 860, 180), new THREE.MeshStandardMaterial({ color: 0xd6cfc2, roughness: 0.4 }));
+        const ledgeWall = new THREE.Mesh(new THREE.BoxGeometry(w, 860, 180), new THREE.MeshStandardMaterial({ color: 0xb8afa0, roughness: 0.55 }));
         ledgeWall.position.set(0, 430, -d / 2 + 90);
         group.add(ledgeWall);
         const ledgeTop = new THREE.Mesh(new THREE.BoxGeometry(w + 20, 36, 210), stoneMat);
@@ -1196,7 +1192,7 @@
         const bowl = new THREE.Mesh(new THREE.CylinderGeometry(195, 155, 410, 24), stoneMat);
         bowl.position.set(0, 205, 85);
         group.add(bowl);
-        const seat = new THREE.Mesh(new THREE.CylinderGeometry(200, 200, 42, 24), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
+        const seat = new THREE.Mesh(new THREE.CylinderGeometry(200, 200, 42, 24), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.25 }));
         seat.position.set(0, 422, 85);
         group.add(seat);
       }
@@ -1211,7 +1207,7 @@
         const counter = new THREE.Mesh(new THREE.BoxGeometry(w + 24, 48, d + 24), stoneMat);
         counter.position.set(0, cabH + 20, 0);
         group.add(counter);
-        const vesselBasin = new THREE.Mesh(new THREE.BoxGeometry(w * 0.64, 115, d * 0.68), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
+        const vesselBasin = new THREE.Mesh(new THREE.BoxGeometry(w * 0.64, 115, d * 0.68), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.25 }));
         vesselBasin.position.set(-w * 0.08, cabH + 92, 0);
         group.add(vesselBasin);
         const tap = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 175, 12), chromeMat);
@@ -1232,10 +1228,10 @@
         const lowerFrame = new THREE.Mesh(new THREE.BoxGeometry(w, 340, d - 360), baseMat);
         lowerFrame.position.set(0, 170, -180);
         group.add(lowerFrame);
-        const lowerMatt = new THREE.Mesh(new THREE.BoxGeometry(w - 60, 180, d - 420), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        const lowerMatt = new THREE.Mesh(new THREE.BoxGeometry(w - 60, 180, d - 420), new THREE.MeshStandardMaterial({ color: 0xd6d3cb, roughness: 0.65 }));
         lowerMatt.position.set(0, 420, -180);
         group.add(lowerMatt);
-        const lowerQuilt = new THREE.Mesh(new THREE.BoxGeometry(w - 50, 190, (d - 420) * 0.65), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.5 }));
+        const lowerQuilt = new THREE.Mesh(new THREE.BoxGeometry(w - 50, 190, (d - 420) * 0.65), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.65 }));
         lowerQuilt.position.set(0, 428, -20);
         group.add(lowerQuilt);
 
@@ -1243,10 +1239,10 @@
         const upperFrame = new THREE.Mesh(new THREE.BoxGeometry(upperW, 160, d - 360), baseMat);
         upperFrame.position.set(-w / 2 + upperW / 2, 1320, -180);
         group.add(upperFrame);
-        const upperMatt = new THREE.Mesh(new THREE.BoxGeometry(upperW - 60, 150, d - 420), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
+        const upperMatt = new THREE.Mesh(new THREE.BoxGeometry(upperW - 60, 150, d - 420), new THREE.MeshStandardMaterial({ color: 0xd6d3cb, roughness: 0.65 }));
         upperMatt.position.set(-w / 2 + upperW / 2, 1460, -180);
         group.add(upperMatt);
-        const upperQuilt = new THREE.Mesh(new THREE.BoxGeometry(upperW - 50, 160, (d - 420) * 0.65), new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.5 }));
+        const upperQuilt = new THREE.Mesh(new THREE.BoxGeometry(upperW - 50, 160, (d - 420) * 0.65), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.65 }));
         upperQuilt.position.set(-w / 2 + upperW / 2, 1468, -20);
         group.add(upperQuilt);
 
@@ -1328,16 +1324,16 @@
         const head = new THREE.Mesh(new THREE.BoxGeometry(w, h, 110), baseMat);
         head.position.set(0, h / 2, -d / 2 + 55);
         group.add(head);
-        const matt = new THREE.Mesh(new THREE.BoxGeometry(w - 60, 210, d - 140), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        const matt = new THREE.Mesh(new THREE.BoxGeometry(w - 60, 210, d - 140), new THREE.MeshStandardMaterial({ color: 0xd6d3cb, roughness: 0.65 }));
         matt.position.set(0, 445, 45);
         group.add(matt);
-        const blanket = new THREE.Mesh(new THREE.BoxGeometry(w - 46, 220, (d - 140) * 0.65), new THREE.MeshStandardMaterial({ color: 0x60a5fa, roughness: 0.45 }));
+        const blanket = new THREE.Mesh(new THREE.BoxGeometry(w - 46, 220, (d - 140) * 0.65), new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.6 }));
         blanket.position.set(0, 454, d * 0.17);
         group.add(blanket);
         const numPillows = w > 1100 ? 2 : 1;
         for (let p = 0; p < numPillows; p++) {
           const px = numPillows === 1 ? 0 : (p === 0 ? -w * 0.23 : w * 0.23);
-          const pillow = new THREE.Mesh(new THREE.BoxGeometry(w * 0.38, 95, 280), new THREE.MeshStandardMaterial({ color: 0xfef3c7 }));
+          const pillow = new THREE.Mesh(new THREE.BoxGeometry(w * 0.38, 95, 280), new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.6 }));
           pillow.position.set(px, 575, -d / 2 + 270);
           group.add(pillow);
         }
@@ -1419,6 +1415,16 @@
         if (obj.isMesh) {
           obj.castShadow = true;
           obj.receiveShadow = true;
+          // Add crisp dark architectural outlines so every furniture piece is clearly visible from above
+          if (obj.geometry && !obj.userData.noEdge) {
+            const edgeGeo = new THREE.EdgesGeometry(obj.geometry);
+            const edgeLine = new THREE.LineSegments(
+              edgeGeo,
+              new THREE.LineBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.42 })
+            );
+            edgeLine.userData.noEdge = true;
+            obj.add(edgeLine);
+          }
         }
       });
       return group;
@@ -2160,19 +2166,54 @@
       rebuildSelectedItemMesh();
     }
 
+    // One-click Zoom Out & Top-Down Full Layout Overview
+    function fitFullLayoutTopView() {
+      if (!camera || !controls) return;
+      // Ensure all zones are visible
+      currentFocusZone = 'all';
+      ['all', 'main_hall', 'hall_1', 'hall_2', 'side_room', 'kitchen', 'bathroom'].forEach(id => {
+        const btn = document.getElementById('zbtn-' + id);
+        if (btn) btn.classList.toggle('zone-btn-active', id === 'all');
+      });
+      applyZoneIsolationVisuals();
+
+      // Calculate exact bounding box of the entire unit structure
+      const box = new THREE.Box3().setFromObject(structureGroup);
+      const center = new THREE.Vector3();
+      const size = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(size);
+
+      const maxDim = Math.max(size.x, size.z, 6800);
+      const fovRad = THREE.MathUtils.degToRad(camera.fov);
+      const aspect = camera.aspect || 1;
+      const fitDist = (maxDim / 2) / Math.tan(fovRad / 2) / Math.min(1, aspect) * 1.18;
+
+      controls.target.set(center.x, 0, center.z);
+      camera.position.set(center.x, Math.max(9600, fitDist), center.z + 10);
+      controls.update();
+      showToast('🗺️ 已縮細並俯視全屋完整 Layout');
+    }
+
     function setCameraView(mode) {
       if (!camera || !controls) return;
+      const box = new THREE.Box3().setFromObject(structureGroup);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      const cx = isFinite(center.x) ? center.x : 1800;
+      const cz = isFinite(center.z) ? center.z : 3300;
+
       if (mode === 'top2d') {
-        controls.target.set(1800, 0, 3300);
-        camera.position.set(1800, 10800, 3301);
+        fitFullLayoutTopView();
       } else if (mode === 'seaview') {
-        controls.target.set(1800, 900, 6500);
-        camera.position.set(1800, 1500, 1200);
+        controls.target.set(cx, 800, cz + 2800);
+        camera.position.set(cx, 1500, cz - 1800);
+        controls.update();
       } else {
-        controls.target.set(1800, 300, 3300);
-        camera.position.set(2200, 7600, 7800);
+        controls.target.set(cx, 300, cz);
+        camera.position.set(cx + 600, 7600, cz + 4600);
+        controls.update();
       }
-      controls.update();
     }
 
     function takeScreenshot() {
