@@ -212,8 +212,17 @@
 
       <!-- Compact Horizontal Scrollable Drawer Body -->
       <div id="drawer-body" class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 no-scrollbar">
-        <!-- TAB 1: 30 TEMPLATES -->
-        <div id="panel-templates" class="h-full flex flex-col justify-center">
+        <!-- TAB 1: 30 TEMPLATES (WITH HOUSEHOLD SIZE FILTER) -->
+        <div id="panel-templates" class="h-full flex flex-col justify-between">
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+            <span class="text-[9px] text-amber-400 font-bold shrink-0">人數方案:</span>
+            <button onclick="filterTemplatesByPeople('all')" id="pfilt-all" class="px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black shrink-0">全部(30)</button>
+            <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👫2人世界</button>
+            <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👨‍👩‍👧3人家庭</button>
+            <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👨‍👩‍👧‍👦4人家庭</button>
+            <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👨‍👩‍👧‍👦5人大家庭</button>
+            <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🏠6人三代同堂</button>
+          </div>
           <div id="templates-grid" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"></div>
         </div>
 
@@ -243,6 +252,7 @@
             <button onclick="filterCatalog('furniture','storage')" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🚪C字櫃/玻璃櫃</button>
             <button onclick="filterCatalog('furniture','bed')" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🛏️子母床/地台</button>
             <button onclick="filterCatalog('furniture','living')" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🛋️梳化/書枱</button>
+            <button onclick="filterCatalog('furniture','decor')" class="px-1.5 py-0.5 rounded bg-pink-600 text-white text-[9px] font-bold shrink-0">🧸毛公仔/抱枕/地氈</button>
             <button onclick="filterCatalog('furniture','kitbath')" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🍳L廚櫃/浴缸</button>
           </div>
           <div id="furniture-catalog-grid" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"></div>
@@ -387,45 +397,57 @@
     ];
 
     const THIRTY_TEMPLATES = [
-      { id: 'tpl_00', name: '00. 交樓標準清水房 (連L廚櫃+浴缸廁所)', badge: '原裝交樓', floor: 'f_oak_nat',   wall: 'w_ivory' },
-      { id: 'tpl_01', name: '01. 日式無印暖木家庭設計',             badge: '無印人氣', floor: 'f_oak_nat',   wall: 'w_cream' },
-      { id: 'tpl_02', name: '02. 北歐奶油風長虹玻璃通透設計',       badge: '採光首選', floor: 'f_oak_white', wall: 'w_cream' },
-      { id: 'tpl_03', name: '03. 五人家庭子母雙層床實用方案',       badge: '5人家庭',  floor: 'f_oak_nat',   wall: 'w_ivory' },
-      { id: 'tpl_04', name: '04. 四人家庭雙童雙書枱溫習方案',       badge: '4人雙書枱',floor: 'f_maple_cr',  wall: 'w_sage' },
-      { id: 'tpl_05', name: '05. 現代輕奢魚肚白雲石高定設計',       badge: '輕奢雲石', floor: 'f_marb_cal',  wall: 'w_marb_cal' },
-      { id: 'tpl_06', name: '06. 2026全屋儲物地台極致收納王',       badge: '收納冠軍', floor: 'f_chev_fr',   wall: 'w_cream' },
-      { id: 'tpl_07', name: '07. 京都侘寂微水泥靜謐居停',           badge: '侘寂美學', floor: 'f_wabi_cem',  wall: 'w_art_wabi' },
-      { id: 'tpl_08', name: '08. 胡桃木大班雙書房在家工作設計',     badge: '雙書房WFH',floor: 'f_walnut_dk', wall: 'w_london_fog' },
-      { id: 'tpl_09', name: '09. 三代同堂長輩安全無地台平地設計',   badge: '長輩友善', floor: 'f_teak_warm', wall: 'w_ivory' },
-      { id: 'tpl_10', name: '10. 法式魚骨拼木浪漫拱門輕法設計',     badge: '法式優雅', floor: 'f_chev_wh',   wall: 'w_rose_grey' },
-      { id: 'tpl_11', name: '11. 莫蘭迪晴空藍海景呼應主題設計',     badge: '海景主題', floor: 'f_ash_grey',  wall: 'w_morandi_bl' },
-      { id: 'tpl_12', name: '12. 黑金型格工業勞倫黑雲石設計',       badge: '型格黑金', floor: 'f_marb_blk',  wall: 'w_art_wabi' },
-      { id: 'tpl_13', name: '13. 以櫃代牆零浪費通道極簡設計',       badge: '以櫃代牆', floor: 'f_herr_cl',   wall: 'w_ivory' },
-      { id: 'tpl_14', name: '14. 意式愛馬仕灰石酒店總統套房風',     badge: '酒店精品', floor: 'f_marb_her',  wall: 'w_marb_grey' },
-      { id: 'tpl_15', name: '15. 二人世界超大橫廳衣帽間設計',       badge: '二人世界', floor: 'f_diag_oak',  wall: 'w_cream' },
-      { id: 'tpl_16', name: '16. 鼠尾草綠自然森林系減壓家居',       badge: '森林療癒', floor: 'f_oak_nat',   wall: 'w_sage' },
-      { id: 'tpl_17', name: '17. 南洋復古緬甸柚木渡假風設計',       badge: '南洋渡假', floor: 'f_teak_warm', wall: 'w_art_sand' },
-      { id: 'tpl_18', name: '18. 意式水磨石繽紛藝術親子樂園',       badge: '親子互動', floor: 'f_terrazzo',  wall: 'w_cream' },
-      { id: 'tpl_19', name: '19. 羅馬洞石藝術漆博物館級質感宅',     badge: '洞石藝術', floor: 'f_trav_rom',  wall: 'w_art_trav' },
-      { id: 'tpl_20', name: '20. 歐式宮廷拼花雲石古典大宅',         badge: '歐式古典', floor: 'f_palace',    wall: 'w_art_vel_wh' },
-      { id: 'tpl_21', name: '21. 五口之家子母床+L型轉角書枱方案',   badge: '5人升級',  floor: 'f_oak_white', wall: 'w_ivory' },
-      { id: 'tpl_22', name: '22. 深海藍天鵝絨配胡桃木紳士格調',     badge: '紳士格調', floor: 'f_diag_wal',  wall: 'w_art_vel_bl' },
-      { id: 'tpl_23', name: '23. 翡翠綠復古電影感高雅家居',         badge: '復古翡翠', floor: 'f_herr_dk',   wall: 'w_art_vel_gr' },
-      { id: 'tpl_24', name: '24. 卡拉拉白雲石配木條子格柵設計',     badge: '雲石木格', floor: 'f_marb_car',  wall: 'w_wood_slat' },
-      { id: 'tpl_25', name: '25. 爵士白雅柏石配玻璃書房設計',       badge: '書香通透', floor: 'f_marb_jaz',  wall: 'w_ivory' },
-      { id: 'tpl_26', name: '26. 多孩家庭雙層床+玩具儲物地台',      badge: '多孩收納', floor: 'f_maple_cr',  wall: 'w_cream' },
-      { id: 'tpl_27', name: '27. 45°斜鋪原木配C字玻璃展示玄關',     badge: '斜鋪原木', floor: 'f_diag_oak',  wall: 'w_wood_oak' },
-      { id: 'tpl_28', name: '28. 暖沙微水泥配胡桃木護牆板設計',     badge: '微水泥木', floor: 'f_sand_warm', wall: 'w_wood_wal' },
-      { id: 'tpl_29', name: '29. 鋼琴音樂家隔音練習室專屬方案',     badge: '隔音琴房', floor: 'f_herr_cl',   wall: 'w_wood_slat_dk' }
+      { id: 'tpl_00', pTag: 'all', name: '00. 交樓標準清水房 (連L廚櫃+浴缸廁所)', badge: '原裝交樓', floor: 'f_oak_nat',   wall: 'w_ivory',      layoutType: 'bare' },
+      // --- 2-PERSON DESIGNS (2人世界 / 新婚 / 雙人WFH) ---
+      { id: 'tpl_01', pTag: '2p',  name: '01. [2人] 日式無印超大橫廳+玻璃書房設計', badge: '2人無印', floor: 'f_oak_nat',   wall: 'w_cream',      layoutType: '2p_open_study' },
+      { id: 'tpl_02', pTag: '2p',  name: '02. [2人] 北歐奶油風步入式衣帽間套房設計', badge: '2人衣帽間',floor: 'f_oak_white', wall: 'w_cream',      layoutType: '2p_walkin_closet' },
+      { id: 'tpl_03', pTag: '2p',  name: '03. [2人] 現代輕奢魚肚白雲石吧台二人世界', badge: '2人輕奢', floor: 'f_marb_cal',  wall: 'w_marb_cal',   layoutType: '2p_luxury_suite' },
+      { id: 'tpl_04', pTag: '2p',  name: '04. [2人] 胡桃木雙人電競/在家工作大書房', badge: '2人雙書房',floor: 'f_walnut_dk', wall: 'w_london_fog', layoutType: '2p_dual_wfh' },
+      { id: 'tpl_05', pTag: '2p',  name: '05. [2人] 京都侘寂微水泥半開放Studio設計', badge: '2人侘寂', floor: 'f_wabi_cem',  wall: 'w_art_wabi',   layoutType: '2p_studio_chill' },
+      { id: 'tpl_06', pTag: '2p',  name: '06. [2人] 意式愛馬仕灰酒店行政套房設計',   badge: '2人酒店風',floor: 'f_marb_her',  wall: 'w_marb_grey',  layoutType: '2p_hotel_king' },
+
+      // --- 3-PERSON DESIGNS (3人小家庭 / 單孩溫習 / 開放式3人) ---
+      { id: 'tpl_07', pTag: '3p',  name: '07. [3人] 暖木主人房+獨立學童溫習房設計', badge: '3人學童房',floor: 'f_oak_nat',   wall: 'w_ivory',      layoutType: '3p_kid_study' },
+      { id: 'tpl_08', pTag: '3p',  name: '08. [3人] 長虹玻璃採光房+上床下書枱設計', badge: '3人高架床',floor: 'f_maple_cr',  wall: 'w_cream',      layoutType: '3p_loft_desk' },
+      { id: 'tpl_09', pTag: '3p',  name: '09. [3人] 2026全屋儲物地台+兒童遊戲區',   badge: '3人地台王',floor: 'f_chev_fr',   wall: 'w_cream',      layoutType: '3p_platform_play' },
+      { id: 'tpl_10', pTag: '3p',  name: '10. [3人] 法式魚骨拼木主人房+BB毛公仔房', badge: '3人育嬰房',floor: 'f_chev_wh',   wall: 'w_rose_grey',  layoutType: '3p_nursery_cute' },
+      { id: 'tpl_11', pTag: '3p',  name: '11. [3人] 莫蘭迪海景主人房+長輩平地單人房',badge: '3人侍親房',floor: 'f_ash_grey',  wall: 'w_morandi_bl', layoutType: '3p_elder_flat' },
+      { id: 'tpl_12', pTag: '3p',  name: '12. [3人] 鼠尾草綠森林系+鋼琴書房三口之家',badge: '3人琴房', floor: 'f_oak_nat',   wall: 'w_sage',       layoutType: '3p_music_study' },
+
+      // --- 4-PERSON DESIGNS (4人雙孩家庭 / 雙書枱溫習 / 一房4人子母床) ---
+      { id: 'tpl_13', pTag: '4p',  name: '13. [4人] 雙童上下格床+1.65米雙人長書枱', badge: '4人雙書枱',floor: 'f_maple_cr',  wall: 'w_sage',       layoutType: '4p_bunk_2desk' },
+      { id: 'tpl_14', pTag: '4p',  name: '14. [4人] 兩間獨立單人學童房+主人套房設計',badge: '4人各自一房',floor:'f_oak_white', wall: 'w_ivory',     layoutType: '4p_sep_kidrooms' },
+      { id: 'tpl_15', pTag: '4p',  name: '15. [4人] 以櫃代牆主人房+雙層床儲物地台', badge: '4人收納王',floor: 'f_herr_cl',   wall: 'w_ivory',      layoutType: '4p_wardrobe_wall' },
+      { id: 'tpl_16', pTag: '4p',  name: '16. [4人] 意式水磨石親子樂園+雙電腦溫習區',badge: '4人親子宅',floor: 'f_terrazzo',  wall: 'w_cream',      layoutType: '4p_play_study' },
+      { id: 'tpl_17', pTag: '4p',  name: '17. [4人] 卡拉拉白雲石客廳+雙孩對坐書房', badge: '4人雲石木',floor: 'f_marb_car',  wall: 'w_wood_slat',  layoutType: '4p_marble_2kids' },
+      { id: 'tpl_18', pTag: '4p',  name: '18. [4人] 南洋柚木主人房+長輩及小童雙床房',badge: '4人三代宅',floor: 'f_teak_warm', wall: 'w_art_sand',   layoutType: '4p_twin_beds' },
+
+      // --- 5-PERSON DESIGNS (5人大家庭 / 子母床下雙上單 / 三代同堂) ---
+      { id: 'tpl_19', pTag: '5p',  name: '19. [5人] 子母雙層床(下雙上單)+主人房+書枱',badge: '5人子母床',floor: 'f_oak_nat',   wall: 'w_ivory',      layoutType: '5p_family_bunk' },
+      { id: 'tpl_20', pTag: '5p',  name: '20. [5人] 三代同堂無地台長輩房+雙童上下床',badge: '5人長輩友善',floor:'f_teak_warm', wall: 'w_ivory',     layoutType: '5p_3gen_flat' },
+      { id: 'tpl_21', pTag: '5p',  name: '21. [5人] 子母床+高架書枱床+五人伸縮大餐枱',badge: '5人三孩溫習',floor:'f_oak_white', wall: 'w_cream',     layoutType: '5p_3kids_study' },
+      { id: 'tpl_22', pTag: '5p',  name: '22. [5人] 羅馬洞石大廳+子母床+工人/長輩房',badge: '5人連工人房',floor:'f_trav_rom',  wall: 'w_art_trav',   layoutType: '5p_helper_room' },
+      { id: 'tpl_23', pTag: '5p',  name: '23. [5人] 45°斜鋪原木+雙區儲物地台五口之家',badge: '5人全地台',floor: 'f_diag_oak',  wall: 'w_wood_oak',   layoutType: '5p_full_platform' },
+      { id: 'tpl_24', pTag: '5p',  name: '24. [5人] 爵士白雅柏石+子母床+雙人連體書枱',badge: '5人輕奢家',floor: 'f_marb_jaz',  wall: 'w_ivory',      layoutType: '5p_marble_family' },
+
+      // --- 6-PERSON DESIGNS (6人三房滿配 / 雙子母床 / 六人雲石餐枱) ---
+      { id: 'tpl_25', pTag: '6p',  name: '25. [6人] 主人房+子母床(3人)+上下格床(2人)',badge: '6人大家庭',floor: 'f_oak_nat',   wall: 'w_cream',      layoutType: '6p_bunk_combo' },
+      { id: 'tpl_26', pTag: '6p',  name: '26. [6人] 雙子母雙層床+六人雲石大餐枱方案',badge: '6人極致空間',floor:'f_maple_cr',  wall: 'w_ivory',      layoutType: '6p_dual_familybunk' },
+      { id: 'tpl_27', pTag: '6p',  name: '27. [6人] 三代同堂(夫婦+長輩雙人+雙童上下床)',badge:'6人三代同堂',floor:'f_herr_cl',  wall: 'w_cream',      layoutType: '6p_3gen_grand' },
+      { id: 'tpl_28', pTag: '6p',  name: '28. [6人] 歐式宮廷六人餐廳+三房雙層床滿配', badge: '6人歐式大宅',floor:'f_palace',    wall: 'w_art_vel_wh', layoutType: '6p_palace_dining' },
+      { id: 'tpl_29', pTag: '6p',  name: '29. [6人] 暖沙微水泥+三房四書位多孩大家庭', badge: '6人四書位',floor: 'f_sand_warm', wall: 'w_wood_wal',   layoutType: '6p_quad_study' }
     ];
 
-    // Global 3D Scene & Application State Variables
-    let scene, camera, renderer, controls, hemiLight, ambientLight, dirLight;
+    let activePeopleFilter = 'all';
+    let scene, camera, renderer, controls;
+    let hemiLight, ambientLight, dirLight;
     let structureGroup, furnitureGroup, dimensionGroup;
-    let floorZoneMeshes = [], wallZoneMeshes = [], structuralWalls = [];
+    let floorZoneMeshes = [];
+    let wallZoneMeshes = [];
+    let structuralWalls = [];
     let placedFurniture = [];
     let selectedItem = null;
-    let isMoveModeArmed = false; // Must click "✥移動" before dragging to prevent accidental moves
+    let isMoveModeArmed = false;
     let isDraggingItem = false;
     let dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     let dragOffset = new THREE.Vector3();
@@ -690,13 +712,13 @@
       { id: 'bed_loft_study',   cat: 'bed', name: '26. 上床下書枱衣櫃組合高架床', w: 1020, d: 2000, h: 1850, color: '#bfa888' },
 
       // --- SOFAS, DINING TABLES & KIDS STUDY DESKS ---
-      { id: 'sofa_2seat_1600',  cat: 'living', name: '27. 1.6米 北歐雙人布藝梳化', w: 1600, d: 820, h: 820, color: '#64748b' },
-      { id: 'sofa_3seat_2100',  cat: 'living', name: '28. 2.1米 三人焦糖真皮梳化', w: 2100, d: 860, h: 840, color: '#b04b07' },
-      { id: 'sofa_l_shape_2400',cat: 'living', name: '29. 2.4米 L型貴妃大梳化', w: 2400, d: 1450, h: 840, color: '#b59d7e' },
-      { id: 'table_fold_5p',    cat: 'living', name: '30. 五人伸縮摺疊餐枱連餐椅', w: 1350, d: 800, h: 750, color: '#c48a45' },
-      { id: 'table_marble_6p',  cat: 'living', name: '31. 1.5米 雲石六人餐枱連餐椅', w: 1500, d: 850, h: 750, color: '#cbd5e1' },
-      { id: 'desk_study_single',cat: 'living', name: '32. 1.1米 學童單人溫習書枱連椅', w: 1100, d: 550, h: 750, color: '#cfb897' },
-      { id: 'desk_study_double',cat: 'living', name: '33. 1.65米 雙人連體長書枱連雙椅', w: 1650, d: 560, h: 750, color: '#c48a45' },
+      { id: 'sofa_2seat_1600',  cat: 'living', name: '27. 1.6米 北歐雙人布藝梳化(連抱枕)', w: 1600, d: 820, h: 820, color: '#64748b' },
+      { id: 'sofa_3seat_2100',  cat: 'living', name: '28. 2.1米 三人焦糖真皮梳化(連抱枕)', w: 2100, d: 860, h: 840, color: '#b04b07' },
+      { id: 'sofa_l_shape_2400',cat: 'living', name: '29. 2.4米 L型貴妃大梳化(連抱枕+公仔)', w: 2400, d: 1450, h: 840, color: '#b59d7e' },
+      { id: 'table_fold_5p',    cat: 'living', name: '30. 五人伸縮摺疊餐枱連餐椅及花瓶', w: 1350, d: 800, h: 750, color: '#c48a45' },
+      { id: 'table_marble_6p',  cat: 'living', name: '31. 1.5米 雲石六人餐枱連餐椅及花藝', w: 1500, d: 850, h: 750, color: '#cbd5e1' },
+      { id: 'desk_study_single',cat: 'living', name: '32. 1.1米 學童溫習書枱(連電腦+檯燈)', w: 1100, d: 550, h: 750, color: '#cfb897' },
+      { id: 'desk_study_double',cat: 'living', name: '33. 1.65米 雙人連體長書枱(連雙電腦)', w: 1650, d: 560, h: 750, color: '#c48a45' },
 
       // --- PHOTO-ACCURATE KITCHEN & BATHROOM MODULES (Attachments 1-4) ---
       { id: 'kit_l_combo_photo',cat: 'kitbath', name: '34. 實景L型一體式全套廚櫃(連洗衣機/洗碗盤/蒸焗爐/煙機)', w: 1620, d: 1380, h: 2380, color: '#c9b18c' },
@@ -715,13 +737,23 @@
       { id: 'app_tv_65',        cat: 'appliance', name: '45. 65吋超薄4K掛牆大電視', w: 1450, d: 70, h: 840, defaultY: 980, color: '#0f172a' },
       { id: 'app_ac_split',     cat: 'appliance', name: '46. 變頻分體式冷氣機', w: 880, d: 240, h: 290, defaultY: 2120, color: '#cbd5e1' },
       { id: 'app_bath_heater',  cat: 'appliance', name: '47. 掛牆電熱毛巾架', w: 520, d: 110, h: 750, defaultY: 1150, color: '#334155' },
+      { id: 'app_air_purifier', cat: 'appliance', name: '48. Dyson風無葉空氣清新風扇', w: 280, d: 280, h: 1020, defaultY: 0, color: '#e2e8f0' },
+      { id: 'app_robot_vac',    cat: 'appliance', name: '49. 智能自動集塵掃拖機械人', w: 380, d: 420, h: 440, defaultY: 0, color: '#f8fafc' },
 
       // --- LIGHTING ---
-      { id: 'light_mag_track',  cat: 'lighting', name: '48. 無主燈磁吸軌道射燈 (2米)', w: 2000, d: 80, h: 50, defaultY: 2520, color: '#1e293b' },
-      { id: 'light_chandelier', cat: 'lighting', name: '49. 意式雙環水晶吊燈', w: 780, d: 780, h: 360, defaultY: 2180, color: '#d97706' },
-      { id: 'light_dining_bar', cat: 'lighting', name: '50. 飯廳極簡一字長吊燈', w: 1050, d: 120, h: 280, defaultY: 2150, color: '#ca8a04' },
-      { id: 'light_ceiling_led',cat: 'lighting', name: '51. 超薄現代吸頂燈', w: 550, d: 550, h: 65, defaultY: 2480, color: '#cbd5e1' },
-      { id: 'light_floor_arc',  cat: 'lighting', name: '52. 設計師大弧形釣魚落地燈', w: 450, d: 450, h: 1850, defaultY: 0, color: '#ca8a04' }
+      { id: 'light_mag_track',  cat: 'lighting', name: '50. 無主燈磁吸軌道射燈 (2米)', w: 2000, d: 80, h: 50, defaultY: 2520, color: '#1e293b' },
+      { id: 'light_chandelier', cat: 'lighting', name: '51. 意式雙環水晶吊燈', w: 780, d: 780, h: 360, defaultY: 2180, color: '#d97706' },
+      { id: 'light_dining_bar', cat: 'lighting', name: '52. 飯廳極簡一字長吊燈', w: 1050, d: 120, h: 280, defaultY: 2150, color: '#ca8a04' },
+      { id: 'light_ceiling_led',cat: 'lighting', name: '53. 超薄現代吸頂燈', w: 550, d: 550, h: 65, defaultY: 2480, color: '#cbd5e1' },
+      { id: 'light_floor_arc',  cat: 'lighting', name: '54. 設計師大弧形釣魚落地燈', w: 450, d: 450, h: 1850, defaultY: 0, color: '#ca8a04' },
+
+      // --- INTERIOR DECOR, PLUSH TOYS, PILLOWS, RUGS & PLANTS ---
+      { id: 'dec_plush_bear',   cat: 'decor', name: '55. 🧸 大號奶油棕泰迪熊毛公仔', w: 360, d: 340, h: 460, defaultY: 560, color: '#b4692c' },
+      { id: 'dec_plush_bunny',  cat: 'decor', name: '56. 🐰 垂耳粉紅兔仔毛公仔連抱枕', w: 340, d: 320, h: 440, defaultY: 560, color: '#f472b6' },
+      { id: 'dec_pillow_set',   cat: 'decor', name: '57. 🛋️ 北歐設計師拼色抱枕三件組', w: 580, d: 260, h: 280, defaultY: 460, color: '#f59e0b' },
+      { id: 'dec_rug_nordic',   cat: 'decor', name: '58. 🧶 北歐幾何羊絨客廳大地氈', w: 1900, d: 1350, h: 16, defaultY: 4, color: '#d6cfc2' },
+      { id: 'dec_plant_tree',   cat: 'decor', name: '59. 🌿 室內天堂鳥大型景觀盆栽', w: 460, d: 460, h: 1380, defaultY: 0, color: '#15803d' },
+      { id: 'dec_pc_imac',      cat: 'decor', name: '60. 🖥️ 27吋一體式電腦連護眼檯燈', w: 620, d: 260, h: 460, defaultY: 750, color: '#e2e8f0' }
     ];
 
     // =========================================================================
@@ -1343,6 +1375,12 @@
         lowerQuilt.position.set(0, 428, -20);
         group.add(lowerQuilt);
 
+        // Cute plush teddy bear & pillows on lower bunk
+        const lPillow = new THREE.Mesh(new THREE.BoxGeometry(w * 0.36, 85, 250), new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.6 }));
+        lPillow.position.set(-w * 0.22, 545, -d / 2 + 240);
+        group.add(lPillow);
+        addMiniPlushBearToGroup(group, w * 0.2, 520, -d / 2 + 260, 0xd97706);
+
         const upperW = id === 'bed_bunk_family_3p' ? Math.round(w * 0.74) : w;
         const upperFrame = new THREE.Mesh(new THREE.BoxGeometry(upperW, 160, d - 360), baseMat);
         upperFrame.position.set(-w / 2 + upperW / 2, 1320, -180);
@@ -1353,6 +1391,9 @@
         const upperQuilt = new THREE.Mesh(new THREE.BoxGeometry(upperW - 50, 160, (d - 420) * 0.65), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.65 }));
         upperQuilt.position.set(-w / 2 + upperW / 2, 1468, -20);
         group.add(upperQuilt);
+
+        // Cute bunny plush on upper bunk
+        addMiniPlushBearToGroup(group, -w / 2 + upperW * 0.5, 1550, -d / 2 + 250, 0xf472b6);
 
         const rail = new THREE.Mesh(new THREE.BoxGeometry(40, 320, d - 450), baseMat);
         rail.position.set(-w / 2 + upperW - 20, 1540, -180);
@@ -1444,9 +1485,14 @@
           const pillow = new THREE.Mesh(new THREE.BoxGeometry(w * 0.38, 95, 280), new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.6 }));
           pillow.position.set(px, 575, -d / 2 + 270);
           group.add(pillow);
+          // Add decorative accent cushion + cute plush toy on bed
+          const accentCush = new THREE.Mesh(new THREE.BoxGeometry(w * 0.24, 140, 110), new THREE.MeshStandardMaterial({ color: p === 0 ? 0xf97316 : 0x38bdf8, roughness: 0.55 }));
+          accentCush.position.set(px, 600, -d / 2 + 420);
+          group.add(accentCush);
         }
+        addMiniPlushBearToGroup(group, w > 1100 ? w * 0.22 : 0, 565, -d / 2 + 560, 0xc27838);
       }
-      // 10. SOFAS (WITH SEAT CUSHIONS & VIBRANT THROW PILLOWS)
+      // 10. SOFAS (WITH SEAT CUSHIONS, MULTI-COLOR THROW PILLOWS & PLUSH DOLL)
       else if (id.startsWith('sofa_')) {
         const seat = new THREE.Mesh(new THREE.BoxGeometry(w, 380, d), baseMat);
         seat.position.set(0, 190, 0);
@@ -1460,13 +1506,16 @@
         const armR = new THREE.Mesh(new THREE.BoxGeometry(150, 560, d), baseMat);
         armR.position.set(w / 2 - 75, 280, 0);
         group.add(armR);
-        [-w * 0.3, w * 0.3].forEach((px, idx) => {
-          const cushion = new THREE.Mesh(new THREE.BoxGeometry(280, 260, 110), new THREE.MeshStandardMaterial({ color: idx === 0 ? 0xf97316 : 0x0ea5e9 }));
-          cushion.position.set(px, 510, -d / 2 + 240);
+        [-w * 0.32, 0, w * 0.32].forEach((px, idx) => {
+          const colors = [0xf97316, 0xfacc15, 0x0ea5e9];
+          const cushion = new THREE.Mesh(new THREE.BoxGeometry(250, 250, 115), new THREE.MeshStandardMaterial({ color: colors[idx % 3], roughness: 0.55 }));
+          cushion.rotation.z = idx === 0 ? 0.14 : (idx === 2 ? -0.14 : 0);
+          cushion.position.set(px, 500, -d / 2 + 245);
           group.add(cushion);
         });
+        addMiniPlushBearToGroup(group, w * 0.18, 410, -d / 2 + 340, 0xf472b6);
       }
-      // 11. TABLES & STUDY DESKS WITH DRAWER HANDLES & CHAIRS
+      // 11. TABLES & STUDY DESKS WITH DRAWER HANDLES, CHAIRS, VASE/LAPTOP & LAMP
       else if (id.startsWith('table_') || id.startsWith('desk_')) {
         const top = new THREE.Mesh(new THREE.BoxGeometry(w, 45, d), id.includes('marble') ? stoneMat : baseMat);
         top.position.set(0, h - 22, 0);
@@ -1491,7 +1540,108 @@
           const chairBack = new THREE.Mesh(new THREE.BoxGeometry(420, 380, 45), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
           chairBack.position.set(cx, 650, d / 2 + 370);
           group.add(chairBack);
+
+          // If study desk, add iMac monitor + keyboard + desk lamp on top
+          if (id.startsWith('desk_')) {
+            const stand = new THREE.Mesh(new THREE.BoxGeometry(90, 90, 80), chromeMat);
+            stand.position.set(cx, h + 45, -d * 0.22);
+            group.add(stand);
+            const screen = new THREE.Mesh(new THREE.BoxGeometry(440, 280, 22), darkMat);
+            screen.position.set(cx, h + 210, -d * 0.22);
+            group.add(screen);
+            const display = new THREE.Mesh(new THREE.BoxGeometry(415, 250, 6), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+            display.position.set(cx, h + 212, -d * 0.22 + 12);
+            group.add(display);
+          }
         }
+        // If dining table, add flower vase centerpiece & fruit tray
+        if (id.startsWith('table_')) {
+          const vase = new THREE.Mesh(new THREE.CylinderGeometry(45, 60, 170, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 }));
+          vase.position.set(0, h + 85, 0);
+          vase.userData.noEdge = true;
+          group.add(vase);
+          const flowers = new THREE.Mesh(new THREE.SphereGeometry(95, 16, 12), new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.5 }));
+          flowers.position.set(0, h + 205, 0);
+          flowers.userData.noEdge = true;
+          group.add(flowers);
+        }
+      }
+      // 11B. DEDICATED PLUSH TOYS, PILLOW SETS, NORDIC RUGS, PLANTS & APPLIANCES
+      else if (id === 'dec_plush_bear' || id === 'dec_plush_bunny') {
+        addMiniPlushBearToGroup(group, 0, 0, 0, id === 'dec_plush_bunny' ? 0xf472b6 : 0xb4692c, 1.35);
+      }
+      else if (id === 'dec_pillow_set') {
+        [-160, 0, 160].forEach((px, i) => {
+          const cols = [0xf59e0b, 0xec4899, 0x0ea5e9];
+          const p = new THREE.Mesh(new THREE.BoxGeometry(230, 240, 110), new THREE.MeshStandardMaterial({ color: cols[i], roughness: 0.55 }));
+          p.rotation.z = (i - 1) * 0.16;
+          p.position.set(px, 125, 0);
+          group.add(p);
+        });
+      }
+      else if (id === 'dec_rug_nordic') {
+        const rugMain = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: 0xd6cfc2, roughness: 0.85 }));
+        rugMain.position.set(0, h / 2, 0);
+        group.add(rugMain);
+        const rugInner = new THREE.Mesh(new THREE.BoxGeometry(w * 0.76, h + 4, d * 0.72), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 }));
+        rugInner.position.set(0, h / 2 + 2, 0);
+        group.add(rugInner);
+        const rugCenter = new THREE.Mesh(new THREE.BoxGeometry(w * 0.45, h + 8, d * 0.42), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.85 }));
+        rugCenter.position.set(0, h / 2 + 4, 0);
+        group.add(rugCenter);
+      }
+      else if (id === 'dec_plant_tree') {
+        const pot = new THREE.Mesh(new THREE.CylinderGeometry(165, 130, 380, 20), stoneMat);
+        pot.position.set(0, 190, 0);
+        pot.userData.noEdge = true;
+        group.add(pot);
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(20, 28, h - 320, 12), new THREE.MeshStandardMaterial({ color: 0x5c4033 }));
+        stem.position.set(0, (h - 320) / 2 + 280, 0);
+        stem.userData.noEdge = true;
+        group.add(stem);
+        const leafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.45 });
+        [[-120, h - 180, -80], [130, h - 120, 90], [0, h - 40, 0], [-110, h - 320, 110], [110, h - 290, -110]].forEach(([lx, ly, lz]) => {
+          const foliage = new THREE.Mesh(new THREE.SphereGeometry(165, 16, 12), leafMat);
+          foliage.scale.set(1.2, 0.55, 0.9);
+          foliage.position.set(lx, ly, lz);
+          foliage.userData.noEdge = true;
+          group.add(foliage);
+        });
+      }
+      else if (id === 'app_air_purifier') {
+        const baseCyl = new THREE.Mesh(new THREE.CylinderGeometry(125, 135, 380, 24), chromeMat);
+        baseCyl.position.set(0, 190, 0);
+        baseCyl.userData.noEdge = true;
+        group.add(baseCyl);
+        const loop = new THREE.Mesh(new THREE.TorusGeometry(115, 22, 14, 32), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.25, metalness: 0.5 }));
+        loop.scale.set(0.85, 2.4, 0.85);
+        loop.position.set(0, 680, 0);
+        loop.userData.noEdge = true;
+        group.add(loop);
+      }
+      else if (id === 'app_robot_vac') {
+        const dock = new THREE.Mesh(new THREE.BoxGeometry(340, 420, 260), stoneMat);
+        dock.position.set(0, 210, -80);
+        group.add(dock);
+        const disc = new THREE.Mesh(new THREE.CylinderGeometry(170, 170, 85, 28), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 }));
+        disc.position.set(0, 43, 85);
+        disc.userData.noEdge = true;
+        group.add(disc);
+        const lidar = new THREE.Mesh(new THREE.CylinderGeometry(45, 45, 30, 18), brassMat);
+        lidar.position.set(0, 95, 85);
+        lidar.userData.noEdge = true;
+        group.add(lidar);
+      }
+      else if (id === 'dec_pc_imac') {
+        const stand = new THREE.Mesh(new THREE.BoxGeometry(110, 95, 95), chromeMat);
+        stand.position.set(0, 48, 0);
+        group.add(stand);
+        const monitor = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, h - 90, 24), darkMat);
+        monitor.position.set(0, (h - 90) / 2 + 90, 0);
+        group.add(monitor);
+        const screen = new THREE.Mesh(new THREE.BoxGeometry(w * 0.8, h - 125, 8), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+        screen.position.set(0, (h - 90) / 2 + 95, 14);
+        group.add(screen);
       }
       // 12. FRIDGE WITH DOORS & HANDLES
       else if (id.startsWith('app_fridge')) {
@@ -1718,9 +1868,57 @@
       return group;
     }
 
+    // Helper: Build cute 3D Teddy Bear / Bunny Plush Toy on Beds & Sofas
+    function addMiniPlushBearToGroup(parentGroup, cx, bottomY, cz, furHex = 0xb4692c, scale = 1.0) {
+      const plush = new THREE.Group();
+      const furMat = new THREE.MeshStandardMaterial({ color: furHex, roughness: 0.75 });
+      const tummyMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.7 });
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
+
+      const torso = new THREE.Mesh(new THREE.SphereGeometry(85 * scale, 16, 14), furMat);
+      torso.scale.set(1, 1.15, 0.88);
+      torso.position.set(0, 90 * scale, 0);
+      torso.userData.noEdge = true;
+      plush.add(torso);
+
+      const tummy = new THREE.Mesh(new THREE.SphereGeometry(55 * scale, 14, 12), tummyMat);
+      tummy.position.set(0, 88 * scale, 42 * scale);
+      tummy.userData.noEdge = true;
+      plush.add(tummy);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(72 * scale, 16, 14), furMat);
+      head.position.set(0, 215 * scale, 10 * scale);
+      head.userData.noEdge = true;
+      plush.add(head);
+
+      [-48 * scale, 48 * scale].forEach(ex => {
+        const ear = new THREE.Mesh(new THREE.SphereGeometry(28 * scale, 12, 10), furMat);
+        ear.position.set(ex, 275 * scale, 5 * scale);
+        ear.userData.noEdge = true;
+        plush.add(ear);
+      });
+
+      [-24 * scale, 24 * scale].forEach(ex => {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(9 * scale, 10, 10), eyeMat);
+        eye.position.set(ex, 225 * scale, 75 * scale);
+        eye.userData.noEdge = true;
+        plush.add(eye);
+      });
+
+      const snout = new THREE.Mesh(new THREE.SphereGeometry(24 * scale, 12, 10), tummyMat);
+      snout.position.set(0, 202 * scale, 74 * scale);
+      snout.userData.noEdge = true;
+      plush.add(snout);
+
+      plush.position.set(cx, bottomY, cz);
+      parentGroup.add(plush);
+    }
+
     // =========================================================================
-    // 10. GENERATE TEMPLATE ITEMS FOR ANY OF THE 36 UNITS + 30 TEMPLATES
-    //     (WITH DOOR-AWARE L-KITCHEN & VANITY -> TOILET -> BATHTUB SEQUENCE)
+    // 10. GENERATE DISTINCT HOUSEHOLD-BASED LAYOUTS FOR ALL 36 UNITS + 30 TEMPLATES
+    //     - 3BR Units: Dedicated 2P, 3P, 4P, 5P, 6P Spatial Layouts
+    //     - 2BR Units: Dedicated 2P, 3P, 4P, 5P Spatial Layouts
+    //     - 1BR / Open-Plan Units: Dedicated 2P Studio, 3P Loft, 2P 1BR, 3P 1BR, 4P 1BR Layouts
     // =========================================================================
     function getItemsForUnitAndTemplate(unitId, tplId) {
       const prof = getUnitGeometryProfile(unitId);
@@ -1735,9 +1933,17 @@
         return r;
       };
 
+      const tplObj = THIRTY_TEMPLATES.find(t => t.id === tplId) || THIRTY_TEMPLATES[1];
+      const pTag = tplObj.pTag || '4p';
+      const idx = parseInt(tplId.replace('tpl_', ''), 10) || 1;
+
+      // Distinct wood/cabinet color palettes per template so each template also has its own material mood
+      const woodPalette = ['#d4be9e', '#c78d46', '#5e3419', '#cfc0a8', '#78879c', '#bfa98a'];
+      const cabColor = woodPalette[idx % woodPalette.length];
+
       const items = [];
       let uidCounter = 1;
-      const pushItem = (catId, x, z, rot = 0, customW, customD, customH, customColor, customY = 0) => {
+      const pushItem = (catId, x, z, rot = 0, customW, customD, customH, customColor, customY = undefined) => {
         const base = CATALOG_ITEMS.find(c => c.id === catId) || CATALOG_ITEMS[0];
         items.push({
           uid: 'it_' + (uidCounter++),
@@ -1755,10 +1961,7 @@
         });
       };
 
-      // A. DOOR-AWARE KITCHEN & BATHROOM (INCLUDED IN ALL 30 TEMPLATES)
-      // Rule 1: Opening Kitchen Door immediately reveals the long side of the L-shaped kitchen cabinet.
-      // Rule 2: Opening Bathroom Door strictly follows: 1st Vanity Cabinet -> 2nd Middle Toilet -> 3rd Far Bathtub.
-      // Rule 3: Updated to non-overlapping coordinates!
+      // A. PHOTO-ACCURATE L-KITCHEN & BATHROOM (INCLUDED IN ALL 30 TEMPLATES)
       if (prof.is1BR) {
         pushItem('kit_l_combo_photo', -750, 2550, 90, 1650, 1250, 2350, '#c9b18c');
         pushItem('app_fridge_3door',  -360, 1980, 0);
@@ -1766,14 +1969,12 @@
         pushItem('bath_toilet_ledge', -980, 350, 0, 540, 650, 880);
         pushItem('bath_low_tub_photo', -1260, 825, 90, 1550, 620, 2050);
       } else if (prof.is2BR) {
-        // 2BR: Kitchen Z=0..1650, Bathroom Z=1650..3120 (Zero overlap)
         pushItem('kit_l_combo_photo', 4180, 825, -90, 1580, 1320, 2380, '#c9b18c');
         pushItem('app_fridge_3door',  3240, 330, 0);
         pushItem('bath_vanity_photo', 2920, 2820, 180, 740, 460, 2150);
         pushItem('bath_toilet_ledge', 3550, 2760, 180, 560, 650, 880);
         pushItem('bath_low_tub_photo', 4180, 2385, -90, 1420, 640, 2050);
       } else {
-        // 3BR: Kitchen Z=1600..3250, Bathroom Z=3250..4720 (Zero overlap)
         pushItem('kit_l_combo_photo', 4450, 2425, -90, 1580, 1360, 2380, '#c9b18c');
         pushItem('app_fridge_3door',  3500, 1930, 0);
         pushItem('bath_vanity_photo', 2920, 4420, 180, 740, 460, 2150);
@@ -1783,91 +1984,341 @@
 
       if (tplId === 'tpl_00') return items;
 
-      const idx = parseInt(tplId.replace('tpl_', ''), 10) || 1;
-      const isGlassPart = (idx % 3 === 2);
-      const isFamilyBunk = [3, 4, 21, 26].includes(idx);
-
+      // =========================================================================
+      // B1. COMPACT 1-BEDROOM & OPEN-PLAN STUDIO UNITS (B2, B5, B12, B17, A12, A15)
+      //     Tailored for Open-Plan (2P, 3P) and 1-Bedroom (2P, 3P, 4P)
+      // =========================================================================
       if (prof.is1BR) {
-        // Place C-cabinet at Z=1350 along right wall, completely clear of Main Door swing at Z=0..900
-        pushItem('cab_c_foyer_1200', 2140, 1450, -90, 1200, 360, 2450);
-        pushItem('table_fold_5p', 1750, 2550, -90, 1200, 750, 750);
-        pushItem(isGlassPart ? 'part_glass_3slide' : 'part_wood_slat', 1175, 4250, 0, 2250, 80, 2500);
-        if (isFamilyBunk) {
-          pushItem('bed_bunk_family_3p', 680, 5200, 0, 1240, 2100, 1800);
-          pushItem('desk_study_single', 1800, 5600, 180, 1050, 520, 750);
+        // Common Foyer C-Cabinet (Clear of Entrance Door at Z=0..900)
+        pushItem('cab_c_foyer_1200', 2140, 1450, -90, 1200, 360, 2450, cabColor);
+        pushItem('app_coffee_pro',   2140, 1450, -90, 380, 340, 360, '#94a3b8', 880);
+        pushItem('app_robot_vac',    2100, 2220, -90);
+
+        if (pTag === '2p' && idx % 2 === 1) {
+          // [開放式 2人 Studio] Open-Plan Studio without solid partition: Slat screen + 4.5ft Queen Bed + Lounge Sofa + Work Desk
+          pushItem('part_wood_slat',   680, 4300, 0, 1150, 80, 2500);
+          pushItem('bed_queen_45ft',   760, 5250, 0, 1370, 1900, 950, cabColor, 0);
+          pushItem('cab_wardrobe_1200',2020, 5250, -90, 1350, 580, 2400, cabColor, 0);
+          pushItem('desk_study_single',1750, 4350, 180, 1050, 500, 750, cabColor);
+          pushItem('sofa_2seat_1600',  1820, 3250, -90, 1600, 800, 820);
+          pushItem('dec_rug_nordic',   1150, 3250, 90, 1500, 1100, 16);
+          pushItem('app_tv_65',        120, 3250, 90, 1350, 70, 780, '#0f172a', 980);
+          pushItem('dec_plant_tree',   280, 4050, 0);
+          pushItem('light_chandelier', 1175, 3300, 0, 700, 700, 340, '#d97706', 2180);
+        } else if (pTag === '2p') {
+          // [一房 2人世界] 1-Bedroom with Fluted Glass Sliding Door + Storage Platform + Queen Bed + Dining Table
+          pushItem('part_glass_3slide',1175, 4250, 0, 2250, 80, 2500);
+          pushItem('plat_storage_2000',1175, 5200, 0, 2250, 1820, 380, cabColor);
+          pushItem('bed_queen_45ft',   780, 5250, 0, 1370, 1860, 920, cabColor, 380);
+          pushItem('cab_wardrobe_1200',1980, 5250, -90, 1250, 560, 2050, cabColor, 380);
+          pushItem('table_fold_5p',    1780, 2500, -90, 1150, 720, 750, cabColor);
+          pushItem('sofa_2seat_1600',  1820, 3550, -90, 1550, 780, 820);
+          pushItem('app_tv_65',        120, 3550, 90, 1300, 70, 780, '#0f172a', 980);
+          pushItem('app_air_purifier', 260, 2750, 0);
+          pushItem('light_ceiling_led',1175, 5200, 0, 520, 520, 65, '#cbd5e1', 2480);
+        } else if (pTag === '3p' && idx % 2 === 1) {
+          // [開放式 3人家庭] Open-Plan 3P: Queen Bed + Loft Bed with Study Desk Underneath + Dining
+          pushItem('part_wood_slat',   1175, 4200, 0, 1400, 80, 2500);
+          pushItem('bed_double_4ft',   680, 5200, 0, 1220, 1880, 920, cabColor);
+          pushItem('bed_loft_study',   1820, 5150, -90, 1000, 1850, 1850, cabColor);
+          pushItem('table_fold_5p',    1780, 2550, -90, 1200, 740, 750, cabColor);
+          pushItem('sofa_2seat_1600',  1820, 3550, -90, 1500, 780, 820);
+          pushItem('app_tv_65',        120, 3550, 90, 1300, 70, 780, '#0f172a', 980);
+          pushItem('dec_plush_bunny',  680, 5500, 0, 340, 320, 440, '#f472b6', 580);
+        } else if (pTag === '3p') {
+          // [一房 3人家庭] Enclosed 1BR with Brick Wall + Door + 3P Family Bunk Bed + Kid Study Desk
+          pushItem('part_brick_100',   750, 4250, 0, 1450, 100, 2550);
+          pushItem('door_wood_room',   1880, 4250, 0, 820, 100, 2150);
+          pushItem('bed_bunk_family_3p',680, 5220, 0, 1240, 1880, 1800, cabColor);
+          pushItem('desk_study_single',1820, 5750, 180, 1000, 500, 750, cabColor);
+          pushItem('cab_wardrobe_1200',2020, 4850, -90, 950, 550, 2400, cabColor);
+          pushItem('table_fold_5p',    1780, 2500, -90, 1200, 750, 750, cabColor);
+          pushItem('sofa_2seat_1600',  1820, 3500, -90, 1550, 780, 820);
+          pushItem('dec_rug_nordic',   1150, 3500, 90, 1450, 1050, 16);
+          pushItem('app_tv_65',        120, 3500, 90, 1300, 70, 780, '#0f172a', 980);
         } else {
-          pushItem('plat_storage_2000', 1175, 5200, 0, 2250, 1800, 380);
-          pushItem('bed_double_4ft', 750, 5250, 0, 1220, 1880, 900, '#d4be9e', 380);
-          pushItem('cab_wardrobe_1200', 1850, 5250, -90, 1200, 580, 2050, '#d4be9e', 380);
+          // [一房 4人家庭] High-Efficiency 4P 1-Bedroom: 3P Family Bunk (Lower Double + Upper Single) + Single Loft Study Bed + 5P Dining
+          pushItem('part_glass_3slide',1175, 4150, 0, 2250, 80, 2500);
+          pushItem('bed_bunk_family_3p',660, 5180, 0, 1240, 1900, 1800, cabColor);
+          pushItem('bed_loft_study',   1820, 5180, -90, 980, 1880, 1850, cabColor);
+          pushItem('table_fold_5p',    1780, 2450, -90, 1300, 760, 750, cabColor);
+          pushItem('sofa_2seat_1600',  1820, 3420, -90, 1500, 760, 820);
+          pushItem('app_tv_65',        120, 3420, 90, 1300, 70, 780, '#0f172a', 980);
+          pushItem('app_air_purifier', 250, 2500, 0);
         }
-        pushItem('sofa_2seat_1600', 1750, 3550, -90, 1550, 780, 820);
-        pushItem('app_tv_65', 120, 3550, 90, 1300, 70, 780, '#0f172a', 980);
-      } else if (prof.is2BR) {
-        // Place C-cabinet along foyer side wall (X=2620, Z=1250), completely clear of entrance door at X=1650..2530, Z=0..880
-        pushItem('cab_c_foyer_1200', 2300, 1220, -90, 1100, 350, 2450);
-        pushItem('table_fold_5p', 1950, 2450, -90, 1250, 750, 750);
+        return items;
+      }
 
-        pushItem('part_brick_100', 725, 2950, 0, 1450, 100, 2550);
-        pushItem('part_brick_100', 1450, 1100, 90, 2100, 100, 2550);
-        pushItem('door_wood_room', 1450, 2520, 90, 820, 100, 2150);
+      // =========================================================================
+      // B2. 2-BEDROOM WIDE-HALL UNITS (B3, B4, B6, B11, B13, B14, B16, B18, B21, B22, A1, A4, A10, A11, A13, A14, A16, A19, A20, A21)
+      //     Tailored for 2P, 3P, 4P, and 5P Families!
+      // =========================================================================
+      if (prof.is2BR) {
+        // Common Foyer C-Cabinet with Coffee Machine & Robot Vacuum
+        pushItem('cab_c_foyer_1200', 2300, 1220, -90, 1100, 350, 2450, cabColor);
+        pushItem('app_coffee_pro',   2300, 1220, -90, 380, 340, 360, '#94a3b8', 880);
+        pushItem('app_robot_vac',    2280, 1950, -90);
 
-        if (isFamilyBunk) {
-          pushItem('bed_bunk_family_3p', 640, 1150, 0, 1220, 2120, 1800);
-          pushItem('desk_study_single', 620, 2580, 180, 1000, 500, 750);
+        if (pTag === '2p') {
+          // [兩房 2人世界] Master Suite in Hall_2 (King Bed + Walk-in Wardrobe) + Fluted Glass Study/WFH Room in Main_Hall + Huge Living Room
+          pushItem('part_glass_3slide', 725, 2950, 0, 1450, 80, 2500);
+          pushItem('part_brick_100',    1450, 1475, 90, 2950, 100, 2550);
+          pushItem('desk_study_double', 720, 420, 0, 1350, 550, 750, cabColor);
+          pushItem('cab_wall_hang_1200',720, 220, 0, 1300, 350, 620, cabColor, 1750);
+          pushItem('cab_wardrobe_1800', 320, 1750, 90, 1750, 560, 2400, cabColor);
+          pushItem('dec_plant_tree',    1150, 2450, 0);
+
+          // Master Suite in Hall_2
+          pushItem('part_brick_100',    2480, 5050, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    2480, 3580, 90, 820, 100, 2150);
+          pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380, cabColor);
+          pushItem('bed_king_5ft',      3550, 5150, -90, 1520, 1920, 960, cabColor, 380);
+          pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1700, 560, 2050, cabColor, 380);
+
+          // Living & Dining in Hall_1
+          pushItem('table_fold_5p',     1980, 2480, -90, 1250, 750, 750, cabColor);
+          pushItem('sofa_l_shape_2400', 550, 4750, 90, 2250, 1350, 840);
+          pushItem('dec_rug_nordic',    1350, 4750, 90, 1950, 1300, 16);
+          pushItem('cab_tv_full_2400',  2220, 4750, -90, 2150, 360, 2400, cabColor);
+          pushItem('cab_bay_window',    1200, 5920, 180, 1900, 450, 420, cabColor);
+          pushItem('light_chandelier',  1250, 4750, 0, 780, 780, 360, '#d97706', 2180);
+          pushItem('light_floor_arc',   380, 3450, 0);
+        } else if (pTag === '3p') {
+          // [兩房 3人家庭] Master Bedroom (4.5ft Queen Bed) + Single Kid/Elder Room (3ft Single Bed + Study Desk + Plush Bear)
+          pushItem('part_brick_100',    725, 2950, 0, 1450, 100, 2550);
+          pushItem('part_brick_100',    1450, 1100, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    1450, 2520, 90, 820, 100, 2150);
+          pushItem('bed_single_3ft',    520, 1050, 0, 920, 1880, 850, cabColor);
+          pushItem('desk_study_single', 650, 2550, 180, 1050, 520, 750, cabColor);
+          pushItem('cab_wardrobe_1200', 1150, 750, -90, 1150, 550, 2400, cabColor);
+
+          // Master Bedroom in Hall_2
+          pushItem('part_brick_100',    2480, 5050, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    2480, 3580, 90, 820, 100, 2150);
+          pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380, cabColor);
+          pushItem('bed_queen_45ft',    3550, 5150, -90, 1370, 1900, 920, cabColor, 380);
+          pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1650, 560, 2050, cabColor, 380);
+
+          // Living & Dining
+          pushItem('table_fold_5p',     1980, 2450, -90, 1300, 760, 750, cabColor);
+          pushItem('sofa_3seat_2100',   480, 4750, 90, 2100, 850, 840);
+          pushItem('dec_rug_nordic',    1300, 4750, 90, 1850, 1250, 16);
+          pushItem('cab_tv_full_2400',  2220, 4750, -90, 2100, 360, 2400, cabColor);
+          pushItem('cab_bay_window',    1200, 5920, 180, 1900, 450, 420, cabColor);
+          pushItem('app_air_purifier',  350, 3450, 0);
+          pushItem('light_chandelier',  1200, 4750, 0, 750, 750, 350, '#d97706', 2180);
+        } else if (pTag === '4p') {
+          // [兩房 4人家庭] Master Bedroom (4.5ft Queen Bed) + Twin Kids Bunk Room (Kids Bunk Bed + Dual Study Desk)
+          pushItem('part_brick_100',    725, 2950, 0, 1450, 100, 2550);
+          pushItem('part_brick_100',    1450, 1100, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    1450, 2520, 90, 820, 100, 2150);
+          pushItem('bed_bunk_kids',     540, 1150, 0, 1000, 2100, 1780, cabColor);
+          pushItem('desk_study_single', 660, 2580, 180, 1100, 520, 750, cabColor);
+          pushItem('cab_wall_hang_1200',660, 2720, 180, 1050, 340, 600, cabColor, 1750);
+
+          // Master Bedroom in Hall_2 with Desk for 2nd Kid or Parent
+          pushItem('part_brick_100',    2480, 5050, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    2480, 3580, 90, 820, 100, 2150);
+          pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380, cabColor);
+          pushItem('bed_queen_45ft',    3550, 5150, -90, 1370, 1900, 920, cabColor, 380);
+          pushItem('cab_wardrobe_1200', 3200, 3520, 0, 1200, 560, 2050, cabColor, 380);
+          pushItem('desk_study_single', 4150, 3550, 0, 900, 500, 750, cabColor, 380);
+
+          // Living & 4-6P Dining
+          pushItem('table_fold_5p',     1980, 2450, -90, 1350, 800, 750, cabColor);
+          pushItem('sofa_3seat_2100',   480, 4750, 90, 2100, 850, 840);
+          pushItem('dec_rug_nordic',    1300, 4750, 90, 1850, 1250, 16);
+          pushItem('cab_tv_full_2400',  2220, 4750, -90, 2100, 360, 2400, cabColor);
+          pushItem('cab_bay_window',    1200, 5920, 180, 1900, 450, 420, cabColor);
+          pushItem('dec_plant_tree',    380, 3450, 0);
+          pushItem('light_chandelier',  1200, 4750, 0, 750, 750, 350, '#d97706', 2180);
         } else {
-          pushItem('bed_bunk_kids', 540, 1150, 0, 1000, 2100, 1780);
-          pushItem('desk_study_single', 620, 2580, 180, 950, 500, 750);
+          // [兩房 5人/6人大家庭] Master Bedroom + 3-Person Family Bunk Room (Lower 4ft Double + Upper 3ft Single) + Dual Study Desk + 6P Marble Table
+          pushItem('part_brick_100',    760, 2950, 0, 1520, 100, 2550);
+          pushItem('part_brick_100',    1520, 1100, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    1520, 2520, 90, 820, 100, 2150);
+          pushItem('bed_bunk_family_3p',660, 1150, 0, 1240, 2120, 1800, cabColor);
+          pushItem('desk_study_single', 680, 2580, 180, 1150, 520, 750, cabColor);
+          pushItem('cab_wall_hang_1200',680, 2720, 180, 1100, 340, 600, cabColor, 1750);
+
+          // Master Bedroom in Hall_2
+          pushItem('part_brick_100',    2480, 5050, 90, 2100, 100, 2550);
+          pushItem('door_wood_room',    2480, 3580, 90, 820, 100, 2150);
+          pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380, cabColor);
+          pushItem('bed_queen_45ft',    3550, 5150, -90, 1370, 1900, 920, cabColor, 380);
+          pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1650, 560, 2050, cabColor, 380);
+
+          // Living & 6P Dining Table
+          pushItem('table_marble_6p',   1980, 2450, -90, 1450, 820, 750);
+          pushItem('sofa_3seat_2100',   480, 4750, 90, 2150, 860, 840);
+          pushItem('dec_rug_nordic',    1300, 4750, 90, 1900, 1250, 16);
+          pushItem('cab_tv_full_2400',  2220, 4750, -90, 2150, 360, 2400, cabColor);
+          pushItem('cab_bay_window',    1200, 5920, 180, 1900, 450, 420, cabColor);
+          pushItem('dec_plush_bunny',   1200, 5920, 180, 340, 320, 440, '#f472b6', 440);
+          pushItem('light_chandelier',  1200, 4750, 0, 780, 780, 360, '#d97706', 2180);
         }
+        return items;
+      }
 
-        pushItem(isGlassPart ? 'part_glass_3slide' : 'part_brick_100', 2480, 5050, 90, 2100, 100, 2550);
-        if (!isGlassPart) pushItem('door_wood_room', 2480, 3580, 90, 820, 100, 2150);
-        pushItem('plat_storage_2000', 3500, 4700, 0, 1950, 2800, 380);
-        pushItem('bed_queen_45ft', 3550, 5150, -90, 1370, 1900, 920, '#d4be9e', 380);
-        pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1650, 560, 2050, '#d4be9e', 380);
+      // =========================================================================
+      // B3. 3-BEDROOM LARGE UNITS (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
+      //     Distinct spatial layouts for 2P, 3P, 4P, 5P, and 6P Households!
+      // =========================================================================
+      // Common Foyer C-Cabinet (Clear of Entrance Door at X=4200, Z=250..1130)
+      pushItem('cab_c_foyer_1200', 3550, 1400, 180, 1200, 360, 2450, cabColor);
+      pushItem('app_coffee_pro',   3550, 1400, 180, 380, 340, 360, '#94a3b8', 880);
+      pushItem('app_robot_vac',    2820, 1400, 180);
 
-        pushItem('sofa_3seat_2100', 480, 4750, 90, 2100, 850, 840);
-        pushItem('cab_tv_full_2400', 2220, 4750, -90, 2100, 360, 2400);
-        pushItem('cab_bay_window', 1200, 5920, 180, 1900, 450, 420);
-        pushItem('light_chandelier', 1200, 4750, 0, 750, 750, 350, '#d97706', 2180);
+      if (pTag === '2p') {
+        // [三房 2人世界] Open-plan top-left Dining/Lounge + Side Room as Walk-in Closet + Hall_2 as Glass Dual-Study + Hall_1 Master/Living
+        // Side Room (-2000..0, Z=2500..4650): Walk-in Closet & Dressing Room
+        pushItem('part_glass_3slide', -50, 3650, 90, 1100, 80, 2500);
+        pushItem('cab_wardrobe_1800', -1000, 2820, 0, 1750, 580, 2450, cabColor);
+        pushItem('cab_wardrobe_1800', -1000, 4340, 180, 1750, 580, 2450, cabColor);
+
+        // Top-Left Zone (X=0..2350, Z=0..2380): Open Dual WFH Study & Reading Lounge (No brick wall blocking!)
+        pushItem('part_wood_slat',    1175, 2380, 0, 1600, 80, 2500);
+        pushItem('desk_study_double', 1175, 420, 0, 1650, 560, 750, cabColor);
+        pushItem('cab_wall_hang_1800',1175, 220, 0, 1650, 350, 650, cabColor, 1750);
+        pushItem('dec_plant_tree',    350, 1850, 0);
+
+        // Master Suite in Hall_2 (X=2480..4525, Z=4720..6815) with King Bed
+        pushItem('part_brick_100',    2480, 6150, 90, 1350, 100, 2550);
+        pushItem('door_wood_room',    2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380, cabColor);
+        pushItem('bed_king_5ft',      3550, 6020, -90, 1520, 1900, 960, cabColor, 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
+
+        // Spacious Dining & Living in Hall_1
+        pushItem('table_marble_6p',   1650, 3100, -90, 1500, 850, 750);
+        pushItem('sofa_l_shape_2400', 550, 5550, 90, 2200, 1380, 840);
+        pushItem('dec_rug_nordic',    1350, 5550, 90, 1900, 1350, 16);
+        pushItem('cab_tv_full_2400',  2220, 5650, -90, 1950, 360, 2400, cabColor);
+        pushItem('cab_bay_window',    1200, 6550, 180, 1950, 450, 420, cabColor);
+        pushItem('light_chandelier',  1250, 5550, 0, 780, 780, 360, '#d97706', 2180);
+        pushItem('light_dining_bar',  1650, 3100, 0, 1050, 120, 280, '#ca8a04', 2150);
+      } else if (pTag === '3p') {
+        // [三房 3人家庭] Side Room = Kid Room (3ft Single Bed + Plush + Wardrobe) + Top-Left = Dedicated Study/Piano Room + Hall_2 = Master Bedroom
+        pushItem('part_brick_100',    -50, 3150, 90, 450, 100, 2550);
+        pushItem('door_wood_room',    -50, 3850, 90, 820, 100, 2150);
+        pushItem('bed_single_3ft',    -1050, 2980, -90, 920, 1880, 850, cabColor);
+        pushItem('cab_wardrobe_1200', -1380, 4340, 180, 1150, 560, 2400, cabColor);
+
+        // Top-Left Glass Study / Music Room
+        pushItem('part_glass_3slide', 1175, 2380, 0, 2350, 80, 2500);
+        pushItem('part_brick_100',    2350, 1190, 90, 2380, 100, 2550);
+        pushItem('desk_study_double', 1175, 420, 0, 1600, 560, 750, cabColor);
+        pushItem('cab_wall_hang_1800',1175, 220, 0, 1600, 350, 620, cabColor, 1750);
+        pushItem('sofa_2seat_1600',   450, 1450, 90, 1500, 780, 820);
+
+        // Master Bedroom in Hall_2
+        pushItem('part_brick_100',    2480, 6150, 90, 1350, 100, 2550);
+        pushItem('door_wood_room',    2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380, cabColor);
+        pushItem('bed_queen_45ft',    3550, 6050, -90, 1370, 1880, 920, cabColor, 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
+
+        // Living & Dining
+        pushItem('table_fold_5p',     1750, 3100, -90, 1350, 780, 750, cabColor);
+        pushItem('sofa_3seat_2100',   480, 5550, 90, 2050, 840, 840);
+        pushItem('dec_rug_nordic',    1300, 5550, 90, 1850, 1250, 16);
+        pushItem('cab_tv_full_2400',  2220, 5650, -90, 1950, 360, 2400, cabColor);
+        pushItem('cab_bay_window',    1200, 6550, 180, 1950, 450, 420, cabColor);
+        pushItem('app_air_purifier',  350, 4350, 0);
+        pushItem('light_chandelier',  1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+      } else if (pTag === '4p') {
+        // [三房 4人家庭] 3 Separate Bedrooms: Side Room (Kid 1 Single Bed + Desk) + Top-Left Room (Kid 2 Single Bed + Desk) + Hall_2 Master Bedroom
+        pushItem('part_brick_100',    -50, 3150, 90, 450, 100, 2550);
+        pushItem('door_wood_room',    -50, 3850, 90, 820, 100, 2150);
+        pushItem('bed_single_3ft',    -1050, 2980, -90, 920, 1880, 850, cabColor);
+        pushItem('desk_study_single', -1450, 4340, 180, 1000, 500, 750, cabColor);
+
+        // Top-Left Bedroom for 2nd Kid (Single Bed + Desk + Wardrobe)
+        pushItem('part_brick_100',    1175, 2380, 0, 2350, 100, 2550);
+        pushItem('part_brick_100',    2350, 750, 90, 1450, 100, 2550);
+        pushItem('door_wood_room',    2350, 1880, 90, 820, 100, 2150);
+        pushItem('bed_double_4ft',    640, 1050, 0, 1220, 1880, 920, cabColor);
+        pushItem('desk_study_single', 1750, 360, 0, 1050, 520, 750, cabColor);
+        pushItem('cab_wall_hang_1200',1750, 220, 0, 1050, 340, 600, cabColor, 1750);
+        pushItem('cab_wardrobe_1200', 1750, 1150, -90, 1100, 550, 2400, cabColor);
+
+        // Master Bedroom in Hall_2
+        pushItem('part_brick_100',    2480, 6150, 90, 1350, 100, 2550);
+        pushItem('door_wood_room',    2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380, cabColor);
+        pushItem('bed_queen_45ft',    3550, 6050, -90, 1370, 1880, 920, cabColor, 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
+
+        // Living & Dining
+        pushItem('table_fold_5p',     1750, 3100, -90, 1350, 800, 750, cabColor);
+        pushItem('sofa_3seat_2100',   480, 5550, 90, 2050, 840, 840);
+        pushItem('dec_rug_nordic',    1300, 5550, 90, 1850, 1250, 16);
+        pushItem('cab_tv_full_2400',  2220, 5650, -90, 1950, 360, 2400, cabColor);
+        pushItem('cab_bay_window',    1200, 6550, 180, 1950, 450, 420, cabColor);
+        pushItem('dec_plant_tree',    350, 4350, 0);
+        pushItem('light_chandelier',  1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+      } else if (pTag === '5p') {
+        // [三房 5人大家庭] Side Room (Elder Flat Single Bed) + Top-Left Room (Kids Bunk Bed + Dual Study Desk) + Hall_2 Master Bedroom
+        pushItem('part_brick_100',    -50, 3150, 90, 450, 100, 2550);
+        pushItem('door_wood_room',    -50, 3850, 90, 820, 100, 2150);
+        pushItem('bed_single_3ft',    -1050, 2980, -90, 920, 1880, 850, cabColor);
+        pushItem('cab_wardrobe_1200', -1380, 4340, 180, 1150, 560, 2400, cabColor);
+
+        // Top-Left Room with 3P Family Bunk Bed + Dual Study Desk
+        pushItem('part_brick_100',    1175, 2380, 0, 2350, 100, 2550);
+        pushItem('part_brick_100',    2350, 750, 90, 1450, 100, 2550);
+        pushItem('door_wood_room',    2350, 1880, 90, 820, 100, 2150);
+        pushItem('bed_bunk_family_3p',660, 1150, 0, 1220, 2120, 1800, cabColor);
+        pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750, cabColor);
+        pushItem('cab_wall_hang_1200',1650, 220, 0, 1250, 350, 600, cabColor, 1750);
+
+        // Master Bedroom in Hall_2
+        pushItem('part_brick_100',    2480, 6150, 90, 1350, 100, 2550);
+        pushItem('door_wood_room',    2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380, cabColor);
+        pushItem('bed_queen_45ft',    3550, 6050, -90, 1370, 1880, 920, cabColor, 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
+
+        // Living & 5P Dining
+        pushItem('table_fold_5p',     1750, 3100, -90, 1350, 800, 750, cabColor);
+        pushItem('sofa_3seat_2100',   480, 5550, 90, 2050, 840, 840);
+        pushItem('dec_rug_nordic',    1300, 5550, 90, 1850, 1250, 16);
+        pushItem('cab_tv_full_2400',  2220, 5650, -90, 1950, 360, 2400, cabColor);
+        pushItem('cab_bay_window',    1200, 6550, 180, 1950, 450, 420, cabColor);
+        pushItem('light_chandelier',  1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+        pushItem('light_dining_bar',  1750, 3100, 0, 1050, 120, 280, '#ca8a04', 2150);
       } else {
-        // 3BR (B10, B9, B1, etc.):
-        // FIXED #2: Main entrance door is at X=4200, Z=250..1130 (opening into X=3320..4200, Z=250..1130).
-        // C-cabinet is now placed at X=3450, Z=1420 facing North (away from the door swing), leaving the entrance 100% unobstructed!
-        pushItem('cab_c_foyer_1200', 3550, 1400, 180, 1200, 360, 2450);
+        // [三房 6人三代同堂大家庭] Side Room (2P Bunk Bed + Study Desk) + Top-Left Room (3P Family Bunk Bed + Dual Study Desk) + Hall_2 Master Bedroom + 6P Marble Table
+        pushItem('part_brick_100',    -50, 3150, 90, 450, 100, 2550);
+        pushItem('door_wood_room',    -50, 3850, 90, 820, 100, 2150);
+        pushItem('bed_bunk_kids',     -1050, 2980, -90, 980, 1900, 1780, cabColor);
+        pushItem('desk_study_single', -1420, 4340, 180, 1000, 500, 750, cabColor);
 
-        // Side Room (X=-2000..0, Z=2500..4650): Door at X=-50, Z=3850; Bed & Wardrobe clear of door swing
-        pushItem('part_brick_100', -50, 3150, 90, 450, 100, 2550);
-        pushItem('door_wood_room', -50, 3850, 90, 820, 100, 2150);
-        pushItem('bed_single_3ft', -1050, 2980, -90, 920, 1880, 850);
-        pushItem('cab_wardrobe_1200', -1380, 4340, 180, 1150, 560, 2400);
+        // Top-Left Room: 3P Family Bunk Bed (Lower Double + Upper Single) + Dual Study Desk
+        pushItem('part_brick_100',    1175, 2380, 0, 2350, 100, 2550);
+        pushItem('part_brick_100',    2350, 750, 90, 1450, 100, 2550);
+        pushItem('door_wood_room',    2350, 1880, 90, 820, 100, 2150);
+        pushItem('bed_bunk_family_3p',660, 1150, 0, 1240, 2120, 1800, cabColor);
+        pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750, cabColor);
+        pushItem('cab_wall_hang_1200',1650, 220, 0, 1250, 350, 600, cabColor, 1750);
 
-        // Top-Left Bedroom (X=0..2350, Z=0..2380): Door at X=2350, Z=1880 swinging inward cleanly
-        pushItem('part_brick_100', 1175, 2380, 0, 2350, 100, 2550);
-        pushItem('part_brick_100', 2350, 750, 90, 1450, 100, 2550);
-        pushItem('door_wood_room', 2350, 1880, 90, 820, 100, 2150);
-        if (isFamilyBunk) {
-          pushItem('bed_bunk_family_3p', 660, 1150, 0, 1220, 2120, 1800);
-        } else {
-          pushItem('bed_bunk_kids', 550, 1150, 0, 1000, 2120, 1780);
-        }
-        pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750);
-        pushItem('cab_wall_hang_1200', 1650, 220, 0, 1250, 350, 600, '#d4be9e', 1750);
+        // Master Bedroom in Hall_2
+        pushItem('part_brick_100',    2480, 6150, 90, 1350, 100, 2550);
+        pushItem('door_wood_room',    2480, 5120, 90, 820, 100, 2150);
+        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380, cabColor);
+        pushItem('bed_queen_45ft',    3550, 6050, -90, 1370, 1880, 920, cabColor, 380);
+        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
 
-        // Master Bedroom in Hall_2 (X=2480..4525, Z=4720..6815):
-        // Door at X=2480, Z=5150, Wardrobe at Z=4980..5550 (X=3650), Queen Bed at Z=5950
-        pushItem(isGlassPart ? 'part_glass_3slide' : 'part_brick_100', 2480, 6150, 90, 1350, 100, 2550);
-        if (!isGlassPart) pushItem('door_wood_room', 2480, 5120, 90, 820, 100, 2150);
-        pushItem('plat_storage_2000', 3500, 5770, 0, 1950, 2050, 380);
-        pushItem('bed_queen_45ft', 3550, 6050, -90, 1370, 1880, 920, '#d4be9e', 380);
-        pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, '#d4be9e', 380);
-
-        // Dining & Living in Hall_1
-        pushItem('table_fold_5p', 1750, 3100, -90, 1300, 780, 750);
-        pushItem('sofa_3seat_2100', 480, 5550, 90, 2050, 840, 840);
-        pushItem('cab_tv_full_2400', 2220, 5650, -90, 1950, 360, 2400);
-        pushItem('cab_bay_window', 1200, 6550, 180, 1950, 450, 420);
-        pushItem('light_chandelier', 1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
-        pushItem('light_dining_bar', 1750, 3100, 0, 1050, 120, 280, '#ca8a04', 2150);
+        // 6-Person Marble Dining Table & Living Room with Plush & Rug
+        pushItem('table_marble_6p',   1720, 3100, -90, 1500, 850, 750);
+        pushItem('sofa_3seat_2100',   480, 5550, 90, 2150, 860, 840);
+        pushItem('dec_rug_nordic',    1300, 5550, 90, 1900, 1300, 16);
+        pushItem('cab_tv_full_2400',  2220, 5650, -90, 1950, 360, 2400, cabColor);
+        pushItem('cab_bay_window',    1200, 6550, 180, 1950, 450, 420, cabColor);
+        pushItem('dec_plush_bear',    1200, 6550, 180, 360, 340, 460, '#b4692c', 440);
+        pushItem('app_air_purifier',  350, 4350, 0);
+        pushItem('light_chandelier',  1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+        pushItem('light_dining_bar',  1720, 3100, 0, 1050, 120, 280, '#ca8a04', 2150);
       }
 
       return items;
@@ -2375,17 +2826,72 @@
       setTimeout(onWindowResize, 240);
     }
 
+    function filterTemplatesByPeople(pTag) {
+      activePeopleFilter = pTag;
+      ['all', '2p', '3p', '4p', '5p', '6p'].forEach(k => {
+        const b = document.getElementById('pfilt-' + k);
+        if (b) {
+          b.className = (k === pTag)
+            ? 'px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black shrink-0'
+            : 'px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0';
+        }
+      });
+      renderTemplatesGrid();
+    }
+
+    function getUnitAdaptedTemplateTitle(t) {
+      if (t.id === 'tpl_00') return { title: t.name, badge: t.badge };
+      const prof = getUnitGeometryProfile(currentUnitId);
+      const idx = parseInt(t.id.replace('tpl_', ''), 10) || 1;
+      if (prof.is1BR) {
+        if (t.pTag === '2p') {
+          const isOpen = (idx % 2 === 1);
+          return {
+            title: t.name.replace(/\[\d人\]/, isOpen ? '[開放式2人]' : '[一房2人]'),
+            badge: isOpen ? '開放式2人' : '一房2人'
+          };
+        }
+        if (t.pTag === '3p') {
+          const isOpen = (idx % 2 === 1);
+          return {
+            title: t.name.replace(/\[\d人\]/, isOpen ? '[開放式3人]' : '[一房3人]'),
+            badge: isOpen ? '開放式3人' : '一房3人'
+          };
+        }
+        return {
+          title: t.name.replace(/\[\d人\]/, '[一房4人]'),
+          badge: '一房4人子母床'
+        };
+      }
+      if (prof.is2BR) {
+        const pMap = { '2p': '兩房2人', '3p': '兩房3人', '4p': '兩房4人', '5p': '兩房5人', '6p': '兩房5人+' };
+        const label = pMap[t.pTag] || '兩房家庭';
+        return {
+          title: t.name.replace(/\[\d人\]/, `[${label}]`),
+          badge: label
+        };
+      }
+      const pMap3 = { '2p': '三房2人', '3p': '三房3人', '4p': '三房4人', '5p': '三房5人', '6p': '三房6人' };
+      const label3 = pMap3[t.pTag] || '三房家庭';
+      return {
+        title: t.name.replace(/\[\d人\]/, `[${label3}]`),
+        badge: label3
+      };
+    }
+
     function renderTemplatesGrid() {
       const container = document.getElementById('templates-grid');
-      container.innerHTML = THIRTY_TEMPLATES.map(t => {
+      const filtered = THIRTY_TEMPLATES.filter(t => activePeopleFilter === 'all' || t.id === 'tpl_00' || t.pTag === activePeopleFilter);
+      container.innerHTML = filtered.map(t => {
         const active = t.id === currentTemplateId;
+        const adapted = getUnitAdaptedTemplateTitle(t);
         return `
-          <button onclick="applyTemplate('${t.id}')" class="shrink-0 w-44 p-2 rounded-xl border text-left transition ${active ? 'bg-amber-500/20 border-amber-400' : 'bg-slate-900 border-slate-800 hover:border-slate-600'}">
+          <button onclick="applyTemplate('${t.id}')" class="shrink-0 w-48 p-1.5 rounded-xl border text-left transition ${active ? 'bg-amber-500/20 border-amber-400' : 'bg-slate-900 border-slate-800 hover:border-slate-600'}">
             <div class="flex items-center justify-between mb-0.5">
-              <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">${t.badge}</span>
+              <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">${adapted.badge}</span>
               <span class="text-[9px] text-amber-400 font-black">套用▶</span>
             </div>
-            <div class="text-[11px] font-extrabold text-white truncate">${t.name}</div>
+            <div class="text-[10px] font-extrabold text-white truncate">${adapted.title}</div>
           </button>
         `;
       }).join('');
