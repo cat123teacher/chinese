@@ -120,10 +120,10 @@
 
           <!-- Simple Icon + Short Text Toolbar (No Day/Night Toggle - Pure Vibrant Color) -->
           <div class="glass-pill px-1 py-0.5 rounded-xl flex items-center gap-0.5 pointer-events-auto overflow-x-auto no-scrollbar shadow-lg">
+          <!-- Simple Icon + Short Text Toolbar (Removed 2D & SeaView buttons as requested) -->
+          <div class="glass-pill px-1 py-0.5 rounded-xl flex items-center gap-0.5 pointer-events-auto overflow-x-auto no-scrollbar shadow-lg">
             <button onclick="fitFullLayoutTopView()" id="cam-fitall" class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🗺️全景俯視</button>
-            <button onclick="setCameraView('top2d')" id="cam-top2d" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 text-slate-200 text-[10px] font-bold shrink-0">📐2D</button>
             <button onclick="setCameraView('iso3d')" id="cam-iso3d" class="px-1.5 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0">🧊3D</button>
-            <button onclick="setCameraView('seaview')" id="cam-seaview" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 text-sky-300 text-[10px] font-bold shrink-0">🌊景</button>
             <button onclick="cycleWallHeight()" id="btn-wall-h" class="px-1.5 py-0.5 rounded-lg bg-slate-800/90 text-amber-300 text-[10px] font-bold shrink-0">🧱半牆</button>
             <button onclick="toggleDimensions()" id="btn-dim" class="px-1.5 py-0.5 rounded-lg bg-rose-950/80 text-rose-200 text-[10px] font-bold shrink-0">📏尺</button>
             <button onclick="takeScreenshot()" class="px-1.5 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px] font-bold shrink-0">📷圖</button>
@@ -212,29 +212,32 @@
 
       <!-- Compact Horizontal Scrollable Drawer Body -->
       <div id="drawer-body" class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 no-scrollbar">
-        <!-- TAB 1: HIERARCHICAL TEMPLATES (PEOPLE -> HOS/PRIV -> 10 DISTINCT SPATIAL LAYOUTS -> 10 DESIGN STYLES) -->
-        <div id="panel-templates" class="h-full flex flex-col justify-between gap-0.5">
-          <!-- Row 1: People Filter + HOS/Private Toggle + Bare Shell Button + View Mode Breadcrumb -->
-          <div class="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar pb-0.5 border-b border-slate-800/80">
-            <div class="flex items-center gap-1 shrink-0">
-              <button onclick="applyBareShellTemplate()" id="btn-bare-shell" class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[9px] font-bold border border-amber-500/40 shrink-0">🏠清水房</button>
-              <button onclick="filterTemplatesByStyle('hos')" id="sfilt-hos" class="px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 text-[9px] font-black shrink-0">🏘️居屋(10擺設×10風格)</button>
-              <button onclick="filterTemplatesByStyle('priv')" id="sfilt-priv" class="px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 text-[9px] font-bold shrink-0 border border-sky-500/30">🏙️私樓(10擺設×10風格)</button>
-              <span class="text-slate-600 text-[9px]">|</span>
-              <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👫2人</button>
-              <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👨‍👩‍👧3人</button>
-              <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">👨‍👩‍👧‍👦4人</button>
-              <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black shrink-0">👨‍👩‍👧‍👦5人</button>
-              <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0">🏠6人</button>
-            </div>
-            <div id="tpl-step-indicator" class="flex items-center gap-1 shrink-0">
-              <button onclick="backToLayoutList()" id="btn-back-layouts" class="hidden px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black shrink-0">⬅ 返回10款擺設</button>
-              <span id="tpl-current-summary" class="text-[9px] text-amber-300 font-bold truncate max-w-[200px]">請選擇10款不同空間擺設</span>
-            </div>
+        <!-- TAB 1: 4 INDEPENDENT ROWS TEMPLATE SELECTION -->
+        <div id="panel-templates" class="h-full flex flex-col gap-1 overflow-y-auto no-scrollbar pb-1">
+          <!-- Row 1: People Filter & Bare Shell -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0 pb-0.5">
+            <button onclick="applyBareShellTemplate()" id="btn-bare-shell" class="px-2 py-0.5 rounded-lg bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0">🏠清水房</button>
+            <span class="text-slate-600 text-[10px] mx-0.5">|</span>
+            <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👫 2人</button>
+            <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧 3人</button>
+            <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧‍👦 4人</button>
+            <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-2 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow">👨‍👩‍👧‍👦 5人</button>
+            <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">🏠 6人</button>
+          </div>
+          
+          <!-- Row 2: HOS / Private Filter -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0 pb-1 border-b border-slate-800/80">
+            <button onclick="filterTemplatesByStyle('hos')" id="sfilt-hos" class="px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🏘️ 居屋實用設計</button>
+            <button onclick="filterTemplatesByStyle('priv')" id="sfilt-priv" class="px-2 py-0.5 rounded-lg bg-slate-800 text-sky-300 text-[10px] font-bold shrink-0 border border-sky-500/30">🏙️ 私樓燈帶設計</button>
           </div>
 
-          <!-- Row 2: Horizontal Cards (Either 10 Spatial Layouts OR 10 Interior Styles for the Selected Layout) -->
-          <div id="templates-grid" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"></div>
+          <!-- Row 3: 10 Spatial Layouts -->
+          <div class="text-[9px] font-bold text-amber-400 mt-0.5">📐 10款空間擺設間隔 (點選切換)：</div>
+          <div id="templates-layouts-row" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 pb-1"></div>
+
+          <!-- Row 4: 10 Design Styles -->
+          <div class="text-[9px] font-bold text-sky-400 mt-1">🎨 10款室內設計風格 (點選套用)：</div>
+          <div id="templates-styles-row" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 pb-1"></div>
         </div>
 
         <!-- TAB 2: 24 FLOORS -->
@@ -483,7 +486,6 @@
     let activeStyleFilter = 'hos';
     let selectedLayoutIdx = 1; // 1..10
     let selectedStyleIdx = 1;  // 1..10
-    let templateDrillMode = 'layouts'; // 'layouts' (show 10 spatial layouts) or 'styles' (show 10 styles for selected layout)
     let isBareShellActive = false;
     let scene, camera, renderer, controls;
     let hemiLight, ambientLight, dirLight;
@@ -828,16 +830,86 @@
     ];
 
     // =========================================================================
-    // 5. UNIT GEOMETRY PROFILE, STRUCTURE BUILDER & DETAILED 3D ITEM MESHES
+    // 5. ACCURATE 36-UNIT GEOMETRY PROFILE & COORDINATE TRANSFORM ENGINE
+    //    Fixes B11/B13/B14 (4900mm Bay Window), B3 (Top Window 6165mm),
+    //    B15 (Bottom-Left Side Room), and Horizontal Units (B21,B22,A2,A3,A7,A8,A9,A10,A19,A20,A21,A22)
     // =========================================================================
     function getUnitGeometryProfile(unitId) {
       const is1BR = ['B2', 'B5', 'B12', 'B17', 'A12', 'A15'].includes(unitId);
       const is3BR = ['B1', 'B9', 'B10', 'B15', 'A2', 'A3', 'A7', 'A8', 'A9', 'A22'].includes(unitId);
       const is2BR = !is1BR && !is3BR;
       const isBay4900 = ['B11', 'B13', 'B14'].includes(unitId);
-      const mirrorX = ['B9', 'B11', 'B13', 'B16', 'B17', 'B18', 'B22', 'A1', 'A4', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16', 'A21'].includes(unitId);
-      const mirrorZ = ['B1', 'B2', 'B3', 'B15', 'B16', 'B17', 'B18', 'A1', 'A2', 'A7', 'A14', 'A15', 'A16', 'A20', 'A21'].includes(unitId);
-      return { is1BR, is2BR, is3BR, isBay4900, mirrorX, mirrorZ };
+      const isHoriz2BR = ['B21', 'B22', 'A10', 'A19', 'A20', 'A21'].includes(unitId);
+      const isHoriz3BR = ['A2', 'A3', 'A7', 'A8', 'A9', 'A22'].includes(unitId);
+      const isHoriz = isHoriz2BR || isHoriz3BR;
+
+      // Canonical coordinate extents BEFORE unit-specific mirror/rotation:
+      // - 1BR canonical (B5): W=2350, Z=6165 (Kitchen/Bath on Left X<0, Window at Bottom Z=6165)
+      // - Bay4900 canonical (B11/B13): W=4900, Z=5325 (Kitchen/Bath on Left, Bay Window at Bottom-Left X=0..2000, Z=4425..5325)
+      // - Standard 2BR canonical (B4/B6): W=4525, Z=6165 (Kitchen/Bath on Right, Window at Bottom Z=6165)
+      // - Standard 3BR canonical (B10): W=4525, Z=6815 (Side room on Left X=-2000..0, Kitchen/Bath on Right, Window at Bottom Z=6815)
+      const baseW = is1BR ? 2350 : (isBay4900 ? 4900 : 4525);
+      const baseZ = is1BR ? 6165 : (isBay4900 ? 5325 : (is3BR ? 6815 : 6165));
+
+      let mirrorX = false;
+      let mirrorZ = false;
+
+      if (is1BR) {
+        // Canonical B5: Left Kit/Bath, Bottom Window
+        mirrorX = ['B12', 'B17', 'A12', 'A15'].includes(unitId); // Right Kit/Bath
+        mirrorZ = ['B2', 'B17', 'A15'].includes(unitId);         // Top Window
+      } else if (isBay4900) {
+        // Canonical B11/B13: Left Kit/Bath, Right 5325mm wall, Bottom-Left 2000x900 bay window
+        // B14 is the exact left-right mirror of B13 (Right Kit/Bath, Left 5325mm wall, Bottom-Right 2000x900 bay window)
+        mirrorX = (unitId === 'B14');
+        mirrorZ = false;
+      } else if (isHoriz2BR) {
+        // Canonical 2BR rotated 90 deg so Window is on Left (X=0) or Right (X=6165)
+        // After 90-deg swap: X_world = Z_canon (0..6165), Z_world = X_canon (0..4525)
+        mirrorX = ['B22', 'A21'].includes(unitId);               // Window on Right (B22, A21) vs Window on Left (B21, A10, A19, A20)
+        mirrorZ = ['B21', 'B22', 'A19'].includes(unitId);        // Kitchen/Bath on Top vs Bottom (A10, A20, A21)
+      } else if (is2BR) {
+        // Canonical B4/B6: Right Kit/Bath, Bottom 4525mm Window, Z=6165
+        mirrorX = ['B16', 'B18', 'A1', 'A4', 'A11', 'A13', 'A14', 'A16'].includes(unitId); // Left Kit/Bath
+        mirrorZ = ['B3', 'B16', 'B18', 'A1', 'A14', 'A16'].includes(unitId);               // Top 4525mm Window (Fixes B3!)
+      } else if (isHoriz3BR) {
+        // Canonical 3BR rotated 90 deg: Window on Right (A2,A3,A7,A8,A22) or Left (A9)
+        mirrorX = ['A2', 'A3', 'A7', 'A8', 'A22'].includes(unitId);
+        mirrorZ = ['A3', 'A8', 'A9', 'A22'].includes(unitId);    // Side room on Bottom vs Top (A2, A7)
+      } else {
+        // Vertical 3BR: Canonical B10 (Left Side Room, Right Kit/Bath, Bottom 4525mm Window)
+        mirrorX = (unitId === 'B9');                             // B9 has Right Side Room, Left Kit/Bath
+        mirrorZ = ['B1', 'B15'].includes(unitId);                // B1 & B15 have Top 4525mm Window
+      }
+
+      // Transform canonical (x, z) -> unit world (wx, wz)
+      const toWorldXZ = (x, z) => {
+        if (!isHoriz) {
+          const wx = mirrorX ? (baseW - x) : x;
+          const wz = mirrorZ ? (baseZ - z) : z;
+          return [wx, wz];
+        } else {
+          // Horizontal units: canonical Z (length 6165/6815) maps to World X, canonical X (width 4525) maps to World Z
+          const wx = mirrorX ? z : (baseZ - z);
+          const wz = mirrorZ ? (baseW - x) : x;
+          return [wx, wz];
+        }
+      };
+
+      const toWorldRot = (rotDeg) => {
+        let ang = rotDeg;
+        if (!isHoriz) {
+          if (mirrorX) ang = (360 - ang) % 360;
+          if (mirrorZ) ang = (180 - ang + 360) % 360;
+        } else {
+          ang = (ang + 90) % 360;
+          if (!mirrorX) ang = (360 - ang) % 360;
+          if (mirrorZ) ang = (180 - ang + 360) % 360;
+        }
+        return ang;
+      };
+
+      return { is1BR, is2BR, is3BR, isBay4900, isHoriz, isHoriz2BR, isHoriz3BR, baseW, baseZ, mirrorX, mirrorZ, toWorldXZ, toWorldRot };
     }
 
     function addOutlinedBox(parent, w, h, d, mat, x, y, z, edgeColor = 0x1e293b) {
@@ -917,16 +989,15 @@
       structuralWalls = [];
 
       const prof = getUnitGeometryProfile(unitId);
-      const W_TOTAL = prof.is1BR ? 2350 : (prof.isBay4900 ? 4900 : 4525);
-      const Z_TOTAL = 6815;
-      const mx = x => prof.mirrorX ? (W_TOTAL - x) : x;
-      const mz = z => prof.mirrorZ ? (Z_TOTAL - z) : z;
+      const { toWorldXZ } = prof;
 
       const addFloorPatch = (zoneId, x1, z1, x2, z2) => {
-        const minX = Math.min(mx(x1), mx(x2));
-        const maxX = Math.max(mx(x1), mx(x2));
-        const minZ = Math.min(mz(z1), mz(z2));
-        const maxZ = Math.max(mz(z1), mz(z2));
+        const [wx1, wz1] = toWorldXZ(x1, z1);
+        const [wx2, wz2] = toWorldXZ(x2, z2);
+        const minX = Math.min(wx1, wx2);
+        const maxX = Math.max(wx1, wx2);
+        const minZ = Math.min(wz1, wz2);
+        const maxZ = Math.max(wz1, wz2);
         const w = Math.max(50, maxX - minX);
         const d = Math.max(50, maxZ - minZ);
         const styleId = zoneFloorAssignment[zoneId] || 'f_oak_white';
@@ -942,10 +1013,12 @@
       };
 
       const addStructWall = (zoneId, x1, z1, x2, z2, maxH = 2550, isWindowWall = false) => {
-        const minX = Math.min(mx(x1), mx(x2));
-        const maxX = Math.max(mx(x1), mx(x2));
-        const minZ = Math.min(mz(z1), mz(z2));
-        const maxZ = Math.max(mz(z1), mz(z2));
+        const [wx1, wz1] = toWorldXZ(x1, z1);
+        const [wx2, wz2] = toWorldXZ(x2, z2);
+        const minX = Math.min(wx1, wx2);
+        const maxX = Math.max(wx1, wx2);
+        const minZ = Math.min(wz1, wz2);
+        const maxZ = Math.max(wz1, wz2);
         const w = Math.max(110, maxX - minX);
         const d = Math.max(110, maxZ - minZ);
         const styleId = zoneWallAssignment[zoneId] || 'w_cream';
@@ -974,9 +1047,15 @@
       };
 
       const addDimLabel = (txt, x, z) => {
+        const [wx, wz] = toWorldXZ(x, z);
         const sp = makeTextSprite(txt);
-        sp.position.set(mx(x), 85, mz(z));
+        sp.position.set(wx, 85, wz);
         dimensionGroup.add(sp);
+      };
+
+      const addUnitDoorArc = (zoneId, x, z, radius, sDeg, eDeg) => {
+        const [wx, wz] = toWorldXZ(x, z);
+        addDoorSwingArc(zoneId, wx, wz, radius, sDeg, eDeg);
       };
 
       if (prof.is1BR) {
@@ -995,25 +1074,59 @@
         addStructWall('bathroom', -1580, -60, 0, 60);
         addStructWall('bathroom', -1640, 0, -1520, 1650);
 
-        addDoorSwingArc('main_hall', mx(1250), mz(60), 860, 0, 90);
-        addDoorSwingArc('kitchen',   mx(0), mz(2550), 750, 90, 180);
-        addDoorSwingArc('bathroom',  mx(0), mz(950), 720, 90, 180);
+        addUnitDoorArc('main_hall', 1250, 60, 860, 0, 90);
+        addUnitDoorArc('kitchen',   0, 2550, 750, 90, 180);
+        addUnitDoorArc('bathroom',  0, 950, 720, 90, 180);
 
         addDimLabel('闊 2350mm', 1175, 5850);
         addDimLabel('總長 6165mm', 1850, 3100);
         addDimLabel('廚房 1415×1765', -700, 2550);
         addDimLabel('浴室 1580×1650', -780, 820);
+      } else if (prof.isBay4900) {
+        // ★ DEDICATED B11, B13, B14 STRUCTURE (Matches attached floorplans 11, 13, 14!)
+        // Canonical B11/B13: Top-Left Kitchen (X=-385..1680, Z=0..1650), Mid-Left Bath (X=0..2000, Z=1650..3120),
+        // Right Wall 5325mm (X=4900, Z=0..4425), Bottom-Right Window (X=2000..4900, Z=4425),
+        // Bottom-Left Protruding 900mm Bay Window (X=0..2000, Z=3120..5325, depth 2945mm)
+        addFloorPatch('main_hall', 1680, 0, 4900, 3120);
+        addFloorPatch('hall_1',    2000, 3120, 4900, 4425);
+        addFloorPatch('hall_2',    0,    3120, 2000, 5325); // 2000x2945 zone with 900mm protruding window bay
+        addFloorPatch('kitchen',  -385,  0, 1680, 1650);
+        addFloorPatch('bathroom',  0,    1650, 2000, 3120);
+
+        addStructWall('main_hall', 1680, -60, 4900, 60);
+        addStructWall('main_hall', 4840, 0, 4960, 4425);
+        addStructWall('hall_1',    2000, 4365, 4900, 4485, 850, true);
+        addStructWall('hall_2',    1940, 4425, 2060, 5325);
+        addStructWall('hall_2',    0,    5265, 2000, 5385, 850, true);
+        addStructWall('hall_2',   -60,   3120, 60,   5325, 900, true);
+        addStructWall('kitchen',  -385, -60, 1680, 60);
+        addStructWall('kitchen',  -445,  0, -325, 1650);
+        addStructWall('kitchen',  -385,  1590, 2000, 1710);
+        addStructWall('kitchen',   1620, 0, 1740, 1650);
+        addStructWall('bathroom', -60,   1650, 60, 3120);
+        addStructWall('bathroom',  0,    3060, 2000, 3180);
+        addStructWall('bathroom',  1940, 1650, 2060, 3120);
+
+        addUnitDoorArc('main_hall', 3100, 60, 880, 0, 90);
+        addUnitDoorArc('kitchen',   1680, 850, 760, 0, 90);
+        addUnitDoorArc('bathroom',  2000, 2350, 740, 0, 90);
+
+        addDimLabel('闊廳 4900mm', 3450, 4150);
+        addDimLabel('凸窗深 2945 (連900窗台)', 1000, 4950);
+        addDimLabel('長牆 5325mm', 4350, 2200);
+        addDimLabel('廚房 2065×1650', 650, 825);
+        addDimLabel('浴室 2000×1470', 1000, 2385);
       } else if (prof.is2BR) {
         addFloorPatch('main_hall', 0, 0, 2525, 3120);
         addFloorPatch('hall_1',    0, 3120, 2440, 6165);
-        addFloorPatch('hall_2',    2440, 3120, W_TOTAL, 6165);
+        addFloorPatch('hall_2',    2440, 3120, 4525, 6165);
         addFloorPatch('kitchen',   2860, 0, 4925, 1650);
         addFloorPatch('bathroom',  2525, 1650, 4525, 3120);
 
         addStructWall('main_hall', 0, -60, 2860, 60);
         addStructWall('main_hall', -60, 0, 60, 6165);
-        addStructWall('hall_1',    0, 6105, W_TOTAL, 6225, 850, true);
-        addStructWall('hall_2',    W_TOTAL - 60, 3120, W_TOTAL + 60, 6165);
+        addStructWall('hall_1',    0, 6105, 4525, 6225, 850, true);
+        addStructWall('hall_2',    4465, 3120, 4585, 6165);
         addStructWall('kitchen',   2860, -60, 4925, 60);
         addStructWall('kitchen',   4865, 0, 4985, 1650, 950, true);
         addStructWall('kitchen',   2525, 1590, 4925, 1710);
@@ -1021,29 +1134,34 @@
         addStructWall('bathroom',  2525, 3060, 4525, 3180);
         addStructWall('bathroom',  2465, 1650, 2585, 3120);
 
-        addDoorSwingArc('main_hall', mx(1800), mz(60), 880, 0, 90);
-        addDoorSwingArc('kitchen',   mx(2860), mz(850), 760, 0, 90);
-        addDoorSwingArc('bathroom',  mx(2525), mz(2350), 740, 0, 90);
+        addUnitDoorArc('main_hall', 1800, 60, 880, 0, 90);
+        addUnitDoorArc('kitchen',   2860, 850, 760, 0, 90);
+        addUnitDoorArc('bathroom',  2525, 2350, 740, 0, 90);
 
-        addDimLabel(`大窗闊 ${W_TOTAL}mm`, W_TOTAL / 2, 5880);
+        addDimLabel('大窗闊 4525mm', 2260, 5880);
         addDimLabel('直牆 6165mm', 520, 3100);
         addDimLabel('廚房 2065×1650', 3850, 825);
         addDimLabel('浴室 2000×1470', 3525, 2385);
       } else {
+        // 3BR Units (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
+        // Note: For B15 / A8 / A9, the protruding side room is shifted closer to the entrance end
+        const sideZ1 = (unitId === 'B15' || unitId === 'A8' || unitId === 'A9') ? 650 : 2500;
+        const sideZ2 = sideZ1 + 2150;
+
         addFloorPatch('main_hall', 0, 0, 3135, 3250);
         addFloorPatch('main_hall', 0, 3250, 2525, 3650);
-        addFloorPatch('side_room', -2000, 2500, 0, 4650);
+        addFloorPatch('side_room', -2000, sideZ1, 0, sideZ2);
         addFloorPatch('hall_1',    0, 3650, 2440, 6815);
         addFloorPatch('hall_2',    2440, 4720, 4525, 6815);
         addFloorPatch('kitchen',   3135, 1600, 5200, 3250);
         addFloorPatch('bathroom',  2525, 3250, 4525, 4720);
 
         addStructWall('main_hall', 0, -60, 4200, 60);
-        addStructWall('main_hall', -60, 0, 60, 2500);
-        addStructWall('side_room', -2000, 2440, 0, 2560);
-        addStructWall('side_room', -2060, 2500, -1940, 4650, 900, true);
-        addStructWall('side_room', -2000, 4590, 0, 4710);
-        addStructWall('hall_1',    -60, 4650, 60, 6815);
+        if (sideZ1 > 100) addStructWall('main_hall', -60, 0, 60, sideZ1);
+        addStructWall('side_room', -2000, sideZ1 - 60, 0, sideZ1 + 60);
+        addStructWall('side_room', -2060, sideZ1, -1940, sideZ2, 900, true);
+        addStructWall('side_room', -2000, sideZ2 - 60, 0, sideZ2 + 60);
+        addStructWall('hall_1',    -60, sideZ2, 60, 6815);
         addStructWall('hall_1',    0, 6755, 2440, 6875, 850, true);
         addStructWall('hall_2',    2440, 6755, 4525, 6875, 850, true);
         addStructWall('hall_2',    4465, 4720, 4585, 6815, 900, true);
@@ -1054,12 +1172,12 @@
         addStructWall('bathroom',  2525, 4660, 4525, 4780);
         addStructWall('bathroom',  2465, 3250, 2585, 4720);
 
-        addDoorSwingArc('main_hall', mx(4120), mz(300), 880, 90, 180);
-        addDoorSwingArc('kitchen',   mx(3135), mz(2400), 760, 0, 90);
-        addDoorSwingArc('bathroom',  mx(2525), mz(3980), 740, 0, 90);
+        addUnitDoorArc('main_hall', 4120, 300, 880, 90, 180);
+        addUnitDoorArc('kitchen',   3135, 2400, 760, 0, 90);
+        addUnitDoorArc('bathroom',  2525, 3980, 740, 0, 90);
 
         addDimLabel('景觀大窗 4525mm', 2260, 6500);
-        addDimLabel('側房 2000×2150', -1000, 3550);
+        addDimLabel('側房 2000×2150', -1000, (sideZ1 + sideZ2) / 2);
         addDimLabel('廚房 2065×1650', 4150, 2425);
         addDimLabel('浴室 2000×1470', 3525, 3985);
       }
@@ -1411,16 +1529,7 @@
     // =========================================================================
     function getItemsForUnitAndTemplate(unitId, tplId) {
       const prof = getUnitGeometryProfile(unitId);
-      const W_TOTAL = prof.is1BR ? 2350 : (prof.isBay4900 ? 4900 : 4525);
-      const Z_TOTAL = 6815;
-      const mx = x => prof.mirrorX ? (W_TOTAL - x) : x;
-      const mz = z => prof.mirrorZ ? (Z_TOTAL - z) : z;
-      const mRot = r => {
-        let ang = r;
-        if (prof.mirrorX) ang = (360 - ang) % 360;
-        if (prof.mirrorZ) ang = (180 - ang + 360) % 360;
-        return ang;
-      };
+      const { toWorldXZ, toWorldRot } = prof;
 
       const styleObj = TEN_DESIGN_STYLES[(selectedStyleIdx - 1) % TEN_DESIGN_STYLES.length] || TEN_DESIGN_STYLES[0];
       const cabColor = styleObj.cabHex;
@@ -1429,9 +1538,31 @@
       const isPrivateStyle = (activeStyleFilter === 'priv');
       const items = [];
 
+      // Transform canonical (x, z, w, d, rot) into accurate Unit World Coordinates (including 90-deg swap for Horizontal units & B11/B13/B14 scaling)
       const pushItem = (catId, x, z, rot = 0, customW = null, customD = null, customH = null, customColor = null, customY = null) => {
         const base = CATALOG_ITEMS.find(c => c.id === catId);
         if (!base) return;
+        let cx = x;
+        let cz = z;
+
+        // Adapt canonical 2BR coordinates to B11/B13/B14 (where Kitchen/Bath are on Left X=0..2000 and Hall is 4900mm wide, Z=5325mm)
+        if (prof.isBay4900) {
+          cx = 4525 - x;
+          if (cz > 3120) {
+            // MapHall_1 (now on right, Z=3120..4425) & Hall_2 (now on left protruding bay, Z=3120..5325)
+            const isLeftBaySide = (cx < 2050);
+            const maxZTarget = isLeftBaySide ? 5200 : 4320;
+            cz = 3120 + ((cz - 3120) / 3045) * (maxZTarget - 3120);
+          }
+          rot = (360 - rot) % 360;
+        }
+
+        // Adapt canonical 3BR Side_Room Z for B15 / A8 / A9 where Side_Room is at Z=650..2800 instead of 2500..4650
+        if (prof.is3BR && (unitId === 'B15' || unitId === 'A8' || unitId === 'A9') && cx < 0) {
+          cz = cz - 1850;
+        }
+
+        const [wx, wz] = toWorldXZ(cx, cz);
         items.push({
           uid: 'it_' + items.length + '_' + Math.random().toString(36).slice(2, 6),
           id: base.id,
@@ -1440,10 +1571,10 @@
           w: customW || base.w,
           d: customD || base.d,
           h: customH || base.h,
-          x: Math.round(mx(x)),
+          x: Math.round(wx),
           y: customY !== null ? customY : (base.defaultY || 0),
-          z: Math.round(mz(z)),
-          rot: mRot(rot),
+          z: Math.round(wz),
+          rot: toWorldRot(rot),
           color: customColor || base.color
         });
       };
@@ -2067,22 +2198,16 @@
       applyTemplate('tpl_00');
     }
 
-    function selectSpatialLayoutAndOpenStyles(layoutIdx) {
+    function selectSpatialLayout(layoutIdx) {
       isBareShellActive = false;
       selectedLayoutIdx = layoutIdx;
-      templateDrillMode = 'styles';
       applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
     }
 
-    function selectInteriorStyleForCurrentLayout(styleIdx) {
+    function selectInteriorStyle(styleIdx) {
       isBareShellActive = false;
       selectedStyleIdx = styleIdx;
       applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
-    }
-
-    function backToLayoutList() {
-      templateDrillMode = 'layouts';
-      renderTemplatesGrid();
     }
 
     function switchUnit(unitId) {
@@ -2152,33 +2277,41 @@
     // =========================================================================
     function getZoneBounds(zoneId) {
       const prof = getUnitGeometryProfile(currentUnitId);
-      const W_TOTAL = prof.is1BR ? 2350 : (prof.isBay4900 ? 4900 : 4525);
-      const Z_TOTAL = 6815;
-      const mx = x => prof.mirrorX ? (W_TOTAL - x) : x;
-      const mz = z => prof.mirrorZ ? (Z_TOTAL - z) : z;
-      const box = (x1, z1, x2, z2) => ({
-        minX: Math.min(mx(x1), mx(x2)) - 200,
-        maxX: Math.max(mx(x1), mx(x2)) + 200,
-        minZ: Math.min(mz(z1), mz(z2)) - 200,
-        maxZ: Math.max(mz(z1), mz(z2)) + 200,
-        cx: (mx(x1) + mx(x2)) / 2,
-        cz: (mz(z1) + mz(z2)) / 2
-      });
+      const { toWorldXZ } = prof;
+      const box = (x1, z1, x2, z2) => {
+        const [wx1, wz1] = toWorldXZ(x1, z1);
+        const [wx2, wz2] = toWorldXZ(x2, z2);
+        return {
+          minX: Math.min(wx1, wx2) - 200,
+          maxX: Math.max(wx1, wx2) + 200,
+          minZ: Math.min(wz1, wz2) - 200,
+          maxZ: Math.max(wz1, wz2) + 200,
+          cx: (wx1 + wx2) / 2,
+          cz: (wz1 + wz2) / 2
+        };
+      };
 
       if (prof.is1BR) {
         if (zoneId === 'main_hall') return box(0, 0, 2350, 3415);
         if (zoneId === 'hall_1' || zoneId === 'hall_2' || zoneId === 'side_room') return box(0, 3415, 2350, 6165);
         if (zoneId === 'kitchen') return box(-1415, 1650, 0, 3415);
         if (zoneId === 'bathroom') return box(-1580, 0, 0, 1650);
+      } else if (prof.isBay4900) {
+        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(1680, 0, 4900, 3120);
+        if (zoneId === 'hall_1') return box(2000, 3120, 4900, 4425);
+        if (zoneId === 'hall_2') return box(0, 3120, 2000, 5325);
+        if (zoneId === 'kitchen') return box(-385, 0, 1680, 1650);
+        if (zoneId === 'bathroom') return box(0, 1650, 2000, 3120);
       } else if (prof.is2BR) {
         if (zoneId === 'main_hall' || zoneId === 'side_room') return box(0, 0, 2525, 3120);
         if (zoneId === 'hall_1') return box(0, 3120, 2440, 6165);
-        if (zoneId === 'hall_2') return box(2440, 3120, W_TOTAL, 6165);
+        if (zoneId === 'hall_2') return box(2440, 3120, 4525, 6165);
         if (zoneId === 'kitchen') return box(2860, 0, 4925, 1650);
         if (zoneId === 'bathroom') return box(2525, 1650, 4525, 3120);
       } else {
+        const sideZ1 = (currentUnitId === 'B15' || currentUnitId === 'A8' || currentUnitId === 'A9') ? 650 : 2500;
         if (zoneId === 'main_hall') return box(0, 0, 3135, 3250);
-        if (zoneId === 'side_room') return box(-2000, 2500, 0, 4650);
+        if (zoneId === 'side_room') return box(-2000, sideZ1, 0, sideZ1 + 2150);
         if (zoneId === 'hall_1') return box(0, 3650, 2440, 6815);
         if (zoneId === 'hall_2') return box(2440, 4720, 4525, 6815);
         if (zoneId === 'kitchen') return box(3135, 1600, 5200, 3250);
@@ -2522,10 +2655,10 @@
         if (b) {
           if (k === activeStyleFilter) {
             b.className = k === 'priv'
-              ? 'px-1.5 py-0.5 rounded bg-sky-400 text-slate-950 text-[9px] font-black shrink-0 shadow'
-              : 'px-1.5 py-0.5 rounded bg-emerald-400 text-slate-950 text-[9px] font-black shrink-0 shadow';
+              ? 'px-2 py-0.5 rounded-lg bg-sky-400 text-slate-950 text-[10px] font-black shrink-0 shadow'
+              : 'px-2 py-0.5 rounded-lg bg-emerald-400 text-slate-950 text-[10px] font-black shrink-0 shadow';
           } else {
-            b.className = 'px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0 border border-slate-700';
+            b.className = 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0 border border-slate-700';
           }
         }
       });
@@ -2535,13 +2668,12 @@
     function filterTemplatesByPeople(pTag) {
       activePeopleFilter = (pTag === 'all') ? '5p' : pTag;
       isBareShellActive = false;
-      templateDrillMode = 'layouts';
       ['2p', '3p', '4p', '5p', '6p'].forEach(k => {
         const b = document.getElementById('pfilt-' + k);
         if (b) {
           b.className = (k === activePeopleFilter)
-            ? 'px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[9px] font-black shrink-0 shadow'
-            : 'px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[9px] font-bold shrink-0';
+            ? 'px-2 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
+            : 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0';
         }
       });
       selectedLayoutIdx = 1;
@@ -2549,55 +2681,59 @@
     }
 
     function renderTemplatesGrid() {
-      const container = document.getElementById('templates-grid');
-      const backBtn = document.getElementById('btn-back-layouts');
-      const summaryEl = document.getElementById('tpl-current-summary');
+      const layContainer = document.getElementById('templates-layouts-row');
+      const styContainer = document.getElementById('templates-styles-row');
+      
       const estLabel = activeStyleFilter === 'priv' ? '🏙️私樓' : '🏘️居屋';
-      const pLabelMap = { '2p': '2人世界', '3p': '3人家庭', '4p': '4人家庭', '5p': '5人大家庭', '6p': '6人大家庭' };
-      const pLabel = pLabelMap[activePeopleFilter] || '5人大家庭';
+      const pLabelMap = { '2p': '2人', '3p': '3人', '4p': '4人', '5p': '5人', '6p': '6人' };
+      const pLabel = pLabelMap[activePeopleFilter] || '5人';
       const layouts = SPATIAL_LAYOUTS_BY_PEOPLE[activePeopleFilter] || SPATIAL_LAYOUTS_BY_PEOPLE['5p'];
-      const curLay = layouts[(selectedLayoutIdx - 1) % layouts.length];
-      const curStyle = TEN_DESIGN_STYLES[(selectedStyleIdx - 1) % TEN_DESIGN_STYLES.length];
-
-      if (templateDrillMode === 'styles') {
-        if (backBtn) backBtn.classList.remove('hidden');
-        if (summaryEl) summaryEl.textContent = `${estLabel}・${pLabel}｜${curLay.title.split(':')[0]}（請揀選10款設計風格）`;
-
-        container.innerHTML = TEN_DESIGN_STYLES.map((st, idx) => {
-          const sNum = idx + 1;
-          const isSelected = (!isBareShellActive && selectedStyleIdx === sNum);
-          return `
-            <button onclick="selectInteriorStyleForCurrentLayout(${sNum})" class="shrink-0 w-56 p-1.5 rounded-xl border text-left transition ${isSelected ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900 border-slate-800 hover:border-sky-400'}">
-              <div class="flex items-center justify-between mb-0.5">
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">🎨 風格 ${st.num}/10・${st.badge}</span>
-                <span class="w-3.5 h-3.5 rounded-full border border-white/40 inline-block" style="background:${st.cabHex}"></span>
-              </div>
-              <div class="text-[10px] font-extrabold text-white truncate">${st.name}</div>
-              <div class="text-[9px] text-amber-300 truncate mt-0.5">套用至：${curLay.title.split(':')[0]} ▶</div>
-            </button>
-          `;
-        }).join('');
-      } else {
-        if (backBtn) backBtn.classList.add('hidden');
-        if (summaryEl) summaryEl.textContent = `${estLabel}・${pLabel}：共10款不同空間擺設 (點選擺設可揀10款風格｜當前風格:${curStyle.badge})`;
-
-        container.innerHTML = layouts.map(lay => {
+      
+      // Render 10 Spatial Layouts (Row 3)
+      if (layContainer) {
+        layContainer.innerHTML = layouts.map(lay => {
           const isSelected = (!isBareShellActive && selectedLayoutIdx === lay.idx);
-          const badgeColor = activeStyleFilter === 'priv'
-            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          const badgeColor = activeStyleFilter === 'priv' 
+            ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' 
+            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
           return `
-            <button onclick="selectSpatialLayoutAndOpenStyles(${lay.idx})" class="shrink-0 w-64 p-1.5 rounded-xl border text-left transition ${isSelected ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900 border-slate-800 hover:border-amber-400'}">
-              <div class="flex items-center justify-between mb-0.5">
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold ${badgeColor}">${estLabel}・${pLabel} #${String(lay.idx).padStart(2,'0')}</span>
-                <span class="text-[9px] text-amber-400 font-black">揀10款風格 ▶</span>
-              </div>
-              <div class="text-[10px] font-extrabold text-white truncate">${lay.title}</div>
+            <button onclick="selectSpatialLayout(${lay.idx})" class="shrink-0 w-48 p-2 rounded-xl border text-left transition ${isSelected ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900 border-slate-800 hover:border-amber-400'}">
+              <div class="px-1.5 py-0.5 rounded text-[9px] font-bold inline-block border mb-1 ${badgeColor}">${estLabel}・${pLabel} #${String(lay.idx).padStart(2,'0')}</div>
+              <div class="text-[10px] font-extrabold text-white truncate">${lay.title.split(':')[1] || lay.title}</div>
               <div class="text-[9px] text-slate-400 truncate mt-0.5">${lay.desc}</div>
             </button>
           `;
         }).join('');
       }
+
+      // Render 10 Design Styles (Row 4)
+      if (styContainer) {
+        styContainer.innerHTML = TEN_DESIGN_STYLES.map((st, idx) => {
+          const sNum = idx + 1;
+          const isSelected = (!isBareShellActive && selectedStyleIdx === sNum);
+          return `
+            <button onclick="selectInteriorStyle(${sNum})" class="shrink-0 w-40 p-2 rounded-xl border text-left transition ${isSelected ? 'bg-sky-500/25 border-sky-400 ring-1 ring-sky-400' : 'bg-slate-900 border-slate-800 hover:border-sky-400'}">
+              <div class="flex items-center justify-between mb-1">
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">🎨 風格 ${st.num}</span>
+                <span class="w-3.5 h-3.5 rounded-full border border-white/40 inline-block" style="background:${st.cabHex}"></span>
+              </div>
+              <div class="text-[10px] font-extrabold text-white truncate">${st.name}</div>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+
+    function selectSpatialLayout(idx) {
+      isBareShellActive = false;
+      selectedLayoutIdx = idx;
+      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
+    }
+
+    function selectInteriorStyle(idx) {
+      isBareShellActive = false;
+      selectedStyleIdx = idx;
+      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
     }
 
     function renderFloorZonePills() {
