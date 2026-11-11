@@ -69,6 +69,9 @@
             padding: 14px;
             box-sizing: border-box;
         }
+        #worksheetView.container {
+            max-width: 860px;
+        }
         .active {
             display: flex;
             animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -157,6 +160,49 @@
             box-shadow: 0 8px 0 var(--blue-dark), 0 12px 20px rgba(79, 172, 254, 0.3);
         }
         .btn-3d.blue:active { box-shadow: 0 1px 0 var(--blue-dark); }
+        .btn-3d.purple {
+            background: linear-gradient(180deg, #B565F6 0%, #845EC2 100%);
+            box-shadow: 0 8px 0 #5E3A98, 0 12px 20px rgba(132, 94, 194, 0.3);
+        }
+        .btn-3d.purple:active { box-shadow: 0 1px 0 #5E3A98; }
+
+        /* 首頁一鍵生成練習紙按鈕組 */
+        .ws-gen-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .ws-gen-btn {
+            border: 3px solid #FFF;
+            border-radius: 18px;
+            padding: 12px 6px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .ws-gen-btn.c1 {
+            background: linear-gradient(180deg, #4CC9F0 0%, #3A86FF 100%);
+            box-shadow: 0 6px 0 #1D4ED8;
+        }
+        .ws-gen-btn.c3 {
+            background: linear-gradient(180deg, #FF9F1C 0%, #F77F00 100%);
+            box-shadow: 0 6px 0 #C2410C;
+        }
+        .ws-gen-btn.c5 {
+            background: linear-gradient(180deg, #B565F6 0%, #8338EC 100%);
+            box-shadow: 0 6px 0 #5B21B6;
+        }
+        .ws-gen-btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
 
         /* ================= 卡片通用樣式 ================= */
         .card {
@@ -523,10 +569,442 @@
             background: #FFF;
             color: #2D3436;
             outline: none;
+            user-select: text;
         }
         input[type="text"]:focus {
             border-color: #FF477E;
             box-shadow: 0 0 0 4px rgba(255, 71, 126, 0.2);
+        }
+
+        /* ================= 🖨️ A4 彩色可愛練習紙樣式 (支援1/3/5頁與直接列印) ================= */
+        .ws-toolbar {
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            border: 3px solid #FFF;
+            border-radius: 22px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+        .ws-toolbar-btn {
+            border: 2px solid #FFF;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ws-toolbar-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        #worksheetPagesContainer {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* A4 直向練習紙本體 */
+        .a4-sheet {
+            width: 100%;
+            max-width: 794px; /* 標準 A4 寬度比例 */
+            background: #FFFFFF;
+            border-radius: 20px;
+            border: 5px solid #FF85A1;
+            padding: 18px 22px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            position: relative;
+            box-sizing: border-box;
+            background-image: radial-gradient(#FFE5EC 1.2px, transparent 1.2px);
+            background-size: 24px 24px;
+        }
+
+        /* 練習紙頂部：標題 + 學生姓名 + 家長批改分數框 */
+        .ws-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 12px;
+            background: linear-gradient(135deg, #FFF0F6 0%, #E7F5FF 100%);
+            border: 3px solid #FF85A1;
+            border-radius: 18px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+        .ws-header-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .ws-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ws-title-row img {
+            width: 34px;
+            height: 34px;
+        }
+        .ws-main-title {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #D6336C;
+            letter-spacing: 0.5px;
+        }
+        .ws-page-tag {
+            background: #FFD166;
+            color: #9C4221;
+            font-size: 0.85rem;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 2px solid #F59F00;
+        }
+        .ws-student-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 10px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #2D3436;
+        }
+        .ws-line-input {
+            display: inline-block;
+            border-bottom: 2.5px solid #339AF0;
+            min-width: 120px;
+            height: 22px;
+        }
+        .ws-line-input.short {
+            min-width: 65px;
+        }
+
+        /* 右側家長批改分數大框 */
+        .ws-score-box {
+            width: 135px;
+            background: #FFF9DB;
+            border: 3px dashed #F59F00;
+            border-radius: 16px;
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .ws-score-label {
+            font-size: 0.85rem;
+            font-weight: 900;
+            color: #D9480F;
+        }
+        .ws-score-line {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: #E03131;
+            margin: 6px 0 2px 0;
+            border-bottom: 2.5px solid #E03131;
+            width: 90%;
+            text-align: right;
+            padding-right: 4px;
+        }
+        .ws-score-sub {
+            font-size: 0.75rem;
+            color: #777;
+            font-weight: bold;
+        }
+
+        /* 12個詞語寶庫框 */
+        .ws-word-bank {
+            background: linear-gradient(90deg, #FFF9DB 0%, #F3F0FF 50%, #E6FCF5 100%);
+            border: 3px solid #845EC2;
+            border-radius: 16px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .ws-wb-title {
+            font-size: 0.98rem;
+            font-weight: 900;
+            color: #5F3DC4;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ws-wb-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 7px;
+        }
+        .ws-wb-item {
+            background: #FFFFFF;
+            border: 2px solid #B197FC;
+            border-radius: 10px;
+            padding: 4px 6px;
+            font-size: 1.08rem;
+            font-weight: 900;
+            color: #2D3436;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .ws-check-box {
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            border: 1.8px solid #845EC2;
+            border-radius: 3px;
+            background: #FFF;
+        }
+
+        /* 12 題填充題雙欄網格 */
+        .ws-questions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 14px;
+        }
+        .ws-q-card {
+            border-radius: 14px;
+            padding: 8px 10px;
+            border: 2.5px solid #74C0FC;
+            background: #F8FAFC;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        /* 繽紛交替色主題 */
+        .ws-q-card.theme-0 { background: #FFF5F7; border-color: #FF85A1; }
+        .ws-q-card.theme-1 { background: #F0F9FF; border-color: #4CC9F0; }
+        .ws-q-card.theme-2 { background: #FFFBEB; border-color: #FBBF24; }
+        .ws-q-card.theme-3 { background: #F0FDF4; border-color: #34D399; }
+        .ws-q-card.theme-4 { background: #FAF5FF; border-color: #C084FC; }
+        .ws-q-card.theme-5 { background: #FFF7ED; border-color: #FB923C; }
+
+        .ws-q-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ws-q-num {
+            background: #FF477E;
+            color: white;
+            font-weight: 900;
+            font-size: 0.88rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .ws-q-card.theme-1 .ws-q-num { background: #0284C7; }
+        .ws-q-card.theme-2 .ws-q-num { background: #D97706; }
+        .ws-q-card.theme-3 .ws-q-num { background: #059669; }
+        .ws-q-card.theme-4 .ws-q-num { background: #7C3AED; }
+        .ws-q-card.theme-5 .ws-q-num { background: #EA580C; }
+
+        .ws-q-emoji {
+            font-size: 1.55rem;
+            line-height: 1;
+        }
+        .ws-q-prompt {
+            font-size: 1.12rem;
+            font-weight: 900;
+            color: #1E293B;
+            letter-spacing: 0.5px;
+        }
+        .ws-blank-line {
+            display: inline-block;
+            width: 50px;
+            border-bottom: 2.5px solid #E11D48;
+            margin-right: 2px;
+        }
+
+        /* 練習紙上的完整答題田字格 */
+        .ws-tzg-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-left: 4px;
+        }
+        .ws-tzg-label {
+            font-size: 0.78rem;
+            font-weight: 900;
+            color: #64748B;
+            margin-right: 2px;
+        }
+        .ws-tzg-box {
+            width: 34px;
+            height: 34px;
+            border: 1.8px solid #EF4444;
+            background: #FFFFFF;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Kaiti', 'STKaiti', 'BiauKai', serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #CBD5E1; /* 淺色描紅提示字 */
+            border-radius: 4px;
+        }
+        .ws-tzg-box.write-blank {
+            background: #FFFDF0;
+            border: 2px solid #E11D48;
+        }
+        .ws-tzg-box::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed rgba(239, 68, 68, 0.45);
+        }
+        .ws-tzg-box::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            border-left: 1px dashed rgba(239, 68, 68, 0.45);
+        }
+
+        /* 練習紙底部鼓勵欄 */
+        .ws-footer {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 2px dashed #CBD5E1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+            font-weight: 900;
+            color: #64748B;
+        }
+
+        /* 手機預覽自適應 */
+        @media (max-width: 640px) {
+            .ws-wb-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .ws-questions-grid {
+                grid-template-columns: 1fr;
+            }
+            .ws-header {
+                flex-direction: column;
+            }
+            .ws-score-box {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 8px 16px;
+            }
+            .ws-score-line {
+                width: 120px;
+                margin: 0;
+            }
+        }
+
+        /* ================= 🖨️ A4 直向列印專用設定 (@media print) ================= */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 7mm 8mm;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body {
+                background: #FFFFFF !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .top-banner,
+            #home,
+            #game,
+            #result,
+            .ws-toolbar {
+                display: none !important;
+            }
+            #worksheetView {
+                display: block !important;
+                width: 100% !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #worksheetPagesContainer {
+                display: block !important;
+                gap: 0 !important;
+            }
+            .a4-sheet {
+                width: 100% !important;
+                max-width: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 12px 14px !important;
+                border: 4px solid #FF85A1 !important;
+                border-radius: 16px !important;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+            }
+            .a4-sheet:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+            /* 確保列印時必定維持 A4 直向雙欄與 6 格詞庫 */
+            .ws-header {
+                flex-direction: row !important;
+                padding: 8px 12px !important;
+                margin-bottom: 8px !important;
+            }
+            .ws-score-box {
+                width: 130px !important;
+                flex-direction: column !important;
+            }
+            .ws-score-line {
+                width: 90% !important;
+                margin: 4px 0 !important;
+            }
+            .ws-word-bank {
+                padding: 7px 10px !important;
+                margin-bottom: 8px !important;
+            }
+            .ws-wb-grid {
+                grid-template-columns: repeat(6, 1fr) !important;
+                gap: 5px !important;
+            }
+            .ws-questions-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 7px 10px !important;
+            }
+            .ws-q-card {
+                padding: 6px 8px !important;
+                gap: 4px !important;
+            }
+            .ws-tzg-box {
+                width: 31px !important;
+                height: 31px !important;
+                font-size: 1.1rem !important;
+            }
         }
     </style>
 </head>
@@ -554,6 +1032,34 @@
     <button class="btn-3d" onclick="startGame()">
         <span>🚀 開始默書挑戰！(12題)</span>
     </button>
+
+    <!-- 新增：隨機生成彩色 A4 練習紙專區 (一鍵生成 1次 / 3次 / 5次) -->
+    <div class="card" style="border-color: #FF85A1; background: linear-gradient(135deg, #FFF5F7 0%, #F0F9FF 100%);">
+        <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3a8/512.gif" style="width:32px;height:32px;" alt="art">
+            <h3 style="margin: 0; color: #D6336C; font-size: 1.3rem;">🖨️ 隨機生成 A4 趣味默書練習紙</h3>
+        </div>
+        <div style="font-size: 0.92rem; color: #555; font-weight: bold; margin-top: 4px;">
+            直向 A4 彩色圖案設計・包含 12 題隨機填充題、田字格及家長批改分數欄
+        </div>
+        <div class="ws-gen-grid">
+            <button class="ws-gen-btn c1" onclick="generateWorksheets(1)">
+                <span style="font-size:1.5rem;">📄</span>
+                <span>一鍵生成 1 次</span>
+                <span style="font-size:0.8rem; opacity:0.95;">(隨機 1 頁 A4)</span>
+            </button>
+            <button class="ws-gen-btn c3" onclick="generateWorksheets(3)">
+                <span style="font-size:1.5rem;">📑</span>
+                <span>一鍵生成 3 次</span>
+                <span style="font-size:0.8rem; opacity:0.95;">(隨機 3 頁 A4)</span>
+            </button>
+            <button class="ws-gen-btn c5" onclick="generateWorksheets(5)">
+                <span style="font-size:1.5rem;">📚</span>
+                <span>一鍵生成 5 次</span>
+                <span style="font-size:0.8rem; opacity:0.95;">(隨機 5 頁 A4)</span>
+            </button>
+        </div>
+    </div>
 
     <div class="card" style="border-color: #FFE066;">
         <h3 style="margin: 0; color: #D9480F; font-size: 1.3rem;">🔊 12個形容詞圖案溫習屋</h3>
@@ -601,7 +1107,7 @@
         <div class="tianzige-row" id="writingPaperRow"></div>
     </div>
 
-    <!-- 4 個選項按鈕區域 (已設定為純文字) -->
+    <!-- 4 個選項按鈕區域 (純文字) -->
     <div class="grid-options" id="optionsGrid"></div>
 
     <div class="nav-bar">
@@ -640,7 +1146,20 @@
     </div>
 </div>
 
-<!-- ================= 遊戲核心邏輯與雲端同步 ================= -->
+<!-- ================= 4. A4 彩色練習紙預覽與列印頁 ================= -->
+<div id="worksheetView" class="container">
+    <div class="ws-toolbar">
+        <button class="ws-toolbar-btn" style="background:#64748B;" onclick="goHome()">🏠 返回主頁</button>
+        <button class="ws-toolbar-btn" style="background:#3A86FF;" onclick="generateWorksheets(1)">📄 重新生成 1 頁</button>
+        <button class="ws-toolbar-btn" style="background:#F77F00;" onclick="generateWorksheets(3)">📑 重新生成 3 頁</button>
+        <button class="ws-toolbar-btn" style="background:#8338EC;" onclick="generateWorksheets(5)">📚 重新生成 5 頁</button>
+        <button class="ws-toolbar-btn" style="background:#06D6A0; font-size:1.1rem; padding:10px 20px;" onclick="window.print()">🖨️ 立即列印練習紙 (A4)</button>
+    </div>
+
+    <div id="worksheetPagesContainer"></div>
+</div>
+
+<!-- ================= 遊戲核心邏輯、練習紙生成器與雲端同步 ================= -->
 <script type="module">
     const vocabMeta = {
         "香甜": "🍎", "尖尖": "✏️", "閃亮": "💎", "高高": "🦒",
@@ -713,6 +1232,106 @@
         return String(Math.floor(s / 60)).padStart(2, '0') + ":" + String(s % 60).padStart(2, '0');
     }
 
+    // ================= 🖨️ 一鍵隨機生成 A4 練習紙 (1頁 / 3頁 / 5頁) =================
+    window.generateWorksheets = function(pageCount) {
+        const container = document.getElementById('worksheetPagesContainer');
+        container.innerHTML = '';
+
+        for (let p = 1; p <= pageCount; p++) {
+            // 每一頁都把 12 個形容詞隨機洗牌，並各自隨機抽取 1 個例子
+            const shuffledAdjs = [...adjectives].sort(() => 0.5 - Math.random());
+            const pageQuestions = shuffledAdjs.map(adj => {
+                const pool = dictationData[adj];
+                const chosen = pool[Math.floor(Math.random() * pool.length)];
+                return { adj, noun: chosen.n, emoji: chosen.e };
+            });
+
+            // 詞語表也隨機排列展示
+            const bankWords = [...adjectives].sort(() => 0.5 - Math.random());
+
+            const wordBankHtml = bankWords.map(w => `
+                <div class="ws-wb-item">
+                    <span class="ws-check-box"></span>
+                    <span>${w}</span>
+                </div>
+            `).join('');
+
+            const questionsHtml = pageQuestions.map((q, idx) => {
+                const themeClass = `theme-${idx % 6}`;
+                const nounChars = q.noun.split('');
+                // 產生完整詞句田字格：前2格空白供填寫形容詞，後面印出淺灰色例子字供描寫/抄寫
+                const tzgBoxesHtml =
+                    `<div class="ws-tzg-box write-blank"></div>` +
+                    `<div class="ws-tzg-box write-blank"></div>` +
+                    nounChars.map(ch => `<div class="ws-tzg-box">${ch}</div>`).join('');
+
+                return `
+                    <div class="ws-q-card ${themeClass}">
+                        <div class="ws-q-top">
+                            <span class="ws-q-num">${idx + 1}</span>
+                            <span class="ws-q-emoji">${q.emoji}</span>
+                            <span class="ws-q-prompt"><span class="ws-blank-line"></span>${q.noun}</span>
+                        </div>
+                        <div class="ws-tzg-wrap">
+                            <span class="ws-tzg-label">答題紙：</span>
+                            ${tzgBoxesHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const sheetEl = document.createElement('div');
+            sheetEl.className = 'a4-sheet';
+            sheetEl.innerHTML = `
+                <!-- 頂部：標題、學生姓名欄、家長批改分數框 -->
+                <div class="ws-header">
+                    <div class="ws-header-left">
+                        <div class="ws-title-row">
+                            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f308/512.gif" alt="rainbow">
+                            <span class="ws-main-title">1B默書三(趣味默書)練習紙</span>
+                            <span class="ws-page-tag">第 ${p} / ${pageCount} 頁</span>
+                        </div>
+                        <div class="ws-student-info">
+                            <span>👧👦 姓名：<span class="ws-line-input"></span></span>
+                            <span>🏫 班別：1B ( <span class="ws-line-input short" style="min-width:32px;"></span> )</span>
+                            <span>📅 日期：<span class="ws-line-input short"></span></span>
+                        </div>
+                    </div>
+                    <div class="ws-score-box">
+                        <div class="ws-score-label">💯 家長批改分數</div>
+                        <div class="ws-score-line">/ 100</div>
+                        <div class="ws-score-sub">⭐ 獎勵貼紙區 ⭐</div>
+                    </div>
+                </div>
+
+                <!-- 12 個形容詞溫習詞語庫 -->
+                <div class="ws-word-bank">
+                    <div class="ws-wb-title">
+                        <span>🎒 溫習詞語寶庫（請選出最適合的形容詞填在 ＿＿ 上，並在田字格寫出完整詞語）：</span>
+                        <span style="color:#E03131;">✨ 用過的詞語可以打 ✓</span>
+                    </div>
+                    <div class="ws-wb-grid">
+                        ${wordBankHtml}
+                    </div>
+                </div>
+
+                <!-- 12 題隨機填充題 -->
+                <div class="ws-questions-grid">
+                    ${questionsHtml}
+                </div>
+
+                <!-- 底部溫馨鼓勵 -->
+                <div class="ws-footer">
+                    <span>🌟 細心觀察圖案，字體端正漂亮會拿更高分喔！加油！</span>
+                    <span>👨‍👩‍👧 家長簽署：___________________</span>
+                </div>
+            `;
+            container.appendChild(sheetEl);
+        }
+
+        showPage('worksheetView');
+    };
+
     function renderTianZiGe(adjOrNull, nounStr) {
         const row = document.getElementById('writingPaperRow');
         row.innerHTML = '';
@@ -778,10 +1397,8 @@
         q.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn' + (answers[currentQ] === opt ? ' selected' : '');
-            
-            // 已修改：移除 emoji 圖案，按鈕內只顯示純文字形容詞
             btn.innerText = opt;
-            
+
             btn.onclick = () => {
                 answers[currentQ] = opt;
                 speak(opt + q.noun);
