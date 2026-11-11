@@ -118,8 +118,6 @@
             <span id="current-unit-type-badge" class="text-[9px] text-amber-300 font-bold hidden md:inline">三房大則</span>
           </div>
 
-          <!-- Simple Icon + Short Text Toolbar (No Day/Night Toggle - Pure Vibrant Color) -->
-          <div class="glass-pill px-1 py-0.5 rounded-xl flex items-center gap-0.5 pointer-events-auto overflow-x-auto no-scrollbar shadow-lg">
           <!-- Simple Icon + Short Text Toolbar (Removed 2D & SeaView buttons as requested) -->
           <div class="glass-pill px-1 py-0.5 rounded-xl flex items-center gap-0.5 pointer-events-auto overflow-x-auto no-scrollbar shadow-lg">
             <button onclick="fitFullLayoutTopView()" id="cam-fitall" class="px-2 py-0.5 rounded-lg bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🗺️全景俯視</button>
@@ -212,32 +210,38 @@
 
       <!-- Compact Horizontal Scrollable Drawer Body -->
       <div id="drawer-body" class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 no-scrollbar">
-        <!-- TAB 1: 4 INDEPENDENT ROWS TEMPLATE SELECTION -->
-        <div id="panel-templates" class="h-full flex flex-col gap-1 overflow-y-auto no-scrollbar pb-1">
-          <!-- Row 1: People Filter & Bare Shell -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0 pb-0.5">
-            <button onclick="applyBareShellTemplate()" id="btn-bare-shell" class="px-2 py-0.5 rounded-lg bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0">🏠清水房</button>
-            <span class="text-slate-600 text-[10px] mx-0.5">|</span>
-            <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👫 2人</button>
-            <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧 3人</button>
-            <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧‍👦 4人</button>
-            <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-2 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow">👨‍👩‍👧‍👦 5人</button>
-            <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">🏠 6人</button>
+        <!-- TAB 1: 4 INDEPENDENT COMPACT ROWS TEMPLATE SELECTION (ALL 4 ROWS VISIBLE AT ONCE) -->
+        <div id="panel-templates" class="h-full flex flex-col justify-between gap-0.5 overflow-y-auto no-scrollbar">
+          <!-- Row 1: ① 人數選行 (People Filter & Bare Shell) -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[9px] font-black text-amber-400 shrink-0 w-11">①人數:</span>
+            <button onclick="applyBareShellTemplate()" id="btn-bare-shell" class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0">🏠清水房</button>
+            <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👫2人</button>
+            <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧3人</button>
+            <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧‍👦4人</button>
+            <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow">👨‍👩‍👧‍👦5人</button>
+            <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">🏠6人</button>
           </div>
           
-          <!-- Row 2: HOS / Private Filter -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0 pb-1 border-b border-slate-800/80">
-            <button onclick="filterTemplatesByStyle('hos')" id="sfilt-hos" class="px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🏘️ 居屋實用設計</button>
-            <button onclick="filterTemplatesByStyle('priv')" id="sfilt-priv" class="px-2 py-0.5 rounded-lg bg-slate-800 text-sky-300 text-[10px] font-bold shrink-0 border border-sky-500/30">🏙️ 私樓燈帶設計</button>
+          <!-- Row 2: ② 居屋/私樓選行 (HOS / Private Filter + Active Layout Summary) -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[9px] font-black text-emerald-400 shrink-0 w-11">②類別:</span>
+            <button onclick="filterTemplatesByStyle('hos')" id="sfilt-hos" class="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🏘️居屋實用</button>
+            <button onclick="filterTemplatesByStyle('priv')" id="sfilt-priv" class="px-2 py-0.5 rounded bg-slate-800 text-sky-300 text-[10px] font-bold shrink-0 border border-sky-500/30">🏙️私樓燈帶</button>
+            <span id="active-layout-summary" class="text-[9px] text-amber-200 font-bold truncate ml-1"></span>
           </div>
 
-          <!-- Row 3: 10 Spatial Layouts -->
-          <div class="text-[9px] font-bold text-amber-400 mt-0.5">📐 10款空間擺設間隔 (點選切換)：</div>
-          <div id="templates-layouts-row" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 pb-1"></div>
+          <!-- Row 3: ③ 10款空間擺設間隔選行 (10 Spatial Layouts) -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[9px] font-black text-amber-300 shrink-0 w-11">③擺設:</span>
+            <div id="templates-layouts-row" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
+          </div>
 
-          <!-- Row 4: 10 Design Styles -->
-          <div class="text-[9px] font-bold text-sky-400 mt-1">🎨 10款室內設計風格 (點選套用)：</div>
-          <div id="templates-styles-row" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 pb-1"></div>
+          <!-- Row 4: ④ 10款室內設計風格選行 (10 Design Styles) -->
+          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
+            <span class="text-[9px] font-black text-sky-400 shrink-0 w-11">④風格:</span>
+            <div id="templates-styles-row" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
+          </div>
         </div>
 
         <!-- TAB 2: 24 FLOORS -->
@@ -2655,10 +2659,10 @@
         if (b) {
           if (k === activeStyleFilter) {
             b.className = k === 'priv'
-              ? 'px-2 py-0.5 rounded-lg bg-sky-400 text-slate-950 text-[10px] font-black shrink-0 shadow'
-              : 'px-2 py-0.5 rounded-lg bg-emerald-400 text-slate-950 text-[10px] font-black shrink-0 shadow';
+              ? 'px-2 py-0.5 rounded bg-sky-400 text-slate-950 text-[10px] font-black shrink-0 shadow'
+              : 'px-2 py-0.5 rounded bg-emerald-400 text-slate-950 text-[10px] font-black shrink-0 shadow';
           } else {
-            b.className = 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0 border border-slate-700';
+            b.className = 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0 border border-slate-700';
           }
         }
       });
@@ -2672,8 +2676,8 @@
         const b = document.getElementById('pfilt-' + k);
         if (b) {
           b.className = (k === activePeopleFilter)
-            ? 'px-2 py-0.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
-            : 'px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0';
+            ? 'px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
+            : 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0';
         }
       });
       selectedLayoutIdx = 1;
@@ -2683,57 +2687,51 @@
     function renderTemplatesGrid() {
       const layContainer = document.getElementById('templates-layouts-row');
       const styContainer = document.getElementById('templates-styles-row');
-      
-      const estLabel = activeStyleFilter === 'priv' ? '🏙️私樓' : '🏘️居屋';
-      const pLabelMap = { '2p': '2人', '3p': '3人', '4p': '4人', '5p': '5人', '6p': '6人' };
-      const pLabel = pLabelMap[activePeopleFilter] || '5人';
+      const summaryEl = document.getElementById('active-layout-summary');
+      const bareBtn = document.getElementById('btn-bare-shell');
+
+      if (bareBtn) {
+        bareBtn.className = isBareShellActive
+          ? 'px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
+          : 'px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0';
+      }
+
       const layouts = SPATIAL_LAYOUTS_BY_PEOPLE[activePeopleFilter] || SPATIAL_LAYOUTS_BY_PEOPLE['5p'];
-      
-      // Render 10 Spatial Layouts (Row 3)
+      const currentLay = layouts[(selectedLayoutIdx - 1) % layouts.length] || layouts[0];
+
+      if (summaryEl) {
+        summaryEl.textContent = isBareShellActive
+          ? '當前：交樓標準清水房'
+          : `當前：${currentLay.title}`;
+      }
+
+      // Render Row 3: 10 Spatial Layouts (Compact 1-Line Pills)
       if (layContainer) {
         layContainer.innerHTML = layouts.map(lay => {
           const isSelected = (!isBareShellActive && selectedLayoutIdx === lay.idx);
-          const badgeColor = activeStyleFilter === 'priv' 
-            ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' 
-            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+          const shortTitle = (lay.title.split(':')[1] || lay.title).trim();
           return `
-            <button onclick="selectSpatialLayout(${lay.idx})" class="shrink-0 w-48 p-2 rounded-xl border text-left transition ${isSelected ? 'bg-amber-500/25 border-amber-400 ring-1 ring-amber-400' : 'bg-slate-900 border-slate-800 hover:border-amber-400'}">
-              <div class="px-1.5 py-0.5 rounded text-[9px] font-bold inline-block border mb-1 ${badgeColor}">${estLabel}・${pLabel} #${String(lay.idx).padStart(2,'0')}</div>
-              <div class="text-[10px] font-extrabold text-white truncate">${lay.title.split(':')[1] || lay.title}</div>
-              <div class="text-[9px] text-slate-400 truncate mt-0.5">${lay.desc}</div>
+            <button onclick="selectSpatialLayout(${lay.idx})" title="${lay.title} (${lay.desc})" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${isSelected ? 'bg-amber-500 text-slate-950 border-white font-black shadow' : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-400 font-bold'}">
+              <span class="text-[10px]">#${String(lay.idx).padStart(2,'0')}</span>
+              <span class="text-[10px] max-w-[135px] truncate">${shortTitle}</span>
             </button>
           `;
         }).join('');
       }
 
-      // Render 10 Design Styles (Row 4)
+      // Render Row 4: 10 Design Styles (Compact 1-Line Pills with Color Dot)
       if (styContainer) {
         styContainer.innerHTML = TEN_DESIGN_STYLES.map((st, idx) => {
           const sNum = idx + 1;
           const isSelected = (!isBareShellActive && selectedStyleIdx === sNum);
           return `
-            <button onclick="selectInteriorStyle(${sNum})" class="shrink-0 w-40 p-2 rounded-xl border text-left transition ${isSelected ? 'bg-sky-500/25 border-sky-400 ring-1 ring-sky-400' : 'bg-slate-900 border-slate-800 hover:border-sky-400'}">
-              <div class="flex items-center justify-between mb-1">
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">🎨 風格 ${st.num}</span>
-                <span class="w-3.5 h-3.5 rounded-full border border-white/40 inline-block" style="background:${st.cabHex}"></span>
-              </div>
-              <div class="text-[10px] font-extrabold text-white truncate">${st.name}</div>
+            <button onclick="selectInteriorStyle(${sNum})" title="${st.name}" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${isSelected ? 'bg-sky-400 text-slate-950 border-white font-black shadow' : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-sky-400 font-bold'}">
+              <span class="w-2.5 h-2.5 rounded-full border border-white/50 shrink-0" style="background:${st.cabHex}"></span>
+              <span class="text-[10px]">${st.num}.${st.badge}</span>
             </button>
           `;
         }).join('');
       }
-    }
-
-    function selectSpatialLayout(idx) {
-      isBareShellActive = false;
-      selectedLayoutIdx = idx;
-      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
-    }
-
-    function selectInteriorStyle(idx) {
-      isBareShellActive = false;
-      selectedStyleIdx = idx;
-      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
     }
 
     function renderFloorZonePills() {
