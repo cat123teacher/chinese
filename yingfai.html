@@ -231,9 +231,9 @@
             <span id="active-layout-summary" class="text-[9px] text-amber-200 font-bold truncate ml-1"></span>
           </div>
 
-          <!-- Row 3: ③ 10款空間擺設間隔選行 (10 Spatial Layouts) -->
+          <!-- Row 3: ③ 15款空間間隔選行 (10款實牆間隔 + 5款免磚牆以櫃間房) -->
           <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <span class="text-[9px] font-black text-amber-300 shrink-0 w-11">③擺設:</span>
+            <span class="text-[9px] font-black text-amber-300 shrink-0 w-11">③間隔:</span>
             <div id="templates-layouts-row" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
           </div>
 
@@ -422,67 +422,93 @@
       { id: 'st_10', num: '10', name: '羅馬洞石配南洋暖柚木大宅風',badge:'洞石柚木',floor: 'f_trav_rom',  wall: 'w_art_trav',   cabHex: '#c78d46', accentHex: '#ad4b05', tvType: 'curved' }
     ];
 
-    // 10 Truly Distinct Furniture & Partition Arrangements for each People Group (2p, 3p, 4p, 5p, 6p)
+    // 15 Truly Distinct Spatial Intervals per People Group:
+    // #01-#10: Classic Partition Intervals | #11-#15: ZERO-BRICK-WALL Furniture-as-Partition (以傢具/高櫃間房)
     const SPATIAL_LAYOUTS_BY_PEOPLE = {
       '2p': [
-        { idx: 1, title: '擺設01: 廳2放5尺大床 + 側房步入式衣帽間 + 主廳開放雙人書房 + 廳1巨廳', desc: '側房雙排大衣櫃・主廳雙人書枱・廳2主人套房' },
-        { idx: 2, title: '擺設02: 側房放雙人床 + 廳2做玻璃書房 + 廳1海景大客廳 + 主廳大飯廳', desc: '側房睡房・廳2玻璃書房・廳1與主廳全打通' },
-        { idx: 3, title: '擺設03: 廳1放海景雙人床 + 廳2做衣帽間兼書房 + 側房儲物室 + 主廳客飯廳', desc: '廳1獨享海景大床・廳2書房衣帽間・主廳梳化電視' },
-        { idx: 4, title: '擺設04: 主廳間房放雙人床 + 側房做獨立書房 + 廳1及廳2全打通做橫廳', desc: '主廳睡房・側房書房・廳1+廳2無敵海景大橫廳' },
-        { idx: 5, title: '擺設05: 廳2放雙人地台床 + 廳1做吧台閱讀區 + 側房做健身/衣帽間 + 主廳客廳', desc: '廳2地台床・廳1窗台休閒吧・主廳客廳' },
-        { idx: 6, title: '擺設06: 分床睡眠：側房放3尺單人床 + 廳2放4尺雙人床 + 主廳雙人長書房', desc: '夫婦分房作息互不干擾・主廳雙人電腦書房' },
-        { idx: 7, title: '擺設07: 全開放Studio風：半高屏風隔出廳2睡眠區 + 側房衣帽間 + 廳1大梳化', desc: '零實牆壓迫感・木條子屏風・全屋採光極佳' },
-        { idx: 8, title: '擺設08: 側房放雙人床 + 主廳間出獨立衣帽間 + 廳2做電競書房 + 廳1客飯廳', desc: '側房主人房・主廳大衣帽間・廳2雙電腦房' },
-        { idx: 9, title: '擺設09: 廳2放雙人床 + 側房做客房(單人床) + 主廳延伸餐枱 + 廳1海景客廳', desc: '預留側房親友留宿單人床・主廳山麗苑延伸枱' },
-        { idx: 10,title: '擺設10: 對調設計：廳1做六人雲石大飯廳 + 主廳做影院客廳 + 廳2主人房 + 側房書房', desc: '海景大餐枱置於廳1・主廳暗調家庭影院' }
+        { idx: 1,  title: '間隔01: 廳2放5尺大床 + 側房步入式衣帽間 + 主廳開放雙人書房 + 廳1巨廳', desc: '側房雙排大衣櫃・主廳雙人書枱・廳2主人套房' },
+        { idx: 2,  title: '間隔02: 側房放雙人床 + 廳2做玻璃書房 + 廳1海景大客廳 + 主廳伸縮餐枱', desc: '側房睡房・廳2玻璃書房・主廳貼牆伸縮餐枱' },
+        { idx: 3,  title: '間隔03: 廳1放海景雙人床 + 廳2做衣帽間兼書房 + 側房儲物室 + 主廳客飯廳', desc: '廳1獨享海景大床・廳2書房衣帽間・主廳梳化電視' },
+        { idx: 4,  title: '間隔04: 主廳間房放雙人床 + 側房做獨立書房 + 廳1及廳2全打通做橫廳', desc: '主廳睡房・側房書房・廳1+廳2無敵海景大橫廳' },
+        { idx: 5,  title: '間隔05: 廳2放雙人地台床 + 廳1做吧台閱讀區 + 側房做衣帽間 + 主廳客廳', desc: '廳2地台床・廳1窗台休閒吧・主廳客廳' },
+        { idx: 6,  title: '間隔06: 分床睡眠：側房放3尺單人床 + 廳2放4尺雙人床 + 主廳雙人長書房', desc: '夫婦分房作息互不干擾・主廳雙人電腦書房' },
+        { idx: 7,  title: '間隔07: 半高屏風隔出廳2睡眠區 + 側房衣帽間 + 廳1大梳化 + 貼牆伸縮餐枱', desc: '木條子屏風・全屋採光極佳・走廊零阻擋' },
+        { idx: 8,  title: '間隔08: 側房放雙人床 + 主廳間出獨立衣帽間 + 廳2做電競書房 + 廳1客飯廳', desc: '側房主人房・主廳大衣帽間・廳2雙電腦房' },
+        { idx: 9,  title: '間隔09: 廳2放雙人床 + 側房做客房(單人床) + 貼牆伸縮餐枱 + 廳1海景客廳', desc: '預留側房親友留宿單人床・貼牆伸縮餐枱櫃' },
+        { idx: 10, title: '間隔10: 對調設計：廳1做海景飯廳 + 主廳做影院客廳 + 廳2主人房 + 側房書房', desc: '餐枱置於廳1窗邊・主廳家庭影院・走廊暢通' },
+        { idx: 11, title: '間隔11(櫃間房): 免磚牆！雙面到頂大衣櫃隔出廳2主人房 + 側房高櫃衣帽間', desc: '✨零磚牆・以2米雙面大衣櫃代牆間出主人房' },
+        { idx: 12, title: '間隔12(櫃間房): 免磚牆！滿牆電視櫃背靠背隔出廳1睡房 + 廳2開放式書房', desc: '✨零磚牆・以電視櫃牆分隔客廳與海景睡房' },
+        { idx: 13, title: '間隔13(櫃間房): 免磚牆！C字展示櫃隔出主廳書房 + 雙面衣櫃隔出廳2大床房', desc: '✨零磚牆・全屋以展示櫃及衣櫃劃分3大功能區' },
+        { idx: 14, title: '間隔14(櫃間房): 免磚牆！地台櫃連半高屏風櫃隔出廳2睡房 + 側房以櫃代牆', desc: '✨零磚牆・儲物地台連半高櫃分隔廳房保採光' },
+        { idx: 15, title: '間隔15(櫃間房): 免磚牆！L型雙衣櫃圍合廳2精品套房 + 廳1伸縮餐枱大廳', desc: '✨零磚牆・L型高櫃創造私密睡房兼倍增收納' }
       ],
       '3p': [
-        { idx: 1, title: '擺設01: 廳2放夫婦雙人床 + 側房放3尺單人床(子女) + 主廳玻璃書房 + 廳1客飯廳', desc: '廳2主人房・側房子女房・主廳獨立書房' },
-        { idx: 2, title: '擺設02: 側房放夫婦雙人床 + 廳2放子女單人床連書枱 + 廳1海景大客廳 + 主廳飯廳', desc: '側房主人房・廳2海景子女溫習房・廳1客廳' },
-        { idx: 3, title: '擺設03: 主廳間房放子女單人床 + 廳2放夫婦雙人床 + 側房做專用書房 + 廳1客飯廳', desc: '主廳子女房・側房全屋書房・廳2主人房' },
-        { idx: 4, title: '擺設04: 廳1間房放夫婦雙人床 + 側房放長輩單人床 + 廳2做海景客廳 + 主廳飯廳', desc: '廳1主人房・側房長輩平地房・廳2海景客廳' },
-        { idx: 5, title: '擺設05: 廳2放子母床(母子同睡) + 側房放爸爸單人床兼書房 + 廳1及主廳超大客飯廳', desc: '廳2子母床・側房單人床連工作台・寬敞雙廳' },
-        { idx: 6, title: '擺設06: 側房放上床下書枱高架床(子女) + 廳2放夫婦雙人床 + 主廳衣帽間 + 廳1客飯廳', desc: '側房高架書枱床・主廳步入式衣櫃區・廳2主人房' },
-        { idx: 7, title: '擺設07: 主廳間房放夫婦雙人床 + 側房放子女單人床 + 廳2做海景書房 + 廳1大客廳', desc: '主廳主人房・側房子女房・廳2海景大書房' },
-        { idx: 8, title: '擺設08: 廳1放子女單人床連書枱 + 廳2放夫婦雙人床 + 側房做衣帽儲物房 + 主廳客飯廳', desc: '兩間睡房皆享海景大窗・主廳集中客飯廳' },
-        { idx: 9, title: '擺設09: 三代同堂3人：主廳近廁所間長輩單人房 + 廳2夫婦雙人床 + 側房書房 + 廳1客廳', desc: '長輩房最近廁所免夜行・廳2主人房・廳1大廳' },
-        { idx: 10,title: '擺設10: 全屋地台設計：廳2地台雙人床 + 側房地台單人床 + 主廳延伸餐枱 + 廳1客廳', desc: '雙房高儲物地台・主廳延伸餐枱・廳1梳化電視' }
+        { idx: 1,  title: '間隔01: 廳2放夫婦雙人床 + 側房放3尺單人床(子女) + 主廳書房 + 廳1客飯廳', desc: '廳2主人房・側房子女房・主廳獨立書房' },
+        { idx: 2,  title: '間隔02: 側房放夫婦雙人床 + 廳2放子女單人床連書枱 + 廳1客廳 + 伸縮餐枱', desc: '側房主人房・廳2海景子女溫習房・貼牆伸縮枱' },
+        { idx: 3,  title: '間隔03: 主廳間房放子女單人床 + 廳2放夫婦雙人床 + 側房做專用書房 + 廳1廳', desc: '主廳子女房・側房全屋書房・廳2主人房' },
+        { idx: 4,  title: '間隔04: 廳1間房放夫婦雙人床 + 側房放長輩單人床 + 廳2做海景客廳 + 伸縮枱', desc: '廳1主人房・側房長輩平地房・廳2海景客廳' },
+        { idx: 5,  title: '間隔05: 廳2放子母床(母子同睡) + 側房放爸爸單人床兼書房 + 廳1寬敞大廳', desc: '廳2子母床・側房單人床連工作台・走廊零阻擋' },
+        { idx: 6,  title: '間隔06: 側房放上床下書枱高架床(子女) + 廳2放夫婦雙人床 + 主廳衣帽間', desc: '側房高架書枱床・主廳步入式衣櫃區・廳2主人房' },
+        { idx: 7,  title: '間隔07: 主廳間房放夫婦雙人床 + 側房放子女單人床 + 廳2做海景書房 + 廳1廳', desc: '主廳主人房・側房子女房・廳2海景大書房' },
+        { idx: 8,  title: '間隔08: 廳1放子女單人床連書枱 + 廳2放夫婦雙人床 + 側房衣帽房 + 主廳客飯廳', desc: '兩間睡房皆享海景大窗・主廳集中客飯廳' },
+        { idx: 9,  title: '間隔09: 三代同堂3人：主廳近廁所間長輩單人房 + 廳2夫婦雙人床 + 側房書房', desc: '長輩房最近廁所免夜行・廳2主人房・廳1大廳' },
+        { idx: 10, title: '間隔10: 全屋地台設計：廳2地台雙人床 + 側房地台單人床 + 貼牆伸縮餐枱櫃', desc: '雙房高儲物地台・貼牆伸縮餐枱・走廊寬敞' },
+        { idx: 11, title: '間隔11(櫃間房): 免磚牆！雙面大衣櫃隔出廳2夫婦房 + 衣櫃隔出側房子女房', desc: '✨零磚牆・全屋用雙面到頂衣櫃間出2間睡房' },
+        { idx: 12, title: '間隔12(櫃間房): 免磚牆！高架床書櫃背板隔出主廳子女房 + 廳2衣櫃間主人房', desc: '✨零磚牆・以高架床櫃體直接作為房間分隔牆' },
+        { idx: 13, title: '間隔13(櫃間房): 免磚牆！滿牆電視櫃隔出廳1主人房 + 側房以櫃間單人房', desc: '✨零磚牆・電視櫃兼具廳牆與房牆雙重功能' },
+        { idx: 14, title: '間隔14(櫃間房): 免磚牆！C字高櫃隔出主廳長輩房 + 雙面衣櫃隔出廳2夫婦房', desc: '✨零磚牆・C字展示櫃作隔斷，長輩出入最順暢' },
+        { idx: 15, title: '間隔15(櫃間房): 免磚牆！雙排衣櫃夾出廳1及廳2雙海景房 + 主廳伸縮餐枱大廳', desc: '✨零磚牆・中間以雙面大衣櫃分隔兩間海景睡房' }
       ],
       '4p': [
-        { idx: 1, title: '擺設01: 廳2放夫婦雙人床 + 側房放單人床(大仔) + 主廳間房放單人床(細女) + 廳1客飯廳', desc: '2子女各自獨立一房・廳2主人房・廳1客飯廳' },
-        { idx: 2, title: '擺設02: 主廳一開二間2間2.5尺床房(2子女) + 廳2放夫婦雙人床 + 側房做雙人書房', desc: '主廳間兩間小童房・側房專用溫習房・廳2主人房' },
-        { idx: 3, title: '擺設03: 側房放雙層上下格床(2子女) + 廳2放夫婦雙人床 + 主廳間出雙人長書房 + 廳1大廳', desc: '側房上下格床・主廳雙人電腦書房・廳2主人房' },
-        { idx: 4, title: '擺設04: 側房放夫婦雙人床 + 廳1間房放雙層床(2子女) + 廳2做海景雙人書房 + 主廳客飯廳', desc: '側房主人房・廳1雙層床房・廳2海景書房' },
-        { idx: 5, title: '擺設05: 廳2放雙層床(2子女)+雙書枱 + 廳1間房放夫婦雙人床 + 側房衣帽間 + 主廳客飯廳', desc: '廳2子女雙層床房・廳1主人房・側房大衣帽間' },
-        { idx: 6, title: '擺設06: 主廳間房放雙層床(2子女) + 廳2放夫婦雙人床 + 側房做書房兼客房 + 廳1海景大廳', desc: '主廳雙層床房・廳2主人房・廳1完整海景大廳' },
-        { idx: 7, title: '擺設07: 三代4人：側房放長輩單人床 + 主廳間房放子女單人床 + 廳2夫婦雙人床 + 廳1客廳', desc: '夫婦+長輩+1子女三房各自獨立・廳1客飯廳' },
-        { idx: 8, title: '擺設08: 廳1及廳2各放1張單人床(2子女海景房) + 主廳間房放夫婦雙人床 + 側房做飯廳/書房', desc: '2子女各享海景房・主廳主人房・側房書房' },
-        { idx: 9, title: '擺設09: 側房放子母床(2子女) + 廳2放夫婦雙人床 + 主廳開放式六人餐廳 + 廳1大客廳', desc: '側房寬敞子母床・主廳大飯廳・廳1大客廳' },
-        { idx: 10,title: '擺設10: 側房與主廳各放上床下書枱高架床(2子女) + 廳2放夫婦雙人床 + 廳1海景客飯廳', desc: '2位子女各擁獨立高架床連書枱衣櫃房' }
+        { idx: 1,  title: '間隔01: 廳2放夫婦雙人床 + 側房放單人床(大仔) + 主廳間房放單人床(細女)', desc: '2子女各自獨立一房・廳2主人房・廳1客飯廳' },
+        { idx: 2,  title: '間隔02: 主廳一開二間2間2.5尺床房(2子女) + 廳2放夫婦雙人床 + 側房書房', desc: '主廳間兩間小童房・側房專用溫習房・廳2主人房' },
+        { idx: 3,  title: '間隔03: 側房放雙層上下格床(2子女) + 廳2放夫婦雙人床 + 主廳雙人長書房', desc: '側房上下格床・主廳雙人電腦書房・廳2主人房' },
+        { idx: 4,  title: '間隔04: 側房放夫婦雙人床 + 廳1間房放雙層床(2子女) + 廳2做海景雙人書房', desc: '側房主人房・廳1雙層床房・廳2海景書房' },
+        { idx: 5,  title: '間隔05: 廳2放雙層床(2子女)+雙書枱 + 廳1間房放夫婦雙人床 + 側房衣帽間', desc: '廳2子女雙層床房・廳1主人房・側房大衣帽間' },
+        { idx: 6,  title: '間隔06: 主廳間房放雙層床(2子女) + 廳2放夫婦雙人床 + 側房書房 + 廳1大廳', desc: '主廳雙層床房・廳2主人房・廳1完整海景大廳' },
+        { idx: 7,  title: '間隔07: 三代4人：側房放長輩單人床 + 主廳間子女單人房 + 廳2夫婦雙人床', desc: '夫婦+長輩+1子女三房各自獨立・廳1客飯廳' },
+        { idx: 8,  title: '間隔08: 廳1及廳2各放1張單人床(2子女海景房) + 主廳間夫婦雙人房 + 側房書房', desc: '2子女各享海景房・主廳主人房・側房書房' },
+        { idx: 9,  title: '間隔09: 側房放子母床(2子女) + 廳2放夫婦雙人床 + 主廳伸縮餐枱 + 廳1大客廳', desc: '側房寬敞子母床・貼牆伸縮餐枱・廳1大客廳' },
+        { idx: 10, title: '間隔10: 側房與主廳各放上床下書枱高架床(2子女) + 廳2放夫婦雙人床 + 廳1廳', desc: '2位子女各擁獨立高架床連書枱衣櫃房' },
+        { idx: 11, title: '間隔11(櫃間房): 免磚牆！雙面衣櫃隔出主廳及廳2睡房 + 側房衣櫃間單人房', desc: '✨零磚牆・全屋3間房均由到頂衣櫃圍合而成' },
+        { idx: 12, title: '間隔12(櫃間房): 免磚牆！以雙面衣櫃在主廳隔出2間2.5尺小童房 + 廳2主人房', desc: '✨零磚牆・用衣櫃代替磚牆分隔兩位小朋友房' },
+        { idx: 13, title: '間隔13(櫃間房): 免磚牆！電視櫃牆隔出廳1雙層床房 + 雙面衣櫃隔出廳2主人房', desc: '✨零磚牆・電視櫃與衣櫃組合間出兩間海景房' },
+        { idx: 14, title: '間隔14(櫃間房): 免磚牆！高架床連衣櫃隔出主廳童房 + 側房長輩房 + 廳2夫婦房', desc: '✨零磚牆・利用高架床背及到頂衣櫃作房間界線' },
+        { idx: 15, title: '間隔15(櫃間房): 免磚牆！C字展示櫃隔出主廳雙人書房 + 廳2衣櫃間主人房 + 側房雙層床', desc: '✨零磚牆・通透展示櫃書房配搭雙衣櫃睡房' }
       ],
       '5p': [
-        { idx: 1, title: '擺設01: 側房放雙人床 + 廳1間房放雙層床(2子女) + 廳2間房放單人床 + 主廳大客飯廳', desc: '★範例1：側房雙人床・廳1雙層床・廳2單人床' },
-        { idx: 2, title: '擺設02: 主廳間2間房各放2.5尺床(2小朋友) + 廳2放雙人床 + 側房放單人床 + 廳1大廳', desc: '★範例2：主廳間2間2.5尺床房・廳2雙人床・側房單人床' },
-        { idx: 3, title: '擺設03: 主廳間房放子母床(下雙上單睡3人) + 廳2放夫婦雙人床 + 側房做三孩長書房 + 廳1廳', desc: '主廳子母床睡3人・側房獨立書房・廳2主人房' },
-        { idx: 4, title: '擺設04: 廳1間房放夫婦雙人床 + 廳2間房放雙層床(2子女) + 側房放長輩單人床 + 主廳客飯廳', desc: '廳1雙人床・廳2雙層床・側房單人床・主廳客廳' },
-        { idx: 5, title: '擺設05: 側房放子母床(下雙上單睡3人) + 廳2放夫婦雙人床 + 主廳雙人書房 + 廳1海景客飯廳', desc: '側房3人子母床・廳2主人房・主廳書房・廳1大廳' },
-        { idx: 6, title: '擺設06: 主廳間房放雙層床(2子女) + 側房放長輩單人床 + 廳2放夫婦雙人床 + 廳1海景大廳', desc: '主廳雙層床・側房長輩單人床・廳2夫婦雙人床' },
-        { idx: 7, title: '擺設07: 廳1一開二間2間2.5尺床房(2小朋友) + 側房放夫婦雙人床 + 廳2放單人床 + 主廳大廳', desc: '廳1間2間2.5尺小童房・側房雙人床・廳2單人床' },
-        { idx: 8, title: '擺設08: 廳2放子母床(下雙上單3人) + 主廳間房放長輩單人床 + 側房放單人床 + 廳1客飯廳', desc: '廳2子母床・主廳及側房各1張單人床・廳1大廳' },
-        { idx: 9, title: '擺設09: 側房放雙層床(2子女) + 主廳間房放夫婦雙人床 + 廳2放長輩單人床 + 廳1海景客飯廳', desc: '側房雙層床・主廳夫婦房・廳2海景長輩單人房' },
-        { idx: 10,title: '擺設10: 主廳間房放上床下書枱床(大仔) + 側房放雙層床(2細女) + 廳2放夫婦雙人床 + 廳1廳', desc: '3名子女分住主廳高架床及側房雙層床・廳2主人房' }
+        { idx: 1,  title: '間隔01: 側房放雙人床 + 廳1間房放雙層床(2子女) + 廳2間房放單人床 + 主廳大廳', desc: '★範例1：側房雙人床・廳1雙層床・廳2單人床' },
+        { idx: 2,  title: '間隔02: 主廳間2間房各放2.5尺床(2小朋友) + 廳2放雙人床 + 側房放單人床', desc: '★範例2：主廳間2間2.5尺床房・廳2雙人床・側房單人床' },
+        { idx: 3,  title: '間隔03: 主廳間房放子母床(下雙上單睡3人) + 廳2放夫婦雙人床 + 側房三孩書房', desc: '主廳子母床睡3人・側房獨立書房・廳2主人房' },
+        { idx: 4,  title: '間隔04: 廳1間房放夫婦雙人床 + 廳2間房放雙層床(2子女) + 側房放長輩單人床', desc: '廳1雙人床・廳2雙層床・側房單人床・主廳客廳' },
+        { idx: 5,  title: '間隔05: 側房放子母床(下雙上單睡3人) + 廳2放夫婦雙人床 + 主廳雙人書房', desc: '側房3人子母床・廳2主人房・主廳書房・廳1大廳' },
+        { idx: 6,  title: '間隔06: 主廳間房放雙層床(2子女) + 側房放長輩單人床 + 廳2放夫婦雙人床', desc: '主廳雙層床・側房長輩單人床・廳2夫婦雙人床' },
+        { idx: 7,  title: '間隔07: 廳1一開二間2間2.5尺床房(2小朋友) + 側房放夫婦雙人床 + 廳2放單人床', desc: '廳1間2間2.5尺小童房・側房雙人床・廳2單人床' },
+        { idx: 8,  title: '間隔08: 廳2放子母床(下雙上單3人) + 主廳間房放長輩單人床 + 側房放單人床', desc: '廳2子母床・主廳及側房各1張單人床・廳1大廳' },
+        { idx: 9,  title: '間隔09: 側房放雙層床(2子女) + 主廳間房放夫婦雙人床 + 廳2放長輩單人床', desc: '側房雙層床・主廳夫婦房・廳2海景長輩單人房' },
+        { idx: 10, title: '間隔10: 主廳間房放上床下書枱床(大仔) + 側房放雙層床(2細女) + 廳2夫婦雙人床', desc: '3名子女分住主廳高架床及側房雙層床・廳2主人房' },
+        { idx: 11, title: '間隔11(櫃間房): 免磚牆！雙面衣櫃隔出廳1雙層床房及廳2單人房 + 側房雙人床', desc: '✨零磚牆・全屋以到頂雙面衣櫃代替磚牆間出3房' },
+        { idx: 12, title: '間隔12(櫃間房): 免磚牆！主廳以衣櫃隔出2間2.5尺小童房 + 廳2衣櫃間主人房', desc: '✨零磚牆・用衣櫃背板分隔兩間2.5尺床小童房' },
+        { idx: 13, title: '間隔13(櫃間房): 免磚牆！C字高櫃隔出主廳子母床房(3人) + 廳2雙面衣櫃主人房', desc: '✨零磚牆・以C字櫃及衣櫃圍合子母床房與主人房' },
+        { idx: 14, title: '間隔14(櫃間房): 免磚牆！滿牆電視櫃隔出廳1主人房 + 衣櫃隔出廳2雙層床房', desc: '✨零磚牆・電視櫃牆作廳房分隔，配貼牆伸縮餐枱' },
+        { idx: 15, title: '間隔15(櫃間房): 免磚牆！高架床書櫃隔出主廳童房 + 側房雙層床 + 廳2衣櫃主人房', desc: '✨零磚牆・全屋以高架床櫃及大衣櫃完成三房五人佈局' }
       ],
       '6p': [
-        { idx: 1, title: '擺設01: 廳2放夫婦雙人床 + 主廳間房放子母床(3人) + 側房放單人床(長輩) + 廳1客飯廳', desc: '廳2雙人床(2)+主廳子母床(3)+側房單人床(1)=6人' },
-        { idx: 2, title: '擺設02: 主廳間2間房(1間雙層床+1間2.5尺床) + 廳2放夫婦雙人床 + 側房放長輩單人床', desc: '主廳一開二住3子女・廳2夫婦・側房長輩・廳1廳' },
-        { idx: 3, title: '擺設03: 側房放雙人床(夫婦) + 廳1間房放子母床(3子女) + 廳2放單人床(長輩) + 主廳大廳', desc: '側房雙人床・廳1子母床(3人)・廳2單人床・主廳廳' },
-        { idx: 4, title: '擺設04: 主廳放子母床(3人) + 側房放雙層床(2人) + 廳2放單人床(1人) + 廳1六人客飯廳', desc: '子母床(3)+雙層床(2)+單人床(1)+六人雲石餐枱' },
-        { idx: 5, title: '擺設05: 三代同堂三雙人：廳2夫婦雙人床 + 主廳長輩雙人床 + 側房雙層床(2子女) + 廳1廳', desc: '夫婦+長輩夫婦+2名子女・三間獨立房各睡2人' },
-        { idx: 6, title: '擺設06: 廳1放雙層床(2子女) + 廳2放雙層床(2子女) + 側房放夫婦雙人床 + 主廳大客飯廳', desc: '4名子女分住廳1及廳2海景雙層床房・側房夫婦房' },
-        { idx: 7, title: '擺設07: 側房放子母床(3人) + 廳2放子母床(3人) + 主廳獨立四座位溫習書房 + 廳1大客廳', desc: '兩間房各放子母床共睡6人・騰出主廳做大書房' },
-        { idx: 8, title: '擺設08: 廳1間2間2.5尺床房(2人) + 側房放雙層床(2人) + 廳2放夫婦雙人床(2人) + 主廳廳', desc: '廳1一開二單人房+側房雙層床+廳2主人房=6人' },
-        { idx: 9, title: '擺設09: 主廳放夫婦雙人床 + 側房放子母床(3子女) + 廳2放長輩單人床 + 廳1海景六人廳', desc: '主廳主人房・側房3人子母床・廳2海景長輩房' },
-        { idx: 10,title: '擺設10: 側房放長輩單人床 + 主廳間房放長輩單人床 + 廳1雙層床(2人) + 廳2夫婦雙人床', desc: '兩位長輩各有獨立單人房+夫婦房+雙層床房' }
+        { idx: 1,  title: '間隔01: 廳2放夫婦雙人床 + 主廳間房放子母床(3人) + 側房放單人床(長輩)', desc: '廳2雙人床(2)+主廳子母床(3)+側房單人床(1)=6人' },
+        { idx: 2,  title: '間隔02: 主廳間2間房(1間雙層床+1間2.5尺床) + 廳2放夫婦雙人床 + 側房長輩床', desc: '主廳一開二住3子女・廳2夫婦・側房長輩・廳1廳' },
+        { idx: 3,  title: '間隔03: 側房放雙人床(夫婦) + 廳1間房放子母床(3子女) + 廳2放單人床(長輩)', desc: '側房雙人床・廳1子母床(3人)・廳2單人床・主廳廳' },
+        { idx: 4,  title: '間隔04: 主廳放子母床(3人) + 側房放雙層床(2人) + 廳2放單人床(1人) + 廳1廳', desc: '子母床(3)+雙層床(2)+單人床(1)+貼牆伸縮餐枱' },
+        { idx: 5,  title: '間隔05: 三代同堂三雙人：廳2夫婦雙人床 + 主廳長輩雙人床 + 側房雙層床(2子女)', desc: '夫婦+長輩夫婦+2名子女・三間獨立房各睡2人' },
+        { idx: 6,  title: '間隔06: 廳1放雙層床(2子女) + 廳2放雙層床(2子女) + 側房放夫婦雙人床 + 主廳廳', desc: '4名子女分住廳1及廳2海景雙層床房・側房夫婦房' },
+        { idx: 7,  title: '間隔07: 側房放子母床(3人) + 廳2放子母床(3人) + 主廳獨立四座位溫習書房', desc: '兩間房各放子母床共睡6人・騰出主廳做大書房' },
+        { idx: 8,  title: '間隔08: 廳1間2間2.5尺床房(2人) + 側房放雙層床(2人) + 廳2放夫婦雙人床(2人)', desc: '廳1一開二單人房+側房雙層床+廳2主人房=6人' },
+        { idx: 9,  title: '間隔09: 主廳放夫婦雙人床 + 側房放子母床(3子女) + 廳2放長輩單人床 + 廳1廳', desc: '主廳主人房・側房3人子母床・廳2海景長輩房' },
+        { idx: 10, title: '間隔10: 側房放長輩單人床 + 主廳間長輩單人房 + 廳1雙層床(2人) + 廳2雙人床', desc: '兩位長輩各有獨立單人房+夫婦房+雙層床房' },
+        { idx: 11, title: '間隔11(櫃間房): 免磚牆！雙面大衣櫃隔出主廳子母床房及廳2夫婦房 + 側房長輩房', desc: '✨零磚牆・全屋以雙面到頂衣櫃間出6人三房空間' },
+        { idx: 12, title: '間隔12(櫃間房): 免磚牆！衣櫃隔出廳1子母床房及廳2單人房 + 側房夫婦雙人床', desc: '✨零磚牆・以衣櫃牆分隔兩間海景睡房，配伸縮枱' },
+        { idx: 13, title: '間隔13(櫃間房): 免磚牆！C字櫃隔出主廳雙人房 + 廳2衣櫃間主人房 + 側房雙層床', desc: '✨零磚牆・三代同堂全靠到頂儲物櫃分隔三間房' },
+        { idx: 14, title: '間隔14(櫃間房): 免磚牆！電視櫃牆隔出廳1雙層床房 + 衣櫃隔出廳2雙層床房', desc: '✨零磚牆・電視櫃與大衣櫃圍合兩間雙層床童房' },
+        { idx: 15, title: '間隔15(櫃間房): 免磚牆！雙面衣櫃在廳1隔出2間2.5尺床房 + 側房雙層床 + 廳2夫婦房', desc: '✨零磚牆・全屋零磚牆實現4房6人高儲物佈局' }
       ]
     };
 
@@ -941,7 +967,7 @@
       const sectorMat = new THREE.MeshBasicMaterial({
         color: 0xf59e0b,
         transparent: true,
-        opacity: 0.16,
+        opacity: 0.2,
         side: THREE.DoubleSide,
         depthWrite: false
       });
@@ -956,7 +982,7 @@
       }
       pts.push(new THREE.Vector3(hingeX, 18, hingeZ));
       const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
-      const lineMat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.7 });
+      const lineMat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.85 });
       group.add(new THREE.Line(lineGeo, lineMat));
       structureGroup.add(group);
     }
@@ -1023,8 +1049,8 @@
         const maxX = Math.max(wx1, wx2);
         const minZ = Math.min(wz1, wz2);
         const maxZ = Math.max(wz1, wz2);
-        const w = Math.max(110, maxX - minX);
-        const d = Math.max(110, maxZ - minZ);
+        const w = Math.max(100, maxX - minX);
+        const d = Math.max(100, maxZ - minZ);
         const styleId = zoneWallAssignment[zoneId] || 'w_cream';
         const tex = getThreeTextureForStyle(styleId, false);
         const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.65, metalness: 0.03 });
@@ -1050,117 +1076,244 @@
         }
       };
 
-      const addDimLabel = (txt, x, z) => {
+      const addDimLabel = (txt, x, z, bgCol = 'rgba(15,23,42,0.88)', txtCol = '#fbbf24') => {
         const [wx, wz] = toWorldXZ(x, z);
-        const sp = makeTextSprite(txt);
+        const sp = makeTextSprite(txt, bgCol, txtCol);
         sp.position.set(wx, 85, wz);
         dimensionGroup.add(sp);
       };
 
-      const addUnitDoorArc = (zoneId, x, z, radius, sDeg, eDeg) => {
-        const [wx, wz] = toWorldXZ(x, z);
-        addDoorSwingArc(zoneId, wx, wz, radius, sDeg, eDeg);
+      // Build 3D Architectural Door (Frame + Open Door Leaf + Digital Lock + Floor Swing Arc)
+      const add3DArchitecturalDoor = (zoneId, hx, hz, ox, oz, intoX, intoZ, isMainDoor = false, labelTxt = '') => {
+        const [whx, whz] = toWorldXZ(hx, hz);
+        const [wox, woz] = toWorldXZ(ox, oz);
+        const [wix, wiz] = toWorldXZ(intoX, intoZ);
+
+        const dx = wox - whx;
+        const dz = woz - whz;
+        const doorW = Math.hypot(dx, dz) || 880;
+        const doorH = 2150;
+
+        const doorGrp = new THREE.Group();
+        doorGrp.userData = { zoneId };
+
+        const frameMat = new THREE.MeshStandardMaterial({ color: isMainDoor ? 0x4a2511 : 0x78492a, roughness: 0.45 });
+        const leafMat = new THREE.MeshStandardMaterial({ color: isMainDoor ? 0x8b4513 : 0xb57c43, roughness: 0.42 });
+        const lockMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.25, metalness: 0.85 });
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.25, metalness: 0.85 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, transparent: true, opacity: 0.45, roughness: 0.15 });
+
+        // Door frame posts at hinge & latch + metallic threshold
+        addOutlinedBox(doorGrp, 75, doorH, 130, frameMat, whx, doorH / 2, whz);
+        addOutlinedBox(doorGrp, 75, doorH, 130, frameMat, wox, doorH / 2, woz);
+        const midX = (whx + wox) / 2;
+        const midZ = (whz + woz) / 2;
+        const threshGeo = new THREE.BoxGeometry(Math.abs(dx) > Math.abs(dz) ? doorW : 110, 14, Math.abs(dz) > Math.abs(dx) ? doorW : 110);
+        const thresh = new THREE.Mesh(threshGeo, goldMat);
+        thresh.position.set(midX, 7, midZ);
+        doorGrp.add(thresh);
+
+        // Compute open door leaf direction (68 deg from closed vector towards into-room vector)
+        const closedAng = Math.atan2(-(woz - whz), wox - whx);
+        const intoAng = Math.atan2(-(wiz - whz), wix - whx);
+        let diff = intoAng - closedAng;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const swingSign = diff >= 0 ? 1 : -1;
+        const openAng = closedAng + swingSign * THREE.MathUtils.degToRad(72);
+
+        const leafPivot = new THREE.Group();
+        leafPivot.position.set(whx, 0, whz);
+        leafPivot.rotation.y = openAng;
+
+        addOutlinedBox(leafPivot, doorW, doorH, 48, leafMat, doorW / 2, doorH / 2, 0);
+        if (!isMainDoor) {
+          // Frosted vertical vision glass panel on Kitchen / Bathroom door
+          addOutlinedBox(leafPivot, doorW * 0.28, doorH * 0.68, 56, glassMat, doorW * 0.5, doorH * 0.54, 0);
+        }
+        // Smart Electronic Lock / Lever Handle on door leaf
+        addOutlinedBox(leafPivot, 46, 260, 82, lockMat, doorW * 0.84, 1020, 0);
+        addOutlinedBox(leafPivot, 110, 26, 110, goldMat, doorW * 0.82, 1020, 0);
+        doorGrp.add(leafPivot);
+
+        // Sync door height with wall height toggle
+        structuralWalls.push({
+          scale: doorGrp.scale,
+          position: doorGrp.position,
+          userData: { zoneId, maxH: doorH, isDoorGroup: true }
+        });
+
+        structureGroup.add(doorGrp);
+
+        // Floor Swing Arc
+        const startDeg = THREE.MathUtils.radToDeg(Math.min(closedAng, closedAng + swingSign * Math.PI / 2));
+        const endDeg = THREE.MathUtils.radToDeg(Math.max(closedAng, closedAng + swingSign * Math.PI / 2));
+        addDoorSwingArc(zoneId, whx, whz, doorW, startDeg, endDeg);
+
+        if (labelTxt) {
+          addDimLabel(labelTxt, (hx + ox) / 2, (hz + oz) / 2, isMainDoor ? 'rgba(180,83,9,0.95)' : 'rgba(15,23,42,0.88)', '#ffffff');
+        }
       };
 
       if (prof.is1BR) {
-        addFloorPatch('main_hall', 0, 0, 2350, 3415);
-        addFloorPatch('hall_1',    0, 3415, 2350, 6165);
-        addFloorPatch('kitchen',  -1415, 1650, 0, 3415);
-        addFloorPatch('bathroom', -1580, 0, 0, 1650);
+        // ★ ACCURATE B12 / B5 / B2 / B17 / A12 / A15 STRUCTURE (Matches image_a6b21a.png 100%!)
+        // Canonical B5: Main Hall X=0..2350, Z=0..6000;
+        // Top Foyer Alcove outside Kitchen: X=-1120..0 (1035mm + 85mm wall), Z=0..1555;
+        // Kitchen: X=-1500..-85 (width 1415mm), Z=1640..3405 (depth 1765mm);
+        // Bathroom: X=-2765..-1185 (width 1580mm), Z=0..1650 (depth 1650mm);
+        addFloorPatch('main_hall',  0,     0,    2350, 3405);
+        addFloorPatch('main_hall', -1120,  0,    0,    1640); // 1035x1555 Foyer Alcove outside Kitchen!
+        addFloorPatch('hall_1',     0,     3405, 2350, 6000);
+        addFloorPatch('kitchen',   -1500,  1640, 0,    3405); // Full 1415x1765 Kitchen!
+        addFloorPatch('bathroom',  -2765,  0,   -1120, 1650); // Full 1580x1650 Bathroom!
 
-        addStructWall('main_hall', 0, -60, 2350, 60);
-        addStructWall('main_hall', 2290, 0, 2410, 6165);
-        addStructWall('hall_1',    0, 6105, 2350, 6225, 900, true);
-        addStructWall('hall_1',   -60, 3415, 60, 6165);
-        addStructWall('kitchen',  -1415, 1590, 0, 1710);
-        addStructWall('kitchen',  -1475, 1650, -1355, 3415, 950, true);
-        addStructWall('kitchen',  -1415, 3355, 0, 3475);
-        addStructWall('bathroom', -1580, -60, 0, 60);
-        addStructWall('bathroom', -1640, 0, -1520, 1650);
+        // Top Entrance Wall with REAL Doorway Gap for Main Entrance Door (X=-50..850, Z=0)
+        addStructWall('main_hall', -1120, -60, -50,  60);
+        addStructWall('main_hall',  850,  -60, 2350, 60);
+        addStructWall('main_hall',  2290,  0,  2410, 6000);
+        addStructWall('hall_1',     0,    5940, 2350, 6060, 900, true);
+        addStructWall('hall_1',    -60,   3405, 60,   6000);
 
-        addUnitDoorArc('main_hall', 1250, 60, 860, 0, 90);
-        addUnitDoorArc('kitchen',   0, 2550, 750, 90, 180);
-        addUnitDoorArc('bathroom',  0, 950, 720, 90, 180);
+        // Kitchen Walls (1415 x 1765mm) with Top Doorway Opening (X=-950..-180, Z=1640) facing Main Entrance Door!
+        addStructWall('kitchen',   -1500, 1580, -950, 1690);
+        addStructWall('kitchen',   -180,  1580,  60,  1690);
+        addStructWall('kitchen',   -60,   1640,  60,  3405);
+        addStructWall('kitchen',   -1555, 1640, -1445, 3405, 950, true);
+        addStructWall('kitchen',   -1500, 3350,  60,  3460);
 
-        addDimLabel('闊 2350mm', 1175, 5850);
-        addDimLabel('總長 6165mm', 1850, 3100);
-        addDimLabel('廚房 1415×1765', -700, 2550);
-        addDimLabel('浴室 1580×1650', -780, 820);
+        // Bathroom Walls (1580 x 1650mm) with Inner Doorway Opening (X=-1120, Z=720..1460)
+        addStructWall('bathroom',  -2765, -60, -1120, 60);
+        addStructWall('bathroom',  -2820,  0,  -2705, 1650);
+        addStructWall('bathroom',  -2765, 1590, -1120, 1700);
+        addStructWall('bathroom',  -1175,  0,  -1065, 720);
+        addStructWall('bathroom',  -1175, 1460,-1065, 1650);
+
+        // 3D Doors: Main Entrance Door (directly opposite Kitchen!), Kitchen Door, Bathroom Door
+        add3DArchitecturalDoor('main_hall', 850,   0,   -50,   0,    850,  900,  true,  '🚪正門(大門)');
+        add3DArchitecturalDoor('kitchen',  -180,  1635, -950, 1635, -180,  2400, false, '廚房門');
+        add3DArchitecturalDoor('bathroom', -1120, 1460, -1120, 720, -1850, 1460, false, '浴室門');
+
+        addDimLabel('廳闊 2350mm', 1175, 5680);
+        addDimLabel('總長 6000mm', 1820, 3000);
+        addDimLabel('廚房 1415×1765', -780, 2520);
+        addDimLabel('浴室 1580×1650', -1950, 820);
       } else if (prof.isBay4900) {
-        // ★ DEDICATED B11, B13, B14 STRUCTURE (Matches attached floorplans 11, 13, 14!)
-        // Canonical B11/B13: Top-Left Kitchen (X=-385..1680, Z=0..1650), Mid-Left Bath (X=0..2000, Z=1650..3120),
-        // Right Wall 5325mm (X=4900, Z=0..4425), Bottom-Right Window (X=2000..4900, Z=4425),
-        // Bottom-Left Protruding 900mm Bay Window (X=0..2000, Z=3120..5325, depth 2945mm)
-        addFloorPatch('main_hall', 1680, 0, 4900, 3120);
-        addFloorPatch('hall_1',    2000, 3120, 4900, 4425);
-        addFloorPatch('hall_2',    0,    3120, 2000, 5325); // 2000x2945 zone with 900mm protruding window bay
-        addFloorPatch('kitchen',  -385,  0, 1680, 1650);
-        addFloorPatch('bathroom',  0,    1650, 2000, 3120);
+        // ★ ACCURATE B11 / B13 / B14 STRUCTURE (Matches image_a703bb.png 100%!)
+        // Total Width X=0..4900; Right Wall Z=0..5325; Bottom-Left 900mm Bay Window Z=3280..6225 (depth 2945mm);
+        // Foyer outside Kitchen & Bath: X=685..2085 (width 1400mm), Z=0..1640;
+        // Main Entrance Door: Z=0, X=2085..3005 (right outside the 1400mm Kitchen Foyer!);
+        // Kitchen: X=-1380..685 (interior width 2065mm!), Z=0..1650 (interior depth 1650mm!);
+        // Bathroom: X=0..2000 (interior width 2000mm!), Z=1725..3195 (interior depth 1470mm!).
+        addFloorPatch('main_hall',  685,   0,    4900, 1725);
+        addFloorPatch('main_hall',  2000,  1725, 4900, 3280);
+        addFloorPatch('hall_1',     2000,  3280, 4900, 5325);
+        addFloorPatch('hall_2',     0,     3280, 2000, 6225); // 2000x2945 zone with 900mm protruding window bay!
+        addFloorPatch('kitchen',   -1380,  0,    685,  1650); // Full 2065x1650 Kitchen!
+        addFloorPatch('bathroom',   0,     1725, 2000, 3280); // Full 2000x1470 Bathroom!
 
-        addStructWall('main_hall', 1680, -60, 4900, 60);
-        addStructWall('main_hall', 4840, 0, 4960, 4425);
-        addStructWall('hall_1',    2000, 4365, 4900, 4485, 850, true);
-        addStructWall('hall_2',    1940, 4425, 2060, 5325);
-        addStructWall('hall_2',    0,    5265, 2000, 5385, 850, true);
-        addStructWall('hall_2',   -60,   3120, 60,   5325, 900, true);
-        addStructWall('kitchen',  -385, -60, 1680, 60);
-        addStructWall('kitchen',  -445,  0, -325, 1650);
-        addStructWall('kitchen',  -385,  1590, 2000, 1710);
-        addStructWall('kitchen',   1620, 0, 1740, 1650);
-        addStructWall('bathroom', -60,   1650, 60, 3120);
-        addStructWall('bathroom',  0,    3060, 2000, 3180);
-        addStructWall('bathroom',  1940, 1650, 2060, 3120);
+        // Top Entrance Wall (4215mm total from X=685 to 4900) with Doorway Gap at X=2085..3005 for Main Entrance Door!
+        addStructWall('main_hall',  685,  -60, 2085, 60);
+        addStructWall('main_hall',  3005, -60, 4900, 60);
+        addStructWall('main_hall',  4840,  0,  4960, 5325);
+        addStructWall('hall_1',     2000, 5265, 4900, 5385, 850, true);
+        addStructWall('hall_2',     1940, 5325, 2060, 6225);
+        addStructWall('hall_2',     0,    6165, 2000, 6285, 850, true);
+        addStructWall('hall_2',    -60,   3280, 60,   6225, 900, true);
 
-        addUnitDoorArc('main_hall', 3100, 60, 880, 0, 90);
-        addUnitDoorArc('kitchen',   1680, 850, 760, 0, 90);
-        addUnitDoorArc('bathroom',  2000, 2350, 740, 0, 90);
+        // Kitchen Walls (2065 x 1650mm) with Doorway Opening on Right Wall (X=685, Z=780..1560)
+        addStructWall('kitchen',   -1380, -60,  685,  60);
+        addStructWall('kitchen',   -1440,  0,  -1320, 1650);
+        addStructWall('kitchen',   -1380, 1590, 685,  1710);
+        addStructWall('kitchen',    630,   0,   740,  780);
 
-        addDimLabel('闊廳 4900mm', 3450, 4150);
-        addDimLabel('凸窗深 2945 (連900窗台)', 1000, 4950);
-        addDimLabel('長牆 5325mm', 4350, 2200);
-        addDimLabel('廚房 2065×1650', 650, 825);
-        addDimLabel('浴室 2000×1470', 1000, 2385);
+        // Bathroom Walls (2000 x 1470mm) with Doorway Opening on Top Wall (Z=1680, X=1150..1900)
+        addStructWall('bathroom',  -60,   1650, 60,   3280);
+        addStructWall('bathroom',   0,    1630, 1150, 1740);
+        addStructWall('bathroom',   0,    3180, 2060, 3290);
+        addStructWall('bathroom',   1950, 1650, 2060, 3280);
+
+        // 3D Doors: Main Entrance Door (X=2085..3005, Z=0), Kitchen Door, Bathroom Door
+        add3DArchitecturalDoor('main_hall', 2085, 0,    3005, 0,    2085, 920,  true,  '🚪正門(大門)');
+        add3DArchitecturalDoor('kitchen',   685,  780,  685,  1560, -100, 780,  false, '廚房門');
+        add3DArchitecturalDoor('bathroom',  1900, 1685, 1150, 1685, 1900, 2450, false, '浴室門');
+
+        addDimLabel('闊廳 4900mm', 3450, 4950);
+        addDimLabel('凸窗深 2945 (連900窗台)', 1000, 5850);
+        addDimLabel('長牆 5325mm', 4350, 2600);
+        addDimLabel('廚房 2065×1650', -350, 825);
+        addDimLabel('浴室 2000×1470', 1000, 2480);
       } else if (prof.is2BR) {
-        addFloorPatch('main_hall', 0, 0, 2525, 3120);
-        addFloorPatch('hall_1',    0, 3120, 2440, 6165);
-        addFloorPatch('hall_2',    2440, 3120, 4525, 6165);
-        addFloorPatch('kitchen',   2860, 0, 4925, 1650);
-        addFloorPatch('bathroom',  2525, 1650, 4525, 3120);
+        // ★ ACCURATE 4525mm 2BR STRUCTURE (B3, B4, B6, B16, B18, A1, A4, A11, A13, A14, A16, B21, B22, A10, A19, A20, A21)
+        // Canonical B4/B6: Top Entrance Wall X=0..3840 (2440 Hall + 1400 Foyer);
+        // Main Entrance Door at Z=0, X=1520..2440 (right outside the 1400mm Kitchen/Bath Foyer!);
+        // Kitchen: X=3925..5990 (interior width 2065mm!), Z=0..1650 (interior depth 1650mm!);
+        // Bathroom: X=2525..4525 (interior width 2000mm!), Z=1725..3195 (interior depth 1470mm!).
+        addFloorPatch('main_hall', 0,    0,    3925, 1725);
+        addFloorPatch('main_hall', 0,    1725, 2525, 3280);
+        addFloorPatch('hall_1',    0,    3280, 2440, 6165);
+        addFloorPatch('hall_2',    2440, 3280, 4525, 6165);
+        addFloorPatch('kitchen',   3925, 0,    5990, 1650); // Full 2065x1650 Kitchen!
+        addFloorPatch('bathroom',  2525, 1725, 4525, 3280); // Full 2000x1470 Bathroom!
 
-        addStructWall('main_hall', 0, -60, 2860, 60);
-        addStructWall('main_hall', -60, 0, 60, 6165);
-        addStructWall('hall_1',    0, 6105, 4525, 6225, 850, true);
-        addStructWall('hall_2',    4465, 3120, 4585, 6165);
-        addStructWall('kitchen',   2860, -60, 4925, 60);
-        addStructWall('kitchen',   4865, 0, 4985, 1650, 950, true);
-        addStructWall('kitchen',   2525, 1590, 4925, 1710);
-        addStructWall('bathroom',  4465, 1650, 4585, 3120);
-        addStructWall('bathroom',  2525, 3060, 4525, 3180);
-        addStructWall('bathroom',  2465, 1650, 2585, 3120);
+        // Top Entrance Wall (3840mm) with Doorway Gap at X=1520..2440 for Main Entrance Door!
+        addStructWall('main_hall', 0,    -60, 1520, 60);
+        addStructWall('main_hall', 2440, -60, 3925, 60);
+        addStructWall('main_hall', -60,   0,  60,   6165);
+        addStructWall('hall_1',    0,    6105, 4525, 6225, 850, true);
+        addStructWall('hall_2',    4465, 3280, 4585, 6165);
 
-        addUnitDoorArc('main_hall', 1800, 60, 880, 0, 90);
-        addUnitDoorArc('kitchen',   2860, 850, 760, 0, 90);
-        addUnitDoorArc('bathroom',  2525, 2350, 740, 0, 90);
+        // Kitchen Walls (2065 x 1650mm) with Doorway Opening on Left Wall (X=3880, Z=780..1560)
+        addStructWall('kitchen',   3925, -60,  5990, 60);
+        addStructWall('kitchen',   5930,  0,   6050, 1650, 950, true);
+        addStructWall('kitchen',   3925, 1590, 5990, 1710);
+        addStructWall('kitchen',   3840,  0,   3950, 780);
+
+        // Bathroom Walls (2000 x 1470mm) with Doorway Opening on Top Wall (Z=1685, X=2620..3380)
+        addStructWall('bathroom',  4465, 1650, 4585, 3280);
+        addStructWall('bathroom',  3380, 1630, 4525, 1740);
+        addStructWall('bathroom',  2465, 3180, 4525, 3290);
+        addStructWall('bathroom',  2465, 1650, 2580, 3280);
+
+        // 3D Doors: Main Entrance Door (X=1520..2440, Z=0), Kitchen Door, Bathroom Door
+        add3DArchitecturalDoor('main_hall', 2440, 0,    1520, 0,    2440, 920,  true,  '🚪正門(大門)');
+        add3DArchitecturalDoor('kitchen',   3885, 780,  3885, 1560, 4650, 780,  false, '廚房門');
+        add3DArchitecturalDoor('bathroom',  2620, 1685, 3380, 1685, 2620, 2450, false, '浴室門');
 
         addDimLabel('大窗闊 4525mm', 2260, 5880);
         addDimLabel('直牆 6165mm', 520, 3100);
-        addDimLabel('廚房 2065×1650', 3850, 825);
-        addDimLabel('浴室 2000×1470', 3525, 2385);
+        addDimLabel('廚房 2065×1650', 4950, 825);
+        addDimLabel('浴室 2000×1470', 3525, 2480);
       } else {
-        // 3BR Units (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
-        // Note: For B15 / A8 / A9, the protruding side room is shifted closer to the entrance end
+        // ★ ACCURATE 3BR LARGE UNITS (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
+        // Kitchen: X=3835..5900 (width 2065mm, depth 1650mm, Z=1600..3250), Foyer outside Kitchen: X=2525..3835 (1310mm);
+        // Bathroom: X=2525..4525 (width 2000mm, depth 1470mm, Z=3335..4805).
         const sideZ1 = (unitId === 'B15' || unitId === 'A8' || unitId === 'A9') ? 650 : 2500;
         const sideZ2 = sideZ1 + 2150;
+        const isSideDoor3BR = ['B10', 'B9'].includes(unitId);
 
-        addFloorPatch('main_hall', 0, 0, 3135, 3250);
-        addFloorPatch('main_hall', 0, 3250, 2525, 3650);
-        addFloorPatch('side_room', -2000, sideZ1, 0, sideZ2);
-        addFloorPatch('hall_1',    0, 3650, 2440, 6815);
-        addFloorPatch('hall_2',    2440, 4720, 4525, 6815);
-        addFloorPatch('kitchen',   3135, 1600, 5200, 3250);
-        addFloorPatch('bathroom',  2525, 3250, 4525, 4720);
+        addFloorPatch('main_hall', 0,     0,      4200,   1600);
+        addFloorPatch('main_hall', 0,     1600,   3835,   3335);
+        addFloorPatch('main_hall', 0,     3335,   2525,   3650);
+        addFloorPatch('side_room', -2000, sideZ1, 0,      sideZ2);
+        addFloorPatch('hall_1',    0,     3650,   2440,   6815);
+        addFloorPatch('hall_2',    2440,  4805,   4525,   6815);
+        addFloorPatch('kitchen',   3835,  1600,   5900,   3250); // Full 2065x1650 Kitchen!
+        addFloorPatch('bathroom',  2525,  3335,   4525,   4805); // Full 2000x1470 Bathroom!
 
-        addStructWall('main_hall', 0, -60, 4200, 60);
+        if (isSideDoor3BR) {
+          // B10 & B9: Top wall solid (0..4200), Main Entrance Door on Foyer Side Wall (X=4200, Z=260..1180)
+          addStructWall('main_hall', 0,    -60, 4200, 60);
+          addStructWall('main_hall', 4140,  0,  4260, 260);
+          addStructWall('main_hall', 4140, 1180,4260, 1600);
+          add3DArchitecturalDoor('main_hall', 4200, 260, 4200, 1180, 3250, 260, true, '🚪正門(大門)');
+        } else {
+          // B1, B15, A2, A3, A7, A8, A9, A22: Main Entrance Door on Entrance Wall (Z=0, X=1520..2440) right aligned with Kitchen Foyer!
+          addStructWall('main_hall', 0,    -60, 1520, 60);
+          addStructWall('main_hall', 2440, -60, 4200, 60);
+          addStructWall('main_hall', 4140,  0,  4260, 1600);
+          add3DArchitecturalDoor('main_hall', 2440, 0, 1520, 0, 2440, 920, true, '🚪正門(大門)');
+        }
+
         if (sideZ1 > 100) addStructWall('main_hall', -60, 0, 60, sideZ1);
         addStructWall('side_room', -2000, sideZ1 - 60, 0, sideZ1 + 60);
         addStructWall('side_room', -2060, sideZ1, -1940, sideZ2, 900, true);
@@ -1168,22 +1321,27 @@
         addStructWall('hall_1',    -60, sideZ2, 60, 6815);
         addStructWall('hall_1',    0, 6755, 2440, 6875, 850, true);
         addStructWall('hall_2',    2440, 6755, 4525, 6875, 850, true);
-        addStructWall('hall_2',    4465, 4720, 4585, 6815, 900, true);
-        addStructWall('kitchen',   3135, 1540, 5200, 1660);
-        addStructWall('kitchen',   5140, 1600, 5260, 3250, 950, true);
-        addStructWall('kitchen',   2525, 3190, 5200, 3310);
-        addStructWall('bathroom',  4465, 3250, 4585, 4720);
-        addStructWall('bathroom',  2525, 4660, 4525, 4780);
-        addStructWall('bathroom',  2465, 3250, 2585, 4720);
+        addStructWall('hall_2',    4465, 4805, 4585, 6815, 900, true);
 
-        addUnitDoorArc('main_hall', 4120, 300, 880, 90, 180);
-        addUnitDoorArc('kitchen',   3135, 2400, 760, 0, 90);
-        addUnitDoorArc('bathroom',  2525, 3980, 740, 0, 90);
+        // Kitchen Walls (2065 x 1650mm) with Doorway Opening at X=3835, Z=2380..3160
+        addStructWall('kitchen',   3835, 1540, 5900, 1660);
+        addStructWall('kitchen',   5840, 1600, 5960, 3250, 950, true);
+        addStructWall('kitchen',   3835, 3190, 5900, 3310);
+        addStructWall('kitchen',   3780, 1600, 3890, 2380);
+
+        // Bathroom Walls (2000 x 1470mm) with Doorway Opening on Top Wall (Z=3280, X=2620..3380)
+        addStructWall('bathroom',  4465, 3250, 4585, 4805);
+        addStructWall('bathroom',  3380, 3230, 4525, 3340);
+        addStructWall('bathroom',  2465, 4745, 4525, 4855);
+        addStructWall('bathroom',  2465, 3250, 2580, 4805);
+
+        add3DArchitecturalDoor('kitchen',  3835, 2380, 3835, 3160, 4600, 2380, false, '廚房門');
+        add3DArchitecturalDoor('bathroom', 2620, 3285, 3380, 3285, 2620, 4050, false, '浴室門');
 
         addDimLabel('景觀大窗 4525mm', 2260, 6500);
         addDimLabel('側房 2000×2150', -1000, (sideZ1 + sideZ2) / 2);
-        addDimLabel('廚房 2065×1650', 4150, 2425);
-        addDimLabel('浴室 2000×1470', 3525, 3985);
+        addDimLabel('廚房 2065×1650', 4860, 2425);
+        addDimLabel('浴室 2000×1470', 3525, 4070);
       }
 
       createZone3DPins();
@@ -1346,7 +1504,18 @@
           addOutlinedBox(g, w - 30, 22, 35, ledMat, 0, 420, d / 2 + 18);
         }
         if (id === 'cab_dining_pullout') {
-          addOutlinedBox(g, w * 0.78, 42, d * 0.62, mainMat, 0, 750, d * 0.22);
+          // Wall-hugging Retractable Dining Table Cabinet (Tucked neatly against wall so corridor is 100% clear)
+          const baseCabD = Math.min(420, d * 0.45);
+          addOutlinedBox(g, w, h, baseCabD, mainMat, 0, h / 2, -d / 2 + baseCabD / 2);
+          addOutlinedBox(g, w - 40, 20, 28, ledMat, 0, 1180, -d / 2 + baseCabD + 8);
+          // Pull-out leaf table (semi-extended 680mm with support leg & 2 tucked stools)
+          const leafW = w * 0.76;
+          const leafD = Math.min(720, d - baseCabD);
+          addOutlinedBox(g, leafW, 38, leafD, whiteMat, 0, 740, -d / 2 + baseCabD + leafD / 2);
+          addOutlinedBox(g, 48, 720, 48, darkMat, -leafW / 2 + 45, 360, -d / 2 + baseCabD + leafD - 45);
+          addOutlinedBox(g, 48, 720, 48, darkMat,  leafW / 2 - 45, 360, -d / 2 + baseCabD + leafD - 45);
+          addOutlinedBox(g, 340, 420, 320, chromeMat, -leafW * 0.24, 210, -d / 2 + baseCabD + leafD * 0.55);
+          addOutlinedBox(g, 340, 420, 320, chromeMat,  leafW * 0.24, 210, -d / 2 + baseCabD + leafD * 0.55);
         }
         return g;
       }
@@ -1549,14 +1718,13 @@
         let cx = x;
         let cz = z;
 
-        // Adapt canonical 2BR coordinates to B11/B13/B14 (where Kitchen/Bath are on Left X=0..2000 and Hall is 4900mm wide, Z=5325mm)
+        // Adapt canonical 2BR coordinates to B11/B13/B14 (where Kitchen/Bath are on Left X=0..2000 and Hall is 4900mm wide)
         if (prof.isBay4900) {
-          cx = 4525 - x;
-          if (cz > 3120) {
-            // MapHall_1 (now on right, Z=3120..4425) & Hall_2 (now on left protruding bay, Z=3120..5325)
+          cx = 4610 - x;
+          if (cz > 3280) {
             const isLeftBaySide = (cx < 2050);
-            const maxZTarget = isLeftBaySide ? 5200 : 4320;
-            cz = 3120 + ((cz - 3120) / 3045) * (maxZTarget - 3120);
+            const maxZTarget = isLeftBaySide ? 6100 : 5220;
+            cz = 3280 + ((cz - 3280) / 2885) * (maxZTarget - 3280);
           }
           rot = (360 - rot) % 360;
         }
@@ -1583,43 +1751,49 @@
         });
       };
 
-      // A. PHOTO-ACCURATE L-KITCHEN, BATHROOM, AIR CONDITIONERS & ELECTRICAL OUTLETS (ALWAYS INCLUDED)
+      // A. PHOTO-ACCURATE FULL-SIZED L-KITCHEN, BATHROOM, AIR CONDITIONERS & ELECTRICAL OUTLETS (ALWAYS INCLUDED)
       if (prof.is1BR) {
-        pushItem('kit_l_combo_photo', -750, 2550, 90, 1650, 1250, 2350, '#c9b18c');
-        pushItem('app_fridge_3door',  -360, 1980, 0);
-        pushItem('bath_vanity_photo', -450, 320, 0, 680, 460, 2100);
-        pushItem('bath_toilet_ledge', -980, 350, 0, 540, 650, 880);
-        pushItem('bath_low_tub_photo', -1260, 825, 90, 1550, 620, 2050);
+        // Full-sized L-Kitchen inside 1415 x 1765mm Kitchen (X=-1500..-85, Z=1640..3405)
+        pushItem('kit_l_combo_photo', -820,  2620, 90,  1720, 1360, 2350, '#c9b18c');
+        pushItem('app_fridge_3door',  -380,  2020, -90, 600,  620,  1900);
+        // Bathroom inside 1580 x 1650mm Bathroom (X=-2765..-1120, Z=0..1650)
+        pushItem('bath_vanity_photo', -1540, 320,  0,   680,  460,  2100);
+        pushItem('bath_toilet_ledge', -2080, 350,  0,   540,  650,  880);
+        pushItem('bath_low_tub_photo', -2440, 825, 90,  1560, 620,  2050);
         pushItem('app_ac_split',      2220, 3600, -90, 920, 250, 300, '#f8fafc', 2120);
-        pushItem('app_ac_window',     420,  6120, 180, 660, 420, 430, '#e2e8f0', 1750);
-        pushItem('elec_light_switch', 1450, 80,   0,   180, 30, 95, '#f8fafc', 1250);
+        pushItem('app_ac_window',     420,  5920, 180, 660, 420, 430, '#e2e8f0', 1750);
+        pushItem('elec_light_switch', 1150, 80,   0,   180, 30, 95, '#f8fafc', 1250);
         pushItem('elec_ac_switch',    2310, 3150, -90, 110, 32, 110, '#f8fafc', 1450);
         pushItem('elec_socket_twin',  120,  3450, 90,  185, 30, 95, '#f8fafc', 420);
         pushItem('elec_data_outlet',  120,  3720, 90,  185, 30, 95, '#e2e8f0', 420);
       } else if (prof.is2BR) {
-        pushItem('kit_l_combo_photo', 4180, 825, -90, 1580, 1320, 2380, '#c9b18c');
-        pushItem('app_fridge_3door',  3240, 330, 0);
-        pushItem('bath_vanity_photo', 2920, 2820, 180, 740, 460, 2150);
-        pushItem('bath_toilet_ledge', 3550, 2760, 180, 560, 650, 880);
-        pushItem('bath_low_tub_photo', 4180, 2385, -90, 1420, 640, 2050);
+        // Full-sized 2065 x 1650mm Kitchen (Canonical X=3925..5990, Z=0..1650; maps to X=-1380..685 in B11/B13!)
+        pushItem('kit_l_combo_photo', 5180, 825,  -90, 1620, 1560, 2380, '#c9b18c');
+        pushItem('app_fridge_3door',  4260, 340,   0,  620,  650,  1920);
+        // Bathroom inside 2000 x 1470mm Bathroom (X=2525..4525, Z=1725..3195)
+        pushItem('bath_vanity_photo', 2920, 2940, 180, 740, 460, 2150);
+        pushItem('bath_toilet_ledge', 3550, 2880, 180, 560, 650, 880);
+        pushItem('bath_low_tub_photo', 4180, 2460, -90, 1440, 640, 2050);
         pushItem('app_ac_split',      140,  4750, 90,  920, 250, 300, '#f8fafc', 2120);
         pushItem('app_ac_split',      4380, 5150, -90, 920, 250, 300, '#f8fafc', 2120);
         pushItem('app_ac_window',     680,  6120, 180, 660, 420, 430, '#e2e8f0', 1750);
-        pushItem('elec_light_switch', 2380, 80,   0,   180, 30, 95, '#f8fafc', 1250);
+        pushItem('elec_light_switch', 2680, 80,   0,   180, 30, 95, '#f8fafc', 1250);
         pushItem('elec_ac_switch',    90,   4150, 90,  110, 32, 110, '#f8fafc', 1450);
         pushItem('elec_socket_twin',  2380, 4450, -90, 185, 30, 95, '#f8fafc', 450);
         pushItem('elec_data_outlet',  2380, 5050, -90, 185, 30, 95, '#e2e8f0', 450);
       } else {
-        pushItem('kit_l_combo_photo', 4450, 2425, -90, 1580, 1360, 2380, '#c9b18c');
-        pushItem('app_fridge_3door',  3500, 1930, 0);
-        pushItem('bath_vanity_photo', 2920, 4420, 180, 740, 460, 2150);
-        pushItem('bath_toilet_ledge', 3550, 4360, 180, 560, 650, 880);
-        pushItem('bath_low_tub_photo', 4180, 3985, -90, 1420, 640, 2050);
+        // Full-sized 2065 x 1650mm Kitchen in 3BR (X=3835..5900, Z=1600..3250)
+        pushItem('kit_l_combo_photo', 5080, 2425, -90, 1620, 1560, 2380, '#c9b18c');
+        pushItem('app_fridge_3door',  4180, 1940,  0,  620,  650,  1920);
+        // Bathroom inside 2000 x 1470mm Bathroom (X=2525..4525, Z=3335..4805)
+        pushItem('bath_vanity_photo', 2920, 4520, 180, 740, 460, 2150);
+        pushItem('bath_toilet_ledge', 3550, 4460, 180, 560, 650, 880);
+        pushItem('bath_low_tub_photo', 4180, 4070, -90, 1440, 640, 2050);
         pushItem('app_ac_split',      140,   5550, 90,  920, 250, 300, '#f8fafc', 2120);
         pushItem('app_ac_split',      4380,  5850, -90, 920, 250, 300, '#f8fafc', 2120);
         pushItem('app_ac_window',     -1950, 3550, 90,  660, 420, 430, '#e2e8f0', 1750);
-        pushItem('app_ac_split',      1150,  140,  0,   920, 250, 300, '#f8fafc', 2120);
-        pushItem('elec_light_switch', 4140, 1320, -90, 180, 30, 95, '#f8fafc', 1250);
+        pushItem('app_ac_split',      850,   140,  0,   920, 250, 300, '#f8fafc', 2120);
+        pushItem('elec_light_switch', 2680, 80,   0,   180, 30, 95, '#f8fafc', 1250);
         pushItem('elec_ac_switch',    90,   4950, 90,  110, 32, 110, '#f8fafc', 1450);
         pushItem('elec_socket_twin',  2380, 5350, -90, 185, 30, 95, '#f8fafc', 450);
         pushItem('elec_data_outlet',  2380, 5950, -90, 185, 30, 95, '#e2e8f0', 450);
@@ -1631,187 +1805,205 @@
       const tvWallId = isPrivateStyle ? (styleObj.tvType === 'langyu' ? 'cab_tv_langyu' : 'cab_tv_curved_niche') : 'cab_tv_full_2400';
       const mainSofaId = isPrivateStyle ? 'sofa_boucle_cream' : 'sofa_3seat_2100';
       const mainPlatId = isPrivateStyle ? 'plat_steps_led' : 'plat_storage_2000';
+      // ★ Intervals #11..#15 use ZERO brick walls! All room divisions are formed by wardrobes/cabinets/shelving!
+      const isFurnPartitionMode = (L >= 11);
+
+      // Helper: Add either a Brick Partition Wall (for L=1..10) OR a Full-Height Double-Sided Wardrobe / Display Cabinet Partition (for L=11..15)
+      const pushPartitionOrCabinet = (x, z, rot, lengthMM, useGlassOrSlat = false) => {
+        if (!isFurnPartitionMode) {
+          pushItem('part_brick_100', x, z, rot, lengthMM, 100, 2550);
+        } else if (useGlassOrSlat) {
+          pushItem('cab_c_foyer_1600', x, z, rot, lengthMM, 340, 2450, cabColor);
+        } else {
+          pushItem('cab_wardrobe_wall', x, z, rot, lengthMM, 460, 2480, cabColor);
+        }
+      };
 
       // =========================================================================
-      // B1. COMPACT 1BR / OPEN STUDIO UNITS (10 DISTINCT LAYOUTS)
+      // B1. COMPACT 1BR / OPEN STUDIO UNITS (15 DISTINCT INTERVALS, 100% CLEAR ENTRANCE)
       // =========================================================================
       if (prof.is1BR) {
-        if (L % 2 === 0 && !isPrivateStyle) {
-          pushItem('cab_dining_pullout', 1820, 1550, -90, 1400, 1150, 2400, cabColor);
-        } else {
-          pushItem(foyerCabId, 2140, 1450, -90, 1200, 360, 2450, cabColor);
-          pushItem('app_coffee_pro', 2140, 1450, -90, 380, 340, 360, '#94a3b8', 880);
-        }
+        // Place Foyer / Retractable Dining Cabinet flush against Right Wall (X=2080, Z=1850), 100% clear of Main Door!
+        pushItem('cab_dining_pullout', 2020, 1950, -90, 1280, 680, 2400, cabColor);
 
-        // Vary partition & bed positions across L=1..10
         const bedOnRight = (L % 2 === 0);
         const bedX = bedOnRight ? 1620 : 680;
         const wardX = bedOnRight ? 320 : 2020;
         const wardRot = bedOnRight ? 90 : -90;
 
-        if (L <= 3) {
-          pushItem('part_glass_3slide', 1175, 4250, 0, 2250, 80, 2500);
+        if (isFurnPartitionMode) {
+          // Intervals #11-#15: Use Double-Sided Wardrobe / Full TV Cabinet + Pocket Door to divide sleeping zone (NO brick walls!)
+          pushItem('cab_wardrobe_wall', bedOnRight ? 1600 : 750, 4180, 0, 1420, 480, 2480, cabColor);
+          pushItem('door_pocket_slide', bedOnRight ? 460 : 1880, 4180, 0, 820, 90, 2150);
+        } else if (L <= 3) {
+          pushItem('part_glass_3slide', 1175, 4200, 0, 2250, 80, 2500);
         } else if (L <= 6) {
-          pushItem('part_brick_100', bedOnRight ? 1600 : 750, 4250, 0, 1450, 100, 2550);
-          pushItem('door_wood_room', bedOnRight ? 460 : 1880, 4250, 0, 820, 100, 2150);
+          pushItem('part_brick_100', bedOnRight ? 1600 : 750, 4200, 0, 1450, 100, 2550);
+          pushItem('door_wood_room', bedOnRight ? 460 : 1880, 4200, 0, 820, 100, 2150);
         } else {
-          pushItem('part_wood_slat', bedOnRight ? 1650 : 700, 4250, 0, 1250, 80, 2500);
+          pushItem('part_wood_slat', bedOnRight ? 1650 : 700, 4200, 0, 1250, 80, 2500);
         }
 
         if (pTag === '2p') {
-          if (L === 6) {
-            // Twin single beds on left and right
-            pushItem('bed_kid_25ft', 480, 5200, 0, 760, 1860, 820, cabColor);
-            pushItem('bed_kid_25ft', 1860, 5200, 0, 760, 1860, 820, cabColor);
+          if (L === 6 || L === 13) {
+            pushItem('bed_kid_25ft', 480, 5080, 0, 760, 1820, 820, cabColor);
+            pushItem('bed_kid_25ft', 1860, 5080, 0, 760, 1820, 820, cabColor);
           } else {
-            pushItem('bed_queen_45ft', bedX, 5220, 0, 1370, 1880, 920, cabColor);
-            pushItem('cab_wardrobe_1200', wardX, 5220, wardRot, 1250, 560, 2400, cabColor);
+            pushItem('bed_queen_45ft', bedX, 5150, 0, 1370, 1850, 920, cabColor);
+            if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', wardX, 5150, wardRot, 1200, 560, 2400, cabColor);
           }
         } else if (pTag === '3p') {
-          if (L <= 5) {
-            pushItem('bed_bunk_family_3p', bedX, 5220, 0, 1240, 1880, 1800, cabColor);
-            pushItem('desk_study_single', bedOnRight ? 580 : 1780, 5750, 180, 1000, 500, 750, cabColor);
+          if (L % 2 === 1) {
+            pushItem('bed_bunk_family_3p', bedX, 5150, 0, 1240, 1850, 1800, cabColor);
+            pushItem('desk_study_single', bedOnRight ? 580 : 1780, 5620, 180, 1000, 500, 750, cabColor);
           } else {
-            pushItem('bed_double_4ft', 660, 5220, 0, 1220, 1880, 920, cabColor);
-            pushItem('bed_loft_study', 1820, 5180, -90, 980, 1860, 1850, cabColor);
+            pushItem('bed_double_4ft', 660, 5150, 0, 1220, 1850, 920, cabColor);
+            pushItem('bed_loft_study', 1820, 5120, -90, 980, 1820, 1850, cabColor);
           }
         } else {
-          // 4P+ in 1BR
-          pushItem('bed_bunk_family_3p', 660, 5180, 0, 1240, 1900, 1800, cabColor);
-          pushItem(L % 2 === 0 ? 'bed_bunk_kids' : 'bed_loft_study', 1820, 5180, -90, 980, 1880, 1820, cabColor);
+          pushItem('bed_bunk_family_3p', 660, 5120, 0, 1240, 1850, 1800, cabColor);
+          pushItem(L % 2 === 0 ? 'bed_bunk_kids' : 'bed_loft_study', 1820, 5120, -90, 980, 1820, 1820, cabColor);
         }
 
-        // Living area swap left/right based on L
         const sofaOnRight = (L % 3 !== 0);
-        pushItem(isPrivateStyle ? 'sofa_boucle_cream' : 'sofa_2seat_1600', sofaOnRight ? 1820 : 520, 3380, sofaOnRight ? -90 : 90, 1550, 780, 820);
-        pushItem('app_tv_65', sofaOnRight ? 120 : 2220, 3380, sofaOnRight ? 90 : -90, 1300, 70, 780, '#0f172a', 980);
-        pushItem('table_fold_5p', 1750, 2380, -90, 1200, 740, 750, cabColor);
-        pushItem('light_chandelier', 1175, 3400, 0, 700, 700, 340, '#d97706', 2180);
+        pushItem(isPrivateStyle ? 'sofa_boucle_cream' : 'sofa_2seat_1600', sofaOnRight ? 1820 : 520, 3250, sofaOnRight ? -90 : 90, 1500, 780, 820);
+        pushItem('app_tv_65', sofaOnRight ? 120 : 2220, 3250, sofaOnRight ? 90 : -90, 1300, 70, 780, '#0f172a', 980);
+        pushItem('light_chandelier', 1175, 3250, 0, 700, 700, 340, '#d97706', 2180);
         return items;
       }
 
       // =========================================================================
-      // B2. 2-BEDROOM WIDE-HALL UNITS (10 DISTINCT SPATIAL LAYOUTS PER PEOPLE COUNT)
+      // B2. 2-BEDROOM WIDE-HALL UNITS (INCLUDING B11, B13, B14 — 15 INTERVALS)
+      //     ★ FIXED B11 CORRIDOR TABLE ISSUE:
+      //     The entrance corridor (X=1420..2525 in canonical, X=2085..3190 in B11) is now 100% FREE of any table!
+      //     Dining uses a Wall-Hugging Retractable Dining Cabinet (`cab_dining_pullout`) flush against the side wall!
       // =========================================================================
       if (prof.is2BR) {
-        pushItem(foyerCabId, 2300, 1220, -90, 1250, 360, 2450, cabColor);
-        pushItem('app_coffee_pro', 2300, 1220, -90, 380, 340, 360, '#94a3b8', 880);
+        // Foyer Shoe Cabinet tucked against Kitchen/Bath Foyer wall (X=3150, Z=220), 100% clear of Main Entrance Door!
+        pushItem(foyerCabId, 3150, 220, 0, 1150, 350, 2450, cabColor);
+        pushItem('app_coffee_pro', 3150, 220, 0, 380, 340, 360, '#94a3b8', 880);
 
-        // Helper for 2BR Zone placements:
-        // Zone A = Top-Left Main_Hall (X=0..1520, Z=0..2950)
-        // Zone B = Bottom-Left Hall_1 (X=0..2400, Z=3120..6165)
-        // Zone C = Bottom-Right Hall_2 (X=2480..4525, Z=3120..6165)
         const buildZoneARoom = (type) => {
           if (type === '2kid_split') {
-            // Split Main_Hall into 2 mini kid rooms with 2.5ft beds!
-            pushItem('part_brick_100', 760, 1480, 0, 1520, 100, 2550);
-            pushItem('part_brick_100', 760, 2950, 0, 1520, 100, 2550);
-            pushItem('part_brick_100', 1520, 1475, 90, 2950, 100, 2550);
-            pushItem('door_pocket_slide', 1520, 750, 90, 800, 90, 2150);
-            pushItem('door_pocket_slide', 1520, 2250, 90, 800, 90, 2150);
-            pushItem('bed_kid_25ft', 720, 520, -90, 760, 1380, 820, cabColor);
-            pushItem('desk_study_single', 450, 1180, 180, 850, 480, 750, cabColor);
-            pushItem('bed_kid_25ft', 720, 1980, -90, 760, 1380, 820, cabColor);
-            pushItem('desk_study_single', 450, 2650, 180, 850, 480, 750, cabColor);
+            // Split Zone A (X=0..1380, Z=0..3020) into 2 mini kid rooms, leaving X=1380..2525 wide open for Main Door!
+            pushPartitionOrCabinet(690,  1500, 0,  1380, false);
+            pushPartitionOrCabinet(690,  3000, 0,  1380, true);
+            pushPartitionOrCabinet(1380, 1500, 90, 3000, false);
+            pushItem('door_pocket_slide', 1380, 760,  90, 780, 90, 2150);
+            pushItem('door_pocket_slide', 1380, 2280, 90, 780, 90, 2150);
+            pushItem('bed_kid_25ft', 580, 480, -90, 760, 1180, 820, cabColor);
+            pushItem('desk_study_single', 450, 1120, 180, 760, 440, 750, cabColor);
+            pushItem('bed_kid_25ft', 580, 1980, -90, 760, 1180, 820, cabColor);
+            pushItem('desk_study_single', 450, 2620, 180, 760, 440, 750, cabColor);
             return;
           }
           if (type === 'open_dining') {
-            pushItem('table_marble_6p', 950, 1650, 0, 1500, 850, 750);
-            pushItem('cab_c_foyer_1600', 220, 1650, 90, 1600, 380, 2450, cabColor);
-            pushItem('light_dining_bar', 950, 1650, 0, 1050, 120, 280, '#ca8a04', 2150);
+            // Wall-hugging Retractable Dining Table Cabinet flush against X=320 wall (X=4290 in B11), leaving corridor wide open!
+            pushItem('cab_dining_pullout', 420, 1650, 90, 1600, 780, 2400, cabColor);
+            pushItem('light_dining_bar', 680, 1650, 90, 1050, 120, 280, '#ca8a04', 2150);
             return;
           }
           if (type === 'open_study') {
-            pushItem('part_glass_3slide', 760, 2950, 0, 1520, 80, 2500);
-            pushItem('desk_study_double', 760, 420, 0, 1450, 550, 750, cabColor);
-            pushItem('cab_wardrobe_1800', 320, 1750, 90, 1750, 560, 2400, cabColor);
+            if (isFurnPartitionMode) {
+              pushItem('cab_c_foyer_1600', 690, 2950, 0, 1380, 360, 2450, cabColor);
+            } else {
+              pushItem('part_glass_3slide', 690, 2950, 0, 1380, 80, 2500);
+            }
+            pushItem('desk_study_double', 680, 420, 0, 1280, 540, 750, cabColor);
+            pushItem('cab_wardrobe_1800', 320, 1720, 90, 1650, 540, 2400, cabColor);
             return;
           }
-          // Enclosed room in Zone A
-          pushItem('part_brick_100', 760, 2950, 0, 1520, 100, 2550);
-          pushItem('part_brick_100', 1520, 1100, 90, 2100, 100, 2550);
-          pushItem('door_wood_room', 1520, 2520, 90, 820, 100, 2150);
+          // Enclosed room in Zone A (X=0..1360, Z=0..2950) -> Main Entrance Door at X=1520..2440 is 100% unobstructed!
+          pushPartitionOrCabinet(680,  2950, 0,  1360, true);
+          pushPartitionOrCabinet(1360, 1080, 90, 2060, false);
+          pushItem('door_pocket_slide', 1360, 2480, 90, 820, 90, 2150);
           if (type === 'double_bed') {
-            pushItem('bed_double_4ft', 640, 1050, 0, 1220, 1880, 920, cabColor);
-            pushItem('cab_wardrobe_1200', 680, 2620, 180, 1150, 550, 2400, cabColor);
+            pushItem('bed_double_4ft', 580, 1020, 0, 1140, 1860, 920, cabColor);
+            if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 580, 2600, 180, 1050, 520, 2400, cabColor);
           } else if (type === 'single_bed') {
-            pushItem('bed_single_3ft', 520, 1050, 0, 920, 1880, 850, cabColor);
-            pushItem('desk_study_single', 680, 2580, 180, 1050, 520, 750, cabColor);
+            pushItem('bed_single_3ft', 480, 1020, 0, 900, 1860, 850, cabColor);
+            pushItem('desk_study_single', 580, 2580, 180, 920, 480, 750, cabColor);
           } else if (type === 'bunk_2p') {
-            pushItem('bed_bunk_kids', 540, 1150, 0, 1000, 2100, 1780, cabColor);
-            pushItem('desk_study_single', 680, 2580, 180, 1050, 520, 750, cabColor);
+            pushItem('bed_bunk_kids', 500, 1120, 0, 960, 2020, 1780, cabColor);
+            pushItem('desk_study_single', 580, 2580, 180, 920, 480, 750, cabColor);
           } else if (type === 'bunk_3p') {
-            pushItem('bed_bunk_family_3p', 660, 1150, 0, 1240, 2120, 1800, cabColor);
-            pushItem('desk_study_single', 680, 2580, 180, 1100, 520, 750, cabColor);
+            pushItem('bed_bunk_family_3p', 580, 1120, 0, 1160, 2020, 1800, cabColor);
+            pushItem('desk_study_single', 580, 2580, 180, 920, 480, 750, cabColor);
           }
         };
 
         const buildZoneBRoom = (type) => {
           if (type === 'living') {
-            pushItem('table_fold_5p', 1980, 2450, -90, 1300, 760, 750, cabColor);
-            pushItem(mainSofaId, 480, 4750, 90, 2100, 850, 840);
-            pushItem('dec_rug_nordic', 1300, 4750, 90, 1850, 1250, 16);
-            pushItem(tvWallId, 2220, 4750, -90, 2100, 360, 2400, cabColor);
-            pushItem('cab_bay_window', 1200, 5920, 180, 1900, 450, 420, cabColor);
-            pushItem('light_chandelier', 1200, 4750, 0, 750, 750, 350, '#d97706', 2180);
+            // ★ Retractable Dining Cabinet placed FLUSH against outer wall (X=360, Z=3620), NEVER in the X=1500..2450 corridor!
+            pushItem('cab_dining_pullout', 380, 3680, 90, 1380, 720, 2400, cabColor);
+            pushItem(mainSofaId, 480, 5050, 90, 1950, 840, 840);
+            pushItem('dec_rug_nordic', 1280, 5050, 90, 1750, 1180, 16);
+            pushItem(tvWallId, 2220, 5050, -90, 1950, 360, 2400, cabColor);
+            pushItem('cab_bay_window', 1200, 5940, 180, 1850, 440, 420, cabColor);
+            pushItem('light_chandelier', 1200, 5050, 0, 750, 750, 350, '#d97706', 2180);
             return;
           }
-          // Enclosed bedroom in Hall_1 (Bottom-Left)
-          pushItem('part_brick_100', 850, 3650, 0, 1700, 100, 2550);
-          pushItem('part_brick_100', 1700, 5250, 90, 1800, 100, 2550);
-          pushItem('door_wood_room', 1700, 4050, 90, 820, 100, 2150);
+          pushPartitionOrCabinet(820,  3650, 0,  1640, true);
+          pushPartitionOrCabinet(1640, 5250, 90, 1800, false);
+          pushItem('door_pocket_slide', 1640, 4050, 90, 820, 90, 2150);
           if (type === 'double_bed') {
-            pushItem('bed_queen_45ft', 820, 5150, 90, 1370, 1880, 920, cabColor);
-            pushItem('cab_wardrobe_1200', 820, 3980, 0, 1200, 560, 2400, cabColor);
+            pushItem('bed_queen_45ft', 780, 5150, 90, 1370, 1850, 920, cabColor);
+            if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 780, 3980, 0, 1150, 540, 2400, cabColor);
           } else if (type === 'bunk_2p') {
-            pushItem('bed_bunk_kids', 620, 5050, 0, 1000, 2050, 1780, cabColor);
-            pushItem('desk_study_single', 1250, 5750, 180, 950, 500, 750, cabColor);
+            pushItem('bed_bunk_kids', 580, 5050, 0, 980, 2020, 1780, cabColor);
+            pushItem('desk_study_single', 1180, 5750, 180, 900, 480, 750, cabColor);
           } else if (type === 'bunk_3p') {
-            pushItem('bed_bunk_family_3p', 720, 5050, 0, 1220, 2080, 1800, cabColor);
+            pushItem('bed_bunk_family_3p', 680, 5050, 0, 1180, 2020, 1800, cabColor);
           }
         };
 
         const buildZoneCRoom = (type) => {
           if (type === 'living') {
-            pushItem(mainSofaId, 4050, 4750, -90, 2050, 840, 840);
-            pushItem('dec_rug_nordic', 3350, 4750, -90, 1800, 1200, 16);
-            pushItem(tvWallId, 2580, 4750, 90, 2000, 360, 2400, cabColor);
-            pushItem('light_chandelier', 3450, 4750, 0, 750, 750, 350, '#d97706', 2180);
+            pushItem('cab_dining_pullout', 4140, 3680, -90, 1380, 720, 2400, cabColor);
+            pushItem(mainSofaId, 4050, 5050, -90, 1950, 840, 840);
+            pushItem('dec_rug_nordic', 3350, 5050, -90, 1750, 1180, 16);
+            pushItem(tvWallId, 2580, 5050, 90, 1900, 360, 2400, cabColor);
+            pushItem('light_chandelier', 3450, 5050, 0, 750, 750, 350, '#d97706', 2180);
             return;
           }
-          pushItem('part_brick_100', 2480, 5050, 90, 2100, 100, 2550);
-          pushItem('door_wood_room', 2480, 3580, 90, 820, 100, 2150);
+          pushPartitionOrCabinet(2520, 5050, 90, 2050, false);
+          pushItem('door_pocket_slide', 2520, 3680, 90, 820, 90, 2150);
           if (type === 'double_bed') {
-            pushItem(mainPlatId, 3500, 4700, 0, 1950, 2800, 380, cabColor);
-            pushItem('bed_queen_45ft', 3550, 5150, -90, 1370, 1900, 920, cabColor, 380);
-            pushItem('cab_wardrobe_1800', 3500, 3520, 0, 1650, 560, 2050, cabColor, 380);
+            pushItem(mainPlatId, 3520, 4750, 0, 1900, 2650, 380, cabColor);
+            pushItem('bed_queen_45ft', 3580, 5180, -90, 1370, 1850, 920, cabColor, 380);
+            if (!isFurnPartitionMode) pushItem('cab_wardrobe_1800', 3520, 3580, 0, 1600, 540, 2050, cabColor, 380);
           } else if (type === 'single_bed') {
-            pushItem('bed_single_3ft', 3850, 5150, -90, 920, 1880, 850, cabColor);
-            pushItem('desk_study_single', 3500, 3550, 0, 1100, 520, 750, cabColor);
-            pushItem('cab_wardrobe_1200', 3300, 5850, 180, 1200, 560, 2400, cabColor);
+            pushItem('bed_single_3ft', 3850, 5180, -90, 920, 1850, 850, cabColor);
+            pushItem('desk_study_single', 3520, 3600, 0, 1080, 500, 750, cabColor);
+            if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 3350, 5850, 180, 1150, 540, 2400, cabColor);
           } else if (type === 'bunk_2p') {
-            pushItem('bed_bunk_kids', 3850, 4950, -90, 1000, 2050, 1780, cabColor);
-            pushItem('desk_study_double', 3500, 3550, 0, 1550, 540, 750, cabColor);
+            pushItem('bed_bunk_kids', 3850, 4980, -90, 980, 2020, 1780, cabColor);
+            pushItem('desk_study_double', 3520, 3600, 0, 1500, 520, 750, cabColor);
           } else if (type === 'bunk_3p') {
-            pushItem('bed_bunk_family_3p', 3780, 4950, -90, 1240, 2080, 1800, cabColor);
-            pushItem('desk_study_single', 3450, 3550, 0, 1150, 520, 750, cabColor);
+            pushItem('bed_bunk_family_3p', 3780, 4980, -90, 1220, 2020, 1800, cabColor);
+            pushItem('desk_study_single', 3520, 3600, 0, 1120, 500, 750, cabColor);
           }
         };
 
-        // Map L=1..10 to distinct zone combinations for 2BR
         const map2BR = [
-          ['bunk_3p',    'living',     'double_bed'], // L1
-          ['2kid_split', 'living',     'double_bed'], // L2: Main_Hall split into two 2.5ft kid beds!
-          ['double_bed', 'bunk_2p',    'single_bed'], // L3: User Example 1 adapted for 2BR!
-          ['single_bed', 'living',     'bunk_3p'],    // L4
-          ['bunk_2p',    'living',     'double_bed'], // L5
-          ['open_study', 'bunk_2p',    'double_bed'], // L6
-          ['double_bed', 'living',     'bunk_2p'],    // L7
-          ['open_dining','double_bed', 'bunk_2p'],    // L8
-          ['single_bed', 'double_bed', 'living'],     // L9
-          ['bunk_3p',    'single_bed', 'double_bed']  // L10
+          ['bunk_3p',    'living',     'double_bed'], // #01
+          ['2kid_split', 'living',     'double_bed'], // #02
+          ['double_bed', 'bunk_2p',    'single_bed'], // #03
+          ['single_bed', 'living',     'bunk_3p'],    // #04
+          ['bunk_2p',    'living',     'double_bed'], // #05
+          ['open_study', 'bunk_2p',    'double_bed'], // #06
+          ['double_bed', 'living',     'bunk_2p'],    // #07
+          ['open_dining','double_bed', 'bunk_2p'],    // #08
+          ['single_bed', 'double_bed', 'living'],     // #09
+          ['bunk_3p',    'single_bed', 'double_bed'], // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['bunk_2p',    'living',     'double_bed'], // #11 (櫃間房)
+          ['2kid_split', 'living',     'double_bed'], // #12 (櫃間房)
+          ['bunk_3p',    'living',     'double_bed'], // #13 (櫃間房)
+          ['open_study', 'double_bed', 'bunk_2p'],    // #14 (櫃間房)
+          ['single_bed', 'bunk_2p',    'double_bed']  // #15 (櫃間房)
         ];
-        const cfg = map2BR[(L - 1) % 10];
+        const cfg = map2BR[(L - 1) % map2BR.length];
         buildZoneARoom(cfg[0]);
         buildZoneBRoom(cfg[1]);
         buildZoneCRoom(cfg[2]);
@@ -1819,17 +2011,14 @@
       }
 
       // =========================================================================
-      // B3. 3-BEDROOM LARGE UNITS (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
-      //     10 COMPLETELY DIFFERENT SPATIAL ARRANGEMENTS FOR EACH PEOPLE COUNT!
-      //     Includes User's Exact Examples:
-      //     - Layout 1 (5P): Double Bed in Side_Room + Bunk Bed (2 kids) in Hall_1 + Single Bed in Hall_2 + Living in Main_Hall
-      //     - Layout 2 (5P): Main_Hall split into 2 rooms with 2.5ft beds (2 kids) + Double Bed in Hall_2 + Single Bed in Side_Room + Living in Hall_1
+      // B3. 3-BEDROOM LARGE UNITS (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22 — 15 INTERVALS)
+      //     100% CLEAR ENTRANCE IN BOTH SIDE-DOOR (B10/B9) & TOP-DOOR (B1/B15/A-SERIES)
       // =========================================================================
-      pushItem(foyerCabId, 3550, 1400, 180, 1250, 360, 2450, cabColor);
-      pushItem('app_coffee_pro', 3550, 1400, 180, 380, 340, 360, '#94a3b8', 880);
-      pushItem('app_robot_vac', 2820, 1400, 180);
+      // Place Foyer C-Cabinet against the Kitchen Top Wall at X=3250, Z=1380 (away from Main Door & Kitchen Door!)
+      pushItem(foyerCabId, 3250, 1380, 180, 1150, 350, 2450, cabColor);
+      pushItem('app_coffee_pro', 3250, 1380, 180, 380, 340, 360, '#94a3b8', 880);
+      pushItem('app_robot_vac', 2600, 1380, 180);
 
-      // MODULAR ZONE BUILDERS FOR 3BR:
       // 1) SIDE_ROOM (-2000..0, Z=2500..4650)
       const buildSideRoom = (mode) => {
         if (mode === 'walkin_closet') {
@@ -1838,24 +2027,25 @@
           pushItem('cab_wardrobe_1800', -1000, 4340, 180, 1750, 580, 2450, cabColor);
           return;
         }
-        pushItem('part_brick_100', -50, 3150, 90, 450, 100, 2550);
-        pushItem('door_wood_room', -50, 3850, 90, 820, 100, 2150);
+        if (isFurnPartitionMode) {
+          pushItem('cab_wardrobe_1200', -180, 3050, 90, 520, 420, 2450, cabColor);
+          pushItem('door_pocket_slide', -50, 3850, 90, 820, 90, 2150);
+        } else {
+          pushItem('part_brick_100', -50, 3150, 90, 450, 100, 2550);
+          pushItem('door_wood_room', -50, 3850, 90, 820, 100, 2150);
+        }
 
         if (mode === 'double_bed') {
-          // Double bed placed in Side Room + Wardrobe
           pushItem('bed_double_4ft', -1050, 3150, -90, 1220, 1880, 920, cabColor);
           pushItem('cab_wardrobe_1200', -1380, 4340, 180, 1150, 560, 2400, cabColor);
         } else if (mode === 'single_bed') {
-          // Single bed placed in Side Room + Study Desk + Wardrobe
           pushItem('bed_single_3ft', -1050, 2980, -90, 920, 1880, 850, cabColor);
           pushItem('desk_study_single', -1420, 4340, 180, 1000, 500, 750, cabColor);
           pushItem('cab_wardrobe_1200', -450, 4340, 180, 850, 550, 2400, cabColor);
         } else if (mode === 'bunk_2p') {
-          // Bunk bed (2 kids) in Side Room + Study Desk
           pushItem('bed_bunk_kids', -1050, 3020, -90, 980, 1900, 1780, cabColor);
           pushItem('desk_study_single', -1420, 4340, 180, 1050, 500, 750, cabColor);
         } else if (mode === 'bunk_3p') {
-          // 3P Family Bunk (Lower Double + Upper Single) in Side Room
           pushItem('bed_bunk_family_3p', -1050, 3150, -90, 1220, 1900, 1800, cabColor);
           pushItem('desk_study_single', -1420, 4340, 180, 1000, 500, 750, cabColor);
         } else if (mode === 'study_room') {
@@ -1868,92 +2058,88 @@
         }
       };
 
-      // 2) MAIN_HALL TOP-LEFT ZONE (X=0..2400, Z=0..2450)
+      // 2) MAIN_HALL TOP-LEFT ZONE (Strictly X=0..1400 at Z=0..2380 so Main Door at X=1520..2440 is 100% unobstructed!)
       const buildMainHallZone = (mode) => {
         if (mode === 'split_2_kid_rooms') {
-          // ★ USER EXAMPLE 2: Split Main_Hall into TWO separate Kid Rooms, each with a 2.5ft bed (760x1880mm) & desk!
-          // Left Kid Room: X=0..1180, Z=0..2380 | Right Kid Room: X=1180..2360, Z=0..2380
-          pushItem('part_brick_100', 1180, 1190, 90, 2380, 100, 2550); // Center divider wall between the 2 kid rooms
-          pushItem('part_brick_100', 1180, 2380, 0,  2360, 100, 2550); // Bottom wall facing Hall_1
-          pushItem('part_brick_100', 2360, 1190, 90, 2380, 100, 2550); // Right wall facing Foyer
-          pushItem('door_pocket_slide', 580,  2380, 0, 780, 90, 2150);  // Door to Kid Room 1
-          pushItem('door_pocket_slide', 1780, 2380, 0, 780, 90, 2150);  // Door to Kid Room 2
+          // Split X=0..1400, Z=0..2420 into 2 Kid Rooms with 2.5ft beds, leaving X=1400..2525 open for Main Door!
+          pushPartitionOrCabinet(700,  1210, 0,  1400, false);
+          pushPartitionOrCabinet(700,  2400, 0,  1400, true);
+          pushPartitionOrCabinet(1400, 1200, 90, 2400, false);
+          pushItem('door_pocket_slide', 1400, 620,  90, 760, 90, 2150);
+          pushItem('door_pocket_slide', 1400, 1820, 90, 760, 90, 2150);
 
-          // Kid Room 1 (Left): 2.5ft Bed + Study Desk + Hanging Cabinet
-          pushItem('bed_kid_25ft', 440, 980, 0, 760, 1880, 820, cabColor);
-          pushItem('desk_study_single', 880, 1950, -90, 850, 480, 750, cabColor);
-          pushItem('cab_wall_hang_1200', 440, 200, 0, 800, 340, 600, cabColor, 1750);
+          pushItem('bed_kid_25ft', 620, 440, -90, 760, 1200, 820, cabColor);
+          pushItem('desk_study_single', 460, 960, 180, 740, 420, 750, cabColor);
 
-          // Kid Room 2 (Right): 2.5ft Bed + Study Desk + Hanging Cabinet
-          pushItem('bed_kid_25ft', 1620, 980, 0, 760, 1880, 820, cabColor);
-          pushItem('desk_study_single', 2080, 1950, -90, 850, 480, 750, cabColor);
-          pushItem('cab_wall_hang_1200', 1620, 200, 0, 800, 340, 600, cabColor, 1750);
+          pushItem('bed_kid_25ft', 620, 1640, -90, 760, 1200, 820, cabColor);
+          pushItem('desk_study_single', 460, 2160, 180, 740, 420, 750, cabColor);
           return;
         }
         if (mode === 'living_dining_main') {
-          // ★ USER EXAMPLE 1: Main_Hall used as spacious Living + Dining Room (since Hall_1 & Hall_2 are bedrooms!)
-          pushItem(mainSofaId, 480, 1150, 90, 2050, 840, 840);
-          pushItem('dec_rug_nordic', 1250, 1150, 90, 1800, 1200, 16);
-          pushItem(tvWallId, 2220, 1150, -90, 2000, 360, 2400, cabColor);
-          pushItem('table_marble_6p', 1450, 2950, 0, 1500, 840, 750);
-          pushItem('light_chandelier', 1250, 1150, 0, 760, 760, 350, '#d97706', 2180);
-          pushItem('light_dining_bar', 1450, 2950, 0, 1050, 120, 280, '#ca8a04', 2150);
+          pushItem(mainSofaId, 480, 1250, 90, 1950, 840, 840);
+          pushItem('dec_rug_nordic', 1150, 1250, 90, 1750, 1150, 16);
+          pushItem(tvWallId, 2320, 1650, -90, 1650, 350, 2400, cabColor);
+          // Wall-hugging Retractable Dining Table Cabinet flush against Left Wall (X=380, Z=2320) -> Corridor X=1400..2525 is 100% open!
+          pushItem('cab_dining_pullout', 420, 2280, 90, 1380, 720, 2400, cabColor);
+          pushItem('light_chandelier', 1150, 1250, 0, 740, 740, 350, '#d97706', 2180);
           return;
         }
         if (mode === 'open_study_lounge') {
-          pushItem('part_wood_slat', 1175, 2380, 0, 1600, 80, 2500);
-          pushItem('desk_study_double', 1175, 420, 0, 1650, 560, 750, cabColor);
-          pushItem('cab_wall_hang_1800', 1175, 220, 0, 1650, 350, 650, cabColor, 1750);
+          if (isFurnPartitionMode) {
+            pushItem('cab_c_foyer_1600', 700, 2350, 0, 1380, 360, 2450, cabColor);
+          } else {
+            pushItem('part_wood_slat', 700, 2350, 0, 1380, 80, 2500);
+          }
+          pushItem('desk_study_double', 700, 420, 0, 1320, 540, 750, cabColor);
+          pushItem('cab_wall_hang_1800', 700, 220, 0, 1320, 350, 650, cabColor, 1750);
           pushItem('dec_plant_tree', 350, 1850, 0);
           return;
         }
         if (mode === 'open_dining_banquet') {
-          pushItem('table_marble_6p', 1175, 1250, 0, 1650, 900, 750);
-          pushItem('cab_dining_pullout', 1175, 420, 0, 1650, 650, 2400, cabColor);
-          pushItem('light_dining_bar', 1175, 1250, 0, 1050, 120, 280, '#ca8a04', 2150);
+          pushItem('cab_dining_pullout', 420, 1450, 90, 1550, 780, 2400, cabColor);
+          pushItem('light_dining_bar', 680, 1450, 90, 1050, 120, 280, '#ca8a04', 2150);
           return;
         }
 
-        // Standard Enclosed Bedroom in Main_Hall Top-Left (X=0..2350, Z=0..2380)
-        pushItem('part_brick_100', 1175, 2380, 0, 2350, 100, 2550);
-        pushItem('part_brick_100', 2350, 750, 90, 1450, 100, 2550);
-        pushItem('door_wood_room', 2350, 1880, 90, 820, 100, 2150);
+        // Standard Enclosed Bedroom in Main_Hall Top-Left (X=0..1380, Z=0..2360 -> Clear of Main Entrance Door at X=1520..2440!)
+        pushPartitionOrCabinet(690,  2360, 0,  1380, true);
+        pushPartitionOrCabinet(1380, 750,  90, 1450, false);
+        pushItem('door_pocket_slide', 1380, 1880, 90, 820, 90, 2150);
 
         if (mode === 'double_bed') {
-          pushItem('bed_double_4ft', 660, 1050, 0, 1220, 1880, 920, cabColor);
-          pushItem('cab_wardrobe_1200', 1750, 1050, -90, 1150, 550, 2400, cabColor);
+          pushItem('bed_double_4ft', 600, 1020, 0, 1140, 1850, 920, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 620, 2080, 180, 1050, 500, 2400, cabColor);
         } else if (mode === 'single_bed') {
-          pushItem('bed_single_3ft', 540, 1050, 0, 920, 1880, 850, cabColor);
-          pushItem('desk_study_single', 1650, 360, 0, 1100, 520, 750, cabColor);
-          pushItem('cab_wardrobe_1200', 1750, 1250, -90, 1050, 550, 2400, cabColor);
+          pushItem('bed_single_3ft', 500, 1020, 0, 900, 1850, 850, cabColor);
+          pushItem('desk_study_single', 620, 2080, 180, 950, 460, 750, cabColor);
         } else if (mode === 'bunk_2p') {
-          pushItem('bed_bunk_kids', 580, 1150, 0, 1000, 2100, 1780, cabColor);
-          pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750, cabColor);
+          pushItem('bed_bunk_kids', 520, 1080, 0, 960, 1980, 1780, cabColor);
+          pushItem('desk_study_single', 620, 2100, 180, 920, 440, 750, cabColor);
         } else if (mode === 'bunk_3p') {
-          pushItem('bed_bunk_family_3p', 660, 1150, 0, 1240, 2120, 1800, cabColor);
-          pushItem('desk_study_double', 1650, 340, 0, 1300, 520, 750, cabColor);
+          pushItem('bed_bunk_family_3p', 600, 1080, 0, 1160, 1980, 1800, cabColor);
+          pushItem('desk_study_single', 620, 2100, 180, 920, 440, 750, cabColor);
         } else if (mode === 'loft_bed') {
-          pushItem('bed_loft_study', 580, 1100, 0, 1020, 2000, 1850, cabColor);
-          pushItem('cab_wardrobe_1200', 1750, 1050, -90, 1200, 560, 2400, cabColor);
+          pushItem('bed_loft_study', 520, 1050, 0, 980, 1920, 1850, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 620, 2080, 180, 1000, 500, 2400, cabColor);
         }
       };
 
       // 3) HALL_1 BOTTOM-LEFT SEA-VIEW ZONE (X=0..2440, Z=3650..6815)
       const buildHall1Zone = (mode) => {
         if (mode === 'living_standard') {
-          pushItem('table_fold_5p', 1750, 3100, -90, 1350, 800, 750, cabColor);
-          pushItem(mainSofaId, 480, 5550, 90, 2100, 850, 840);
-          pushItem('dec_rug_nordic', 1300, 5550, 90, 1850, 1250, 16);
-          pushItem(tvWallId, 2220, 5650, -90, 1950, 360, 2400, cabColor);
+          // ★ Retractable Dining Cabinet placed FLUSH against Left Wall (X=380, Z=4320), keeping central walkway 100% open!
+          pushItem('cab_dining_pullout', 380, 4320, 90, 1380, 720, 2400, cabColor);
+          pushItem(mainSofaId, 480, 5680, 90, 2000, 840, 840);
+          pushItem('dec_rug_nordic', 1300, 5680, 90, 1800, 1200, 16);
+          pushItem(tvWallId, 2220, 5680, -90, 1950, 360, 2400, cabColor);
           pushItem('cab_bay_window', 1200, 6550, 180, 1950, 450, 420, cabColor);
-          pushItem('light_chandelier', 1200, 5550, 0, 780, 780, 360, '#d97706', 2180);
+          pushItem('light_chandelier', 1200, 5680, 0, 780, 780, 360, '#d97706', 2180);
           return;
         }
         if (mode === 'split_2_kid_rooms') {
-          // Split Hall_1 (Bottom-Left) into 2 separate 2.5ft bed Kid Rooms!
-          pushItem('part_brick_100', 1150, 4550, 0, 2300, 100, 2550);
-          pushItem('part_brick_100', 1150, 5680, 90, 2250, 100, 2550);
-          pushItem('part_brick_100', 2300, 5680, 90, 2250, 100, 2550);
+          pushPartitionOrCabinet(1150, 4550, 0,  2300, true);
+          pushPartitionOrCabinet(1150, 5680, 90, 2250, false);
+          pushPartitionOrCabinet(2300, 5680, 90, 2250, false);
           pushItem('door_pocket_slide', 580, 4550, 0, 780, 90, 2150);
           pushItem('door_pocket_slide', 1720, 4550, 0, 780, 90, 2150);
           pushItem('bed_kid_25ft', 440, 5650, 0, 760, 1880, 820, cabColor);
@@ -1963,27 +2149,26 @@
           return;
         }
 
-        // Enclosed Bedroom in Hall_1 (Bottom-Left Sea-View Room: X=0..1850, Z=4550..6815, leaving corridor X=1850..2480)
-        pushItem('part_brick_100', 925, 4550, 0, 1850, 100, 2550);
-        pushItem('part_brick_100', 1850, 6050, 90, 1500, 100, 2550);
-        pushItem('door_wood_room', 1850, 4950, 90, 820, 100, 2150);
+        // Enclosed Bedroom in Hall_1 (Bottom-Left Sea-View Room: X=0..1820, Z=4550..6815, leaving corridor X=1820..2480)
+        pushPartitionOrCabinet(910,  4550, 0,  1820, true);
+        pushPartitionOrCabinet(1820, 6050, 90, 1500, false);
+        pushItem('door_pocket_slide', 1820, 4950, 90, 820, 90, 2150);
 
         if (mode === 'bunk_2p') {
-          // ★ USER EXAMPLE 1: Bunk Bed (2 kids) placed in Hall_1 + Dual Study Desk
-          pushItem('bed_bunk_kids', 580, 5680, 0, 1000, 2100, 1780, cabColor);
-          pushItem('desk_study_single', 1350, 6420, 180, 1000, 500, 750, cabColor);
-          pushItem('cab_wardrobe_1200', 1350, 4880, 0, 950, 540, 2400, cabColor);
+          pushItem('bed_bunk_kids', 560, 5680, 0, 980, 2080, 1780, cabColor);
+          pushItem('desk_study_single', 1320, 6420, 180, 960, 480, 750, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 1320, 4880, 0, 920, 520, 2400, cabColor);
         } else if (mode === 'double_bed') {
-          pushItem(mainPlatId, 920, 5680, 0, 1800, 2150, 380, cabColor);
-          pushItem('bed_queen_45ft', 850, 5850, 90, 1370, 1850, 920, cabColor, 380);
-          pushItem('cab_wardrobe_1200', 920, 4860, 0, 1350, 550, 2050, cabColor, 380);
+          pushItem(mainPlatId, 900, 5680, 0, 1760, 2150, 380, cabColor);
+          pushItem('bed_queen_45ft', 820, 5850, 90, 1370, 1820, 920, cabColor, 380);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 900, 4860, 0, 1320, 540, 2050, cabColor, 380);
         } else if (mode === 'bunk_3p') {
-          pushItem('bed_bunk_family_3p', 680, 5680, 0, 1240, 2100, 1800, cabColor);
-          pushItem('desk_study_single', 1420, 6420, 180, 900, 500, 750, cabColor);
+          pushItem('bed_bunk_family_3p', 660, 5680, 0, 1220, 2080, 1800, cabColor);
+          pushItem('desk_study_single', 1380, 6420, 180, 880, 480, 750, cabColor);
         } else if (mode === 'single_bed') {
-          pushItem('bed_single_3ft', 550, 5750, 0, 920, 1880, 850, cabColor);
-          pushItem('desk_study_single', 1350, 6420, 180, 1000, 500, 750, cabColor);
-          pushItem('cab_wardrobe_1200', 1250, 4860, 0, 1100, 550, 2400, cabColor);
+          pushItem('bed_single_3ft', 540, 5750, 0, 920, 1850, 850, cabColor);
+          pushItem('desk_study_single', 1320, 6420, 180, 960, 480, 750, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 1220, 4860, 0, 1080, 540, 2400, cabColor);
         }
       };
 
@@ -1997,114 +2182,138 @@
           return;
         }
         if (mode === 'study_glass') {
-          pushItem('part_glass_3slide', 2480, 5750, 90, 2050, 80, 2500);
+          if (isFurnPartitionMode) {
+            pushItem('cab_c_foyer_1600', 2520, 5750, 90, 1950, 360, 2450, cabColor);
+          } else {
+            pushItem('part_glass_3slide', 2480, 5750, 90, 2050, 80, 2500);
+          }
           pushItem('desk_study_double', 3550, 6450, 180, 1650, 560, 750, cabColor);
           pushItem('cab_wardrobe_1800', 3550, 5020, 0, 1650, 560, 2400, cabColor);
           return;
         }
 
-        // Enclosed Room in Hall_2
-        pushItem('part_brick_100', 2480, 6150, 90, 1350, 100, 2550);
-        pushItem('door_wood_room', 2480, 5120, 90, 820, 100, 2150);
+        // Enclosed Room in Hall_2 (Partitioned by Wardrobe when isFurnPartitionMode=true)
+        pushPartitionOrCabinet(2520, 6150, 90, 1350, false);
+        pushItem('door_pocket_slide', 2520, 5120, 90, 820, 90, 2150);
 
         if (mode === 'double_bed') {
-          pushItem(mainPlatId, 3500, 5770, 0, 1950, 2050, 380, cabColor);
-          pushItem('bed_queen_45ft', 3550, 6050, -90, 1370, 1880, 920, cabColor, 380);
-          pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2050, cabColor, 380);
+          pushItem(mainPlatId, 3520, 5770, 0, 1920, 2050, 380, cabColor);
+          pushItem('bed_queen_45ft', 3580, 6050, -90, 1370, 1850, 920, cabColor, 380);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 540, 2050, cabColor, 380);
         } else if (mode === 'single_bed') {
-          // ★ USER EXAMPLE 1: Single Bed placed in Hall_2 + Study Desk + Wardrobe
-          pushItem('bed_single_3ft', 3550, 6220, -90, 920, 1880, 850, cabColor);
-          pushItem('desk_study_single', 4150, 5350, -90, 1050, 520, 750, cabColor);
-          pushItem('cab_wardrobe_1200', 3350, 5020, 0, 1200, 560, 2400, cabColor);
+          pushItem('bed_single_3ft', 3580, 6220, -90, 920, 1850, 850, cabColor);
+          pushItem('desk_study_single', 4150, 5350, -90, 1050, 500, 750, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 3350, 5020, 0, 1200, 540, 2400, cabColor);
         } else if (mode === 'bunk_2p') {
-          pushItem('bed_bunk_kids', 3550, 6150, -90, 1000, 1950, 1780, cabColor);
-          pushItem('desk_study_single', 4150, 5250, -90, 1000, 500, 750, cabColor);
-          pushItem('cab_wardrobe_1200', 3250, 5020, 0, 1100, 550, 2400, cabColor);
+          pushItem('bed_bunk_kids', 3580, 6150, -90, 980, 1920, 1780, cabColor);
+          pushItem('desk_study_single', 4150, 5250, -90, 1000, 480, 750, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 3280, 5020, 0, 1080, 520, 2400, cabColor);
         } else if (mode === 'bunk_3p') {
-          pushItem('bed_bunk_family_3p', 3550, 6050, -90, 1240, 1950, 1800, cabColor);
-          pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 560, 2400, cabColor);
+          pushItem('bed_bunk_family_3p', 3580, 6050, -90, 1220, 1920, 1800, cabColor);
+          if (!isFurnPartitionMode) pushItem('cab_wardrobe_1200', 3850, 5020, 0, 1200, 540, 2400, cabColor);
         }
       };
 
       // =========================================================================
-      // DISPATCH 10 DISTINCT SPATIAL MATRICES FOR EACH HOUSEHOLD SIZE (2P..6P)
+      // DISPATCH 15 DISTINCT SPATIAL MATRICES FOR EACH HOUSEHOLD SIZE (2P..6P)
+      // #01..#10: Standard Partition Intervals | #11..#15: ZERO-BRICK-WALL Furniture-Partition Intervals
       // Format: [Side_Room, Main_Hall_TopLeft, Hall_1_BottomLeft, Hall_2_BottomRight]
       // =========================================================================
       const matricesByPeople = {
         '2p': [
-          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // L01
-          ['double_bed',    'open_dining_banquet', 'living_standard',    'study_glass'],   // L02
-          ['study_room',    'living_dining_main',  'double_bed',         'walkin_closet'], // L03
-          ['study_room',    'double_bed',          'living_standard',    'living_sea'],    // L04
-          ['walkin_closet', 'open_dining_banquet', 'living_standard',    'double_bed'],    // L05
-          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // L06
-          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // L07
-          ['double_bed',    'open_study_lounge',   'living_standard',    'study_glass'],   // L08
-          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed'],    // L09
-          ['study_room',    'living_dining_main',  'open_dining_banquet','double_bed']     // L10
+          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #01
+          ['double_bed',    'open_dining_banquet', 'living_standard',    'study_glass'],   // #02
+          ['study_room',    'living_dining_main',  'double_bed',         'walkin_closet'], // #03
+          ['study_room',    'double_bed',          'living_standard',    'living_sea'],    // #04
+          ['walkin_closet', 'open_dining_banquet', 'living_standard',    'double_bed'],    // #05
+          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #06
+          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #07
+          ['double_bed',    'open_study_lounge',   'living_standard',    'study_glass'],   // #08
+          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed'],    // #09
+          ['study_room',    'living_dining_main',  'open_dining_banquet','double_bed'],    // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #11(櫃間房)
+          ['study_room',    'living_dining_main',  'double_bed',         'study_glass'],   // #12(櫃間房)
+          ['walkin_closet', 'open_dining_banquet', 'living_standard',    'double_bed'],    // #13(櫃間房)
+          ['double_bed',    'open_study_lounge',   'living_standard',    'study_glass'],   // #14(櫃間房)
+          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed']     // #15(櫃間房)
         ],
         '3p': [
-          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // L01
-          ['double_bed',    'open_dining_banquet', 'living_standard',    'single_bed'],    // L02
-          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // L03
-          ['single_bed',    'living_dining_main',  'double_bed',         'living_sea'],    // L04
-          ['single_bed',    'open_study_lounge',   'living_standard',    'bunk_3p'],       // L05
-          ['loft_bed',      'open_study_lounge',   'living_standard',    'double_bed'],    // L06
-          ['single_bed',    'double_bed',          'living_standard',    'study_glass'],   // L07
-          ['walkin_closet', 'living_dining_main',  'single_bed',         'double_bed'],    // L08
-          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // L09
-          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed']     // L10
+          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #01
+          ['double_bed',    'open_dining_banquet', 'living_standard',    'single_bed'],    // #02
+          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #03
+          ['single_bed',    'living_dining_main',  'double_bed',         'living_sea'],    // #04
+          ['single_bed',    'open_study_lounge',   'living_standard',    'bunk_3p'],       // #05
+          ['loft_bed',      'open_study_lounge',   'living_standard',    'double_bed'],    // #06
+          ['single_bed',    'double_bed',          'living_standard',    'study_glass'],   // #07
+          ['walkin_closet', 'living_dining_main',  'single_bed',         'double_bed'],    // #08
+          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #09
+          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed'],    // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #11(櫃間房)
+          ['study_room',    'loft_bed',            'living_standard',    'double_bed'],    // #12(櫃間房)
+          ['single_bed',    'living_dining_main',  'double_bed',         'study_glass'],   // #13(櫃間房)
+          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #14(櫃間房)
+          ['walkin_closet', 'living_dining_main',  'single_bed',         'double_bed']     // #15(櫃間房)
         ],
         '4p': [
-          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // L01
-          ['study_room',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // L02
-          ['bunk_2p',       'open_study_lounge',   'living_standard',    'double_bed'],    // L03
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'study_glass'],   // L04
-          ['walkin_closet', 'living_dining_main',  'double_bed',         'bunk_2p'],       // L05
-          ['study_room',    'bunk_2p',             'living_standard',    'double_bed'],    // L06
-          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // L07
-          ['study_room',    'double_bed',          'single_bed',         'single_bed'],    // L08
-          ['bunk_3p',       'open_dining_banquet', 'living_standard',    'double_bed'],    // L09
-          ['loft_bed',      'loft_bed',            'living_standard',    'double_bed']     // L10
+          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #01
+          ['study_room',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #02
+          ['bunk_2p',       'open_study_lounge',   'living_standard',    'double_bed'],    // #03
+          ['double_bed',    'living_dining_main',  'bunk_2p',            'study_glass'],   // #04
+          ['walkin_closet', 'living_dining_main',  'double_bed',         'bunk_2p'],       // #05
+          ['study_room',    'bunk_2p',             'living_standard',    'double_bed'],    // #06
+          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #07
+          ['study_room',    'double_bed',          'single_bed',         'single_bed'],    // #08
+          ['bunk_3p',       'open_dining_banquet', 'living_standard',    'double_bed'],    // #09
+          ['loft_bed',      'loft_bed',            'living_standard',    'double_bed'],    // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #11(櫃間房)
+          ['study_room',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #12(櫃間房)
+          ['walkin_closet', 'living_dining_main',  'bunk_2p',            'double_bed'],    // #13(櫃間房)
+          ['single_bed',    'loft_bed',            'living_standard',    'double_bed'],    // #14(櫃間房)
+          ['bunk_2p',       'open_study_lounge',   'living_standard',    'double_bed']     // #15(櫃間房)
         ],
         '5p': [
-          // ★ L01 (User Example 1): Side_Room=Double Bed, Hall_1=Bunk Bed (2 kids), Hall_2=Single Bed, Main_Hall=Living/Dining!
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'single_bed'],
-          // ★ L02 (User Example 2): Main_Hall=Split 2 Kid Rooms (2.5ft beds), Hall_2=Double Bed, Side_Room=Single Bed, Hall_1=Living!
-          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'double_bed'],
-          // L03: Main_Hall=3P Family Bunk, Hall_2=Double Bed, Side_Room=Study Room, Hall_1=Living
-          ['study_room',    'bunk_3p',             'living_standard',    'double_bed'],
-          // L04: Hall_1=Double Bed, Hall_2=Bunk Bed (2 kids), Side_Room=Single Bed, Main_Hall=Living/Dining
-          ['single_bed',    'living_dining_main',  'double_bed',         'bunk_2p'],
-          // L05: Side_Room=3P Family Bunk, Hall_2=Double Bed, Main_Hall=Open Study, Hall_1=Living
-          ['bunk_3p',       'open_study_lounge',   'living_standard',    'double_bed'],
-          // L06: Main_Hall=Bunk Bed (2 kids), Side_Room=Single Bed, Hall_2=Double Bed, Hall_1=Living
-          ['single_bed',    'bunk_2p',             'living_standard',    'double_bed'],
-          // L07: Hall_1=Split 2 Kid Rooms (2.5ft beds), Side_Room=Double Bed, Hall_2=Single Bed, Main_Hall=Living/Dining
-          ['double_bed',    'living_dining_main',  'split_2_kid_rooms',  'single_bed'],
-          // L08: Hall_2=3P Family Bunk, Main_Hall=Single Bed, Side_Room=Single Bed, Hall_1=Living
-          ['single_bed',    'single_bed',          'living_standard',    'bunk_3p'],
-          // L09: Side_Room=Bunk Bed (2 kids), Main_Hall=Double Bed, Hall_2=Single Bed, Hall_1=Living
-          ['bunk_2p',       'double_bed',          'living_standard',    'single_bed'],
-          // L10: Main_Hall=Loft Bed, Side_Room=Bunk Bed (2 kids), Hall_2=Double Bed, Hall_1=Living
-          ['bunk_2p',       'loft_bed',            'living_standard',    'double_bed']
+          ['double_bed',    'living_dining_main',  'bunk_2p',            'single_bed'],    // #01
+          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #02
+          ['study_room',    'bunk_3p',             'living_standard',    'double_bed'],    // #03
+          ['single_bed',    'living_dining_main',  'double_bed',         'bunk_2p'],       // #04
+          ['bunk_3p',       'open_study_lounge',   'living_standard',    'double_bed'],    // #05
+          ['single_bed',    'bunk_2p',             'living_standard',    'double_bed'],    // #06
+          ['double_bed',    'living_dining_main',  'split_2_kid_rooms',  'single_bed'],    // #07
+          ['single_bed',    'single_bed',          'living_standard',    'bunk_3p'],       // #08
+          ['bunk_2p',       'double_bed',          'living_standard',    'single_bed'],    // #09
+          ['bunk_2p',       'loft_bed',            'living_standard',    'double_bed'],    // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['double_bed',    'living_dining_main',  'bunk_2p',            'single_bed'],    // #11(櫃間房)
+          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #12(櫃間房)
+          ['study_room',    'bunk_3p',             'living_standard',    'double_bed'],    // #13(櫃間房)
+          ['single_bed',    'living_dining_main',  'double_bed',         'bunk_2p'],       // #14(櫃間房)
+          ['bunk_2p',       'loft_bed',            'living_standard',    'double_bed']     // #15(櫃間房)
         ],
         '6p': [
-          ['single_bed',    'bunk_3p',             'living_standard',    'double_bed'],    // L01
-          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'bunk_3p'],       // L02
-          ['double_bed',    'living_dining_main',  'bunk_3p',            'single_bed'],    // L03
-          ['bunk_2p',       'bunk_3p',             'living_standard',    'single_bed'],    // L04
-          ['bunk_2p',       'double_bed',          'living_standard',    'double_bed'],    // L05
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'bunk_2p'],       // L06
-          ['bunk_3p',       'open_study_lounge',   'living_standard',    'bunk_3p'],       // L07
-          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms',  'double_bed'],    // L08
-          ['bunk_3p',       'double_bed',          'living_standard',    'single_bed'],    // L09
-          ['single_bed',    'single_bed',          'bunk_2p',            'double_bed']     // L10
+          ['single_bed',    'bunk_3p',             'living_standard',    'double_bed'],    // #01
+          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'bunk_3p'],       // #02
+          ['double_bed',    'living_dining_main',  'bunk_3p',            'single_bed'],    // #03
+          ['bunk_2p',       'bunk_3p',             'living_standard',    'single_bed'],    // #04
+          ['bunk_2p',       'double_bed',          'living_standard',    'double_bed'],    // #05
+          ['double_bed',    'living_dining_main',  'bunk_2p',            'bunk_2p'],       // #06
+          ['bunk_3p',       'open_study_lounge',   'living_standard',    'bunk_3p'],       // #07
+          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms',  'double_bed'],    // #08
+          ['bunk_3p',       'double_bed',          'living_standard',    'single_bed'],    // #09
+          ['single_bed',    'single_bed',          'bunk_2p',            'double_bed'],    // #10
+          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
+          ['single_bed',    'bunk_3p',             'living_standard',    'double_bed'],    // #11(櫃間房)
+          ['double_bed',    'living_dining_main',  'bunk_3p',            'single_bed'],    // #12(櫃間房)
+          ['bunk_2p',       'double_bed',          'living_standard',    'double_bed'],    // #13(櫃間房)
+          ['double_bed',    'living_dining_main',  'bunk_2p',            'bunk_2p'],       // #14(櫃間房)
+          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms',  'double_bed']     // #15(櫃間房)
         ]
       };
 
       const groupMatrix = matricesByPeople[pTag] || matricesByPeople['5p'];
-      const chosenCfg = groupMatrix[(L - 1) % 10];
+      const chosenCfg = groupMatrix[(L - 1) % groupMatrix.length];
       buildSideRoom(chosenCfg[0]);
       buildMainHallZone(chosenCfg[1]);
       buildHall1Zone(chosenCfg[2]);
@@ -2296,30 +2505,30 @@
       };
 
       if (prof.is1BR) {
-        if (zoneId === 'main_hall') return box(0, 0, 2350, 3415);
-        if (zoneId === 'hall_1' || zoneId === 'hall_2' || zoneId === 'side_room') return box(0, 3415, 2350, 6165);
-        if (zoneId === 'kitchen') return box(-1415, 1650, 0, 3415);
-        if (zoneId === 'bathroom') return box(-1580, 0, 0, 1650);
+        if (zoneId === 'main_hall') return box(-1120, 0, 2350, 3405);
+        if (zoneId === 'hall_1' || zoneId === 'hall_2' || zoneId === 'side_room') return box(0, 3405, 2350, 6000);
+        if (zoneId === 'kitchen') return box(-1500, 1640, 0, 3405);
+        if (zoneId === 'bathroom') return box(-2765, 0, -1120, 1650);
       } else if (prof.isBay4900) {
-        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(1680, 0, 4900, 3120);
-        if (zoneId === 'hall_1') return box(2000, 3120, 4900, 4425);
-        if (zoneId === 'hall_2') return box(0, 3120, 2000, 5325);
-        if (zoneId === 'kitchen') return box(-385, 0, 1680, 1650);
-        if (zoneId === 'bathroom') return box(0, 1650, 2000, 3120);
+        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(685, 0, 4900, 3280);
+        if (zoneId === 'hall_1') return box(2000, 3280, 4900, 5325);
+        if (zoneId === 'hall_2') return box(0, 3280, 2000, 6225);
+        if (zoneId === 'kitchen') return box(-1380, 0, 685, 1650);
+        if (zoneId === 'bathroom') return box(0, 1725, 2000, 3280);
       } else if (prof.is2BR) {
-        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(0, 0, 2525, 3120);
-        if (zoneId === 'hall_1') return box(0, 3120, 2440, 6165);
-        if (zoneId === 'hall_2') return box(2440, 3120, 4525, 6165);
-        if (zoneId === 'kitchen') return box(2860, 0, 4925, 1650);
-        if (zoneId === 'bathroom') return box(2525, 1650, 4525, 3120);
+        if (zoneId === 'main_hall' || zoneId === 'side_room') return box(0, 0, 3925, 3280);
+        if (zoneId === 'hall_1') return box(0, 3280, 2440, 6165);
+        if (zoneId === 'hall_2') return box(2440, 3280, 4525, 6165);
+        if (zoneId === 'kitchen') return box(3925, 0, 5990, 1650);
+        if (zoneId === 'bathroom') return box(2525, 1725, 4525, 3280);
       } else {
         const sideZ1 = (currentUnitId === 'B15' || currentUnitId === 'A8' || currentUnitId === 'A9') ? 650 : 2500;
-        if (zoneId === 'main_hall') return box(0, 0, 3135, 3250);
+        if (zoneId === 'main_hall') return box(0, 0, 4200, 3335);
         if (zoneId === 'side_room') return box(-2000, sideZ1, 0, sideZ1 + 2150);
         if (zoneId === 'hall_1') return box(0, 3650, 2440, 6815);
-        if (zoneId === 'hall_2') return box(2440, 4720, 4525, 6815);
-        if (zoneId === 'kitchen') return box(3135, 1600, 5200, 3250);
-        if (zoneId === 'bathroom') return box(2525, 3250, 4525, 4720);
+        if (zoneId === 'hall_2') return box(2440, 4805, 4525, 6815);
+        if (zoneId === 'kitchen') return box(3835, 1600, 5900, 3250);
+        if (zoneId === 'bathroom') return box(2525, 3335, 4525, 4805);
       }
       return { minX: -3000, maxX: 6000, minZ: -500, maxZ: 7500, cx: 1800, cz: 3200 };
     }
@@ -2705,15 +2914,21 @@
           : `當前：${currentLay.title}`;
       }
 
-      // Render Row 3: 10 Spatial Layouts (Compact 1-Line Pills)
+      // Render Row 3: 15 Spatial Intervals (#01-#10 Partition Walls + #11-#15 Furniture-as-Partition)
       if (layContainer) {
         layContainer.innerHTML = layouts.map(lay => {
           const isSelected = (!isBareShellActive && selectedLayoutIdx === lay.idx);
+          const isCabRoom = lay.idx >= 11;
           const shortTitle = (lay.title.split(':')[1] || lay.title).trim();
+          const btnStyle = isSelected
+            ? 'bg-amber-500 text-slate-950 border-white font-black shadow'
+            : (isCabRoom
+              ? 'bg-emerald-950/90 border-emerald-400/60 text-emerald-200 hover:border-emerald-300 font-bold'
+              : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-400 font-bold');
           return `
-            <button onclick="selectSpatialLayout(${lay.idx})" title="${lay.title} (${lay.desc})" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${isSelected ? 'bg-amber-500 text-slate-950 border-white font-black shadow' : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-400 font-bold'}">
-              <span class="text-[10px]">#${String(lay.idx).padStart(2,'0')}</span>
-              <span class="text-[10px] max-w-[135px] truncate">${shortTitle}</span>
+            <button onclick="selectSpatialLayout(${lay.idx})" title="${lay.title} (${lay.desc})" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${btnStyle}">
+              <span class="text-[10px]">${isCabRoom ? '✨櫃#' + String(lay.idx).padStart(2,'0') : '#' + String(lay.idx).padStart(2,'0')}</span>
+              <span class="text-[10px] max-w-[140px] truncate">${shortTitle}</span>
             </button>
           `;
         }).join('');
