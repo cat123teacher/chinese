@@ -31,21 +31,23 @@
       height: 100dvh;
       overflow: hidden;
     }
-    /* 3D Layout occupies 80% of screen height on mobile/portrait */
+    /* 3D Layout occupies 88% of screen height on mobile/portrait for maximum view */
     #viewport-stage {
       position: relative;
       width: 100%;
-      height: 80dvh;
-      flex: 1 1 80%;
-      min-height: 55%;
+      height: 88dvh;
+      flex: 1 1 88%;
+      min-height: 65%;
       background: radial-gradient(circle at 50% 42%, #1e293b 0%, #0f172a 100%);
       overflow: hidden;
     }
-    /* Bottom Design Menu occupies 20% of screen height */
+    /* Ultra-compact Bottom Design Menu occupies only 12% of screen height */
     #design-drawer {
       width: 100%;
-      height: 20dvh;
-      flex: 0 0 20dvh;
+      height: 12dvh;
+      min-height: 76px;
+      max-height: 92px;
+      flex: 0 0 auto;
       background: rgba(15, 23, 42, 0.98);
       border-top: 1px solid rgba(245, 158, 11, 0.4);
       display: flex;
@@ -54,8 +56,9 @@
       transition: height 0.22s ease, flex-basis 0.22s ease;
     }
     #design-drawer.drawer-collapsed {
-      height: 40px !important;
-      flex: 0 0 40px !important;
+      height: 38px !important;
+      min-height: 38px !important;
+      flex: 0 0 38px !important;
     }
     #design-drawer.drawer-collapsed #drawer-body {
       display: none !important;
@@ -176,9 +179,18 @@
 
       <!-- Toast Message -->
       <div id="toast-banner" class="hidden absolute top-14 left-1/2 -translate-x-1/2 z-30 glass-pill px-3 py-1 rounded-full text-[11px] font-bold text-emerald-300 border border-emerald-500/40 shadow-lg pointer-events-none"></div>
+
+      <!-- Pop-up Selector Overlay for "人數 / 類別 / 間隔 / 風格" (Only appears when user clicks one of the 4 buttons) -->
+      <div id="template-popup-popover" class="hidden absolute bottom-2 left-2 right-2 z-30 glass-pill p-2.5 rounded-2xl shadow-2xl border border-amber-400/60 pointer-events-auto max-h-[52dvh] flex flex-col gap-2">
+        <div class="flex items-center justify-between border-b border-slate-700/80 pb-1">
+          <span id="tpl-popup-title" class="text-xs font-black text-amber-400">揀選項目</span>
+          <button onclick="closeTemplatePopup()" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-200 text-[10px] font-bold">✕ 關閉</button>
+        </div>
+        <div id="tpl-popup-content" class="overflow-y-auto no-scrollbar flex flex-wrap gap-1.5 py-0.5"></div>
+      </div>
     </div>
 
-    <!-- ==================== 20% ULTRA-COMPACT ICON MENU ==================== -->
+    <!-- ==================== ULTRA-COMPACT BOTTOM MENU ==================== -->
     <div id="design-drawer">
       <!-- Top Icon + 2-Char Tab Strip -->
       <div class="flex items-center justify-between px-1.5 py-1 bg-slate-900 border-b border-slate-800 shrink-0 gap-1 overflow-x-auto no-scrollbar">
@@ -209,39 +221,32 @@
       </div>
 
       <!-- Compact Horizontal Scrollable Drawer Body -->
-      <div id="drawer-body" class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 no-scrollbar">
-        <!-- TAB 1: 4 INDEPENDENT COMPACT ROWS TEMPLATE SELECTION (ALL 4 ROWS VISIBLE AT ONCE) -->
-        <div id="panel-templates" class="h-full flex flex-col justify-between gap-0.5 overflow-y-auto no-scrollbar">
-          <!-- Row 1: ① 人數選行 (People Filter & Bare Shell) -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <span class="text-[9px] font-black text-amber-400 shrink-0 w-11">①人數:</span>
-            <button onclick="applyBareShellTemplate()" id="btn-bare-shell" class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0">🏠清水房</button>
-            <button onclick="filterTemplatesByPeople('2p')" id="pfilt-2p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👫2人</button>
-            <button onclick="filterTemplatesByPeople('3p')" id="pfilt-3p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧3人</button>
-            <button onclick="filterTemplatesByPeople('4p')" id="pfilt-4p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">👨‍👩‍👧‍👦4人</button>
-            <button onclick="filterTemplatesByPeople('5p')" id="pfilt-5p" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow">👨‍👩‍👧‍👦5人</button>
-            <button onclick="filterTemplatesByPeople('6p')" id="pfilt-6p" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0">🏠6人</button>
+      <div id="drawer-body" class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 no-scrollbar flex items-center">
+        <!-- TAB 1: ONLY 4 COMPACT TRIGGER BUTTONS ("人數", "類別", "間隔", "風格") - POP UP ON CLICK -->
+        <div id="panel-templates" class="w-full flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="toggleTemplatePopup('people')" id="tpop-btn-people" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-500/50 text-white text-[11px] font-black flex items-center gap-1 shadow shrink-0 active:scale-95 transition">
+              <span class="text-amber-400">👥人數:</span>
+              <span id="tpop-val-people" class="text-amber-200">5人</span>
+              <span class="text-[9px] text-slate-400">▲</span>
+            </button>
+            <button onclick="toggleTemplatePopup('category')" id="tpop-btn-category" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/50 text-white text-[11px] font-black flex items-center gap-1 shadow shrink-0 active:scale-95 transition">
+              <span class="text-emerald-400">🏘️類別:</span>
+              <span id="tpop-val-category" class="text-emerald-200">居屋實用</span>
+              <span class="text-[9px] text-slate-400">▲</span>
+            </button>
+            <button onclick="toggleTemplatePopup('interval')" id="tpop-btn-interval" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-400/50 text-white text-[11px] font-black flex items-center gap-1 shadow shrink-0 active:scale-95 transition">
+              <span class="text-amber-300">📐間隔:</span>
+              <span id="tpop-val-interval" class="text-white max-w-[115px] sm:max-w-[200px] truncate">#01 側房雙人床</span>
+              <span class="text-[9px] text-slate-400">▲</span>
+            </button>
+            <button onclick="toggleTemplatePopup('style')" id="tpop-btn-style" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-sky-400/50 text-white text-[11px] font-black flex items-center gap-1 shadow shrink-0 active:scale-95 transition">
+              <span class="text-sky-400">🎨風格:</span>
+              <span id="tpop-val-style" class="text-sky-200">01.日系暖木</span>
+              <span class="text-[9px] text-slate-400">▲</span>
+            </button>
           </div>
-          
-          <!-- Row 2: ② 居屋/私樓選行 (HOS / Private Filter + Active Layout Summary) -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <span class="text-[9px] font-black text-emerald-400 shrink-0 w-11">②類別:</span>
-            <button onclick="filterTemplatesByStyle('hos')" id="sfilt-hos" class="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 text-[10px] font-black shrink-0 shadow">🏘️居屋實用</button>
-            <button onclick="filterTemplatesByStyle('priv')" id="sfilt-priv" class="px-2 py-0.5 rounded bg-slate-800 text-sky-300 text-[10px] font-bold shrink-0 border border-sky-500/30">🏙️私樓燈帶</button>
-            <span id="active-layout-summary" class="text-[9px] text-amber-200 font-bold truncate ml-1"></span>
-          </div>
-
-          <!-- Row 3: ③ 15款空間間隔選行 (10款實牆間隔 + 5款免磚牆以櫃間房) -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <span class="text-[9px] font-black text-amber-300 shrink-0 w-11">③間隔:</span>
-            <div id="templates-layouts-row" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
-          </div>
-
-          <!-- Row 4: ④ 10款室內設計風格選行 (10 Design Styles) -->
-          <div class="flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <span class="text-[9px] font-black text-sky-400 shrink-0 w-11">④風格:</span>
-            <div id="templates-styles-row" class="flex items-center gap-1 overflow-x-auto no-scrollbar"></div>
-          </div>
+          <span id="active-layout-summary" class="text-[10px] text-slate-300 font-bold truncate hidden md:inline ml-2"></span>
         </div>
 
         <!-- TAB 2: 24 FLOORS -->
@@ -843,8 +848,8 @@
       { id: 'dec_plant_tree',   cat: 'decor', name: '59. 🌿 室內天堂鳥大型景觀盆栽', w: 460, d: 460, h: 1380, defaultY: 0, color: '#15803d' },
       { id: 'dec_pc_imac',      cat: 'decor', name: '60. 🖥️ 27吋一體式電腦連護眼檯燈', w: 620, d: 260, h: 460, defaultY: 750, color: '#e2e8f0' },
       { id: 'dec_wall_art_nordic',cat:'decor', name: '61. 🖼️ 北歐極簡抽象掛畫(連頂部燈帶)', w: 1100, d: 45, h: 800, defaultY: 1250, color: '#d6cbb9' },
-
-      // --- NEW 2025-2026 PRIVATE HOUSING & HOS SIGNATURE LED-LIT FURNITURE (FROM ATTACHED PHOTOS 1-6) ---
+      // --- NEW 2025-2026 PRIVATE HOUSING & HOS SIGNATURE LED-LIT FURNITURE (FROM ATTACHED PHOTOS 1-6 & PHOTO 2 HALL DISPLAY CABINET) ---
+      { id: 'cab_hall_display_photo',cat:'storage', name: '61B. ✨實景展示收納廳櫃 (頂5格射燈玻璃+三層錯格燈帶架+四門地櫃)', w: 2150, d: 380, h: 2450, color: '#dfd8ce' },
       { id: 'cab_tv_langyu',       cat: 'storage', name: '62. ✨朗譽風・木條子門楣燈帶+雲石格柵懸浮電視牆', w: 2350, d: 380, h: 2480, color: '#d8c5ab' },
       { id: 'cab_tv_curved_niche', cat: 'storage', name: '63. ✨私樓奶油風・圓角內藏燈帶滿牆電視櫃', w: 2250, d: 380, h: 2450, color: '#dfd3c3' },
       { id: 'cab_foyer_lit_shelves',cat:'storage', name: '64. ✨私樓酒店風・多層燈帶開放格+黑框玻璃C字玄關櫃', w: 1450, d: 380, h: 2450, color: '#d5c4ae' },
@@ -1484,7 +1489,98 @@
         return g;
       }
 
+      // ★ PHOTO-ACCURATE HALL DISPLAY & STORAGE CABINET (Matches user's Attached Photo 2 `image_883c48.png` 100%)
+      if (id === 'cab_hall_display_photo') {
+        const stoneMat = new THREE.MeshStandardMaterial({ color: '#64748b', roughness: 0.72 });
+        const smokedGlassMat = new THREE.MeshPhysicalMaterial({ color: '#785a3c', transparent: true, opacity: 0.42, roughness: 0.12 });
+        const warmGlowMat = new THREE.MeshBasicMaterial({ color: '#fde047' });
+        const softWashMat = new THREE.MeshBasicMaterial({ color: '#f59e0b', transparent: true, opacity: 0.36 });
+
+        // Outer carcass & back panel
+        addOutlinedBox(g, w, h, 36, mainMat, 0, h / 2, -d / 2 + 18);
+        addOutlinedBox(g, 36, h, d, mainMat, -w / 2 + 18, h / 2, 0);
+        addOutlinedBox(g, 36, h, d, mainMat,  w / 2 - 18, h / 2, 0);
+        addOutlinedBox(g, w, 40, d, mainMat, 0, h - 20, 0);
+
+        const leftColW = w * 0.21;
+        const rightAreaW = w - leftColW - 54;
+        const rightCenterX = -w / 2 + leftColW + 27 + rightAreaW / 2;
+        const leftCenterX = -w / 2 + 18 + leftColW / 2;
+
+        // 1) Left Tall Smoked-Glass Display Column (0..1920mm) with internal LED strips & glass shelves
+        addOutlinedBox(g, 28, 1920, d - 10, mainMat, -w / 2 + leftColW + 18, 960, 0);
+        addOutlinedBox(g, leftColW - 24, 1860, d - 45, darkMat, leftCenterX, 960, -10);
+        addOutlinedBox(g, leftColW - 16, 1840, 14, smokedGlassMat, leftCenterX, 960, d / 2 - 12);
+        addOutlinedBox(g, 14, 1800, 18, warmGlowMat, leftCenterX - leftColW * 0.38, 960, 10);
+        addOutlinedBox(g, leftColW - 28, 16, d - 50, chromeMat, leftCenterX, 940, 0);
+
+        // 2) Bottom 4-Door White-Oak Storage Base Cabinet (h = 0..760mm on Right 79% width) + Toe-kick LED strip
+        const baseH = 760;
+        addOutlinedBox(g, rightAreaW, baseH - 50, d - 20, mainMat, rightCenterX, (baseH - 50) / 2 + 50, 0);
+        addOutlinedBox(g, rightAreaW - 40, 16, 24, warmGlowMat, rightCenterX, 24, d / 2 - 28); // Toe-kick LED
+        const doorW = (rightAreaW - 24) / 4;
+        for (let i = 0; i < 4; i++) {
+          const dx = rightCenterX - rightAreaW / 2 + 12 + (i + 0.5) * doorW;
+          addOutlinedBox(g, doorW - 8, baseH - 66, 18, mainMat, dx, (baseH - 50) / 2 + 50, d / 2 - 2);
+        }
+
+        // 3) Top 5-Compartment Smoked Glass Display Row with 5 Warm LED Spotlights (h = 1920..2430mm)
+        const topY1 = 1920;
+        const topH = h - topY1 - 24;
+        const boxW = (w - 56) / 5;
+        for (let i = 0; i < 5; i++) {
+          const bx = -w / 2 + 28 + (i + 0.5) * boxW;
+          addOutlinedBox(g, boxW - 10, topH, d - 35, stoneMat, bx, topY1 + topH / 2, -10);
+          addOutlinedBox(g, boxW - 6, topH - 6, 14, smokedGlassMat, bx, topY1 + topH / 2, d / 2 - 8);
+          addOutlinedBox(g, boxW - 22, 12, d - 55, glassMat, bx, topY1 + topH * 0.48, 0);
+          // Warm Ceiling Spotlight Puck + Light Wash inside each of the 5 top glass boxes
+          const puck = new THREE.Mesh(new THREE.CylinderGeometry(36, 42, 14, 18), warmGlowMat);
+          puck.position.set(bx, topY1 + topH - 14, 15);
+          g.add(puck);
+          addOutlinedBox(g, boxW * 0.72, topH * 0.75, 8, softWashMat, bx, topY1 + topH * 0.52, -d / 2 + 44);
+        }
+
+        // 4) Middle 3-Tier Staggered Open Display Shelves with Stone Backpanel, White Accent Cubes & Full-Width LED Strips (h = 760..1920mm)
+        const midY1 = 760;
+        const midH = 1160;
+        const tierH = midH / 3;
+        // Stone-grey textured backwall inside the open niche
+        addOutlinedBox(g, rightAreaW, midH, 22, stoneMat, rightCenterX, midY1 + midH / 2, -d / 2 + 34);
+
+        for (let t = 0; t < 3; t++) {
+          const shelfTopY = midY1 + (t + 1) * tierH;
+          // Sleek black metal horizontal shelf
+          addOutlinedBox(g, rightAreaW, 24, d - 16, darkMat, rightCenterX, shelfTopY, 0);
+          // ★ Bright Warm LED Strip + Backwall Warm Glow Wash under EVERY shelf (just like Photo 2!)
+          addOutlinedBox(g, rightAreaW - 20, 16, 28, warmGlowMat, rightCenterX, shelfTopY - 16, d / 2 - 55);
+          addOutlinedBox(g, rightAreaW - 24, tierH * 0.52, 8, softWashMat, rightCenterX, shelfTopY - tierH * 0.32, -d / 2 + 48);
+        }
+
+        // Staggered White/Wood Box Inserts & Black Vertical Dividers matching Photo 2
+        // Top tier (t=2): White closed box on far right + 2 black vertical dividers
+        addOutlinedBox(g, rightAreaW * 0.25, tierH - 28, d - 28, mainMat, rightCenterX + rightAreaW * 0.36, midY1 + tierH * 2.5, 4);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX - rightAreaW * 0.24, midY1 + tierH * 2.5, 0);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX + rightAreaW * 0.04, midY1 + tierH * 2.5, 0);
+
+        // Middle tier (t=1): White closed box at center-left + 2 black vertical dividers
+        addOutlinedBox(g, rightAreaW * 0.23, tierH - 28, d - 28, mainMat, rightCenterX - rightAreaW * 0.14, midY1 + tierH * 1.5, 4);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX + rightAreaW * 0.15, midY1 + tierH * 1.5, 0);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX + rightAreaW * 0.34, midY1 + tierH * 1.5, 0);
+
+        // Bottom tier (t=0): Open counter with recessed white cube box, twin sockets & black dividers
+        addOutlinedBox(g, rightAreaW * 0.18, tierH - 32, d - 32, whiteMat, rightCenterX + rightAreaW * 0.18, midY1 + tierH * 0.5, 2);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX - rightAreaW * 0.32, midY1 + tierH * 0.5, 0);
+        addOutlinedBox(g, 20, tierH - 28, d - 35, darkMat, rightCenterX - rightAreaW * 0.08, midY1 + tierH * 0.5, 0);
+        // Wall power sockets in lower niche
+        addOutlinedBox(g, 90, 50, 12, whiteMat, rightCenterX - rightAreaW * 0.2, midY1 + 110, -d / 2 + 48);
+        addOutlinedBox(g, 90, 50, 12, whiteMat, rightCenterX + rightAreaW * 0.36, midY1 + 110, -d / 2 + 48);
+        return g;
+      }
+
       if (cat === 'storage' || id === 'cab_dining_pullout') {
+        const warmGlowMat = new THREE.MeshBasicMaterial({ color: '#fde047' });
+        const softWashMat = new THREE.MeshBasicMaterial({ color: '#f59e0b', transparent: true, opacity: 0.34 });
+
         addOutlinedBox(g, w, h, d, mainMat, 0, h / 2, 0);
         // Cabinet door panel seams & long handles
         const doors = Math.max(2, Math.round(w / 480));
@@ -1494,20 +1590,43 @@
           const isGlassDoor = (id.includes('foyer') || id.includes('full') || id.includes('1800')) && (i === doors - 1);
           addOutlinedBox(g, dw - 10, h * 0.88, 18, isGlassDoor ? glassMat : mainMat, dx, h * 0.5, d / 2 + 8);
           addOutlinedBox(g, 16, Math.min(360, h * 0.28), 24, goldMat, dx + (i % 2 === 0 ? dw * 0.34 : -dw * 0.34), h * 0.5, d / 2 + 22);
+          if (isGlassDoor) {
+            // Vertical internal LED strip + glowing display shelves inside glass cabinet door
+            addOutlinedBox(g, 14, h * 0.82, 16, warmGlowMat, dx + dw * 0.36, h * 0.5, d / 2 - 8);
+            [0.32, 0.52, 0.72].forEach(ry => {
+              addOutlinedBox(g, dw - 24, 14, 24, warmGlowMat, dx, h * ry, d / 2 - 6);
+            });
+          }
         }
-        // Embedded warm LED light strip
-        addOutlinedBox(g, w - 40, 20, 26, ledMat, 0, h > 1000 ? h * 0.52 : h - 22, d / 2 + 12);
+        // ★ Multi-tier Embedded Warm LED Light Strips (Top Crown LED + Mid Niche LED + Toe-Kick Floor LED + Warm Glow Wash)
+        addOutlinedBox(g, w - 32, 18, 28, warmGlowMat, 0, h - 24, d / 2 + 12);
+        addOutlinedBox(g, w - 32, 18, 28, warmGlowMat, 0, h > 1000 ? h * 0.52 : h * 0.48, d / 2 + 12);
+        addOutlinedBox(g, w - 40, Math.min(180, h * 0.14), 8, softWashMat, 0, h > 1000 ? h * 0.45 : h * 0.35, d / 2 + 11);
+        if (h > 900) {
+          addOutlinedBox(g, w - 36, 16, 26, warmGlowMat, 0, 22, d / 2 + 10); // Bottom Toe-kick LED strip
+          // Top recessed LED spotlights across tall cabinets
+          const spotCount = Math.max(2, Math.min(5, Math.round(w / 450)));
+          for (let s = 0; s < spotCount; s++) {
+            const sx = -w / 2 + (s + 0.5) * (w / spotCount);
+            const puck = new THREE.Mesh(new THREE.CylinderGeometry(28, 32, 12, 16), warmGlowMat);
+            puck.position.set(sx, h - 55, d / 2 + 12);
+            g.add(puck);
+          }
+        }
 
         if (id === 'cab_tv_langyu' || id === 'cab_tv_curved_niche' || id === 'cab_tv_full_2400') {
           addOutlinedBox(g, Math.min(1420, w * 0.65), 820, 48, darkMat, 0, 1280, d / 2 + 26);
-          addOutlinedBox(g, w - 30, 22, 35, ledMat, 0, 1750, d / 2 + 18);
-          addOutlinedBox(g, w - 30, 22, 35, ledMat, 0, 420, d / 2 + 18);
+          addOutlinedBox(g, w - 30, 22, 35, warmGlowMat, 0, 1750, d / 2 + 18);
+          addOutlinedBox(g, w - 30, 22, 35, warmGlowMat, 0, 820, d / 2 + 18);
+          addOutlinedBox(g, w - 30, 22, 35, warmGlowMat, 0, 420, d / 2 + 18);
         }
         if (id === 'cab_dining_pullout') {
           // Wall-hugging Retractable Dining Table Cabinet (Tucked neatly against wall so corridor is 100% clear)
           const baseCabD = Math.min(420, d * 0.45);
           addOutlinedBox(g, w, h, baseCabD, mainMat, 0, h / 2, -d / 2 + baseCabD / 2);
-          addOutlinedBox(g, w - 40, 20, 28, ledMat, 0, 1180, -d / 2 + baseCabD + 8);
+          addOutlinedBox(g, w - 36, 20, 28, warmGlowMat, 0, 1620, -d / 2 + baseCabD + 8);
+          addOutlinedBox(g, w - 36, 20, 28, warmGlowMat, 0, 1180, -d / 2 + baseCabD + 8);
+          addOutlinedBox(g, w - 40, 220, 8, softWashMat, 0, 1380, -d / 2 + baseCabD + 4);
           // Pull-out leaf table (semi-extended 680mm with support leg & 2 tucked stools)
           const leafW = w * 0.76;
           const leafD = Math.min(720, d - baseCabD);
@@ -1802,18 +1921,18 @@
       if (isBareShellActive || tplId === 'tpl_00') return items;
 
       const foyerCabId = isPrivateStyle ? 'cab_foyer_lit_shelves' : 'cab_c_foyer_1200';
-      const tvWallId = isPrivateStyle ? (styleObj.tvType === 'langyu' ? 'cab_tv_langyu' : 'cab_tv_curved_niche') : 'cab_tv_full_2400';
+      const tvWallId = (L % 2 === 0) ? 'cab_hall_display_photo' : (isPrivateStyle ? (styleObj.tvType === 'langyu' ? 'cab_tv_langyu' : 'cab_tv_curved_niche') : 'cab_tv_full_2400');
       const mainSofaId = isPrivateStyle ? 'sofa_boucle_cream' : 'sofa_3seat_2100';
       const mainPlatId = isPrivateStyle ? 'plat_steps_led' : 'plat_storage_2000';
       // ★ Intervals #11..#15 use ZERO brick walls! All room divisions are formed by wardrobes/cabinets/shelving!
       const isFurnPartitionMode = (L >= 11);
 
-      // Helper: Add either a Brick Partition Wall (for L=1..10) OR a Full-Height Double-Sided Wardrobe / Display Cabinet Partition (for L=11..15)
+      // Helper: Add either a Brick Partition Wall (for L=1..10) OR a Full-Height Double-Sided Wardrobe / Photo 2 Display Hall Cabinet Partition (for L=11..15)
       const pushPartitionOrCabinet = (x, z, rot, lengthMM, useGlassOrSlat = false) => {
         if (!isFurnPartitionMode) {
           pushItem('part_brick_100', x, z, rot, lengthMM, 100, 2550);
         } else if (useGlassOrSlat) {
-          pushItem('cab_c_foyer_1600', x, z, rot, lengthMM, 340, 2450, cabColor);
+          pushItem('cab_hall_display_photo', x, z, rot, lengthMM, 360, 2450, cabColor);
         } else {
           pushItem('cab_wardrobe_wall', x, z, rot, lengthMM, 460, 2480, cabColor);
         }
@@ -1832,8 +1951,8 @@
         const wardRot = bedOnRight ? 90 : -90;
 
         if (isFurnPartitionMode) {
-          // Intervals #11-#15: Use Double-Sided Wardrobe / Full TV Cabinet + Pocket Door to divide sleeping zone (NO brick walls!)
-          pushItem('cab_wardrobe_wall', bedOnRight ? 1600 : 750, 4180, 0, 1420, 480, 2480, cabColor);
+          // Intervals #11-#15: Use Photo 2 Multi-LED Display & Storage Hall Cabinet + Pocket Door to divide sleeping zone (NO brick walls!)
+          pushItem('cab_hall_display_photo', bedOnRight ? 1600 : 750, 4180, 0, 1420, 380, 2450, cabColor);
           pushItem('door_pocket_slide', bedOnRight ? 460 : 1880, 4180, 0, 820, 90, 2150);
         } else if (L <= 3) {
           pushItem('part_glass_3slide', 1175, 4200, 0, 2250, 80, 2500);
@@ -1905,12 +2024,12 @@
           }
           if (type === 'open_study') {
             if (isFurnPartitionMode) {
-              pushItem('cab_c_foyer_1600', 690, 2950, 0, 1380, 360, 2450, cabColor);
+              pushItem('cab_hall_display_photo', 690, 2950, 0, 1380, 360, 2450, cabColor);
             } else {
               pushItem('part_glass_3slide', 690, 2950, 0, 1380, 80, 2500);
             }
             pushItem('desk_study_double', 680, 420, 0, 1280, 540, 750, cabColor);
-            pushItem('cab_wardrobe_1800', 320, 1720, 90, 1650, 540, 2400, cabColor);
+            pushItem('cab_hall_display_photo', 320, 1720, 90, 1650, 380, 2450, cabColor);
             return;
           }
           // Enclosed room in Zone A (X=0..1360, Z=0..2950) -> Main Entrance Door at X=1520..2440 is 100% unobstructed!
@@ -2086,13 +2205,19 @@
         }
         if (mode === 'open_study_lounge') {
           if (isFurnPartitionMode) {
-            pushItem('cab_c_foyer_1600', 700, 2350, 0, 1380, 360, 2450, cabColor);
+            pushItem('cab_hall_display_photo', 700, 2350, 0, 1380, 360, 2450, cabColor);
           } else {
             pushItem('part_wood_slat', 700, 2350, 0, 1380, 80, 2500);
           }
           pushItem('desk_study_double', 700, 420, 0, 1320, 540, 750, cabColor);
-          pushItem('cab_wall_hang_1800', 700, 220, 0, 1320, 350, 650, cabColor, 1750);
-          pushItem('dec_plant_tree', 350, 1850, 0);
+          pushItem('cab_hall_display_photo', 320, 1420, 90, 1550, 360, 2450, cabColor);
+          pushItem('dec_plant_tree', 350, 2150, 0);
+          return;
+        }
+        if (mode === 'open_dining_banquet') {
+          pushItem('cab_hall_display_photo', 360, 980, 90, 1550, 380, 2450, cabColor);
+          pushItem('cab_dining_pullout', 420, 2180, 90, 1350, 760, 2400, cabColor);
+          pushItem('light_dining_bar', 680, 2180, 90, 1050, 120, 280, '#ca8a04', 2150);
           return;
         }
         if (mode === 'open_dining_banquet') {
@@ -2214,126 +2339,87 @@
         }
       };
 
-      // =========================================================================
-      // DISPATCH 15 DISTINCT SPATIAL MATRICES FOR EACH HOUSEHOLD SIZE (2P..6P)
-      // #01..#10: Standard Partition Intervals | #11..#15: ZERO-BRICK-WALL Furniture-Partition Intervals
-      // Format: [Side_Room, Main_Hall_TopLeft, Hall_1_BottomLeft, Hall_2_BottomRight]
-      // =========================================================================
-      const matricesByPeople = {
+      const map3BRByPeople = {
         '2p': [
-          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #01
-          ['double_bed',    'open_dining_banquet', 'living_standard',    'study_glass'],   // #02
-          ['study_room',    'living_dining_main',  'double_bed',         'walkin_closet'], // #03
-          ['study_room',    'double_bed',          'living_standard',    'living_sea'],    // #04
-          ['walkin_closet', 'open_dining_banquet', 'living_standard',    'double_bed'],    // #05
-          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #06
-          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #07
-          ['double_bed',    'open_study_lounge',   'living_standard',    'study_glass'],   // #08
-          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed'],    // #09
-          ['study_room',    'living_dining_main',  'open_dining_banquet','double_bed'],    // #10
-          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
-          ['walkin_closet', 'open_study_lounge',   'living_standard',    'double_bed'],    // #11(櫃間房)
-          ['study_room',    'living_dining_main',  'double_bed',         'study_glass'],   // #12(櫃間房)
-          ['walkin_closet', 'open_dining_banquet', 'living_standard',    'double_bed'],    // #13(櫃間房)
-          ['double_bed',    'open_study_lounge',   'living_standard',    'study_glass'],   // #14(櫃間房)
-          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed']     // #15(櫃間房)
+          ['walkin_closet', 'open_study_lounge',   'living_standard', 'double_bed'],
+          ['double_bed',    'open_dining_banquet', 'living_standard', 'study_glass'],
+          ['study_room',    'open_dining_banquet', 'double_bed',      'living_sea'],
+          ['study_room',    'double_bed',          'living_standard', 'living_sea'],
+          ['walkin_closet', 'open_dining_banquet', 'living_standard', 'double_bed'],
+          ['single_bed',    'open_study_lounge',   'living_standard', 'double_bed'],
+          ['walkin_closet', 'open_study_lounge',   'living_standard', 'double_bed'],
+          ['double_bed',    'open_study_lounge',   'living_standard', 'study_glass'],
+          ['single_bed',    'open_dining_banquet', 'living_standard', 'double_bed'],
+          ['study_room',    'living_dining_main',  'living_standard', 'double_bed']
         ],
         '3p': [
-          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #01
-          ['double_bed',    'open_dining_banquet', 'living_standard',    'single_bed'],    // #02
-          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #03
-          ['single_bed',    'living_dining_main',  'double_bed',         'living_sea'],    // #04
-          ['single_bed',    'open_study_lounge',   'living_standard',    'bunk_3p'],       // #05
-          ['loft_bed',      'open_study_lounge',   'living_standard',    'double_bed'],    // #06
-          ['single_bed',    'double_bed',          'living_standard',    'study_glass'],   // #07
-          ['walkin_closet', 'living_dining_main',  'single_bed',         'double_bed'],    // #08
-          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #09
-          ['single_bed',    'open_dining_banquet', 'living_standard',    'double_bed'],    // #10
-          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
-          ['single_bed',    'open_study_lounge',   'living_standard',    'double_bed'],    // #11(櫃間房)
-          ['study_room',    'loft_bed',            'living_standard',    'double_bed'],    // #12(櫃間房)
-          ['single_bed',    'living_dining_main',  'double_bed',         'study_glass'],   // #13(櫃間房)
-          ['study_room',    'single_bed',          'living_standard',    'double_bed'],    // #14(櫃間房)
-          ['walkin_closet', 'living_dining_main',  'single_bed',         'double_bed']     // #15(櫃間房)
+          ['single_bed',    'open_study_lounge',   'living_standard', 'double_bed'],
+          ['double_bed',    'open_dining_banquet', 'living_standard', 'single_bed'],
+          ['study_room',    'single_bed',          'living_standard', 'double_bed'],
+          ['single_bed',    'open_dining_banquet', 'double_bed',      'living_sea'],
+          ['single_bed',    'open_study_lounge',   'living_standard', 'bunk_3p'],
+          ['loft_bed',      'open_study_lounge',   'living_standard', 'double_bed'],
+          ['single_bed',    'double_bed',          'living_standard', 'study_glass'],
+          ['walkin_closet', 'living_dining_main',  'single_bed',      'double_bed'],
+          ['study_room',    'single_bed',          'living_standard', 'double_bed'],
+          ['single_bed',    'open_dining_banquet', 'living_standard', 'double_bed']
         ],
         '4p': [
-          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #01
-          ['study_room',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #02
-          ['bunk_2p',       'open_study_lounge',   'living_standard',    'double_bed'],    // #03
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'study_glass'],   // #04
-          ['walkin_closet', 'living_dining_main',  'double_bed',         'bunk_2p'],       // #05
-          ['study_room',    'bunk_2p',             'living_standard',    'double_bed'],    // #06
-          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #07
-          ['study_room',    'double_bed',          'single_bed',         'single_bed'],    // #08
-          ['bunk_3p',       'open_dining_banquet', 'living_standard',    'double_bed'],    // #09
-          ['loft_bed',      'loft_bed',            'living_standard',    'double_bed'],    // #10
-          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
-          ['single_bed',    'single_bed',          'living_standard',    'double_bed'],    // #11(櫃間房)
-          ['study_room',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #12(櫃間房)
-          ['walkin_closet', 'living_dining_main',  'bunk_2p',            'double_bed'],    // #13(櫃間房)
-          ['single_bed',    'loft_bed',            'living_standard',    'double_bed'],    // #14(櫃間房)
-          ['bunk_2p',       'open_study_lounge',   'living_standard',    'double_bed']     // #15(櫃間房)
+          ['single_bed',    'single_bed',          'living_standard', 'double_bed'],
+          ['study_room',    'split_2_kid_rooms',   'living_standard', 'double_bed'],
+          ['bunk_2p',       'open_study_lounge',   'living_standard', 'double_bed'],
+          ['double_bed',    'open_dining_banquet', 'bunk_2p',         'study_glass'],
+          ['walkin_closet', 'living_dining_main',  'double_bed',      'bunk_2p'],
+          ['study_room',    'bunk_2p',             'living_standard', 'double_bed'],
+          ['single_bed',    'single_bed',          'living_standard', 'double_bed'],
+          ['study_room',    'double_bed',          'single_bed',      'single_bed'],
+          ['bunk_3p',       'open_dining_banquet', 'living_standard', 'double_bed'],
+          ['loft_bed',      'loft_bed',            'living_standard', 'double_bed']
         ],
         '5p': [
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'single_bed'],    // #01
-          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #02
-          ['study_room',    'bunk_3p',             'living_standard',    'double_bed'],    // #03
-          ['single_bed',    'living_dining_main',  'double_bed',         'bunk_2p'],       // #04
-          ['bunk_3p',       'open_study_lounge',   'living_standard',    'double_bed'],    // #05
-          ['single_bed',    'bunk_2p',             'living_standard',    'double_bed'],    // #06
-          ['double_bed',    'living_dining_main',  'split_2_kid_rooms',  'single_bed'],    // #07
-          ['single_bed',    'single_bed',          'living_standard',    'bunk_3p'],       // #08
-          ['bunk_2p',       'double_bed',          'living_standard',    'single_bed'],    // #09
-          ['bunk_2p',       'loft_bed',            'living_standard',    'double_bed'],    // #10
-          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'single_bed'],    // #11(櫃間房)
-          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'double_bed'],    // #12(櫃間房)
-          ['study_room',    'bunk_3p',             'living_standard',    'double_bed'],    // #13(櫃間房)
-          ['single_bed',    'living_dining_main',  'double_bed',         'bunk_2p'],       // #14(櫃間房)
-          ['bunk_2p',       'loft_bed',            'living_standard',    'double_bed']     // #15(櫃間房)
+          ['double_bed',    'living_dining_main',  'bunk_2p',           'single_bed'],
+          ['single_bed',    'split_2_kid_rooms',   'living_standard',   'double_bed'],
+          ['study_room',    'bunk_3p',             'living_standard',   'double_bed'],
+          ['single_bed',    'living_dining_main',  'double_bed',        'bunk_2p'],
+          ['bunk_3p',       'open_study_lounge',   'living_standard',   'double_bed'],
+          ['single_bed',    'bunk_2p',             'living_standard',   'double_bed'],
+          ['double_bed',    'living_dining_main',  'split_2_kid_rooms', 'single_bed'],
+          ['single_bed',    'single_bed',          'living_standard',   'bunk_3p'],
+          ['bunk_2p',       'double_bed',          'living_standard',   'single_bed'],
+          ['bunk_2p',       'loft_bed',            'living_standard',   'double_bed']
         ],
         '6p': [
-          ['single_bed',    'bunk_3p',             'living_standard',    'double_bed'],    // #01
-          ['single_bed',    'split_2_kid_rooms',   'living_standard',    'bunk_3p'],       // #02
-          ['double_bed',    'living_dining_main',  'bunk_3p',            'single_bed'],    // #03
-          ['bunk_2p',       'bunk_3p',             'living_standard',    'single_bed'],    // #04
-          ['bunk_2p',       'double_bed',          'living_standard',    'double_bed'],    // #05
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'bunk_2p'],       // #06
-          ['bunk_3p',       'open_study_lounge',   'living_standard',    'bunk_3p'],       // #07
-          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms',  'double_bed'],    // #08
-          ['bunk_3p',       'double_bed',          'living_standard',    'single_bed'],    // #09
-          ['single_bed',    'single_bed',          'bunk_2p',            'double_bed'],    // #10
-          // ★ #11..#15: ZERO-BRICK-WALL Furniture-as-Partition Intervals
-          ['single_bed',    'bunk_3p',             'living_standard',    'double_bed'],    // #11(櫃間房)
-          ['double_bed',    'living_dining_main',  'bunk_3p',            'single_bed'],    // #12(櫃間房)
-          ['bunk_2p',       'double_bed',          'living_standard',    'double_bed'],    // #13(櫃間房)
-          ['double_bed',    'living_dining_main',  'bunk_2p',            'bunk_2p'],       // #14(櫃間房)
-          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms',  'double_bed']     // #15(櫃間房)
+          ['single_bed',    'bunk_3p',             'living_standard',   'double_bed'],
+          ['single_bed',    'split_2_kid_rooms',   'living_standard',   'bunk_3p'],
+          ['double_bed',    'living_dining_main',  'bunk_3p',           'single_bed'],
+          ['bunk_2p',       'bunk_3p',             'living_standard',   'single_bed'],
+          ['bunk_2p',       'double_bed',          'living_standard',   'double_bed'],
+          ['double_bed',    'living_dining_main',  'bunk_2p',           'bunk_2p'],
+          ['bunk_3p',       'open_study_lounge',   'living_standard',   'bunk_3p'],
+          ['bunk_2p',       'living_dining_main',  'split_2_kid_rooms', 'double_bed'],
+          ['bunk_3p',       'double_bed',          'living_standard',   'single_bed'],
+          ['single_bed',    'single_bed',          'bunk_2p',           'double_bed']
         ]
       };
 
-      const groupMatrix = matricesByPeople[pTag] || matricesByPeople['5p'];
-      const chosenCfg = groupMatrix[(L - 1) % groupMatrix.length];
-      buildSideRoom(chosenCfg[0]);
-      buildMainHallZone(chosenCfg[1]);
-      buildHall1Zone(chosenCfg[2]);
-      buildHall2Zone(chosenCfg[3]);
-
+      const pList3BR = map3BRByPeople[pTag] || map3BRByPeople['5p'];
+      const cfg3 = pList3BR[(L - 1) % pList3BR.length];
+      buildSideRoom(cfg3[0]);
+      buildMainHallZone(cfg3[1]);
+      buildHall1Zone(cfg3[2]);
+      buildHall2Zone(cfg3[3]);
       return items;
     }
 
-    // =========================================================================
-    // 11. UNIT SWITCHING, TEMPLATE APPLICATION & FURNITURE SPAWNING
-    // =========================================================================
     function getTargetWallHeightMM() {
       if (wallHeightMode === 'full') return 2550;
       if (wallHeightMode === 'low') return 420;
-      return 1250;
+      return 1280;
     }
 
     function spawnFurnitureMesh(itemData) {
       const mesh = buildDetailedItemMesh(itemData);
-      mesh.position.set(itemData.x, itemData.y || 0, itemData.z);
+      mesh.position.set(itemData.x || 0, itemData.y || 0, itemData.z || 0);
       mesh.rotation.y = THREE.MathUtils.degToRad(itemData.rot || 0);
       mesh.userData = { isFurnitureRoot: true, uid: itemData.uid };
       furnitureGroup.add(mesh);
@@ -2347,7 +2433,7 @@
       if (!base) return;
       const b = getZoneBounds(currentFocusZone === 'all' ? 'main_hall' : currentFocusZone);
       const newItem = {
-        uid: 'it_' + Date.now() + '_' + Math.floor(Math.random() * 999),
+        uid: 'it_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
         id: base.id,
         name: base.name,
         cat: base.cat,
@@ -2362,20 +2448,19 @@
       };
       const entry = spawnFurnitureMesh(newItem);
       applyCurrentWallHeightToStructure();
-      applyZoneIsolationVisuals();
-      selectItem(entry, true); // Newly added item comes with move mode armed for convenience
+      selectItem(entry, true);
       updateBomList();
-      showToast(`✅ 已新增「${base.name.replace(/^\d+\.\s*/, '')}」(可直接拖動擺位)`);
+      showToast(`✨ 已加入「${base.name.replace(/^\d+[A-Z]?\.\s*/, '')}」，可直接拖動擺位！`);
     }
 
     function applyTemplate(tplId) {
-      currentTemplateId = tplId;
-      isBareShellActive = (tplId === 'tpl_00');
-      const styleObj = TEN_DESIGN_STYLES[(selectedStyleIdx - 1) % TEN_DESIGN_STYLES.length] || TEN_DESIGN_STYLES[0];
+      currentTemplateId = tplId || 'tpl_01';
+      deselectItem();
 
+      const styleObj = TEN_DESIGN_STYLES[(selectedStyleIdx - 1) % TEN_DESIGN_STYLES.length] || TEN_DESIGN_STYLES[0];
       ['main_hall', 'hall_1', 'hall_2', 'side_room'].forEach(z => {
-        zoneFloorAssignment[z] = isBareShellActive ? 'f_oak_nat' : styleObj.floor;
-        zoneWallAssignment[z] = isBareShellActive ? 'w_ivory' : styleObj.wall;
+        zoneFloorAssignment[z] = styleObj.floor;
+        zoneWallAssignment[z] = styleObj.wall;
       });
       zoneFloorAssignment.kitchen = 'f_slate_dk';
       zoneFloorAssignment.bathroom = 'f_slate_dk';
@@ -2383,26 +2468,184 @@
       zoneWallAssignment.bathroom = 'w_tile_bath';
 
       clearAndBuildUnitStructure(currentUnitId);
-
-      deselectItem();
       while (furnitureGroup.children.length) furnitureGroup.remove(furnitureGroup.children[0]);
       placedFurniture = [];
 
-      const items = getItemsForUnitAndTemplate(currentUnitId, tplId);
+      const items = getItemsForUnitAndTemplate(currentUnitId, currentTemplateId);
       items.forEach(it => spawnFurnitureMesh(it));
 
       applyCurrentWallHeightToStructure();
       applyZoneIsolationVisuals();
       renderTemplatesGrid();
       updateBomList();
+    }
 
-      if (isBareShellActive) {
-        showToast(`🏠 已切換至「交樓標準清水房」(${UNIT_META[currentUnitId].name})`);
-      } else {
+    // =========================================================================
+    // 15. UI RENDERERS FOR COMPACT POP-UP TEMPLATE SELECTOR & DRAWER
+    // =========================================================================
+    let activeTemplatePopupType = null; // 'people' | 'category' | 'interval' | 'style' | null
+
+    function switchMainTab(tab) {
+      closeTemplatePopup();
+      ['templates', 'floors', 'walls', 'furniture', 'appliances', 'lighting', 'bom'].forEach(t => {
+        document.getElementById('tab-btn-' + t).classList.toggle('nav-tab-active', t === tab);
+        document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
+      });
+      const drawer = document.getElementById('design-drawer');
+      if (drawer.classList.contains('drawer-collapsed')) {
+        drawer.classList.remove('drawer-collapsed');
+        document.getElementById('btn-collapse-drawer').textContent = '▼';
+        setTimeout(onWindowResize, 250);
+      }
+    }
+
+    function toggleDrawerCollapse() {
+      closeTemplatePopup();
+      const drawer = document.getElementById('design-drawer');
+      const collapsed = drawer.classList.toggle('drawer-collapsed');
+      document.getElementById('btn-collapse-drawer').textContent = collapsed ? '▲展開' : '▼';
+      setTimeout(onWindowResize, 250);
+    }
+
+    function closeTemplatePopup() {
+      activeTemplatePopupType = null;
+      const pop = document.getElementById('template-popup-popover');
+      if (pop) pop.classList.add('hidden');
+    }
+
+    function toggleTemplatePopup(type) {
+      const pop = document.getElementById('template-popup-popover');
+      if (!pop) return;
+      if (activeTemplatePopupType === type && !pop.classList.contains('hidden')) {
+        closeTemplatePopup();
+        return;
+      }
+      activeTemplatePopupType = type;
+      pop.classList.remove('hidden');
+      renderTemplatePopupContent();
+    }
+
+    function renderTemplatePopupContent() {
+      const pop = document.getElementById('template-popup-popover');
+      const titleEl = document.getElementById('tpl-popup-title');
+      const contentEl = document.getElementById('tpl-popup-content');
+      if (!pop || !contentEl || !activeTemplatePopupType) return;
+
+      if (activeTemplatePopupType === 'people') {
+        titleEl.textContent = '① 揀選居住人數 (或交樓標準清水房)';
+        const pList = [
+          { id: 'bare', label: '🏠 交樓標準清水房', isBare: true },
+          { id: '2p',   label: '👫 2人世界' },
+          { id: '3p',   label: '👨‍👩‍👧 3人小家庭' },
+          { id: '4p',   label: '👨‍👩‍👧‍👦 4人核心家庭' },
+          { id: '5p',   label: '👨‍👩‍👧‍👦 5人大家庭' },
+          { id: '6p',   label: '🏠 6人三代同堂' }
+        ];
+        contentEl.innerHTML = pList.map(p => {
+          const active = p.isBare ? isBareShellActive : (!isBareShellActive && activePeopleFilter === p.id);
+          const clickCall = p.isBare
+            ? `applyBareShellTemplate();closeTemplatePopup()`
+            : `filterTemplatesByPeople('${p.id}');closeTemplatePopup()`;
+          return `
+            <button onclick="${clickCall}" class="px-3 py-1.5 rounded-xl border text-xs font-black transition ${active ? 'bg-amber-500 text-slate-950 border-white shadow' : 'bg-slate-900 text-slate-200 border-slate-700 hover:border-amber-400'}">
+              ${p.label}
+            </button>
+          `;
+        }).join('');
+      } else if (activeTemplatePopupType === 'category') {
+        titleEl.textContent = '② 揀選屋苑設計類別 (居屋實用 / 私樓多層燈帶風)';
+        const cats = [
+          { id: 'hos',  label: '🏘️ 居屋實用設計 (15款間隔 × 10款風格)' },
+          { id: 'priv', label: '🏙️ 私樓燈帶設計 (附圖實景展示廳櫃 + 多層燈帶)' }
+        ];
+        contentEl.innerHTML = cats.map(c => {
+          const active = (!isBareShellActive && activeStyleFilter === c.id);
+          return `
+            <button onclick="filterTemplatesByStyle('${c.id}');closeTemplatePopup()" class="px-3 py-2 rounded-xl border text-xs font-black transition ${active ? 'bg-emerald-400 text-slate-950 border-white shadow' : 'bg-slate-900 text-slate-200 border-slate-700 hover:border-emerald-400'}">
+              ${c.label}
+            </button>
+          `;
+        }).join('');
+      } else if (activeTemplatePopupType === 'interval') {
+        titleEl.textContent = `③ 揀選空間間隔方案 (${activePeopleFilter.toUpperCase()}・共15款：#01-#10實牆間隔 / #11-#15免磚牆以櫃間房)`;
         const layouts = SPATIAL_LAYOUTS_BY_PEOPLE[activePeopleFilter] || SPATIAL_LAYOUTS_BY_PEOPLE['5p'];
-        const layObj = layouts[(selectedLayoutIdx - 1) % layouts.length];
-        const estLabel = activeStyleFilter === 'priv' ? '私樓' : '居屋';
-        showToast(`✨ 已套用【${estLabel}・${activePeopleFilter.toUpperCase()}】${layObj.title.split(':')[0]} ➔ 風格${styleObj.num}:${styleObj.name}`);
+        contentEl.innerHTML = layouts.map(lay => {
+          const isSelected = (!isBareShellActive && selectedLayoutIdx === lay.idx);
+          const isCabRoom = lay.idx >= 11;
+          const badge = isCabRoom ? `✨櫃#${String(lay.idx).padStart(2, '0')}` : `#${String(lay.idx).padStart(2, '0')}`;
+          const shortTitle = (lay.title.split(':')[1] || lay.title).trim();
+          const btnStyle = isSelected
+            ? 'bg-amber-500 text-slate-950 border-white font-black shadow'
+            : (isCabRoom
+              ? 'bg-emerald-950/90 border-emerald-400/60 text-emerald-200 hover:border-emerald-300 font-bold'
+              : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-400 font-bold');
+          return `
+            <button onclick="selectSpatialLayout(${lay.idx});closeTemplatePopup()" class="w-full sm:w-[48%] px-2.5 py-1.5 rounded-xl border text-left transition flex flex-col gap-0.5 ${btnStyle}">
+              <div class="text-[11px] flex items-center gap-1">
+                <span class="px-1.5 py-0.2 rounded bg-black/25 text-[10px]">${badge}</span>
+                <span class="truncate">${shortTitle}</span>
+              </div>
+              <div class="text-[9px] opacity-80 truncate">${lay.desc}</div>
+            </button>
+          `;
+        }).join('');
+      } else if (activeTemplatePopupType === 'style') {
+        titleEl.textContent = '④ 揀選室內設計風格 (共10款配色與廳櫃燈帶配搭)';
+        contentEl.innerHTML = TEN_DESIGN_STYLES.map((st, idx) => {
+          const sNum = idx + 1;
+          const isSelected = (!isBareShellActive && selectedStyleIdx === sNum);
+          return `
+            <button onclick="selectInteriorStyle(${sNum});closeTemplatePopup()" class="px-3 py-1.5 rounded-xl border text-left transition flex items-center gap-1.5 ${isSelected ? 'bg-sky-400 text-slate-950 border-white font-black shadow' : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-sky-400 font-bold'}">
+              <span class="w-3.5 h-3.5 rounded-full border border-white/60 shrink-0" style="background:${st.cabHex}"></span>
+              <span class="text-xs">${st.num}. ${st.name}</span>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+
+    function filterTemplatesByStyle(sTag) {
+      activeStyleFilter = (sTag === 'priv') ? 'priv' : 'hos';
+      isBareShellActive = false;
+      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
+    }
+
+    function filterTemplatesByPeople(pTag) {
+      activePeopleFilter = (pTag === 'all') ? '5p' : pTag;
+      isBareShellActive = false;
+      selectedLayoutIdx = 1;
+      applyTemplate(`tpl_L1_S${selectedStyleIdx}`);
+    }
+
+    function renderTemplatesGrid() {
+      const summaryEl = document.getElementById('active-layout-summary');
+      const layouts = SPATIAL_LAYOUTS_BY_PEOPLE[activePeopleFilter] || SPATIAL_LAYOUTS_BY_PEOPLE['5p'];
+      const currentLay = layouts[(selectedLayoutIdx - 1) % layouts.length] || layouts[0];
+      const currentStyle = TEN_DESIGN_STYLES[(selectedStyleIdx - 1) % TEN_DESIGN_STYLES.length] || TEN_DESIGN_STYLES[0];
+
+      const pLabels = { '2p': '2人', '3p': '3人', '4p': '4人', '5p': '5人', '6p': '6人' };
+      const valPeople = document.getElementById('tpop-val-people');
+      const valCat = document.getElementById('tpop-val-category');
+      const valInt = document.getElementById('tpop-val-interval');
+      const valSty = document.getElementById('tpop-val-style');
+
+      if (valPeople) valPeople.textContent = isBareShellActive ? '清水房' : (pLabels[activePeopleFilter] || '5人');
+      if (valCat) valCat.textContent = activeStyleFilter === 'priv' ? '私樓燈帶' : '居屋實用';
+      if (valInt) {
+        const shortT = (currentLay.title.split(':')[1] || currentLay.title).trim();
+        const prefix = currentLay.idx >= 11 ? `✨櫃#${String(currentLay.idx).padStart(2, '0')}` : `#${String(currentLay.idx).padStart(2, '0')}`;
+        valInt.textContent = isBareShellActive ? '無間隔' : `${prefix} ${shortT}`;
+      }
+      if (valSty) valSty.textContent = `${currentStyle.num}.${currentStyle.badge}`;
+
+      if (summaryEl) {
+        summaryEl.textContent = isBareShellActive
+          ? '當前：交樓標準清水房'
+          : `${currentLay.title}`;
+      }
+
+      if (activeTemplatePopupType) {
+        renderTemplatePopupContent();
       }
     }
 
@@ -2835,118 +3078,6 @@
       while (furnitureGroup.children.length) furnitureGroup.remove(furnitureGroup.children[0]);
       placedFurniture = [];
       updateBomList();
-    }
-
-    // =========================================================================
-    // 15. UI RENDERERS FOR 20% DRAWER (TEMPLATES, FLOORS, WALLS, CATALOG, BOM)
-    // =========================================================================
-    function switchMainTab(tab) {
-      ['templates', 'floors', 'walls', 'furniture', 'appliances', 'lighting', 'bom'].forEach(t => {
-        document.getElementById('tab-btn-' + t).classList.toggle('nav-tab-active', t === tab);
-        document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
-      });
-      const drawer = document.getElementById('design-drawer');
-      if (drawer.classList.contains('drawer-collapsed')) {
-        drawer.classList.remove('drawer-collapsed');
-        document.getElementById('btn-collapse-drawer').textContent = '▼';
-        setTimeout(onWindowResize, 250);
-      }
-    }
-
-    function toggleDrawerCollapse() {
-      const drawer = document.getElementById('design-drawer');
-      const collapsed = drawer.classList.toggle('drawer-collapsed');
-      document.getElementById('btn-collapse-drawer').textContent = collapsed ? '▲展開' : '▼';
-      setTimeout(onWindowResize, 250);
-    }
-
-    function filterTemplatesByStyle(sTag) {
-      activeStyleFilter = (sTag === 'priv') ? 'priv' : 'hos';
-      isBareShellActive = false;
-      ['hos', 'priv'].forEach(k => {
-        const b = document.getElementById('sfilt-' + k);
-        if (b) {
-          if (k === activeStyleFilter) {
-            b.className = k === 'priv'
-              ? 'px-2 py-0.5 rounded bg-sky-400 text-slate-950 text-[10px] font-black shrink-0 shadow'
-              : 'px-2 py-0.5 rounded bg-emerald-400 text-slate-950 text-[10px] font-black shrink-0 shadow';
-          } else {
-            b.className = 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0 border border-slate-700';
-          }
-        }
-      });
-      applyTemplate(`tpl_L${selectedLayoutIdx}_S${selectedStyleIdx}`);
-    }
-
-    function filterTemplatesByPeople(pTag) {
-      activePeopleFilter = (pTag === 'all') ? '5p' : pTag;
-      isBareShellActive = false;
-      ['2p', '3p', '4p', '5p', '6p'].forEach(k => {
-        const b = document.getElementById('pfilt-' + k);
-        if (b) {
-          b.className = (k === activePeopleFilter)
-            ? 'px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
-            : 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-bold shrink-0';
-        }
-      });
-      selectedLayoutIdx = 1;
-      applyTemplate(`tpl_L1_S${selectedStyleIdx}`);
-    }
-
-    function renderTemplatesGrid() {
-      const layContainer = document.getElementById('templates-layouts-row');
-      const styContainer = document.getElementById('templates-styles-row');
-      const summaryEl = document.getElementById('active-layout-summary');
-      const bareBtn = document.getElementById('btn-bare-shell');
-
-      if (bareBtn) {
-        bareBtn.className = isBareShellActive
-          ? 'px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-[10px] font-black shrink-0 shadow'
-          : 'px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] font-bold border border-amber-500/40 shrink-0';
-      }
-
-      const layouts = SPATIAL_LAYOUTS_BY_PEOPLE[activePeopleFilter] || SPATIAL_LAYOUTS_BY_PEOPLE['5p'];
-      const currentLay = layouts[(selectedLayoutIdx - 1) % layouts.length] || layouts[0];
-
-      if (summaryEl) {
-        summaryEl.textContent = isBareShellActive
-          ? '當前：交樓標準清水房'
-          : `當前：${currentLay.title}`;
-      }
-
-      // Render Row 3: 15 Spatial Intervals (#01-#10 Partition Walls + #11-#15 Furniture-as-Partition)
-      if (layContainer) {
-        layContainer.innerHTML = layouts.map(lay => {
-          const isSelected = (!isBareShellActive && selectedLayoutIdx === lay.idx);
-          const isCabRoom = lay.idx >= 11;
-          const shortTitle = (lay.title.split(':')[1] || lay.title).trim();
-          const btnStyle = isSelected
-            ? 'bg-amber-500 text-slate-950 border-white font-black shadow'
-            : (isCabRoom
-              ? 'bg-emerald-950/90 border-emerald-400/60 text-emerald-200 hover:border-emerald-300 font-bold'
-              : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-amber-400 font-bold');
-          return `
-            <button onclick="selectSpatialLayout(${lay.idx})" title="${lay.title} (${lay.desc})" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${btnStyle}">
-              <span class="text-[10px]">${isCabRoom ? '✨櫃#' + String(lay.idx).padStart(2,'0') : '#' + String(lay.idx).padStart(2,'0')}</span>
-              <span class="text-[10px] max-w-[140px] truncate">${shortTitle}</span>
-            </button>
-          `;
-        }).join('');
-      }
-
-      // Render Row 4: 10 Design Styles (Compact 1-Line Pills with Color Dot)
-      if (styContainer) {
-        styContainer.innerHTML = TEN_DESIGN_STYLES.map((st, idx) => {
-          const sNum = idx + 1;
-          const isSelected = (!isBareShellActive && selectedStyleIdx === sNum);
-          return `
-            <button onclick="selectInteriorStyle(${sNum})" title="${st.name}" class="shrink-0 px-2 py-0.5 rounded border text-left transition flex items-center gap-1 ${isSelected ? 'bg-sky-400 text-slate-950 border-white font-black shadow' : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-sky-400 font-bold'}">
-              <span class="w-2.5 h-2.5 rounded-full border border-white/50 shrink-0" style="background:${st.cabHex}"></span>
-              <span class="text-[10px]">${st.num}.${st.badge}</span>
-            </button>
-          `;
-        }).join('');
-      }
     }
 
     function renderFloorZonePills() {
