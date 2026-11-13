@@ -2,6 +2,7 @@
 <!-- 影輝苑 A、B座 1:1 室內設計 DIY 系統 (36單位) -->
 <!-- 1:1 圖則 + 居屋/私樓15款間隔 + 10款風格 -->
 <!-- 實景入屋漫遊 + 平面圖瞬移導航系統 -->
+<!-- 全屋範本物件精準貼牆對位與防穿牆引擎 -->
 <html lang="zh-HK" class="dark">
 <head>
   <meta charset="UTF-8" />
@@ -789,11 +790,10 @@
       };
 
       const toWorldRot = (deg) => {
-        let r = deg;
-        if (mirrorX) r = -r;
-        if (mirrorZ) r = 180 - r;
-        if (isHoriz) r += 90;
-        return r;
+        const rad = THREE.MathUtils.degToRad(deg);
+        const [ox, oz] = toWorldXZ(0, 0);
+        const [tx, tz] = toWorldXZ(Math.sin(rad), Math.cos(rad));
+        return THREE.MathUtils.radToDeg(Math.atan2(tx - ox, tz - oz));
       };
 
       return { meta, is1BR, isBay4900, is2BR, is3BR, isHoriz, mirrorX, mirrorZ, baseW, baseD, toWorldXZ, toWorldRot };
@@ -915,7 +915,8 @@
         shape.moveTo(0, 0);
         for (let i = 0; i <= steps; i++) {
           const a = a0 + (a1 - a0) * (i / steps);
-          shape.lineTo(Math.cos(a) * radius, Math.sin(a) * radius);
+          const [px, pz] = toWorldXZ(hx + Math.cos(a) * radius, hz + Math.sin(a) * radius);
+          shape.lineTo(px - wx, -(pz - wz));
         }
         shape.closePath();
 
@@ -943,8 +944,11 @@
         doorGroup.add(post);
 
         const openAngle = a0 + (a1 - a0) * 0.72;
+        const [ox, oz] = toWorldXZ(hx + Math.cos(openAngle) * radius, hz + Math.sin(openAngle) * radius);
+        const worldLeafAngle = Math.atan2(oz - wz, ox - wx);
+
         const leafPivot = new THREE.Group();
-        leafPivot.rotation.y = -openAngle;
+        leafPivot.rotation.y = -worldLeafAngle;
         const leaf = new THREE.Mesh(
           new THREE.BoxGeometry(radius, doorH - 30, 44),
           new THREE.MeshStandardMaterial({ color: doorColor, roughness: 0.55 })
@@ -1438,32 +1442,91 @@
         });
       };
 
+      // Smart Wall-Hugging & Room-Clamping Placement Engine (prevents wall clipping & overlaps)
+      const placeInBox = (box, id, side, align = 'center', shiftAlong = 0, shiftDepth = 0, customColor = null, customSec = null) => {
+        const meta = CATALOG_ITEMS.find(c => c.id === id);
+        if (!meta) return;
+        const w = meta.w, d = meta.d;
+        const pad = 68;
+        let x = (box.x1 + box.x2) / 2;
+        let z = (box.z1 + box.z2) / 2;
+        let rot = 0;
+
+        if (side === 'top') {
+          rot = 0;
+          z = box.z1 + pad + d / 2 + shiftDepth;
+          if (align === 'left') x = box.x1 + pad + w / 2 + shiftAlong;
+          else if (align === 'right') x = box.x2 - pad - w / 2 + shiftAlong;
+          else x = (box.x1 + box.x2) / 2 + shiftAlong;
+        } else if (side === 'bottom') {
+          rot = 180;
+          z = box.z2 - pad - d / 2 - shiftDepth;
+          if (align === 'left') x = box.x1 + pad + w / 2 + shiftAlong;
+          else if (align === 'right') x = box.x2 - pad - w / 2 + shiftAlong;
+          else x = (box.x1 + box.x2) / 2 + shiftAlong;
+        } else if (side === 'left') {
+          rot = 90;
+          x = box.x1 + pad + d / 2 + shiftDepth;
+          if (align === 'top') z = box.z1 + pad + w / 2 + shiftAlong;
+          else if (align === 'bottom') z = box.z2 - pad - w / 2 + shiftAlong;
+          else z = (box.z1 + box.z2) / 2 + shiftAlong;
+        } else if (side === 'right') {
+          rot = -90;
+          x = box.x2 - pad - d / 2 - shiftDepth;
+          if (align === 'top') z = box.z1 + pad + w / 2 + shiftAlong;
+          else if (align === 'bottom') z = box.z2 - pad - w / 2 + shiftAlong;
+          else z = (box.z1 + box.z2) / 2 + shiftAlong;
+        }
+
+        const isRot90 = Math.abs(rot) === 90;
+        const halfX = (isRot90 ? d : w) / 2;
+        const halfZ = (isRot90 ? w : d) / 2;
+        const minX = box.x1 + 55 + halfX, maxX = box.x2 - 55 - halfX;
+        const minZ = box.z1 + 55 + halfZ, maxZ = box.z2 - 55 - halfZ;
+        if (minX <= maxX) x = THREE.MathUtils.clamp(x, minX, maxX);
+        else x = (box.x1 + box.x2) / 2;
+        if (minZ <= maxZ) z = THREE.MathUtils.clamp(z, minZ, maxZ);
+        else z = (box.z1 + box.z2) / 2;
+
+        push(id, x, z, rot, customColor, customSec);
+      };
+
+      // 1. Standard Kitchen, Bathroom & Main Door Switch for Each Unit Type
       if (is1BR) {
-        push('kit_l_photo_full', -710, 2480, 90);
-        push('bath_vanity_photo', -1420, 480, 0);
-        push('bath_toilet_photo', -1820, 480, 0);
-        push('bath_tub_photo', -2220, 950, 90);
-        push('elec_switch_3g', 950, 120, 0);
+        const kitBox = { x1: -1415, z1: 1555, x2: 0, z2: 3320 };
+        const bathBox = { x1: -2615, z1: 0, x2: -1035, z2: 1650 };
+        placeInBox(kitBox, 'app_fridge_double', 'bottom', 'right', -40, 0);
+        placeInBox(bathBox, 'bath_tub_photo', 'left', 'center', 0, 0);
+        placeInBox(bathBox, 'bath_toilet_photo', 'bottom', 'right', -60, 0);
+        placeInBox(bathBox, 'bath_vanity_photo', 'top', 'right', -40, 0);
+        push('elec_switch_3g', 1150, 90, 0);
       } else if (isBay4900) {
-        push('kit_l_photo_full', 380, 820, 0);
-        push('app_fridge_double', -220, 1260, 90);
-        push('bath_vanity_photo', 1480, 2720, 180);
-        push('bath_toilet_photo', 960, 2720, 180);
-        push('bath_tub_photo', 380, 2380, 90);
-        push('elec_switch_3g', 2250, 120, 0);
+        const kitBox = { x1: -615, z1: 0, x2: 1450, z2: 1650 };
+        const bathBox = { x1: 0, z1: 1650, x2: 2000, z2: 3110 };
+        placeInBox(kitBox, 'kit_l_photo_full', 'left', 'top', 0, 0);
+        placeInBox(kitBox, 'app_fridge_double', 'top', 'right', -60, 0);
+        placeInBox(bathBox, 'bath_tub_photo', 'left', 'center', 0, 0);
+        placeInBox(bathBox, 'bath_toilet_photo', 'top', 'center', 80, 0);
+        placeInBox(bathBox, 'bath_vanity_photo', 'bottom', 'right', -60, 0);
+        push('elec_switch_3g', 2350, 90, 0);
       } else if (is2BR) {
-        push('kit_l_photo_full', 4980, 820, 0);
-        push('bath_vanity_photo', 3050, 2720, 180);
-        push('bath_toilet_photo', 3620, 2720, 180);
-        push('bath_tub_photo', 4150, 2380, -90);
-        push('elec_switch_3g', 1950, 120, 0);
+        const kitBox = { x1: 3925, z1: 0, x2: 5990, z2: 1650 };
+        const bathBox = { x1: 2525, z1: 1650, x2: 4525, z2: 3120 };
+        placeInBox(kitBox, 'kit_l_photo_full', 'top', 'right', 0, 0);
+        placeInBox(kitBox, 'app_fridge_double', 'bottom', 'right', -650, 0);
+        placeInBox(bathBox, 'bath_tub_photo', 'right', 'center', 0, 0);
+        placeInBox(bathBox, 'bath_toilet_photo', 'top', 'center', 140, 0);
+        placeInBox(bathBox, 'bath_vanity_photo', 'bottom', 'left', 60, 0);
+        push('elec_switch_3g', 2150, 90, 0);
       } else {
-        push('kit_l_photo_full', 4880, 2420, 0);
-        push('app_fridge_double', 4220, 2880, 180);
-        push('bath_vanity_photo', 3050, 4320, 180);
-        push('bath_toilet_photo', 3620, 4320, 180);
-        push('bath_tub_photo', 4150, 3985, -90);
-        push('elec_switch_3g', 2850, 120, 0);
+        const kitBox = { x1: 3820, z1: 1600, x2: 5885, z2: 3250 };
+        const bathBox = { x1: 2525, z1: 3250, x2: 4525, z2: 4720 };
+        placeInBox(kitBox, 'kit_l_photo_full', 'top', 'right', 0, 0);
+        placeInBox(kitBox, 'app_fridge_double', 'bottom', 'left', 60, 0);
+        placeInBox(bathBox, 'bath_tub_photo', 'right', 'center', 0, 0);
+        placeInBox(bathBox, 'bath_toilet_photo', 'bottom', 'center', 80, 0);
+        placeInBox(bathBox, 'bath_vanity_photo', 'top', 'left', 120, 0);
+        push('elec_switch_3g', 2950, 90, 0);
       }
 
       if (peopleCount === 0) return list;
@@ -1471,197 +1534,407 @@
       const partId = byCab ? 'cab_divider_wardrobe' : (isPrivate ? 'part_glass_slider' : 'part_brick_2000');
       const tvCabId = isPrivate ? (layoutIdx % 2 === 0 ? 'cab_photo2_display' : 'cab_langyu_tv') : 'cab_cream_tv';
 
+      // =====================================================================
+      // A. 1BR / OPEN STUDIO UNITS (B12, B2, B5, B17, A12, A15)
+      // =====================================================================
       if (is1BR) {
-        push('cab_dining_pullout', 1850, 1850, -90);
-        push('sofa_2p', 750, 2850, 90);
-        push(tvCabId, 2050, 3200, -90);
-        push('app_ac_split', 1175, 5880, 180);
-        push('light_chandelier_ring', 1175, 2850, 0);
-        if (peopleCount >= 4) {
-          push('bed_bunk_family_3p', 820, 5050, 0, style.cab, style.bed);
-          push('bed_loft_desk', 1820, 4950, -90);
-        } else if (peopleCount === 3) {
-          push('bed_bunk_family_3p', 1175, 5050, 0, style.cab, style.bed);
-          push('desk_single_1000', 1820, 4250, -90);
-        } else {
-          push('bed_queen_1500', 1175, 5050, 0, style.cab, style.bed);
-          push('wardrobe_1200', 480, 4200, 90);
+        const foyerBox = { x1: 0, z1: 1050, x2: 2350, z2: 3550 };
+        const winBox   = { x1: 0, z1: 3650, x2: 2350, z2: 6000 };
+
+        placeInBox(winBox, 'app_ac_split', 'bottom', 'center', 0, 0);
+        push('light_chandelier_ring', 1175, 2450, 0);
+        push('light_ceiling_round', 1175, 4850, 0);
+        push('elec_ac_switch', 2260, 4400, -90);
+        push('elec_data_tv', 2260, 2600, -90);
+
+        const swapZones = (layoutIdx % 3 === 0);
+        const sleepBox = swapZones ? foyerBox : winBox;
+        const livBox   = swapZones ? winBox   : foyerBox;
+
+        if (layoutIdx % 2 === 1) {
+          push(partId, 1250, 3600, 0);
         }
-        if (layoutIdx % 2 === 1) push(partId, 1175, 3950, 0);
+
+        // Living zone items
+        placeInBox(livBox, 'sofa_2p', 'left', 'bottom', -40, 0);
+        placeInBox(livBox, 'app_tv_65', 'right', 'bottom', -40, 0);
+        placeInBox(livBox, 'cab_dining_pullout', 'right', 'top', 40, 0);
+
+        // Sleeping zone items by headcount
+        if (peopleCount >= 4) {
+          placeInBox(sleepBox, 'bed_bunk_family_3p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          placeInBox(sleepBox, 'bed_single_910', 'right', 'top', 0, 0, style.cab, style.bed);
+        } else if (peopleCount === 3) {
+          placeInBox(sleepBox, 'bed_bunk_family_3p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          placeInBox(sleepBox, 'desk_single_1000', 'right', 'top', 0, 0);
+        } else {
+          placeInBox(sleepBox, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(sleepBox, 'wardrobe_1200', 'left', 'top', 0, 0);
+        }
         return list;
       }
 
+      // =====================================================================
+      // B. 2BR BAY-WINDOW WIDE HALL UNITS (B11, B13, B14: 4900×5325mm)
+      // =====================================================================
       if (isBay4900) {
-        push('cab_dining_pullout', 4320, 1650, -90);
-        push('cab_hotel_foyer', 4620, 580, -90);
-        push('app_ac_split', 3450, 5200, 180);
-        push('app_ac_window', 1000, 5950, 180);
-        push('light_chandelier_ring', 3450, 3950, 0);
-        push('elec_ac_switch', 4820, 4200, -90);
-        push('elec_data_tv', 4820, 3600, -90);
+        const foyerBox  = { x1: 1450, z1: 0,    x2: 4900, z2: 1650 };
+        const midHall   = { x1: 2050, z1: 1650, x2: 4900, z2: 3110 };
+        const rightWing = { x1: 2050, z1: 3150, x2: 4900, z2: 5325 };
+        const bayRoom   = { x1: 0,    z1: 3150, x2: 2000, z2: 6055 };
+
+        placeInBox(foyerBox, 'cab_hotel_foyer', 'right', 'bottom', 0, 0);
+        placeInBox(rightWing, 'app_ac_split', 'bottom', 'center', 0, 0);
+        placeInBox(bayRoom, 'app_ac_window', 'bottom', 'center', 0, 0);
+        push('light_chandelier_ring', 3450, 4150, 0);
+        push('light_track_4spot', 3450, 2350, 0);
+        push('elec_ac_switch', 4810, 4200, -90);
+        push('elec_data_tv', 4810, 3550, -90);
+
+        const mode = (layoutIdx - 1) % 5;
 
         if (peopleCount >= 5) {
-          if (layoutIdx % 3 === 1) {
-            push(partId, 1000, 3250, 0);
-            push('bed_bunk_family_3p', 880, 4950, 0, style.cab, style.bed);
-            push('desk_single_1000', 1550, 3950, -90);
-            push(partId, 3850, 2750, 0);
-            push('bed_double_1370', 4050, 1850, -90, style.cab, style.bed);
-            push('sofa_3p', 2850, 4550, 90);
-            push(tvCabId, 4620, 4450, -90);
-          } else if (layoutIdx % 3 === 2) {
-            push(partId, 1000, 3250, 0);
-            push('bed_queen_1500', 950, 4950, 0, style.cab, style.bed);
-            push(partId, 3850, 2950, 0);
-            push('bed_bunk_family_3p', 3950, 4350, -90, style.cab, style.bed);
-            push('sofa_2p', 2650, 2350, 0);
+          if (mode === 0) {
+            // Layout A: Bay room has 3p family bunk + desk; MidHall has parents double room; RightWing is large sea-view living room
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_bunk_family_3p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+            placeInBox(bayRoom, 'desk_single_1000', 'left', 'top', 120, 0);
+            push(partId, 3850, 3110, 0);
+            placeInBox(midHall, 'bed_double_1370', 'right', 'center', 0, 0, style.cab, style.bed);
+            placeInBox(rightWing, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(rightWing, tvCabId, 'right', 'center', 0, 0);
+            placeInBox(foyerBox, 'cab_dining_pullout', 'left', 'bottom', 0, 0);
+          } else if (mode === 1) {
+            // Layout B: Bay room is Master Queen room; RightWing has 3p family bunk + desk; MidHall is living & dining
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+            placeInBox(bayRoom, 'wardrobe_1200', 'left', 'top', 120, 0);
+            push(partId, 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_bunk_family_3p', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(rightWing, 'desk_single_1000', 'left', 'bottom', 0, 0);
+            placeInBox(midHall, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(midHall, tvCabId, 'right', 'center', 0, 0);
+          } else if (mode === 2) {
+            // Layout C: RightWing split into two 2.5ft kid beds + BayRoom parents Queen + MidHall elder single bed
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+            push(partId, 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_kid_760', 'bottom', 'left', 40, 0, style.cab, '#fbcfe8');
+            placeInBox(rightWing, 'bed_kid_760', 'bottom', 'right', -40, 0, style.cab, '#93c5fd');
+            placeInBox(rightWing, 'desk_double_1600', 'right', 'top', 80, 0);
+            placeInBox(midHall, 'bed_single_910', 'right', 'top', 0, 0, style.cab, style.bed);
+            placeInBox(midHall, 'sofa_2p', 'left', 'bottom', 0, 0);
+          } else if (mode === 3) {
+            // Layout D: Bay room has 2p bunk + single bed; RightWing has parents Queen; MidHall living
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_bunk_2p', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(bayRoom, 'bed_single_910', 'right', 'top', 140, 0, style.cab, style.bed);
+            push(partId, 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(rightWing, 'wardrobe_1200', 'right', 'top', 80, 0);
+            placeInBox(midHall, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(midHall, 'cab_dining_pullout', 'right', 'center', 0, 0);
           } else {
-            push('cab_platform_step', 1020, 4850, 0);
-            push('bed_bunk_family_3p', 920, 4950, 0, style.cab, style.bed);
-            push('cab_photo2_display', 3550, 3150, 0);
-            push('bed_queen_1500', 3850, 4450, -90, style.cab, style.bed);
-            push('sofa_2p', 2650, 2250, 0);
+            // Layout E: Storage platform in Bay room + Photo2 cabinet divider in RightWing
+            placeInBox(bayRoom, 'cab_platform_step', 'bottom', 'center', 0, 0);
+            placeInBox(bayRoom, 'bed_bunk_family_3p', 'bottom', 'center', 0, 0, style.cab, style.bed);
+            push('cab_photo2_display', 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_queen_1500', 'right', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(midHall, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(midHall, 'cab_dining_pullout', 'right', 'center', 0, 0);
           }
         } else if (peopleCount === 4) {
-          push(partId, 1000, 3250, 0);
-          push('bed_bunk_2p', 620, 4850, 90, style.cab, style.bed);
-          push('desk_double_1600', 1650, 4650, -90);
-          push(partId, 3850, 3150, 0);
-          push('bed_queen_1500', 3950, 4450, -90, style.cab, style.bed);
-          push('sofa_2p', 2750, 2350, 0);
-          push(tvCabId, 4620, 2350, -90);
+          if (mode % 2 === 0) {
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_bunk_2p', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(bayRoom, 'desk_single_1000', 'right', 'top', 140, 0);
+            push(partId, 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(midHall, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(midHall, tvCabId, 'right', 'center', 0, 0);
+          } else {
+            push(partId, 1000, 3150, 0);
+            placeInBox(bayRoom, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+            push(partId, 3850, 3110, 0);
+            placeInBox(midHall, 'bed_bunk_2p', 'right', 'center', 0, 0, style.cab, style.bed);
+            placeInBox(rightWing, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(rightWing, tvCabId, 'right', 'center', 0, 0);
+          }
         } else if (peopleCount === 3) {
-          push(partId, 1000, 3250, 0);
-          push('bed_single_910', 650, 4950, 0, style.cab, style.bed);
-          push('desk_single_1000', 1550, 4650, -90);
-          push('bed_queen_1500', 3950, 4450, -90, style.cab, style.bed);
-          push('sofa_3p', 2650, 3950, 90);
+          push(partId, 1000, 3150, 0);
+          if (mode % 2 === 0) {
+            placeInBox(bayRoom, 'bed_single_910', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(bayRoom, 'desk_single_1000', 'right', 'top', 140, 0);
+            push(partId, 3450, 3150, 0);
+            placeInBox(rightWing, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(midHall, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(midHall, tvCabId, 'right', 'center', 0, 0);
+          } else {
+            placeInBox(bayRoom, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+            placeInBox(midHall, 'bed_loft_desk', 'right', 'center', 0, 0);
+            placeInBox(rightWing, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(rightWing, tvCabId, 'right', 'center', 0, 0);
+          }
         } else {
-          push(partId, 1000, 3250, 0);
-          push('bed_queen_1500', 980, 4850, 0, style.cab, style.bed);
-          push('wardrobe_1800', 1750, 4450, -90);
-          push('sofa_3p', 2650, 4350, 90);
-          push(tvCabId, 4620, 4350, -90);
-          push('dec_rug_2000', 3550, 4350, 90);
+          push(partId, 1000, 3150, 0);
+          placeInBox(bayRoom, 'bed_queen_1500', 'bottom', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(bayRoom, 'wardrobe_1800', 'left', 'top', 150, 0);
+          placeInBox(rightWing, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(rightWing, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(rightWing, 'dec_rug_2000', 'bottom', 'center', -150, 200);
+          placeInBox(midHall, 'cab_dining_pullout', 'right', 'center', 0, 0);
         }
         return list;
       }
 
+      // =====================================================================
+      // C. STANDARD 2BR WIDE HALL UNITS (B3, B4, B6, B16, B18, B21, B22, A1, A4, A10, A11, A13, A14, A16, A19-A21)
+      // =====================================================================
       if (is2BR) {
-        push('cab_dining_pullout', 580, 1850, 90);
-        push('app_ac_split', 1150, 6020, 180);
-        push('app_ac_window', 3450, 6020, 180);
+        const mainHallBox = { x1: 0,    z1: 1050, x2: 2525, z2: 3120 };
+        const hall1Box    = { x1: 0,    z1: 3180, x2: 2260, z2: 6165 };
+        const hall2Box    = { x1: 2260, z1: 3180, x2: 4525, z2: 6165 };
+
+        placeInBox(mainHallBox, 'cab_hotel_foyer', 'top', 'left', 40, -900);
+        placeInBox(hall1Box, 'app_ac_split', 'bottom', 'center', 0, 0);
+        placeInBox(hall2Box, 'app_ac_window', 'bottom', 'center', 0, 0);
         push('light_chandelier_ring', 1250, 4550, 0);
+        push('light_track_4spot', 1250, 2150, 0);
+        push('elec_ac_switch', 90, 4500, 90);
+        push('elec_data_tv', 2180, 4500, -90);
+
+        const mode = (layoutIdx - 1) % 5;
 
         if (peopleCount >= 5) {
-          push(partId, 3380, 3350, 0);
-          push('bed_bunk_family_3p', 3450, 5050, 0, style.cab, style.bed);
-          push(partId, 1150, 3350, 0);
-          push('bed_queen_1500', 1050, 5050, 0, style.cab, style.bed);
-          push('sofa_2p', 1250, 2350, 0);
+          if (mode === 0) {
+            push(partId, 3380, 3180, 0);
+            placeInBox(hall2Box, 'bed_bunk_family_3p', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(hall2Box, 'desk_single_1000', 'right', 'top', 120, 0);
+            push(partId, 1130, 3180, 0);
+            placeInBox(hall1Box, 'bed_queen_1500', 'bottom', 'left', 0, 0, style.cab, style.bed);
+            placeInBox(mainHallBox, 'sofa_2p', 'left', 'bottom', 0, 0);
+            placeInBox(mainHallBox, 'cab_dining_pullout', 'right', 'top', 0, 0);
+          } else if (mode === 1) {
+            push(partId, 3380, 3180, 0);
+            placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            push(partId, 1130, 3180, 0);
+            placeInBox(hall1Box, 'bed_bunk_family_3p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+            placeInBox(mainHallBox, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+          } else if (mode === 2) {
+            push(partId, 3380, 3180, 0);
+            placeInBox(hall2Box, 'bed_kid_760', 'bottom', 'left', 30, 0, style.cab, '#fbcfe8');
+            placeInBox(hall2Box, 'bed_kid_760', 'bottom', 'right', -30, 0, style.cab, '#93c5fd');
+            placeInBox(hall2Box, 'desk_double_1600', 'right', 'top', 100, 0);
+            placeInBox(mainHallBox, 'bed_bunk_family_3p', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          } else {
+            push(partId, 3380, 3180, 0);
+            placeInBox(hall2Box, 'bed_bunk_2p', 'right', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(hall2Box, 'bed_single_910', 'left', 'top', 120, 0, style.cab, style.bed);
+            placeInBox(mainHallBox, 'bed_double_1370', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          }
         } else if (peopleCount === 4) {
-          push(partId, 3380, 3350, 0);
-          push('bed_bunk_2p', 3850, 5050, -90, style.cab, style.bed);
-          push('desk_single_1000', 2750, 4650, 90);
-          push(partId, 1150, 3350, 0);
-          push('bed_queen_1500', 1050, 5050, 0, style.cab, style.bed);
-          push('sofa_2p', 1250, 2350, 0);
+          push(partId, 3380, 3180, 0);
+          if (mode % 2 === 0) {
+            placeInBox(hall2Box, 'bed_bunk_2p', 'right', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(hall2Box, 'desk_single_1000', 'left', 'top', 140, 0);
+            push(partId, 1130, 3180, 0);
+            placeInBox(hall1Box, 'bed_queen_1500', 'bottom', 'left', 0, 0, style.cab, style.bed);
+            placeInBox(mainHallBox, 'sofa_2p', 'left', 'center', 0, 0);
+            placeInBox(mainHallBox, 'cab_dining_pullout', 'right', 'center', 0, 0);
+          } else {
+            placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+            placeInBox(mainHallBox, 'bed_bunk_2p', 'left', 'bottom', 0, 0, style.cab, style.bed);
+            placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+            placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          }
+        } else if (peopleCount === 3) {
+          push(partId, 3380, 3180, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(mainHallBox, 'bed_single_910', 'left', 'bottom', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
         } else {
-          push(partId, 3380, 3350, 0);
-          push('bed_queen_1500', 3450, 5050, 0, style.cab, style.bed);
-          push('sofa_3p', 520, 4650, 90);
-          push(tvCabId, 2050, 4650, -90);
-          if (peopleCount === 3) push('bed_single_910', 950, 2350, 90, style.cab, style.bed);
+          push(partId, 3380, 3180, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall2Box, 'wardrobe_1800', 'right', 'top', 120, 0);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 200, 0);
         }
         return list;
       }
 
-      // 3BR Large Units
+      // =====================================================================
+      // D. 3BR LARGE UNITS (B10, B9, B1, B15, A2, A3, A7, A8, A9, A22)
+      // =====================================================================
       const sideZ1 = (unitId === 'B15' || unitId === 'A8' || unitId === 'A9') ? 650 : 2500;
-      const sideMidZ = sideZ1 + 1025;
+      const sideBox     = { x1: -2215, z1: sideZ1, x2: 0,    z2: sideZ1 + 2050 };
+      const mainHallBox = { x1: 0,     z1: 550,    x2: 2525, z2: 3650 };
+      const hall1Box    = { x1: 0,     z1: 4450,   x2: 2260, z2: 6665 };
+      const hall2Box    = { x1: 2260,  z1: 4720,   x2: 4525, z2: 6665 };
 
-      push('cab_hotel_foyer', 1650, 280, 0);
-      push('app_ac_split', 1150, 6520, 180);
-      push('app_ac_window', 3450, 6520, 180);
-      push('app_ac_window', -2080, sideMidZ, 90);
-      push('light_chandelier_ring', 1250, 4950, 0);
-      push('light_track_4spot', 1350, 1950, 0);
-      push('elec_ac_switch', 240, 4800, 90);
-      push('elec_data_tv', 2180, 4800, -90);
+      placeInBox({ x1: 600, z1: 0, x2: 2500, z2: 650 }, 'cab_hotel_foyer', 'top', 'center', 0, 0);
+      placeInBox(hall1Box, 'app_ac_split', 'bottom', 'center', 0, 0);
+      placeInBox(hall2Box, 'app_ac_window', 'bottom', 'center', 0, 0);
+      placeInBox(sideBox, 'app_ac_window', 'left', 'center', 0, 0);
+      push('light_chandelier_ring', 1250, 5250, 0);
+      push('light_track_4spot', 1250, 2150, 0);
+      push('elec_ac_switch', 90, 4900, 90);
+      push('elec_data_tv', 2180, 4900, -90);
+
+      const mode = (layoutIdx - 1) % 10;
 
       if (peopleCount === 5) {
-        if (layoutIdx === 2 || layoutIdx === 12) {
-          push(partId, 1450, 1750, 90);
-          push('part_brick_1400', 750, 1750, 0);
-          push('bed_kid_760', 550, 1050, 90, style.cab, '#fbcfe8');
-          push('bed_kid_760', 550, 2350, 90, style.cab, '#93c5fd');
-          push(partId, 3380, 4750, 0);
-          push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-          push('bed_single_910', -1150, sideMidZ, -90, style.cab, style.bed);
-          push('desk_single_1000', -1150, sideZ1 + 360, 0);
-          push('sofa_3p', 520, 5150, 90);
-          push(tvCabId, 2050, 5150, -90);
-          push('cab_dining_pullout', 1950, 3550, -90);
-        } else if (layoutIdx === 3 || layoutIdx === 13) {
-          push(partId, 1150, 4350, 0);
-          push('bed_bunk_family_3p', 980, 5580, 0, style.cab, style.bed);
-          push(partId, 3380, 4750, 0);
-          push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-          push('desk_double_1600', -1150, sideMidZ, -90);
-          push('sofa_3p', 620, 1950, 90);
-          push(tvCabId, 2150, 1950, -90);
-        } else if (layoutIdx === 5 || layoutIdx === 15) {
-          push('bed_bunk_family_3p', -1150, sideMidZ, -90, style.cab, style.bed);
-          push(partId, 3380, 4750, 0);
-          push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-          push('sofa_3p', 520, 5150, 90);
-          push(tvCabId, 2050, 5150, -90);
-          push('cab_dining_pullout', 620, 1850, 90);
+        if (mode === 0) {
+          // #01 & #11: SideRoom Double Bed + Hall1 Bunk Bed (2 kids) + Hall2 Single Bed + MainHall Living
+          placeInBox(sideBox, 'bed_double_1370', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 1130, 4450, 0);
+          placeInBox(hall1Box, 'bed_bunk_2p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'desk_single_1000', 'right', 'bottom', 0, 0);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_single_910', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall2Box, 'wardrobe_1200', 'right', 'top', 40, 0);
+          placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(mainHallBox, 'cab_dining_pullout', 'left', 'bottom', 0, 0);
+        } else if (mode === 1) {
+          // #02 & #12: MainHall split into 2 Kid Rooms (each 2.5ft bed) + Hall2 Queen Bed + SideRoom Single Bed + Hall1 Sea-view Living
+          const kidRoomTop = { x1: 0, z1: 600,  x2: 1550, z2: 2050 };
+          const kidRoomBot = { x1: 0, z1: 2100, x2: 1550, z2: 3550 };
+          push(partId, 1550, 2050, 90);
+          push('part_brick_1400', 780, 2050, 0);
+          placeInBox(kidRoomTop, 'bed_kid_760', 'left', 'center', 0, 0, style.cab, '#fbcfe8');
+          placeInBox(kidRoomBot, 'bed_kid_760', 'left', 'center', 0, 0, style.cab, '#93c5fd');
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'bed_single_910', 'left', 'bottom', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'desk_single_1000', 'top', 'right', -60, 0);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+        } else if (mode === 2) {
+          // #03 & #13: Hall1 Family Bunk (3p) + Hall2 Queen Bed + SideRoom Study + MainHall Living
+          push(partId, 1130, 4450, 0);
+          placeInBox(hall1Box, 'bed_bunk_family_3p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'desk_double_1600', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+        } else if (mode === 3) {
+          // #04 & #14: Hall1 Queen Bed + Hall2 Bunk Bed (2 kids) + SideRoom Elder Single Bed + MainHall Living
+          push(partId, 1130, 4450, 0);
+          placeInBox(hall1Box, 'bed_queen_1500', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_bunk_2p', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'bed_single_910', 'left', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+        } else if (mode === 4) {
+          // #05 & #15: SideRoom Family Bunk (3 kids) + Hall2 Queen Bed + Hall1 Sea-view Living
+          placeInBox(sideBox, 'bed_bunk_family_3p', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 250, 0);
+        } else if (mode === 5) {
+          // #06: MainHall Bunk Room + SideRoom Elder Single + Hall2 Queen + Hall1 Living
+          const mhRoom = { x1: 0, z1: 950, x2: 1550, z2: 3250 };
+          push(partId, 1550, 2100, 90);
+          placeInBox(mhRoom, 'bed_bunk_2p', 'left', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'bed_single_910', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+        } else if (mode === 6) {
+          // #07: Hall1 split into two 2.5ft kid beds + SideRoom Queen + Hall2 Single + MainHall Living
+          push(partId, 1130, 4450, 0);
+          placeInBox(hall1Box, 'bed_kid_760', 'bottom', 'left', 20, 0, style.cab, '#fbcfe8');
+          placeInBox(hall1Box, 'bed_kid_760', 'bottom', 'right', -20, 0, style.cab, '#93c5fd');
+          placeInBox(sideBox, 'bed_double_1370', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_single_910', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+        } else if (mode === 7) {
+          // #08: Hall2 Family Bunk (3p) + SideRoom Bunk (2p) + Hall1 Living
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_bunk_family_3p', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'bed_bunk_2p', 'left', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 250, 0);
+        } else if (mode === 8) {
+          // #09: SideRoom Bunk (2 kids) + MainHall Master Room + Hall2 Elder Single + Hall1 Living
+          placeInBox(sideBox, 'bed_bunk_2p', 'left', 'center', 0, 0, style.cab, style.bed);
+          const mhRoom = { x1: 0, z1: 950, x2: 1650, z2: 3250 };
+          push(partId, 1650, 2100, 90);
+          placeInBox(mhRoom, 'bed_double_1370', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_single_910', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
         } else {
-          push('bed_double_1370', -1180, sideMidZ, -90, style.cab, style.bed);
-          push(partId, 1150, 4450, 0);
-          push('bed_bunk_2p', 620, 5580, 90, style.cab, style.bed);
-          push('desk_double_1600', 1880, 5550, -90);
-          push(partId, 3380, 4750, 0);
-          push('bed_single_910', 3850, 5680, -90, style.cab, style.bed);
-          push('desk_single_1000', 2850, 5550, 90);
-          push('sofa_3p', 520, 1950, 90);
-          push(tvCabId, 2180, 1950, -90);
-          push('cab_dining_pullout', 620, 3450, 90);
+          // #10: Accessible Elder Room in MainHall + SideRoom Bunk + Hall2 Queen + Hall1 Living
+          const mhRoom = { x1: 0, z1: 950, x2: 1500, z2: 3150 };
+          push(partId, 1500, 2050, 90);
+          placeInBox(mhRoom, 'bed_single_910', 'left', 'center', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'bed_bunk_2p', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
         }
       } else if (peopleCount === 6) {
-        push('bed_bunk_family_3p', -1150, sideMidZ, -90, style.cab, style.bed);
-        push(partId, 1150, 4450, 0);
-        push('bed_bunk_2p', 620, 5580, 90, style.cab, style.bed);
-        push(partId, 3380, 4750, 0);
-        push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-        push('sofa_3p', 520, 1950, 90);
-        push(tvCabId, 2180, 1950, -90);
+        placeInBox(sideBox, 'bed_bunk_family_3p', 'left', 'center', 0, 0, style.cab, style.bed);
+        push(partId, 1130, 4450, 0);
+        placeInBox(hall1Box, 'bed_bunk_2p', 'bottom', 'left', 0, 0, style.cab, style.bed);
+        placeInBox(hall1Box, 'desk_single_1000', 'right', 'bottom', 0, 0);
+        push(partId, 3380, 4720, 0);
+        placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+        placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+        placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+        placeInBox(mainHallBox, 'cab_dining_pullout', 'left', 'bottom', 0, 0);
       } else if (peopleCount === 4) {
-        push('bed_bunk_2p', -1250, sideMidZ, -90, style.cab, style.bed);
-        push('desk_single_1000', -850, sideZ1 + 360, 0);
-        push(partId, 3380, 4750, 0);
-        push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-        push('sofa_3p', 520, 5150, 90);
-        push(tvCabId, 2050, 5150, -90);
-        push('cab_dining_pullout', 620, 1950, 90);
+        if (mode % 2 === 0) {
+          placeInBox(sideBox, 'bed_bunk_2p', 'left', 'bottom', 0, 0, style.cab, style.bed);
+          placeInBox(sideBox, 'desk_single_1000', 'top', 'right', -80, 0);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+          placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 250, 0);
+        } else {
+          placeInBox(sideBox, 'bed_double_1370', 'left', 'center', 0, 0, style.cab, style.bed);
+          push(partId, 1130, 4450, 0);
+          placeInBox(hall1Box, 'bed_single_910', 'bottom', 'left', 0, 0, style.cab, style.bed);
+          push(partId, 3380, 4720, 0);
+          placeInBox(hall2Box, 'bed_single_910', 'bottom', 'right', 0, 0, style.cab, style.bed);
+          placeInBox(mainHallBox, 'sofa_3p', 'left', 'center', 0, 0);
+          placeInBox(mainHallBox, tvCabId, 'right', 'center', 0, 0);
+        }
       } else if (peopleCount === 3) {
-        push('bed_single_910', -1250, sideMidZ, -90, style.cab, style.bed);
-        push('desk_single_1000', -850, sideZ1 + 360, 0);
-        push(partId, 3380, 4750, 0);
-        push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-        push('sofa_3p', 520, 5150, 90);
-        push(tvCabId, 2050, 5150, -90);
-        push('dining_set_4p', 1250, 2150, 0);
+        placeInBox(sideBox, 'bed_single_910', 'left', 'bottom', 0, 0, style.cab, style.bed);
+        placeInBox(sideBox, 'desk_single_1000', 'top', 'right', -80, 0);
+        push(partId, 3380, 4720, 0);
+        placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+        placeInBox(hall1Box, 'sofa_3p', 'left', 'center', 0, 0);
+        placeInBox(hall1Box, tvCabId, 'right', 'center', 0, 0);
+        placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 250, 0);
       } else {
-        push('desk_double_1600', -1150, sideMidZ, -90);
-        push(partId, 3380, 4750, 0);
-        push('bed_queen_1500', 3450, 5680, 0, style.cab, style.bed);
-        push('wardrobe_1800', 1150, 6250, 180);
-        push('sofa_3p', 520, 4650, 90);
-        push(tvCabId, 2150, 4650, -90);
-        push('dec_rug_2000', 1350, 4650, 90);
-        push('dining_set_4p', 1250, 2150, 0);
+        placeInBox(sideBox, 'desk_double_1600', 'left', 'center', 0, 0);
+        push(partId, 3380, 4720, 0);
+        placeInBox(hall2Box, 'bed_queen_1500', 'bottom', 'right', 0, 0, style.cab, style.bed);
+        placeInBox(hall1Box, 'wardrobe_1800', 'bottom', 'center', 0, 0);
+        placeInBox(hall1Box, 'sofa_3p', 'left', 'top', 150, 0);
+        placeInBox(hall1Box, tvCabId, 'right', 'top', 150, 0);
+        placeInBox(mainHallBox, 'dining_set_4p', 'left', 'center', 250, 0);
       }
 
       return list;
@@ -2821,5 +3094,6 @@
 </body>
 <!-- 影輝苑 A、B座 1:1 室內設計 DIY 系統 -->
 <!-- 36 Units 1:1 Floor Plan & Furniture Engine -->
+<!-- Smart Wall-Hugging & Room-Clamping Active -->
 <!-- First-Person Walkthrough & MiniMap Ready -->
 </html>
