@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1B語文知識評估一 - 供詞填充、標點符號及重組句子</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --kaiti-font: "DFKai-SB", "BiauKai", "標楷體", "Kaiti TC", "Noto Sans TC", sans-serif;
+      --ui-font: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      font-family: var(--ui-font);
+      background-color: #FFFBEB;
+      background-image:
+        radial-gradient(#FDE68A 2px, transparent 2px),
+        radial-gradient(#BAE6FD 2px, #FFFBEB 2px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      color: #1E293B;
+      margin: 0;
+      padding: 0;
+    }
+
+    .kaiti {
+      font-family: var(--kaiti-font);
+    }
+
+    /* A4 直向練習紙樣式 (第一、二部分) */
+    .a4-paper {
+      width: 210mm;
+      min-height: 297mm;
+      background: #FFFFFF;
+      margin: 0 auto;
+      padding: 12mm 14mm;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+      border-radius: 12px;
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    @media screen and (max-width: 820px) {
+      .a4-paper {
+        width: 96%;
+        min-height: auto;
+        padding: 18px 14px;
+      }
+    }
+
+    /* 可愛動畫 */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .float-anim {
+      animation: floatSlow 3s ease-in-out infinite;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.94); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop-in {
+      animation: popIn 0.25s ease-out forwards;
+    }
+
+    @keyframes pulseSpeak {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .speaking-anim {
+      animation: pulseSpeak 0.7s ease-in-out infinite;
+    }
+
+    /* 第一部分：詞語卡與空格互動樣式 */
+    .word-chip {
+      font-family: var(--kaiti-font);
+      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+    .word-chip:hover:not(.used) {
+      transform: translateY(-2px) scale(1.04);
+    }
+    .word-chip.used {
+      opacity: 0.35;
+      background-color: #F1F5F9 !important;
+      border-color: #CBD5E1 !important;
+      color: #94A3B8 !important;
+      text-decoration: line-through;
+      cursor: default;
+    }
+
+    .blank-slot {
+      font-family: var(--kaiti-font);
+      min-width: 92px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2.5px solid #3B82F6;
+      background-color: #EFF6FF;
+      border-radius: 8px 8px 2px 2px;
+      padding: 0 10px;
+      margin: 0 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      vertical-align: middle;
+      font-weight: 700;
+      color: #1D4ED8;
+    }
+    .blank-slot:hover {
+      background-color: #DBEAFE;
+    }
+    .blank-slot.active-blank {
+      background-color: #FEF3C7;
+      border-bottom: 3px solid #F59E0B;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+    }
+    .blank-slot.filled {
+      background-color: #E0F2FE;
+      border-bottom-color: #0284C7;
+      color: #0369A1;
+    }
+    .blank-slot.correct {
+      background-color: #DCFCE7 !important;
+      border-bottom-color: #16A34A !important;
+      color: #15803D !important;
+      cursor: default;
+    }
+    .blank-slot.wrong {
+      background-color: #FEE2E2 !important;
+      border-bottom-color: #DC2626 !important;
+      color: #B91C1C !important;
+      text-decoration: line-through;
+      cursor: default;
+    }
+
+    /* 第二部分：標點符號方格樣式 */
+    .punct-slot {
+      font-family: var(--kaiti-font);
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2.5px solid #EC4899;
+      background-color: #FDF2F8;
+      border-radius: 10px;
+      margin: 0 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      vertical-align: middle;
+      font-weight: 900;
+      font-size: 1.45rem;
+      color: #BE185D;
+      user-select: none;
+    }
+    .punct-slot:hover {
+      background-color: #FCE7F3;
+      transform: scale(1.06);
+    }
+    .punct-slot.active-punct {
+      background-color: #FEF3C7;
+      border-color: #F59E0B;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35);
+      transform: scale(1.08);
+    }
+    .punct-slot.filled {
+      background-color: #FCE7F3;
+      border-color: #DB2777;
+      color: #9D174D;
+    }
+    .punct-slot.correct {
+      background-color: #DCFCE7 !important;
+      border-color: #16A34A !important;
+      color: #15803D !important;
+      cursor: default;
+      transform: none;
+    }
+    .punct-slot.wrong {
+      background-color: #FEE2E2 !important;
+      border-color: #DC2626 !important;
+      color: #B91C1C !important;
+      text-decoration: line-through;
+      cursor: default;
+      transform: none;
+    }
+
+    .punct-btn {
+      transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+    .punct-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+    .punct-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* 第三部分：重組句子詞卡樣式 */
+    .chunk-card {
+      font-family: var(--kaiti-font);
+      transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+    .chunk-card:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+    .chunk-card:active {
+      transform: scale(0.98);
+    }
+
+    /* 列印專用樣式：確保單頁 A4 直向完美列印 */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+      body {
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-paper {
+        width: 100% !important;
+        min-height: 278mm !important;
+        max-height: 280mm !important;
+        margin: 0 !important;
+        padding: 6mm 10mm !important;
+        box-shadow: none !important;
+        border: 1.5px solid #94A3B8 !important;
+        border-radius: 0 !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      .word-chip {
+        background: #FFFFFF !important;
+        border: 1.5px solid #334155 !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        text-decoration: none !important;
+        padding: 4px 6px !important;
+        font-size: 19pt !important;
+      }
+      .blank-slot {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1.5px solid #000000 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        min-width: 85px !important;
+        height: 28px !important;
+        color: #000000 !important;
+      }
+      .punct-slot {
+        background: #FFFFFF !important;
+        border: 1.5px solid #000000 !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+        width: 28px !important;
+        height: 28px !important;
+        color: #000000 !important;
+      }
+      .punct-guide-box {
+        background: #FFFFFF !important;
+        border: 1.5px solid #334155 !important;
+      }
+      .question-row {
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+        font-size: 16.5pt !important;
+        line-height: 1.65 !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-10">
+
+  <!-- ==================== 首頁 (HOME VIEW) ==================== -->
+  <div id="home-view" class="max-w-6xl mx-auto px-4 pt-6 sm:pt-8 pb-12">
+    <div class="bg-white rounded-3xl shadow-xl border-4 border-amber-300 overflow-hidden pop-in">
+      <!-- 頂部鮮豔橫幅 -->
+      <div class="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 p-6 sm:p-8 text-center text-white relative">
+        <div class="flex justify-center items-center gap-4 mb-2">
+          <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg" alt="書本" class="w-12 h-12 float-anim" />
+          <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/270f.svg" alt="鉛筆" class="w-12 h-12 float-anim" style="animation-delay: 0.5s;" />
+          <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f31f.svg" alt="星星" class="w-12 h-12 float-anim" style="animation-delay: 1s;" />
+        </div>
+        <span class="inline-block bg-amber-300 text-amber-950 font-black text-sm px-4 py-1 rounded-full mb-2 shadow-sm">
+          小學一年級中文科評估互動練習
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-wider drop-shadow-md kaiti mt-1">
+          1B語文知識評估一
+        </h1>
+        <p class="text-sky-100 text-base sm:text-lg font-bold mt-2">
+          請點選下面評估部分開始練習
+        </p>
+      </div>
+
+      <!-- 三大評估部分選擇卡片 -->
+      <div class="p-6 sm:p-8 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- ========== 第一部分：供詞填充 ========== -->
+          <div class="bg-gradient-to-b from-sky-50 to-white rounded-3xl border-3 border-sky-300 p-5 flex flex-col justify-between shadow-md hover:shadow-lg transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="bg-sky-500 text-white font-black text-xs px-3 py-1 rounded-full tracking-wide">
+                  第一部分 (Part 1)
+                </span>
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f9e9.svg" alt="拼圖" class="w-10 h-10" />
+              </div>
+
+              <h2 class="text-2xl font-black text-sky-950 kaiti mb-2">
+                一、供詞填充練習
+              </h2>
+              <p class="text-sm text-slate-600 font-medium mb-4">
+                收錄課本 78 組重點詞語，每次隨機抽出 10 個詞語及 10 題句子進行填充配對（支援 A4 列印）。
+              </p>
+
+              <!-- 供詞填充範圍選擇 -->
+              <div class="space-y-2 mb-5">
+                <div class="text-xs font-black text-sky-800">選擇詞語範圍：</div>
+                <div class="grid grid-cols-2 gap-1.5" id="part1-mode-selector">
+                  <button type="button" onclick="selectPart1Mode('all')" data-mode="all"
+                    class="p1-mode-btn bg-sky-500 text-white border-2 border-sky-600 rounded-xl p-2 text-xs font-black text-center transition cursor-pointer shadow-xs">
+                    🌈 全部單元綜合
+                  </button>
+                  <button type="button" onclick="selectPart1Mode('unit6')" data-mode="unit6"
+                    class="p1-mode-btn bg-white text-slate-700 border-2 border-sky-200 hover:border-sky-400 rounded-xl p-2 text-xs font-bold text-center transition cursor-pointer">
+                    🌿 單元六及量詞
+                  </button>
+                  <button type="button" onclick="selectPart1Mode('unit34')" data-mode="unit34"
+                    class="p1-mode-btn bg-white text-slate-700 border-2 border-sky-200 hover:border-sky-400 rounded-xl p-2 text-xs font-bold text-center transition cursor-pointer">
+                    🌙 單元三及單元四
+                  </button>
+                  <button type="button" onclick="selectPart1Mode('category')" data-mode="category"
+                    class="p1-mode-btn bg-white text-slate-700 border-2 border-sky-200 hover:border-sky-400 rounded-xl p-2 text-xs font-bold text-center transition cursor-pointer">
+                    🐦 名詞動詞數詞
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="startPart1()"
+              class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-black text-lg py-3.5 px-5 rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition cursor-pointer">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/270d.svg" class="w-6 h-6" />
+              <span>進入供詞填充</span>
+            </button>
+          </div>
+
+          <!-- ========== 第二部分：標點符號練習 ========== -->
+          <div class="bg-gradient-to-b from-pink-50 to-white rounded-3xl border-3 border-pink-300 p-5 flex flex-col justify-between shadow-md hover:shadow-lg transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="bg-pink-500 text-white font-black text-xs px-3 py-1 rounded-full tracking-wide">
+                  第二部分 (Part 2)
+                </span>
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4ac.svg" alt="對話氣泡" class="w-10 h-10" />
+              </div>
+
+              <h2 class="text-2xl font-black text-pink-950 kaiti mb-2">
+                二、標點符號練習
+              </h2>
+              <p class="text-sm text-slate-600 font-medium mb-4">
+                緊貼課文時間詞、三素句及提問句式，專練三大基本標點符號（支援 A4 列印）：
+              </p>
+
+              <!-- 三大標點展示卡 -->
+              <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+                <div class="bg-white border-2 border-pink-200 rounded-2xl p-2">
+                  <div class="text-3xl font-black text-pink-600 kaiti leading-none mb-1">，</div>
+                  <div class="text-xs font-black text-slate-800">逗號</div>
+                  <div class="text-[11px] text-slate-500">20 題</div>
+                </div>
+                <div class="bg-white border-2 border-purple-200 rounded-2xl p-2">
+                  <div class="text-3xl font-black text-purple-600 kaiti leading-none mb-1">。</div>
+                  <div class="text-xs font-black text-slate-800">句號</div>
+                  <div class="text-[11px] text-slate-500">20 題</div>
+                </div>
+                <div class="bg-white border-2 border-amber-200 rounded-2xl p-2">
+                  <div class="text-3xl font-black text-amber-600 kaiti leading-none mb-1">？</div>
+                  <div class="text-xs font-black text-slate-800">問號</div>
+                  <div class="text-[11px] text-slate-500">20 題</div>
+                </div>
+              </div>
+
+              <div class="bg-pink-100/70 border border-pink-200 rounded-xl px-3 py-2 text-xs font-bold text-pink-900 mb-5 flex items-center gap-2">
+                <span>🎯</span>
+                <span>共 60 題題庫，每次平均隨機抽出 10 題！</span>
+              </div>
+            </div>
+
+            <button onclick="startPart2()"
+              class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-black text-lg py-3.5 px-5 rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition cursor-pointer">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2753.svg" class="w-6 h-6" />
+              <span>進入標點符號練習</span>
+            </button>
+          </div>
+
+          <!-- ========== 第三部分：重組句子練習 (100題題庫) ========== -->
+          <div class="bg-gradient-to-b from-emerald-50 to-white rounded-3xl border-3 border-emerald-300 p-5 flex flex-col justify-between shadow-md hover:shadow-lg transition relative overflow-hidden">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-full tracking-wide">
+                  第三部分 (Part 3)
+                </span>
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f682.svg" alt="火車車廂" class="w-10 h-10" />
+              </div>
+
+              <h2 class="text-2xl font-black text-emerald-950 kaiti mb-2">
+                三、重組句子練習
+              </h2>
+              <p class="text-sm text-slate-600 font-medium mb-4">
+                收錄 <strong>100 題</strong>三素句及四素句句庫，拆成 3 或 4 個元素詞卡，按次序點選排成完整句子！
+              </p>
+
+              <!-- 句式結構示意 -->
+              <div class="space-y-2 mb-4">
+                <div class="bg-white border-2 border-emerald-200 rounded-xl px-3 py-2 text-xs">
+                  <span class="font-black text-emerald-700">🔹 三素句 (60題)：</span>
+                  <span class="text-slate-700 font-bold">時間／人或物 ＋ 地點 ＋ 事情</span>
+                </div>
+                <div class="bg-white border-2 border-teal-200 rounded-xl px-3 py-2 text-xs">
+                  <span class="font-black text-teal-700">🔸 四素句 (40題)：</span>
+                  <span class="text-slate-700 font-bold">時間 ＋ 人或物 ＋ 地點 ＋ 事情</span>
+                </div>
+              </div>
+
+              <div class="bg-emerald-100/80 border border-emerald-200 rounded-xl px-3 py-2 text-xs font-bold text-emerald-900 mb-5 flex items-center gap-2">
+                <span>🔊</span>
+                <span>100 題隨機抽 10 題，支援即時組句及發音朗讀！</span>
+              </div>
+            </div>
+
+            <button onclick="startPart3()"
+              class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-black text-lg py-3.5 px-5 rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition cursor-pointer">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f50a.svg" class="w-6 h-6" />
+              <span>進入重組句子練習</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 第一及第二部分：A4 練習紙頁面 (WORKSHEET VIEW) ==================== -->
+  <div id="worksheet-view" class="hidden pt-4 pb-10">
+
+    <!-- 頂部工具列（列印時自動隱藏） -->
+    <div class="no-print max-w-[210mm] mx-auto mb-4 px-3 flex flex-wrap items-center justify-between gap-3 bg-white/95 backdrop-blur p-3 rounded-2xl shadow-md border-2 border-sky-200">
+      <div class="flex items-center gap-2">
+        <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4dd.svg" class="w-7 h-7" />
+        <span class="font-black text-slate-700 text-sm sm:text-base">
+          填寫進度：<span id="progress-text" class="text-blue-600 text-lg">0</span> / 10 題
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="regenerateCurrentPractice()"
+          class="inline-flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-sm px-3.5 py-2 rounded-xl border border-amber-300 transition cursor-pointer">
+          <span>🔀 換一組新題目</span>
+        </button>
+        <button onclick="printWorksheet()"
+          class="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-sm px-4 py-2 rounded-xl shadow transition cursor-pointer">
+          <span>🖨️ 列印練習紙 (A4)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- A4 直向練習紙主體 -->
+    <div class="a4-paper" id="a4-sheet">
+      <div>
+        <!-- 試卷標題欄 -->
+        <div class="border-b-2 border-slate-800 pb-3 mb-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 no-print">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f31e.svg" class="w-8 h-8" />
+            </div>
+            <h1 id="sheet-main-title" class="text-2xl sm:text-3xl font-black text-center tracking-widest kaiti text-slate-900 flex-1">
+              1B語文知識評估一
+            </h1>
+            <div class="flex items-center gap-2 no-print">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f308.svg" class="w-8 h-8" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap justify-between items-center text-sm sm:text-base kaiti text-slate-800 mt-3 gap-y-2">
+            <div>姓名：____________________</div>
+            <div>班別：1B（  ）</div>
+            <div>日期：____月____日</div>
+            <div>成績：<span id="paper-score-display" class="font-bold text-red-600 underline decoration-dotted">   </span> / 100</div>
+          </div>
+        </div>
+
+        <!-- 成績結算橫幅（提交後顯示，列印時隱藏） -->
+        <div id="result-banner" class="hidden no-print mb-4 rounded-2xl p-4 border-3 text-center pop-in">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <img id="result-emoji" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3c6.svg" class="w-14 h-14" />
+            <div>
+              <div id="result-score-title" class="text-2xl sm:text-3xl font-black"></div>
+              <p id="result-feedback-msg" class="text-sm sm:text-base font-bold mt-1"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 第一部分專屬內容：供詞填充 ==================== -->
+        <div id="part1-container">
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p class="text-base sm:text-lg font-bold kaiti text-slate-900">
+              一、供詞填充：從下面的詞語中選出適當的詞語，填在<span class="inline-block border-b-2 border-slate-800 w-12 mx-1"></span>上。（100分，每題10分）
+            </p>
+            <span class="no-print text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full">
+              💡 點選下方詞語即可填入空格
+            </span>
+          </div>
+
+          <!-- 頂部 10 個隨機詞語庫 -->
+          <div class="bg-sky-50/80 border-2 border-sky-400 rounded-2xl p-3 mb-5">
+            <div id="word-bank" class="grid grid-cols-5 gap-2 sm:gap-2.5 text-center">
+              <!-- JS 動態生成 10 個隨機詞語 -->
+            </div>
+          </div>
+
+          <!-- 下面 10 題供詞填充題 -->
+          <div id="part1-questions-list" class="space-y-2.5 sm:space-y-3">
+            <!-- JS 動態生成 10 題 -->
+          </div>
+        </div>
+
+        <!-- ==================== 第二部分專屬內容：標點符號 ==================== -->
+        <div id="part2-container" class="hidden">
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p class="text-base sm:text-lg font-bold kaiti text-slate-900">
+              二、標點符號：在句子中的<span class="inline-block border-2 border-slate-800 w-6 h-6 align-middle mx-1 rounded-xs"></span>裏填上適當的標點符號（ <span class="font-black">，</span> <span class="font-black">。</span> <span class="font-black">？</span> ）。（100分，每題10分）
+            </p>
+            <span class="no-print text-xs bg-pink-100 text-pink-800 font-bold px-2.5 py-1 rounded-full">
+              💡 點選下面按鈕填入選中的方格
+            </span>
+          </div>
+
+          <!-- 頂部三大標點符號點選欄 -->
+          <div class="punct-guide-box bg-pink-50/80 border-2 border-pink-400 rounded-2xl p-3 mb-5">
+            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
+              <button type="button" onclick="handlePunctSelect('，')"
+                class="punct-btn bg-white border-2 border-pink-300 hover:border-pink-500 hover:bg-pink-50 rounded-2xl py-2 px-3 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3 shadow-xs cursor-pointer">
+                <span class="text-3xl sm:text-4xl font-black text-pink-600 kaiti leading-none">，</span>
+                <div class="text-center sm:text-left">
+                  <div class="font-black text-slate-800 text-sm sm:text-base">逗號</div>
+                  <div class="no-print text-[11px] text-slate-500 font-medium">句子中間沒說完</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="handlePunctSelect('。')"
+                class="punct-btn bg-white border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 rounded-2xl py-2 px-3 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3 shadow-xs cursor-pointer">
+                <span class="text-3xl sm:text-4xl font-black text-purple-600 kaiti leading-none">。</span>
+                <div class="text-center sm:text-left">
+                  <div class="font-black text-slate-800 text-sm sm:text-base">句號</div>
+                  <div class="no-print text-[11px] text-slate-500 font-medium">一句話說完了</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="handlePunctSelect('？')"
+                class="punct-btn bg-white border-2 border-amber-300 hover:border-amber-500 hover:bg-amber-50 rounded-2xl py-2 px-3 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-3 shadow-xs cursor-pointer">
+                <span class="text-3xl sm:text-4xl font-black text-amber-600 kaiti leading-none">？</span>
+                <div class="text-center sm:text-left">
+                  <div class="font-black text-slate-800 text-sm sm:text-base">問號</div>
+                  <div class="no-print text-[11px] text-slate-500 font-medium">提出問題有疑問</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- 下面 10 題標點符號練習題 -->
+          <div id="part2-questions-list" class="space-y-2.5 sm:space-y-3">
+            <!-- JS 動態生成 10 題 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 練習紙最下方按鈕區（列印時隱藏） -->
+      <div class="no-print mt-6 pt-4 border-t-2 border-dashed border-slate-200">
+        <!-- 未提交前的按鈕 -->
+        <div id="pre-submit-actions" class="flex items-center justify-between gap-4">
+          <button onclick="goHome()"
+            class="inline-flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-black text-base sm:text-lg px-6 py-3 rounded-2xl transition cursor-pointer">
+            <span>⬅️ 上一頁</span>
+          </button>
+
+          <button onclick="handleFinishClick()"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg sm:text-xl px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition cursor-pointer">
+            <span>✅ 完成練習</span>
+          </button>
+        </div>
+
+        <!-- 提交後的按鈕 -->
+        <div id="post-submit-actions" class="hidden flex flex-wrap items-center justify-center gap-4">
+          <button onclick="regenerateCurrentPractice()"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-black text-lg sm:text-xl px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition cursor-pointer">
+            <span>🔄 再做練習</span>
+          </button>
+
+          <button onclick="goHome()"
+            class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-xl px-8 py-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition cursor-pointer">
+            <span>🏠 回主頁</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 第三部分：重組句子互動頁面 (PART 3 VIEW) ==================== -->
+  <div id="part3-view" class="hidden max-w-4xl mx-auto px-4 pt-5 pb-12">
+
+    <!-- 逐題互動作答卡片 -->
+    <div id="p3-quiz-card" class="bg-white rounded-3xl shadow-xl border-4 border-emerald-300 overflow-hidden pop-in">
+      <!-- 頂部標題與進度列 -->
+      <div class="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 p-4 sm:p-6 text-white">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span class="bg-white/20 backdrop-blur-xs text-white font-black text-xs sm:text-sm px-3.5 py-1 rounded-full">
+            1B語文知識評估一 ・ 第三部分（100題句庫）
+          </span>
+
+          <!-- 語音語言切換鍵 -->
+          <button type="button" id="voice-lang-toggle" onclick="toggleVoiceLang()"
+            class="bg-amber-300 hover:bg-amber-400 text-amber-950 font-black text-xs sm:text-sm px-3.5 py-1 rounded-full shadow-xs transition cursor-pointer flex items-center gap-1.5">
+            <span>🗣️ 語音：廣東話</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f682.svg" class="w-10 h-10 float-anim" />
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-black kaiti tracking-wide">三、重組句子練習</h2>
+              <p class="text-emerald-100 text-xs sm:text-sm font-bold">按正確次序點選元素詞卡，組合成通順句子</p>
+            </div>
+          </div>
+
+          <!-- 題號進度徽章 -->
+          <div class="bg-white text-emerald-900 font-black px-4 py-2 rounded-2xl shadow-sm text-center">
+            <div class="text-xs text-emerald-600">目前題目</div>
+            <div class="text-xl sm:text-2xl leading-none mt-0.5">
+              第 <span id="p3-q-num" class="text-orange-500">1</span> / 10 題
+            </div>
+          </div>
+        </div>
+
+        <!-- 進度條 -->
+        <div class="w-full bg-emerald-800/40 h-2.5 rounded-full mt-4 overflow-hidden">
+          <div id="p3-progress-bar" class="bg-amber-300 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+        </div>
+      </div>
+
+      <!-- 作答主體區 -->
+      <div class="p-5 sm:p-8 space-y-6">
+        <!-- 句式提示標籤 -->
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl px-4 py-2.5">
+          <div class="flex items-center gap-2">
+            <span id="p3-type-badge" class="bg-emerald-600 text-white font-black text-xs px-2.5 py-1 rounded-lg">四素句</span>
+            <span id="p3-formula-hint" class="text-sm sm:text-base font-black text-emerald-900">
+              結構提示：時間 ＋ 人或物 ＋ 地點 ＋ 事情
+            </span>
+          </div>
+          <span class="text-xs text-emerald-700 font-bold">💡 點選已選詞卡可取消重排</span>
+        </div>
+
+        <!-- 1. 打亂次序的 3 個 / 4 個元素詞卡區 -->
+        <div>
+          <div class="text-sm font-black text-slate-600 mb-3 flex items-center gap-1.5">
+            <span>👆 請按順序點選下面的詞語元素：</span>
+          </div>
+          <div id="p3-chunks-area" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- JS 動態生成 3 或 4 個元素詞卡 -->
+          </div>
+        </div>
+
+        <!-- 2. 下方即時顯示句子區 + 發音鍵 -->
+        <div class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-3 border-amber-300 rounded-3xl p-5 shadow-inner">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="text-sm font-black text-amber-900 flex items-center gap-1.5">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2728.svg" class="w-5 h-5" />
+              <span>即時組成的句子：</span>
+            </span>
+
+            <div class="flex items-center gap-2">
+              <!-- 清除重選按鈕 -->
+              <button type="button" onclick="clearCurrentP3Selection()"
+                class="bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-200 font-black text-xs sm:text-sm px-3 py-1.5 rounded-xl transition cursor-pointer">
+                🔄 重選本題
+              </button>
+
+              <!-- 發音鍵 -->
+              <button type="button" id="p3-speak-btn" onclick="speakCurrentP3Sentence()"
+                class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-sm sm:text-base px-4 py-1.5 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex items-center gap-1.5">
+                <span id="p3-speak-icon">🔊</span>
+                <span>讀出句子</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 即時句子顯示框 -->
+          <div id="p3-live-sentence"
+            class="min-h-[68px] bg-white rounded-2xl border-2 border-amber-200 px-4 py-3.5 flex flex-wrap items-center gap-2 kaiti text-2xl sm:text-3xl font-bold text-slate-900 shadow-xs">
+            <!-- JS 即時渲染已選順序與待填空格 -->
+          </div>
+        </div>
+
+        <!-- 3. 下方導航按鈕：上一頁 / 主頁 / 下一頁 -->
+        <div class="pt-2 border-t-2 border-dashed border-slate-200 flex items-center justify-between gap-3">
+          <button type="button" id="p3-prev-btn" onclick="prevP3Question()"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 font-black text-base sm:text-lg px-6 py-3.5 rounded-2xl transition cursor-pointer">
+            <span>⬅️ 上一頁</span>
+          </button>
+
+          <button type="button" onclick="goHome()"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-sky-100 hover:bg-sky-200 text-sky-900 border-2 border-sky-300 font-black text-base sm:text-lg px-6 py-3.5 rounded-2xl transition cursor-pointer">
+            <span>🏠 主頁</span>
+          </button>
+
+          <button type="button" id="p3-next-btn" onclick="nextP3Question()"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-base sm:text-lg px-6 py-3.5 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer">
+            <span id="p3-next-text">下一頁 ➡️</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第三部分最終成績單與逐題訂正畫面 -->
+    <div id="p3-result-card" class="hidden bg-white rounded-3xl shadow-xl border-4 border-amber-300 overflow-hidden pop-in">
+      <div id="p3-score-header" class="p-6 sm:p-8 text-center border-b-4">
+        <img id="p3-score-emoji" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3c6.svg" class="w-20 h-20 mx-auto mb-3 float-anim" />
+        <span class="inline-block bg-white/80 text-slate-800 font-black text-xs px-3.5 py-1 rounded-full mb-2">
+          1B語文知識評估一 ・ 重組句子成績單
+        </span>
+        <h2 id="p3-score-title" class="text-3xl sm:text-4xl font-black mb-2"></h2>
+        <p id="p3-score-msg" class="text-base sm:text-lg font-bold"></p>
+      </div>
+
+      <!-- 逐題訂正列表 -->
+      <div class="p-5 sm:p-8">
+        <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+          <span>📋 題目批改與訂正（點擊喇叭可聆聽正確句子）：</span>
+        </h3>
+        <div id="p3-review-list" class="space-y-3">
+          <!-- JS 動態生成 10 題訂正結果 -->
+        </div>
+
+        <!-- 底部操作按鈕 -->
+        <div class="mt-8 pt-5 border-t-2 border-dashed border-slate-200 flex flex-wrap items-center justify-center gap-4">
+          <button onclick="startPart3()"
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-black text-lg sm:text-xl px-8 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition cursor-pointer">
+            <span>🔄 再做練習</span>
+          </button>
+
+          <button onclick="goHome()"
+            class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-xl px-8 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition cursor-pointer">
+            <span>🏠 回主頁</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 未填完提示彈窗（第一、二部分共用） -->
+  <div id="incomplete-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center border-4 border-amber-300 shadow-2xl pop-in">
+      <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f914.svg" class="w-16 h-16 mx-auto mb-3" />
+      <h3 class="text-xl font-black text-slate-800 mb-2">還有題目未填寫喔！</h3>
+      <p id="incomplete-msg" class="text-slate-600 font-medium mb-5">你還有幾題未填好，想繼續填寫還是現在交卷？</p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="closeIncompleteModal()"
+          class="flex-1 bg-amber-400 hover:bg-amber-500 text-amber-950 font-black py-2.5 px-4 rounded-xl transition cursor-pointer">
+          繼續填寫
+        </button>
+        <button onclick="submitAssessment()"
+          class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition cursor-pointer">
+          直接交卷
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 第一部分：供詞填充題庫 (78題) ====================
+    const PART1_QUESTION_BANK = [
+      // --- 單元六 說一聲謝謝 (課業18) ---
+      { word: "畫", before: "我做了一幅美麗的樹葉", after: "。", cat: "unit6" },
+      { word: "公園", before: "昨天，我在", after: "裏找好看的落葉。", cat: "unit6" },
+      { word: "找", before: "小螞蟻在泥地上", after: "食物。", cat: "unit6" },
+      { word: "片", before: "早上，我吃了一", after: "麵包。", cat: "unit6", group: "mw_pian" },
+      { word: "已經", before: "哥哥", after: "小學畢業了。", cat: "unit6" },
+      { word: "美", before: "小妹妹的樣子真", after: "！", cat: "unit6", group: "pretty" },
+      { word: "不久", before: "爸爸出門", after: "便下雨了。", cat: "unit6" },
+      { word: "像", before: "圓圓的月亮", after: "一面鏡子。", cat: "unit6" },
+      { word: "老師", before: "我們的班主任是王", after: "。", cat: "unit6" },
+      { word: "再", before: "課文很有趣，老師叫我們", after: "讀一次。", cat: "unit6" },
+      { word: "寫", before: "媽媽每天晚上教小弟弟", after: "字。", cat: "unit6", group: "write_char" },
+
+      // --- 課業18, 19 字詞與量詞 ---
+      { word: "生日", before: "今天是爸爸的", after: "，我給他唱了一首歌。", cat: "unit6" },
+      { word: "早上", before: "", after: "，我準時坐校車上學。", cat: "unit6" },
+      { word: "祝", before: "新年到了，我", after: "爸媽身體健康。", cat: "unit6" },
+      { word: "你", before: "媽媽問妹妹：「", after: "做好功課了嗎？」", cat: "unit6" },
+      { word: "快樂", before: "我和同學一起拍球，玩得很", after: "。", cat: "unit6" },
+      { word: "得到", before: "在學校裏，我常常", after: "同學的幫助。", cat: "unit6" },
+      { word: "顆", before: "夜空中有一", after: "閃亮的星星。", cat: "unit6" },
+      { word: "頓", before: "媽媽為我們準備了一", after: "豐富的晚餐。", cat: "unit6" },
+      { word: "張", before: "我做了一", after: "感謝卡送給老師。", cat: "unit6" },
+
+      // --- 單元三 秋天的節目 (課業8, 10) ---
+      { word: "晚上", before: "中秋節的", after: "，月亮又圓又大。", cat: "unit34" },
+      { word: "月亮", before: "美麗的", after: "高高掛在天空上。", cat: "unit34", group: "moon" },
+      { word: "又", before: "姐姐長得", after: "高又瘦。", cat: "unit34" },
+      { word: "圓", before: "媽媽對着一面", after: "鏡子梳頭。", cat: "unit34" },
+      { word: "大", before: "西瓜", after: "，蘋果小。", cat: "unit34" },
+      { word: "在", before: "同學們安靜地", after: "教室裏上課。", cat: "unit34" },
+      { word: "了", before: "我剛才吃", after: "一塊美味的蛋糕。", cat: "unit34" },
+      { word: "明亮", before: "弟弟的一雙眼睛很", after: "。", cat: "unit34" },
+      { word: "好看", before: "姐姐穿的新衣服很", after: "。", cat: "unit34", group: "pretty" },
+      { word: "天上", before: "藍藍的", after: "飄着朵朵白雲。", cat: "unit34" },
+      { word: "白", before: "老師在", after: "板上寫字。", cat: "unit34" },
+      { word: "人們", before: "早晨，", after: "在巴士站排隊等候巴士。", cat: "unit34" },
+      { word: "山坡", before: "我家後面有一個綠油油的小", after: "。", cat: "unit34" },
+      { word: "紅", before: "媽媽最喜歡", after: "色的玫瑰花。", cat: "unit34" },
+      { word: "綠", before: "郊外到處都是", after: "色的樹木。", cat: "unit34" },
+      { word: "草地", before: "小牛在青青的", after: "上吃草。", cat: "unit34" },
+      { word: "給", before: "奶奶每天晚上都會", after: "我們說笑話。", cat: "unit34" },
+      { word: "美麗", before: "孔雀開屏時，羽毛真", after: "！", cat: "unit34", group: "pretty" },
+
+      // --- 單元四 閱讀真有趣 (課業11, 12) ---
+      { word: "多", before: "弟弟有很多玩具，種類真", after: "。", cat: "unit34" },
+      { word: "書", before: "我很喜歡到圖書館看圖", after: "。", cat: "unit34" },
+      { word: "把", before: "我先", after: "功課做好了，才看電視。", cat: "unit34" },
+      { word: "詞語", before: "你明白這個", after: "的意思嗎？", cat: "unit34" },
+      { word: "馬車", before: "旅客可以乘坐", after: "在古城裏遊覽。", cat: "unit34" },
+      { word: "字", before: "爸爸耐心地教妹妹寫", after: "。", cat: "unit34", group: "write_char" },
+      { word: "王子", before: "童話故事裏有公主和", after: "。", cat: "unit34" },
+      { word: "呢", before: "我喜歡吃魚，你", after: "？", cat: "unit34" },
+      { word: "一起", before: "每天早上，我跟哥哥", after: "上學去。", cat: "unit34" },
+      { word: "爸爸", before: "每天清早，", after: "便要出門上班去。", cat: "unit34" },
+      { word: "和", before: "假日裏，我", after: "弟弟到公園去玩。", cat: "unit34" },
+      { word: "媽媽", before: "", after: "很愛我，我也非常愛她。", cat: "unit34" },
+      { word: "故事", before: "我最愛聽奶奶講", after: "。", cat: "unit34" },
+      { word: "很", before: "媽媽做的點心", after: "好吃。", cat: "unit34" },
+      { word: "可愛", before: "小寶寶笑起來的樣子真", after: "！", cat: "unit34", group: "pretty" },
+      { word: "可以", before: "星期天，我們", after: "到圖書館看書。", cat: "unit34" },
+
+      // --- 動植物名詞、自然現象、動詞、數詞 (課業4, 5, 6) ---
+      { word: "鳥兒", before: "", after: "拍拍翅膀在空中飛。", cat: "category", group: "bird" },
+      { word: "金魚", before: "我家魚缸裏養了一尾", after: "。", cat: "category", group: "fish" },
+      { word: "牛奶", before: "每天早餐我都愛喝", after: "。", cat: "category" },
+      { word: "山羊", before: "", after: "的頭上長了一對角。", cat: "category", group: "sheep" },
+      { word: "禾苗", before: "春天到了，田裏插滿了綠油油的", after: "。", cat: "category" },
+      { word: "白米", before: "媽媽去超級市場買了一包", after: "。", cat: "category" },
+      { word: "竹葉", before: "大熊貓最愛吃新鮮的", after: "。", cat: "category" },
+      { word: "西瓜", before: "夏天吃又大又甜的", after: "真解渴。", cat: "category" },
+      { word: "果汁", before: "這杯鮮榨橙汁和蘋果", after: "真甜。", cat: "category" },
+      { word: "吹", before: "妹妹在草地上開心地", after: "泡泡。", cat: "category" },
+      { word: "搖", before: "微風吹過，花兒輕輕地", after: "。", cat: "category" },
+      { word: "點頭", before: "早上回到學校，我向老師", after: "說聲早。", cat: "category" },
+      { word: "笑", before: "小弟弟聽到笑話後常常大", after: "。", cat: "category" },
+      { word: "飛", before: "小蜜蜂", after: "到花園裏採花蜜。", cat: "category" },
+      { word: "游", before: "哥哥在泳池裏快樂地", after: "泳。", cat: "category" },
+      { word: "追", before: "我和弟弟在草地上", after: "着足球跑。", cat: "category" },
+      { word: "風", before: "秋", after: "吹起，樹上的黃葉紛紛落下。", cat: "category" },
+      { word: "花", before: "春天來了，公園裏的", after: "兒真漂亮。", cat: "category" },
+      { word: "雨", before: "下", after: "了，快把窗子關好吧！", cat: "category" },
+      { word: "雲", before: "天上飄着片片雪白的", after: "。", cat: "category" },
+      { word: "星", before: "夜空中有月亮，還有閃閃的", after: "。", cat: "category" },
+      { word: "也", before: "他一點", after: "不害怕在舞台上表演。", cat: "category" },
+      { word: "一", before: "我在跑步比賽中得了第", after: "名。", cat: "category", group: "num" },
+      { word: "四", before: "春、夏、秋、冬，一年有", after: "季。", cat: "category", group: "num" },
+      { word: "七", before: "一星期共有", after: "天。", cat: "category", group: "num" },
+      { word: "十", before: "我有一雙手，共有", after: "隻手指。", cat: "category", group: "num" }
+    ];
+
+    // ==================== 第二部分：標點符號題庫 (共60題) ====================
+    const COMMA_BANK = [
+      { before: "昨天", after: "我在山坡上放風箏。", mark: "，", reason: "時間詞「昨天」放在句首後，要用逗號停頓。" },
+      { before: "今天", after: "我和媽媽去郊遊。", mark: "，", reason: "時間詞「今天」放在句首後，要用逗號停頓。" },
+      { before: "明天", after: "我會到朋友家玩遊戲。", mark: "，", reason: "時間詞「明天」放在句首後，要用逗號停頓。" },
+      { before: "早上", after: "我跟爸爸去圖書館。", mark: "，", reason: "時間詞「早上」放在句首後，要用逗號停頓。" },
+      { before: "下午", after: "我跟媽媽一起做蛋糕。", mark: "，", reason: "時間詞「下午」放在句首後，要用逗號停頓。" },
+      { before: "晚飯後", after: "我和爸爸、媽媽一起讀故事書。", mark: "，", reason: "時間詞「晚飯後」放在句首後，要用逗號停頓。" },
+      { before: "昨天，我看了一本書", after: "學會怎樣介紹姓氏。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "我姓王", after: "王子的王。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "昨天，我在公園裏找好看的落葉", after: "打算做一幅樹葉畫。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "我拾起一片樹葉", after: "以為已經找到最美的了。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "可是不久", after: "我又找到一片更美的樹葉。", mark: "，", reason: "「可是不久」表示轉折停頓，後面用逗號。" },
+      { before: "它像一顆心", after: "又像老師的笑臉。", mark: "，", reason: "句子中間還沒說完，要用逗號分開兩部分。" },
+      { before: "晚上", after: "我在家裏把樹葉貼在一張紙上。", mark: "，", reason: "時間詞「晚上」放在句首後，要用逗號停頓。" },
+      { before: "我在紙上寫上祝福", after: "做成一張感謝卡。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "中秋節的晚上", after: "月亮又圓又大。", mark: "，", reason: "表示時間的詞語後，要用逗號停頓。" },
+      { before: "藍藍的天空上有片片白雲", after: "人們在山坡上放風箏。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "草地上", after: "小妹妹快樂地跟着黃蝴蝶跳舞。", mark: "，", reason: "表示地點的詞語放在句首後，要用逗號停頓。" },
+      { before: "爸爸給我們拍照", after: "留下了我們的笑臉。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "我們可以把姓氏拆成兩個字", after: "例如：弓長張、木子李。", mark: "，", reason: "句子中間還沒說完，要用逗號停頓。" },
+      { before: "每天清早", after: "爸爸便要出門上班去。", mark: "，", reason: "時間詞「每天清早」放在句首後，要用逗號停頓。" }
+    ];
+
+    const PERIOD_BANK = [
+      { before: "風兒輕輕地吹", after: "", mark: "。", reason: "這是一句完整的陳述句，說完了要用句號。" },
+      { before: "公園裏的花兒搖來搖去", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "鳥兒拍拍翅膀在空中飛", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "魚兒在水裏快樂地游", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "晚上，圓圓的月亮出來了", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "今天，我和姐姐一起上學去", after: "", mark: "。", reason: "這是一句完整的三素句，說完了要用句號。" },
+      { before: "我喜歡在中秋節玩燈籠", after: "", mark: "。", reason: "回答別人的問題，一句話說完了要用句號。" },
+      { before: "我喜歡吃香甜的月餅", after: "", mark: "。", reason: "陳述自己的喜好，說完了要用句號。" },
+      { before: "昨天，我在公園裏找好看的落葉", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "我把感謝卡送給我最愛的老師", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "用這些方法介紹姓氏真有趣", after: "", mark: "。", reason: "表達感受的句子說完了，結尾要用句號。" },
+      { before: "童話故事裏有公主和王子", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "哥哥在泳池裏快樂地游泳", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "早上，我向老師點頭說聲早", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "田裏插滿了綠油油的禾苗", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "大熊貓最愛吃新鮮的竹葉", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "昨天，我看了一本有趣的故事書", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "媽媽做的點心非常好吃", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "我們的班主任是王老師", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" },
+      { before: "天上有日，有月，還有星", after: "", mark: "。", reason: "一句話說完了，結尾要用句號。" }
+    ];
+
+    const QUESTION_BANK = [
+      { before: "請問你在中秋節喜歡做甚麼", after: "", mark: "？", reason: "句子有「甚麼」，表示提出問題，要用問號。" },
+      { before: "你在中秋節喜歡吃甚麼", after: "", mark: "？", reason: "句子有「甚麼」，表示發問，要用問號。" },
+      { before: "明天晚餐吃甚麼", after: "", mark: "？", reason: "句子提出疑問，結尾要用問號。" },
+      { before: "媽媽要到菜市場買甚麼", after: "", mark: "？", reason: "句子提出疑問，結尾要用問號。" },
+      { before: "思思在購物清單上寫錯了甚麼字", after: "", mark: "？", reason: "句子有「甚麼」，表示發問，要用問號。" },
+      { before: "你見過公園裏的落葉嗎", after: "", mark: "？", reason: "句尾有疑問詞「嗎」，要用問號。" },
+      { before: "這些漂亮的落葉可以用來做甚麼", after: "", mark: "？", reason: "句子詢問用途，結尾要用問號。" },
+      { before: "我姓王，王子的王。你呢", after: "", mark: "？", reason: "句尾有疑問詞「呢」，反問對方要用問號。" },
+      { before: "我喜歡吃魚，你呢", after: "", mark: "？", reason: "句尾有疑問詞「呢」，反問對方要用問號。" },
+      { before: "媽媽問妹妹：「你做好功課了嗎", after: "」", mark: "？", reason: "句尾有「嗎」，表示媽媽在發問，要用問號。" },
+      { before: "你是哪一班的學生", after: "", mark: "？", reason: "句子有「哪」，表示詢問，要用問號。" },
+      { before: "你明白這個詞語的意思嗎", after: "", mark: "？", reason: "句尾有「嗎」，表示詢問對方，要用問號。" },
+      { before: "天上一點也不空，怎麼還能叫天空", after: "", mark: "？", reason: "句子有「怎麼」，表示反問，要用問號。" },
+      { before: "請問圖書館在哪裏", after: "", mark: "？", reason: "句子詢問地點，結尾要用問號。" },
+      { before: "你的書包裏有多少本故事書", after: "", mark: "？", reason: "句子詢問數量，結尾要用問號。" },
+      { before: "今天是星期幾", after: "", mark: "？", reason: "句子詢問日期，結尾要用問號。" },
+      { before: "這張漂亮的感謝卡是誰做的", after: "", mark: "？", reason: "句子有「誰」，表示發問，要用問號。" },
+      { before: "星期天，我可以和你一起去公園嗎", after: "", mark: "？", reason: "句尾有「嗎」，表示請求與詢問，要用問號。" },
+      { before: "猜一猜，這個古文字是哪個姓氏", after: "", mark: "？", reason: "句子提出問題讓人猜，結尾要用問號。" },
+      { before: "小鳥在樹上唱甚麼歌", after: "", mark: "？", reason: "句子有「甚麼」，表示發問，要用問號。" }
+    ];
+
+    // ==================== 第三部分：重組句子題庫 (共 100 題：四素句 40 題 + 三素句 60 題) ====================
+    const PART3_QUESTION_BANK = [
+      // --- 一、四素句：時間 + 人或物 + 地點 + 事情 (40題) ---
+      { parts: ["昨天，", "我", "在公園裏", "找好看的樹葉。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["昨天，", "我", "在家裏", "做生日卡。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["昨天，", "我", "在山坡上", "放風箏。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["明天，", "我", "會到朋友家", "玩遊戲。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "我", "在學校裏", "向老師點頭說聲早。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚上，", "我", "在家裏", "寫感謝卡。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["星期天，", "我和爸爸", "到圖書館", "看圖書。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["假日裏，", "我和弟弟", "到公園", "放風箏。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "小鳥", "在樹上", "快樂地唱歌。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "哥哥", "在泳池裏", "快樂地游泳。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["今天，", "小妹妹", "在草地上", "快樂地跳舞。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["中秋節的晚上，", "我們一家", "在公園裏", "賞月。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["春天到了，", "農夫", "在田裏", "插滿禾苗。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "小螞蟻", "在泥地上", "找食物。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["昨天，", "媽媽", "到超級市場", "買了一包白米。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚上，", "弟弟", "在房間裏", "上牀睡覺。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "同學們", "在教室裏", "專心上課。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["今天，", "老師", "在白板上", "寫字。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "人們", "在巴士站", "排隊等候巴士。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["星期六，", "我和媽媽", "到郊外", "旅行。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "山羊", "在山坡上", "吃嫩草。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "小蜜蜂", "飛到花園裏", "採花蜜。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚飯後，", "爺爺", "在客廳裏", "看報紙。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["昨天，", "奶奶", "在廚房裏", "做美味的點心。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["今天，", "姐姐", "在鏡子前", "梳頭。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚上，", "圓圓的月亮", "在天空中", "發光。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "小狗", "在池塘邊", "喝水。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["假日裏，", "旅客", "乘坐馬車", "在古城裏遊覽。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["春天，", "黃蝴蝶", "在花叢中", "飛來飛去。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["秋天，", "黃葉", "從大樹上", "紛紛落下。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "小魚", "在清清的河水裏", "游來游去。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "我和弟弟", "在草地上", "追着足球跑。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["昨天，", "爸爸", "在草地上", "給我們拍照。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["中秋節，", "小朋友", "在公園裏", "提着燈籠玩。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["星期天，", "大熊貓", "在竹林裏", "吃新鮮的竹葉。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚上，", "閃閃的星星", "在夜空中", "眨眼睛。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["早上，", "公雞", "在山坡上", "喔喔叫。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["下午，", "妹妹", "在公園的草地上", "吹泡泡。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["今天，", "王老師", "在課室裏", "教我們讀課文。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["晚飯後，", "我和姐姐", "在書房裏", "做功課。"], type: "四素句", formula: "時間 ＋ 人或物 ＋ 地點 ＋ 事情" },
+
+      // --- 二、三素句 A：時間 + 人或物 + 事情 (30題) ---
+      { parts: ["昨天，", "我", "看了一本書。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["早上，", "我跟爸爸", "去圖書館。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["下午，", "我跟媽媽", "做蛋糕。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["晚飯後，", "我和爸爸、媽媽", "一起讀故事書。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["今天，", "我和姐姐", "上學去。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["今天，", "我和媽媽", "去郊遊。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["每天清早，", "爸爸", "便要出門上班去。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["每天晚上，", "奶奶", "都會給我們說笑話。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["早上，", "我", "吃了一片麵包。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["晚上，", "我", "做好功課才看電視。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["早上，", "我", "準時坐校車上學。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["每天晚上，", "媽媽", "教小弟弟寫字。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["新年到了，", "我", "祝爸媽身體健康。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["昨天，", "我", "學會怎樣介紹姓氏。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["今天，", "哥哥", "小學畢業了。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["晚上，", "月亮", "又圓又大。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["早上，", "紅日", "從東方升起來了。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["下雨了，", "爸爸", "快把窗子關好。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["秋天到了，", "樹葉", "變成黃色。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["夏天到了，", "我們", "愛吃又大又甜的西瓜。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["每天早餐，", "我", "都愛喝牛奶。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["今天，", "我", "給爸爸唱了一首生日歌。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["昨天，", "媽媽", "買了一個好看的文具盒給我。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["晚上，", "姐姐", "講了一個有趣的故事。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["早上，", "小弟弟", "開心地大笑。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["星期天，", "我們一家", "去飲茶。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["假日裏，", "我和同學", "一起拍球。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["下午，", "妹妹", "吃了一塊美味的蛋糕。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["晚上，", "我們", "一起賞月和吃月餅。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+      { parts: ["每天早上，", "小鳥", "都在唱歌。"], type: "三素句", formula: "時間 ＋ 人或物 ＋ 事情" },
+
+      // --- 三、三素句 B：人或物 + 地點 + 事情 (30題) ---
+      { parts: ["小弟弟", "在草地上", "跑。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小狗", "在池塘邊", "喝水。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["叔叔", "在海邊", "釣魚。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["媽媽和妹妹", "在山坡上", "放風箏。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["哥哥", "在草地上", "吃蘋果。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["魚兒", "在池塘裏", "游。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小蟲", "在樹葉上", "爬。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["蝴蝶", "在郊外", "飛。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小鳥", "在天空中", "飛。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["風箏", "在天空中", "飛。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["我們一家", "到郊外", "登高。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小牛", "在草地上", "吃草。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小鴨子", "在池塘裏", "學游泳。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小花貓", "在院子裏", "追着毛線球跑。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["白雲", "在藍藍的天上", "飄動。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["燈籠", "高高掛在", "公園的樹上。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小朋友", "在視藝室裏", "畫畫。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["同學們", "在操場上", "做早操。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["校長", "在禮堂裏", "講話。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["金魚", "在魚缸裏", "游來游去。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小羊", "在青青的草地上", "跑來跑去。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["農夫", "在田裏", "收割禾稻。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小妹妹", "在公園裏", "追着蝴蝶跑。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["哥哥", "在跑步比賽中", "得了第一名。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["姐姐", "在舞台上", "表演唱歌。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["孔雀", "在動物園裏", "開屏。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["小青蛙", "在荷葉上", "跳來跳去。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["松鼠", "在樹林裏", "找松果。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["爸爸和媽媽", "在客廳裏", "聽音樂。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" },
+      { parts: ["我們", "在課室裏", "認真地寫字。"], type: "三素句", formula: "人或物 ＋ 地點 ＋ 事情" }
+    ];
+
+    // ==================== 全局狀態管理 ====================
+    let activePart = "part1"; // "part1" | "part2" | "part3"
+    let part1Mode = "all";
+
+    // Part 1 狀態
+    let p1Questions = [];
+    let p1ShuffledWords = [];
+    let p1UserAnswers = Array(10).fill(null);
+    let p1ActiveBlank = 0;
+
+    // Part 2 狀態
+    let p2Questions = [];
+    let p2UserAnswers = Array(10).fill(null);
+    let p2ActiveBlank = 0;
+
+    // Part 3 狀態
+    let p3Questions = [];      // 10 題物件：{ parts, type, formula, shuffledChunks }
+    let p3Selections = [];     // 每題已選的 chunk index 陣列，例如 [2, 0, 1]
+    let p3CurrentIdx = 0;      // 0..9
+    let voiceLang = "zh-HK";   // "zh-HK" (廣東話) | "zh-TW" (普通話)
+
+    let isSubmitted = false;
+
+    // 洗牌函數（確保打亂後不會剛好和原本順序完全一樣）
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function shuffleDistinct(arr) {
+      if (arr.length <= 1) return [...arr];
+      let result = shuffleArray(arr);
+      let tries = 0;
+      while (result.every((val, idx) => val === arr[idx]) && tries < 10) {
+        result = shuffleArray(arr);
+        tries++;
+      }
+      return result;
+    }
+
+    // 隱藏所有主視圖
+    function hideAllViews() {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      document.getElementById("home-view").classList.add("hidden");
+      document.getElementById("worksheet-view").classList.add("hidden");
+      document.getElementById("part3-view").classList.add("hidden");
+    }
+
+    // 返回首頁
+    function goHome() {
+      hideAllViews();
+      document.getElementById("home-view").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 首頁選擇第一部分子模式
+    function selectPart1Mode(mode) {
+      part1Mode = mode;
+      document.querySelectorAll(".p1-mode-btn").forEach(btn => {
+        if (btn.dataset.mode === mode) {
+          btn.classList.remove("bg-white", "text-slate-700", "border-sky-200");
+          btn.classList.add("bg-sky-500", "text-white", "border-sky-600", "shadow-xs");
+        } else {
+          btn.classList.remove("bg-sky-500", "text-white", "border-sky-600", "shadow-xs");
+          btn.classList.add("bg-white", "text-slate-700", "border-sky-200");
+        }
+      });
+    }
+
+    // 啟動第一部分：供詞填充
+    function startPart1() {
+      activePart = "part1";
+      hideAllViews();
+      document.getElementById("worksheet-view").classList.remove("hidden");
+      document.getElementById("part1-container").classList.remove("hidden");
+      document.getElementById("part2-container").classList.add("hidden");
+      generatePart1Worksheet();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 啟動第二部分：標點符號練習
+    function startPart2() {
+      activePart = "part2";
+      hideAllViews();
+      document.getElementById("worksheet-view").classList.remove("hidden");
+      document.getElementById("part1-container").classList.add("hidden");
+      document.getElementById("part2-container").classList.remove("hidden");
+      generatePart2Worksheet();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 啟動第三部分：重組句子練習（從 100 題隨機抽 6 題三素句 + 4 題四素句）
+    function startPart3() {
+      activePart = "part3";
+      hideAllViews();
+      document.getElementById("part3-view").classList.remove("hidden");
+      document.getElementById("p3-quiz-card").classList.remove("hidden");
+      document.getElementById("p3-result-card").classList.add("hidden");
+
+      const threeElemPool = shuffleArray(PART3_QUESTION_BANK.filter(q => q.parts.length === 3)).slice(0, 6);
+      const fourElemPool = shuffleArray(PART3_QUESTION_BANK.filter(q => q.parts.length === 4)).slice(0, 4);
+      const combined = shuffleArray([...threeElemPool, ...fourElemPool]);
+
+      p3Questions = combined.map(q => ({
+        ...q,
+        shuffledChunks: shuffleDistinct(q.parts)
+      }));
+      p3Selections = Array.from({ length: 10 }, () => []);
+      p3CurrentIdx = 0;
+
+      renderPart3Question();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 換一組新題目 / 再做練習（Part 1 & 2）
+    function regenerateCurrentPractice() {
+      if (activePart === "part1") {
+        generatePart1Worksheet();
+      } else if (activePart === "part2") {
+        generatePart2Worksheet();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // 重置共用試卷狀態
+    function resetCommonSheetState() {
+      isSubmitted = false;
+      document.getElementById("result-banner").classList.add("hidden");
+      document.getElementById("post-submit-actions").classList.add("hidden");
+      document.getElementById("pre-submit-actions").classList.remove("hidden");
+      document.getElementById("paper-score-display").textContent = "   ";
+    }
+
+    // ==================== 第一部分邏輯 ====================
+    function generatePart1Worksheet() {
+      resetCommonSheetState();
+      p1UserAnswers = Array(10).fill(null);
+      p1ActiveBlank = 0;
+
+      let pool = part1Mode === "all"
+        ? PART1_QUESTION_BANK
+        : PART1_QUESTION_BANK.filter(q => q.cat === part1Mode);
+
+      if (pool.length < 10) pool = PART1_QUESTION_BANK;
+
+      const shuffledPool = shuffleArray(pool);
+      const selected = [];
+      const usedWords = new Set();
+      const usedGroups = new Set();
+
+      for (const item of shuffledPool) {
+        if (selected.length === 10) break;
+        if (usedWords.has(item.word)) continue;
+        if (item.group && usedGroups.has(item.group)) continue;
+
+        selected.push(item);
+        usedWords.add(item.word);
+        if (item.group) usedGroups.add(item.group);
+      }
+
+      p1Questions = selected;
+      p1ShuffledWords = shuffleArray(selected).map((item, idx) => ({
+        id: idx,
+        word: item.word,
+        usedByBlankIndex: null
+      }));
+
+      renderPart1();
+    }
+
+    function renderPart1() {
+      renderWordBank();
+      renderPart1Questions();
+      updateProgress();
+    }
+
+    function renderWordBank() {
+      const bankEl = document.getElementById("word-bank");
+      bankEl.innerHTML = "";
+
+      p1ShuffledWords.forEach((wObj) => {
+        const isUsed = wObj.usedByBlankIndex !== null;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = wObj.word;
+        btn.className = `word-chip py-2 px-2 rounded-xl border-2 font-bold text-xl sm:text-2xl shadow-xs cursor-pointer ${
+          isUsed
+            ? "used"
+            : "bg-white border-sky-300 text-slate-800 hover:border-amber-400 hover:bg-amber-50"
+        }`;
+
+        if (!isSubmitted) {
+          btn.onclick = () => handleWordClick(wObj.id);
+        } else {
+          btn.style.cursor = "default";
+        }
+
+        bankEl.appendChild(btn);
+      });
+    }
+
+    function renderPart1Questions() {
+      const listEl = document.getElementById("part1-questions-list");
+      listEl.innerHTML = "";
+
+      p1Questions.forEach((q, idx) => {
+        const filledWordObj = p1UserAnswers[idx];
+        const row = document.createElement("div");
+        row.className = "question-row flex flex-wrap items-center justify-between py-2 px-3 rounded-xl transition kaiti text-xl sm:text-2xl text-slate-900 border border-transparent";
+
+        let blankClass = "blank-slot";
+        if (!isSubmitted) {
+          if (idx === p1ActiveBlank) blankClass += " active-blank";
+          if (filledWordObj) blankClass += " filled";
+        } else {
+          const isCorrect = filledWordObj && filledWordObj.word === q.word;
+          blankClass += isCorrect ? " correct" : " wrong";
+          row.classList.add(isCorrect ? "bg-emerald-50/70" : "bg-rose-50/70");
+        }
+
+        const blankText = filledWordObj ? filledWordObj.word : "  ";
+
+        const leftPart = document.createElement("div");
+        leftPart.className = "flex flex-wrap items-center leading-relaxed";
+        leftPart.innerHTML = `
+          <span class="font-bold mr-2 w-7 inline-block text-slate-700">${idx + 1}.</span>
+          <span>${q.before}</span>
+          <span id="p1-blank-${idx}" class="${blankClass}" title="${isSubmitted ? '' : '點選可清除此格'}">${blankText}</span>
+          <span>${q.after}</span>
+        `;
+
+        if (!isSubmitted) {
+          const blankEl = leftPart.querySelector(`#p1-blank-${idx}`);
+          blankEl.onclick = () => handleP1BlankClick(idx);
+        }
+
+        row.appendChild(leftPart);
+
+        if (isSubmitted) {
+          const isCorrect = filledWordObj && filledWordObj.word === q.word;
+          const feedbackPart = document.createElement("div");
+          feedbackPart.className = "no-print flex items-center gap-2 text-base sm:text-lg font-sans font-bold mt-1 sm:mt-0";
+
+          if (isCorrect) {
+            feedbackPart.innerHTML = `
+              <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-0.5 rounded-full">
+                ✔️ 答對了
+              </span>
+            `;
+          } else {
+            feedbackPart.innerHTML = `
+              <span class="inline-flex items-center gap-1 bg-rose-100 text-rose-700 px-3 py-0.5 rounded-full">
+                ❌ 正確答案：<strong class="kaiti text-xl underline">${q.word}</strong>
+              </span>
+            `;
+          }
+          row.appendChild(feedbackPart);
+        }
+
+        listEl.appendChild(row);
+      });
+    }
+
+    function handleWordClick(wordId) {
+      if (isSubmitted) return;
+      const wordObj = p1ShuffledWords.find(w => w.id === wordId);
+      if (!wordObj || wordObj.usedByBlankIndex !== null) return;
+
+      if (p1UserAnswers[p1ActiveBlank] !== null) {
+        p1UserAnswers[p1ActiveBlank].usedByBlankIndex = null;
+      }
+
+      p1UserAnswers[p1ActiveBlank] = wordObj;
+      wordObj.usedByBlankIndex = p1ActiveBlank;
+
+      const nextEmpty = findNextEmpty(p1UserAnswers, p1ActiveBlank);
+      if (nextEmpty !== -1) p1ActiveBlank = nextEmpty;
+
+      renderPart1();
+    }
+
+    function handleP1BlankClick(blankIdx) {
+      if (isSubmitted) return;
+      if (p1UserAnswers[blankIdx] !== null) {
+        p1UserAnswers[blankIdx].usedByBlankIndex = null;
+        p1UserAnswers[blankIdx] = null;
+      }
+      p1ActiveBlank = blankIdx;
+      renderPart1();
+    }
+
+    // ==================== 第二部分邏輯：標點符號 ====================
+    function generatePart2Worksheet() {
+      resetCommonSheetState();
+      p2UserAnswers = Array(10).fill(null);
+      p2ActiveBlank = 0;
+
+      const distributions = [
+        { comma: 4, period: 3, question: 3 },
+        { comma: 3, period: 4, question: 3 },
+        { comma: 3, period: 3, question: 4 }
+      ];
+      const dist = distributions[Math.floor(Math.random() * distributions.length)];
+
+      const pickedCommas = shuffleArray(COMMA_BANK).slice(0, dist.comma);
+      const pickedPeriods = shuffleArray(PERIOD_BANK).slice(0, dist.period);
+      const pickedQuestions = shuffleArray(QUESTION_BANK).slice(0, dist.question);
+
+      p2Questions = shuffleArray([
+        ...pickedCommas,
+        ...pickedPeriods,
+        ...pickedQuestions
+      ]);
+
+      renderPart2();
+    }
+
+    function renderPart2() {
+      const listEl = document.getElementById("part2-questions-list");
+      listEl.innerHTML = "";
+
+      p2Questions.forEach((q, idx) => {
+        const userMark = p2UserAnswers[idx];
+        const row = document.createElement("div");
+        row.className = "question-row flex flex-wrap items-center justify-between py-2 px-3 rounded-xl transition kaiti text-xl sm:text-2xl text-slate-900 border border-transparent";
+
+        let slotClass = "punct-slot";
+        if (!isSubmitted) {
+          if (idx === p2ActiveBlank) slotClass += " active-punct";
+          if (userMark) slotClass += " filled";
+        } else {
+          const isCorrect = userMark === q.mark;
+          slotClass += isCorrect ? " correct" : " wrong";
+          row.classList.add(isCorrect ? "bg-emerald-50/70" : "bg-rose-50/70");
+        }
+
+        const slotText = userMark ? userMark : " ";
+
+        const leftPart = document.createElement("div");
+        leftPart.className = "flex flex-wrap items-center leading-relaxed";
+        leftPart.innerHTML = `
+          <span class="font-bold mr-2 w-7 inline-block text-slate-700">${idx + 1}.</span>
+          <span>${q.before}</span>
+          <span id="p2-slot-${idx}" class="${slotClass}" title="${isSubmitted ? '' : '點選可切換或清除標點'}">${slotText}</span>
+          <span>${q.after}</span>
+        `;
+
+        if (!isSubmitted) {
+          const slotEl = leftPart.querySelector(`#p2-slot-${idx}`);
+          slotEl.onclick = () => handleP2SlotClick(idx);
+        }
+
+        row.appendChild(leftPart);
+
+        if (isSubmitted) {
+          const isCorrect = userMark === q.mark;
+          const feedbackPart = document.createElement("div");
+          feedbackPart.className = "no-print flex flex-col items-end text-sm sm:text-base font-sans font-bold mt-1 sm:mt-0";
+
+          if (isCorrect) {
+            feedbackPart.innerHTML = `
+              <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-0.5 rounded-full">
+                ✔️ 答對了
+              </span>
+            `;
+          } else {
+            feedbackPart.innerHTML = `
+              <span class="inline-flex items-center gap-1 bg-rose-100 text-rose-700 px-3 py-0.5 rounded-full">
+                ❌ 正確標點：<strong class="kaiti text-xl bg-white px-2 rounded border border-rose-300">${q.mark}</strong>
+              </span>
+              <span class="text-xs text-slate-500 font-medium mt-0.5">${q.reason}</span>
+            `;
+          }
+          row.appendChild(feedbackPart);
+        }
+
+        listEl.appendChild(row);
+      });
+
+      updateProgress();
+    }
+
+    function handlePunctSelect(mark) {
+      if (isSubmitted || activePart !== "part2") return;
+
+      p2UserAnswers[p2ActiveBlank] = mark;
+
+      const nextEmpty = findNextEmpty(p2UserAnswers, p2ActiveBlank);
+      if (nextEmpty !== -1) {
+        p2ActiveBlank = nextEmpty;
+      }
+
+      renderPart2();
+    }
+
+    function handleP2SlotClick(slotIdx) {
+      if (isSubmitted) return;
+
+      if (p2ActiveBlank === slotIdx && p2UserAnswers[slotIdx] !== null) {
+        p2UserAnswers[slotIdx] = null;
+      } else {
+        p2ActiveBlank = slotIdx;
+      }
+
+      renderPart2();
+    }
+
+    // ==================== 共用輔助與交卷批改邏輯 (Part 1 & 2) ====================
+    function findNextEmpty(arr, startIdx) {
+      for (let i = startIdx + 1; i < 10; i++) {
+        if (arr[i] === null) return i;
+      }
+      for (let i = 0; i < startIdx; i++) {
+        if (arr[i] === null) return i;
+      }
+      return -1;
+    }
+
+    function updateProgress() {
+      const arr = activePart === "part1" ? p1UserAnswers : p2UserAnswers;
+      const filledCount = arr.filter(a => a !== null).length;
+      document.getElementById("progress-text").textContent = filledCount;
+    }
+
+    function handleFinishClick() {
+      const arr = activePart === "part1" ? p1UserAnswers : p2UserAnswers;
+      const emptyCount = arr.filter(a => a === null).length;
+      if (emptyCount > 0) {
+        document.getElementById("incomplete-msg").textContent =
+          `你還有 ${emptyCount} 題未填寫喔！想繼續填寫還是現在交卷？`;
+        document.getElementById("incomplete-modal").classList.remove("hidden");
+      } else {
+        submitAssessment();
+      }
+    }
+
+    function closeIncompleteModal() {
+      document.getElementById("incomplete-modal").classList.add("hidden");
+    }
+
+    function submitAssessment() {
+      closeIncompleteModal();
+      isSubmitted = true;
+
+      let correctCount = 0;
+      if (activePart === "part1") {
+        p1Questions.forEach((q, idx) => {
+          if (p1UserAnswers[idx] && p1UserAnswers[idx].word === q.word) {
+            correctCount++;
+          }
+        });
+      } else {
+        p2Questions.forEach((q, idx) => {
+          if (p2UserAnswers[idx] === q.mark) {
+            correctCount++;
+          }
+        });
+      }
+
+      const score = correctCount * 10;
+      document.getElementById("paper-score-display").textContent = ` ${score} `;
+
+      const banner = document.getElementById("result-banner");
+      const emojiImg = document.getElementById("result-emoji");
+      const titleEl = document.getElementById("result-score-title");
+      const msgEl = document.getElementById("result-feedback-msg");
+
+      banner.classList.remove("hidden", "bg-emerald-50", "border-emerald-400", "text-emerald-900",
+        "bg-amber-50", "border-amber-400", "text-amber-900",
+        "bg-sky-50", "border-sky-400", "text-sky-900");
+
+      if (score === 100) {
+        banner.classList.add("bg-emerald-50", "border-emerald-400", "text-emerald-900");
+        emojiImg.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3c6.svg";
+        titleEl.textContent = `滿分 100 分！答對 ${correctCount} / 10 題！`;
+        msgEl.textContent = "🌟 太厲害了！全部答對，你真是語文小博士！";
+      } else if (score >= 70) {
+        banner.classList.add("bg-amber-50", "border-amber-400", "text-amber-900");
+        emojiImg.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f31f.svg";
+        titleEl.textContent = `成績：${score} 分（答對 ${correctCount} / 10 題）`;
+        msgEl.textContent = "👏 做得很好！看看下面紅色標示的題目，記住正確答案就更棒了！";
+      } else {
+        banner.classList.add("bg-sky-50", "border-sky-400", "text-sky-900");
+        emojiImg.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4aa.svg";
+        titleEl.textContent = `成績：${score} 分（答對 ${correctCount} / 10 題）`;
+        msgEl.textContent = "🌈 繼續加油！先看看下面錯在哪裏，再按「再做練習」挑戰一次吧！";
+      }
+
+      document.getElementById("pre-submit-actions").classList.add("hidden");
+      document.getElementById("post-submit-actions").classList.remove("hidden");
+
+      if (activePart === "part1") {
+        renderPart1();
+      } else {
+        renderPart2();
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function printWorksheet() {
+      window.print();
+    }
+
+    // ==================== 第三部分邏輯：重組句子練習 ====================
+    function renderPart3Question() {
+      const q = p3Questions[p3CurrentIdx];
+      const selectedIndices = p3Selections[p3CurrentIdx];
+
+      // 更新頂部題號、進度條與句式提示
+      document.getElementById("p3-q-num").textContent = p3CurrentIdx + 1;
+      document.getElementById("p3-progress-bar").style.width = `${(p3CurrentIdx + 1) * 10}%`;
+      document.getElementById("p3-type-badge").textContent = q.type;
+      document.getElementById("p3-formula-hint").textContent = `結構提示：${q.formula}`;
+
+      // 渲染元素詞卡（3個或4個）
+      const chunksArea = document.getElementById("p3-chunks-area");
+      chunksArea.innerHTML = "";
+      chunksArea.className = q.shuffledChunks.length === 3
+        ? "grid grid-cols-1 sm:grid-cols-3 gap-3.5"
+        : "grid grid-cols-1 sm:grid-cols-2 gap-3.5";
+
+      const orderBadges = ["①", "②", "③", "④"];
+
+      q.shuffledChunks.forEach((chunkText, chunkIdx) => {
+        const orderPos = selectedIndices.indexOf(chunkIdx);
+        const isSelected = orderPos !== -1;
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.onclick = () => toggleP3Chunk(chunkIdx);
+
+        if (isSelected) {
+          btn.className = "chunk-card relative bg-emerald-100 border-3 border-emerald-500 text-emerald-950 rounded-2xl py-4 px-5 text-2xl sm:text-3xl font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer";
+          btn.innerHTML = `
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-600 text-white font-sans text-lg font-black shrink-0">
+              ${orderBadges[orderPos]}
+            </span>
+            <span>${chunkText}</span>
+          `;
+        } else {
+          btn.className = "chunk-card relative bg-white hover:bg-sky-50 border-3 border-sky-300 hover:border-sky-500 text-slate-900 rounded-2xl py-4 px-5 text-2xl sm:text-3xl font-bold shadow-md flex items-center justify-center cursor-pointer";
+          btn.innerHTML = `<span>${chunkText}</span>`;
+        }
+
+        chunksArea.appendChild(btn);
+      });
+
+      // 即時渲染下方組成的句子
+      const liveBox = document.getElementById("p3-live-sentence");
+      liveBox.innerHTML = "";
+
+      if (selectedIndices.length === 0) {
+        liveBox.innerHTML = `<span class="text-slate-400 font-sans text-base sm:text-lg font-bold">（請點選上面的詞語元素，句子會即時出現在這裏）</span>`;
+      } else {
+        selectedIndices.forEach((chunkIdx) => {
+          const span = document.createElement("span");
+          span.className = "inline-block bg-amber-100/90 border-b-3 border-amber-500 px-2.5 py-1 rounded-lg text-slate-900 pop-in";
+          span.textContent = q.shuffledChunks[chunkIdx];
+          span.title = "點選可取消此詞卡";
+          span.style.cursor = "pointer";
+          span.onclick = () => toggleP3Chunk(chunkIdx);
+          liveBox.appendChild(span);
+        });
+
+        // 顯示剩餘尚未點選的空白提示格
+        const remaining = q.shuffledChunks.length - selectedIndices.length;
+        for (let r = 0; r < remaining; r++) {
+          const emptySlot = document.createElement("span");
+          emptySlot.className = "inline-flex items-center justify-center min-w-[64px] h-10 border-2 border-dashed border-amber-300 rounded-lg text-amber-400 font-sans text-sm font-bold px-2";
+          emptySlot.textContent = `第${selectedIndices.length + r + 1}部分`;
+          liveBox.appendChild(emptySlot);
+        }
+      }
+
+      // 更新下方導航按鈕狀態（上一頁 / 主頁 / 下一頁）
+      const prevBtn = document.getElementById("p3-prev-btn");
+      prevBtn.disabled = p3CurrentIdx === 0;
+
+      const nextBtn = document.getElementById("p3-next-btn");
+      const nextText = document.getElementById("p3-next-text");
+      if (p3CurrentIdx === 9) {
+        nextText.textContent = "✅ 完成看成績";
+        nextBtn.className = "flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-base sm:text-lg px-6 py-3.5 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer";
+      } else {
+        nextText.textContent = "下一頁 ➡️";
+        nextBtn.className = "flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-base sm:text-lg px-6 py-3.5 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer";
+      }
+    }
+
+    // 點選或取消詞語元素
+    function toggleP3Chunk(chunkIdx) {
+      const currentSel = p3Selections[p3CurrentIdx];
+      const existingPos = currentSel.indexOf(chunkIdx);
+
+      if (existingPos !== -1) {
+        currentSel.splice(existingPos, 1);
+      } else {
+        currentSel.push(chunkIdx);
+      }
+
+      renderPart3Question();
+    }
+
+    // 清除本題已選次序
+    function clearCurrentP3Selection() {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      p3Selections[p3CurrentIdx] = [];
+      renderPart3Question();
+    }
+
+    // 上一頁
+    function prevP3Question() {
+      if (p3CurrentIdx > 0) {
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        p3CurrentIdx--;
+        renderPart3Question();
+      }
+    }
+
+    // 下一頁（第10題時提交出成績）
+    function nextP3Question() {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (p3CurrentIdx < 9) {
+        p3CurrentIdx++;
+        renderPart3Question();
+      } else {
+        showPart3Results();
+      }
+    }
+
+    // 切換廣東話 / 普通話語音
+    function toggleVoiceLang() {
+      voiceLang = voiceLang === "zh-HK" ? "zh-TW" : "zh-HK";
+      const label = voiceLang === "zh-HK" ? "🗣️ 語音：廣東話" : "🗣️ 語音：普通話";
+      document.getElementById("voice-lang-toggle").innerHTML = `<span>${label}</span>`;
+    }
+
+    // 朗讀指定文字
+    function speakText(text, btnEl = null) {
+      if (!("speechSynthesis" in window)) {
+        alert("你的瀏覽器暫時不支援語音朗讀功能喔！");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = voiceLang;
+      utter.rate = 0.88; // 稍慢語速，適合小一學生聆聽
+      utter.pitch = 1.05;
+
+      if (btnEl) {
+        btnEl.classList.add("speaking-anim");
+        utter.onend = () => btnEl.classList.remove("speaking-anim");
+        utter.onerror = () => btnEl.classList.remove("speaking-anim");
+      }
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    // 發音鍵：讀出當前組成的句子
+    function speakCurrentP3Sentence() {
+      const q = p3Questions[p3CurrentIdx];
+      const selectedIndices = p3Selections[p3CurrentIdx];
+      const speakBtn = document.getElementById("p3-speak-btn");
+
+      if (selectedIndices.length === 0) {
+        speakText("請先點選上面的詞語卡片組成句子。", speakBtn);
+        return;
+      }
+
+      const assembledText = selectedIndices.map(i => q.shuffledChunks[i]).join("");
+      speakText(assembledText, speakBtn);
+    }
+
+    // 顯示第三部分最終成績單與逐題訂正
+    function showPart3Results() {
+      document.getElementById("p3-quiz-card").classList.add("hidden");
+      document.getElementById("p3-result-card").classList.remove("hidden");
+
+      let correctCount = 0;
+      const reviewList = document.getElementById("p3-review-list");
+      reviewList.innerHTML = "";
+
+      p3Questions.forEach((q, idx) => {
+        const selectedIndices = p3Selections[idx];
+        const userSentence = selectedIndices.map(i => q.shuffledChunks[i]).join("");
+        const correctSentence = q.parts.join("");
+        const isCorrect = userSentence === correctSentence;
+
+        if (isCorrect) correctCount++;
+
+        const item = document.createElement("div");
+        item.className = `p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+          isCorrect
+            ? "bg-emerald-50/80 border-emerald-300"
+            : "bg-rose-50/80 border-rose-300"
+        }`;
+
+        const displayUserText = userSentence ? userSentence : "（未作答）";
+
+        item.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-black text-slate-700">第 ${idx + 1} 題</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">${q.type}</span>
+              ${
+                isCorrect
+                  ? `<span class="text-xs font-black text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">✔️ 答對了</span>`
+                  : `<span class="text-xs font-black text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full">❌ 再想想</span>`
+              }
+            </div>
+            <div class="kaiti text-xl sm:text-2xl font-bold ${isCorrect ? "text-emerald-950" : "text-rose-800"}">
+              你的句子：${displayUserText}
+            </div>
+            ${
+              !isCorrect
+                ? `<div class="kaiti text-xl sm:text-2xl font-bold text-emerald-700">
+                     正確句子：${correctSentence}
+                   </div>`
+                : ""
+            }
+          </div>
+
+          <button type="button" onclick="speakText('${correctSentence.replace(/'/g, "\\'")}', this)"
+            class="self-start sm:self-center shrink-0 inline-flex items-center gap-1.5 bg-white hover:bg-amber-50 text-amber-900 border-2 border-amber-300 font-black text-sm px-3.5 py-2 rounded-xl shadow-xs transition cursor-pointer">
+            <span>🔊 聽讀</span>
+          </button>
+        `;
+
+        reviewList.appendChild(item);
+      });
+
+      const score = correctCount * 10;
+      const headerEl = document.getElementById("p3-score-header");
+      const emojiEl = document.getElementById("p3-score-emoji");
+      const titleEl = document.getElementById("p3-score-title");
+      const msgEl = document.getElementById("p3-score-msg");
+
+      headerEl.className = "p-6 sm:p-8 text-center border-b-4";
+
+      if (score === 100) {
+        headerEl.classList.add("bg-emerald-50", "border-emerald-300", "text-emerald-950");
+        emojiEl.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f3c6.svg";
+        titleEl.textContent = `滿分 100 分！答對 ${correctCount} / 10 題！`;
+        msgEl.textContent = "🏆 太棒了！三素句和四素句全部排對，你是造句小高手！";
+      } else if (score >= 70) {
+        headerEl.classList.add("bg-amber-50", "border-amber-300", "text-amber-950");
+        emojiEl.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f31f.svg";
+        titleEl.textContent = `成績：${score} 分（答對 ${correctCount} / 10 題）`;
+        msgEl.textContent = "👏 做得很好！記得「時間 → 人或物 → 地點 → 事情」的順序就更完美了！";
+      } else {
+        headerEl.classList.add("bg-sky-50", "border-sky-300", "text-sky-950");
+        emojiEl.src = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4aa.svg";
+        titleEl.textContent = `成績：${score} 分（答對 ${correctCount} / 10 題）`;
+        msgEl.textContent = "🌈 繼續加油！點選每題的「🔊 聽讀」聽聽正確句子，再挑戰一次吧！";
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
