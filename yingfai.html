@@ -11,6 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    .hidden { display: none !important; }
+    .pointer-events-none { pointer-events: none !important; }
+    .pointer-events-auto { pointer-events: auto !important; }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%;
       overflow: hidden; background-color: #090e1a;
@@ -2864,6 +2867,7 @@
       renderFloorAndWallTabs();
       updateTemplateButtonLabels();
       updateBomList();
+      rebuild3DZonePinDOM();
       update3DZonePins();
       drawMinimap();
 
@@ -3024,17 +3028,42 @@
       showToast(isGyroEnabled ? '📱 已開啟手機陀螺儀環顧' : '📱 已關閉陀螺儀');
     }
 
+    let zonePinElementsMap = {};
+    function rebuild3DZonePinDOM() {
+      const layer = document.getElementById('zone-pins-layer');
+      if (!layer) return;
+      layer.innerHTML = '';
+      zonePinElementsMap = {};
+      const zones = getUnitZones(currentUnitId);
+      Object.keys(zones).forEach(k => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `zone-3d-pin ${currentFocusZone === k ? 'active' : ''}`;
+        btn.textContent = zones[k].label;
+        btn.setAttribute('onclick', `focusRoomZone('${k}')`);
+        layer.appendChild(btn);
+        zonePinElementsMap[k] = btn;
+      });
+    }
+
     function update3DZonePins() {
       const layer = document.getElementById('zone-pins-layer');
       if (!layer || !camera || !renderer) return;
       if (isFirstPersonMode) {
-        layer.innerHTML = '';
+        layer.style.display = 'none';
         return;
+      }
+      layer.style.display = 'block';
+      if (Object.keys(zonePinElementsMap).length === 0) {
+        rebuild3DZonePinDOM();
       }
       const zones = getUnitZones(currentUnitId);
       const rect = renderer.domElement.getBoundingClientRect();
-      let html = '';
+      if (rect.width === 0 || rect.height === 0) return;
+
       Object.keys(zones).forEach(k => {
+        const btn = zonePinElementsMap[k];
+        if (!btn) return;
         const z = zones[k];
         const p1 = toWorldXZ(z.x1, z.z1, currentUnitId);
         const p2 = toWorldXZ(z.x2, z.z2, currentUnitId);
@@ -3044,11 +3073,15 @@
           const sx = (v.x * 0.5 + 0.5) * rect.width;
           const sy = (-v.y * 0.5 + 0.5) * rect.height;
           if (sx > 24 && sx < rect.width - 24 && sy > 70 && sy < rect.height - 24) {
-            html += `<button onclick="focusRoomZone('${k}')" style="left:${sx}px; top:${sy}px;" class="zone-3d-pin ${currentFocusZone === k ? 'active' : ''}">${z.label}</button>`;
+            btn.style.display = 'block';
+            btn.style.left = `${sx.toFixed(1)}px`;
+            btn.style.top = `${sy.toFixed(1)}px`;
+            btn.className = `zone-3d-pin ${currentFocusZone === k ? 'active' : ''}`;
+            return;
           }
         }
+        btn.style.display = 'none';
       });
-      layer.innerHTML = html;
     }
 
     // =========================================================================
@@ -3401,10 +3434,16 @@
       camera.aspect = container.clientWidth / Math.max(1, container.clientHeight);
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
+      update3DZonePins();
     }
 
     function animateLoop() {
       requestAnimationFrame(animateLoop);
+      // Pause heavy 3D rendering while the full-screen Home Portal is open so mobile UI stays 100% responsive
+      const portal = document.getElementById('home-layout-portal');
+      if (portal && !portal.classList.contains('hidden')) {
+        return;
+      }
       if (isFirstPersonMode) {
         const speed = 38;
         const fwdX = -Math.sin(fpYaw), fwdZ = -Math.cos(fpYaw);
@@ -3948,7 +3987,58 @@
       toastTimer = setTimeout(() => box.classList.add('hidden'), 2400);
     }
 
+    // Global Mobile Touch-to-Click Bridge (prevents iOS/Android WebView from swallowing taps on buttons or SVG units)
+    function initMobileTouchFix() {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let lastTapTime = 0;
+
+      document.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+        const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if (dx > 22 || dy > 22) return; // User was scrolling/dragging, not tapping
+
+        const target = e.target && e.target.closest
+          ? e.target.closest('button, .master-unit-poly, #home-unit-hover-card, [onclick]')
+          : null;
+        if (!target || target.tagName === 'SELECT') return;
+
+        // Avoid double-triggering if native click also fires within 380ms
+        const now = Date.now();
+        if (now - lastTapTime < 380) return;
+        lastTapTime = now;
+
+        if (typeof target.onclick === 'function') {
+          e.preventDefault();
+          target.onclick(e);
+        } else {
+          const code = target.getAttribute('onclick');
+          if (code) {
+            e.preventDefault();
+            try { new Function('event', code).call(target, e); } catch (err) { console.error(err); }
+          }
+        }
+      }, { passive: false });
+
+      // Deduplicate subsequent synthetic click after touchend handled it
+      document.addEventListener('click', (e) => {
+        if (Date.now() - lastTapTime < 350 && e.isTrusted) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+    }
+
     function initApp() {
+      initMobileTouchFix();
       renderHomeMasterFloorPlanSVG();
       try {
         initThreeEngine();
