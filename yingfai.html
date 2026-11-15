@@ -58,11 +58,20 @@
       transform: translate(-50%, -50%) scale(1.08);
       opacity: 1;
     }
+    button, select, .master-unit-poly {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
     .master-unit-poly {
       cursor: pointer;
+      pointer-events: all;
       transition: opacity 0.18s ease, filter 0.18s ease, stroke-width 0.18s ease;
     }
-    .master-unit-poly:hover {
+    .master-unit-poly text, .master-unit-poly line {
+      pointer-events: none;
+    }
+    .master-unit-poly:hover, .master-unit-poly:active {
       filter: brightness(1.25) drop-shadow(0 0 8px rgba(251, 191, 36, 0.85));
       stroke: #fbbf24 !important;
       stroke-width: 3.5px !important;
@@ -75,43 +84,52 @@
 <body>
   <div id="app-shell">
     <!-- ==================== HOME LANDING PORTAL: A座 & B座 售樓書標準樓層互動總圖 ==================== -->
-    <div id="home-layout-portal" class="fixed inset-0 z-50 bg-slate-950/98 flex flex-col overflow-hidden">
+    <div id="home-layout-portal" class="fixed inset-0 z-50 bg-slate-950 flex flex-col overflow-hidden" style="background: rgba(2, 6, 23, 0.98);">
       <!-- Top Header -->
-      <div class="px-3 py-2 bg-slate-900/95 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <div class="px-3 py-2 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 shrink-0 z-30">
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-sm sm:text-base font-black text-amber-400 tracking-tight">🏢 影輝苑標準樓層平面總圖</span>
           <span class="hidden md:inline text-[11px] text-slate-300 font-semibold">點擊平面圖中任何單位即可進入 1:1 3D 室內設計工作室（或從頂部選單直接選單位）</span>
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 flex-wrap">
           <!-- Block Switcher -->
           <div class="flex items-center bg-slate-950 p-0.5 rounded-xl border border-slate-700">
-            <button onclick="switchHomeBlock('B')" id="home-btn-block-B" class="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition">B座 (4樓-38樓)</button>
-            <button onclick="switchHomeBlock('A')" id="home-btn-block-A" class="px-3 py-1 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition">A座 (3樓-39樓)</button>
+            <button type="button" onclick="switchHomeBlock('B')" id="home-btn-block-B" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition cursor-pointer">B座 (4樓-38樓)</button>
+            <button type="button" onclick="switchHomeBlock('A')" id="home-btn-block-A" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer">A座 (3樓-39樓)</button>
           </div>
           <!-- Direct Top Dropdown Mirror inside Home Portal -->
-          <select id="home-unit-quick-select" onchange="selectUnitFromHomeLayout(this.value)" class="bg-slate-900 text-amber-300 text-xs font-extrabold rounded-xl px-2 py-1.5 border border-amber-400/50 focus:outline-none">
+          <select id="home-unit-quick-select" onchange="selectUnitFromHomeLayout(this.value)" class="bg-slate-900 text-amber-300 text-xs font-extrabold rounded-xl px-2 py-1.5 border border-amber-400/50 focus:outline-none cursor-pointer">
             <option value="">🔍 頂部選單快速選單位...</option>
           </select>
-          <button onclick="closeHomeLayoutPortal()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-600">進入設計 ➔</button>
+          <button type="button" onclick="closeHomeLayoutPortal()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black shadow cursor-pointer">進入設計 ➔</button>
         </div>
       </div>
 
       <!-- Category Filter & Legend Strip -->
-      <div class="px-3 py-1.5 bg-slate-900/75 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+      <div class="px-3 py-1.5 bg-slate-900/90 border-b border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 z-30">
         <span class="text-[10px] font-black text-slate-400 shrink-0">單位分類篩選：</span>
-        <button onclick="filterHomeCategory('ALL')" id="hcat-ALL" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-950 text-[11px] font-black shrink-0">全部 (22伙)</button>
-        <button onclick="filterHomeCategory('LARGE_2BR')" id="hcat-LARGE_2BR" class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[11px] font-bold shrink-0">🟡 約550尺 大兩房 (間2-4房・住2-6人)</button>
-        <button onclick="filterHomeCategory('STD_2BR')" id="hcat-STD_2BR" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[11px] font-bold shrink-0">🟢 約447尺 兩房 (間2-3房・住2-5人)</button>
-        <button onclick="filterHomeCategory('ONE_BR')" id="hcat-ONE_BR" class="px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/50 text-[11px] font-bold shrink-0">🔵 約380尺 一房 (最多間2房・住2-4人)</button>
-        <button onclick="filterHomeCategory('STUDIO')" id="hcat-STUDIO" class="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/50 text-[11px] font-bold shrink-0">🟣 約283尺 開放式 (最多間1房・住2-3人)</button>
+        <button type="button" onclick="filterHomeCategory('ALL')" id="hcat-ALL" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-950 text-[11px] font-black shrink-0 cursor-pointer">全部 (22伙)</button>
+        <button type="button" onclick="filterHomeCategory('LARGE_2BR')" id="hcat-LARGE_2BR" class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[11px] font-bold shrink-0 cursor-pointer">🟡 約550尺 大兩房 (間2-4房・住2-6人)</button>
+        <button type="button" onclick="filterHomeCategory('STD_2BR')" id="hcat-STD_2BR" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[11px] font-bold shrink-0 cursor-pointer">🟢 約447尺 兩房 (間2-3房・住2-5人)</button>
+        <button type="button" onclick="filterHomeCategory('ONE_BR')" id="hcat-ONE_BR" class="px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/50 text-[11px] font-bold shrink-0 cursor-pointer">🔵 約380尺 一房 (最多間2房・住2-4人)</button>
+        <button type="button" onclick="filterHomeCategory('STUDIO')" id="hcat-STUDIO" class="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/50 text-[11px] font-bold shrink-0 cursor-pointer">🟣 約283尺 開放式 (最多間1房・住2-3人)</button>
       </div>
 
       <!-- Main Interactive Architectural Floor Plan SVG Stage -->
-      <div class="flex-1 relative flex items-center justify-center p-2 sm:p-4 overflow-hidden bg-[radial-gradient(circle_at_center,#17253b_0%,#090e1a_80%)]">
-        <div id="home-master-svg-container" class="w-full h-full flex items-center justify-center"></div>
+      <div class="flex-1 relative flex flex-col items-center justify-between p-1.5 sm:p-3 overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_center,#17253b_0%,#090e1a_80%)]">
+        <div id="home-master-svg-container" class="w-full flex-1 min-h-[240px] flex items-center justify-center"></div>
 
-        <!-- Floating Hover/Tap Unit Preview Card -->
-        <div id="home-unit-hover-card" class="hidden pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 glass-pill px-4 py-2 rounded-2xl border border-amber-400/70 shadow-2xl flex items-center gap-3 z-20">
+        <!-- Mobile-Friendly Direct Unit Tap Grid (Instant 1-Tap Entry on Phones) -->
+        <div class="w-full max-w-[1100px] mt-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-2 shrink-0 z-20">
+          <div class="flex items-center justify-between mb-1.5 px-1">
+            <span id="home-quick-grid-title" class="text-[10px] font-black text-amber-300">📱 點擊下方室號或上方平面圖直接進入 3D 設計：</span>
+            <span class="text-[9px] text-slate-400 font-semibold">單指輕觸即入</span>
+          </div>
+          <div id="home-mobile-unit-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-11 gap-1 max-h-[22vh] overflow-y-auto pr-0.5"></div>
+        </div>
+
+        <!-- Floating Hover/Tap Unit Preview Card (Now Clickable!) -->
+        <div id="home-unit-hover-card" onclick="if(homePreviewUnitId) selectUnitFromHomeLayout(homePreviewUnitId)" class="hidden pointer-events-auto cursor-pointer absolute bottom-20 left-1/2 -translate-x-1/2 glass-pill px-4 py-2 rounded-2xl border border-amber-400/70 shadow-2xl flex items-center gap-3 z-30">
           <div>
             <div class="flex items-center gap-2">
               <span id="hcard-unit-id" class="text-sm font-black text-amber-300">B10室</span>
@@ -124,7 +142,7 @@
       </div>
 
       <!-- Bottom Notation Bar matching Sales Brochure -->
-      <div class="px-3 py-1.5 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 shrink-0">
+      <div class="px-3 py-1.5 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 shrink-0 z-30">
         <div class="flex flex-wrap items-center gap-3">
           <span><strong class="text-slate-200">LIFT LOBBY</strong> 升降機大堂 (6部升降機)</span>
           <span><strong class="text-rose-300">RS &amp; MRR</strong> 垃圾及物料回收室</span>
@@ -3414,6 +3432,7 @@
     // =========================================================================
     let homeActiveBlock = 'B';
     let homeFilterCategory = 'ALL';
+    let homePreviewUnitId = 'B11';
 
     const BLOCK_LAYOUT_NODES = {
       B: [
@@ -3477,6 +3496,7 @@
     function closeHomeLayoutPortal() {
       const portal = document.getElementById('home-layout-portal');
       if (portal) portal.classList.add('hidden');
+      setTimeout(onWindowResize, 60);
     }
 
     function switchHomeBlock(blockLetter) {
@@ -3485,13 +3505,13 @@
       const btnA = document.getElementById('home-btn-block-A');
       if (btnB) {
         btnB.className = blockLetter === 'B'
-          ? 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition'
-          : 'px-3 py-1 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition';
+          ? 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer';
       }
       if (btnA) {
         btnA.className = blockLetter === 'A'
-          ? 'px-3 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition'
-          : 'px-3 py-1 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition';
+          ? 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-black transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold transition cursor-pointer';
       }
       renderHomeMasterFloorPlanSVG();
     }
@@ -3521,6 +3541,7 @@
       }
       const meta = UNIT_META[unitId];
       if (!meta) return;
+      homePreviewUnitId = unitId;
       const cat = UNIT_CATEGORIES[meta.category];
       card.classList.remove('hidden');
       document.getElementById('hcard-unit-id').textContent = `${meta.name} (${unitId})`;
@@ -3532,6 +3553,7 @@
 
     function selectUnitFromHomeLayout(unitId) {
       if (!unitId || !UNIT_META[unitId]) return;
+      homePreviewUnitId = unitId;
       const sel = document.getElementById('unit-select');
       if (sel) sel.value = unitId;
       closeHomeLayoutPortal();
@@ -3568,8 +3590,8 @@
 
         return `
           <g class="master-unit-poly ${isDimmed ? 'master-unit-dimmed' : ''}" ${transformAttr}
-             onmouseenter="previewHomeUnitHover('${n.id}')"
-             onmouseleave="previewHomeUnitHover(null)"
+             onpointerenter="if(event.pointerType==='mouse') previewHomeUnitHover('${n.id}')"
+             onpointerleave="if(event.pointerType==='mouse') previewHomeUnitHover(null)"
              onclick="selectUnitFromHomeLayout('${n.id}')">
             <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="4"
                   fill="${cat.fillHex}"
@@ -3584,8 +3606,33 @@
         `;
       }).join('');
 
+      // Populate Mobile Direct Tap Unit Grid
+      const mobileGrid = document.getElementById('home-mobile-unit-grid');
+      const gridTitle = document.getElementById('home-quick-grid-title');
+      if (gridTitle) {
+        const catObj = UNIT_CATEGORIES[homeFilterCategory];
+        gridTitle.textContent = catObj
+          ? `📱 ${homeActiveBlock}座【${catObj.label}】可選單位（點擊即入）：`
+          : `📱 ${homeActiveBlock}座 全部 22 個單位（點擊室號或上方平面圖即入）：`;
+      }
+      if (mobileGrid) {
+        const filteredNodes = nodes.filter(n => homeFilterCategory === 'ALL' || UNIT_META[n.id].category === homeFilterCategory);
+        mobileGrid.innerHTML = filteredNodes.map(n => {
+          const meta = UNIT_META[n.id];
+          const cat = UNIT_CATEGORIES[meta.category];
+          return `
+            <button type="button" onclick="selectUnitFromHomeLayout('${n.id}')"
+                    style="border-color:${cat.strokeHex}; background:${cat.fillHex};"
+                    class="py-1.5 px-1 rounded-xl border text-center flex flex-col items-center justify-center active:scale-95 transition cursor-pointer">
+              <span class="text-xs font-black text-white leading-tight">${n.id}室</span>
+              <span style="color:${cat.strokeHex}" class="text-[9px] font-extrabold leading-tight truncate max-w-full">${cat.shortLabel}</span>
+            </button>
+          `;
+        }).join('');
+      }
+
       container.innerHTML = `
-        <svg viewBox="0 0 1040 700" class="w-full h-full max-w-[1160px] max-h-[78vh] select-none">
+        <svg viewBox="0 0 1040 700" class="w-full h-full max-w-[1160px] max-h-[62vh] select-none">
           <defs>
             <pattern id="cad-grid" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(148,163,184,0.07)" stroke-width="1"/>
@@ -3902,15 +3949,19 @@
     }
 
     function initApp() {
-      initThreeEngine();
-      initMinimapEvents();
-      init2DFloorPlanModalEvents();
-      renderFloorAndWallTabs();
-      renderCatalogTabs();
       renderHomeMasterFloorPlanSVG();
-      switchUnit('B11');
-      animateLoop();
-      setTimeout(onWindowResize, 120);
+      try {
+        initThreeEngine();
+        initMinimapEvents();
+        init2DFloorPlanModalEvents();
+        renderFloorAndWallTabs();
+        renderCatalogTabs();
+        switchUnit('B11');
+        animateLoop();
+        setTimeout(onWindowResize, 120);
+      } catch (err) {
+        console.error('3D Engine Init Error:', err);
+      }
     }
 
     if (document.readyState === 'loading') {
