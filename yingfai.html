@@ -66,21 +66,54 @@
       -webkit-user-select: none;
       user-select: none;
     }
+    #home-master-stage-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 1140px;
+      aspect-ratio: 1040 / 700;
+      max-height: 62vh;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.78), 0 0 0 1px rgba(251, 191, 36, 0.28);
+      background: #141922;
+    }
+    #home-master-photo-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+    #home-master-overlay-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
     .master-unit-poly {
       cursor: pointer;
       pointer-events: all;
-      transition: opacity 0.18s ease, filter 0.18s ease, stroke-width 0.18s ease;
+      transition: opacity 0.18s ease, filter 0.18s ease;
     }
     .master-unit-poly text, .master-unit-poly line {
       pointer-events: none;
     }
-    .master-unit-poly:hover, .master-unit-poly:active {
-      filter: brightness(1.25) drop-shadow(0 0 8px rgba(251, 191, 36, 0.85));
+    .master-unit-poly:hover .unit-hit-frame,
+    .master-unit-poly:active .unit-hit-frame {
       stroke: #fbbf24 !important;
       stroke-width: 3.5px !important;
+      fill: rgba(251, 191, 36, 0.18) !important;
+    }
+    .master-unit-poly:hover .unit-pill-bg,
+    .master-unit-poly:active .unit-pill-bg {
+      fill: rgba(15, 23, 42, 0.96) !important;
+      stroke: #fbbf24 !important;
+      stroke-width: 1.8px !important;
     }
     .master-unit-dimmed {
-      opacity: 0.22 !important;
+      opacity: 0.26 !important;
     }
   </style>
 </head>
@@ -119,8 +152,13 @@
       </div>
 
       <!-- Main Interactive Architectural Floor Plan SVG Stage -->
-      <div class="flex-1 relative flex flex-col items-center justify-between p-1.5 sm:p-3 overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_center,#17253b_0%,#090e1a_80%)]">
-        <div id="home-master-svg-container" class="w-full flex-1 min-h-[240px] flex items-center justify-center"></div>
+      <div class="flex-1 relative flex flex-col items-center justify-between p-1.5 sm:p-3 overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_center,#1e2634_0%,#090e1a_85%)]">
+        <div id="home-master-svg-container" class="w-full flex-1 min-h-[240px] flex items-center justify-center">
+          <div id="home-master-stage-wrap">
+            <canvas id="home-master-photo-canvas" width="2080" height="1400"></canvas>
+            <svg id="home-master-overlay-svg" viewBox="0 0 1040 700" class="select-none"></svg>
+          </div>
+        </div>
 
         <!-- Mobile-Friendly Direct Unit Tap Grid (Instant 1-Tap Entry on Phones) -->
         <div class="w-full max-w-[1100px] mt-1 bg-slate-900/90 border border-slate-800 rounded-2xl p-2 shrink-0 z-20">
@@ -131,7 +169,7 @@
           <div id="home-mobile-unit-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-11 gap-1 max-h-[22vh] overflow-y-auto pr-0.5"></div>
         </div>
 
-        <!-- Floating Hover/Tap Unit Preview Card (Now Clickable!) -->
+        <!-- Floating Hover/Tap Unit Preview Card (Clickable) -->
         <div id="home-unit-hover-card" onclick="if(homePreviewUnitId) selectUnitFromHomeLayout(homePreviewUnitId)" class="hidden pointer-events-auto cursor-pointer absolute bottom-20 left-1/2 -translate-x-1/2 glass-pill px-4 py-2 rounded-2xl border border-amber-400/70 shadow-2xl flex items-center gap-3 z-30">
           <div>
             <div class="flex items-center gap-2">
@@ -313,7 +351,7 @@
             </button>
           </div>
           <div class="flex items-center justify-between gap-2 pt-0.5">
-            <span class="text-[10px] text-slate-400">💡 含 #11–#15「免磚牆以櫃間房」及 3000K 暖光間接燈槽</span>
+            <span class="text-[10px] text-slate-400">💡 含「奶油弧形高訂特調」、「免磚牆以櫃間房」及 3000K 暖光間接燈槽</span>
             <button onclick="closeDrawerSheet()" class="px-2.5 py-1 rounded-lg bg-slate-800 text-[10px] font-bold text-slate-300">收起 ▾</button>
           </div>
         </div>
@@ -482,7 +520,7 @@
       A7:  { name: 'A座 7室',  category: 'STD_2BR', type: '3BR_H',            mirrorX: false, mirrorZ: false, size: '6165×4525主廳 + 外凸側房2215×2050mm' },
       A8:  { name: 'A座 8室',  category: 'STD_2BR', type: '3BR_H',            mirrorX: false, mirrorZ: true,  size: '6165×4525主廳 + 外凸側房2215×2050mm' },
       A9:  { name: 'A座 9室',  category: 'STD_2BR', type: '3BR_H',            mirrorX: true,  mirrorZ: true,  size: '6165×4525主廳 + 外凸側房2215×2050mm' },
-      A22: { name: 'A座 22室', category: 'STD_2BR', type: '3BR_H',            mirrorX: false, mirrorZ: false, size: '6165×4525主廳 + 外凸側房2215×2050mm' },
+      A22: { name: 'A座 22室', category: 'STD_2BR', type: 'STD_2BR_A22',      mirrorX: false, mirrorZ: false, size: '6165×4525主廳 + 下凸側房2150×2000 + 左上廚1650×2065mm' },
       B1:  { name: 'B座 1室',  category: 'STD_2BR', type: 'STD_2BR_WING',     mirrorX: false, mirrorZ: false, size: '4525×6165主廳 + 左凸側房2000×2150(中位) + 右下廚2065×1650mm' },
       B15: { name: 'B座 15室', category: 'STD_2BR', type: 'STD_2BR_WING_B15', mirrorX: false, mirrorZ: false, size: '4525×6165主廳 + 左下平底側房2000×2150 + 右下廚2065×1650mm' },
 
@@ -582,6 +620,14 @@
     // 3. PURE THREE.JS PROCEDURAL FURNITURE, APPLIANCE & LIGHTING CATALOG
     // =========================================================================
     const CATALOG_ITEMS = [
+      // ✨ 奶油弧形高訂系列標誌性訂造傢俬 (純 Three.js 程式幾何 + 3000K 燈槽)
+      { id: 'bespoke_arc_foyer_c_cab',       cat: 'cabinets',     bespokeArc: true, name: '【奶油弧形】弧角C字懸浮玄關櫃連換鞋凳', w: 1350, d: 400,  h: 2450, color: '#efeae1', sec: '#c8ae8d', led: true },
+      { id: 'bespoke_arc_tv_wall',           cat: 'cabinets',     bespokeArc: true, name: '【奶油弧形】奶油弧形格柵隱藏門電視牆', w: 2400, d: 420,  h: 2450, color: '#efeae1', sec: '#b89872', led: true },
+      { id: 'bespoke_arc_sideboard_island',  cat: 'cabinets',     bespokeArc: true, name: '【奶油弧形】弧形燈槽餐邊櫃連半島餐桌', w: 1550, d: 1280, h: 2450, color: '#efeae1', sec: '#c8ae8d', led: true },
+      { id: 'bespoke_arc_podium_bed',        cat: 'beds',         bespokeArc: true, name: '【奶油弧形】步入式燈帶地台床連轉角衣櫃', w: 2050, d: 1950, h: 2450, color: '#efeae1', sec: '#c8ae8d', led: true },
+      { id: 'bespoke_arc_study_sofa_bed',    cat: 'partitions',   bespokeArc: true, name: '【奶油弧形】長虹玻璃書房隔斷連地台書枱', w: 1950, d: 1650, h: 2450, color: '#efeae1', sec: '#c8ae8d', led: true },
+      { id: 'bespoke_arc_semi_open_kit_bar', cat: 'kitchen_bath', bespokeArc: true, name: '【奶油弧形】半開放長虹玻璃趟門U型廚櫃', w: 1980, d: 1600, h: 2420, color: '#efeae1', sec: '#c8ae8d', led: true },
+
       // Cabinets & LED Cove Units
       { id: 'cab_langyu_tv',       cat: 'cabinets', name: '朗譽滿牆LED電視櫃', w: 2400, d: 420, h: 2450, color: '#4b3b30', sec: '#d6c3a8', led: true },
       { id: 'cab_cream_tv',        cat: 'cabinets', name: '奶昔弧形燈帶電視櫃', w: 2200, d: 420, h: 2450, color: '#e5d4bc', sec: '#c9a67d', led: true },
@@ -700,40 +746,40 @@
       }
       if (categoryId === 'LARGE_2BR') {
         return [
-          { id: 1, rooms: 3, title: '#01 [3房・2-6人] 1房側房(雙人床) + 1房窗1(雙層床) + 1房窗2(單人床)' },
-          { id: 2, rooms: 4, title: '#02 [4房・5-6人] 1房側房 + 2房廳1(一開二2.5尺床) + 1房窗2(夫婦雙人床)' },
-          { id: 3, rooms: 4, title: '#03 [4房・4-6人] 1房側房(雙層床) + 2房廳1(一開二) + 1房窗2(主人房)' },
-          { id: 4, rooms: 3, title: '#04 [3房・3-6人] 1房側房(子母床睡3人) + 1房廳1(單人房) + 1房窗2(夫婦床)' },
-          { id: 5, rooms: 2, title: '#05 [2大房・2-4人] 1房側房(雙人床) + 1房窗2(主人套房) + 窗1闊大廳' },
-          { id: 6, rooms: 3, title: '#06 [3房・4-6人] 1房側房(長輩房) + 1房窗1(雙層床) + 1房窗2(夫婦大床)' },
-          { id: 7, rooms: 3, title: '#07 [3房・3-5人] 1房側房(書房睡房) + 1房廳1(孩童房) + 1房窗2(雙人床)' },
-          { id: 8, rooms: 4, title: '#08 [4房・5-6人] 1房側房(子母床3人) + 2房廳1(兩孩分房) + 1房窗2(單人床)' },
-          { id: 9, rooms: 2, title: '#09 [2大房・2-4人] 1房側房(雙層床) + 1房窗2(5尺大床) + 雙面採光大廳' },
-          { id: 10,rooms: 3, title: '#10 [3房・4-6人] 1房側房(雙人床) + 1房廳1(子母床3人) + 1房窗2(溫習睡房)' },
-          { id: 11,rooms: 3, byCabinet: true, title: '✨櫃#11 [免磚牆3房] 雙面衣櫃間出 1房側房 + 1房窗1 + 1房窗2' },
-          { id: 12,rooms: 4, byCabinet: true, title: '✨櫃#12 [免磚牆4房] 附圖2燈帶櫃+高櫃間出 1房側房 + 2房廳1 + 1房窗2' },
-          { id: 13,rooms: 3, byCabinet: true, title: '✨櫃#13 [免磚牆3房] 以櫃代牆分隔 1房側房 + 1房廳1(子母床) + 1房窗2' },
-          { id: 14,rooms: 4, byCabinet: true, title: '✨櫃#14 [免磚牆4房] 滿牆C字櫃+雙面衣櫃零磚牆四房六人格局' },
-          { id: 15,rooms: 3, byCabinet: true, title: '✨櫃#15 [免磚牆3房] 弧級儲物地台連雙面櫃間出三房大兩房' }
+          { id: 1, rooms: 3, isBespokeArc: true, byCabinet: true, title: '✨高訂#01 [奶油弧形特調] 弧角C字玄關櫃 + 格柵隱藏門電視牆 + 燈帶地台床' },
+          { id: 2, rooms: 3, title: '#02 [3房・2-6人] 1房側房(雙人床) + 1房窗1(雙層床) + 1房窗2(單人床)' },
+          { id: 3, rooms: 4, title: '#03 [4房・5-6人] 1房側房 + 2房廳1(一開二2.5尺床) + 1房窗2(夫婦雙人床)' },
+          { id: 4, rooms: 4, title: '#04 [4房・4-6人] 1房側房(雙層床) + 2房廳1(一開二) + 1房窗2(主人房)' },
+          { id: 5, rooms: 3, title: '#05 [3房・3-6人] 1房側房(子母床睡3人) + 1房廳1(單人房) + 1房窗2(夫婦床)' },
+          { id: 6, rooms: 2, title: '#06 [2大房・2-4人] 1房側房(雙人床) + 1房窗2(主人套房) + 窗1闊大廳' },
+          { id: 7, rooms: 3, title: '#07 [3房・4-6人] 1房側房(長輩房) + 1房窗1(雙層床) + 1房窗2(夫婦大床)' },
+          { id: 8, rooms: 3, title: '#08 [3房・3-5人] 1房側房(書房睡房) + 1房廳1(孩童房) + 1房窗2(雙人床)' },
+          { id: 9, rooms: 4, title: '#09 [4房・5-6人] 1房側房(子母床3人) + 2房廳1(兩孩分房) + 1房窗2(單人床)' },
+          { id: 10,rooms: 2, title: '#10 [2大房・2-4人] 1房側房(雙層床) + 1房窗2(5尺大床) + 雙面採光大廳' },
+          { id: 11,rooms: 3, title: '#11 [3房・4-6人] 1房側房(雙人床) + 1房廳1(子母床3人) + 1房窗2(溫習睡房)' },
+          { id: 12,rooms: 3, byCabinet: true, title: '✨櫃#12 [免磚牆3房] 雙面衣櫃間出 1房側房 + 1房窗1 + 1房窗2' },
+          { id: 13,rooms: 4, byCabinet: true, title: '✨櫃#13 [免磚牆4房] 附圖2燈帶櫃+高櫃間出 1房側房 + 2房廳1 + 1房窗2' },
+          { id: 14,rooms: 3, byCabinet: true, title: '✨櫃#14 [免磚牆3房] 以櫃代牆分隔 1房側房 + 1房廳1(子母床) + 1房窗2' },
+          { id: 15,rooms: 4, byCabinet: true, title: '✨櫃#15 [免磚牆4房] 滿牆C字櫃+雙面衣櫃零磚牆四房六人格局' }
         ];
       }
       if (categoryId === 'STD_2BR') {
         return [
-          { id: 1, rooms: 2, title: '#01 [2房・2-4人] 1房側房(雙人床) + 1房窗2(雙人/雙層床) + 窗1客飯廳' },
-          { id: 2, rooms: 3, title: '#02 [3房・3-5人] 1房側房(雙人床) + 1房窗1(單人/雙層床) + 1房窗2(主人房)' },
-          { id: 3, rooms: 3, title: '#03 [3房・4-5人] 1房側房(雙層床2孩) + 1房廳1(單人房) + 1房窗2(夫婦床)' },
-          { id: 4, rooms: 3, title: '#04 [3房・3-5人] 1房側房(長輩單人床) + 1房廳1(孩童房) + 1房窗2(夫婦雙人床)' },
-          { id: 5, rooms: 2, title: '#05 [2房・2-4人] 1房側房(雙層床) + 1房窗2(5尺主人床) + 闊大客飯廳' },
-          { id: 6, rooms: 3, title: '#06 [3房・4-5人] 1房側房(雙人床) + 1房窗1(上床下書枱) + 1房窗2(單人床)' },
-          { id: 7, rooms: 2, title: '#07 [2房・2-3人] 1房側房(玻璃書房睡房) + 1房窗2(5尺雙人床) + 大橫廳' },
-          { id: 8, rooms: 3, title: '#08 [3房・4-5人] 1房側房(子母床3人) + 1房廳1(溫習睡房) + 1房窗2(單人床)' },
-          { id: 9, rooms: 2, title: '#09 [2房・2-4人] 1房側房(5尺主床) + 1房窗1(兒童天地) + 窗2陽光飯廳' },
-          { id: 10,rooms: 3, title: '#10 [3房・3-5人] 1房側房 + 1房窗1 + 1房窗2 獨立三睡房佈局' },
-          { id: 11,rooms: 3, byCabinet: true, title: '✨櫃#11 [免磚牆3房] 雙面衣櫃間出 1房側房 + 1房窗1 + 1房窗2' },
-          { id: 12,rooms: 3, byCabinet: true, title: '✨櫃#12 [免磚牆3房] 附圖2五格展示櫃間出 1房側房 + 1房廳1 + 1房窗2' },
-          { id: 13,rooms: 2, byCabinet: true, title: '✨櫃#13 [免磚牆2房] 高架床衣櫃一體化間出兩房 + 伸縮餐枱廳' },
-          { id: 14,rooms: 3, byCabinet: true, title: '✨櫃#14 [免磚牆3房] 滿牆電視櫃+衣櫃零磚牆三房五人方案' },
-          { id: 15,rooms: 3, byCabinet: true, title: '✨櫃#15 [免磚牆3房] 燈帶儲物地台配雙面櫃分隔三睡房' }
+          { id: 1, rooms: 2, isBespokeArc: true, byCabinet: true, title: '✨高訂#01 [奶油弧形特調] 弧角C字玄關櫃 + 弧形燈槽餐邊櫃 + 步入式地台床' },
+          { id: 2, rooms: 2, title: '#02 [2房・2-4人] 1房側房(雙人床) + 1房窗2(雙人/雙層床) + 窗1客飯廳' },
+          { id: 3, rooms: 3, title: '#03 [3房・3-5人] 1房側房(雙人床) + 1房窗1(單人/雙層床) + 1房窗2(主人房)' },
+          { id: 4, rooms: 3, title: '#04 [3房・4-5人] 1房側房(雙層床2孩) + 1房廳1(單人房) + 1房窗2(夫婦床)' },
+          { id: 5, rooms: 3, title: '#05 [3房・3-5人] 1房側房(長輩單人床) + 1房廳1(孩童房) + 1房窗2(夫婦雙人床)' },
+          { id: 6, rooms: 2, title: '#06 [2房・2-4人] 1房側房(雙層床) + 1房窗2(5尺主人床) + 闊大客飯廳' },
+          { id: 7, rooms: 3, title: '#07 [3房・4-5人] 1房側房(雙人床) + 1房窗1(上床下書枱) + 1房窗2(單人床)' },
+          { id: 8, rooms: 2, title: '#08 [2房・2-3人] 1房側房(玻璃書房睡房) + 1房窗2(5尺雙人床) + 大橫廳' },
+          { id: 9, rooms: 3, title: '#09 [3房・4-5人] 1房側房(子母床3人) + 1房廳1(溫習睡房) + 1房窗2(單人床)' },
+          { id: 10,rooms: 2, title: '#10 [2房・2-4人] 1房側房(5尺主床) + 1房窗1(兒童天地) + 窗2陽光飯廳' },
+          { id: 11,rooms: 3, title: '#11 [3房・3-5人] 1房側房 + 1房窗1 + 1房窗2 獨立三睡房佈局' },
+          { id: 12,rooms: 3, byCabinet: true, title: '✨櫃#12 [免磚牆3房] 雙面衣櫃間出 1房側房 + 1房窗1 + 1房窗2' },
+          { id: 13,rooms: 3, byCabinet: true, title: '✨櫃#13 [免磚牆3房] 附圖2五格展示櫃間出 1房側房 + 1房廳1 + 1房窗2' },
+          { id: 14,rooms: 2, byCabinet: true, title: '✨櫃#14 [免磚牆2房] 高架床衣櫃一體化間出兩房 + 伸縮餐枱廳' },
+          { id: 15,rooms: 3, byCabinet: true, title: '✨櫃#15 [免磚牆3房] 滿牆電視櫃+衣櫃零磚牆三房五人方案' }
         ];
       }
       if (categoryId === 'ONE_BR') {
@@ -1065,6 +1111,7 @@
       if (t === '2BR_BAY_4900')     return { minX: -1465, maxX: 4900, minZ: 0, maxZ: 6065 };
       if (t === 'STD_2BR_WING')     return { minX: -2000, maxX: 5990, minZ: 0, maxZ: 6165 };
       if (t === 'STD_2BR_WING_B15') return { minX: -2000, maxX: 5990, minZ: 0, maxZ: 6165 };
+      if (t === 'STD_2BR_A22')      return { minX: 0, maxX: 6165, minZ: -1375, maxZ: 6525 };
       if (t === '2BR_4525')         return { minX: 0, maxX: 5990, minZ: 0, maxZ: 6165 };
       if (t === '3BR_H')            return { minX: 0, maxX: 6740, minZ: 0, maxZ: 6165 };
       if (t === 'STUDIO_H')         return { minX: 0, maxX: 3350, minZ: 0, maxZ: 6165 };
@@ -1107,7 +1154,6 @@
           bathroom:  { x1: 2525, x2: 4525, z1: 3535, z2: 5005, label: '🚿浴室' }
         };
       } else if (t === 'WING_H_6165') {
-        // A2, A3 (約550尺 大兩房): Horizontal 7965×4525mm hall + downward protruding side wing 2000×2150mm + downward protruding KIT 2065×1650mm
         return {
           main_hall: { x1: 0, x2: 1800, z1: 0, z2: 4200, label: '🚪正門玄關' },
           hall_1:    { x1: 1800, x2: 5005, z1: 0, z2: 4200, label: '🪟客飯廳1' },
@@ -1126,7 +1172,6 @@
           bathroom:  { x1: 0, x2: 2000, z1: 1650, z2: 3120, label: '🚿浴室' }
         };
       } else if (t === 'STD_2BR_WING') {
-        // B1 (約447尺 兩房 - image_c06724.png): Top 4525mm Acoustic Windows + Left Protruding Wing 2000×2150 (z=2615..4765) + Bottom-Right Protruding KIT 2065×1650
         return {
           main_hall: { x1: 2440, x2: 3840, z1: 4525, z2: 6165, label: '🚪正門玄關' },
           hall_1:    { x1: 0, x2: 4525, z1: 0, z2: 2885, label: '🪟客飯廳1' },
@@ -1136,7 +1181,6 @@
           bathroom:  { x1: 2525, x2: 4525, z1: 2970, z2: 4440, label: '🚿浴室' }
         };
       } else if (t === 'STD_2BR_WING_B15') {
-        // B15 (約447尺 兩房 - image_c00d2d.png): Top 4525mm Acoustic Windows + Bottom-Left Flush Side Room Wing 2000×2150 (z=4015..6165, doorway 4115..5265) + Bottom-Right Protruding KIT 2065×1650
         return {
           main_hall: { x1: 2440, x2: 3835, z1: 4525, z2: 6165, label: '🚪正門玄關' },
           hall_1:    { x1: 0, x2: 4525, z1: 0, z2: 2885, label: '🪟客飯廳1' },
@@ -1145,8 +1189,16 @@
           kitchen:   { x1: 3920, x2: 5985, z1: 4515, z2: 6165, label: '🍳廚房' },
           bathroom:  { x1: 2525, x2: 4525, z1: 2970, z2: 4440, label: '🚿浴室' }
         };
+      } else if (t === 'STD_2BR_A22') {
+        return {
+          main_hall: { x1: 0, x2: 1725, z1: 775, z2: 4525, label: '🚪正門玄關' },
+          hall_1:    { x1: 1725, x2: 6165, z1: 2085, z2: 4525, label: '🪟客飯廳1' },
+          hall_2:    { x1: 3280, x2: 6165, z1: 0, z2: 2085, label: '🌅1房窗2' },
+          side_room: { x1: 1800, x2: 3950, z1: 4525, z2: 6525, label: '🛏️1房側房' },
+          kitchen:   { x1: 0, x2: 1650, z1: -1375, z2: 690, label: '🍳廚房' },
+          bathroom:  { x1: 1725, x2: 3195, z1: 0, z2: 2000, label: '🚿浴室' }
+        };
       } else if (t === '3BR_H') {
-        // A7, A8, A9, A22 (約447尺 兩房): 6165×4525mm Hall + Protruding Side Room Wing 2215×2050mm
         return {
           main_hall: { x1: 0, x2: 2525, z1: 0, z2: 3200, label: '🚪正門客廳' },
           hall_1:    { x1: 0, x2: 2260, z1: 3200, z2: 6165, label: '🪟1房窗1' },
@@ -1174,7 +1226,6 @@
           bathroom:  { x1: 2525, x2: 4525, z1: 3100, z2: 4570, label: '🚿浴室' }
         };
       } else {
-        // 2BR_4525 (約380尺 一房 - image_c0643f.png: B3,B4,B6,B16,B18, A1,A4,A11,A13,A14,A16)
         return {
           main_hall: { x1: 2440, x2: 3840, z1: 4525, z2: 6165, label: '🚪正門玄關' },
           hall_1:    { x1: 0, x2: 2260, z1: 0, z2: 2885, label: '🪟1房窗1' },
@@ -1204,6 +1255,10 @@
         list.push({ zone: 'main_hall', x1: 2440, x2: 2525, z1: 2885, z2: 4525 });
         list.push({ zone: 'main_hall', x1: 2525, x2: 4525, z1: 2885, z2: 2970 });
         list.push({ zone: 'main_hall', x1: 2525, x2: 3925, z1: 4440, z2: 4525 });
+      } else if (t === 'STD_2BR_A22') {
+        list.push({ zone: 'main_hall', x1: 0, x2: 1725, z1: 690, z2: 775 });
+        list.push({ zone: 'hall_1', x1: 1725, x2: 3280, z1: 2000, z2: 2085 });
+        list.push({ zone: 'hall_2', x1: 3195, x2: 3280, z1: 0, z2: 2085 });
       }
       return list;
     }
@@ -1235,7 +1290,6 @@
       mesh.receiveShadow = true;
       buildingGroup.add(mesh);
 
-      // Architectural Poché Cap (Dark Section Cut Top Cap for High-Contrast Floor Plan Readability)
       const capMat = new THREE.MeshStandardMaterial({
         color: isOuter ? 0x1e242e : 0x363d4a,
         roughness: 0.45,
@@ -1246,7 +1300,6 @@
       cap.rotation.y = ang;
       buildingGroup.add(cap);
 
-      // Brushed Bronze Inner Trim Line on Cut Cap
       const bronzeTrim = new THREE.Mesh(
         new THREE.BoxGeometry(len, 6, Math.max(24, thick * 0.28)),
         new THREE.MeshStandardMaterial({ color: 0xb89658, roughness: 0.3, metalness: 0.75 })
@@ -1255,7 +1308,6 @@
       bronzeTrim.rotation.y = ang;
       buildingGroup.add(bronzeTrim);
 
-      // 75mm Recessed Dark Walnut Skirting Board + Floor AO Shadow Strip
       const skirtMat = new THREE.MeshStandardMaterial({ color: 0x2b2118, roughness: 0.42 });
       const skirt = new THREE.Mesh(new THREE.BoxGeometry(len, 75, thick + 12), skirtMat);
       skirt.position.set(cx, 37.5, cz);
@@ -1272,7 +1324,6 @@
       aoMesh.rotation.y = ang;
       buildingGroup.add(aoMesh);
 
-      // Warm 3000K Cove Light Strip along full-height living/dining walls
       if (h > 2000 && (zoneKey === 'hall_1' || zoneKey === 'hall_2') && len >= 1800) {
         const coveHolder = new THREE.Group();
         coveHolder.position.set(cx, h - 60, cz);
@@ -1294,7 +1345,6 @@
       const cz = (p1.z + p2.z) / 2;
       const ang = Math.atan2(-dz, dx);
 
-      // Lower parapet sill wall (850mm)
       const wallId = zoneWallAssignment[zoneKey] || 'w_cream';
       const styleObj = WALL_STYLES.find(w => w.id === wallId) || WALL_STYLES[0];
       const sillWall = new THREE.Mesh(new THREE.BoxGeometry(len, 850, 220), createProceduralWallPBRMaterial(styleObj, false));
@@ -1303,7 +1353,6 @@
       sillWall.receiveShadow = true;
       buildingGroup.add(sillWall);
 
-      // Calacatta Marble Window Sill Ledge
       const marbleSill = new THREE.Mesh(
         new THREE.BoxGeometry(len, 32, 260),
         new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: 0.2, metalness: 0.05 })
@@ -1312,7 +1361,6 @@
       marbleSill.rotation.y = ang;
       buildingGroup.add(marbleSill);
 
-      // Acoustic Window Frame & Double-Glazed Glass (1500mm tall)
       const winH = isHalfWallMode ? 520 : 1520;
       const frameMat = new THREE.MeshStandardMaterial({ color: 0x262b33, roughness: 0.35, metalness: 0.65 });
       const glassMat = new THREE.MeshPhysicalMaterial({
@@ -1349,7 +1397,6 @@
       const closedAng = Math.atan2(dz, dx);
       const openAng = closedAng + effDir * (Math.PI * 0.46);
 
-      // Door Leaf
       const doorH = isHalfWallMode ? 1150 : 2120;
       const doorMat = new THREE.MeshStandardMaterial({
         color: isMainDoor ? 0x5c3e28 : 0xd8c2a3,
@@ -1366,7 +1413,6 @@
       leaf.castShadow = true;
       buildingGroup.add(leaf);
 
-      // Floor Swing Arc Sector
       const shape = new THREE.Shape();
       shape.moveTo(0, 0);
       shape.absarc(0, 0, doorW, closedAng, openAng, effDir < 0);
@@ -1431,7 +1477,6 @@
       const meta = UNIT_META[unitId] || UNIT_META.B11;
       const t = meta.type;
 
-      // 1. Floor Slabs
       const slabs = getFloorSlabSpecs(unitId);
       slabs.forEach(s => {
         const p1 = toWorldXZ(s.x1, s.z1, unitId);
@@ -1447,7 +1492,6 @@
         buildingGroup.add(mesh);
       });
 
-      // 2. Architectural Walls, Doors, Windows & Dimensions
       if (t === '1BR') {
         addWindowSegment(0, 0, 2350, 0, 'hall_1');
         addWallSegment(2350, 0, 2720, 0, 200, 'main_hall');
@@ -1470,7 +1514,6 @@
         addDimensionLine(0, 6000, 2350, 6000, '2350mm', 280);
         addDimensionLine(3555, 0, 5135, 0, '浴1580mm', -280);
       } else if (t === 'WING_4525') {
-        // B10, B9 exact blueprint (image_1e085d.png)
         addWallSegment(0, 0, 4200, 0, 220, 'main_hall');
         addWallSegment(4200, 0, 4200, 550, 220, 'main_hall');
         addDoorWithSwingShadow(4200, 550, 4200, 1450, 1, true);
@@ -1499,7 +1542,6 @@
         addWallSegment(0, 7965, 0, 5700, 220, 'hall_2');
         addWallSegment(0, 4550, 0, 0, 220, 'hall_1');
 
-        // Protruding Left Bedroom Wing (2000 × 2150mm: x=-2000..0, z=3650..5800)
         addWallSegment(0, 3650, -2000, 3650, 220, 'side_room');
         addWallSegment(-2000, 3650, -2000, 5800, 220, 'side_room');
         addWindowSegment(-2000, 5800, 0, 5800, 'side_room');
@@ -1511,22 +1553,18 @@
         addDimensionLine(-2000, 3650, -2000, 5800, '側房2150mm', -280);
         addDimensionLine(-2000, 5800, 0, 5800, '2000mm', 260);
       } else if (t === 'WING_H_6165') {
-        // A2, A3 (約550尺 大兩房): Horizontal 7965×4525mm hall + downward protruding side room wing 2000×2150mm + downward protruding KIT 2065×1650mm
         addWallSegment(0, 0, 7965, 0, 220, 'hall_1');
-        // Right Double Acoustic Windows across 4525mm height (x=7965)
         addWallSegment(7965, 0, 7965, 300, 220, 'hall_2');
         addWindowSegment(7965, 300, 7965, 2100, 'hall_2');
         addWallSegment(7965, 2100, 7965, 2425, 220, 'hall_2');
         addWindowSegment(7965, 2425, 7965, 4225, 'hall_2');
         addWallSegment(7965, 4225, 7965, 4525, 220, 'hall_2');
 
-        // Bottom-right wall & Protruding Side Room Wing (x=3650..5800, z=4200..6200)
         addWallSegment(7965, 4525, 5800, 4525, 220, 'hall_2');
         addWallSegment(5800, 4525, 5800, 6200, 220, 'side_room');
         addWindowSegment(5800, 6200, 3650, 6200, 'side_room');
         addWallSegment(3650, 6200, 3650, 4200, 220, 'side_room');
 
-        // Protruding Kitchen KIT (1650 × 2065mm: x=1800..3450, z=4200..6265)
         addWallSegment(3650, 4200, 3450, 4200, 200, 'kitchen');
         addWallSegment(3450, 4200, 3450, 6265, 200, 'kitchen');
         addWallSegment(3450, 6265, 1800, 6265, 200, 'kitchen');
@@ -1534,13 +1572,11 @@
         addWallSegment(1800, 4200, 2520, 4200, 100, 'kitchen', false);
         addDoorWithSwingShadow(2520, 4200, 3365, 4200, 1, false);
 
-        // Bottom-Left Main Entrance Door & Left Wall
         addWallSegment(1800, 4200, 1450, 4200, 220, 'main_hall');
         addDoorWithSwingShadow(1450, 4200, 550, 4200, -1, true);
         addWallSegment(550, 4200, 0, 4200, 220, 'main_hall');
         addWallSegment(0, 4200, 0, 0, 220, 'main_hall');
 
-        // Bathroom BATH (1470 × 2000mm: x=3535..5005, z=2525..4525)
         addWallSegment(3535, 2525, 5005, 2525, 85, 'bathroom', false);
         addWallSegment(5005, 2525, 5005, 4525, 85, 'bathroom', false);
         addWallSegment(3535, 2525, 3535, 3325, 85, 'bathroom', false);
@@ -1578,40 +1614,32 @@
         addDimensionLine(rightW, 0, rightW, 5325, '5325mm', 320);
         addDimensionLine(0, 6065, rightW, 6065, `${rightW}mm`, 300);
       } else if (t === 'STD_2BR_WING') {
-        // B1, B15 (約447尺 兩房 - image_c06724.png): exact CAD dimensions
-        // Top Wall (z=0, x=0..4525) with 2 Acoustic Windows
         addWallSegment(0, 0, 300, 0, 220, 'hall_1');
         addWindowSegment(300, 0, 2100, 0, 'hall_1');
         addWallSegment(2100, 0, 2425, 0, 220, 'hall_1');
         addWindowSegment(2425, 0, 4225, 0, 'hall_1');
         addWallSegment(4225, 0, 4525, 0, 220, 'hall_1');
 
-        // Left Structural Wall (x=0, z=0..6165) with 1150mm Side Room Wing Opening (z=2615..3765)
         addWallSegment(0, 0, 0, 2615, 220, 'hall_1');
-        addWallSegment(0, 3765, 0, 4765, 220, 'side_room', false); // 900mm internal wing nib
+        addWallSegment(0, 3765, 0, 4765, 220, 'side_room', false);
         addWallSegment(0, 4765, 0, 6165, 220, 'hall_2');
 
-        // Protruding Left Side Room Wing (2000 × 2150mm: x=-2000..0, z=2615..4765)
-        addWindowSegment(-2000, 2615, 0, 2615, 'side_room'); // Top acoustic window of side room
+        addWindowSegment(-2000, 2615, 0, 2615, 'side_room');
         addWallSegment(-2000, 2615, -2000, 4765, 220, 'side_room');
         addWallSegment(-2000, 4765, 0, 4765, 220, 'side_room');
 
-        // Bottom Wall (z=6165, x=0..3840) with Main Entrance Door (x=1450..2350) swinging inward-left
         addWallSegment(0, 6165, 1450, 6165, 220, 'hall_2');
         addDoorWithSwingShadow(2350, 6165, 1450, 6165, 1, true);
         addWallSegment(2350, 6165, 3925, 6165, 220, 'main_hall');
 
-        // Protruding Bottom-Right Kitchen KIT (2065 × 1650mm: x=3925..5990, z=4515..6165)
         addWallSegment(3925, 6165, 5990, 6165, 220, 'kitchen');
         addWallSegment(5990, 6165, 5990, 4515, 220, 'kitchen');
         addWallSegment(5990, 4515, 3925, 4515, 200, 'kitchen');
         addDoorWithSwingShadow(3925, 4525, 3925, 5350, 1, false);
         addWallSegment(3925, 5350, 3925, 6165, 85, 'kitchen', false);
 
-        // Right Structural Wall (x=4525, z=0..4515)
         addWallSegment(4525, 0, 4525, 4515, 220, 'hall_1');
 
-        // Bathroom BATH (2000 × 1470mm: x=2525..4525, z=2970..4440)
         addWallSegment(2440, 2970, 4525, 2970, 85, 'bathroom', false);
         addWallSegment(2480, 2970, 2480, 4440, 85, 'bathroom', false);
         addDoorWithSwingShadow(2525, 4440, 3325, 4440, -1, false);
@@ -1624,39 +1652,31 @@
         addDimensionLine(3925, 6165, 5990, 6165, '廚2065mm', 300);
         addDimensionLine(4525, 0, 4525, 4440, '4350mm', 320);
       } else if (t === 'STD_2BR_WING_B15') {
-        // B15 (約447尺 兩房 - image_c00d2d.png): exact CAD dimensions
-        // Top Wall (z=0, x=0..4525) with 2 Acoustic Windows
         addWallSegment(0, 0, 300, 0, 220, 'hall_1');
         addWindowSegment(300, 0, 2100, 0, 'hall_1');
         addWallSegment(2100, 0, 2425, 0, 220, 'hall_1');
         addWindowSegment(2425, 0, 4225, 0, 'hall_1');
         addWallSegment(4225, 0, 4525, 0, 220, 'hall_1');
 
-        // Left Structural Wall (x=0): 4115mm straight down (z=0..4115) + 1150mm doorway (z=4115..5265) + 900mm bottom nib (z=5265..6165)
         addWallSegment(0, 0, 0, 4115, 220, 'hall_1');
         addWallSegment(0, 5265, 0, 6165, 220, 'side_room', false);
 
-        // Protruding Bottom-Left Side Room Wing flush with bottom wall (2000 × 2150mm: x=-2000..0, z=4015..6165)
-        addWindowSegment(-2000, 4015, 0, 4015, 'side_room'); // Top acoustic window of side room (with 100mm nib z=4015..4115)
+        addWindowSegment(-2000, 4015, 0, 4015, 'side_room');
         addWallSegment(-2000, 4015, -2000, 6165, 220, 'side_room');
         addWallSegment(-2000, 6165, 0, 6165, 220, 'side_room');
 
-        // Bottom Wall (z=6165, x=0..3835) with Main Entrance Door (x=1450..2350) swinging inward-left
         addWallSegment(0, 6165, 1450, 6165, 220, 'hall_2');
         addDoorWithSwingShadow(2350, 6165, 1450, 6165, 1, true);
         addWallSegment(2350, 6165, 3920, 6165, 220, 'main_hall');
 
-        // Protruding Bottom-Right Kitchen KIT (2065 × 1650mm: x=3920..5985, z=4515..6165)
         addWallSegment(3920, 6165, 5985, 6165, 220, 'kitchen');
         addWallSegment(5985, 6165, 5985, 4515, 220, 'kitchen');
         addWallSegment(5985, 4515, 3920, 4515, 200, 'kitchen');
         addDoorWithSwingShadow(3920, 4525, 3920, 5350, 1, false);
         addWallSegment(3920, 5350, 3920, 6165, 85, 'kitchen', false);
 
-        // Right Structural Wall (x=4525, z=0..4515)
         addWallSegment(4525, 0, 4525, 4515, 220, 'hall_1');
 
-        // Bathroom BATH (2000 × 1470mm: x=2525..4525, z=2970..4440)
         addWallSegment(2440, 2970, 4525, 2970, 85, 'bathroom', false);
         addWallSegment(2480, 2970, 2480, 4440, 85, 'bathroom', false);
         addDoorWithSwingShadow(2525, 4440, 3325, 4440, -1, false);
@@ -1668,33 +1688,76 @@
         addDimensionLine(0, 6165, 3835, 6165, '3750mm', 300);
         addDimensionLine(3920, 6165, 5985, 6165, '廚2065mm', 300);
         addDimensionLine(4525, 0, 4525, 4440, '4365mm', 320);
+      } else if (t === 'STD_2BR_A22') {
+        // Exact A22 blueprint (image_54ff4f.png):
+        // 1) Top-Left Protruding Kitchen KIT (1650 × 2065mm: x=0..1650, z=-1375..690)
+        addWallSegment(0, -1375, 1650, -1375, 220, 'kitchen');
+        addWallSegment(0, -1375, 0, 690, 220, 'kitchen');
+        addWallSegment(1650, -1375, 1650, 0, 200, 'kitchen');
+        addWallSegment(0, 730, 780, 730, 85, 'kitchen', false);
+        addDoorWithSwingShadow(1580, 730, 780, 730, 1, false);
+        addWallSegment(1580, 730, 1725, 730, 85, 'kitchen', false);
+
+        // 2) Left Foyer Wall & Main Entrance Door (3750mm: x=0, z=690..4525)
+        addWallSegment(0, 690, 0, 2120, 220, 'main_hall');
+        addDoorWithSwingShadow(0, 2120, 0, 3020, -1, true);
+        addWallSegment(0, 3020, 0, 4525, 220, 'main_hall');
+
+        // 3) Top Structural Wall across BATH & LIV/DIN (4365mm: x=1650..6165, z=0)
+        addWallSegment(1650, 0, 6165, 0, 220, 'hall_2');
+
+        // 4) Central-Top Bathroom BATH (1470 × 2000mm: x=1725..3195, z=0..2000)
+        addWallSegment(1685, 0, 1685, 1180, 85, 'bathroom', false);
+        addDoorWithSwingShadow(1685, 1980, 1685, 1180, -1, false);
+        addWallSegment(1685, 2040, 3235, 2040, 85, 'bathroom', false);
+        addWallSegment(3235, 0, 3235, 2040, 85, 'bathroom', false);
+
+        // 5) Right LIV/DIN Exterior Wall with Double Acoustic Windows (4525mm: x=6165, z=0..4525)
+        addWallSegment(6165, 0, 6165, 300, 220, 'hall_2');
+        addWindowSegment(6165, 300, 6165, 2100, 'hall_2');
+        addWallSegment(6165, 2100, 6165, 2425, 220, 'hall_1');
+        addWindowSegment(6165, 2425, 6165, 4225, 'hall_1');
+        addWallSegment(6165, 4225, 6165, 4525, 220, 'hall_1');
+
+        // 6) Bottom Main Hall Wall (2700mm left + 1150mm doorway + 2315mm right = 6165mm)
+        addWallSegment(0, 4525, 2700, 4525, 220, 'main_hall');
+        addWallSegment(3850, 4525, 6165, 4525, 220, 'hall_1');
+
+        // 7) Bottom Protruding Side Room (2150 × 2000mm: x=1800..3950, z=4525..6525, Acoustic Window on Right Wall)
+        addWallSegment(1800, 4525, 1800, 6525, 220, 'side_room');
+        addWallSegment(1800, 6525, 3950, 6525, 220, 'side_room');
+        addWallSegment(3950, 4525, 3950, 4725, 220, 'side_room');
+        addWindowSegment(3950, 4725, 3950, 6325, 'side_room');
+        addWallSegment(3950, 6325, 3950, 6525, 220, 'side_room');
+
+        // Red Dimension Lines matching image_54ff4f.png
+        addDimensionLine(0, -1375, 0, 690, '廚2065mm', -300);
+        addDimensionLine(0, 775, 0, 4525, '3750mm', -300);
+        addDimensionLine(1650, 0, 6165, 0, '4365mm', -300);
+        addDimensionLine(6165, 0, 6165, 4525, '4525mm', 320);
+        addDimensionLine(1800, 6525, 3950, 6525, '側房2150mm', 280);
+        addDimensionLine(1800, 4525, 1800, 6525, '2000mm', -280);
       } else if (t === '2BR_4525') {
-        // B3, B4, B6, B16, B18, A1, A4, A11, A13, A14, A16 (約380尺 一房 - image_c0643f.png): exact CAD dimensions
         addWallSegment(0, 0, 300, 0, 220, 'hall_1');
         addWindowSegment(300, 0, 2100, 0, 'hall_1');
         addWallSegment(2100, 0, 2425, 0, 220, 'hall_1');
         addWindowSegment(2425, 0, 4225, 0, 'hall_2');
         addWallSegment(4225, 0, 4525, 0, 220, 'hall_2');
 
-        // Straight Left Structural Wall (6165mm)
         addWallSegment(0, 0, 0, 6165, 220, 'side_room');
 
-        // Bottom Wall (z=6165, x=0..3925) with Main Entrance Door (x=1450..2350) swinging inward-left
         addWallSegment(0, 6165, 1450, 6165, 220, 'side_room');
         addDoorWithSwingShadow(2350, 6165, 1450, 6165, 1, true);
         addWallSegment(2350, 6165, 3925, 6165, 220, 'main_hall');
 
-        // Protruding Bottom-Right Kitchen KIT (2065 × 1650mm: x=3925..5990, z=4515..6165)
         addWallSegment(3925, 6165, 5990, 6165, 220, 'kitchen');
         addWallSegment(5990, 6165, 5990, 4515, 220, 'kitchen');
         addWallSegment(5990, 4515, 3925, 4515, 200, 'kitchen');
         addDoorWithSwingShadow(3925, 4525, 3925, 5350, 1, false);
         addWallSegment(3925, 5350, 3925, 6165, 85, 'kitchen', false);
 
-        // Right Structural Wall (x=4525, z=0..4515)
         addWallSegment(4525, 0, 4525, 4515, 220, 'hall_2');
 
-        // Bathroom BATH (2000 × 1470mm: x=2525..4525, z=2970..4440)
         addWallSegment(2440, 2970, 4525, 2970, 85, 'bathroom', false);
         addWallSegment(2480, 2970, 2480, 4440, 85, 'bathroom', false);
         addDoorWithSwingShadow(2525, 4440, 3325, 4440, -1, false);
@@ -1739,7 +1802,6 @@
         addDimensionLine(0, 6165, 4525, 6165, '4525mm', 300);
         if (t === '3BR_H') addDimensionLine(4525, 6165, 6740, 6165, '側房2215mm', 300);
       } else {
-        // STUDIO_H (3350 × 6165mm compact single-bay unit)
         addWallSegment(0, 0, 1850, 0, 200, 'main_hall');
         addDoorWithSwingShadow(1850, 0, 2750, 0, 1, true);
         addWallSegment(2750, 0, 3350, 0, 200, 'main_hall');
@@ -1795,6 +1857,454 @@
         addContactShadowPad(g, w, d, meta.cat === 'partitions' ? 0.22 : 0.36);
       }
 
+      // =========================================================================
+      // ✨ CREAM ARC BESPOKE 6 SIGNATURE CUSTOM FURNITURE MODELS
+      // =========================================================================
+      if (meta.id === 'bespoke_arc_foyer_c_cab') {
+        // 1) 【奶油弧形】弧角C字懸浮玄關櫃連換鞋凳 (1350 × 400 × 2450 mm)
+        const benchW = 460;
+        const cabW = w - benchW;
+        const benchX = -w / 2 + benchW / 2;
+        const cabX = -w / 2 + benchW + cabW / 2;
+
+        const plinth = new THREE.Mesh(new THREE.BoxGeometry(w - 40, 140, d - 50), darkWoodMat);
+        plinth.position.set(0, 70, -15);
+        g.add(plinth);
+        addWarmCoveLightStrip(g, w - 80, 18, 12, 0, 165, d / 2 - 20);
+
+        const benchBase = new THREE.Mesh(new THREE.BoxGeometry(benchW, 270, d - 10), secMat);
+        benchBase.position.set(benchX, 180 + 135, 0);
+        benchBase.castShadow = true;
+        g.add(benchBase);
+
+        const cushion = new THREE.Mesh(
+          new THREE.BoxGeometry(benchW - 24, 56, d - 30),
+          new THREE.MeshStandardMaterial({ color: 0xd9ceb8, roughness: 0.68 })
+        );
+        cushion.position.set(benchX, 478, 4);
+        g.add(cushion);
+
+        const flutedTex = getProceduralItemTexture('fluted', meta.sec || '#c8ae8d');
+        const flutedBack = new THREE.Mesh(
+          new THREE.BoxGeometry(benchW - 10, 1180, 22),
+          new THREE.MeshStandardMaterial({ map: flutedTex, roughness: 0.42 })
+        );
+        flutedBack.position.set(benchX, 1080, -d / 2 + 24);
+        g.add(flutedBack);
+
+        const coatBar = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, benchW - 60, 12), goldMat);
+        coatBar.rotation.z = Math.PI / 2;
+        coatBar.position.set(benchX, 1560, 0);
+        g.add(coatBar);
+
+        const leftTopCab = new THREE.Mesh(new THREE.BoxGeometry(benchW, 760, d), mainMat);
+        leftTopCab.position.set(benchX, h - 380, 0);
+        leftTopCab.castShadow = true;
+        g.add(leftTopCab);
+        addWarmCoveLightStrip(g, benchW - 40, 16, 12, benchX, h - 765, d / 2 - 30);
+
+        const lowShoeCab = new THREE.Mesh(new THREE.BoxGeometry(cabW - 40, 820, d), mainMat);
+        lowShoeCab.position.set(cabX - 20, 180 + 410, 0);
+        lowShoeCab.castShadow = true;
+        g.add(lowShoeCab);
+
+        const rCol = new THREE.Mesh(new THREE.CylinderGeometry(d / 2, d / 2, h - 180, 24), secMat);
+        rCol.position.set(w / 2 - d / 2, 180 + (h - 180) / 2, 0);
+        rCol.castShadow = true;
+        g.add(rCol);
+
+        const nicheBack = new THREE.Mesh(new THREE.BoxGeometry(cabW - 30, 440, 24), secMat);
+        nicheBack.position.set(cabX - 15, 1220, -d / 2 + 20);
+        g.add(nicheBack);
+        const nicheDeck = new THREE.Mesh(new THREE.BoxGeometry(cabW - 20, 24, d - 10), secMat);
+        nicheDeck.position.set(cabX - 10, 1012, 0);
+        g.add(nicheDeck);
+        addWarmCoveLightStrip(g, cabW - 80, 18, 12, cabX - 15, 1425, d / 2 - 40);
+
+        const vase = new THREE.Mesh(
+          new THREE.CylinderGeometry(34, 48, 170, 18),
+          new THREE.MeshStandardMaterial({ color: 0xe8dfd1, roughness: 0.28 })
+        );
+        vase.position.set(cabX + 80, 1110, 20);
+        g.add(vase);
+
+        const upShoeCab = new THREE.Mesh(new THREE.BoxGeometry(cabW - 40, 1010, d), mainMat);
+        upShoeCab.position.set(cabX - 20, h - 505, 0);
+        upShoeCab.castShadow = true;
+        g.add(upShoeCab);
+
+        const seam = new THREE.Mesh(new THREE.BoxGeometry(6, h - 220, 10), darkWoodMat);
+        seam.position.set(cabX - 20, h / 2 + 60, d / 2 + 2);
+        g.add(seam);
+        [-16, 16].forEach(dx => {
+          const hdl = new THREE.Mesh(new THREE.BoxGeometry(10, 320, 14), goldMat);
+          hdl.position.set(cabX - 20 + dx, 620, d / 2 + 10);
+          g.add(hdl);
+        });
+        return g;
+      }
+
+      if (meta.id === 'bespoke_arc_tv_wall') {
+        // 2) 【奶油弧形】奶油弧形格柵隱藏門電視牆 (2400 × 420 × 2450 mm)
+        const doorW = 680;
+        const centerW = 1220;
+        const rightW = w - doorW - centerW;
+
+        const flutedTex = getProceduralItemTexture('fluted', meta.sec || '#b89872');
+        const flutedMat = new THREE.MeshStandardMaterial({ map: flutedTex, roughness: 0.40 });
+        const hiddenDoor = new THREE.Mesh(new THREE.BoxGeometry(doorW, h, 85), flutedMat);
+        hiddenDoor.position.set(-w / 2 + doorW / 2, h / 2, -d / 2 + 45);
+        hiddenDoor.castShadow = true;
+        g.add(hiddenDoor);
+
+        const doorHdl = new THREE.Mesh(new THREE.BoxGeometry(14, 180, 28), goldMat);
+        doorHdl.position.set(-w / 2 + doorW - 65, 1050, -d / 2 + 95);
+        g.add(doorHdl);
+
+        const arcPillar = new THREE.Mesh(new THREE.CylinderGeometry(95, 95, h, 24), mainMat);
+        arcPillar.position.set(-w / 2 + doorW + 25, h / 2, -d / 2 + 95);
+        g.add(arcPillar);
+
+        const centerX = -w / 2 + doorW + centerW / 2;
+        const backBoard = new THREE.Mesh(new THREE.BoxGeometry(centerW, h - 380, 55), mainMat);
+        backBoard.position.set(centerX, (h - 380) / 2, -d / 2 + 30);
+        backBoard.receiveShadow = true;
+        g.add(backBoard);
+
+        const topBridge = new THREE.Mesh(new THREE.BoxGeometry(centerW, 380, d), mainMat);
+        topBridge.position.set(centerX, h - 190, 0);
+        topBridge.castShadow = true;
+        g.add(topBridge);
+        addWarmCoveLightStrip(g, centerW - 60, 18, 14, centerX, h - 386, d / 2 - 40);
+
+        const tvConsole = new THREE.Mesh(new THREE.BoxGeometry(centerW - 80, 320, d - 20), secMat);
+        tvConsole.position.set(centerX, 360, 10);
+        tvConsole.castShadow = true;
+        g.add(tvConsole);
+        [-centerW / 2 + 45, centerW / 2 - 45].forEach(rx => {
+          const endCyl = new THREE.Mesh(new THREE.CylinderGeometry((d - 20) / 2, (d - 20) / 2, 320, 20), secMat);
+          endCyl.position.set(centerX + rx, 360, 10);
+          g.add(endCyl);
+        });
+        addWarmCoveLightStrip(g, centerW - 100, 20, 14, centerX, 190, d / 2 - 15);
+
+        const tvFrame = new THREE.Mesh(new THREE.BoxGeometry(1080, 620, 36), darkWoodMat);
+        tvFrame.position.set(centerX, 1280, -d / 2 + 78);
+        g.add(tvFrame);
+        const tvScreen = new THREE.Mesh(
+          new THREE.PlaneGeometry(1048, 588),
+          new THREE.MeshBasicMaterial({ map: getProceduralItemTexture('tv_art') })
+        );
+        tvScreen.position.set(centerX, 1280, -d / 2 + 98);
+        g.add(tvScreen);
+        addWarmCoveLightStrip(g, 1020, 16, 12, centerX, 1600, -d / 2 + 65);
+
+        const rightX = w / 2 - rightW / 2;
+        const rightCarcass = new THREE.Mesh(new THREE.BoxGeometry(rightW, h, d), darkWoodMat);
+        rightCarcass.position.set(rightX, h / 2, 0);
+        rightCarcass.castShadow = true;
+        g.add(rightCarcass);
+
+        for (let i = 1; i <= 4; i++) {
+          const sy = (h / 5) * i;
+          addWarmCoveLightStrip(g, rightW - 50, 14, 10, rightX, sy, d / 2 - 20);
+        }
+
+        const teaGlass = new THREE.Mesh(
+          new THREE.BoxGeometry(rightW - 28, h - 80, 14),
+          new THREE.MeshPhysicalMaterial({ color: 0x261d15, transparent: true, opacity: 0.48, roughness: 0.1 })
+        );
+        teaGlass.position.set(rightX, h / 2, d / 2 + 6);
+        g.add(teaGlass);
+
+        const glassFrameHdl = new THREE.Mesh(new THREE.BoxGeometry(12, 950, 18), goldMat);
+        glassFrameHdl.position.set(rightX - rightW * 0.36, h / 2, d / 2 + 14);
+        g.add(glassFrameHdl);
+        return g;
+      }
+
+      if (meta.id === 'bespoke_arc_sideboard_island') {
+        // 3) 【奶油弧形】弧形燈槽餐邊櫃連半島餐桌 (1550 × 1280 × 2450 mm)
+        const sbD = 420;
+        const sbZ = -d / 2 + sbD / 2;
+
+        const baseCab = new THREE.Mesh(new THREE.BoxGeometry(w, 880, sbD), mainMat);
+        baseCab.position.set(0, 440, sbZ);
+        baseCab.castShadow = true;
+        g.add(baseCab);
+
+        const stoneMat = new THREE.MeshStandardMaterial({ color: 0xf2efe9, roughness: 0.22, metalness: 0.05 });
+        const barTop = new THREE.Mesh(new THREE.BoxGeometry(w + 10, 32, sbD + 16), stoneMat);
+        barTop.position.set(0, 896, sbZ + 4);
+        g.add(barTop);
+
+        const oakBack = new THREE.Mesh(new THREE.BoxGeometry(w - 40, 620, 24), secMat);
+        oakBack.position.set(0, 1210, -d / 2 + 20);
+        g.add(oakBack);
+        addWarmCoveLightStrip(g, w - 90, 20, 14, 0, 1505, sbZ + sbD * 0.32);
+
+        const upCab = new THREE.Mesh(new THREE.BoxGeometry(w, h - 1520, sbD), mainMat);
+        upCab.position.set(0, 1520 + (h - 1520) / 2, sbZ);
+        upCab.castShadow = true;
+        g.add(upCab);
+
+        const reededGlass = new THREE.Mesh(
+          new THREE.BoxGeometry(w - 90, h - 1600, 14),
+          new THREE.MeshPhysicalMaterial({ color: 0xdbe7ed, transparent: true, opacity: 0.42, roughness: 0.18 })
+        );
+        reededGlass.position.set(0, 1520 + (h - 1520) / 2, sbZ + sbD / 2 + 6);
+        g.add(reededGlass);
+
+        const tblW = 760;
+        const tblLen = d - sbD - 110;
+        const tblZ = sbZ + sbD / 2 + tblLen / 2 - 20;
+
+        const tblDeck = new THREE.Mesh(new THREE.BoxGeometry(tblW, 38, tblLen - tblW / 2), stoneMat);
+        tblDeck.position.set(0, 740, tblZ - tblW / 4);
+        tblDeck.castShadow = true;
+        g.add(tblDeck);
+
+        const tblArc = new THREE.Mesh(new THREE.CylinderGeometry(tblW / 2, tblW / 2, 38, 28), stoneMat);
+        tblArc.position.set(0, 740, tblZ + tblLen / 2 - tblW / 2);
+        tblArc.castShadow = true;
+        g.add(tblArc);
+
+        const pedLeg = new THREE.Mesh(
+          new THREE.CylinderGeometry(145, 165, 720, 24),
+          new THREE.MeshStandardMaterial({ map: getProceduralItemTexture('fluted', meta.sec || '#c8ae8d'), roughness: 0.4 })
+        );
+        pedLeg.position.set(0, 360, tblZ + 60);
+        pedLeg.castShadow = true;
+        g.add(pedLeg);
+
+        const goldRing = new THREE.Mesh(new THREE.CylinderGeometry(172, 175, 28, 24), goldMat);
+        goldRing.position.set(0, 14, tblZ + 60);
+        g.add(goldRing);
+
+        [-tblW / 2 - 140, tblW / 2 + 140].forEach(cx => {
+          const seat = new THREE.Mesh(
+            new THREE.CylinderGeometry(195, 195, 55, 20),
+            new THREE.MeshStandardMaterial({ color: 0xe6dfd3, roughness: 0.65 })
+          );
+          seat.position.set(cx, 450, tblZ);
+          seat.castShadow = true;
+          g.add(seat);
+
+          const back = new THREE.Mesh(new THREE.BoxGeometry(110, 320, 360), secMat);
+          back.position.set(cx + (cx < 0 ? -155 : 155), 620, tblZ);
+          back.castShadow = true;
+          g.add(back);
+        });
+        return g;
+      }
+
+      if (meta.id === 'bespoke_arc_podium_bed') {
+        // 4) 【奶油弧形】步入式燈帶地台床連轉角衣櫃 (2050 × 1950 × 2450 mm)
+        const podH = 400;
+        const stepD = 260;
+        const wardW = 540;
+        const bedW = w - wardW;
+        const wardX = -w / 2 + wardW / 2;
+        const bedX = -w / 2 + wardW + bedW / 2;
+
+        const podium = new THREE.Mesh(new THREE.BoxGeometry(w, podH, d - stepD), secMat);
+        podium.position.set(0, podH / 2, -stepD / 2);
+        podium.receiveShadow = true;
+        podium.castShadow = true;
+        g.add(podium);
+
+        const step = new THREE.Mesh(new THREE.BoxGeometry(bedW, 200, stepD), secMat);
+        step.position.set(bedX, 100, d / 2 - stepD / 2);
+        step.castShadow = true;
+        g.add(step);
+        addWarmCoveLightStrip(g, bedW - 60, 18, 12, bedX, podH - 18, d / 2 - stepD + 8);
+        addWarmCoveLightStrip(g, bedW - 60, 18, 12, bedX, 185, d / 2 + 4);
+
+        const wardLow = new THREE.Mesh(new THREE.BoxGeometry(wardW, podH + 320, d), mainMat);
+        wardLow.position.set(wardX, (podH + 320) / 2, 0);
+        wardLow.castShadow = true;
+        g.add(wardLow);
+
+        const frontWardBody = new THREE.Mesh(new THREE.BoxGeometry(wardW, h - (podH + 320), d - 520), mainMat);
+        frontWardBody.position.set(wardX, (podH + 320) + (h - podH - 320) / 2, 260);
+        frontWardBody.castShadow = true;
+        g.add(frontWardBody);
+
+        const topBridgeWard = new THREE.Mesh(new THREE.BoxGeometry(wardW, h - 1180, 520), mainMat);
+        topBridgeWard.position.set(wardX, 1180 + (h - 1180) / 2, -d / 2 + 260);
+        topBridgeWard.castShadow = true;
+        g.add(topBridgeWard);
+
+        addWarmCoveLightStrip(g, 380, 18, 12, wardX + wardW * 0.25, 1170, -d / 2 + 260);
+
+        const wHdl = new THREE.Mesh(new THREE.BoxGeometry(14, 880, 14), goldMat);
+        wHdl.position.set(wardX + wardW / 2 + 8, 1380, 180);
+        g.add(wHdl);
+
+        const headBoard = new THREE.Mesh(
+          new THREE.BoxGeometry(bedW - 30, 680, 85),
+          new THREE.MeshStandardMaterial({ color: 0xe6dfd3, roughness: 0.65 })
+        );
+        headBoard.position.set(bedX, podH + 340, -d / 2 + 48);
+        headBoard.castShadow = true;
+        g.add(headBoard);
+        addWarmCoveLightStrip(g, bedW - 80, 18, 14, bedX, podH + 685, -d / 2 + 55);
+
+        const matH = 190;
+        const matD = d - stepD - 110;
+        const mattress = new THREE.Mesh(
+          new THREE.BoxGeometry(bedW - 60, matH, matD),
+          new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.7 })
+        );
+        mattress.position.set(bedX, podH + matH / 2, -stepD / 2 + 35);
+        mattress.castShadow = true;
+        g.add(mattress);
+
+        const duvet = new THREE.Mesh(
+          new THREE.BoxGeometry(bedW - 48, matH + 16, matD * 0.62),
+          new THREE.MeshStandardMaterial({ color: 0x8c6b4a, roughness: 0.68 })
+        );
+        duvet.position.set(bedX, podH + matH / 2 + 6, -stepD / 2 + matD * 0.2);
+        duvet.castShadow = true;
+        g.add(duvet);
+
+        [-bedW * 0.22, bedW * 0.22].forEach(px => {
+          const pil = new THREE.Mesh(
+            new THREE.BoxGeometry(bedW * 0.36, 95, 260),
+            new THREE.MeshStandardMaterial({ color: 0xfaf7f2, roughness: 0.6 })
+          );
+          pil.position.set(bedX + px, podH + matH + 38, -d / 2 + 230);
+          pil.rotation.x = 0.2;
+          g.add(pil);
+        });
+        return g;
+      }
+
+      if (meta.id === 'bespoke_arc_study_sofa_bed') {
+        // 5) 【奶油弧形】長虹玻璃書房隔斷連地台書枱 (1950 × 1650 × 2450 mm)
+        const lowWallH = 920;
+        const lowWall = new THREE.Mesh(new THREE.BoxGeometry(w, lowWallH, 95), mainMat);
+        lowWall.position.set(0, lowWallH / 2, d / 2 - 48);
+        lowWall.castShadow = true;
+        g.add(lowWall);
+
+        const winH = isHalfWallMode ? 420 : (h - lowWallH);
+        const frameTop = new THREE.Mesh(new THREE.BoxGeometry(w, 36, 105), darkWoodMat);
+        frameTop.position.set(0, lowWallH + winH, d / 2 - 48);
+        g.add(frameTop);
+
+        const reededGlass = new THREE.Mesh(
+          new THREE.BoxGeometry(w - 60, winH - 30, 22),
+          new THREE.MeshPhysicalMaterial({ color: 0xcbe0eb, transparent: true, opacity: 0.38, roughness: 0.16 })
+        );
+        reededGlass.position.set(0, lowWallH + winH / 2, d / 2 - 48);
+        g.add(reededGlass);
+
+        for (let i = -2; i <= 2; i++) {
+          const bar = new THREE.Mesh(new THREE.BoxGeometry(18, winH, 42), goldMat);
+          bar.position.set(i * (w / 5), lowWallH + winH / 2, d / 2 - 48);
+          g.add(bar);
+        }
+
+        const desk = new THREE.Mesh(new THREE.BoxGeometry(w - 80, 42, 500), secMat);
+        desk.position.set(0, 740, d / 2 - 340);
+        desk.castShadow = true;
+        g.add(desk);
+        addWarmCoveLightStrip(g, w - 140, 18, 12, 0, 712, d / 2 - 220);
+
+        const podD = 780;
+        const podBase = new THREE.Mesh(new THREE.BoxGeometry(w - 40, 360, podD), secMat);
+        podBase.position.set(0, 180, -d / 2 + podD / 2 + 20);
+        podBase.castShadow = true;
+        g.add(podBase);
+        addWarmCoveLightStrip(g, w - 100, 18, 12, 0, 65, -d / 2 + podD + 22);
+
+        const dayMat = new THREE.Mesh(
+          new THREE.BoxGeometry(w - 70, 140, podD - 40),
+          new THREE.MeshStandardMaterial({ color: 0xe8e0d2, roughness: 0.68 })
+        );
+        dayMat.position.set(0, 430, -d / 2 + podD / 2 + 20);
+        dayMat.castShadow = true;
+        g.add(dayMat);
+
+        const bookCab = new THREE.Mesh(new THREE.BoxGeometry(w - 40, 760, 340), mainMat);
+        bookCab.position.set(0, h - 380, -d / 2 + 180);
+        bookCab.castShadow = true;
+        g.add(bookCab);
+        addWarmCoveLightStrip(g, w - 100, 18, 12, 0, h - 765, -d / 2 + 280);
+        return g;
+      }
+
+      if (meta.id === 'bespoke_arc_semi_open_kit_bar') {
+        // 6) 【奶油弧形】半開放長虹玻璃趟門U型廚櫃 (1980 × 1600 × 2420 mm)
+        const baseH = 860;
+        const stoneMat = new THREE.MeshStandardMaterial({ color: 0xf3f0e8, roughness: 0.2, metalness: 0.06 });
+
+        const backBase = new THREE.Mesh(new THREE.BoxGeometry(w, baseH, 580), mainMat);
+        backBase.position.set(0, baseH / 2, -d / 2 + 290);
+        backBase.castShadow = true;
+        g.add(backBase);
+        const backTop = new THREE.Mesh(new THREE.BoxGeometry(w + 12, 36, 600), stoneMat);
+        backTop.position.set(0, baseH + 18, -d / 2 + 295);
+        g.add(backTop);
+
+        const rightBase = new THREE.Mesh(new THREE.BoxGeometry(580, baseH, d - 580), mainMat);
+        rightBase.position.set(w / 2 - 290, baseH / 2, 290);
+        rightBase.castShadow = true;
+        g.add(rightBase);
+        const rightTop = new THREE.Mesh(new THREE.BoxGeometry(600, 36, d - 570), stoneMat);
+        rightTop.position.set(w / 2 - 295, baseH + 18, 290);
+        g.add(rightTop);
+
+        const barW = 1180;
+        const barX = -w / 2 + barW / 2;
+        const frontBar = new THREE.Mesh(new THREE.BoxGeometry(barW, baseH, 420), secMat);
+        frontBar.position.set(barX, baseH / 2, d / 2 - 210);
+        frontBar.castShadow = true;
+        g.add(frontBar);
+        const frontTop = new THREE.Mesh(new THREE.BoxGeometry(barW + 24, 38, 460), stoneMat);
+        frontTop.position.set(barX, baseH + 19, d / 2 - 205);
+        g.add(frontTop);
+        addWarmCoveLightStrip(g, barW - 60, 18, 12, barX, baseH - 25, d / 2 + 6);
+
+        const glassH = isHalfWallMode ? 480 : (h - baseH - 40);
+        const glassPanel = new THREE.Mesh(
+          new THREE.BoxGeometry(barW - 40, glassH, 24),
+          new THREE.MeshPhysicalMaterial({ color: 0xd4e6ee, transparent: true, opacity: 0.36, roughness: 0.14 })
+        );
+        glassPanel.position.set(barX, baseH + 38 + glassH / 2, d / 2 - 205);
+        g.add(glassPanel);
+
+        const topTrack = new THREE.Mesh(new THREE.BoxGeometry(w, 42, 65), goldMat);
+        topTrack.position.set(0, baseH + 38 + glassH, d / 2 - 205);
+        g.add(topTrack);
+
+        const hob = new THREE.Mesh(
+          new THREE.BoxGeometry(580, 12, 420),
+          new THREE.MeshStandardMaterial({ color: 0x11151c, roughness: 0.12, metalness: 0.45 })
+        );
+        hob.position.set(-w * 0.16, baseH + 38, -d / 2 + 295);
+        g.add(hob);
+
+        const sink = new THREE.Mesh(
+          new THREE.BoxGeometry(420, 14, 540),
+          new THREE.MeshStandardMaterial({ color: 0x262c36, roughness: 0.25, metalness: 0.75 })
+        );
+        sink.position.set(w / 2 - 295, baseH + 38, 240);
+        g.add(sink);
+
+        const tap = new THREE.Mesh(new THREE.CylinderGeometry(12, 14, 240, 12), goldMat);
+        tap.position.set(w / 2 - 120, baseH + 150, 240);
+        g.add(tap);
+
+        const upperCab = new THREE.Mesh(new THREE.BoxGeometry(w, 680, 350), mainMat);
+        upperCab.position.set(0, 1980, -d / 2 + 175);
+        upperCab.castShadow = true;
+        g.add(upperCab);
+        addWarmCoveLightStrip(g, w - 80, 18, 12, 0, 1625, -d / 2 + 230);
+        return g;
+      }
+
       if (meta.cat === 'cabinets') {
         const effH = h;
         const body = new THREE.Mesh(new THREE.BoxGeometry(w, effH, d), mainMat);
@@ -1803,7 +2313,6 @@
         body.receiveShadow = true;
         g.add(body);
 
-        // Dark Walnut Top Crown & Recessed Base Plinth for Clear Plan Readability
         const topCrown = new THREE.Mesh(new THREE.BoxGeometry(w + 6, 22, d + 6), darkWoodMat);
         topCrown.position.set(0, effH + 11, 0);
         g.add(topCrown);
@@ -1812,7 +2321,6 @@
         plinth.position.set(0, 38, -8);
         g.add(plinth);
 
-        // Vertical Door Seam Grooves on Front Face
         const doorCount = Math.max(2, Math.round(w / 520));
         for (let i = 1; i < doorCount; i++) {
           const sx = -w / 2 + i * (w / doorCount);
@@ -1821,7 +2329,6 @@
           g.add(seam);
         }
 
-        // Fluted Decorative Accent Panel
         if (h > 1800) {
           const flutedTex = getProceduralItemTexture('fluted', meta.sec || '#8c6b4a');
           const flutedPanel = new THREE.Mesh(
@@ -1832,7 +2339,6 @@
           g.add(flutedPanel);
         }
 
-        // Smoked Glass Display Niche for Showflat Cabinets
         if (meta.id === 'cab_photo2_display' || meta.id === 'cab_langyu_tv') {
           const nicheW = Math.min(700, w * 0.32);
           const glassMat = new THREE.MeshPhysicalMaterial({
@@ -1846,7 +2352,6 @@
           g.add(glassDoor);
         }
 
-        // Brushed Gold Handles
         const handleH = Math.min(540, effH * 0.38);
         const h1 = new THREE.Mesh(new THREE.BoxGeometry(12, handleH, 16), goldMat);
         h1.position.set(-18, effH * 0.5, d / 2 + 12);
@@ -1859,7 +2364,6 @@
         }
       } else if (meta.cat === 'beds') {
         const baseH = 280;
-        // Dark Walnut Recessed Floating Platform Base
         const underPlinth = new THREE.Mesh(new THREE.BoxGeometry(w - 110, 110, d - 110), darkWoodMat);
         underPlinth.position.set(0, 55, 0);
         g.add(underPlinth);
@@ -1870,7 +2374,6 @@
         base.receiveShadow = true;
         g.add(base);
 
-        // Warm Ivory Quilted Mattress
         const matH = 210;
         const mattress = new THREE.Mesh(
           new THREE.BoxGeometry(w - 50, matH, d - 90),
@@ -1881,7 +2384,6 @@
         mattress.receiveShadow = true;
         g.add(mattress);
 
-        // High-Contrast Designer Duvet Throw Blanket across lower 62% of bed (crucial for top-down readability!)
         const duvetD = (d - 90) * 0.62;
         const duvet = new THREE.Mesh(
           new THREE.BoxGeometry(w - 36, matH + 18, duvetD),
@@ -1891,7 +2393,6 @@
         duvet.castShadow = true;
         g.add(duvet);
 
-        // Folded Cream Accent Runner Strip at foot of bed
         const runner = new THREE.Mesh(
           new THREE.BoxGeometry(w - 28, matH + 26, Math.min(320, d * 0.18)),
           darkWoodMat
@@ -1899,7 +2400,6 @@
         runner.position.set(0, baseH + matH / 2 + 10, d / 2 - 210);
         g.add(runner);
 
-        // Tufted Upholstered Headboard with Dark Wood Frame
         const headFrame = new THREE.Mesh(new THREE.BoxGeometry(w + 50, h + 16, 105), darkWoodMat);
         headFrame.position.set(0, h / 2, -d / 2 + 52);
         g.add(headFrame);
@@ -1909,7 +2409,6 @@
         head.castShadow = true;
         g.add(head);
 
-        // Layered Sleeping Pillows + Front Accent Cushions
         const pCount = w >= 1200 ? 2 : 1;
         for (let i = 0; i < pCount; i++) {
           const px = pCount === 2 ? (i === 0 ? -w * 0.24 : w * 0.24) : 0;
@@ -1928,7 +2427,6 @@
           g.add(bolster);
         }
 
-        // Bunk Bed Upper Deck
         if (meta.id.includes('bunk')) {
           const effBunkH = h;
           const postPositions = [
@@ -1988,12 +2486,10 @@
             g.add(leaf);
           });
         } else {
-          // Dark Wood Plinth Frame under Sofa
           const plinth = new THREE.Mesh(new THREE.BoxGeometry(w - 30, 75, d - 30), darkWoodMat);
           plinth.position.set(0, 45, 0);
           g.add(plinth);
 
-          // Segmented Individual Seat Cushions with Dark Seams
           const cCount = w >= 1800 ? 3 : 2;
           const innerW = w - 320;
           const seatW = innerW / cCount - 12;
@@ -2024,7 +2520,6 @@
             g.add(arm);
           });
 
-          // Designer Round Coffee Table in front of 3-Seat Sofa
           if (w >= 1800) {
             const tblTop = new THREE.Mesh(
               new THREE.CylinderGeometry(340, 340, 36, 28),
@@ -2185,7 +2680,6 @@
           leg2.castShadow = true;
           g.add(leg2);
 
-          // Contrast Warm Grey Sintered Stone Countertop
           const stoneMat = new THREE.MeshStandardMaterial({ color: 0xc8c2b8, roughness: 0.24, metalness: 0.08 });
           const top1 = new THREE.Mesh(new THREE.BoxGeometry(w + 12, 38, 600), stoneMat);
           top1.position.set(0, baseH + 19, -d / 2 + 295);
@@ -2194,7 +2688,6 @@
           top2.position.set(w / 2 - 295, baseH + 19, 290);
           g.add(top2);
 
-          // Black Glass Induction Hob + Undermount Dark Sink + Gold Faucet (High top-down visibility)
           const hob = new THREE.Mesh(
             new THREE.BoxGeometry(560, 12, 420),
             new THREE.MeshStandardMaterial({ color: 0x11151c, roughness: 0.12, metalness: 0.4 })
@@ -2252,7 +2745,6 @@
           cistern.position.set(0, 390, -d / 2 + 75);
           g.add(cistern);
         } else {
-          // Bathtub with Dark Stone Apron Surround & Recessed Inner Basin
           const apron = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), darkWoodMat);
           apron.position.set(0, h / 2, 0);
           apron.castShadow = true;
@@ -2321,6 +2813,7 @@
       const variations = getCategoryLayoutVariations(catId, peopleCount);
       const layoutObj = variations[(layoutIdx - 1) % variations.length] || variations[0];
       const isByCab = !!layoutObj.byCabinet;
+      const isBespokeArc = !!layoutObj.isBespokeArc;
       const targetRooms = layoutObj.rooms !== undefined ? layoutObj.rooms : 1;
 
       const items = [];
@@ -2330,7 +2823,7 @@
       const bedOpt = { color: style.bed, sec: style.sec };
       const sofaOpt = { color: style.sec, sec: style.cab };
 
-      // 1. Essential Kitchen, Bathroom, Electrical Switches & Split A/C
+      // 1. Essential Kitchen, Bathroom & Split A/C
       if (t === '1BR') {
         placeInBox(items, boxes, 'kit_l_compact_1br', { x1: 2455, x2: 3830, z1: 1660, z2: 3380 }, 'right', 'top', 0, cabOpt);
         placeInBox(items, boxes, 'app_fridge_double', { x1: 2455, x2: 3830, z1: 1660, z2: 3380 }, 'right', 'bottom', -Math.PI / 2);
@@ -2350,7 +2843,6 @@
         placeInBox(items, boxes, 'bath_tub_photo',    { x1: 2545, x2: 4505, z1: 3555, z2: 4985 }, 'right', 'center', -Math.PI / 2);
         placeInBox(items, boxes, 'app_ac_split',      { x1: 40, x2: 4485, z1: 40, z2: 7920 }, 'right', 6400, -Math.PI / 2);
       } else if (t === 'WING_H_6165') {
-        // A2, A3 fixtures inside KIT (x=1800..3450, z=4200..6265) & BATH (x=3535..5005, z=2525..4525)
         placeInBox(items, boxes, 'kit_l_photo_full',  { x1: 1820, x2: 3430, z1: 4220, z2: 6245 }, 'left', 'bottom', Math.PI, cabOpt);
         placeInBox(items, boxes, 'app_fridge_double', { x1: 1820, x2: 3430, z1: 4220, z2: 6245 }, 'right', 'bottom', -Math.PI / 2);
         placeInBox(items, boxes, 'bath_tub_photo',    { x1: 3555, x2: 4985, z1: 2545, z2: 4505 }, 'right', 'bottom', Math.PI);
@@ -2366,13 +2858,20 @@
         placeInBox(items, boxes, 'bath_vanity_photo', { x1: 20, x2: 1980, z1: 1670, z2: 3100 }, 'left', 'bottom', Math.PI, cabOpt);
         placeInBox(items, boxes, 'app_ac_split',      { x1: 2000, x2: rightW - 40, z1: 40, z2: 5280 }, 'right', 3600, -Math.PI / 2);
       } else if (t === 'STD_2BR_WING' || t === 'STD_2BR_WING_B15' || t === '2BR_4525') {
-        // Fixtures inside KIT (x=3925..5990, z=4515..6165) & BATH (x=2525..4525, z=2970..4440)
         placeInBox(items, boxes, 'kit_l_photo_full',  { x1: 3955, x2: 5970, z1: 4535, z2: 6145 }, 'right', 'top', 0, cabOpt);
         placeInBox(items, boxes, 'app_fridge_double', { x1: 3955, x2: 5970, z1: 4535, z2: 6145 }, 'right', 'bottom', -Math.PI / 2);
         placeInBox(items, boxes, 'bath_vanity_photo', { x1: 2545, x2: 4505, z1: 2990, z2: 4420 }, 'left', 'top', 0, cabOpt);
         placeInBox(items, boxes, 'bath_toilet_photo', { x1: 2545, x2: 4505, z1: 2990, z2: 4420 }, 3520, 'top', 0);
         placeInBox(items, boxes, 'bath_tub_photo',    { x1: 2545, x2: 4505, z1: 2990, z2: 4420 }, 'right', 'center', -Math.PI / 2);
         placeInBox(items, boxes, 'app_ac_split',      { x1: 40, x2: 4485, z1: 40, z2: 6125 }, 'right', 1400, -Math.PI / 2);
+      } else if (t === 'STD_2BR_A22') {
+        // Exact A22 Kitchen (x=0..1650, z=-1375..690) & Bathroom (x=1725..3195, z=0..2000) fixtures
+        placeInBox(items, boxes, 'kit_l_photo_full',  { x1: 20, x2: 1630, z1: -1355, z2: 660 }, 'left', 'top', 0, cabOpt);
+        placeInBox(items, boxes, 'app_fridge_double', { x1: 20, x2: 1630, z1: -1355, z2: 660 }, 'left', 'bottom', Math.PI / 2);
+        placeInBox(items, boxes, 'bath_tub_photo',    { x1: 1745, x2: 3175, z1: 20, z2: 1980 }, 'left', 'top', Math.PI / 2);
+        placeInBox(items, boxes, 'bath_toilet_photo', { x1: 1745, x2: 3175, z1: 20, z2: 1980 }, 'right', 'top', 0);
+        placeInBox(items, boxes, 'bath_vanity_photo', { x1: 1745, x2: 3175, z1: 20, z2: 1980 }, 'right', 'bottom', -Math.PI / 2, cabOpt);
+        placeInBox(items, boxes, 'app_ac_split',      { x1: 3280, x2: 6125, z1: 40, z2: 4485 }, 'right', 2250, -Math.PI / 2);
       } else {
         placeInBox(items, boxes, 'kit_l_photo_full',  { x1: 2545, x2: 4505, z1: 1470, z2: 3080 }, 'right', 'top', 0, cabOpt);
         placeInBox(items, boxes, 'app_fridge_double', { x1: 2545, x2: 4505, z1: 1470, z2: 3080 }, 'left', 'bottom', Math.PI / 2);
@@ -2450,7 +2949,6 @@
             placeInBox(items, boxes, 'dec_plant_tree', h2Box, 'right', 'bottom', 0);
           }
         } else if (t === '2BR_4525') {
-          // 約380尺 一房 (B3, B4, B6, B16, B18, A1, A4, A11, A13, A14, A16)
           const foyerBox = { x1: 2460, x2: 3820, z1: 4550, z2: 6130 };
           const livBox   = { x1: 40, x2: 2400, z1: 2950, z2: 6100 };
           const win1Box  = { x1: 40, x2: 2210, z1: 40, z2: 2450 };
@@ -2478,11 +2976,11 @@
           }
           placeInBox(items, boxes, 'light_chandelier_ring', livBox, 'center', 'center', 0);
         } else {
-          // 2BR_H
+          // 2BR_H in ONE_BR (A10, A19, A20, A21, B21, B22)
           const foyerBox = { x1: 2545, x2: 4505, z1: 40, z2: 1430 };
-          const h2Box = { x1: 2280, x2: 4505, z1: 4600, z2: 6130 };
-          const h1Box = { x1: 30, x2: 2240, z1: 3800, z2: 6130 };
-          const livBox = { x1: 30, x2: 2490, z1: 40, z2: 3700 };
+          const h2Box    = { x1: 2280, x2: 4505, z1: 4600, z2: 6130 };
+          const h1Box    = { x1: 30, x2: 2240, z1: 3800, z2: 6130 };
+          const livBox   = { x1: 30, x2: 2490, z1: 40, z2: 3700 };
 
           placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'right', 'center', -Math.PI / 2, cabOpt);
           placeInBox(items, boxes, divId, { x1: 2280, x2: 4505, z1: 4580, z2: 4690 }, 'center', 'center', 0, cabOpt);
@@ -2508,12 +3006,25 @@
         return items;
       }
 
-      // CATEGORY 1 & 2: 約550尺 大兩房 (LARGE_2BR: 2-4房, 2-6人) & 約447尺 兩房 (STD_2BR: 2-3房, 2-5人)
+      // CATEGORY 1 & 2: 約550尺 大兩房 (LARGE_2BR) & 約447尺 兩房 (STD_2BR)
       if (t === 'WING_4525') {
         const foyerBox = { x1: 40, x2: 4160, z1: 40, z2: 1760 };
         const wingBox  = { x1: -1960, x2: -40, z1: 3690, z2: 5760 };
         const midBox   = { x1: 40, x2: 2480, z1: 1850, z2: 4980 };
         const bayH2Box = { x1: 40, x2: 4485, z1: 5050, z2: 7925 };
+
+        if (isBespokeArc) {
+          placeInBox(items, boxes, 'bespoke_arc_foyer_c_cab', foyerBox, 'left', 'top', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_sideboard_island', foyerBox, 'center', 'bottom', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_tv_wall', midBox, 'left', 2950, Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'sofa_3p', midBox, 2050, 2950, -Math.PI / 2, sofaOpt);
+          placeInBox(items, boxes, 'bespoke_arc_study_sofa_bed', wingBox, 'left', 'center', Math.PI / 2, cabOpt);
+          const masterBox = { x1: 2350, x2: 4485, z1: 5150, z2: 7925 };
+          placeInBox(items, boxes, divId, { x1: 2350, x2: 4485, z1: 5050, z2: 5160 }, 'center', 'center', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_podium_bed', masterBox, 'right', 'bottom', 0, bedOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', midBox, 'center', 2950, 0);
+          return items;
+        }
 
         placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'left', 'top', Math.PI / 2, cabOpt);
         placeInBox(items, boxes, 'dining_set_4p', foyerBox, 'center', 'bottom', 0, cabOpt);
@@ -2549,11 +3060,23 @@
           placeInBox(items, boxes, 'app_purifier', bayH2Box, 1650, 'bottom', 0);
         }
       } else if (t === 'WING_H_6165') {
-        // A2, A3 (約550尺 大兩房: 最多間 2-4 房, 住 2-6 人)
         const foyerBox = { x1: 40, x2: 1760, z1: 40, z2: 4160 };
         const wingBox  = { x1: 3690, x2: 5760, z1: 4240, z2: 6160 };
         const midBox   = { x1: 1850, x2: 4980, z1: 40, z2: 2480 };
         const bayH2Box = { x1: 5050, x2: 7925, z1: 40, z2: 4485 };
+
+        if (isBespokeArc) {
+          placeInBox(items, boxes, 'bespoke_arc_foyer_c_cab', foyerBox, 'top', 'left', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_sideboard_island', foyerBox, 'right', 'center', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_tv_wall', midBox, 2950, 'top', 0, cabOpt);
+          placeInBox(items, boxes, 'sofa_3p', midBox, 2950, 2050, Math.PI, sofaOpt);
+          placeInBox(items, boxes, 'bespoke_arc_study_sofa_bed', wingBox, 'center', 'bottom', 0, cabOpt);
+          const masterBox = { x1: 5150, x2: 7925, z1: 40, z2: 2150 };
+          placeInBox(items, boxes, divId, { x1: 5050, x2: 5160, z1: 40, z2: 2150 }, 'center', 'center', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_podium_bed', masterBox, 'right', 'top', -Math.PI / 2, bedOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', midBox, 'center', 'center', 0);
+          return items;
+        }
 
         placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'top', 'left', 0, cabOpt);
         placeInBox(items, boxes, 'dining_set_4p', foyerBox, 'right', 'center', Math.PI / 2, cabOpt);
@@ -2589,7 +3112,6 @@
           placeInBox(items, boxes, 'app_purifier', bayH2Box, 'right', 1650, 0);
         }
       } else if (t === 'STD_2BR_WING' || t === 'STD_2BR_WING_B15') {
-        // B1 & B15 (約447尺 兩房: 最多間 2-3 房 [1房側房 + 1房窗1 + 1房窗2], 住 2-5 人)
         const foyerBox    = { x1: 2460, x2: 3820, z1: 4550, z2: 6130 };
         const sideWingBox = t === 'STD_2BR_WING_B15'
           ? { x1: -1960, x2: -40, z1: 4055, z2: 6125 }
@@ -2597,6 +3119,19 @@
         const livBox      = { x1: 40, x2: 2400, z1: 3850, z2: 6100 };
         const win1Box     = { x1: 40, x2: 2210, z1: 40, z2: 2450 };
         const win2Box     = { x1: 2270, x2: 4485, z1: 40, z2: 2450 };
+
+        if (isBespokeArc) {
+          placeInBox(items, boxes, 'bespoke_arc_foyer_c_cab', foyerBox, 'right', 'center', -Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_sideboard_island', livBox, 'left', 'top', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_study_sofa_bed', sideWingBox, 'left', 'center', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, divShortId, { x1: 2270, x2: 4485, z1: 2460, z2: 2570 }, 'right', 'center', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_podium_bed', win2Box, 'right', 'top', Math.PI, bedOpt);
+          const centerLivBox = { x1: 40, x2: 2210, z1: 40, z2: 2550 };
+          placeInBox(items, boxes, 'sofa_3p', centerLivBox, 'left', 'top', Math.PI / 2, sofaOpt);
+          placeInBox(items, boxes, 'bespoke_arc_tv_wall', centerLivBox, 'right', 'top', -Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', livBox, 'center', 'center', 0);
+          return items;
+        }
 
         placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'right', 'center', -Math.PI / 2, cabOpt);
         placeInBox(items, boxes, 'dining_set_4p', livBox, 'left', 'top', 0, cabOpt);
@@ -2622,13 +3157,68 @@
           placeInBox(items, boxes, 'app_tv_65', centerLivBox, 'right', 'top', -Math.PI / 2);
         }
         placeInBox(items, boxes, 'light_chandelier_ring', livBox, 'center', 'center', 0);
+      } else if (t === 'STD_2BR_A22') {
+        // A22 (約447尺 兩房): Foyer x=0..1700, z=775..4485; Side Room x=1840..3910, z=4565..6485; Top-Right Bay x=3320..6125, z=40..2050; Lower Hall x=1750..6125, z=2120..4485
+        const foyerBox    = { x1: 40, x2: 1640, z1: 820, z2: 4485 };
+        const sideWingBox = { x1: 1840, x2: 3910, z1: 4565, z2: 6485 };
+        const win2Box     = { x1: 3320, x2: 6125, z1: 40, z2: 2050 };
+        const livBox      = { x1: 1750, x2: 3820, z1: 2120, z2: 4450 };
+        const win1Box     = { x1: 3920, x2: 6125, z1: 2120, z2: 4485 };
+
+        if (isBespokeArc) {
+          placeInBox(items, boxes, 'bespoke_arc_foyer_c_cab', foyerBox, 'left', 'bottom', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_sideboard_island', { x1: 40, x2: 2550, z1: 3100, z2: 4485 }, 'left', 'bottom', Math.PI, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_study_sofa_bed', sideWingBox, 'left', 'bottom', 0, cabOpt);
+          placeInBox(items, boxes, divId, { x1: 3320, x2: 6125, z1: 2020, z2: 2130 }, 'right', 'center', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_podium_bed', win2Box, 'right', 'top', -Math.PI / 2, bedOpt);
+          placeInBox(items, boxes, 'bespoke_arc_tv_wall', win1Box, 'center', 'bottom', Math.PI, cabOpt);
+          placeInBox(items, boxes, 'sofa_3p', win1Box, 'center', 2450, 0, sofaOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', win1Box, 'center', 'center', 0);
+          return items;
+        }
+
+        placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'left', 1450, Math.PI / 2, cabOpt);
+        placeInBox(items, boxes, 'dining_set_4p', { x1: 350, x2: 2550, z1: 3150, z2: 4485 }, 'center', 'bottom', 0, cabOpt);
+        placeInBox(items, boxes, 'light_pendant_bar', { x1: 350, x2: 2550, z1: 3150, z2: 4485 }, 'center', 'bottom', 0);
+
+        placeInBox(items, boxes, peopleCount >= 4 && layoutIdx % 2 === 1 ? 'bed_bunk_2p' : 'bed_double_1370', sideWingBox, 'left', 'bottom', 0, bedOpt);
+        placeInBox(items, boxes, 'desk_single_1000', sideWingBox, 'right', 'bottom', -Math.PI / 2, cabOpt);
+
+        placeInBox(items, boxes, divId, { x1: 3320, x2: 6125, z1: 2020, z2: 2130 }, 'right', 'center', 0, cabOpt);
+        placeInBox(items, boxes, peopleCount >= 5 ? 'bed_bunk_family_3p' : 'bed_queen_1500', win2Box, 'right', 'top', -Math.PI / 2, bedOpt);
+        placeInBox(items, boxes, 'wardrobe_1200', win2Box, 'left', 'top', Math.PI, cabOpt);
+
+        if (targetRooms >= 3) {
+          placeInBox(items, boxes, divShortId, { x1: 3860, x2: 3970, z1: 2150, z2: 4485 }, 'center', 'center', Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bed_single_910', win1Box, 'right', 'bottom', -Math.PI / 2, bedOpt);
+          placeInBox(items, boxes, 'desk_single_1000', win1Box, 'right', 'top', -Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'sofa_2p', livBox, 'center', 'top', 0, sofaOpt);
+          placeInBox(items, boxes, 'app_tv_65', livBox, 'center', 'bottom', Math.PI);
+        } else {
+          placeInBox(items, boxes, tvCabId, win1Box, 'center', 'bottom', Math.PI, cabOpt);
+          placeInBox(items, boxes, 'app_tv_65', win1Box, 'center', 'bottom', Math.PI);
+          placeInBox(items, boxes, 'sofa_3p', win1Box, 'center', 2480, 0, sofaOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', win1Box, 'center', 'center', 0);
+        }
       } else {
-        // 3BR_H (A7, A8, A9, A22: 約447尺 兩房, 最多間 2-3 房, 住 2-5 人)
+        // 3BR_H (A7, A8, A9: 約447尺 兩房, 最多間 2-3 房, 住 2-5 人)
         const foyerBox = { x1: 2545, x2: 4505, z1: 40, z2: 1430 };
         const sideBox  = { x1: 4545, x2: 6710, z1: 4140, z2: 6135 };
         const h2Box    = { x1: 2280, x2: 4505, z1: 4600, z2: 6135 };
         const h1Box    = { x1: 30, x2: 2240, z1: 3800, z2: 6135 };
         const livBox   = { x1: 30, x2: 2490, z1: 40, z2: 3700 };
+
+        if (isBespokeArc) {
+          placeInBox(items, boxes, 'bespoke_arc_foyer_c_cab', foyerBox, 'right', 'center', -Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_study_sofa_bed', sideBox, 'right', 'center', -Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, divId, { x1: 2280, x2: 4505, z1: 4580, z2: 4690 }, 'center', 'center', 0, cabOpt);
+          placeInBox(items, boxes, 'bespoke_arc_podium_bed', h2Box, 'right', 'bottom', 0, bedOpt);
+          placeInBox(items, boxes, 'bespoke_arc_tv_wall', livBox, 'left', 2250, Math.PI / 2, cabOpt);
+          placeInBox(items, boxes, 'sofa_3p', livBox, 1750, 2250, -Math.PI / 2, sofaOpt);
+          placeInBox(items, boxes, 'bespoke_arc_sideboard_island', livBox, 'left', 650, 0, cabOpt);
+          placeInBox(items, boxes, 'light_chandelier_ring', livBox, 'center', 2250, 0);
+          return items;
+        }
 
         placeInBox(items, boxes, 'cab_hotel_foyer', foyerBox, 'right', 'center', -Math.PI / 2, cabOpt);
 
@@ -2901,7 +3491,6 @@
       const wb = getWorldUnitBox(currentUnitId);
       const maxSpan = Math.max(wb.w, wb.d);
 
-      // Hide ceiling-mounted lights in top2d floor plan view so they never obscure furniture below
       placedFurniture.forEach(rec => {
         if (rec.group && rec.group.userData.isCeilingLight) {
           rec.group.visible = (mode !== 'top2d');
@@ -3113,7 +3702,6 @@
       const mapX = wx => ox + wx * scale;
       const mapZ = wz => oz + wz * scale;
 
-      // Grid lines in full CAD modal
       if (isFullModal) {
         ctx.strokeStyle = 'rgba(148,163,184,0.08)';
         ctx.lineWidth = 1;
@@ -3121,7 +3709,6 @@
         for (let gy = 0; gy < H; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
       }
 
-      // Draw Floor Slabs
       const slabs = getFloorSlabSpecs(currentUnitId);
       slabs.forEach(s => {
         const p1 = toWorldXZ(s.x1, s.z1, currentUnitId);
@@ -3140,7 +3727,6 @@
         ctx.strokeRect(x, y, rw, rh);
       });
 
-      // Draw Placed Furniture Footprints
       placedFurniture.forEach(rec => {
         const pos = rec.group.position;
         const rot = rec.group.rotation.y;
@@ -3166,7 +3752,6 @@
         ctx.restore();
       });
 
-      // Zone Labels & Dimensions
       const zones = getUnitZones(currentUnitId);
       Object.keys(zones).forEach(k => {
         const z = zones[k];
@@ -3187,7 +3772,6 @@
         }
       });
 
-      // Camera Position & Viewing Cone Indicator
       if (camera) {
         const camX = mapX(camera.position.x);
         const camZ = mapZ(camera.position.z);
@@ -3289,7 +3873,6 @@
       renderer.toneMappingExposure = 0.84;
       container.appendChild(renderer.domElement);
 
-      // High-Contrast Architectural Studio Lightdome (prevents whiteout overexposure)
       const pmrem = new THREE.PMREMGenerator(renderer);
       const envScene = new THREE.Scene();
       envScene.background = new THREE.Color(0x161b24);
@@ -3301,7 +3884,6 @@
       scene.environment = pmrem.fromScene(envScene).texture;
       pmrem.dispose();
 
-      // Balanced Magazine Photography Lighting (Warm Directional Sun + Soft Sky/Ground Hemisphere + 3000K Cove Accent)
       const hemi = new THREE.HemisphereLight(0xf5e8d3, 0x1e2430, 0.44);
       scene.add(hemi);
 
@@ -3439,7 +4021,6 @@
 
     function animateLoop() {
       requestAnimationFrame(animateLoop);
-      // Pause heavy 3D rendering while the full-screen Home Portal is open so mobile UI stays 100% responsive
       const portal = document.getElementById('home-layout-portal');
       if (portal && !portal.classList.contains('hidden')) {
         return;
@@ -3599,9 +4180,350 @@
       switchUnit(unitId);
     }
 
+    // Photorealistic Architectural Scale-Model Photography Renderer for Master Floor Plan
+    function drawPhotorealisticMasterFloorplate(canvas, blockLetter, filterCat, activeUnitId) {
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = 1040;
+      const H = 700;
+
+      ctx.save();
+      ctx.scale(2, 2); // High-DPI 2080x1400 crisp architectural render
+
+      // 1. Luxury Sales Gallery Architectural Studio Backdrop (Warm Stone & Sunlight Falloff)
+      const bgGrad = ctx.createRadialGradient(W * 0.46, H * 0.44, 60, W * 0.5, H * 0.5, W * 0.68);
+      bgGrad.addColorStop(0, '#323a46');
+      bgGrad.addColorStop(0.55, '#212731');
+      bgGrad.addColorStop(1, '#12161d');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle architectural presentation board grid & warm sunlight wash from top-left
+      ctx.strokeStyle = 'rgba(255, 245, 225, 0.035)';
+      ctx.lineWidth = 1;
+      for (let gx = 0; gx < W; gx += 32) {
+        ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+      }
+      for (let gy = 0; gy < H; gy += 32) {
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+      }
+
+      const sunWash = ctx.createLinearGradient(0, 0, W * 0.85, H * 0.85);
+      sunWash.addColorStop(0, 'rgba(255, 234, 196, 0.13)');
+      sunWash.addColorStop(0.45, 'rgba(255, 224, 175, 0.04)');
+      sunWash.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+      ctx.fillStyle = sunWash;
+      ctx.fillRect(0, 0, W, H);
+
+      // Podium Landscaped Courtyard Greenery Clusters (Miniature Architectural Foliage)
+      const foliageSpots = [
+        [210, 145, 36], [248, 128, 28], [176, 165, 25],
+        [825, 145, 38], [865, 168, 27], [790, 125, 24],
+        [185, 565, 34], [225, 585, 26], [835, 560, 36], [872, 535, 26]
+      ];
+      foliageSpots.forEach(([fx, fy, fr]) => {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetX = 6;
+        ctx.shadowOffsetY = 8;
+        const gGrad = ctx.createRadialGradient(fx - fr * 0.28, fy - fr * 0.28, 3, fx, fy, fr);
+        gGrad.addColorStop(0, '#5a7d62');
+        gGrad.addColorStop(0.65, '#36523d');
+        gGrad.addColorStop(1, '#1e3023');
+        ctx.fillStyle = gGrad;
+        ctx.beginPath();
+        ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      const nodes = BLOCK_LAYOUT_NODES[blockLetter] || BLOCK_LAYOUT_NODES.B;
+      const rsPos = blockLetter === 'B' ? { x: 495, y: 172 } : { x: 505, y: 238 };
+
+      // 2. Deep Architectural Scale-Model Cast Shadow under All Wings & Core
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.72)';
+      ctx.shadowBlur = 26;
+      ctx.shadowOffsetX = 10;
+      ctx.shadowOffsetY = 14;
+      ctx.fillStyle = '#181d24';
+
+      // Corridor arms base shadow
+      ctx.fillRect(356, 348, 368, 38);
+      ctx.fillRect(524, 162, 38, 368);
+
+      // Core shadow
+      ctx.save();
+      ctx.translate(542, 365);
+      ctx.rotate(-Math.PI / 4);
+      ctx.fillRect(-104, -94, 208, 188);
+      ctx.restore();
+
+      // Unit footprints shadow
+      nodes.forEach(n => {
+        const cx = n.x + n.w / 2;
+        const cy = n.y + n.h / 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (n.rot) ctx.rotate((n.rot * Math.PI) / 180);
+        ctx.fillRect(-n.w / 2 - 2, -n.h / 2 - 2, n.w + 4, n.h + 4);
+        ctx.restore();
+      });
+      ctx.restore();
+
+      // 3. Public Corridors with Travertine Floor & 3000K Warm Indirect LED Cove Strips
+      const drawCorridor = (x, y, w, h, horiz) => {
+        const cGrad = ctx.createLinearGradient(x, y, horiz ? x : x + w, horiz ? y + h : y);
+        cGrad.addColorStop(0, '#cfc7ba');
+        cGrad.addColorStop(0.5, '#e5dfd4');
+        cGrad.addColorStop(1, '#bfb6a8');
+        ctx.fillStyle = cGrad;
+        ctx.fillRect(x, y, w, h);
+
+        // Warm 3000K LED cove glow lines along corridor edges
+        ctx.fillStyle = 'rgba(255, 206, 115, 0.75)';
+        if (horiz) {
+          ctx.fillRect(x + 4, y + 2, w - 8, 2.2);
+          ctx.fillRect(x + 4, y + h - 4.2, w - 8, 2.2);
+        } else {
+          ctx.fillRect(x + 2, y + 4, 2.2, h - 8);
+          ctx.fillRect(x + w - 4.2, y + 4, 2.2, h - 8);
+        }
+      };
+      drawCorridor(358, 350, 364, 34, true);
+      drawCorridor(526, 164, 34, 364, false);
+
+      // Refuse Storage & Material Recovery Room (垃圾房 RS & MRR) - Realistic Tiled Utility Room
+      ctx.save();
+      ctx.fillStyle = '#3b424d';
+      ctx.fillRect(rsPos.x, rsPos.y, 92, 34);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(rsPos.x, rsPos.y, 92, 34);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(rsPos.x + 8, rsPos.y + 7, 16, 20);
+      ctx.fillRect(rsPos.x + 28, rsPos.y + 7, 16, 20);
+      ctx.restore();
+
+      // 4. Photorealistic Furnished Showflat Miniature for All 22 Residential Units
+      nodes.forEach(n => {
+        const meta = UNIT_META[n.id];
+        const cat = UNIT_CATEGORIES[meta.category];
+        const cx = n.x + n.w / 2;
+        const cy = n.y + n.h / 2;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (n.rot) ctx.rotate((n.rot * Math.PI) / 180);
+
+        const hw = n.w / 2;
+        const hh = n.h / 2;
+
+        // A) Warm Natural Oak Wood Flooring Base
+        const floorGrad = ctx.createLinearGradient(-hw, -hh, hw, hh);
+        floorGrad.addColorStop(0, '#dfc19d');
+        floorGrad.addColorStop(0.5, '#cfa87c');
+        floorGrad.addColorStop(1, '#b88f63');
+        ctx.fillStyle = floorGrad;
+        ctx.fillRect(-hw, -hh, n.w, n.h);
+
+        // Subtle Wood Plank Grooves
+        ctx.strokeStyle = 'rgba(78, 48, 22, 0.16)';
+        ctx.lineWidth = 0.7;
+        for (let px = -hw + 8; px < hw; px += 8) {
+          ctx.beginPath(); ctx.moveTo(px, -hh); ctx.lineTo(px, hh); ctx.stroke();
+        }
+
+        // B) Kitchen (KIT) & Bathroom (BATH) Stone Tile Zones (Top-Inner Corner)
+        const wetW = Math.min(n.w * 0.42, 36);
+        const wetH = Math.min(n.h * 0.40, 34);
+        ctx.fillStyle = '#cfd6df';
+        ctx.fillRect(-hw + 3, -hh + 3, wetW, wetH);
+        // Quartz kitchen counter & dark induction hob
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-hw + 4, -hh + 4, wetW - 3, 8);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(-hw + 8, -hh + 5, 10, 5);
+        // Bathroom sanitary partition & vanity
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(-hw + 3, -hh + 3, wetW, wetH);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(-hw + 5, -hh + wetH - 10, 12, 7);
+
+        // C) Miniature Living/Dining Furniture (Sofa, Rug, Dining Set)
+        const livX = hw - Math.min(n.w * 0.44, 36);
+        // Woven area rug
+        ctx.fillStyle = 'rgba(244, 239, 230, 0.65)';
+        ctx.fillRect(livX - 4, -4, 26, 20);
+        // 3-seater cream sofa
+        ctx.fillStyle = '#f5f0e6';
+        ctx.shadowColor = 'rgba(0,0,0,0.28)';
+        ctx.shadowBlur = 3;
+        ctx.fillRect(livX + 14, -2, 8, 20);
+        ctx.shadowBlur = 0;
+        // Coffee table
+        ctx.fillStyle = '#5c4028';
+        ctx.fillRect(livX + 3, 3, 7, 10);
+        // Dining table near kitchen
+        ctx.fillStyle = '#efeae1';
+        ctx.fillRect(livX - 2, -hh + 10, 14, 10);
+
+        // D) Miniature Bedroom(s) near Window Frontage
+        const bedW = meta.category === 'STUDIO' ? 18 : 22;
+        const bedH = 24;
+        const bedX = -hw + 6;
+        const bedY = hh - bedH - 5;
+        ctx.fillStyle = '#faf7f2';
+        ctx.fillRect(bedX, bedY, bedW, bedH);
+        // Warm duvet throw & pillows
+        ctx.fillStyle = meta.category === 'LARGE_2BR' ? '#9a6b43' : meta.category === 'STD_2BR' ? '#4d7c68' : '#587896';
+        ctx.fillRect(bedX, bedY + 7, bedW, bedH - 7);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(bedX + 2, bedY + 2, bedW * 0.4, 4);
+        ctx.fillRect(bedX + bedW * 0.52, bedY + 2, bedW * 0.4, 4);
+
+        // Second bedroom miniature for 2BR / Large 2BR units
+        if ((meta.category === 'LARGE_2BR' || meta.category === 'STD_2BR') && n.w >= 95) {
+          const b2X = bedX + bedW + 5;
+          ctx.fillStyle = '#faf7f2';
+          ctx.fillRect(b2X, bedY + 3, 16, bedH - 3);
+          ctx.fillStyle = '#b08968';
+          ctx.fillRect(b2X, bedY + 9, 16, bedH - 9);
+        }
+
+        // E) Natural Daylight Sunbeams Streaming Inward from Bottom Acoustic Windows
+        const beamGrad = ctx.createLinearGradient(0, hh, 0, hh - n.h * 0.55);
+        beamGrad.addColorStop(0, 'rgba(255, 248, 220, 0.34)');
+        beamGrad.addColorStop(1, 'rgba(255, 248, 220, 0)');
+        ctx.fillStyle = beamGrad;
+        ctx.fillRect(-hw + 4, hh - n.h * 0.55, n.w - 8, n.h * 0.55);
+
+        // F) Warm 3000K Indirect LED Cove Glow along Feature Wall
+        ctx.fillStyle = 'rgba(255, 210, 120, 0.55)';
+        ctx.fillRect(hw - 4.5, -hh + 8, 2.2, n.h - 16);
+
+        // G) Thick 2.5D Architectural Concrete Structural Walls & Sunlit Top Bevel
+        ctx.strokeStyle = '#181e26';
+        ctx.lineWidth = 4.2;
+        ctx.strokeRect(-hw, -hh, n.w, n.h);
+
+        ctx.strokeStyle = 'rgba(248, 242, 232, 0.65)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-hw - 1.5, -hh - 1.5, n.w + 3, n.h + 3);
+
+        // Green-Tinted Double-Glazed Acoustic Window Strip (減音窗)
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(-hw + 7, hh - 2.5, n.w - 14, 4.5);
+        ctx.fillStyle = 'rgba(209, 250, 229, 0.85)';
+        ctx.fillRect(-hw + 9, hh - 1.2, n.w - 18, 1.5);
+
+        // Main Entrance Door Swing Arc (Top Corridor Wall)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(4, -hh, 9, 0, Math.PI * 0.5);
+        ctx.stroke();
+
+        // H) Category Filter Dimming Mask or Active Unit Spotlight
+        if (filterCat !== 'ALL' && meta.category !== filterCat) {
+          ctx.fillStyle = 'rgba(9, 14, 26, 0.72)';
+          ctx.fillRect(-hw - 2, -hh - 2, n.w + 4, n.h + 4);
+        } else if (n.id === activeUnitId) {
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(-hw - 3, -hh - 3, n.w + 6, n.h + 6);
+        }
+
+        ctx.restore();
+      });
+
+      // 5. Photorealistic Central 45° Lift Lobby Core (魚肚白雲石升降機大堂 + 6部香檳金升降機)
+      ctx.save();
+      ctx.translate(542, 365);
+      ctx.rotate(-Math.PI / 4);
+
+      // Core Outer Concrete Structural Shell
+      ctx.fillStyle = '#1b222c';
+      ctx.fillRect(-102, -92, 204, 184);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-102, -92, 204, 184);
+
+      // Calacatta White Marble Lobby Floor
+      const marbleGrad = ctx.createLinearGradient(-68, -42, 68, 42);
+      marbleGrad.addColorStop(0, '#f3efe6');
+      marbleGrad.addColorStop(0.5, '#e2dbd0');
+      marbleGrad.addColorStop(1, '#cfc6b8');
+      ctx.fillStyle = marbleGrad;
+      ctx.fillRect(-68, -42, 136, 84);
+
+      // Subtle Marble Veining
+      ctx.strokeStyle = 'rgba(148, 138, 124, 0.28)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-60, -25);
+      ctx.bezierCurveTo(-20, -10, 15, 22, 62, 30);
+      ctx.stroke();
+
+      // 3000K Warm Indirect LED Ceiling Cove Lighting Frame inside Lift Lobby
+      ctx.strokeStyle = 'rgba(255, 208, 115, 0.85)';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(-63, -37, 126, 74);
+
+      // 6 Brushed Champagne-Gold / Stainless Steel Elevator Cars (L1-L3 Top, L4-L6 Bottom)
+      const drawLiftCar = (lx, ly) => {
+        const liftGrad = ctx.createLinearGradient(lx, ly, lx + 36, ly + 34);
+        liftGrad.addColorStop(0, '#64748b');
+        liftGrad.addColorStop(0.5, '#cbd5e1');
+        liftGrad.addColorStop(1, '#475569');
+        ctx.fillStyle = liftGrad;
+        ctx.fillRect(lx, ly, 36, 34);
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(lx, ly, 36, 34);
+        // X-shaft structural lines + champagne gold door threshold
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(lx, ly); ctx.lineTo(lx + 36, ly + 34);
+        ctx.moveTo(lx + 36, ly); ctx.lineTo(lx, ly + 34);
+        ctx.stroke();
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(lx + 6, ly > 0 ? ly : ly + 31, 24, 3);
+      };
+      [-60, -18, 24].forEach(lx => {
+        drawLiftCar(lx, -83);
+        drawLiftCar(lx, 49);
+      });
+
+      // Left & Right Concrete Scissor Staircases with Individual Step Treads
+      [-94, 70].forEach(sx => {
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(sx, -42, 24, 84);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(sx, -42, 24, 84);
+        for (let sy = -36; sy <= 36; sy += 6) {
+          ctx.fillStyle = sy % 12 === 0 ? '#64748b' : '#475569';
+          ctx.fillRect(sx + 2, sy, 20, 3);
+        }
+      });
+
+      // Utility Rooms (Elec Meter & Telecom/HR)
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(-94, -83, 28, 34);
+      ctx.fillRect(66, 49, 28, 34);
+
+      ctx.restore();
+      ctx.restore();
+    }
+
     function renderHomeMasterFloorPlanSVG() {
-      const container = document.getElementById('home-master-svg-container');
-      if (!container) return;
+      const photoCanvas = document.getElementById('home-master-photo-canvas');
+      const overlaySvg = document.getElementById('home-master-overlay-svg');
+      if (!photoCanvas || !overlaySvg) return;
 
       const quickSel = document.getElementById('home-unit-quick-select');
       if (quickSel && quickSel.options.length <= 1) {
@@ -3611,10 +4533,13 @@
         }
       }
 
+      // Render high-DPI photorealistic architectural scale model onto Canvas
+      drawPhotorealisticMasterFloorplate(photoCanvas, homeActiveBlock, homeFilterCategory, currentUnitId);
+
       const nodes = BLOCK_LAYOUT_NODES[homeActiveBlock] || BLOCK_LAYOUT_NODES.B;
       const blockTitle = homeActiveBlock === 'B'
-        ? 'B座標準樓層平面圖 (4樓至38樓) BLOCK B TYPICAL FLOOR PLAN'
-        : 'A座標準樓層平面圖 (3樓至39樓) BLOCK A TYPICAL FLOOR PLAN';
+        ? 'B座標準樓層實景平面總圖 (4樓至38樓) BLOCK B TYPICAL FLOOR PLAN'
+        : 'A座標準樓層實景平面總圖 (3樓至39樓) BLOCK A TYPICAL FLOOR PLAN';
 
       const rsPos = homeActiveBlock === 'B' ? { x: 495, y: 172 } : { x: 505, y: 238 };
 
@@ -3626,33 +4551,33 @@
         const cx = n.x + n.w / 2;
         const cy = n.y + n.h / 2;
         const transformAttr = n.rot ? `transform="rotate(${n.rot} ${cx} ${cy})"` : '';
+        const pillW = Math.min(n.w - 8, 66);
 
         return `
           <g class="master-unit-poly ${isDimmed ? 'master-unit-dimmed' : ''}" ${transformAttr}
              onpointerenter="if(event.pointerType==='mouse') previewHomeUnitHover('${n.id}')"
              onpointerleave="if(event.pointerType==='mouse') previewHomeUnitHover(null)"
              onclick="selectUnitFromHomeLayout('${n.id}')">
-            <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="4"
-                  fill="${cat.fillHex}"
-                  stroke="${isCurrent ? '#ffffff' : cat.strokeHex}"
-                  stroke-width="${isCurrent ? '3' : '1.8'}" />
-            <line x1="${n.x + 8}" y1="${n.y + n.h - 3}" x2="${n.x + n.w - 8}" y2="${n.y + n.h - 3}"
-                  stroke="#22c55e" stroke-width="3" />
-            <text x="${cx}" y="${cy - 8}" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="900">${n.id}</text>
-            <text x="${cx}" y="${cy + 7}" text-anchor="middle" fill="${cat.strokeHex}" font-size="8.5" font-weight="800">${cat.shortLabel}</text>
-            <text x="${cx}" y="${cy + 19}" text-anchor="middle" fill="#cbd5e1" font-size="7.5" font-weight="600">住${cat.peopleOptions[1]}-${cat.peopleOptions[cat.peopleOptions.length - 1]}人</text>
+            <rect class="unit-hit-frame" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="4"
+                  fill="transparent"
+                  stroke="${isCurrent ? '#fbbf24' : 'rgba(255,255,255,0.22)'}"
+                  stroke-width="${isCurrent ? '2.8' : '1'}" />
+            <!-- Crisp Translucent Glass Architectural Label Pill -->
+            <rect class="unit-pill-bg" x="${cx - pillW / 2}" y="${cy - 17}" width="${pillW}" height="34" rx="7"
+                  fill="rgba(9, 14, 26, 0.80)" stroke="${cat.strokeHex}" stroke-width="1.3" />
+            <text x="${cx}" y="${cy - 3}" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="900">${n.id}</text>
+            <text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="${cat.strokeHex}" font-size="7.8" font-weight="800">${cat.shortLabel}</text>
           </g>
         `;
       }).join('');
 
-      // Populate Mobile Direct Tap Unit Grid
       const mobileGrid = document.getElementById('home-mobile-unit-grid');
       const gridTitle = document.getElementById('home-quick-grid-title');
       if (gridTitle) {
         const catObj = UNIT_CATEGORIES[homeFilterCategory];
         gridTitle.textContent = catObj
           ? `📱 ${homeActiveBlock}座【${catObj.label}】可選單位（點擊即入）：`
-          : `📱 ${homeActiveBlock}座 全部 22 個單位（點擊室號或上方平面圖即入）：`;
+          : `📱 ${homeActiveBlock}座 全部 22 個單位（點擊室號或上方實景平面圖即入）：`;
       }
       if (mobileGrid) {
         const filteredNodes = nodes.filter(n => homeFilterCategory === 'ALL' || UNIT_META[n.id].category === homeFilterCategory);
@@ -3670,85 +4595,46 @@
         }).join('');
       }
 
-      container.innerHTML = `
-        <svg viewBox="0 0 1040 700" class="w-full h-full max-w-[1160px] max-h-[62vh] select-none">
-          <defs>
-            <pattern id="cad-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(148,163,184,0.07)" stroke-width="1"/>
-            </pattern>
-          </defs>
-          <rect x="0" y="0" width="1040" height="700" fill="url(#cad-grid)" rx="16" />
+      overlaySvg.innerHTML = `
+        <!-- Brochure Architectural Title Banner -->
+        <rect x="20" y="14" width="520" height="44" rx="10" fill="rgba(9, 14, 26, 0.72)" stroke="rgba(251, 191, 36, 0.35)" stroke-width="1" />
+        <text x="32" y="34" fill="#fbbf24" font-size="15" font-weight="900">${blockTitle}</text>
+        <text x="32" y="50" fill="#e2e8f0" font-size="10" font-weight="600">實景建築模型俯視圖 ・ 含雲石升降機大堂 (6部升降機)、垃圾房 (RS &amp; MRR) 及全層 22 伙</text>
 
-          <text x="28" y="34" fill="#f59e0b" font-size="16" font-weight="900">${blockTitle}</text>
-          <text x="28" y="52" fill="#94a3b8" font-size="10.5" font-weight="600">包含升降機大堂 (LIFT LOBBY)、垃圾及物料回收室 (RS &amp; MRR)、電錶房、消防喉轆及全部 22 個標準單位</text>
+        <!-- Refuse Room Label Pill -->
+        <g pointer-events="none">
+          <rect x="${rsPos.x + 4}" y="${rsPos.y + 4}" width="84" height="26" rx="5" fill="rgba(15, 23, 42, 0.85)" stroke="#fb7185" stroke-width="1.2" />
+          <text x="${rsPos.x + 46}" y="${rsPos.y + 15}" text-anchor="middle" fill="#fda4af" font-size="8" font-weight="900">垃圾房 RS &amp; MRR</text>
+          <text x="${rsPos.x + 46}" y="${rsPos.y + 25}" text-anchor="middle" fill="#fecdd3" font-size="6.8" font-weight="600">垃圾及物料回收室</text>
+        </g>
 
-          <rect x="360" y="352" width="360" height="30" fill="rgba(51,65,85,0.45)" stroke="#475569" stroke-width="1" />
-          <rect x="528" y="165" width="30" height="360" fill="rgba(51,65,85,0.45)" stroke="#475569" stroke-width="1" />
+        <!-- Lift Lobby Center Label Pill -->
+        <g transform="rotate(-45 542 365)" pointer-events="none">
+          <rect x="484" y="342" width="116" height="46" rx="8" fill="rgba(15, 23, 42, 0.84)" stroke="#38bdf8" stroke-width="1.3" />
+          <text x="542" y="362" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="900">升降機大堂</text>
+          <text x="542" y="376" text-anchor="middle" fill="#7dd3fc" font-size="8.5" font-weight="800">LIFT LOBBY (6 LIFTS)</text>
+          <text x="460" y="368" text-anchor="middle" fill="#f8fafc" font-size="7" font-weight="800" transform="rotate(-90 460 368)">樓梯 STAIR</text>
+          <text x="624" y="368" text-anchor="middle" fill="#f8fafc" font-size="7" font-weight="800" transform="rotate(-90 624 368)">樓梯 STAIR</text>
+        </g>
 
-          <g>
-            <rect x="${rsPos.x}" y="${rsPos.y}" width="92" height="34" rx="4" fill="rgba(244,63,94,0.22)" stroke="#fb7185" stroke-width="1.5" />
-            <text x="${rsPos.x + 46}" y="${rsPos.y + 14}" text-anchor="middle" fill="#fda4af" font-size="8.5" font-weight="900">垃圾房 RS &amp; MRR</text>
-            <text x="${rsPos.x + 46}" y="${rsPos.y + 26}" text-anchor="middle" fill="#fecdd3" font-size="7" font-weight="600">垃圾及物料回收室</text>
-          </g>
+        <!-- All 22 Interactive Unit Hit-Targets & Glass Pills -->
+        ${unitsSvg}
 
-          <g transform="rotate(-45 542 365)">
-            <rect x="442" y="275" width="200" height="180" rx="8" fill="#0f172a" stroke="#94a3b8" stroke-width="2.5" />
+        <!-- Architectural Scale Bar & Compass North -->
+        <g transform="translate(820, 658)" pointer-events="none">
+          <rect x="-10" y="-16" width="195" height="28" rx="7" fill="rgba(9, 14, 26, 0.78)" stroke="rgba(148, 163, 184, 0.35)" stroke-width="1" />
+          <text x="0" y="2" fill="#cbd5e1" font-size="9" font-weight="800">比例尺 SCALE:</text>
+          <rect x="74" y="-4" width="45" height="4" fill="#fbbf24" />
+          <rect x="119" y="-4" width="45" height="4" fill="#f8fafc" />
+          <text x="72" y="-7" fill="#cbd5e1" font-size="7.5" font-weight="700">0</text>
+          <text x="160" y="-7" fill="#cbd5e1" font-size="7.5" font-weight="700">5m</text>
+        </g>
 
-            <rect x="482" y="283" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="482" y1="283" x2="518" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <line x1="518" y1="283" x2="482" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <text x="500" y="304" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L1</text>
-
-            <rect x="524" y="283" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="524" y1="283" x2="560" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <line x1="560" y1="283" x2="524" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <text x="542" y="304" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L2</text>
-
-            <rect x="566" y="283" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="566" y1="283" x2="602" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <line x1="602" y1="283" x2="566" y2="317" stroke="#38bdf8" stroke-width="1" />
-            <text x="584" y="304" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L3</text>
-
-            <rect x="476" y="324" width="132" height="82" rx="4" fill="rgba(56,189,248,0.14)" stroke="#7dd3fc" stroke-width="1.2" stroke-dasharray="4 2" />
-            <text x="542" y="361" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="900">升降機大堂</text>
-            <text x="542" y="376" text-anchor="middle" fill="#7dd3fc" font-size="9" font-weight="800">LIFT LOBBY (6 LIFTS)</text>
-
-            <rect x="482" y="413" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="482" y1="413" x2="518" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <line x1="518" y1="413" x2="482" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <text x="500" y="434" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L4</text>
-
-            <rect x="524" y="413" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="524" y1="413" x2="560" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <line x1="560" y1="413" x2="524" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <text x="542" y="434" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L5</text>
-
-            <rect x="566" y="413" width="36" height="34" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
-            <line x1="566" y1="413" x2="602" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <line x1="602" y1="413" x2="566" y2="447" stroke="#38bdf8" stroke-width="1" />
-            <text x="584" y="434" text-anchor="middle" fill="#e0f2fe" font-size="8" font-weight="800">L6</text>
-
-            <rect x="448" y="324" width="24" height="82" fill="#1e293b" stroke="#64748b" stroke-width="1" />
-            <text x="460" y="368" text-anchor="middle" fill="#cbd5e1" font-size="7" font-weight="700" transform="rotate(-90 460 368)">樓梯 STAIR</text>
-
-            <rect x="612" y="324" width="24" height="82" fill="#1e293b" stroke="#64748b" stroke-width="1" />
-            <text x="624" y="368" text-anchor="middle" fill="#cbd5e1" font-size="7" font-weight="700" transform="rotate(-90 624 368)">樓梯 STAIR</text>
-
-            <rect x="448" y="283" width="28" height="34" fill="#334155" stroke="#94a3b8" stroke-width="1" />
-            <text x="462" y="303" text-anchor="middle" fill="#fde68a" font-size="6.5" font-weight="800">電錶房</text>
-
-            <rect x="608" y="413" width="28" height="34" fill="#334155" stroke="#94a3b8" stroke-width="1" />
-            <text x="622" y="433" text-anchor="middle" fill="#fca5a5" font-size="6.5" font-weight="800">HR/電訊</text>
-          </g>
-
-          ${unitsSvg}
-
-          <g transform="translate(985, 65)">
-            <circle cx="0" cy="0" r="18" fill="#0f172a" stroke="#64748b" stroke-width="1.5" />
-            <polygon points="-10,0 4,-6 1,0 4,6" fill="#f59e0b" />
-            <text x="8" y="4" fill="#f8fafc" font-size="11" font-weight="900">N</text>
-          </g>
-        </svg>
+        <g transform="translate(985, 65)" pointer-events="none">
+          <circle cx="0" cy="0" r="20" fill="rgba(9, 14, 26, 0.85)" stroke="#fbbf24" stroke-width="1.5" />
+          <polygon points="-11,0 4,-6 1,0 4,6" fill="#fbbf24" />
+          <text x="8" y="4" fill="#ffffff" font-size="11" font-weight="900">N</text>
+        </g>
       `;
     }
 
@@ -3856,7 +4742,7 @@
           </button>
         `).join('');
       } else if (mode === 'layout') {
-        title.textContent = `③ 選擇【${cat.label}】專屬間隔 (最多間${cat.maxRooms}房・含#11-#15免磚牆以櫃間房)`;
+        title.textContent = `③ 選擇【${cat.label}】專屬間隔 (最多間${cat.maxRooms}房・含免磚牆以櫃間房)`;
         const vars = getCategoryLayoutVariations(meta.category, currentPeopleCount);
         body.innerHTML = vars.map(v => `
           <button onclick="selectTemplateOption('layout', ${v.id})" class="p-2 rounded-xl text-left text-[10px] font-bold border ${currentLayoutIndex === v.id ? 'bg-emerald-400 text-slate-950 border-emerald-200' : v.byCabinet ? 'bg-slate-900 text-amber-300 border-amber-500/40' : 'bg-slate-900 text-slate-200 border-slate-700'}">
@@ -3934,6 +4820,7 @@
       const catPills = document.getElementById('catalog-cat-pills');
       const grid = document.getElementById('catalog-items-grid');
       const cats = [
+        { id: 'bespoke_arc', name: '✨奶油弧形高訂系列' },
         { id: 'cabinets', name: '🗄️燈帶廳櫃/衣櫃' },
         { id: 'beds', name: '🛏️睡床/雙層床' },
         { id: 'sofas', name: '🛋️梳化/地氈' },
@@ -3948,10 +4835,12 @@
         `).join('');
       }
       if (grid) {
-        const list = CATALOG_ITEMS.filter(i => i.cat === currentCatalogCat);
+        const list = currentCatalogCat === 'bespoke_arc'
+          ? CATALOG_ITEMS.filter(i => i.bespokeArc)
+          : CATALOG_ITEMS.filter(i => i.cat === currentCatalogCat);
         grid.innerHTML = list.map(item => `
-          <button onclick="spawnFurnitureItem('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-left flex flex-col justify-between gap-1">
-            <div class="text-[11px] font-black text-slate-100 leading-tight">${item.name}</div>
+          <button onclick="spawnFurnitureItem('${item.id}')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border ${item.bespokeArc ? 'border-amber-400/70' : 'border-slate-700'} text-left flex flex-col justify-between gap-1">
+            <div class="text-[11px] font-black ${item.bespokeArc ? 'text-amber-300' : 'text-slate-100'} leading-tight">${item.name}</div>
             <div class="flex items-center justify-between text-[9px] text-amber-300/90 font-mono">
               <span>${item.w}×${item.d}mm</span>
               <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-sans font-bold">+加入</span>
@@ -3987,7 +4876,6 @@
       toastTimer = setTimeout(() => box.classList.add('hidden'), 2400);
     }
 
-    // Global Mobile Touch-to-Click Bridge (prevents iOS/Android WebView from swallowing taps on buttons or SVG units)
     function initMobileTouchFix() {
       let touchStartX = 0;
       let touchStartY = 0;
@@ -4004,14 +4892,13 @@
         if (!e.changedTouches || e.changedTouches.length !== 1) return;
         const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
         const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-        if (dx > 22 || dy > 22) return; // User was scrolling/dragging, not tapping
+        if (dx > 22 || dy > 22) return;
 
         const target = e.target && e.target.closest
           ? e.target.closest('button, .master-unit-poly, #home-unit-hover-card, [onclick]')
           : null;
         if (!target || target.tagName === 'SELECT') return;
 
-        // Avoid double-triggering if native click also fires within 380ms
         const now = Date.now();
         if (now - lastTapTime < 380) return;
         lastTapTime = now;
@@ -4028,7 +4915,6 @@
         }
       }, { passive: false });
 
-      // Deduplicate subsequent synthetic click after touchend handled it
       document.addEventListener('click', (e) => {
         if (Date.now() - lastTapTime < 350 && e.isTrusted) {
           e.stopImmediatePropagation();
