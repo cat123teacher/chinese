@@ -610,7 +610,7 @@
     );
   }
 
-  /* ===== Print System (Debugged: Zero Blank-Page Overflow) ===== */
+  /* ===== Print System (A4 Portrait, Zero Overflow) ===== */
   #print-root { display: none; }
 
   @media print {
@@ -811,8 +811,8 @@
       <div class="stage-overlay">
         <div class="bear-speech">
           <span style="font-size:24px;">🐻</span>
-          <span id="bear-msg">哈囉 1B 班小朋友！我是熊熊老師，點我可以打招呼，一齊輕鬆學寫生日卡啦！</span>
-          <button class="btn btn-sunny btn-sm" onclick="speakText(document.getElementById('bear-msg').textContent)">🔊</button>
+          <span id="bear-msg">哈囉 1B 班小朋友！我是熊熊老師，需要朗讀時按「🔊」按鈕就可以啦！</span>
+          <button class="btn btn-sunny btn-sm" onclick="speakText(document.getElementById('bear-msg').textContent)" title="朗讀這句話">🔊 讀出</button>
         </div>
         <div class="stage-hint">👆 拖曳轉動 3D 舞台・點擊熊熊老師</div>
       </div>
@@ -838,14 +838,13 @@
 
 <script>
 /* =========================================================================
-   1. SPEECH SYNTHESIS (廣東話 zh-HK + 普通話 zh-CN) — Debugged Timing
+   1. ON-DEMAND SPEECH SYNTHESIS (Only speaks when user clicks a 🔊 button)
    ========================================================================= */
 let currentLang = 'zh-HK';
 let totalStars = 0;
 let availableVoices = [];
 let speakTimer = null;
 
-// Safe default animation hooks in case WebGL / CDN is offline
 window.triggerBearCelebrate = function() {};
 window.triggerBearEncourage = function() {};
 
@@ -859,23 +858,30 @@ if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
+function stopSpeech() {
+  if (speakTimer) clearTimeout(speakTimer);
+  if ('speechSynthesis' in window) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+  }
+}
+
 function setLanguage(lang) {
   currentLang = lang;
   document.getElementById('lang-hk').classList.toggle('active', lang === 'zh-HK');
   document.getElementById('lang-cn').classList.toggle('active', lang === 'zh-CN');
+  stopSpeech();
   const greeting = lang === 'zh-HK'
-    ? '已切換到廣東話發音！熊熊老師陪你一齊練習寫生日卡！'
-    : '已切换到普通话发音！熊熊老师陪你一起练习写生日卡！';
-  setBearMessage(greeting, true);
+    ? '已切換到廣東話發音模式，有需要時按「🔊」按鈕就可以聽讀音！'
+    : '已切换到普通话发音模式，有需要时按“🔊”按钮就可以听读音！';
+  setBearMessage(greeting);
 }
 
 function speakText(text) {
   if (!('speechSynthesis' in window) || !text) return;
   try {
-    if (speakTimer) clearTimeout(speakTimer);
-    window.speechSynthesis.cancel();
+    stopSpeech();
     const clean = String(text)
-      .replace(/[🔊⭐🎉🐻🏆✏️🔍🕵️🧱🖨️🔄🏠💯🌟💪❓📝🎯]/g, '')
+      .replace(/[🔊⭐🎉🐻🏆✏️🔍🕵️🧱🖨️🔄🏠💯🌟💪❓📝🎯✅❌💡]/g, '')
       .replace(/□□/g, '空兩格');
 
     speakTimer = setTimeout(() => {
@@ -900,10 +906,17 @@ function speakText(text) {
   } catch (e) {}
 }
 
-function setBearMessage(msg, autoSpeak = false) {
+function speakContainerText(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('button').forEach(b => b.remove());
+  speakText(clone.textContent);
+}
+
+function setBearMessage(msg) {
   const el = document.getElementById('bear-msg');
   if (el) el.textContent = msg;
-  if (autoSpeak) speakText(msg);
 }
 
 function addStars(n) {
@@ -929,7 +942,7 @@ function triggerCleanPrint() {
 }
 
 /* =========================================================================
-   2. PURE THREE.JS PIXAR-STYLE 3D STAGE (Zero Memory Leak + Touch Safe)
+   2. PURE THREE.JS PIXAR-STYLE 3D STAGE
    ========================================================================= */
 const threeState = {
   celebrateTimer: 0,
@@ -962,7 +975,6 @@ function initThreeStage() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     wrap.appendChild(renderer.domElement);
 
-    // Warm Pixar Lighting
     const hemi = new THREE.HemisphereLight(0xffffff, 0xffd6a5, 1.05);
     scene.add(hemi);
 
@@ -983,7 +995,6 @@ function initThreeStage() {
     const world = new THREE.Group();
     scene.add(world);
 
-    // Soft pastel stage floor
     const floorMat = new THREE.MeshStandardMaterial({ color: 0xfff1d0, roughness: 0.75 });
     const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.4, 0.35, 48), floorMat);
     floor.position.y = -0.18;
@@ -1249,7 +1260,7 @@ function initThreeStage() {
       balloons.push({ grp, baseY: b.y, phase: idx * 1.4 });
     });
 
-    // Reusable Particle Geometries & Materials (Zero GPU Leak)
+    // Reusable Particle Geometries & Materials
     const starGeo = new THREE.OctahedronGeometry(0.11);
     const rectGeo = new THREE.BoxGeometry(0.14, 0.14, 0.03);
     const confettiMats = [0xff4d6d, 0xffd166, 0x4ecdc4, 0x9775fa, 0x4dabf7, 0x69db7c].map(
@@ -1278,7 +1289,6 @@ function initThreeStage() {
       threeState.shakeTimer = 0.85;
     };
 
-    // Drag to rotate + Click bear interaction (pointercancel safe)
     let dragging = false, startX = 0, targetRotY = 0, moved = 0;
     wrap.addEventListener('pointerdown', e => {
       dragging = true;
@@ -1308,7 +1318,7 @@ function initThreeStage() {
           '写给长辈记得用“您”和加“敬上”，你真棒！'
         ];
         const pool = currentLang === 'zh-HK' ? cheersHK : cheersCN;
-        setBearMessage(pool[Math.floor(Math.random() * pool.length)], true);
+        setBearMessage(pool[Math.floor(Math.random() * pool.length)]);
       }
       dragging = false;
     });
@@ -1528,7 +1538,7 @@ const L4_BANK = [
 ];
 
 /* =========================================================================
-   4. SESSION STATE (Preserves Answers, Prevents Star Farming)
+   4. SESSION STATE
    ========================================================================= */
 let currentView = 'home';
 
@@ -1550,6 +1560,7 @@ const state = {
 };
 
 function resetLevelSession(lvl) {
+  stopSpeech();
   if (lvl === 'l1') {
     state.l1 = { list: shuffleArray(L1_BANK).slice(0, 10), idx: 0, results: {}, answers: {}, awarded: {} };
   } else if (lvl === 'l2') {
@@ -1570,6 +1581,7 @@ function resetLevelSession(lvl) {
 ['l1','l2','l3','l4','l5'].forEach(resetLevelSession);
 
 function switchView(view) {
+  stopSpeech();
   currentView = view;
   ['home','l1','l2','l3','l4','l5'].forEach(v => {
     const el = document.getElementById('tab-' + v);
@@ -1742,7 +1754,7 @@ function printCuteWorksheets(pageCount) {
     </div>
   `).join('');
 
-  setBearMessage(`已生成 ${pageCount} 頁 A4 直向可愛動畫風練習紙，正在開啟列印視窗！`, true);
+  setBearMessage(`已生成 ${pageCount} 頁 A4 直向可愛動畫風練習紙，正在開啟列印視窗！`);
   triggerCleanPrint();
 }
 
@@ -1759,6 +1771,7 @@ function renderDots(lvl) {
 }
 
 function jumpQuestion(lvl, i) {
+  stopSpeech();
   state[lvl].idx = i;
   renderCurrentView();
 }
@@ -1779,7 +1792,7 @@ function renderL1() {
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l1')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l1');renderL1();setBearMessage('已重新隨機抽出 10 題格式大偵探！',true);">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l1');renderL1();setBearMessage('已重新隨機抽出 10 題格式大偵探！');">🔄 重新抽 10 題</button>
       </div>
     </div>
 
@@ -1814,7 +1827,8 @@ function renderL1() {
         <div class="feedback-box ${prevChoice === q.target ? 'feedback-ok' : 'feedback-err'}">
           ${prevChoice === q.target ? '🎉 答對了！（已獲得 1 星星）' : `💡 正確答案是 ${q.target}。`}<br>
           ${q.explain}
-          <div style="margin-top:10px;">
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l1-fb')">🔊 聽講解</button>
             ${s.idx < 9
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l1', ${s.idx + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l2')">完成本組！挑戰第二關 ➡️</button>`}
@@ -1837,10 +1851,10 @@ function answerL1(choice) {
     s.awarded[s.idx] = true;
     addStars(1);
     window.triggerBearCelebrate();
-    setBearMessage('答對啦！你真是小小格式大偵探！', true);
+    setBearMessage('答對啦！你真是小小格式大偵探！');
   } else if (!ok) {
     window.triggerBearEncourage();
-    setBearMessage('差一點點！快看看熊熊老師的講解再挑戰下一題！', true);
+    setBearMessage('差一點點！快看看熊熊老師的講解再挑戰下一題！');
   }
   renderL1();
 }
@@ -1866,7 +1880,7 @@ function renderL2() {
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l2')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l2');renderL2();setBearMessage('已重新隨機抽出 10 題捉錯處！',true);">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l2');renderL2();setBearMessage('已重新隨機抽出 10 題捉錯處！');">🔄 重新抽 10 題</button>
       </div>
     </div>
 
@@ -1905,7 +1919,8 @@ function renderL2() {
           <div style="margin-top:8px;display:inline-block;background:#d3f9d8;color:#1b5e20;padding:5px 12px;border-radius:10px;">
             ✅ 正確寫法：${q.fixText}
           </div>
-          <div style="margin-top:10px;">
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l2-fb')">🔊 聽講解</button>
             ${s.idx < 9
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l2', ${s.idx + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l3')">完成本組！挑戰第三關 ➡️</button>`}
@@ -1928,16 +1943,16 @@ function answerL2(origIdx) {
     s.awarded[s.idx] = true;
     addStars(1);
     window.triggerBearCelebrate();
-    setBearMessage('好眼力！一下子就捉到錯處啦！', true);
+    setBearMessage('好眼力！一下子就捉到錯處啦！');
   } else if (!ok) {
     window.triggerBearEncourage();
-    setBearMessage('不要緊，記住這個小秘訣下次就不會錯！', true);
+    setBearMessage('不要緊，記住這個小秘訣下次就不會錯！');
   }
   renderL2();
 }
 
 /* =========================================================================
-   8. LEVEL 3: BLOCK BUILDER (30 BANK -> 10 RANDOM, PRESERVED PER-INDEX)
+   8. LEVEL 3: BLOCK BUILDER (30 BANK -> 10 RANDOM)
    ========================================================================= */
 function prepareL3Question(targetIdx) {
   const s = state.l3;
@@ -1972,7 +1987,7 @@ function renderL3() {
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l3')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l3');renderL3();setBearMessage('已重新隨機抽出 10 題積木砌卡！',true);">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l3');renderL3();setBearMessage('已重新隨機抽出 10 題積木砌卡！');">🔄 重新抽 10 題</button>
       </div>
     </div>
 
@@ -2011,7 +2026,8 @@ function renderL3() {
         <div class="feedback-box ${passed ? 'feedback-ok' : 'feedback-err'}">
           ${passed ? '🎉 砌得非常工整！（已獲得 2 星星）' : '💡 順序小提醒：1.收卡人稱呼 → 2.祝福的話（空兩格）→ 3.關係／自稱 → 4.送卡人名字 → 5.日期。'}
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-            ${!passed ? `<button class="btn btn-sunny btn-sm" onclick="prepareL3Question(${i});renderL3();">🔄 再試一次</button>` : ''}
+            <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l3-fb')">🔊 聽講解</button>
+            ${!passed ? `<button class="btn btn-teal btn-sm" onclick="prepareL3Question(${i});renderL3();">🔄 再試一次</button>` : ''}
             ${i < 9
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l3', ${i + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l4')">完成本組！挑戰第四關 ➡️</button>`}
@@ -2046,7 +2062,7 @@ function checkL3() {
   const i = s.idx;
   const slots = s.slotsByIdx[i];
   if (slots.some(v => v === null)) {
-    setBearMessage('仲有空格未放積木呀，放齊 5 塊再檢查啦！', true);
+    setBearMessage('仲有空格未放積木呀，放齊 5 塊再檢查啦！');
     return;
   }
   const ok = slots.every((item, k) => item.key === L3_SLOTS[k].key);
@@ -2059,10 +2075,10 @@ function checkL3() {
       addStars(2);
     }
     window.triggerBearCelebrate();
-    setBearMessage('嘩！五個位置全部砌啱，完美梯級排版！', true);
+    setBearMessage('嘩！五個位置全部砌啱，完美梯級排版！');
   } else {
     window.triggerBearEncourage();
-    setBearMessage('有幾塊積木排錯位呀，試下點清空重砌，再檢查一次！', true);
+    setBearMessage('有幾塊積木排錯位呀，試下點清空重砌，再檢查一次！');
   }
   renderL3();
 }
@@ -2105,7 +2121,7 @@ function renderL4() {
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l4')">🔊 聽老師讀題</button>
         <button class="btn btn-blue btn-sm" onclick="printTwoPerPage(state.l4.list)">🖨️ 列印練習紙（A4直向・每頁2題）</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l4');renderL4();setBearMessage('已重新隨機抽出 10 條寫作題！',true);">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l4');renderL4();setBearMessage('已重新隨機抽出 10 條寫作題！');">🔄 重新抽 10 題</button>
       </div>
     </div>
 
@@ -2220,7 +2236,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
   const checks = [];
   let score = 0;
 
-  // 1. Recipient & colon
   const ok1 = to.includes(q.recipient) && /[：:]\s*$/.test(to.trim());
   if (ok1) score++;
   checks.push({
@@ -2230,7 +2245,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
       : `❌ 上款需包含收卡人「${q.recipient}」並以冒號（：）結尾`
   });
 
-  // 2. Indent
   const ok2 = hasIndent && body.trim().length > 0;
   if (ok2) score++;
   checks.push({
@@ -2240,7 +2254,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
       : '❌ 正文開頭記得空兩格（可用兩個全形空格、□□ 或 XX）並寫上祝福內容'
   });
 
-  // 3. Blessing & 您/你
   const hasBless = /(生日快樂|快樂|健康|開心|平安|幸福|進步|順利|如意|長大|美麗|愛您|愛你|長命百歲|笑口常開|心想事成)/.test(body);
   const pronounOk = q.elder ? (body.includes('您') && !body.includes('你')) : (!body.includes('您'));
   const ok3 = hasBless && pronounOk;
@@ -2259,7 +2272,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
   }
   checks.push({ ok: ok3, text: msg3 });
 
-  // 4. Relation
   const ok4 = rel.includes(q.relation);
   if (ok4) score++;
   checks.push({
@@ -2269,7 +2281,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
       : `❌ 審題提示：送卡人關係／自稱應為「${q.relation}」`
   });
 
-  // 5. Sender & 敬上
   const hasSender = from.includes(q.sender);
   const hasJing = from.includes('敬上');
   const ok5 = hasSender && (q.elder ? hasJing : !hasJing);
@@ -2283,7 +2294,6 @@ function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date, extraNo
         : (q.elder ? '❌ 寫給長輩時，名字後面要加上「敬上」' : '❌ 寫給平輩同學／朋友，名字後面不用寫「敬上」')
   });
 
-  // 6. Chinese Date
   const cleanDate = date.trim().replace(/[。．.]$/, '');
   const ok6 = /^[一二三四五六七八九十]+月[一二三四五六七八九十廿卅]+日$/.test(cleanDate);
   if (ok6) score++;
@@ -2318,10 +2328,10 @@ function gradeL4() {
       addStars(3);
     }
     window.triggerBearCelebrate();
-    setBearMessage(`太棒了！你在寫作題 #${q.id} 拿到 ${res.score} 分（滿分 6 分）！`, true);
+    setBearMessage(`太棒了！你在寫作題 #${q.id} 拿到 ${res.score} 分（滿分 6 分）！`);
   } else {
     window.triggerBearEncourage();
-    setBearMessage(`得到 ${res.score} 分，看看熊熊老師的紅筆建議，改好再交卷吧！`, true);
+    setBearMessage(`得到 ${res.score} 分，看看熊熊老師的紅筆建議，改好再交卷吧！`);
   }
 
   const stamp = res.score === 6 ? '💯 滿分小作家！' : res.score >= 5 ? '🌟 非常優秀！' : '💪 繼續加油！';
@@ -2334,12 +2344,14 @@ function gradeL4() {
       <ul class="check-list">
         ${res.checks.map(c => `<li>${c.text}</li>`).join('')}
       </ul>
+      <div style="margin-top:10px;">
+        <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l4-grade-area')">🔊 聽評語</button>
+      </div>
     </div>
   `;
   renderL4();
 }
 
-// --- LEVEL 4 & 5 PRINT: A4 PORTRAIT, 2 QUESTIONS PER PAGE, ONLY PROMPT + WRITING LINES ---
 function printTwoPerPage(questionList) {
   const pages = [];
   for (let i = 0; i < questionList.length; i += 2) {
@@ -2366,7 +2378,7 @@ function printTwoPerPage(questionList) {
     </div>
   `).join('');
 
-  setBearMessage('已準備好 A4 直向每頁 2 題的簡潔答題線練習紙，正在開啟列印！', true);
+  setBearMessage('已準備好 A4 直向每頁 2 題的簡潔答題線練習紙，正在開啟列印！');
   triggerCleanPrint();
 }
 
@@ -2389,7 +2401,7 @@ function renderL5() {
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l5')">🔊 聽老師讀題</button>
         <button class="btn btn-blue btn-sm" onclick="printTwoPerPage(state.l5.list)">🖨️ 列印本組試卷（A4每頁2題）</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l5');renderL5();setBearMessage('終極第五關已重新抽出 10 條考題！',true);">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l5');renderL5();setBearMessage('終極第五關已重新抽出 10 條考題！');">🔄 重新抽 10 題</button>
       </div>
     </div>
 
@@ -2421,6 +2433,7 @@ function renderL5() {
 }
 
 function clearL5Draft(i, qid) {
+  stopSpeech();
   state.l5.draft[qid] = '';
   state.l5.grades[i] = '';
   renderL5();
@@ -2435,14 +2448,13 @@ function gradeL5() {
 
   const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
   if (lines.length < 2) {
-    setBearMessage('請先分行寫出完整的生日卡再交卷喔！', true);
+    setBearMessage('請先分行寫出完整的生日卡再交卷喔！');
     return;
   }
 
   const line1 = lines[0].trim();
   const working = lines.slice(1);
 
-  // Smartly detect if last line is a date (avoid eating sender name if date omitted)
   let dateLine = '';
   const lastCandidate = working[working.length - 1].trim();
   if (/[月日\/\-\d]/.test(lastCandidate) && lastCandidate.length <= 14) {
@@ -2482,10 +2494,10 @@ function gradeL5() {
       addStars(5);
     }
     window.triggerBearCelebrate();
-    setBearMessage(`終極大考驗成功！你獨立完成並拿到 ${res.score} 分（滿分 6 分）！`, true);
+    setBearMessage(`終極大考驗成功！你獨立完成並拿到 ${res.score} 分（滿分 6 分）！`);
   } else {
     window.triggerBearEncourage();
-    setBearMessage(`得到 ${res.score} 分，看看下面每一項檢查結果，改好就滿分啦！`, true);
+    setBearMessage(`得到 ${res.score} 分，看看下面每一項檢查結果，改好就滿分啦！`);
   }
 
   const stamp = res.score === 6 ? '🏆 終極滿分王！' : res.score >= 5 ? '🌟 挑戰成功！' : '💪 再接再厲！';
@@ -2498,6 +2510,9 @@ function gradeL5() {
       <ul class="check-list">
         ${res.checks.map(c => `<li>${c.text}</li>`).join('')}
       </ul>
+      <div style="margin-top:10px;">
+        <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l5-grade-area')">🔊 聽評語</button>
+      </div>
     </div>
   `;
   renderL5();
