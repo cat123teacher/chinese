@@ -53,7 +53,7 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
   }
   .brand-badge {
@@ -70,16 +70,10 @@
   }
   .brand h1 {
     margin: 0;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 900;
     color: #e0486c;
     letter-spacing: 1px;
-  }
-  .brand small {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 600;
   }
 
   .controls {
@@ -313,17 +307,17 @@
   .progress-dots {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 14px;
   }
   .p-dot {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: #eef2f7;
     color: var(--muted);
     font-weight: 800;
-    font-size: 13px;
+    font-size: 14px;
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -742,7 +736,7 @@
       color: #5c3b00;
     }
 
-    /* --- Mode B: Level 4 Clean 2-Questions-Per-Page A4 Portrait --- */
+    /* --- Mode B: Clean 2-Questions-Per-Page A4 Portrait --- */
     .clean-2up-page {
       height: 266mm;
       display: flex;
@@ -789,10 +783,7 @@
   <header class="topbar">
     <div class="brand" onclick="switchView('home')">
       <div class="brand-badge">1B</div>
-      <div>
-        <h1>1B生日卡練習</h1>
-        <small>3D Pixar 熊熊老師互動寫作教室（120題強化題庫）</small>
-      </div>
+      <h1>1B生日卡練習</h1>
     </div>
 
     <div class="controls">
@@ -811,7 +802,7 @@
       <div class="stage-overlay">
         <div class="bear-speech">
           <span style="font-size:24px;">🐻</span>
-          <span id="bear-msg">哈囉 1B 班小朋友！我是熊熊老師，需要朗讀時按「🔊」按鈕就可以啦！</span>
+          <span id="bear-msg">哈囉 1B 班小朋友！第一關至第五關每關隨機抽出 5 題，有需要聽讀音按「🔊」按鈕就得啦！</span>
           <button class="btn btn-sunny btn-sm" onclick="speakText(document.getElementById('bear-msg').textContent)" title="朗讀這句話">🔊 讀出</button>
         </div>
         <div class="stage-hint">👆 拖曳轉動 3D 舞台・點擊熊熊老師</div>
@@ -881,7 +872,7 @@ function speakText(text) {
   try {
     stopSpeech();
     const clean = String(text)
-      .replace(/[🔊⭐🎉🐻🏆✏️🔍🕵️🧱🖨️🔄🏠💯🌟💪❓📝🎯✅❌💡]/g, '')
+      .replace(/[🔊⭐🎉🐻🏆✏️🔍🕵️🧱🖨️🔄🏠💯🌟💪❓📝🎯✅❌💡🎲]/g, '')
       .replace(/□□/g, '空兩格');
 
     speakTimer = setTimeout(() => {
@@ -1260,7 +1251,6 @@ function initThreeStage() {
       balloons.push({ grp, baseY: b.y, phase: idx * 1.4 });
     });
 
-    // Reusable Particle Geometries & Materials
     const starGeo = new THREE.OctahedronGeometry(0.11);
     const rectGeo = new THREE.BoxGeometry(0.14, 0.14, 0.03);
     const confettiMats = [0xff4d6d, 0xffd166, 0x4ecdc4, 0x9775fa, 0x4dabf7, 0x69db7c].map(
@@ -1394,7 +1384,7 @@ function initThreeStage() {
 }
 
 /* =========================================================================
-   3. COMPLETE 120-QUESTION BANKS (30 PER LEVEL 1–4; LEVEL 5 USES L4 BANK)
+   3. COMPLETE 150-QUESTION BANKS (30 PER LEVEL 1–5 -> RANDOM 5 PER LEVEL)
    ========================================================================= */
 const L1_OPTIONS = [
   { key: 'A', label: 'A. 收卡人的名字或稱呼' },
@@ -1537,9 +1527,43 @@ const L4_BANK = [
   { id:30, elder:false, recipient:'晴晴', sender:'善雅', relation:'同學', prompt:'同學晴晴的生日快到了，請你以同學善雅的身份，寫一張生日卡給晴晴，祝她生日快樂。' }
 ];
 
+const L5_BANK = [
+  { id:1, elder:true, recipient:'何老師', sender:'芷瑩', relation:'學生', prompt:'何老師的生日快到了，請你以學生芷瑩的身份，寫一張生日卡給何老師，寫下你對她的祝福。' },
+  { id:2, elder:true, recipient:'爸爸', sender:'柏軒', relation:'兒子', prompt:'爸爸的生日快到了，請你以兒子柏軒的身份，寫一張生日卡給爸爸，祝賀他生日快樂。' },
+  { id:3, elder:true, recipient:'媽媽', sender:'梓晴', relation:'女兒', prompt:'明天是媽媽的生日，請你以女兒梓晴的身份，寫一張生日卡給媽媽，表達你的祝福。' },
+  { id:4, elder:true, recipient:'爺爺', sender:'嘉欣', relation:'孫女', prompt:'爺爺的生日快到了，請你以孫女嘉欣的身份，寫一張生日卡給爺爺，祝他笑口常開。' },
+  { id:5, elder:true, recipient:'嫲嫲', sender:'朗賢', relation:'孫兒', prompt:'嫲嫲的生日快到了，請你以孫兒朗賢的身份，寫一張生日卡給嫲嫲，送上你的祝福。' },
+  { id:6, elder:true, recipient:'林老師', sender:'晉軒', relation:'學生', prompt:'林老師的生日快到了，請你以學生晉軒的身份，寫一張生日卡祝賀林老師生日快樂。' },
+  { id:7, elder:true, recipient:'公公', sender:'佩珊', relation:'外孫女', prompt:'公公的生日快到了，請你以外孫女佩珊的身份，寫一張生日卡給公公，祝他身體健康。' },
+  { id:8, elder:true, recipient:'婆婆', sender:'詠詩', relation:'外孫女', prompt:'婆婆的生日快到了，請你以外孫女詠詩的身份，寫一張生日卡給婆婆，寫下你的祝福。' },
+  { id:9, elder:true, recipient:'姑丈', sender:'俊熙', relation:'姪兒', prompt:'姑丈的生日快到了，請你以姪兒俊熙的身份，寫一張生日卡給姑丈，祝賀他生日快樂。' },
+  { id:10, elder:true, recipient:'舅母', sender:'凱琪', relation:'外甥女', prompt:'舅母的生日快到了，請你以外甥女凱琪的身份，寫一張生日卡給舅母，送上溫暖祝福。' },
+  { id:11, elder:true, recipient:'劉老師', sender:'啟明', relation:'學生', prompt:'劉老師的生日快到了，請你以學生啟明的身份，寫一張生日卡給劉老師，寫下你對他的祝福。' },
+  { id:12, elder:true, recipient:'李校長', sender:'澤銘', relation:'學生', prompt:'李校長的生日快到了，請你以學生澤銘的身份，寫一張生日卡給李校長，祝他工作順利。' },
+  { id:13, elder:true, recipient:'姑姐', sender:'凱琳', relation:'姪女', prompt:'姑姐的生日快到了，請你以姪女凱琳的身份，寫一張生日卡給姑姐，祝她青春美麗。' },
+  { id:14, elder:true, recipient:'姨丈', sender:'芯蕾', relation:'外甥女', prompt:'姨丈的生日快到了，請你以外甥女芯蕾的身份，寫一張生日卡給姨丈，送上祝福。' },
+  { id:15, elder:true, recipient:'吳老師', sender:'天樂', relation:'學生', prompt:'吳老師的生日快到了，請你以學生天樂的身份，寫一張生日卡給吳老師，寫下你的祝福。' },
+  { id:16, elder:false, recipient:'子朗', sender:'浩天', relation:'同學', prompt:'同學子朗的生日快到了，請你以同學浩天的身份，寫一張生日卡給子朗，祝他生日快樂。' },
+  { id:17, elder:false, recipient:'美美', sender:'小晴', relation:'同學', prompt:'同學美美的生日快到了，請你以同學小晴的身份，寫一張生日卡給美美，送上你的祝福。' },
+  { id:18, elder:false, recipient:'哥哥', sender:'穎欣', relation:'妹妹', prompt:'哥哥的生日快到了，請你以妹妹穎欣的身份，寫一張生日卡給哥哥，祝他學業進步。' },
+  { id:19, elder:false, recipient:'姐姐', sender:'思雅', relation:'妹妹', prompt:'姐姐的生日快到了，請你以妹妹思雅的身份，寫一張生日卡給姐姐，寫下你的祝福。' },
+  { id:20, elder:false, recipient:'表姐', sender:'希彤', relation:'表妹', prompt:'表姐的生日快到了，請你以表妹希彤的身份，寫一張生日卡給表姐，祝她天天開心。' },
+  { id:21, elder:false, recipient:'嘉豪', sender:'子謙', relation:'同學', prompt:'同學嘉豪的生日快到了，請你以同學子謙的身份，寫一張生日卡給嘉豪，祝賀他生日快樂。' },
+  { id:22, elder:false, recipient:'樂兒', sender:'心怡', relation:'好朋友', prompt:'好朋友樂兒的生日快到了，請你以好朋友心怡的身份，寫一張生日卡給樂兒，送上祝福。' },
+  { id:23, elder:false, recipient:'弟弟', sender:'柏宇', relation:'哥哥', prompt:'弟弟的生日快到了，請你以哥哥柏宇的身份，寫一張生日卡給弟弟，祝他快高長大。' },
+  { id:24, elder:false, recipient:'妹妹', sender:'明傑', relation:'哥哥', prompt:'妹妹的生日快到了，請你以哥哥明傑的身份，寫一張生日卡給妹妹，寫下你對她的祝福。' },
+  { id:25, elder:false, recipient:'天明', sender:'卓軒', relation:'同學', prompt:'同學天明的生日快到了，請你以同學卓軒的身份，寫一張生日卡給天明，祝他生日快樂。' },
+  { id:26, elder:false, recipient:'詩雅', sender:'善雅', relation:'好朋友', prompt:'好朋友詩雅的生日快到了，請你以好朋友善雅的身份，寫一張生日卡給詩雅，送上祝福。' },
+  { id:27, elder:false, recipient:'堂姐', sender:'巧兒', relation:'堂妹', prompt:'堂姐的生日快到了，請你以堂妹巧兒的身份，寫一張生日卡給堂姐，祝她生日快樂。' },
+  { id:28, elder:false, recipient:'志豪', sender:'家朗', relation:'好朋友', prompt:'好朋友志豪的生日快到了，請你以好朋友家朗的身份，寫一張生日卡給志豪，寫下你的祝福。' },
+  { id:29, elder:false, recipient:'小美', sender:'欣彤', relation:'同學', prompt:'同學小美的生日快到了，請你以同學欣彤的身份，寫一張生日卡給小美，祝她天天快樂。' },
+  { id:30, elder:false, recipient:'表弟', sender:'澤宇', relation:'表哥', prompt:'表弟的生日快到了，請你以表哥澤宇的身份，寫一張生日卡給表弟，祝賀他生日快樂。' }
+];
+
 /* =========================================================================
-   4. SESSION STATE
+   4. SESSION STATE (Each Level Randomly Draws 5 Questions From 30)
    ========================================================================= */
+const QUESTIONS_PER_ROUND = 5;
 let currentView = 'home';
 
 const L3_COLORS = ['#ff6b8b', '#4dabf7', '#20c997', '#9775fa', '#f59f00'];
@@ -1562,19 +1586,19 @@ const state = {
 function resetLevelSession(lvl) {
   stopSpeech();
   if (lvl === 'l1') {
-    state.l1 = { list: shuffleArray(L1_BANK).slice(0, 10), idx: 0, results: {}, answers: {}, awarded: {} };
+    state.l1 = { list: shuffleArray(L1_BANK).slice(0, QUESTIONS_PER_ROUND), idx: 0, results: {}, answers: {}, awarded: {} };
   } else if (lvl === 'l2') {
-    const picked = shuffleArray(L2_BANK).slice(0, 10);
+    const picked = shuffleArray(L2_BANK).slice(0, QUESTIONS_PER_ROUND);
     const optOrder = picked.map(() => shuffleArray([0, 1, 2, 3]));
     state.l2 = { list: picked, idx: 0, results: {}, answers: {}, optOrder, awarded: {} };
   } else if (lvl === 'l3') {
-    const picked = shuffleArray(L3_BANK).slice(0, 10);
+    const picked = shuffleArray(L3_BANK).slice(0, QUESTIONS_PER_ROUND);
     state.l3 = { list: picked, idx: 0, results: {}, slotsByIdx: {}, poolByIdx: {}, checkedByIdx: {}, awarded: {} };
     picked.forEach((_, i) => prepareL3Question(i));
   } else if (lvl === 'l4') {
-    state.l4 = { list: shuffleArray(L4_BANK).slice(0, 10), idx: 0, results: {}, indentOn: true, draft: {}, grades: {}, awarded: {} };
+    state.l4 = { list: shuffleArray(L4_BANK).slice(0, QUESTIONS_PER_ROUND), idx: 0, results: {}, indentOn: true, draft: {}, grades: {}, awarded: {} };
   } else if (lvl === 'l5') {
-    state.l5 = { list: shuffleArray(L4_BANK).slice(0, 10), idx: 0, results: {}, draft: {}, grades: {}, awarded: {} };
+    state.l5 = { list: shuffleArray(L5_BANK).slice(0, QUESTIONS_PER_ROUND), idx: 0, results: {}, draft: {}, grades: {}, awarded: {} };
   }
 }
 
@@ -1625,34 +1649,34 @@ function renderHome() {
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
       <div>
         <h2 style="margin:0;font-size:24px;color:#e0486c;">🎉 歡迎來到 1B 生日卡練習教室！</h2>
-        <p style="margin:6px 0 0;color:var(--muted);font-size:15px;">一至四關各有 <b>30 題強化題庫</b>（每次隨機抽 10 題），更有「終極第五關」無提示大考驗！</p>
+        <p style="margin:6px 0 0;color:var(--muted);font-size:15px;">第一關至終極第五關，每關都會從 30 題庫中<b>隨機抽出 5 題</b>作答！</p>
       </div>
-      <button class="btn btn-teal btn-sm" onclick="speakText('歡迎來到 1B 生日卡練習教室！小朋友可以選擇第一關至終極第五關，亦可以直接列印可愛動畫風練習紙。')">🔊 聽老師介紹</button>
+      <button class="btn btn-teal btn-sm" onclick="speakText('歡迎來到 1B 生日卡練習教室！第一關至第五關，每關隨機抽出五題，亦可以直接列印可愛動畫風練習紙。')">🔊 聽老師介紹</button>
     </div>
 
     <div class="home-grid">
       <div class="level-card" onclick="switchView('l1')">
-        <span class="badge">30題隨機抽10題</span>
+        <span class="badge">隨機抽出 5 題</span>
         <h3>🔍 第一關：格式大偵探</h3>
         <p>認識生日卡五寶（收卡人、祝福語、關係、送卡人、日期），小心「感謝的話」干擾項！</p>
       </div>
       <div class="level-card" onclick="switchView('l2')">
-        <span class="badge">30題隨機抽10題</span>
+        <span class="badge">隨機抽出 5 題</span>
         <h3>🕵️ 第二關：小老師捉錯處</h3>
         <p>找出漏空兩格、「您／你」誤用、漏寫「敬上」、冒號及梯級排列等 6 大常見失分位。</p>
       </div>
       <div class="level-card" onclick="switchView('l3')">
-        <span class="badge">30題隨機抽10題</span>
+        <span class="badge">隨機抽出 5 題</span>
         <h3>🧱 第三關：積木砌砌生日卡</h3>
         <p>把彩色 3D 積木放到正確的梯級位置，熟習長輩與平輩的標準排版。</p>
       </div>
       <div class="level-card" onclick="switchView('l4')">
-        <span class="badge">30題隨機抽10題・可列印2題/頁</span>
+        <span class="badge">隨機抽出 5 題・可列印2題/頁</span>
         <h3>✏️ 第四關：小小作家評估室</h3>
         <p>備有詞庫小幫手、空兩格開關與熊熊老師自動批改，並可列印 A4 每頁 2 題簡潔練習紙。</p>
       </div>
       <div class="level-card" style="border-color:#d0bfff;background:linear-gradient(180deg,#fff 0%,#f8f5ff 100%);" onclick="switchView('l5')">
-        <span class="badge" style="background:#ede9fe;color:#5f3dc4;">無提示實戰評估</span>
+        <span class="badge" style="background:#ede9fe;color:#5f3dc4;">隨機抽出 5 題・無提示</span>
         <h3>🏆 終極第五關：無提示大考</h3>
         <p>沒有提示、沒有分行框，完全模擬學校工作紙作答，挑戰 6 項滿分紅印章！</p>
       </div>
@@ -1661,7 +1685,7 @@ function renderHome() {
     <div class="worksheet-box">
       <div style="flex:1;min-width:260px;">
         <h3>📄 第四關・可愛動畫風格練習紙（A4 直向・每頁 1 題）</h3>
-        <p>隨機從 30 條小一生日卡寫作題目中抽取，自動排版成 <b>A4 直向可愛熊熊蛋糕卡通工作紙</b>，適合列印出來給小朋友手寫練習！</p>
+        <p>隨機從小一生日卡寫作題庫中抽取，自動排版成 <b>A4 直向可愛熊熊蛋糕卡通工作紙</b>，適合列印出來給小朋友手寫練習！</p>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;">
         <button class="btn btn-pink" onclick="printCuteWorksheets(3)">🖨️ 一次生成 3 頁</button>
@@ -1759,7 +1783,7 @@ function printCuteWorksheets(pageCount) {
 }
 
 /* =========================================================================
-   6. LEVEL 1: FORMAT DETECTIVE (30 BANK -> 10 RANDOM)
+   6. LEVEL 1: FORMAT DETECTIVE (RANDOM 5 OF 30)
    ========================================================================= */
 function renderDots(lvl) {
   const s = state[lvl];
@@ -1778,6 +1802,7 @@ function jumpQuestion(lvl, i) {
 
 function renderL1() {
   const s = state.l1;
+  const total = s.list.length;
   const q = s.list[s.idx];
   const prevChoice = s.answers[s.idx];
   const answered = prevChoice !== undefined;
@@ -1787,12 +1812,12 @@ function renderL1() {
   panel.innerHTML = `
     <div class="quiz-head">
       <div>
-        <h2 style="margin:0;font-size:21px;color:#e0486c;">🔍 第一關：格式大偵探（第 ${s.idx + 1} / 10 題・題庫 #${q.id}）</h2>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🔍 第一關：格式大偵探（第 ${s.idx + 1} / ${total} 題・題庫 #${q.id}）</h2>
         <small style="color:var(--muted);">看看生日卡上黃色箭咀指著的部分，它屬於哪一個格式項目？</small>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l1')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l1');renderL1();setBearMessage('已重新隨機抽出 10 題格式大偵探！');">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l1');renderL1();setBearMessage('已重新隨機抽出 5 題格式大偵探！');">🔄 重新抽 5 題</button>
       </div>
     </div>
 
@@ -1829,7 +1854,7 @@ function renderL1() {
           ${q.explain}
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l1-fb')">🔊 聽講解</button>
-            ${s.idx < 9
+            ${s.idx < total - 1
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l1', ${s.idx + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l2')">完成本組！挑戰第二關 ➡️</button>`}
           </div>
@@ -1860,10 +1885,11 @@ function answerL1(choice) {
 }
 
 /* =========================================================================
-   7. LEVEL 2: ERROR SPOTTER (30 BANK -> 10 RANDOM, SHUFFLED OPTIONS)
+   7. LEVEL 2: ERROR SPOTTER (RANDOM 5 OF 30)
    ========================================================================= */
 function renderL2() {
   const s = state.l2;
+  const total = s.list.length;
   const q = s.list[s.idx];
   const c = q.card;
   const order = s.optOrder[s.idx];
@@ -1875,12 +1901,12 @@ function renderL2() {
   panel.innerHTML = `
     <div class="quiz-head">
       <div>
-        <h2 style="margin:0;font-size:21px;color:#e0486c;">🕵️ 第二關：小老師捉錯處（第 ${s.idx + 1} / 10 題・題庫 #${q.id}）</h2>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🕵️ 第二關：小老師捉錯處（第 ${s.idx + 1} / ${total} 題・題庫 #${q.id}）</h2>
         <small style="color:var(--muted);">做個精明小老師，找出下面這張生日卡的扣分位！</small>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l2')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l2');renderL2();setBearMessage('已重新隨機抽出 10 題捉錯處！');">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l2');renderL2();setBearMessage('已重新隨機抽出 5 題捉錯處！');">🔄 重新抽 5 題</button>
       </div>
     </div>
 
@@ -1921,7 +1947,7 @@ function renderL2() {
           </div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l2-fb')">🔊 聽講解</button>
-            ${s.idx < 9
+            ${s.idx < total - 1
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l2', ${s.idx + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l3')">完成本組！挑戰第三關 ➡️</button>`}
           </div>
@@ -1952,7 +1978,7 @@ function answerL2(origIdx) {
 }
 
 /* =========================================================================
-   8. LEVEL 3: BLOCK BUILDER (30 BANK -> 10 RANDOM)
+   8. LEVEL 3: BLOCK BUILDER (RANDOM 5 OF 30)
    ========================================================================= */
 function prepareL3Question(targetIdx) {
   const s = state.l3;
@@ -1970,6 +1996,7 @@ function prepareL3Question(targetIdx) {
 
 function renderL3() {
   const s = state.l3;
+  const total = s.list.length;
   const i = s.idx;
   const q = s.list[i];
   if (!s.slotsByIdx[i]) prepareL3Question(i);
@@ -1982,12 +2009,12 @@ function renderL3() {
   panel.innerHTML = `
     <div class="quiz-head">
       <div>
-        <h2 style="margin:0;font-size:21px;color:#e0486c;">🧱 第三關：積木砌砌生日卡（第 ${i + 1} / 10 題・題庫 #${q.id}）</h2>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🧱 第三關：積木砌砌生日卡（第 ${i + 1} / ${total} 題・題庫 #${q.id}）</h2>
         <small style="color:var(--muted);">點選下方彩色積木，依次放入生日卡的正確梯級位置（點已放好的格可放回）</small>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l3')">🔊 聽老師讀題</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l3');renderL3();setBearMessage('已重新隨機抽出 10 題積木砌卡！');">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l3');renderL3();setBearMessage('已重新隨機抽出 5 題積木砌卡！');">🔄 重新抽 5 題</button>
       </div>
     </div>
 
@@ -2028,7 +2055,7 @@ function renderL3() {
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-sunny btn-sm" onclick="speakContainerText('l3-fb')">🔊 聽講解</button>
             ${!passed ? `<button class="btn btn-teal btn-sm" onclick="prepareL3Question(${i});renderL3();">🔄 再試一次</button>` : ''}
-            ${i < 9
+            ${i < total - 1
               ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l3', ${i + 1})">下一題 ➡️</button>`
               : `<button class="btn btn-teal btn-sm" onclick="switchView('l4')">完成本組！挑戰第四關 ➡️</button>`}
           </div>
@@ -2084,7 +2111,7 @@ function checkL3() {
 }
 
 /* =========================================================================
-   9. LEVEL 4: GUIDED WRITING STUDIO + 2-PER-PAGE A4 CLEAN PRINT BUTTON
+   9. LEVEL 4: GUIDED WRITING STUDIO (RANDOM 5 OF 30) + A4 2-PER-PAGE PRINT
    ========================================================================= */
 const BLESSINGS_ELDER = [
   '祝您生日快樂！',
@@ -2107,6 +2134,7 @@ function escapeHtml(str) {
 
 function renderL4() {
   const s = state.l4;
+  const total = s.list.length;
   const i = s.idx;
   const q = s.list[i];
   const d = s.draft[q.id] || { to:'', body:'', rel:'', from:'', date:'' };
@@ -2115,13 +2143,13 @@ function renderL4() {
   panel.innerHTML = `
     <div class="quiz-head">
       <div>
-        <h2 style="margin:0;font-size:21px;color:#e0486c;">✏️ 第四關：小小作家評估室（第 ${i + 1} / 10 題・寫作 #${q.id}）</h2>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">✏️ 第四關：小小作家評估室（第 ${i + 1} / ${total} 題・寫作 #${q.id}）</h2>
         <small style="color:var(--muted);">利用詞庫小幫手寫出滿分生日卡，或列印 A4 每頁 2 題簡潔練習紙！</small>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l4')">🔊 聽老師讀題</button>
         <button class="btn btn-blue btn-sm" onclick="printTwoPerPage(state.l4.list)">🖨️ 列印練習紙（A4直向・每頁2題）</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l4');renderL4();setBearMessage('已重新隨機抽出 10 條寫作題！');">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l4');renderL4();setBearMessage('已重新隨機抽出 5 條寫作題！');">🔄 重新抽 5 題</button>
       </div>
     </div>
 
@@ -2167,7 +2195,7 @@ function renderL4() {
 
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn btn-pink" onclick="gradeL4()">🐻 交給熊熊老師批改</button>
-          ${i < 9
+          ${i < total - 1
             ? `<button class="btn btn-teal" onclick="jumpQuestion('l4', ${i + 1})">下一題 ➡️</button>`
             : `<button class="btn btn-purple" onclick="switchView('l5')">挑戰終極第五關 🏆</button>`}
         </div>
@@ -2383,10 +2411,11 @@ function printTwoPerPage(questionList) {
 }
 
 /* =========================================================================
-   10. ULTIMATE LEVEL 5: NO HINTS, NO ROW SELECTORS, SMART LINE PARSER
+   10. ULTIMATE LEVEL 5: NO HINTS, NO ROW SELECTORS (RANDOM 5 OF 30)
    ========================================================================= */
 function renderL5() {
   const s = state.l5;
+  const total = s.list.length;
   const i = s.idx;
   const q = s.list[i];
   const textVal = s.draft[q.id] || '';
@@ -2395,13 +2424,13 @@ function renderL5() {
   panel.innerHTML = `
     <div class="quiz-head">
       <div>
-        <h2 style="margin:0;font-size:21px;color:#6741d9;">🏆 終極第五關：無提示寫作大考驗（第 ${i + 1} / 10 題・寫作 #${q.id}）</h2>
+        <h2 style="margin:0;font-size:21px;color:#6741d9;">🏆 終極第五關：無提示寫作大考驗（第 ${i + 1} / ${total} 題・寫作 #${q.id}）</h2>
         <small style="color:var(--muted);">沒有提示、沒有分行框，完全靠自己獨立完成一張完整的生日卡！</small>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-sunny btn-sm" onclick="speakCurrentQuestion('l5')">🔊 聽老師讀題</button>
         <button class="btn btn-blue btn-sm" onclick="printTwoPerPage(state.l5.list)">🖨️ 列印本組試卷（A4每頁2題）</button>
-        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l5');renderL5();setBearMessage('終極第五關已重新抽出 10 條考題！');">🔄 重新抽 10 題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l5');renderL5();setBearMessage('終極第五關已重新抽出 5 條考題！');">🔄 重新抽 5 題</button>
       </div>
     </div>
 
@@ -2423,7 +2452,7 @@ function renderL5() {
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn btn-purple" onclick="gradeL5()">🐻 提交給熊熊老師批改</button>
       <button class="btn btn-gray" onclick="clearL5Draft(${i}, ${q.id})">🧹 清空重寫</button>
-      ${i < 9
+      ${i < total - 1
         ? `<button class="btn btn-teal" onclick="jumpQuestion('l5', ${i + 1})">下一題 ➡️</button>`
         : `<button class="btn btn-sunny" onclick="switchView('home')">返回首頁 🏠</button>`}
     </div>
