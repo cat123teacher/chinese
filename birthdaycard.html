@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>1B生日卡練習</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    --sky-1: #dff4ff;
+    --sky-2: #fff6e8;
+    --primary: #ff6b8b;
+    --primary-dark: #e0486c;
+    --secondary: #4ecdc4;
+    --secondary-dark: #2ba89f;
+    --sunny: #ffd166;
+    --sunny-dark: #e0a82e;
+    --purple: #845ef7;
+    --purple-dark: #6741d9;
+    --blue: #339af0;
+    --blue-dark: #1c7ed6;
+    --ink: #2d3142;
+    --muted: #5c6378;
+    --card-bg: #ffffff;
+    --shadow: 0 10px 26px rgba(45, 49, 66, 0.12);
+    --radius: 24px;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", "Heiti TC", sans-serif;
+    background: linear-gradient(160deg, var(--sky-1) 0%, var(--sky-2) 55%, #ffe9f0 100%);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ===== Top Bar ===== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 3px solid #ffe0eb;
+    padding: 10px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .brand-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ff8fab, #ff5d8f);
+    color: #fff;
+    font-weight: 900;
+    font-size: 20px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 5px 0 #d93b6b;
+  }
+  .brand h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 900;
+    color: #e0486c;
+    letter-spacing: 1px;
+  }
+  .brand small {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .lang-toggle {
+    display: inline-flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 999px;
+    border: 2px solid #e2e8f0;
+  }
+  .lang-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: linear-gradient(135deg, #4ecdc4, #2ba89f);
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(43, 168, 159, 0.35);
+  }
+
+  .star-pill {
+    background: linear-gradient(135deg, #ffe066, #fab005);
+    color: #5c3b00;
+    font-weight: 900;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 15px;
+    box-shadow: 0 4px 0 #d99300;
+  }
+
+  /* ===== Main Layout ===== */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 18px 16px 60px;
+  }
+
+  /* ===== 3D Pixar Stage ===== */
+  .stage-card {
+    position: relative;
+    background: linear-gradient(180deg, #b8e8ff 0%, #e5f6ff 60%, #fff4d6 100%);
+    border-radius: 28px;
+    border: 4px solid #ffffff;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  #three-wrap {
+    width: 100%;
+    height: 240px;
+    position: relative;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  #three-wrap:active { cursor: grabbing; }
+  .stage-overlay {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    gap: 10px;
+  }
+  .bear-speech {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.94);
+    border: 3px solid #ffd166;
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    max-width: 680px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stage-hint {
+    background: rgba(45, 49, 66, 0.65);
+    color: #fff;
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* ===== Navigation Tabs ===== */
+  .nav-tabs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 820px) {
+    .nav-tabs { grid-template-columns: repeat(3, 1fr); }
+    #three-wrap { height: 200px; }
+    .stage-hint { display: none; }
+  }
+  .tab-btn {
+    border: none;
+    border-radius: 18px;
+    padding: 12px 8px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 0 5px 0 #dce3ee;
+    transition: transform 0.12s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .tab-btn:active { transform: translateY(3px); }
+  .tab-btn .t-ico { font-size: 20px; }
+  .tab-btn.active {
+    background: linear-gradient(145deg, #ff758f, #ff4d6d);
+    color: #fff;
+    box-shadow: 0 5px 0 #c9184a;
+  }
+  .tab-btn.ultimate.active {
+    background: linear-gradient(145deg, #9775fa, #7048e8);
+    box-shadow: 0 5px 0 #5f3dc4;
+  }
+
+  /* ===== Panels & Buttons ===== */
+  .panel {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border: 3px solid #fff;
+  }
+  .btn {
+    border: none;
+    border-radius: 16px;
+    padding: 11px 18px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: transform 0.12s, filter 0.15s;
+    color: #fff;
+  }
+  .btn:hover { filter: brightness(1.04); }
+  .btn:active { transform: translateY(3px); }
+  .btn-pink { background: linear-gradient(135deg, #ff758f, #ff4d6d); box-shadow: 0 4px 0 #c9184a; }
+  .btn-teal { background: linear-gradient(135deg, #4ecdc4, #20b2aa); box-shadow: 0 4px 0 #17857f; }
+  .btn-blue { background: linear-gradient(135deg, #4dabf7, #228be6); box-shadow: 0 4px 0 #1864ab; }
+  .btn-sunny { background: linear-gradient(135deg, #ffd43b, #fab005); color: #5c3b00; box-shadow: 0 4px 0 #d99300; }
+  .btn-purple { background: linear-gradient(135deg, #9775fa, #7950f2); box-shadow: 0 4px 0 #5f3dc4; }
+  .btn-gray { background: #eef2f7; color: var(--ink); box-shadow: 0 4px 0 #cbd5e1; }
+  .btn-sm { padding: 7px 13px; font-size: 13px; border-radius: 12px; }
+
+  /* ===== Home Dashboard ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .level-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 3px solid #e7f0ff;
+    border-radius: 22px;
+    padding: 18px;
+    cursor: pointer;
+    transition: transform 0.16s, border-color 0.2s;
+    position: relative;
+  }
+  .level-card:hover { transform: translateY(-4px); border-color: #ff8fab; }
+  .level-card .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    background: #ffe3ec;
+    color: #c9184a;
+    margin-bottom: 8px;
+  }
+  .level-card h3 { margin: 4px 0 8px; font-size: 19px; }
+  .level-card p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  .worksheet-box {
+    margin-top: 22px;
+    background: linear-gradient(135deg, #fff9db 0%, #ffe8f3 100%);
+    border: 3px dashed #ff8fab;
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .worksheet-box h3 { margin: 0 0 6px; font-size: 20px; color: #c2255c; }
+  .worksheet-box p { margin: 0; font-size: 14px; color: #5c4b51; }
+
+  /* ===== Quiz Header & Progress ===== */
+  .quiz-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px dashed #e9ecef;
+  }
+  .progress-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .p-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #eef2f7;
+    color: var(--muted);
+    font-weight: 800;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .p-dot.current { border-color: #ff4d6d; background: #fff0f3; color: #c9184a; transform: scale(1.08); }
+  .p-dot.done-ok { background: #38d9a9; color: #fff; }
+  .p-dot.done-err { background: #ff8787; color: #fff; }
+
+  /* ===== Birthday Card Visual Display ===== */
+  .bcard-paper {
+    background: linear-gradient(180deg, #fffdf7 0%, #fff7eb 100%);
+    border: 4px solid #ffd8a8;
+    border-radius: 22px;
+    padding: 24px 28px;
+    position: relative;
+    font-size: 20px;
+    line-height: 1.9;
+    box-shadow: inset 0 0 0 4px #fff;
+    margin: 14px 0;
+  }
+  .bcard-line {
+    padding: 4px 10px;
+    border-radius: 12px;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .bcard-line.highlight {
+    background: #fff3bf;
+    outline: 3px solid #fab005;
+    font-weight: 800;
+  }
+  .bcard-line.highlight::after {
+    content: " ◀ 看這裡！";
+    font-size: 14px;
+    background: #fab005;
+    color: #fff;
+    padding: 2px 9px;
+    border-radius: 999px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .indent-boxes {
+    display: inline-flex;
+    gap: 3px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .indent-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #adb5bd;
+    background: #f8f9fa;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  .stair-wrap {
+    margin-top: 16px;
+    position: relative;
+  }
+  .stair-rel { text-align: right; padding-right: 115px; }
+  .stair-from { text-align: right; padding-right: 32px; }
+  .stair-date { text-align: right; padding-right: 14px; }
+  .stair-guide {
+    border-top: 3px dashed #ffa8a8;
+    border-right: 3px dashed #ffa8a8;
+    width: 110px;
+    height: 62px;
+    position: absolute;
+    right: 112px;
+    top: 34px;
+    pointer-events: none;
+    border-top-right-radius: 6px;
+    opacity: 0.7;
+  }
+  .bad-left { text-align: left !important; padding-right: 0 !important; }
+
+  /* ===== Options Grid ===== */
+  .opt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .opt-btn {
+    text-align: left;
+    background: #f8fafc;
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 13px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: #4dabf7; background: #eef8ff; transform: translateY(-2px); }
+  .opt-btn.correct { background: #d3f9d8; border-color: #2b8a3e; color: #1b5e20; }
+  .opt-btn.wrong { background: #ffe3e3; border-color: #e03131; color: #9b1c1c; }
+
+  .feedback-box {
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .feedback-ok { background: #e6fcf5; border: 2px solid #20c997; color: #087f5b; }
+  .feedback-err { background: #fff5f5; border: 2px solid #ff8787; color: #c92a2a; }
+
+  /* ===== Level 3 Block Builder ===== */
+  .slot-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .slot-label {
+    min-width: 112px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--muted);
+  }
+  .slot-box {
+    flex: 1;
+    min-height: 48px;
+    border: 3px dashed #adb5bd;
+    border-radius: 14px;
+    padding: 8px 14px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .slot-box.filled { border-style: solid; border-color: #4dabf7; background: #e7f5ff; }
+  .slot-box.align-rel { margin-left: 22%; }
+  .slot-box.align-from { margin-left: 38%; }
+  .slot-box.align-date { margin-left: 44%; }
+  .block-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 14px;
+    background: #f1f5f9;
+    border-radius: 18px;
+  }
+  .block-chip {
+    border: none;
+    border-radius: 14px;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+    transition: transform 0.12s;
+  }
+  .block-chip:active { transform: translateY(3px); }
+  .block-chip.used { opacity: 0.35; pointer-events: none; }
+
+  /* ===== Level 4 Writing Studio ===== */
+  .prompt-banner {
+    background: linear-gradient(135deg, #fff0f6 0%, #fff9db 100%);
+    border: 3px solid #ffadd2;
+    border-radius: 20px;
+    padding: 16px 20px;
+    font-size: 19px;
+    font-weight: 800;
+    color: #862e9c;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .w-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 820px) { .w-grid { grid-template-columns: 1fr; } }
+
+  .card-editor {
+    background: #fffdf5;
+    border: 4px solid #ffd8a8;
+    border-radius: 22px;
+    padding: 20px;
+  }
+  .field-row { margin-bottom: 12px; }
+  .field-row label { display: block; font-size: 13px; font-weight: 800; color: #8c6d46; margin-bottom: 4px; }
+  .field-input, .field-textarea {
+    width: 100%;
+    border: 2px solid #e9d8be;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 17px;
+    font-family: inherit;
+    background: #fff;
+  }
+  .field-input:focus, .field-textarea:focus { outline: none; border-color: #ff6b8b; }
+  .stair-inputs { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 10px; }
+  .stair-inputs .field-row { width: 65%; margin-bottom: 0; }
+  .stair-inputs .s-rel { margin-right: 18%; width: 52%; }
+  .stair-inputs .s-from { margin-right: 4%; width: 52%; }
+  .stair-inputs .s-date { margin-right: 0; width: 52%; }
+
+  .helper-box {
+    background: #f8fbff;
+    border: 2px solid #d0ebff;
+    border-radius: 20px;
+    padding: 16px;
+  }
+  .helper-box h4 { margin: 0 0 8px; font-size: 15px; color: #1971c2; }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .word-chip {
+    background: #fff;
+    border: 2px solid #a5d8ff;
+    color: #1864ab;
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .word-chip:hover { background: #e7f5ff; }
+
+  .stamp-box {
+    display: inline-block;
+    border: 4px solid #e03131;
+    color: #e03131;
+    border-radius: 16px;
+    padding: 6px 16px;
+    font-size: 20px;
+    font-weight: 900;
+    transform: rotate(-6deg);
+    margin-top: 8px;
+  }
+  .check-list { list-style: none; padding: 0; margin: 10px 0 0; }
+  .check-list li { padding: 5px 0; font-size: 15px; font-weight: 700; }
+
+  /* ===== Level 5 Ultimate Blank Exam ===== */
+  .exam-paper {
+    background: #fffef9;
+    border: 4px solid #d0bfff;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: inset 0 0 0 4px #fff;
+  }
+  .lined-textarea {
+    width: 100%;
+    min-height: 310px;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 21px;
+    line-height: 44px;
+    padding: 0 10px;
+    color: #1e293b;
+    background-color: transparent;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 42px,
+      #94a3b8 42px,
+      #94a3b8 44px
+    );
+  }
+
+  /* ===== Print System ===== */
+  #print-root { display: none; }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+    html, body {
+      background: #ffffff !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    #app-root { display: none !important; }
+    #print-root { display: block !important; }
+
+    .print-page {
+      width: 100%;
+      page-break-after: always;
+      break-after: page;
+      box-sizing: border-box;
+    }
+    .print-page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    /* --- Mode A: Cute Cartoon 1-Question-Per-Page A4 Worksheet --- */
+    .cute-page {
+      height: 274mm;
+      border: 4px solid #ff8fab;
+      border-radius: 18px;
+      padding: 10mm 11mm;
+      background: linear-gradient(180deg, #fff9fc 0%, #ffffff 30%, #fffdf5 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .cute-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px dashed #ffd166;
+      padding-bottom: 5mm;
+    }
+    .cute-title-block h1 {
+      margin: 0;
+      font-size: 22pt;
+      color: #e0486c;
+      letter-spacing: 2px;
+    }
+    .cute-title-block p {
+      margin: 2mm 0 0;
+      font-size: 11pt;
+      color: #475569;
+      font-weight: 700;
+    }
+    .cute-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12pt;
+      font-weight: 700;
+      margin: 4mm 0;
+      color: #334155;
+    }
+    .cute-qbox {
+      background: #fff0f6;
+      border: 3px solid #ffadd2;
+      border-radius: 14px;
+      padding: 5mm 6mm;
+      font-size: 14.5pt;
+      font-weight: 800;
+      color: #4a154b;
+      line-height: 1.6;
+    }
+    .cute-card-area {
+      flex: 1;
+      margin: 5mm 0;
+      border: 3px solid #74c0fc;
+      border-radius: 16px;
+      padding: 7mm 9mm;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .cute-card-tag {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #4dabf7;
+      color: #fff;
+      font-size: 10.5pt;
+      font-weight: 800;
+      padding: 2px 12px;
+      border-radius: 999px;
+    }
+    .cute-write-line {
+      border-bottom: 1.6px solid #64748b;
+      height: 18mm;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 2mm;
+    }
+    .cute-indent-hint {
+      display: inline-flex;
+      gap: 2px;
+      margin-right: 4px;
+      opacity: 0.55;
+    }
+    .cute-indent-sq {
+      width: 6mm;
+      height: 6mm;
+      border: 1.5px dashed #94a3b8;
+    }
+    .cute-footer {
+      background: #fff9db;
+      border: 2px solid #ffd43b;
+      border-radius: 12px;
+      padding: 3.5mm 5mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #5c3b00;
+    }
+
+    /* --- Mode B: Level 4 Clean 2-Questions-Per-Page A4 Portrait --- */
+    .clean-2up-page {
+      height: 274mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2mm 4mm;
+    }
+    .clean-q-block {
+      height: 132mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 4mm 0;
+    }
+    .clean-q-block:first-child {
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 6mm;
+    }
+    .clean-q-title {
+      font-size: 14pt;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.55;
+      margin-bottom: 4mm;
+    }
+    .clean-lines-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .clean-write-line {
+      border-bottom: 1.4px solid #334155;
+      height: 14.5mm;
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app-root">
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand" onclick="switchView('home')">
+      <div class="brand-badge">1B</div>
+      <div>
+        <h1>1B生日卡練習</h1>
+        <small>3D Pixar 熊熊老師互動寫作教室（120題強化題庫）</small>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="lang-toggle" role="group" aria-label="語言選擇">
+        <button id="lang-hk" class="lang-btn active" onclick="setLanguage('zh-HK')">🇭🇰 廣東話</button>
+        <button id="lang-cn" class="lang-btn" onclick="setLanguage('zh-CN')">🇨🇳 普通話</button>
+      </div>
+      <div class="star-pill">⭐ 星星：<span id="total-stars">0</span></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 3D Pixar Stage -->
+    <section class="stage-card">
+      <div id="three-wrap"></div>
+      <div class="stage-overlay">
+        <div class="bear-speech">
+          <span style="font-size:24px;">🐻</span>
+          <span id="bear-msg">哈囉 1B 班小朋友！我是熊熊老師，點我可以打招呼，一齊輕鬆學寫生日卡啦！</span>
+          <button class="btn btn-sunny btn-sm" onclick="speakText(document.getElementById('bear-msg').textContent)">🔊</button>
+        </div>
+        <div class="stage-hint">👆 拖曳轉動 3D 舞台・點擊熊熊老師</div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+      <button id="tab-home" class="tab-btn active" onclick="switchView('home')"><span class="t-ico">🏠</span>首頁與練習紙</button>
+      <button id="tab-l1" class="tab-btn" onclick="switchView('l1')"><span class="t-ico">🔍</span>第一關<br>格式偵探</button>
+      <button id="tab-l2" class="tab-btn" onclick="switchView('l2')"><span class="t-ico">🕵️</span>第二關<br>捉錯處</button>
+      <button id="tab-l3" class="tab-btn" onclick="switchView('l3')"><span class="t-ico">🧱</span>第三關<br>積木砌卡</button>
+      <button id="tab-l4" class="tab-btn" onclick="switchView('l4')"><span class="t-ico">✏️</span>第四關<br>小小作家</button>
+      <button id="tab-l5" class="tab-btn ultimate" onclick="switchView('l5')"><span class="t-ico">🏆</span>終極第五關<br>無提示大考</button>
+    </nav>
+
+    <!-- Dynamic Main Panel -->
+    <section id="main-panel" class="panel"></section>
+  </main>
+</div>
+
+<!-- Print Container -->
+<div id="print-root"></div>
+
+<script>
+/* =========================================================================
+   1. SPEECH SYNTHESIS (廣東話 zh-HK + 普通話 zh-CN)
+   ========================================================================= */
+let currentLang = 'zh-HK';
+let totalStars = 0;
+let availableVoices = [];
+
+function loadVoices() {
+  if ('speechSynthesis' in window) {
+    availableVoices = window.speechSynthesis.getVoices();
+  }
+}
+if ('speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  document.getElementById('lang-hk').classList.toggle('active', lang === 'zh-HK');
+  document.getElementById('lang-cn').classList.toggle('active', lang === 'zh-CN');
+  const greeting = lang === 'zh-HK'
+    ? '已切換到廣東話發音！熊熊老師陪你一齊練習寫生日卡！'
+    : '已切换到普通话发音！熊熊老师陪你一起练习写生日卡！';
+  setBearMessage(greeting, true);
+}
+
+function speakText(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[🔊⭐🎉🐻🏆✏️🔍🕵️🧱🖨️🔄🏠]/g, '').replace(/□□/g, '空兩格');
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.lang = currentLang;
+    utter.rate = 0.92;
+    utter.pitch = 1.06;
+
+    if (!availableVoices.length) loadVoices();
+    let voice = null;
+    if (currentLang === 'zh-HK') {
+      voice = availableVoices.find(v => /zh[-_]HK|yue/i.test(v.lang))
+           || availableVoices.find(v => /hong kong|cantonese|粵/i.test(v.name));
+    } else {
+      voice = availableVoices.find(v => /zh[-_]CN|cmn/i.test(v.lang) && !/HK/i.test(v.lang))
+           || availableVoices.find(v => /mandarin|putonghua|普通話|普通话|ting/i.test(v.name))
+           || availableVoices.find(v => /zh[-_]TW/i.test(v.lang));
+    }
+    if (voice) utter.voice = voice;
+    window.speechSynthesis.speak(utter);
+  } catch (e) {}
+}
+
+function setBearMessage(msg, autoSpeak = false) {
+  const el = document.getElementById('bear-msg');
+  if (el) el.textContent = msg;
+  if (autoSpeak) speakText(msg);
+}
+
+function addStars(n) {
+  totalStars += n;
+  document.getElementById('total-stars').textContent = totalStars;
+}
+
+function shuffleArray(arr) {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/* =========================================================================
+   2. PURE THREE.JS PIXAR-STYLE 3D STAGE
+   ========================================================================= */
+const threeState = {
+  celebrateTimer: 0,
+  shakeTimer: 0,
+  waveTimer: 0,
+  particles: []
+};
+
+function initThreeStage() {
+  const wrap = document.getElementById('three-wrap');
+  if (!wrap || typeof THREE === 'undefined') return;
+  try {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(36, wrap.clientWidth / wrap.clientHeight, 0.1, 100);
+    camera.position.set(0, 2.35, 7.2);
+    camera.lookAt(0, 1.05, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    wrap.appendChild(renderer.domElement);
+
+    // Warm Pixar Lighting
+    const hemi = new THREE.HemisphereLight(0xffffff, 0xffd6a5, 1.05);
+    scene.add(hemi);
+
+    const keyLight = new THREE.DirectionalLight(0xfff6e5, 1.15);
+    keyLight.position.set(4, 7, 5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    scene.add(keyLight);
+
+    const rimLight = new THREE.DirectionalLight(0x90e0ef, 0.55);
+    rimLight.position.set(-5, 4, -4);
+    scene.add(rimLight);
+
+    const candleLight = new THREE.PointLight(0xffb703, 0.9, 6);
+    candleLight.position.set(2.1, 1.9, 0.3);
+    scene.add(candleLight);
+
+    // World pivot for interactive rotation
+    const world = new THREE.Group();
+    scene.add(world);
+
+    // Soft pastel stage floor
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0xfff1d0, roughness: 0.75 });
+    const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.4, 0.35, 48), floorMat);
+    floor.position.y = -0.18;
+    floor.receiveShadow = true;
+    world.add(floor);
+
+    const rug = new THREE.Mesh(
+      new THREE.CylinderGeometry(3.2, 3.2, 0.04, 48),
+      new THREE.MeshStandardMaterial({ color: 0xffcad4, roughness: 0.85 })
+    );
+    rug.position.y = 0.01;
+    rug.receiveShadow = true;
+    world.add(rug);
+
+    // --- 3D Pixar Bear Teacher ---
+    const bear = new THREE.Group();
+    bear.position.set(-0.3, 0, 0.15);
+    world.add(bear);
+
+    const furMat = new THREE.MeshStandardMaterial({ color: 0xc68642, roughness: 0.58 });
+    const creamMat = new THREE.MeshStandardMaterial({ color: 0xffe5c2, roughness: 0.65 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.18, metalness: 0.1 });
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25 });
+    const blushMat = new THREE.MeshStandardMaterial({ color: 0xff8fab, roughness: 0.6 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffc300, roughness: 0.25, metalness: 0.7 });
+    const redMat = new THREE.MeshStandardMaterial({ color: 0xff4d6d, roughness: 0.35 });
+
+    // Body
+    const torso = new THREE.Mesh(new THREE.SphereGeometry(0.76, 32, 24), furMat);
+    torso.scale.set(1, 1.08, 0.9);
+    torso.position.y = 0.86;
+    torso.castShadow = true;
+    bear.add(torso);
+
+    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.54, 24, 20), creamMat);
+    belly.scale.set(0.95, 1.0, 0.55);
+    belly.position.set(0, 0.82, 0.45);
+    bear.add(belly);
+
+    // Feet
+    [-0.36, 0.36].forEach(x => {
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.27, 20, 16), furMat);
+      foot.scale.set(1, 0.72, 1.35);
+      foot.position.set(x, 0.2, 0.22);
+      foot.castShadow = true;
+      bear.add(foot);
+      const pad = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 14), creamMat);
+      pad.scale.set(1, 0.85, 0.4);
+      pad.position.set(x, 0.18, 0.52);
+      bear.add(pad);
+    });
+
+    // Arms (articulated pivots)
+    const leftArm = new THREE.Group();
+    leftArm.position.set(-0.68, 1.12, 0.05);
+    const lArmMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 16), furMat);
+    lArmMesh.scale.set(0.85, 1.55, 0.85);
+    lArmMesh.position.set(-0.08, -0.25, 0.08);
+    lArmMesh.rotation.z = 0.4;
+    lArmMesh.castShadow = true;
+    leftArm.add(lArmMesh);
+    bear.add(leftArm);
+
+    const rightArm = new THREE.Group();
+    rightArm.position.set(0.68, 1.12, 0.05);
+    const rArmMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 16), furMat);
+    rArmMesh.scale.set(0.85, 1.55, 0.85);
+    rArmMesh.position.set(0.08, -0.25, 0.08);
+    rArmMesh.rotation.z = -0.4;
+    rArmMesh.castShadow = true;
+    rightArm.add(rArmMesh);
+    bear.add(rightArm);
+
+    // Bow tie
+    const bowCenter = new THREE.Mesh(new THREE.SphereGeometry(0.09, 14, 14), redMat);
+    bowCenter.position.set(0, 1.46, 0.62);
+    bear.add(bowCenter);
+    [-0.14, 0.14].forEach(x => {
+      const wing = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.22, 16), redMat);
+      wing.rotation.z = x < 0 ? -Math.PI / 2 : Math.PI / 2;
+      wing.position.set(x, 1.46, 0.61);
+      bear.add(wing);
+    });
+
+    // Head Group
+    const head = new THREE.Group();
+    head.position.set(0, 1.98, 0.04);
+    bear.add(head);
+
+    const skull = new THREE.Mesh(new THREE.SphereGeometry(0.64, 32, 24), furMat);
+    skull.scale.set(1.06, 0.98, 0.98);
+    skull.castShadow = true;
+    head.add(skull);
+
+    // Ears
+    [-0.48, 0.48].forEach(x => {
+      const ear = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 16), furMat);
+      ear.position.set(x, 0.5, -0.04);
+      ear.castShadow = true;
+      head.add(ear);
+      const inner = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 14), creamMat);
+      inner.position.set(x, 0.49, 0.08);
+      head.add(inner);
+    });
+
+    // Snout & Nose
+    const snout = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 18), creamMat);
+    snout.scale.set(1.15, 0.85, 0.85);
+    snout.position.set(0, -0.1, 0.52);
+    head.add(snout);
+
+    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.095, 18, 14), darkMat);
+    nose.scale.set(1.2, 0.8, 0.8);
+    nose.position.set(0, -0.02, 0.72);
+    head.add(nose);
+
+    // Eyes + Pixar highlights + Glasses + Rosy cheeks
+    [-0.22, 0.22].forEach(x => {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.085, 18, 16), darkMat);
+      eye.position.set(x, 0.14, 0.56);
+      head.add(eye);
+      const shine = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 12), whiteMat);
+      shine.position.set(x + 0.03, 0.17, 0.63);
+      head.add(shine);
+
+      const glass = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.022, 14, 28), goldMat);
+      glass.position.set(x, 0.14, 0.62);
+      head.add(glass);
+
+      const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.09, 14, 12), blushMat);
+      cheek.scale.set(1.2, 0.65, 0.4);
+      cheek.position.set(x * 1.65, -0.06, 0.52);
+      head.add(cheek);
+    });
+    const bridge = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.14, 10), goldMat);
+    bridge.rotation.z = Math.PI / 2;
+    bridge.position.set(0, 0.14, 0.63);
+    head.add(bridge);
+
+    // Party Hat
+    const hatGroup = new THREE.Group();
+    hatGroup.position.set(0.06, 0.58, 0.02);
+    hatGroup.rotation.z = -0.12;
+    const hatCone = new THREE.Mesh(
+      new THREE.ConeGeometry(0.32, 0.66, 24),
+      new THREE.MeshStandardMaterial({ color: 0x4dabf7, roughness: 0.35 })
+    );
+    hatCone.position.y = 0.28;
+    hatCone.castShadow = true;
+    hatGroup.add(hatCone);
+    const pom = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1, 16, 14),
+      new THREE.MeshStandardMaterial({ color: 0xffd43b, roughness: 0.4 })
+    );
+    pom.position.y = 0.64;
+    hatGroup.add(pom);
+    head.add(hatGroup);
+
+    // --- 3D Two-Tier Strawberry Birthday Cake ---
+    const cake = new THREE.Group();
+    cake.position.set(2.05, 0, 0.25);
+    world.add(cake);
+
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.85, 0.09, 32), whiteMat);
+    plate.position.y = 0.05;
+    plate.receiveShadow = true;
+    cake.add(plate);
+
+    const tier1 = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.76, 0.78, 0.54, 32),
+      new THREE.MeshStandardMaterial({ color: 0xffb3c6, roughness: 0.45 })
+    );
+    tier1.position.y = 0.35;
+    tier1.castShadow = true;
+    cake.add(tier1);
+
+    const tier2 = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.52, 0.54, 0.44, 32),
+      new THREE.MeshStandardMaterial({ color: 0xfff3d1, roughness: 0.42 })
+    );
+    tier2.position.y = 0.84;
+    tier2.castShadow = true;
+    cake.add(tier2);
+
+    // Cream pearls & strawberries
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      const pearl = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), whiteMat);
+      pearl.position.set(Math.cos(a) * 0.74, 0.63, Math.sin(a) * 0.74);
+      cake.add(pearl);
+    }
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const berry = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.16, 14), redMat);
+      berry.rotation.x = Math.PI;
+      berry.position.set(Math.cos(a) * 0.36, 1.13, Math.sin(a) * 0.36);
+      cake.add(berry);
+    }
+
+    // 3 Candles with flickering flames
+    const flames = [];
+    const candleColors = [0x4ecdc4, 0xffd166, 0x9775fa];
+    [[-0.16, 0], [0, -0.14], [0.16, 0.04]].forEach((pos, idx) => {
+      const c = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.04, 0.04, 0.34, 14),
+        new THREE.MeshStandardMaterial({ color: candleColors[idx], roughness: 0.35 })
+      );
+      c.position.set(pos[0], 1.22, pos[1]);
+      cake.add(c);
+      const flame = new THREE.Mesh(
+        new THREE.SphereGeometry(0.055, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xffbe0b })
+      );
+      flame.scale.set(0.8, 1.45, 0.8);
+      flame.position.set(pos[0], 1.45, pos[1]);
+      cake.add(flame);
+      flames.push(flame);
+    });
+
+    // --- 3D Ribbon Gift Box ---
+    const gift = new THREE.Group();
+    gift.position.set(-2.2, 0, 0.45);
+    gift.rotation.y = 0.35;
+    world.add(gift);
+
+    const gBox = new THREE.Mesh(
+      new THREE.BoxGeometry(0.88, 0.78, 0.88),
+      new THREE.MeshStandardMaterial({ color: 0xffd43b, roughness: 0.35 })
+    );
+    gBox.position.y = 0.4;
+    gBox.castShadow = true;
+    gift.add(gBox);
+
+    const r1 = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.82, 0.16), redMat);
+    r1.position.y = 0.4;
+    gift.add(r1);
+    const r2 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.82, 0.92), redMat);
+    r2.position.y = 0.4;
+    gift.add(r2);
+    [-0.14, 0.14].forEach(x => {
+      const loop = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.045, 12, 20), redMat);
+      loop.position.set(x, 0.88, 0);
+      loop.rotation.y = x < 0 ? 0.4 : -0.4;
+      gift.add(loop);
+    });
+
+    // --- 3D Floating Balloons ---
+    const balloons = [];
+    const bSpecs = [
+      { x: -2.75, y: 2.35, z: -0.5, col: 0xff6b8b },
+      { x: -1.95, y: 2.7, z: -0.9, col: 0x4ecdc4 },
+      { x: 2.65, y: 2.55, z: -0.6, col: 0xffd166 },
+      { x: 1.85, y: 2.85, z: -1.1, col: 0x9775fa }
+    ];
+    bSpecs.forEach((b, idx) => {
+      const grp = new THREE.Group();
+      grp.position.set(b.x, b.y, b.z);
+      const orb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.36, 22, 18),
+        new THREE.MeshStandardMaterial({ color: b.col, roughness: 0.22, metalness: 0.08 })
+      );
+      orb.scale.set(0.92, 1.15, 0.92);
+      orb.castShadow = true;
+      grp.add(orb);
+      const str = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.008, 0.008, 1.25, 6),
+        new THREE.MeshBasicMaterial({ color: 0x94a3b8 })
+      );
+      str.position.y = -0.98;
+      grp.add(str);
+      world.add(grp);
+      balloons.push({ grp, baseY: b.y, phase: idx * 1.4 });
+    });
+
+    // Celebration 3D Confetti Spawner
+    const confettiColors = [0xff4d6d, 0xffd166, 0x4ecdc4, 0x9775fa, 0x4dabf7, 0x69db7c];
+    window.triggerBearCelebrate = function() {
+      threeState.celebrateTimer = 1.6;
+      threeState.waveTimer = 1.8;
+      for (let i = 0; i < 36; i++) {
+        const geo = i % 2 === 0
+          ? new THREE.OctahedronGeometry(0.11)
+          : new THREE.BoxGeometry(0.14, 0.14, 0.03);
+        const mat = new THREE.MeshStandardMaterial({
+          color: confettiColors[i % confettiColors.length],
+          roughness: 0.3
+        });
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set((Math.random() - 0.5) * 2.2, 2.0 + Math.random() * 0.8, (Math.random() - 0.5) * 1.5);
+        world.add(m);
+        threeState.particles.push({
+          mesh: m,
+          vx: (Math.random() - 0.5) * 0.09,
+          vy: 0.08 + Math.random() * 0.09,
+          vz: (Math.random() - 0.5) * 0.08,
+          vr: (Math.random() - 0.5) * 0.25,
+          life: 1.8 + Math.random() * 0.8
+        });
+      }
+    };
+
+    window.triggerBearEncourage = function() {
+      threeState.shakeTimer = 0.85;
+    };
+
+    // Drag to rotate + Click bear interaction
+    let dragging = false, startX = 0, targetRotY = 0, moved = 0;
+    wrap.addEventListener('pointerdown', e => {
+      dragging = true;
+      startX = e.clientX;
+      moved = 0;
+    });
+    window.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      startX = e.clientX;
+      moved += Math.abs(dx);
+      targetRotY = Math.max(-0.9, Math.min(0.9, targetRotY + dx * 0.008));
+    });
+    window.addEventListener('pointerup', () => {
+      if (dragging && moved < 8) {
+        threeState.waveTimer = 1.5;
+        threeState.celebrateTimer = 0.6;
+        const cheersHK = [
+          '1B 班小朋友加油呀！你寫的生日卡一定最靚！',
+          '記得寫生日卡五寶：收卡人、祝福語、關係、送卡人同日期呀！',
+          '寫俾長輩記得用「您」同加「敬上」，你好叻仔叻女呀！'
+        ];
+        const cheersCN = [
+          '1B 班小朋友加油呀！你写的生日卡一定最棒！',
+          '记得写生日卡五宝：收卡人、祝福语、关系、送卡人和日期哦！',
+          '写给长辈记得用“您”和加“敬上”，你真棒！'
+        ];
+        const pool = currentLang === 'zh-HK' ? cheersHK : cheersCN;
+        setBearMessage(pool[Math.floor(Math.random() * pool.length)], true);
+      }
+      dragging = false;
+    });
+
+    window.addEventListener('resize', () => {
+      if (!wrap.clientWidth) return;
+      camera.aspect = wrap.clientWidth / wrap.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    });
+
+    // Animation Loop
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const t = clock.elapsedTime;
+
+      world.rotation.y += (targetRotY - world.rotation.y) * 0.1;
+
+      // Bear idle breathing + celebration jump
+      let jumpY = 0;
+      if (threeState.celebrateTimer > 0) {
+        threeState.celebrateTimer -= dt;
+        jumpY = Math.abs(Math.sin(t * 11)) * 0.45;
+      }
+      bear.position.y = jumpY + Math.sin(t * 2.4) * 0.03;
+
+      // Head shake or gentle nod
+      if (threeState.shakeTimer > 0) {
+        threeState.shakeTimer -= dt;
+        head.rotation.y = Math.sin(t * 22) * 0.25;
+      } else {
+        head.rotation.y = Math.sin(t * 1.2) * 0.1;
+        head.rotation.z = Math.sin(t * 1.6) * 0.04;
+      }
+
+      // Waving right arm
+      if (threeState.waveTimer > 0) {
+        threeState.waveTimer -= dt;
+        rightArm.rotation.z = 2.15 + Math.sin(t * 14) * 0.35;
+      } else {
+        rightArm.rotation.z += (0 - rightArm.rotation.z) * 0.12;
+      }
+
+      // Balloons bobbing
+      balloons.forEach(b => {
+        b.grp.position.y = b.baseY + Math.sin(t * 2.1 + b.phase) * 0.14;
+        b.grp.rotation.z = Math.sin(t * 1.4 + b.phase) * 0.06;
+      });
+
+      // Candle flicker
+      flames.forEach((f, i) => {
+        const s = 0.9 + Math.sin(t * 16 + i * 2) * 0.16;
+        f.scale.set(0.8 * s, 1.45 * s, 0.8 * s);
+      });
+
+      // Confetti update
+      for (let i = threeState.particles.length - 1; i >= 0; i--) {
+        const p = threeState.particles[i];
+        p.life -= dt;
+        p.mesh.position.x += p.vx;
+        p.mesh.position.y += p.vy;
+        p.mesh.position.z += p.vz;
+        p.vy -= 0.0038;
+        p.mesh.rotation.x += p.vr;
+        p.mesh.rotation.y += p.vr;
+        if (p.life <= 0) {
+          world.remove(p.mesh);
+          threeState.particles.splice(i, 1);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+  } catch (e) {
+    wrap.innerHTML = '<div style="height:100%;display:grid;place-items:center;font-size:20px;font-weight:800;color:#e0486c;">🐻 熊熊老師的 3D 生日派對教室 🎂🎈</div>';
+  }
+}
+
+/* =========================================================================
+   3. COMPLETE 120-QUESTION BANKS (30 PER LEVEL 1–4; LEVEL 5 USES L4 BANK)
+   ========================================================================= */
+
+// --- LEVEL 1: FORMAT DETECTIVE (30 Questions: 6 each for A, B, C, D, E + distractor F) ---
+const L1_OPTIONS = [
+  { key: 'A', label: 'A. 收卡人的名字或稱呼' },
+  { key: 'B', label: 'B. 送卡人的名字' },
+  { key: 'C', label: 'C. 送卡人跟收卡人的關係／自稱' },
+  { key: 'D', label: 'D. 祝福的話' },
+  { key: 'E', label: 'E. 日期' },
+  { key: 'F', label: 'F. 感謝的話（干擾項）' }
+];
+
+const L1_BANK = [
+  // A x 6
+  { id:1, target:'A', to:'親愛的爸爸：', body:'明天是您的生日，祝您生日快樂！希望您每天都開開心心。我愛您！', rel:'兒子', from:'文賢敬上', date:'三月六日', explain:'「親愛的爸爸：」寫在第一行頂格，是收卡人的稱呼（A），後面要加上冒號。' },
+  { id:2, target:'A', to:'親愛的天明：', body:'祝你生日快樂！希望我們常常一起玩遊戲。', rel:'同學', from:'可欣', date:'十一月二十日', explain:'「親愛的天明：」寫在最上方左邊，是收卡人的名字（A）。' },
+  { id:3, target:'A', to:'親愛的王老師：', body:'祝您生日快樂！身體健康！', rel:'學生', from:'允行敬上', date:'十一月二日', explain:'「親愛的王老師：」是指收到這張生日卡的人，屬於收卡人的稱呼（A）。' },
+  { id:4, target:'A', to:'親愛的媽媽：', body:'祝您生日快樂！每天青春美麗，笑口常開！', rel:'女兒', from:'煒晴敬上', date:'五月十二日', explain:'「親愛的媽媽：」在第一行左邊頂格，代表收卡人的稱呼（A）。' },
+  { id:5, target:'A', to:'親愛的爺爺：', body:'祝您生日快樂，福如東海，壽比南山！', rel:'孫兒', from:'曉昇敬上', date:'九月八日', explain:'「親愛的爺爺：」寫在開頭，指出生日卡是送給爺爺的，是收卡人的稱呼（A）。' },
+  { id:6, target:'A', to:'親愛的小美：', body:'祝你生日快樂！希望你天天開心，學業進步！', rel:'好朋友', from:'詩雅', date:'四月十五日', explain:'「親愛的小美：」是收卡人的名字（A），寫在生日卡第一行。' },
+  // B x 6
+  { id:7, target:'B', to:'親愛的爸爸：', body:'明天是您的生日，祝您生日快樂！我愛您！', rel:'兒子', from:'文賢敬上', date:'三月六日', explain:'「文賢敬上」寫在關係的右下方，是送卡人的名字（B）；寫給長輩要加「敬上」。' },
+  { id:8, target:'B', to:'親愛的天明：', body:'祝你生日快樂！', rel:'同學', from:'可欣', date:'十一月二十日', explain:'「可欣」在「同學」的右下方，是送卡人的名字（B），平輩不用寫敬上。' },
+  { id:9, target:'B', to:'親愛的陳老師：', body:'祝您生日快樂，工作順利！', rel:'學生', from:'子軒敬上', date:'十月四日', explain:'「子軒敬上」說明是誰送出這張卡，屬於送卡人的名字（B）。' },
+  { id:10, target:'B', to:'親愛的嫲嫲：', body:'祝您生日快樂，身體健康，龍馬精神！', rel:'孫女', from:'心柔敬上', date:'十二月一日', explain:'「心柔敬上」位於「孫女」的右下方，是送卡人的名字（B）。' },
+  { id:11, target:'B', to:'親愛的志豪：', body:'祝你生日快樂！希望你跑步越來越快！', rel:'同學', from:'家朗', date:'二月十八日', explain:'「家朗」是寄出這張生日卡的同學，屬於送卡人的名字（B）。' },
+  { id:12, target:'B', to:'親愛的姑姐：', body:'祝您生日快樂，天天開心！', rel:'姪女', from:'樂怡敬上', date:'七月九日', explain:'「樂怡敬上」是送卡人的名字（B），寫給長輩要加上「敬上」。' },
+  // C x 6
+  { id:13, target:'C', to:'親愛的爸爸：', body:'祝您生日快樂！希望您每天都開開心心。', rel:'兒子', from:'文賢敬上', date:'三月六日', explain:'「兒子」表示文賢跟爸爸的關係，屬於送卡人跟收卡人的關係／自稱（C）。' },
+  { id:14, target:'C', to:'親愛的天明：', body:'祝你生日快樂！', rel:'同學', from:'可欣', date:'十一月二十日', explain:'「同學」表示可欣的自稱及與天明的關係（C），寫在送卡人名字的左上方。' },
+  { id:15, target:'C', to:'親愛的王老師：', body:'祝您生日快樂！', rel:'學生', from:'允行敬上', date:'十一月二日', explain:'「學生」表示允行與王老師的關係（C），排在「允行敬上」的上一行偏左位置。' },
+  { id:16, target:'C', to:'親愛的公公：', body:'祝您生日快樂，身體健康！', rel:'外孫', from:'浩然敬上', date:'八月二十三日', explain:'「外孫」說明浩然與公公的親屬關係（C）。' },
+  { id:17, target:'C', to:'親愛的姐姐：', body:'祝你生日快樂，學業進步！', rel:'妹妹', from:'凱晴', date:'六月十日', explain:'「妹妹」是送卡人的自稱，表示與姐姐的關係（C）。' },
+  { id:18, target:'C', to:'親愛的李校長：', body:'祝您生日快樂，事事順心！', rel:'學生', from:'思齊敬上', date:'一月十五日', explain:'「學生」代表思齊與李校長的關係（C）。' },
+  // D x 6
+  { id:19, target:'D', to:'親愛的爸爸：', body:'明天是您的生日，祝您生日快樂！希望您每天都開開心心。我愛您！', rel:'兒子', from:'文賢敬上', date:'三月六日', explain:'開頭空兩格寫出來的祝賀句子，就是祝福的話（D）。' },
+  { id:20, target:'D', to:'親愛的天明：', body:'祝你生日快樂！', rel:'同學', from:'可欣', date:'十一月二十日', explain:'「祝你生日快樂！」是送給同學的祝福的話（D），不是感謝的話喔！' },
+  { id:21, target:'D', to:'親愛的婆婆：', body:'祝您生日快樂，身體健康，長命百歲！', rel:'外孫女', from:'嘉恩敬上', date:'九月十九日', explain:'正文空兩格後寫出祝賀婆婆的句子，這部分是祝福的話（D）。' },
+  { id:22, target:'D', to:'親愛的哥哥：', body:'祝你生日快樂，天天開心，考試滿分！', rel:'弟弟', from:'柏希', date:'四月二日', explain:'「祝你生日快樂，天天開心，考試滿分！」屬於正文中的祝福的話（D）。' },
+  { id:23, target:'D', to:'親愛的張老師：', body:'祝您生日快樂！希望您每天都笑口常開！', rel:'學生', from:'紫晴敬上', date:'十月二十八日', explain:'這一段空兩格的正文寫滿對張老師的祝願，是祝福的話（D）。' },
+  { id:24, target:'D', to:'親愛的姨媽：', body:'祝您生日快樂，生活愉快，心想事成！', rel:'外甥女', from:'映彤敬上', date:'五月七日', explain:'寫在稱呼下一行、開頭空兩格的祝賀內容就是祝福的話（D）。' },
+  // E x 6
+  { id:25, target:'E', to:'親愛的爸爸：', body:'明天是您的生日，祝您生日快樂！', rel:'兒子', from:'文賢敬上', date:'三月六日', explain:'「三月六日」寫在最下面右邊，用中文數字表示寫卡的日期（E）。' },
+  { id:26, target:'E', to:'親愛的天明：', body:'祝你生日快樂！', rel:'同學', from:'可欣', date:'十一月二十日', explain:'「十一月二十日」位於送卡人名字的下一行，是寫生日卡的日期（E）。' },
+  { id:27, target:'E', to:'親愛的林老師：', body:'祝您生日快樂，身體健康！', rel:'學生', from:'晉軒敬上', date:'三月十二日', explain:'「三月十二日」寫在最後一行，代表日期（E）。' },
+  { id:28, target:'E', to:'親愛的叔叔：', body:'祝您生日快樂，工作順利！', rel:'姪兒', from:'瑋健敬上', date:'七月二十五日', explain:'「七月二十五日」寫在卡片最底端，是日期（E）。' },
+  { id:29, target:'E', to:'親愛的表哥：', body:'祝你生日快樂，每天都快快樂樂！', rel:'表妹', from:'巧兒', date:'十二月八日', explain:'「十二月八日」寫在送卡人名字下面，表示日期（E）。' },
+  { id:30, target:'E', to:'親愛的媽媽：', body:'祝您生日快樂，永遠健康快樂！', rel:'兒子', from:'朗軒敬上', date:'二月十四日', explain:'「二月十四日」是寫卡當天的中文日期（E）。' }
+];
+
+// --- LEVEL 2: ERROR SPOTTER (30 Questions covering all P1 pitfalls) ---
+const L2_BANK = [
+  // 1-6: Missing 2-space indent
+  { id:1, prompt:'小文寫給爸爸的生日卡，哪裏出錯了？', card:{to:'親愛的爸爸：', body:'祝您生日快樂，身體健康！', rel:'兒子', from:'小文敬上', date:'三月六日', badIndent:true}, options:['正文開頭漏了空兩格','不應該寫「敬上」','稱呼漏了冒號','日期寫錯格式'], ans:0, fixText:'□□祝您生日快樂，身體健康！', explain:'生日卡正文第一行開頭必須空兩格（□□）才開始寫祝福的話！' },
+  { id:2, prompt:'樂兒寫給黃老師的生日卡，請幫她捉錯處！', card:{to:'親愛的黃老師：', body:'祝您生日快樂，工作順利！', rel:'學生', from:'樂兒敬上', date:'九月十日', badIndent:true}, options:['寫給老師不應用「您」','正文開頭沒有空兩格','日期應該寫在最上面','學生應該改寫同學'], ans:1, fixText:'□□祝您生日快樂，工作順利！', explain:'正文開頭頂格寫是小一最常扣分的地方，記得空兩格（□□）！' },
+  { id:3, prompt:'浩天寫給同學子朗的生日卡，哪個地方不對？', card:{to:'親愛的子朗：', body:'祝你生日快樂，天天開心！', rel:'同學', from:'浩天', date:'五月三日', badIndent:true}, options:['同學之間應該用「您」','正文開頭漏空兩格','浩天後面漏寫敬上','漏了收卡人名字'], ans:1, fixText:'□□祝你生日快樂，天天開心！', explain:'無論寫給長輩還是同學，正文開頭都要空兩格（□□）。' },
+  { id:4, prompt:'心怡寫給嫲嫲的生日卡，看看有什麼毛病？', card:{to:'親愛的嫲嫲：', body:'祝您生日快樂，長命百歲！', rel:'孫女', from:'心怡敬上', date:'十月八日', badIndent:true}, options:['正文開頭忘記空兩格','稱呼應該寫在右邊','不應稱呼孫女','日期不應寫中文數字'], ans:0, fixText:'□□祝您生日快樂，長命百歲！', explain:'「祝您生日快樂」前面要留出兩個方格的空白（□□）。' },
+  { id:5, prompt:'柏宇寫給媽媽的生日卡，哪裏要修改？', card:{to:'親愛的媽媽：', body:'明天是您的生日，祝您天天美麗！', rel:'兒子', from:'柏宇敬上', date:'四月一日', badIndent:true}, options:['媽媽後面不應加冒號','應把「您」改成「你」','正文第一行漏空兩格','不應該寫「敬上」'], ans:2, fixText:'□□明天是您的生日，祝您天天美麗！', explain:'正文的開頭必須空兩格（□□），這樣格式才滿分！' },
+  { id:6, prompt:'思雅寫給姐姐的生日卡，哪裏有錯誤？', card:{to:'親愛的姐姐：', body:'祝你生日快樂，學業進步！', rel:'妹妹', from:'思雅', date:'八月十二日', badIndent:true}, options:['沒有寫出日期','正文開頭漏了空兩格','上款缺少了冒號','沒有寫送卡人關係'], ans:1, fixText:'□□祝你生日快樂，學業進步！', explain:'正文開頭記得空兩格（□□）再寫「祝你生日快樂」。' },
+
+  // 7-12: 您 vs 你 misuse
+  { id:7, prompt:'允行寫給王老師的生日卡，哪個字用得不夠禮貌？', card:{to:'親愛的王老師：', body:'祝你生日快樂，身體健康！', rel:'學生', from:'允行敬上', date:'十一月二日'}, options:['把「你」改成「您」才夠有禮貌','正文沒有空兩格','不應該寫「敬上」','王老師後面不應有冒號'], ans:0, fixText:'□□祝您生日快樂，身體健康！', explain:'王老師是長輩和師長，稱呼長輩要使用尊稱「您」（心字底）！' },
+  { id:8, prompt:'嘉欣寫給爺爺的生日卡，請找出用詞錯誤！', card:{to:'親愛的爺爺：', body:'祝你生日快樂，笑口常開！', rel:'孫女', from:'嘉欣敬上', date:'一月二十日'}, options:['孫女應該改寫同學','寫給爺爺應該用「您」而不是「你」','不應該寫日期','爺爺後面漏了句號'], ans:1, fixText:'□□祝您生日快樂，笑口常開！', explain:'爺爺是長輩，祝福語要用敬稱「您」才顯得尊敬。' },
+  { id:9, prompt:'俊熙寫給姑丈的生日卡，哪裏需要改正？', card:{to:'親愛的姑丈：', body:'希望你每天都開開心心，生日快樂！', rel:'姪兒', from:'俊熙敬上', date:'六月十五日'}, options:['正文開頭沒有空兩格','寫給長輩姑丈應把「你」改為「您」','漏寫了送卡人名字','不應寫「敬上」'], ans:1, fixText:'□□希望您每天都開開心心，生日快樂！', explain:'姑丈是長輩，要用「您」代表尊敬。' },
+  { id:10, prompt:'可欣寫給同學天明的生日卡，哪裏怪怪的？', card:{to:'親愛的天明：', body:'祝您生日快樂，天天開心！', rel:'同學', from:'可欣', date:'十一月二十日'}, options:['同學是平輩，用「你」比「您」更自然','漏了空兩格','可欣後面應該加「敬上」','漏了寫日期'], ans:0, fixText:'□□祝你生日快樂，天天開心！', explain:'天明是同齡同學（平輩），平常使用「你」就可以了，不用「您」。' },
+  { id:11, prompt:'澤銘寫給陳校長的生日卡，哪裏出錯了？', card:{to:'親愛的陳校長：', body:'祝你生日快樂，工作順利！', rel:'學生', from:'澤銘敬上', date:'十月三日'}, options:['應該刪去「學生」','陳校長是長輩，應把「你」改成「您」','日期不應該在最下方','陳校長後面不該有冒號'], ans:1, fixText:'□□祝您生日快樂，工作順利！', explain:'寫給校長、老師和長輩時，都要用「您」表達敬意！' },
+  { id:12, prompt:'詠詩寫給婆婆的生日卡，哪個字要改？', card:{to:'親愛的婆婆：', body:'祝你生日快樂，身體永遠健康！', rel:'外孫女', from:'詠詩敬上', date:'七月四日'}, options:['把「你」改為「您」','把「敬上」刪去','把冒號改成問號','把日期搬到第一行'], ans:0, fixText:'□□祝您生日快樂，身體永遠健康！', explain:'婆婆是長輩，記得把「你」改成有心字底的「您」。' },
+
+  // 13-18: 敬上 misuse
+  { id:13, prompt:'明傑寫給李老師的生日卡，下款缺少了什麼？', card:{to:'親愛的李老師：', body:'祝您生日快樂，桃李滿門！', rel:'學生', from:'明傑', date:'九月五日'}, options:['送卡人名字後漏了「敬上」','正文開頭漏了空兩格','稱呼不應寫「親愛的」','應該把「您」改成「你」'], ans:0, fixText:'明傑敬上', explain:'寫生日卡給老師或長輩時，送卡人名字後面要加上「敬上」表示恭敬！' },
+  { id:14, prompt:'梓晴寫給媽媽的生日卡，看看下款少了什麼？', card:{to:'親愛的媽媽：', body:'祝您生日快樂，我愛您！', rel:'女兒', from:'梓晴', date:'五月九日'}, options:['日期寫在太下面','寫給長輩媽媽，下款應寫「梓晴敬上」','不應寫「女兒」','冒號寫錯了'], ans:1, fixText:'梓晴敬上', explain:'媽媽是長輩，送卡人名字後面加上「敬上」更有禮貌。' },
+  { id:15, prompt:'朗賢寫給公公的生日卡，請幫忙找出錯誤！', card:{to:'親愛的公公：', body:'祝您生日快樂，身體健康！', rel:'外孫', from:'朗賢', date:'十二月十二日'}, options:['「外孫」寫錯位置','下款漏寫「敬上」','「祝您」應改成「祝你」','沒有祝福語'], ans:1, fixText:'朗賢敬上', explain:'寫給公公這類長輩，下款要寫「朗賢敬上」。' },
+  { id:16, prompt:'小晴寫給同班同學美美的生日卡，下款哪裏多餘了？', card:{to:'親愛的美美：', body:'祝你生日快樂，天天開心！', rel:'同學', from:'小晴敬上', date:'三月二十日'}, options:['平輩同學之間一般不用寫「敬上」','美美後面不應有冒號','應該把「你」改成「您」','漏寫了日期'], ans:0, fixText:'小晴（平輩不用加敬上）', explain:'「敬上」是用給長輩或老師的；寫給同學或朋友只寫名字「小晴」就可以了！' },
+  { id:17, prompt:'駿軒寫給弟弟的生日卡，哪裏不太合適？', card:{to:'親愛的弟弟：', body:'祝你生日快樂，快高長大！', rel:'哥哥', from:'駿軒敬上', date:'八月六日'}, options:['哥哥寫給弟弟（晚輩）不應用「敬上」','弟弟後面漏了冒號','正文漏了空兩格','漏寫送卡人關係'], ans:0, fixText:'駿軒（寫給弟弟不用敬上）', explain:'哥哥是比弟弟年長的平輩，寫給弟弟不需要用「敬上」。' },
+  { id:18, prompt:'凱琳寫給舅父的生日卡，下款欠缺了什麼？', card:{to:'親愛的舅父：', body:'祝您生日快樂，萬事如意！', rel:'外甥女', from:'凱琳', date:'二月九日'}, options:['凱琳後面漏了「敬上」','正文漏空兩格','應該把「您」改為「你」','日期錯了'], ans:0, fixText:'凱琳敬上', explain:'舅父是長輩，下款應該寫「凱琳敬上」。' },
+
+  // 19-22: Punctuation mistakes
+  { id:19, prompt:'柏軒寫給爸爸的生日卡，標點符號哪裏出錯了？', card:{to:'親愛的爸爸', body:'祝您生日快樂，天天開心！', rel:'兒子', from:'柏軒敬上', date:'四月十日'}, options:['稱呼「親愛的爸爸」後面漏了冒號（：）','漏寫了「敬上」','正文沒有空兩格','日期寫錯了'], ans:0, fixText:'親愛的爸爸：', explain:'收卡人的稱呼後面一定要加上冒號（：），表示接下來要對他說話。' },
+  { id:20, prompt:'芷瑩寫給何老師的生日卡，找找標點錯處！', card:{to:'親愛的何老師。', body:'祝您生日快樂，身體健康！', rel:'學生', from:'芷瑩敬上', date:'十一月八日'}, options:['何老師後面應該用冒號（：），不是句號（。）','應該刪掉「學生」','應該把「您」改為「你」','漏寫了日期'], ans:0, fixText:'親愛的何老師：', explain:'上款稱呼後面要用冒號（：），不能用句號（。）。' },
+  { id:21, prompt:'子謙寫給好朋友嘉豪的生日卡，上款缺少了什麼？', card:{to:'親愛的嘉豪', body:'祝你生日快樂，學業進步！', rel:'好朋友', from:'子謙', date:'六月二日'}, options:['「親愛的嘉豪」後面漏了冒號（：）','沒有寫送卡人名字','沒有寫日期','應該把「你」改為「您」'], ans:0, fixText:'親愛的嘉豪：', explain:'不管寫給誰，收卡人名字後面都一定要有冒號（：）！' },
+  { id:22, prompt:'芯蕾寫給姨媽的生日卡，請檢查標點符號！', card:{to:'親愛的姨媽？', body:'祝您生日快樂，青春常駐！', rel:'外甥女', from:'芯蕾敬上', date:'七月十八日'}, options:['姨媽後面誤用了問號，應改為冒號（：）','正文漏空兩格','漏寫「敬上」','日期不正確'], ans:0, fixText:'親愛的姨媽：', explain:'稱呼後面不是發問，要把問號（？）改成冒號（：）喔！' },
+
+  // 23-26: Layout / Staircase errors
+  { id:23, prompt:'天樂寫給張老師的生日卡，看看排版位置哪裏不對？', card:{to:'親愛的張老師：', body:'祝您生日快樂，每天開心！', rel:'學生', from:'天樂敬上', date:'十月十日', badLayout:'leftSign'}, options:['下款（關係、名字和日期）排到左邊了，應靠右呈梯級排列','正文漏了空兩格','沒有寫「敬上」','張老師後面漏了冒號'], ans:0, fixText:'下款要靠右方，並按「學生 ↘ 天樂敬上 ↘ 十月十日」梯級排列！', explain:'生日卡下款不可以貼在左邊，要放在右下方並像樓梯一樣斜排。' },
+  { id:24, prompt:'希彤寫給媽媽的生日卡，看看下款順序有沒有排錯？', card:{to:'親愛的媽媽：', body:'祝您生日快樂，身體健康！', rel:'五月二日', from:'希彤敬上', date:'女兒', badLayout:'swapDate'}, options:['日期和關係調轉了！日期應該寫在最下面一行','漏寫了「敬上」','應該用「你」不用「您」','媽媽後面漏了冒號'], ans:0, fixText:'順序應是：女兒 → 希彤敬上 → 五月二日', explain:'下款正確順序由上而下是：1.關係（女兒）→ 2.名字（希彤敬上）→ 3.日期（五月二日）。' },
+  { id:25, prompt:'卓軒寫給同學小明的生日卡，下款排法有什麼問題？', card:{to:'親愛的小明：', body:'祝你生日快樂，天天開心！', rel:'卓軒', from:'同學', date:'三月九日', badLayout:'swapRel'}, options:['「同學」和「卓軒」位置倒轉了，應先寫關係再寫名字','應該加上「敬上」','正文漏空兩格','小明後面漏冒號'], ans:0, fixText:'順序應是：同學 → 卓軒 → 三月九日', explain:'送卡人的關係／自稱（同學）要寫在送卡人名字（卓軒）的左上方。' },
+  { id:26, prompt:'佩珊寫給爺爺的生日卡，哪裏排版不正確？', card:{to:'親愛的爺爺：', body:'祝您生日快樂，福壽安康！', rel:'孫女', from:'佩珊敬上', date:'一月五日', badLayout:'leftSign'}, options:['下款和日期沒有靠右排列','爺爺後面漏了冒號','把「您」寫錯了','漏寫「敬上」'], ans:0, fixText:'「孫女」、「佩珊敬上」、「一月五日」都應該靠右下方排列！', explain:'生日卡的下款與日期都要靠右邊，不可以跟左邊對齊。' },
+
+  // 27-30: Date format & Role check
+  { id:27, prompt:'題目要你以「學生允行」寫給王老師，這張卡哪裏審題出錯？', card:{to:'親愛的王老師：', body:'祝您生日快樂！', rel:'兒子', from:'允行敬上', date:'十一月二日'}, options:['關係寫錯了！對王老師應寫「學生」，不是「兒子」','漏了空兩格','日期寫錯了','漏了冒號'], ans:0, fixText:'把「兒子」改成「學生」', explain:'寫作前一定要看清楚題目身份！寫給王老師的身份是「學生」。' },
+  { id:28, prompt:'這張中文生日卡的日期寫法，哪裏要改成標準中文格式？', card:{to:'親愛的爸爸：', body:'祝您生日快樂，工作順利！', rel:'女兒', from:'善雅敬上', date:'11月2日'}, options:['中文生日卡日期應用中文數字寫成「十一月二日」','漏寫了「敬上」','正文漏空兩格','稱呼漏了冒號'], ans:0, fixText:'十一月二日', explain:'中文寫作的生日卡，日期要寫成中文數字（十一月二日），不要寫阿拉伯數字！' },
+  { id:29, prompt:'題目叫「妹妹穎欣」寫給哥哥，看看這張卡哪裏弄錯了？', card:{to:'親愛的哥哥：', body:'祝你生日快樂，天天開心！', rel:'姐姐', from:'穎欣', date:'六月二十日'}, options:['自稱寫錯了！題目是「妹妹」，不應寫「姐姐」','漏寫了「敬上」','正文漏了空兩格','哥哥後面漏冒號'], ans:0, fixText:'把「姐姐」改成「妹妹」', explain:'動筆前要圈出題目中的送卡人身份，妹妹送給哥哥要自稱「妹妹」。' },
+  { id:30, prompt:'這張送給劉老師的中文生日卡，日期哪裏不符合規範？', card:{to:'親愛的劉老師：', body:'祝您生日快樂，身體健康！', rel:'學生', from:'啟明敬上', date:'2026/3/8'}, options:['日期用了斜線和阿拉伯數字，應寫成「三月八日」','劉老師後面漏冒號','應該刪掉「敬上」','把「您」改成「你」'], ans:0, fixText:'三月八日', explain:'香港小一中文生日卡日期規範是用中文數字寫「〇月〇日」，例如「三月八日」。' }
+];
+
+// --- LEVEL 3: BLOCK BUILDER (30 Questions: 15 Elder + 15 Peer) ---
+const L3_BANK = [
+  // 15 Elder
+  { id:1, title:'以「兒子文賢」身份寫給「爸爸」（長輩）', elder:true, parts:{ to:'親愛的爸爸：', body:'□□明天是您的生日，祝您生日快樂！我愛您！', rel:'兒子', from:'文賢敬上', date:'三月六日' } },
+  { id:2, title:'以「學生允行」身份寫給「王老師」（長輩）', elder:true, parts:{ to:'親愛的王老師：', body:'□□祝您生日快樂！身體健康！', rel:'學生', from:'允行敬上', date:'十一月二日' } },
+  { id:3, title:'以「女兒煒晴」身份寫給「媽媽」（長輩）', elder:true, parts:{ to:'親愛的媽媽：', body:'□□祝您生日快樂！希望您每天都開開心心！', rel:'女兒', from:'煒晴敬上', date:'五月十日' } },
+  { id:4, title:'以「孫兒曉昇」身份寫給「爺爺」（長輩）', elder:true, parts:{ to:'親愛的爺爺：', body:'□□祝您生日快樂，身體健康，笑口常開！', rel:'孫兒', from:'曉昇敬上', date:'九月八日' } },
+  { id:5, title:'以「孫女心柔」身份寫給「嫲嫲」（長輩）', elder:true, parts:{ to:'親愛的嫲嫲：', body:'□□祝您生日快樂，長命百歲，天天開心！', rel:'孫女', from:'心柔敬上', date:'十月十五日' } },
+  { id:6, title:'以「學生子軒」身份寫給「李老師」（長輩）', elder:true, parts:{ to:'親愛的李老師：', body:'□□祝您生日快樂，工作順利！', rel:'學生', from:'子軒敬上', date:'四月三日' } },
+  { id:7, title:'以「外孫浩然」身份寫給「公公」（長輩）', elder:true, parts:{ to:'親愛的公公：', body:'□□祝您生日快樂，龍馬精神！', rel:'外孫', from:'浩然敬上', date:'八月十二日' } },
+  { id:8, title:'以「外孫女嘉恩」身份寫給「婆婆」（長輩）', elder:true, parts:{ to:'親愛的婆婆：', body:'□□祝您生日快樂，永遠健康快樂！', rel:'外孫女', from:'嘉恩敬上', date:'十二月四日' } },
+  { id:9, title:'以「外甥俊傑」身份寫給「舅父」（長輩）', elder:true, parts:{ to:'親愛的舅父：', body:'□□祝您生日快樂，事事順心！', rel:'外甥', from:'俊傑敬上', date:'七月十九日' } },
+  { id:10, title:'以「姪女樂怡」身份寫給「姑姐」（長輩）', elder:true, parts:{ to:'親愛的姑姐：', body:'□□祝您生日快樂，青春美麗！', rel:'姪女', from:'樂怡敬上', date:'六月一日' } },
+  { id:11, title:'以「學生思齊」身份寫給「陳校長」（長輩）', elder:true, parts:{ to:'親愛的陳校長：', body:'□□祝您生日快樂，身體健康！', rel:'學生', from:'思齊敬上', date:'一月十八日' } },
+  { id:12, title:'以「姪兒瑋健」身份寫給「叔叔」（長輩）', elder:true, parts:{ to:'親愛的叔叔：', body:'□□祝您生日快樂，萬事如意！', rel:'姪兒', from:'瑋健敬上', date:'二月九日' } },
+  { id:13, title:'以「外甥女映彤」身份寫給「姨媽」（長輩）', elder:true, parts:{ to:'親愛的姨媽：', body:'□□祝您生日快樂，生活愉快！', rel:'外甥女', from:'映彤敬上', date:'五月二十二日' } },
+  { id:14, title:'以「學生紫晴」身份寫給「張老師」（長輩）', elder:true, parts:{ to:'親愛的張老師：', body:'□□祝您生日快樂，每天都笑口常開！', rel:'學生', from:'紫晴敬上', date:'九月二十八日' } },
+  { id:15, title:'以「外孫女凱琪」身份寫給「舅母」（長輩）', elder:true, parts:{ to:'親愛的舅母：', body:'□□祝您生日快樂，心想事成！', rel:'外甥女', from:'凱琪敬上', date:'十一月十六日' } },
+  // 15 Peer
+  { id:16, title:'以「同學可欣」身份寫給「天明」（平輩）', elder:false, parts:{ to:'親愛的天明：', body:'□□祝你生日快樂！', rel:'同學', from:'可欣', date:'十一月二十日' } },
+  { id:17, title:'以「同學小晴」身份寫給「美美」（平輩）', elder:false, parts:{ to:'親愛的美美：', body:'□□祝你生日快樂，天天開心！', rel:'同學', from:'小晴', date:'三月十四日' } },
+  { id:18, title:'以「好朋友詩雅」身份寫給「小美」（平輩）', elder:false, parts:{ to:'親愛的小美：', body:'□□祝你生日快樂，學業進步！', rel:'好朋友', from:'詩雅', date:'四月十五日' } },
+  { id:19, title:'以「弟弟柏希」身份寫給「哥哥」（平輩）', elder:false, parts:{ to:'親愛的哥哥：', body:'□□祝你生日快樂，考試滿分！', rel:'弟弟', from:'柏希', date:'六月八日' } },
+  { id:20, title:'以「妹妹凱晴」身份寫給「姐姐」（平輩）', elder:false, parts:{ to:'親愛的姐姐：', body:'□□祝你生日快樂，每天都快快樂樂！', rel:'妹妹', from:'凱晴', date:'七月七日' } },
+  { id:21, title:'以「同學家朗」身份寫給「志豪」（平輩）', elder:false, parts:{ to:'親愛的志豪：', body:'□□祝你生日快樂，跑步越來越快！', rel:'同學', from:'家朗', date:'二月十八日' } },
+  { id:22, title:'以「表妹巧兒」身份寫給「表哥」（平輩）', elder:false, parts:{ to:'親愛的表哥：', body:'□□祝你生日快樂，希望我們常常一起玩！', rel:'表妹', from:'巧兒', date:'十二月八日' } },
+  { id:23, title:'以「哥哥駿軒」身份寫給「弟弟」（平輩）', elder:false, parts:{ to:'親愛的弟弟：', body:'□□祝你生日快樂，快高長大！', rel:'哥哥', from:'駿軒', date:'八月六日' } },
+  { id:24, title:'以「好朋友子謙」身份寫給「嘉豪」（平輩）', elder:false, parts:{ to:'親愛的嘉豪：', body:'□□祝你生日快樂，開開心心！', rel:'好朋友', from:'子謙', date:'五月十九日' } },
+  { id:25, title:'以「同學欣彤」身份寫給「樂兒」（平輩）', elder:false, parts:{ to:'親愛的樂兒：', body:'□□祝你生日快樂，畫畫越來越靚！', rel:'同學', from:'欣彤', date:'九月三日' } },
+  { id:26, title:'以「堂哥澤宇」身份寫給「堂弟」（平輩）', elder:false, parts:{ to:'親愛的堂弟：', body:'□□祝你生日快樂，身體健康，天天開心！', rel:'堂哥', from:'澤宇', date:'十月二日' } },
+  { id:27, title:'以「同學卓軒」身份寫給「小明」（平輩）', elder:false, parts:{ to:'親愛的小明：', body:'□□祝你生日快樂，希望你喜歡我的禮物！', rel:'同學', from:'卓軒', date:'一月二十五日' } },
+  { id:28, title:'以「姐姐詠恩」身份寫給「妹妹」（平輩）', elder:false, parts:{ to:'親愛的妹妹：', body:'□□祝你生日快樂，越來越可愛！', rel:'姐姐', from:'詠恩', date:'三月二十九日' } },
+  { id:29, title:'以「好朋友梓朗」身份寫給「浩天」（平輩）', elder:false, parts:{ to:'親愛的浩天：', body:'□□祝你生日快樂，友誼永固！', rel:'好朋友', from:'梓朗', date:'七月十一日' } },
+  { id:30, title:'以「同學善雅」身份寫給「晴晴」（平輩）', elder:false, parts:{ to:'親愛的晴晴：', body:'□□祝你生日快樂，每天都笑哈哈！', rel:'同學', from:'善雅', date:'十二月十五日' } }
+];
+
+// --- LEVEL 4 & LEVEL 5 & WORKSHEETS: 30 WRITING PROMPTS (15 Elder + 15 Peer) ---
+const L4_BANK = [
+  { id:1, elder:true, recipient:'王老師', sender:'允行', relation:'學生', prompt:'王老師的生日快到了，請你以學生允行的身份，寫一張生日卡給王老師，寫下你對他的祝福。' },
+  { id:2, elder:true, recipient:'爸爸', sender:'文賢', relation:'兒子', prompt:'明天是爸爸的生日，請你以兒子文賢的身份，寫一張生日卡給爸爸，送上你對他的祝福。' },
+  { id:3, elder:false, recipient:'天明', sender:'可欣', relation:'同學', prompt:'同學天明的生日快到了，請你以同學可欣的身份，寫一張生日卡給天明，寫下你的祝福。' },
+  { id:4, elder:true, recipient:'媽媽', sender:'煒晴', relation:'女兒', prompt:'媽媽的生日快到了，請你以女兒煒晴的身份，寫一張生日卡給媽媽，表達你的愛和祝福。' },
+  { id:5, elder:true, recipient:'爺爺', sender:'曉昇', relation:'孫兒', prompt:'爺爺的生日快到了，請你以孫兒曉昇的身份，寫一張生日卡給爺爺，祝賀他生日快樂。' },
+  { id:6, elder:true, recipient:'嫲嫲', sender:'心柔', relation:'孫女', prompt:'嫲嫲的生日快到了，請你以孫女心柔的身份，寫一張生日卡給嫲嫲，送上溫暖的祝福。' },
+  { id:7, elder:true, recipient:'李老師', sender:'子軒', relation:'學生', prompt:'李老師的生日快到了，請你以學生子軒的身份，寫一張生日卡給李老師，寫下你對她的祝福。' },
+  { id:8, elder:true, recipient:'公公', sender:'浩然', relation:'外孫', prompt:'公公的生日快到了，請你以外孫浩然的身份，寫一張生日卡祝賀公公生日快樂。' },
+  { id:9, elder:true, recipient:'婆婆', sender:'嘉恩', relation:'外孫女', prompt:'婆婆的生日快到了，請你以外孫女嘉恩的身份，寫一張生日卡給婆婆，祝她身體健康。' },
+  { id:10, elder:true, recipient:'陳校長', sender:'思齊', relation:'學生', prompt:'陳校長的生日快到了，請你以學生思齊的身份，寫一張生日卡給陳校長，送上誠摯的祝福。' },
+  { id:11, elder:true, recipient:'姑姐', sender:'樂怡', relation:'姪女', prompt:'姑姐的生日快到了，請你以姪女樂怡的身份，寫一張生日卡給姑姐，寫下你對她的祝福。' },
+  { id:12, elder:true, recipient:'舅父', sender:'俊傑', relation:'外甥', prompt:'舅父的生日快到了，請你以外甥俊傑的身份，寫一張生日卡祝賀舅父。' },
+  { id:13, elder:true, recipient:'叔叔', sender:'瑋健', relation:'姪兒', prompt:'叔叔的生日快到了，請你以姪兒瑋健的身份，寫一張生日卡給叔叔，祝賀他生日快樂。' },
+  { id:14, elder:true, recipient:'姨媽', sender:'映彤', relation:'外甥女', prompt:'姨媽的生日快到了，請你以外甥女映彤的身份，寫一張生日卡給姨媽，寫下你的祝福。' },
+  { id:15, elder:true, recipient:'張老師', sender:'紫晴', relation:'學生', prompt:'張老師的生日快到了，請你以學生紫晴的身份，寫一張生日卡給張老師，送上你的祝福。' },
+  { id:16, elder:true, recipient:'黃老師', sender:'朗軒', relation:'學生', prompt:'黃老師的生日快到了，請你以學生朗軒的身份，寫一張生日卡給黃老師，祝他生日快樂。' },
+  { id:17, elder:false, recipient:'小晴', sender:'美美', relation:'同學', prompt:'同學小晴的生日快到了，請你以同學美美的身份，寫一張生日卡給小晴，送上你的祝福。' },
+  { id:18, elder:false, recipient:'小美', sender:'詩雅', relation:'好朋友', prompt:'好朋友小美的生日快到了，請你以好朋友詩雅的身份，寫一張生日卡給小美，寫下你對她的祝福。' },
+  { id:19, elder:false, recipient:'哥哥', sender:'柏希', relation:'弟弟', prompt:'哥哥的生日快到了，請你以弟弟柏希的身份，寫一張生日卡給哥哥，祝他生日快樂。' },
+  { id:20, elder:false, recipient:'姐姐', sender:'凱晴', relation:'妹妹', prompt:'姐姐的生日快到了，請你以妹妹凱晴的身份，寫一張生日卡給姐姐，送上你的祝福。' },
+  { id:21, elder:false, recipient:'弟弟', sender:'駿軒', relation:'哥哥', prompt:'弟弟的生日快到了，請你以哥哥駿軒的身份，寫一張生日卡給弟弟，祝他快高長大。' },
+  { id:22, elder:false, recipient:'妹妹', sender:'詠恩', relation:'姐姐', prompt:'妹妹的生日快到了，請你以姐姐詠恩的身份，寫一張生日卡給妹妹，寫下你對她的祝福。' },
+  { id:23, elder:false, recipient:'志豪', sender:'家朗', relation:'同學', prompt:'同學志豪的生日快到了，請你以同學家朗的身份，寫一張生日卡給志豪，祝賀他生日快樂。' },
+  { id:24, elder:false, recipient:'表哥', sender:'巧兒', relation:'表妹', prompt:'表哥的生日快到了，請你以表妹巧兒的身份，寫一張生日卡給表哥，寫下你的祝福。' },
+  { id:25, elder:false, recipient:'嘉豪', sender:'子謙', relation:'好朋友', prompt:'好朋友嘉豪的生日快到了，請你以好朋友子謙的身份，寫一張生日卡給嘉豪，送上祝福。' },
+  { id:26, elder:false, recipient:'樂兒', sender:'欣彤', relation:'同學', prompt:'同學樂兒的生日快到了，請你以同學欣彤的身份，寫一張生日卡給樂兒，祝她天天開心。' },
+  { id:27, elder:false, recipient:'堂弟', sender:'澤宇', relation:'堂哥', prompt:'堂弟的生日快到了，請你以堂哥澤宇的身份，寫一張生日卡給堂弟，寫下你的祝福。' },
+  { id:28, elder:false, recipient:'小明', sender:'卓軒', relation:'同學', prompt:'同學小明的生日快到了，請你以同學卓軒的身份，寫一張生日卡給小明，祝賀他生日快樂。' },
+  { id:29, elder:false, recipient:'浩天', sender:'梓朗', relation:'好朋友', prompt:'好朋友浩天的生日快到了，請你以好朋友梓朗的身份，寫一張生日卡給浩天，送上你的祝福。' },
+  { id:30, elder:false, recipient:'晴晴', sender:'善雅', relation:'同學', prompt:'同學晴晴的生日快到了，請你以同學善雅的身份，寫一張生日卡給晴晴，祝她生日快樂。' }
+];
+
+/* =========================================================================
+   4. SESSION STATE (Each Level Draws 10 Random Questions From 30)
+   ========================================================================= */
+let currentView = 'home';
+
+const state = {
+  l1: { list: [], idx: 0, results: {}, answered: false },
+  l2: { list: [], idx: 0, results: {}, answered: false },
+  l3: { list: [], idx: 0, results: {}, slots: [null,null,null,null,null], pool: [], checked: false },
+  l4: { list: [], idx: 0, results: {}, indentOn: true, draft: {}, grade: null },
+  l5: { list: [], idx: 0, results: {}, draft: {}, grade: null }
+};
+
+function resetLevelSession(lvl) {
+  if (lvl === 'l1') {
+    state.l1 = { list: shuffleArray(L1_BANK).slice(0, 10), idx: 0, results: {}, answered: false };
+  } else if (lvl === 'l2') {
+    state.l2 = { list: shuffleArray(L2_BANK).slice(0, 10), idx: 0, results: {}, answered: false };
+  } else if (lvl === 'l3') {
+    state.l3 = { list: shuffleArray(L3_BANK).slice(0, 10), idx: 0, results: {}, slots: [null,null,null,null,null], pool: [], checked: false };
+    prepareL3Question();
+  } else if (lvl === 'l4') {
+    state.l4 = { list: shuffleArray(L4_BANK).slice(0, 10), idx: 0, results: {}, indentOn: true, draft: {}, grade: null };
+  } else if (lvl === 'l5') {
+    state.l5 = { list: shuffleArray(L4_BANK).slice(0, 10), idx: 0, results: {}, draft: {}, grade: null };
+  }
+}
+
+['l1','l2','l3','l4','l5'].forEach(resetLevelSession);
+
+function switchView(view) {
+  currentView = view;
+  ['home','l1','l2','l3','l4','l5'].forEach(v => {
+    const el = document.getElementById('tab-' + v);
+    if (el) el.classList.toggle('active', v === view);
+  });
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  if (currentView === 'home') renderHome();
+  else if (currentView === 'l1') renderL1();
+  else if (currentView === 'l2') renderL2();
+  else if (currentView === 'l3') renderL3();
+  else if (currentView === 'l4') renderL4();
+  else if (currentView === 'l5') renderL5();
+}
+
+/* =========================================================================
+   5. HOME VIEW + CUTE CARTOON WORKSHEET GENERATOR (3 PAGES / 5 PAGES)
+   ========================================================================= */
+function renderHome() {
+  const panel = document.getElementById('main-panel');
+  panel.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+      <div>
+        <h2 style="margin:0;font-size:24px;color:#e0486c;">🎉 歡迎來到 1B 生日卡練習教室！</h2>
+        <p style="margin:6px 0 0;color:var(--muted);font-size:15px;">一至四關各有 <b>30 題強化題庫</b>（每次隨機抽 10 題），更有「終極第五關」無提示大考驗！</p>
+      </div>
+      <button class="btn btn-teal btn-sm" onclick="speakText('歡迎來到 1B 生日卡練習教室！小朋友可以選擇第一關至終極第五關，亦可以直接列印可愛動畫風練習紙。')">🔊 聽老師介紹</button>
+    </div>
+
+    <div class="home-grid">
+      <div class="level-card" onclick="switchView('l1')">
+        <span class="badge">30題隨機抽10題</span>
+        <h3>🔍 第一關：格式大偵探</h3>
+        <p>認識生日卡五寶（收卡人、祝福語、關係、送卡人、日期），小心「感謝的話」干擾項！</p>
+      </div>
+      <div class="level-card" onclick="switchView('l2')">
+        <span class="badge">30題隨機抽10題</span>
+        <h3>🕵️ 第二關：小老師捉錯處</h3>
+        <p>找出漏空兩格、「您／你」誤用、漏寫「敬上」、冒號及梯級排列等 6 大常見失分位。</p>
+      </div>
+      <div class="level-card" onclick="switchView('l3')">
+        <span class="badge">30題隨機抽10題</span>
+        <h3>🧱 第三關：積木砌砌生日卡</h3>
+        <p>把彩色 3D 積木放到正確的梯級位置，熟習長輩與平輩的標準排版。</p>
+      </div>
+      <div class="level-card" onclick="switchView('l4')">
+        <span class="badge">30題隨機抽10題・可列印2題/頁</span>
+        <h3>✏️ 第四關：小小作家評估室</h3>
+        <p>備有詞庫小幫手、空兩格開關與熊熊老師自動批改，並可列印 A4 每頁 2 題簡潔練習紙。</p>
+      </div>
+      <div class="level-card" style="border-color:#d0bfff;background:linear-gradient(180deg,#fff 0%,#f8f5ff 100%);" onclick="switchView('l5')">
+        <span class="badge" style="background:#ede9fe;color:#5f3dc4;">無提示實戰評估</span>
+        <h3>🏆 終極第五關：無提示大考</h3>
+        <p>沒有提示、沒有分行框，完全模擬學校工作紙作答，挑戰 6 項滿分紅印章！</p>
+      </div>
+    </div>
+
+    <div class="worksheet-box">
+      <div style="flex:1;min-width:260px;">
+        <h3>📄 第四關・可愛動畫風格練習紙（A4 直向・每頁 1 題）</h3>
+        <p>隨機從 30 條小一生日卡寫作題目中抽取，自動排版成 <b>A4 直向可愛熊熊蛋糕卡通工作紙</b>，適合列印出來給小朋友手寫練習！</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <button class="btn btn-pink" onclick="printCuteWorksheets(3)">🖨️ 一次生成 3 頁</button>
+        <button class="btn btn-purple" onclick="printCuteWorksheets(5)">🖨️ 一次生成 5 頁</button>
+      </div>
+    </div>
+  `;
+}
+
+function getCuteBearSVG() {
+  return `<svg width="68" height="68" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="26" r="14" fill="#c68642" stroke="#8d5524" stroke-width="3"/>
+    <circle cx="24" cy="26" r="7" fill="#ffe5c2"/>
+    <circle cx="76" cy="26" r="14" fill="#c68642" stroke="#8d5524" stroke-width="3"/>
+    <circle cx="76" cy="26" r="7" fill="#ffe5c2"/>
+    <polygon points="50,2 34,26 66,26" fill="#4dabf7" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="50" cy="4" r="5" fill="#ffd43b"/>
+    <circle cx="50" cy="56" r="34" fill="#c68642" stroke="#8d5524" stroke-width="3"/>
+    <ellipse cx="50" cy="66" rx="16" ry="12" fill="#ffe5c2"/>
+    <ellipse cx="50" cy="61" rx="6" ry="4" fill="#2d3142"/>
+    <path d="M44 70 Q50 76 56 70" fill="none" stroke="#2d3142" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="37" cy="52" r="4.5" fill="#2d3142"/>
+    <circle cx="63" cy="52" r="4.5" fill="#2d3142"/>
+    <circle cx="38.5" cy="50.5" r="1.6" fill="#fff"/>
+    <circle cx="64.5" cy="50.5" r="1.6" fill="#fff"/>
+    <circle cx="37" cy="52" r="9" fill="none" stroke="#f59f00" stroke-width="2.5"/>
+    <circle cx="63" cy="52" r="9" fill="none" stroke="#f59f00" stroke-width="2.5"/>
+    <line x1="46" y1="52" x2="54" y2="52" stroke="#f59f00" stroke-width="2.5"/>
+    <ellipse cx="26" cy="62" rx="5" ry="3" fill="#ff8fab" opacity="0.8"/>
+    <ellipse cx="74" cy="62" rx="5" ry="3" fill="#ff8fab" opacity="0.8"/>
+  </svg>`;
+}
+
+function getCuteCakeSVG() {
+  return `<svg width="64" height="64" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="46" y="14" width="8" height="20" rx="3" fill="#4ecdc4"/>
+    <ellipse cx="50" cy="10" rx="5" ry="7" fill="#ffd43b"/>
+    <rect x="24" y="34" width="52" height="22" rx="8" fill="#fff3bf" stroke="#f59f00" stroke-width="2.5"/>
+    <rect x="14" y="54" width="72" height="28" rx="9" fill="#ffccd5" stroke="#e0486c" stroke-width="2.5"/>
+    <path d="M14 62 Q24 72 34 62 T54 62 T74 62 T86 62" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <rect x="8" y="82" width="84" height="8" rx="4" fill="#a5d8ff"/>
+  </svg>`;
+}
+
+function printCuteWorksheets(pageCount) {
+  const picked = shuffleArray(L4_BANK).slice(0, pageCount);
+  const printRoot = document.getElementById('print-root');
+  printRoot.innerHTML = picked.map((q, idx) => `
+    <div class="print-page cute-page">
+      <div>
+        <div class="cute-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${getCuteBearSVG()}
+            <div class="cute-title-block">
+              <h1>1B 生日卡寫作練習紙</h1>
+              <p>可愛熊熊老師陪你學寫作・第 ${idx + 1} 頁（共 ${pageCount} 頁）</p>
+            </div>
+          </div>
+          ${getCuteCakeSVG()}
+        </div>
+
+        <div class="cute-meta">
+          <span>姓名：_____________________</span>
+          <span>班別：1B (  )</span>
+          <span>日期：______月______日</span>
+        </div>
+
+        <div class="cute-qbox">
+          ⭐ 寫作題目（#${q.id}）：${q.prompt}
+        </div>
+      </div>
+
+      <div class="cute-card-area">
+        <div class="cute-card-tag">🎂 我的生日卡（請把生日卡寫在橫線上）</div>
+        <div class="cute-write-line"></div>
+        <div class="cute-write-line">
+          <span class="cute-indent-hint"><span class="cute-indent-sq"></span><span class="cute-indent-sq"></span></span>
+        </div>
+        <div class="cute-write-line"></div>
+        <div class="cute-write-line"></div>
+        <div class="cute-write-line"></div>
+        <div class="cute-write-line"></div>
+        <div class="cute-write-line"></div>
+      </div>
+
+      <div class="cute-footer">
+        <span>🐻 熊熊老師小檢查： □ 上款加冒號 □ 正文空兩格 □ 您／你 □ 下款梯級 □ 中文日期</span>
+        <span>表現：☆☆☆☆☆</span>
+      </div>
+    </div>
+  `).join('');
+
+  setBearMessage(`已生成 ${pageCount} 頁 A4 直向可愛動畫風練習紙，正在開啟列印視窗！`, true);
+  setTimeout(() => window.print(), 180);
+}
+
+/* =========================================================================
+   6. LEVEL 1: FORMAT DETECTIVE (30 BANK -> 10 RANDOM)
+   ========================================================================= */
+function renderDots(lvl) {
+  const s = state[lvl];
+  return `<div class="progress-dots">${s.list.map((q, i) => {
+    const r = s.results[i];
+    const cls = (i === s.idx ? 'current ' : '') + (r === true ? 'done-ok' : r === false ? 'done-err' : '');
+    return `<div class="p-dot ${cls}" onclick="jumpQuestion('${lvl}', ${i})">${i + 1}</div>`;
+  }).join('')}</div>`;
+}
+
+function jumpQuestion(lvl, i) {
+  state[lvl].idx = i;
+  if (lvl === 'l1' || lvl === 'l2') state[lvl].answered = false;
+  if (lvl === 'l3') prepareL3Question();
+  if (lvl === 'l4' || lvl === 'l5') state[lvl].grade = null;
+  renderCurrentView();
+}
+
+function renderL1() {
+  const s = state.l1;
+  const q = s.list[s.idx];
+  const panel = document.getElementById('main-panel');
+  const hl = key => q.target === key ? 'highlight' : '';
+
+  panel.innerHTML = `
+    <div class="quiz-head">
+      <div>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🔍 第一關：格式大偵探（第 ${s.idx + 1} / 10 題・題庫 #${q.id}）</h2>
+        <small style="color:var(--muted);">看看生日卡上黃色箭咀指著的部分，它屬於哪一個格式項目？</small>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sunny btn-sm" onclick="speakText('第一關第${s.idx + 1}題，請看看黃色標示的部分，選出它代表生日卡的哪一個部分。')">🔊 聽老師讀題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l1');renderL1();setBearMessage('已重新隨機抽出 10 題格式大偵探！',true);">🔄 重新抽 10 題</button>
+      </div>
+    </div>
+
+    ${renderDots('l1')}
+
+    <div class="bcard-paper">
+      <div class="bcard-line ${hl('A')}">${q.to}</div>
+      <div class="bcard-line ${hl('D')}">
+        <span class="indent-boxes"><span class="indent-box"></span><span class="indent-box"></span></span>${q.body}
+      </div>
+      <div class="stair-wrap">
+        <div class="stair-guide"></div>
+        <div class="bcard-line stair-rel ${hl('C')}">${q.rel}</div>
+        <div class="bcard-line stair-from ${hl('B')}">${q.from}</div>
+        <div class="bcard-line stair-date ${hl('E')}">${q.date}</div>
+      </div>
+    </div>
+
+    <div class="opt-grid" id="l1-opts">
+      ${L1_OPTIONS.map(o => `<button class="opt-btn" onclick="answerL1('${o.key}', this)">${o.label}</button>`).join('')}
+    </div>
+    <div id="l1-fb"></div>
+  `;
+}
+
+function answerL1(choice, btn) {
+  const s = state.l1;
+  if (s.answered) return;
+  s.answered = true;
+  const q = s.list[s.idx];
+  const ok = choice === q.target;
+  s.results[s.idx] = ok;
+
+  const btns = document.querySelectorAll('#l1-opts .opt-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    const key = L1_OPTIONS[i].key;
+    if (key === q.target) b.classList.add('correct');
+    else if (key === choice && !ok) b.classList.add('wrong');
+  });
+
+  if (ok) {
+    addStars(1);
+    if (window.triggerBearCelebrate) window.triggerBearCelebrate();
+    setBearMessage('答對啦！你真是小小格式大偵探！', true);
+  } else {
+    if (window.triggerBearEncourage) window.triggerBearEncourage();
+    setBearMessage('差一點點！快看看熊熊老師的講解再挑戰下一題！', true);
+  }
+
+  document.getElementById('l1-fb').innerHTML = `
+    <div class="feedback-box ${ok ? 'feedback-ok' : 'feedback-err'}">
+      ${ok ? '🎉 答對了！（+1 星星）' : `💡 正確答案是 ${q.target}。`}<br>
+      ${q.explain}
+      <div style="margin-top:10px;">
+        ${s.idx < 9
+          ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l1', ${s.idx + 1})">下一題 ➡️</button>`
+          : `<button class="btn btn-teal btn-sm" onclick="switchView('l2')">完成本組！挑戰第二關 ➡️</button>`}
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   7. LEVEL 2: ERROR SPOTTER (30 BANK -> 10 RANDOM)
+   ========================================================================= */
+function renderL2() {
+  const s = state.l2;
+  const q = s.list[s.idx];
+  const c = q.card;
+  const panel = document.getElementById('main-panel');
+  const leftCls = c.badLayout === 'leftSign' ? 'bad-left' : '';
+
+  panel.innerHTML = `
+    <div class="quiz-head">
+      <div>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🕵️ 第二關：小老師捉錯處（第 ${s.idx + 1} / 10 題・題庫 #${q.id}）</h2>
+        <small style="color:var(--muted);">做個精明小老師，找出下面這張生日卡的扣分位！</small>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sunny btn-sm" onclick="speakText('${q.prompt}')">🔊 聽老師讀題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l2');renderL2();setBearMessage('已重新隨機抽出 10 題捉錯處！',true);">🔄 重新抽 10 題</button>
+      </div>
+    </div>
+
+    ${renderDots('l2')}
+
+    <div class="prompt-banner">❓ ${q.prompt}</div>
+
+    <div class="bcard-paper">
+      <div class="bcard-line">${c.to}</div>
+      <div class="bcard-line">
+        ${c.badIndent ? '' : '<span class="indent-boxes"><span class="indent-box"></span><span class="indent-box"></span></span>'}${c.body}
+      </div>
+      <div class="stair-wrap">
+        <div class="bcard-line stair-rel ${leftCls}">${c.rel}</div>
+        <div class="bcard-line stair-from ${leftCls}">${c.from}</div>
+        <div class="bcard-line stair-date ${leftCls}">${c.date}</div>
+      </div>
+    </div>
+
+    <div class="opt-grid" id="l2-opts">
+      ${q.options.map((opt, idx) => `<button class="opt-btn" onclick="answerL2(${idx})">${String.fromCharCode(65+idx)}. ${opt}</button>`).join('')}
+    </div>
+    <div id="l2-fb"></div>
+  `;
+}
+
+function answerL2(choice) {
+  const s = state.l2;
+  if (s.answered) return;
+  s.answered = true;
+  const q = s.list[s.idx];
+  const ok = choice === q.ans;
+  s.results[s.idx] = ok;
+
+  const btns = document.querySelectorAll('#l2-opts .opt-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.ans) b.classList.add('correct');
+    else if (i === choice && !ok) b.classList.add('wrong');
+  });
+
+  if (ok) {
+    addStars(1);
+    if (window.triggerBearCelebrate) window.triggerBearCelebrate();
+    setBearMessage('好眼力！一下子就捉到錯處啦！', true);
+  } else {
+    if (window.triggerBearEncourage) window.triggerBearEncourage();
+    setBearMessage('不要緊，記住這個小秘訣下次就不會錯！', true);
+  }
+
+  document.getElementById('l2-fb').innerHTML = `
+    <div class="feedback-box ${ok ? 'feedback-ok' : 'feedback-err'}">
+      ${ok ? '🎉 捉對了！（+1 星星）' : '💡 再看清楚喔！'}<br>
+      ${q.explain}<br>
+      <div style="margin-top:8px;display:inline-block;background:#d3f9d8;color:#1b5e20;padding:5px 12px;border-radius:10px;">
+        ✅ 正確寫法：${q.fixText}
+      </div>
+      <div style="margin-top:10px;">
+        ${s.idx < 9
+          ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l2', ${s.idx + 1})">下一題 ➡️</button>`
+          : `<button class="btn btn-teal btn-sm" onclick="switchView('l3')">完成本組！挑戰第三關 ➡️</button>`}
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   8. LEVEL 3: BLOCK BUILDER (30 BANK -> 10 RANDOM)
+   ========================================================================= */
+const L3_COLORS = ['#ff6b8b', '#4dabf7', '#20c997', '#9775fa', '#f59f00'];
+const L3_SLOTS = [
+  { key:'to', label:'1. 收卡人稱呼', cls:'' },
+  { key:'body', label:'2. 祝福的話', cls:'' },
+  { key:'rel', label:'3. 關係／自稱', cls:'align-rel' },
+  { key:'from', label:'4. 送卡人名字', cls:'align-from' },
+  { key:'date', label:'5. 日期', cls:'align-date' }
+];
+
+function prepareL3Question() {
+  const s = state.l3;
+  const q = s.list[s.idx];
+  s.slots = [null, null, null, null, null];
+  s.checked = false;
+  s.pool = shuffleArray(L3_SLOTS.map((sl, i) => ({
+    id: i,
+    key: sl.key,
+    text: q.parts[sl.key],
+    color: L3_COLORS[i]
+  })));
+}
+
+function renderL3() {
+  const s = state.l3;
+  const q = s.list[s.idx];
+  const panel = document.getElementById('main-panel');
+
+  panel.innerHTML = `
+    <div class="quiz-head">
+      <div>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">🧱 第三關：積木砌砌生日卡（第 ${s.idx + 1} / 10 題・題庫 #${q.id}）</h2>
+        <small style="color:var(--muted);">點選下方彩色積木，依次放入生日卡的正確梯級位置（點已放好的格可放回）</small>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sunny btn-sm" onclick="speakText('第三關，請砌出一張生日卡：${q.title}')">🔊 聽老師讀題</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l3');renderL3();setBearMessage('已重新隨機抽出 10 題積木砌卡！',true);">🔄 重新抽 10 題</button>
+      </div>
+    </div>
+
+    ${renderDots('l3')}
+
+    <div class="prompt-banner">🎯 任務：${q.title}</div>
+
+    <div class="bcard-paper" style="padding:18px 20px;">
+      ${L3_SLOTS.map((sl, i) => {
+        const item = s.slots[i];
+        return `
+          <div class="slot-row">
+            <div class="slot-label">${sl.label}</div>
+            <div class="slot-box ${sl.cls} ${item ? 'filled' : ''}" onclick="removeL3Slot(${i})">
+              ${item ? item.text : '<span style="color:#94a3b8;font-size:14px;">點擊下方積木放進這裡…</span>'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="block-pool">
+      ${s.pool.map((b, idx) => {
+        const used = s.slots.some(sl => sl && sl.id === b.id);
+        return `<button class="block-chip ${used ? 'used' : ''}" style="background:${b.color};" onclick="pickL3Block(${idx})">${b.text}</button>`;
+      }).join('')}
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-pink" onclick="checkL3()">✅ 檢查生日卡排版</button>
+      <button class="btn btn-gray" onclick="prepareL3Question();renderL3();">↩️ 清空重砌</button>
+    </div>
+    <div id="l3-fb"></div>
+  `;
+}
+
+function pickL3Block(poolIdx) {
+  const s = state.l3;
+  if (s.checked) return;
+  const emptyIdx = s.slots.findIndex(v => v === null);
+  if (emptyIdx === -1) return;
+  s.slots[emptyIdx] = s.pool[poolIdx];
+  renderL3();
+}
+
+function removeL3Slot(slotIdx) {
+  const s = state.l3;
+  if (s.checked || !s.slots[slotIdx]) return;
+  s.slots[slotIdx] = null;
+  renderL3();
+}
+
+function checkL3() {
+  const s = state.l3;
+  if (s.slots.some(v => v === null)) {
+    setBearMessage('仲有空格未放積木呀，放齊 5 塊再檢查啦！', true);
+    return;
+  }
+  const ok = s.slots.every((item, i) => item.key === L3_SLOTS[i].key);
+  s.results[s.idx] = ok;
+  s.checked = true;
+
+  if (ok) {
+    addStars(2);
+    if (window.triggerBearCelebrate) window.triggerBearCelebrate();
+    setBearMessage('嘩！五個位置全部砌啱，完美梯級排版！', true);
+  } else {
+    if (window.triggerBearEncourage) window.triggerBearEncourage();
+    setBearMessage('有幾塊積木排錯位呀，試下點清空重砌，再檢查一次！', true);
+  }
+
+  document.getElementById('l3-fb').innerHTML = `
+    <div class="feedback-box ${ok ? 'feedback-ok' : 'feedback-err'}">
+      ${ok ? '🎉 砌得非常工整！（+2 星星）' : '💡 順序小提醒：1.收卡人稱呼 → 2.祝福的話（空兩格）→ 3.關係／自稱 → 4.送卡人名字 → 5.日期。'}
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${!ok ? `<button class="btn btn-sunny btn-sm" onclick="prepareL3Question();renderL3();">🔄 再試一次</button>` : ''}
+        ${s.idx < 9
+          ? `<button class="btn btn-pink btn-sm" onclick="jumpQuestion('l3', ${s.idx + 1})">下一題 ➡️</button>`
+          : `<button class="btn btn-teal btn-sm" onclick="switchView('l4')">完成本組！挑戰第四關 ➡️</button>`}
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   9. LEVEL 4: GUIDED WRITING STUDIO + 2-PER-PAGE A4 CLEAN PRINT BUTTON
+   ========================================================================= */
+const BLESSINGS_ELDER = [
+  '祝您生日快樂！',
+  '祝您身體健康，龍馬精神！',
+  '希望您每天都開開心心！',
+  '祝您工作順利，笑口常開！',
+  '我愛您！'
+];
+const BLESSINGS_PEER = [
+  '祝你生日快樂！',
+  '祝你天天開心，學業進步！',
+  '希望我們常常一起玩遊戲！',
+  '祝你快高長大，考試滿分！'
+];
+const QUICK_DATES = ['十一月二日', '十一月二十日', '三月六日', '五月十日', '九月八日', '十二月十五日'];
+
+function renderL4() {
+  const s = state.l4;
+  const q = s.list[s.idx];
+  const d = s.draft[q.id] || { to:'', body:'', rel:'', from:'', date:'' };
+  const panel = document.getElementById('main-panel');
+
+  panel.innerHTML = `
+    <div class="quiz-head">
+      <div>
+        <h2 style="margin:0;font-size:21px;color:#e0486c;">✏️ 第四關：小小作家評估室（第 ${s.idx + 1} / 10 題・寫作 #${q.id}）</h2>
+        <small style="color:var(--muted);">利用詞庫小幫手寫出滿分生日卡，或列印 A4 每頁 2 題簡潔練習紙！</small>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sunny btn-sm" onclick="speakText('寫作題目：${q.prompt}')">🔊 聽老師讀題</button>
+        <button class="btn btn-blue btn-sm" onclick="printLevel4TwoPerPage()">🖨️ 列印練習紙（A4直向・每頁2題）</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l4');renderL4();setBearMessage('已重新隨機抽出 10 條寫作題！',true);">🔄 重新抽 10 題</button>
+      </div>
+    </div>
+
+    ${renderDots('l4')}
+
+    <div class="prompt-banner">📝 寫作題目（#${q.id}）：${q.prompt}</div>
+
+    <div class="w-grid">
+      <div class="card-editor">
+        <div class="field-row">
+          <label>1. 上款（收卡人稱呼＋冒號）</label>
+          <input id="l4-to" class="field-input" value="${escapeHtml(d.to)}" placeholder="例如：親愛的${q.recipient}：" oninput="saveL4Draft(${q.id})" />
+        </div>
+
+        <div class="field-row">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <label style="margin:0;">2. 正文（祝福的話）</label>
+            <label style="margin:0;cursor:pointer;color:#e0486c;display:flex;align-items:center;gap:5px;">
+              <input type="checkbox" id="l4-indent" ${s.indentOn ? 'checked' : ''} onchange="toggleL4Indent()" />
+              自動加上「□□ 空兩格」
+            </label>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px;">
+            ${s.indentOn ? '<div style="padding-top:10px;"><span class="indent-boxes"><span class="indent-box"></span><span class="indent-box"></span></span></div>' : ''}
+            <textarea id="l4-body" class="field-textarea" rows="3" placeholder="寫下祝福語，例如：祝${q.elder ? '您' : '你'}生日快樂！" oninput="saveL4Draft(${q.id})">${escapeHtml(d.body)}</textarea>
+          </div>
+        </div>
+
+        <div class="stair-inputs">
+          <div class="field-row s-rel">
+            <label>3. 送卡人關係／自稱</label>
+            <input id="l4-rel" class="field-input" value="${escapeHtml(d.rel)}" placeholder="例如：${q.relation}" oninput="saveL4Draft(${q.id})" />
+          </div>
+          <div class="field-row s-from">
+            <label>4. 送卡人名字${q.elder ? '（寫給長輩加「敬上」）' : '（平輩不用敬上）'}</label>
+            <input id="l4-from" class="field-input" value="${escapeHtml(d.from)}" placeholder="例如：${q.sender}${q.elder ? '敬上' : ''}" oninput="saveL4Draft(${q.id})" />
+          </div>
+          <div class="field-row s-date">
+            <label>5. 中文日期</label>
+            <input id="l4-date" class="field-input" value="${escapeHtml(d.date)}" placeholder="例如：十一月二日" oninput="saveL4Draft(${q.id})" />
+          </div>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-pink" onclick="gradeL4()">🐻 交給熊熊老師批改</button>
+          ${s.idx < 9
+            ? `<button class="btn btn-teal" onclick="jumpQuestion('l4', ${s.idx + 1})">下一題 ➡️</button>`
+            : `<button class="btn btn-purple" onclick="switchView('l5')">挑戰終極第五關 🏆</button>`}
+        </div>
+      </div>
+
+      <div class="helper-box">
+        <h4>💡 詞庫小幫手（點擊即可插入）</h4>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">稱呼捷徑：</div>
+        <div class="chip-wrap">
+          <button class="word-chip" onclick="insertL4Field('to', '親愛的${q.recipient}：')">親愛的${q.recipient}：</button>
+          <button class="word-chip" onclick="insertL4Field('rel', '${q.relation}')">${q.relation}</button>
+          <button class="word-chip" onclick="insertL4Field('from', '${q.sender}${q.elder ? '敬上' : ''}')">${q.sender}${q.elder ? '敬上' : ''}</button>
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">祝福語詞庫：</div>
+        <div class="chip-wrap">
+          ${(q.elder ? BLESSINGS_ELDER : BLESSINGS_PEER).map(w => `<button class="word-chip" onclick="appendL4Body('${w}')">${w}</button>`).join('')}
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">中文日期捷徑：</div>
+        <div class="chip-wrap">
+          ${QUICK_DATES.map(dt => `<button class="word-chip" onclick="insertL4Field('date', '${dt}')">${dt}</button>`).join('')}
+        </div>
+
+        <div id="l4-grade-area">${s.grade || ''}</div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function saveL4Draft(qid) {
+  state.l4.draft[qid] = {
+    to: document.getElementById('l4-to').value,
+    body: document.getElementById('l4-body').value,
+    rel: document.getElementById('l4-rel').value,
+    from: document.getElementById('l4-from').value,
+    date: document.getElementById('l4-date').value
+  };
+}
+
+function toggleL4Indent() {
+  state.l4.indentOn = document.getElementById('l4-indent').checked;
+  renderL4();
+}
+
+function insertL4Field(field, val) {
+  const el = document.getElementById('l4-' + field);
+  if (el) {
+    el.value = val;
+    saveL4Draft(state.l4.list[state.l4.idx].id);
+  }
+}
+
+function appendL4Body(text) {
+  const el = document.getElementById('l4-body');
+  if (el) {
+    el.value = (el.value || '') + text;
+    saveL4Draft(state.l4.list[state.l4.idx].id);
+  }
+}
+
+function evaluateStructuredCard(q, to, body, hasIndent, rel, from, date) {
+  const checks = [];
+  let score = 0;
+
+  // 1. Recipient & colon
+  const ok1 = to.includes(q.recipient) && /[：:]\s*$/.test(to.trim());
+  if (ok1) score++;
+  checks.push({ ok: ok1, text: ok1 ? `✅ 上款正確寫出「${q.recipient}」及冒號` : `❌ 上款需包含收卡人「${q.recipient}」並以冒號（：）結尾` });
+
+  // 2. Indent
+  const ok2 = hasIndent && body.trim().length > 0;
+  if (ok2) score++;
+  checks.push({ ok: ok2, text: ok2 ? '✅ 正文開頭已正確空兩格（□□）' : '❌ 正文開頭記得空兩格（□□）並寫上祝福內容' });
+
+  // 3. Blessing & 您/你
+  const hasBless = /(生日快樂|快樂|健康|開心|平安|幸福|進步|順利|如意|長大|美麗|愛您|愛你)/.test(body);
+  const pronounOk = q.elder ? (body.includes('您') && !body.includes('你')) : (!body.includes('您'));
+  const ok3 = hasBless && pronounOk;
+  if (ok3) score++;
+  checks.push({
+    ok: ok3,
+    text: ok3
+      ? `✅ 祝福語切題，而且正確使用${q.elder ? '尊稱「您」' : '平輩「你」'}`
+      : !hasBless
+        ? '❌ 正文請寫上生日祝福語（例如：祝您／你生日快樂！）'
+        : (q.elder ? '❌ 寫給長輩請把「你」改為尊稱「您」' : '❌ 寫給平輩用「你」即可，不用「您」')
+  });
+
+  // 4. Relation
+  const ok4 = rel.includes(q.relation);
+  if (ok4) score++;
+  checks.push({ ok: ok4, text: ok4 ? `✅ 關係／自稱正確寫出「${q.relation}」` : `❌ 審題提示：送卡人關係／自稱應為「${q.relation}」` });
+
+  // 5. Sender & 敬上
+  const hasSender = from.includes(q.sender);
+  const hasJing = from.includes('敬上');
+  const ok5 = hasSender && (q.elder ? hasJing : !hasJing);
+  if (ok5) score++;
+  checks.push({
+    ok: ok5,
+    text: ok5
+      ? `✅ 下款名字「${q.sender}」及敬詞運用完全正確`
+      : !hasSender
+        ? `❌ 下款請寫上題目指定的送卡人名字「${q.sender}」`
+        : (q.elder ? '❌ 寫給長輩時，名字後面要加上「敬上」' : '❌ 寫給平輩同學／朋友，名字後面不用寫「敬上」')
+  });
+
+  // 6. Chinese Date
+  const ok6 = /^[一二三四五六七八九十]+月[一二三四五六七八九十廿卅]+日$/.test(date.trim());
+  if (ok6) score++;
+  checks.push({ ok: ok6, text: ok6 ? `✅ 日期「${date.trim()}」符合中文數字格式` : '❌ 日期請用中文數字寫成「〇月〇日」（例如：十一月二日）' });
+
+  return { score, checks };
+}
+
+function gradeL4() {
+  const s = state.l4;
+  const q = s.list[s.idx];
+  saveL4Draft(q.id);
+  const d = s.draft[q.id];
+  const hasIndent = s.indentOn || /^(  |  |□□|\t)/.test(d.body);
+  const res = evaluateStructuredCard(q, d.to, d.body, hasIndent, d.rel, d.from, d.date);
+
+  const pass = res.score >= 5;
+  s.results[s.idx] = pass;
+  if (pass) {
+    addStars(3);
+    if (window.triggerBearCelebrate) window.triggerBearCelebrate();
+    setBearMessage(`太棒了！你在寫作題 #${q.id} 拿到 ${res.score} 分（滿分 6 分）！`, true);
+  } else {
+    if (window.triggerBearEncourage) window.triggerBearEncourage();
+    setBearMessage(`得到 ${res.score} 分，看看熊熊老師的紅筆建議，改好再交卷吧！`, true);
+  }
+
+  const stamp = res.score === 6 ? '💯 滿分小作家！' : res.score >= 5 ? '🌟 非常優秀！' : '💪 繼續加油！';
+  s.grade = `
+    <div class="feedback-box ${pass ? 'feedback-ok' : 'feedback-err'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <b>🐻 熊熊老師批改結果：${res.score} / 6 分</b>
+        <span class="stamp-box">${stamp}</span>
+      </div>
+      <ul class="check-list">
+        ${res.checks.map(c => `<li>${c.text}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+  renderL4();
+}
+
+// --- LEVEL 4 PRINT: A4 PORTRAIT, 2 QUESTIONS PER PAGE, ONLY PROMPT + WRITING LINES ---
+function printLevel4TwoPerPage() {
+  const questions = state.l4.list; // 10 questions => 5 A4 portrait pages (2 per page)
+  const pages = [];
+  for (let i = 0; i < questions.length; i += 2) {
+    pages.push(questions.slice(i, i + 2));
+  }
+
+  const printRoot = document.getElementById('print-root');
+  printRoot.innerHTML = pages.map(pair => `
+    <div class="print-page clean-2up-page">
+      ${pair.map(q => `
+        <div class="clean-q-block">
+          <div class="clean-q-title">寫作題目（#${q.id}）：${q.prompt}</div>
+          <div class="clean-lines-wrap">
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+            <div class="clean-write-line"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  setBearMessage('已準備好 A4 直向每頁 2 題的簡潔答題線練習紙，正在開啟列印！', true);
+  setTimeout(() => window.print(), 180);
+}
+
+/* =========================================================================
+   10. ULTIMATE LEVEL 5: NO HINTS, NO ROW SELECTORS, PURE FREE WRITING EXAM
+   ========================================================================= */
+function renderL5() {
+  const s = state.l5;
+  const q = s.list[s.idx];
+  const textVal = s.draft[q.id] || '';
+  const panel = document.getElementById('main-panel');
+
+  panel.innerHTML = `
+    <div class="quiz-head">
+      <div>
+        <h2 style="margin:0;font-size:21px;color:#6741d9;">🏆 終極第五關：無提示寫作大考驗（第 ${s.idx + 1} / 10 題・寫作 #${q.id}）</h2>
+        <small style="color:var(--muted);">沒有提示、沒有分行框，完全靠自己獨立完成一張完整的生日卡！</small>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-sunny btn-sm" onclick="speakText('${q.prompt}')">🔊 聽老師讀題</button>
+        <button class="btn btn-blue btn-sm" onclick="printL5TwoPerPage()">🖨️ 列印本組試卷（A4每頁2題）</button>
+        <button class="btn btn-gray btn-sm" onclick="resetLevelSession('l5');renderL5();setBearMessage('終極第五關已重新抽出 10 條考題！',true);">🔄 重新抽 10 題</button>
+      </div>
+    </div>
+
+    ${renderDots('l5')}
+
+    <div class="prompt-banner" style="border-color:#b197fc;background:linear-gradient(135deg,#f3f0ff,#fff9db);color:#4c1d95;">
+      ${q.prompt}
+    </div>
+
+    <div class="exam-paper">
+      <textarea
+        id="l5-answer"
+        class="lined-textarea"
+        placeholder="請在橫線上直接寫出整張生日卡..."
+        oninput="state.l5.draft[${q.id}] = this.value"
+      >${escapeHtml(textVal)}</textarea>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-purple" onclick="gradeL5()">🐻 提交給熊熊老師批改</button>
+      <button class="btn btn-gray" onclick="state.l5.draft[${q.id}]='';state.l5.grade=null;renderL5();">🧹 清空重寫</button>
+      ${s.idx < 9
+        ? `<button class="btn btn-teal" onclick="jumpQuestion('l5', ${s.idx + 1})">下一題 ➡️</button>`
+        : `<button class="btn btn-sunny" onclick="switchView('home')">返回首頁 🏠</button>`}
+    </div>
+
+    <div id="l5-grade-area">${s.grade || ''}</div>
+  `;
+}
+
+function gradeL5() {
+  const s = state.l5;
+  const q = s.list[s.idx];
+  const raw = document.getElementById('l5-answer').value || '';
+  s.draft[q.id] = raw;
+
+  const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
+  if (lines.length < 2) {
+    setBearMessage('請先分行寫出完整的生日卡再交卷喔！', true);
+    return;
+  }
+
+  const line1 = lines[0].trim();
+  const dateLine = lines[lines.length - 1].trim();
+  const middleLines = lines.slice(1, lines.length - 1);
+
+  // Extract body vs lower sign-off lines smartly
+  const rawLine2 = lines[1] || '';
+  const hasIndent = /^(  |  |□□|\t)/.test(rawLine2);
+
+  // Combine lower lines (excluding line1) to detect rel/from/body cleanly
+  const signCandidate = lines.slice(Math.max(1, lines.length - 3), lines.length - 1).join('\n');
+  const bodyCandidate = middleLines.length >= 3
+    ? middleLines.slice(0, middleLines.length - 2).join('')
+    : rawLine2;
+
+  const res = evaluateStructuredCard(
+    q,
+    line1,
+    bodyCandidate,
+    hasIndent,
+    signCandidate,
+    signCandidate,
+    dateLine
+  );
+
+  const pass = res.score >= 5;
+  s.results[s.idx] = pass;
+
+  if (pass) {
+    addStars(5);
+    if (window.triggerBearCelebrate) window.triggerBearCelebrate();
+    setBearMessage(`終極大考驗成功！你獨立完成並拿到 ${res.score} 分（滿分 6 分）！`, true);
+  } else {
+    if (window.triggerBearEncourage) window.triggerBearEncourage();
+    setBearMessage(`得到 ${res.score} 分，看看下面每一項檢查結果，改好就滿分啦！`, true);
+  }
+
+  const stamp = res.score === 6 ? '🏆 終極滿分王！' : res.score >= 5 ? '🌟 挑戰成功！' : '💪 再接再厲！';
+  s.grade = `
+    <div class="feedback-box ${pass ? 'feedback-ok' : 'feedback-err'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <b>🐻 熊熊老師終極批改：${res.score} / 6 分</b>
+        <span class="stamp-box">${stamp}</span>
+      </div>
+      <ul class="check-list">
+        ${res.checks.map(c => `<li>${c.text}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+  renderL5();
+}
+
+function printL5TwoPerPage() {
+  const prev = state.l4.list;
+  state.l4.list = state.l5.list;
+  printLevel4TwoPerPage();
+  state.l4.list = prev;
+}
+
+/* =========================================================================
+   11. INITIALIZE APP
+   ========================================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  initThreeStage();
+  renderHome();
+});
+</script>
+</body>
+</html>
