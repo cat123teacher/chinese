@@ -1,269 +1,3879 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" dir="ltr">
+<html lang="zh-Hant">
 <head>
-<!-- ... existing code ... -->
-        // 右下點綴小亮點
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
-        ctx.beginPath();
-        ctx.arc(166, 154, 9, 0, Math.PI * 2);
-        ctx.fill();
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>錦鯉池 3D · 互動禪意水池</title>
+  <style>
+    :root {
+      --glass-bg: rgba(10, 26, 30, 0.62);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --glass-active: rgba(114, 198, 232, 0.28);
+      --accent: #7fd4f5;
+      --accent-warm: #f6b36b;
+      --text-main: #f3f9fb;
+      --text-muted: rgba(235, 246, 249, 0.72);
+    }
 
-        return new THREE.CanvasTexture(c, { flipY: false });
-      },
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-      // 繪製 3D 微笑深紅口腔內壁紋理（取代 vec3 陣列 uniform，確保完全相容內嵌渲染器）
-      createSharkMouthTexture() {
-        const c = document.createElement('canvas');
-        c.width = 64; c.height = 64;
-        const ctx = c.getContext('2d');
-        const g = ctx.createRadialGradient(32, 32, 4, 32, 32, 34);
-        g.addColorStop(0.0, '#7a0a14');
-        g.addColorStop(0.65, '#a8121f');
-        g.addColorStop(1.0, '#c41c2a');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 64, 64);
-        return new THREE.CanvasTexture(c, { flipY: false });
-      },
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #07191d;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text-main);
+      touch-action: none;
+    }
 
-      // 繪製 3D 純白珍珠光澤小尖牙紋理
-      createSharkTeethTexture() {
-        const c = document.createElement('canvas');
-        c.width = 32; c.height = 32;
-        const ctx = c.getContext('2d');
-        const g = ctx.createLinearGradient(0, 0, 0, 32);
-        g.addColorStop(0.0, '#f4f7fa');
-        g.addColorStop(1.0, '#ffffff');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 32, 32);
-        return new THREE.CanvasTexture(c, { flipY: false });
-      },
+    #pond-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      touch-action: none;
+      cursor: pointer;
+    }
 
-      // 繪製鼻尖兩側迷你小鼻孔紋理
-      createSharkNostrilTexture() {
-        const c = document.createElement('canvas');
-        c.width = 32; c.height = 32;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#295b7e';
-        ctx.fillRect(0, 0, 32, 32);
-        return new THREE.CanvasTexture(c, { flipY: false });
+    /* 頂部資訊列 */
+    .hud-top {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .pill {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff8a65, #e53935);
+      box-shadow: 0 0 10px rgba(255, 110, 80, 0.8);
+    }
+
+    .stats-sep {
+      color: rgba(255, 255, 255, 0.35);
+      margin: 0 1px;
+    }
+
+    .stats-text {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      transition: transform 0.14s ease, background 0.2s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* 提示氣泡 */
+    #toast {
+      position: fixed;
+      top: calc(max(12px, env(safe-area-inset-top)) + 52px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      padding: 7px 15px;
+      border-radius: 999px;
+      background: rgba(12, 32, 38, 0.78);
+      border: 1px solid rgba(127, 212, 245, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12.5px;
+      color: #e9f8ff;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 25;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 底部操作區 */
+    .hud-bottom {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .sub-bar {
+      pointer-events: auto;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 18px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+      max-width: min(96vw, 430px);
+    }
+
+    .sub-bar.open {
+      display: flex;
+      animation: popIn 0.18s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .sub-btn {
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 7px 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+    }
+
+    .sub-btn:active {
+      transform: scale(0.94);
+    }
+
+    .sub-btn.active {
+      background: var(--glass-active);
+      border-color: rgba(127, 212, 245, 0.72);
+      color: #ffffff;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      flex-shrink: 0;
+    }
+
+    .dock {
+      pointer-events: auto;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      width: 100%;
+      max-width: 430px;
+      padding: 6px;
+      border-radius: 22px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36);
+    }
+
+    .dock-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 16px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
+    }
+
+    .dock-btn .ico {
+      font-size: 18px;
+      line-height: 1.1;
+    }
+
+    .dock-btn:active {
+      transform: scale(0.93);
+    }
+
+    .dock-btn.active {
+      background: var(--glass-active);
+      border-color: rgba(127, 212, 245, 0.65);
+      color: #ffffff;
+    }
+
+    #fallback-msg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      background: #07191d;
+      color: #e6f5f8;
+      z-index: 100;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pond-canvas"></canvas>
+
+  <!-- 頂部狀態與快速按鈕 -->
+  <div class="hud-top">
+    <div class="pill">
+      <span class="brand-dot"></span>
+      <span>錦鯉池</span>
+      <span class="stats-sep">|</span>
+      <span class="stats-text" id="stats-label">9 鯉 · 1 鯊</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-sound" title="音效開關" aria-label="音效開關">🔊</button>
+      <button class="icon-btn" id="btn-reset" title="重置水池" aria-label="重置水池">↺</button>
+    </div>
+  </div>
+
+  <!-- 互動提示 -->
+  <div id="toast">滑動水面泛起漣漪</div>
+
+  <!-- 底部模式列與子選單 -->
+  <div class="hud-bottom">
+    <div class="sub-bar" id="sub-fish">
+      <button class="sub-btn active" data-fish="kohaku">
+        <span class="swatch" style="background:linear-gradient(135deg,#fff 45%,#e83622 45%);"></span>紅白
+      </button>
+      <button class="sub-btn" data-fish="sanke">
+        <span class="swatch" style="background:linear-gradient(135deg,#fff 32%,#e83622 32% 68%,#1d2024 68%);"></span>大正三色
+      </button>
+      <button class="sub-btn" data-fish="yamabuki">
+        <span class="swatch" style="background:linear-gradient(135deg,#fff3a1,#f2ae1c);"></span>黃金
+      </button>
+      <button class="sub-btn" data-fish="shark">
+        <span class="swatch" style="background:linear-gradient(135deg,#72bde4 55%,#ffffff 55%);"></span>胖鯊魚
+      </button>
+    </div>
+
+    <div class="sub-bar" id="sub-decor">
+      <button class="sub-btn active" data-decor="lotus">🌸 睡蓮</button>
+      <button class="sub-btn" data-decor="pad">🍃 荷葉</button>
+      <button class="sub-btn" data-decor="rock">🪨 苔石</button>
+      <button class="sub-btn" data-decor="pebble">⚪ 卵石</button>
+    </div>
+
+    <div class="dock">
+      <button class="dock-btn active" data-mode="ripple">
+        <span class="ico">🌊</span><span>撥水</span>
+      </button>
+      <button class="dock-btn" data-mode="feed">
+        <span class="ico">🌾</span><span>投餵</span>
+      </button>
+      <button class="dock-btn" data-mode="fish">
+        <span class="ico">🐟</span><span>放魚</span>
+      </button>
+      <button class="dock-btn" data-mode="decor">
+        <span class="ico">🪷</span><span>造景</span>
+      </button>
+      <button class="dock-btn" data-mode="remove">
+        <span class="ico">✕</span><span>移除</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="fallback-msg">
+    您的裝置或瀏覽器目前不支援 WebGL，無法顯示 3D 錦鯉池。<br />請嘗試更新瀏覽器或開啟硬體加速。
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* =========================================================================
+       * 1. 內嵌輕量 Three.js 風格 WebGL 3D 引擎（完全離線、零外部網路請求）
+       * ========================================================================= */
+      const Mat4 = {
+        create() {
+          const m = new Float32Array(16);
+          m[0] = m[5] = m[10] = m[15] = 1;
+          return m;
+        },
+        multiply(out, a, b) {
+          const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+          const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+          const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+          const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+          for (let i = 0; i < 4; i++) {
+            const bi0 = b[i * 4], bi1 = b[i * 4 + 1], bi2 = b[i * 4 + 2], bi3 = b[i * 4 + 3];
+            out[i * 4]     = a00 * bi0 + a10 * bi1 + a20 * bi2 + a30 * bi3;
+            out[i * 4 + 1] = a01 * bi0 + a11 * bi1 + a21 * bi2 + a31 * bi3;
+            out[i * 4 + 2] = a02 * bi0 + a12 * bi1 + a22 * bi2 + a32 * bi3;
+            out[i * 4 + 3] = a03 * bi0 + a13 * bi1 + a23 * bi2 + a33 * bi3;
+          }
+          return out;
+        },
+        perspective(out, fovyRad, aspect, near, far) {
+          const f = 1.0 / Math.tan(fovyRad * 0.5);
+          const nf = 1.0 / (near - far);
+          out.fill(0);
+          out[0] = f / aspect;
+          out[5] = f;
+          out[10] = (far + near) * nf;
+          out[11] = -1;
+          out[14] = 2 * far * near * nf;
+          return out;
+        },
+        lookAt(out, eye, center, up) {
+          let zx = eye[0] - center[0];
+          let zy = eye[1] - center[1];
+          let zz = eye[2] - center[2];
+          let len = Math.hypot(zx, zy, zz) || 1;
+          zx /= len; zy /= len; zz /= len;
+
+          let xx = up[1] * zz - up[2] * zy;
+          let xy = up[2] * zx - up[0] * zz;
+          let xz = up[0] * zy - up[1] * zx;
+          len = Math.hypot(xx, xy, xz) || 1;
+          xx /= len; xy /= len; xz /= len;
+
+          const yx = zy * xz - zz * xy;
+          const yy = zz * xx - zx * xz;
+          const yz = zx * xy - zy * xx;
+
+          out[0] = xx; out[1] = yx; out[2] = zx; out[3] = 0;
+          out[4] = xy; out[5] = yy; out[6] = zy; out[7] = 0;
+          out[8] = xz; out[9] = yz; out[10] = zz; out[11] = 0;
+          out[12] = -(xx * eye[0] + xy * eye[1] + xz * eye[2]);
+          out[13] = -(yx * eye[0] + yy * eye[1] + yz * eye[2]);
+          out[14] = -(zx * eye[0] + zy * eye[1] + zz * eye[2]);
+          out[15] = 1;
+          return out;
+        },
+        // 順序：M = T * Ry * Rx * Rz * S
+        fromTRS(out, pos, rot, scale) {
+          const cx = Math.cos(rot.x), sx = Math.sin(rot.x);
+          const cy = Math.cos(rot.y), sy = Math.sin(rot.y);
+          const cz = Math.cos(rot.z), sz = Math.sin(rot.z);
+
+          const r00 = cy * cz + sy * sx * sz;
+          const r01 = -cy * sz + sy * sx * cz;
+          const r02 = sy * cx;
+
+          const r10 = cx * sz;
+          const r11 = cx * cz;
+          const r12 = -sx;
+
+          const r20 = -sy * cz + cy * sx * sz;
+          const r21 = sy * sz + cy * sx * cz;
+          const r22 = cy * cx;
+
+          out[0] = r00 * scale.x; out[1] = r10 * scale.x; out[2] = r20 * scale.x; out[3] = 0;
+          out[4] = r01 * scale.y; out[5] = r11 * scale.y; out[6] = r21 * scale.y; out[7] = 0;
+          out[8] = r02 * scale.z; out[9] = r12 * scale.z; out[10] = r22 * scale.z; out[11] = 0;
+          out[12] = pos.x; out[13] = pos.y; out[14] = pos.z; out[15] = 1;
+          return out;
+        },
+        // 正確計算 column-major 3x3 逆轉置矩陣 (M^-1)^T
+        normalFromMat4(out, m) {
+          const m00 = m[0], m10 = m[1], m20 = m[2];
+          const m01 = m[4], m11 = m[5], m21 = m[6];
+          const m02 = m[8], m12 = m[9], m22 = m[10];
+
+          const c00 = m11 * m22 - m12 * m21;
+          const c01 = -(m10 * m22 - m12 * m20);
+          const c02 = m10 * m21 - m11 * m20;
+
+          const c10 = -(m01 * m22 - m02 * m21);
+          const c11 = m00 * m22 - m02 * m20;
+          const c12 = -(m00 * m21 - m01 * m20);
+
+          const c20 = m01 * m12 - m02 * m11;
+          const c21 = -(m00 * m12 - m02 * m10);
+          const c22 = m00 * m11 - m01 * m10;
+
+          const det = m00 * c00 + m01 * c01 + m02 * c02;
+          if (Math.abs(det) < 1e-8) {
+            out[0] = 1; out[1] = 0; out[2] = 0;
+            out[3] = 0; out[4] = 1; out[5] = 0;
+            out[6] = 0; out[7] = 0; out[8] = 1;
+            return out;
+          }
+          const invDet = 1.0 / det;
+          out[0] = c00 * invDet; out[1] = c10 * invDet; out[2] = c20 * invDet;
+          out[3] = c01 * invDet; out[4] = c11 * invDet; out[5] = c21 * invDet;
+          out[6] = c02 * invDet; out[7] = c12 * invDet; out[8] = c22 * invDet;
+          return out;
+        },
+        invert(out, a) {
+          const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+          const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+          const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+          const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+          const b00 = a00 * a11 - a01 * a10;
+          const b01 = a00 * a12 - a02 * a10;
+          const b02 = a00 * a13 - a03 * a10;
+          const b03 = a01 * a12 - a02 * a11;
+          const b04 = a01 * a13 - a03 * a11;
+          const b05 = a02 * a13 - a03 * a12;
+          const b06 = a20 * a31 - a21 * a30;
+          const b07 = a20 * a32 - a22 * a30;
+          const b08 = a20 * a33 - a23 * a30;
+          const b09 = a21 * a32 - a22 * a31;
+          const b10 = a21 * a33 - a23 * a31;
+          const b11 = a22 * a33 - a23 * a32;
+
+          let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+          if (!det) return null;
+          det = 1.0 / det;
+
+          out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+          out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+          out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+          out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+          out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+          out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+          out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+          out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+          out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+          out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+          out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+          out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+          out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+          out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+          out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+          out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+          return out;
+        },
+        transformPoint(m, x, y, z) {
+          const w = m[3] * x + m[7] * y + m[11] * z + m[15] || 1;
+          return [
+            (m[0] * x + m[4] * y + m[8] * z + m[12]) / w,
+            (m[1] * x + m[5] * y + m[9] * z + m[13]) / w,
+            (m[2] * x + m[6] * y + m[10] * z + m[14]) / w
+          ];
+        }
+      };
+
+      const THREE = {
+        FrontSide: 0,
+        DoubleSide: 2,
+
+        BufferGeometry: class BufferGeometry {
+          constructor() {
+            this.attributes = {};
+            this.index = null;
+            this._uploaded = false;
+            this._glBuffers = {};
+            this._glIndex = null;
+            this._count = 0;
+          }
+          setAttribute(name, array, itemSize) {
+            this.attributes[name] = { array: array instanceof Float32Array ? array : new Float32Array(array), itemSize };
+            return this;
+          }
+          setIndex(array) {
+            this.index = array instanceof Uint16Array ? array : new Uint16Array(array);
+            return this;
+          }
+        },
+
+        CanvasTexture: class CanvasTexture {
+          constructor(canvas, opts = {}) {
+            this.image = canvas;
+            this.flipY = opts.flipY !== undefined ? opts.flipY : true;
+            this.repeat = !!opts.repeat;
+            this.needsUpdate = true;
+            this._glTex = null;
+            this.isTexture = true;
+          }
+        },
+
+        DataTexture: class DataTexture {
+          constructor(data, width, height) {
+            this.data = data;
+            this.width = width;
+            this.height = height;
+            this.needsUpdate = true;
+            this._glTex = null;
+            this.isTexture = true;
+            this.isDataTexture = true;
+          }
+        },
+
+        RenderTarget: class RenderTarget {
+          constructor(width, height) {
+            this.width = Math.max(2, width | 0);
+            this.height = Math.max(2, height | 0);
+            this.texture = { isTexture: true, _glTex: null };
+            this._fbo = null;
+            this._depthRb = null;
+          }
+          resize(gl, width, height) {
+            width = Math.max(2, width | 0);
+            height = Math.max(2, height | 0);
+            if (this._fbo && this.width === width && this.height === height) return;
+            this.width = width;
+            this.height = height;
+            if (!this._fbo) {
+              this._fbo = gl.createFramebuffer();
+              this.texture._glTex = gl.createTexture();
+              this._depthRb = gl.createRenderbuffer();
+            }
+            gl.bindTexture(gl.TEXTURE_2D, this.texture._glTex);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+            gl.bindRenderbuffer(gl.RENDERBUFFER, this._depthRb);
+            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this._fbo);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture._glTex, 0);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this._depthRb);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+          }
+        },
+
+        ShaderMaterial: class ShaderMaterial {
+          constructor(params) {
+            this.vertexShader = params.vertexShader;
+            this.fragmentShader = params.fragmentShader;
+            this.uniforms = params.uniforms || {};
+            this.transparent = !!params.transparent;
+            this.depthTest = params.depthTest !== undefined ? params.depthTest : true;
+            this.depthWrite = params.depthWrite !== undefined ? params.depthWrite : !this.transparent;
+            this.side = params.side !== undefined ? params.side : THREE.FrontSide;
+          }
+        },
+
+        Object3D: class Object3D {
+          constructor() {
+            this.position = { x: 0, y: 0, z: 0 };
+            this.rotation = { x: 0, y: 0, z: 0 };
+            this.scale = { x: 1, y: 1, z: 1 };
+            this.children = [];
+            this.visible = true;
+            this.renderOrder = 0;
+            this._localMat = Mat4.create();
+            this._worldMat = Mat4.create();
+            this._normalMat = new Float32Array(9);
+          }
+          add(child) {
+            this.children.push(child);
+            return this;
+          }
+          remove(child) {
+            const idx = this.children.indexOf(child);
+            if (idx >= 0) this.children.splice(idx, 1);
+            return this;
+          }
+          updateMatrixWorld(parentMat) {
+            Mat4.fromTRS(this._localMat, this.position, this.rotation, this.scale);
+            if (parentMat) Mat4.multiply(this._worldMat, parentMat, this._localMat);
+            else this._worldMat.set(this._localMat);
+            Mat4.normalFromMat4(this._normalMat, this._worldMat);
+            for (let i = 0; i < this.children.length; i++) {
+              this.children[i].updateMatrixWorld(this._worldMat);
+            }
+          }
+        },
+
+        Mesh: class Mesh {
+          constructor(geometry, material) {
+            this.geometry = geometry;
+            this.material = material;
+            this.position = { x: 0, y: 0, z: 0 };
+            this.rotation = { x: 0, y: 0, z: 0 };
+            this.scale = { x: 1, y: 1, z: 1 };
+            this.children = [];
+            this.visible = true;
+            this.renderOrder = 0;
+            this.isMesh = true;
+            this._localMat = Mat4.create();
+            this._worldMat = Mat4.create();
+            this._normalMat = new Float32Array(9);
+          }
+          add(child) {
+            this.children.push(child);
+            return this;
+          }
+          remove(child) {
+            const idx = this.children.indexOf(child);
+            if (idx >= 0) this.children.splice(idx, 1);
+            return this;
+          }
+          updateMatrixWorld(parentMat) {
+            Mat4.fromTRS(this._localMat, this.position, this.rotation, this.scale);
+            if (parentMat) Mat4.multiply(this._worldMat, parentMat, this._localMat);
+            else this._worldMat.set(this._localMat);
+            Mat4.normalFromMat4(this._normalMat, this._worldMat);
+            for (let i = 0; i < this.children.length; i++) {
+              this.children[i].updateMatrixWorld(this._worldMat);
+            }
+          }
+        },
+
+        PerspectiveCamera: class PerspectiveCamera {
+          constructor(fov, aspect, near, far) {
+            this.fov = fov;
+            this.aspect = aspect;
+            this.near = near;
+            this.far = far;
+            this.eye = [0, 13.5, 1.3];
+            this.target = [0, 0, 0];
+            this.up = [0, 0, -1];
+            this.projectionMatrix = Mat4.create();
+            this.viewMatrix = Mat4.create();
+            this.viewProjMatrix = Mat4.create();
+            this.invViewProjMatrix = Mat4.create();
+            this.updateMatrices();
+          }
+          updateMatrices() {
+            Mat4.perspective(this.projectionMatrix, (this.fov * Math.PI) / 180, this.aspect, this.near, this.far);
+            Mat4.lookAt(this.viewMatrix, this.eye, this.target, this.up);
+            Mat4.multiply(this.viewProjMatrix, this.projectionMatrix, this.viewMatrix);
+            Mat4.invert(this.invViewProjMatrix, this.viewProjMatrix);
+          }
+          screenToWaterPlane(ndcX, ndcY) {
+            const p0 = Mat4.transformPoint(this.invViewProjMatrix, ndcX, ndcY, -1);
+            const p1 = Mat4.transformPoint(this.invViewProjMatrix, ndcX, ndcY, 1);
+            const dy = p1[1] - p0[1];
+            if (Math.abs(dy) < 1e-6) return { x: 0, z: 0 };
+            const t = -p0[1] / dy;
+            return { x: p0[0] + t * (p1[0] - p0[0]), z: p0[2] + t * (p1[2] - p0[2]) };
+          }
+        },
+
+        WebGLRenderer: class WebGLRenderer {
+          constructor(canvas) {
+            this.canvas = canvas;
+            const gl = canvas.getContext('webgl', {
+              alpha: false,
+              antialias: true,
+              premultipliedAlpha: false,
+              powerPreference: 'high-performance'
+            }) || canvas.getContext('experimental-webgl');
+            if (!gl) throw new Error('WebGL unavailable');
+            this.gl = gl;
+            this._programCache = new Map();
+            this._drawList = [];
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+          }
+
+          setSize(cssW, cssH, dpr) {
+            const w = Math.max(2, Math.floor(cssW * dpr));
+            const h = Math.max(2, Math.floor(cssH * dpr));
+            if (this.canvas.width !== w || this.canvas.height !== h) {
+              this.canvas.width = w;
+              this.canvas.height = h;
+            }
+          }
+
+          _getProgram(vsSrc, fsSrc) {
+            const key = vsSrc + '###' + fsSrc;
+            let prog = this._programCache.get(key);
+            if (prog) return prog;
+
+            const gl = this.gl;
+            const compile = (type, src) => {
+              const s = gl.createShader(type);
+              gl.shaderSource(s, src);
+              gl.compileShader(s);
+              if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error('Shader compile error:', gl.getShaderInfoLog(s));
+                return null;
+              }
+              return s;
+            };
+            const vs = compile(gl.VERTEX_SHADER, vsSrc);
+            const fs = compile(gl.FRAGMENT_SHADER, fsSrc);
+            if (!vs || !fs) return null;
+
+            const p = gl.createProgram();
+            gl.attachShader(p, vs);
+            gl.attachShader(p, fs);
+            gl.linkProgram(p);
+            if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+              console.error('Program link error:', gl.getProgramInfoLog(p));
+              return null;
+            }
+
+            const uniforms = {};
+            const nUni = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+            for (let i = 0; i < nUni; i++) {
+              const info = gl.getActiveUniform(p, i);
+              if (info) uniforms[info.name] = { loc: gl.getUniformLocation(p, info.name), type: info.type };
+            }
+            const attribs = {};
+            const nAtt = gl.getProgramParameter(p, gl.ACTIVE_ATTRIBUTES);
+            for (let i = 0; i < nAtt; i++) {
+              const info = gl.getActiveAttrib(p, i);
+              if (info) attribs[info.name] = gl.getAttribLocation(p, info.name);
+            }
+            prog = { program: p, uniforms, attribs };
+            this._programCache.set(key, prog);
+            return prog;
+          }
+
+          _uploadGeometry(geo) {
+            if (geo._uploaded) return;
+            const gl = this.gl;
+            for (const name in geo.attributes) {
+              const attr = geo.attributes[name];
+              const buf = gl.createBuffer();
+              gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+              gl.bufferData(gl.ARRAY_BUFFER, attr.array, gl.STATIC_DRAW);
+              geo._glBuffers[name] = { buf, itemSize: attr.itemSize };
+              if (name === 'position') geo._count = attr.array.length / attr.itemSize;
+            }
+            if (geo.index) {
+              const ib = gl.createBuffer();
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geo.index, gl.STATIC_DRAW);
+              geo._glIndex = ib;
+              geo._count = geo.index.length;
+            }
+            geo._uploaded = true;
+          }
+
+          _bindTexture(tex, unit) {
+            const gl = this.gl;
+            gl.activeTexture(gl.TEXTURE0 + unit);
+            if (!tex._glTex) {
+              tex._glTex = gl.createTexture();
+              tex.needsUpdate = true;
+            }
+            gl.bindTexture(gl.TEXTURE_2D, tex._glTex);
+            if (tex.needsUpdate) {
+              if (tex.isDataTexture) {
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tex.width, tex.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, tex.data);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+              } else if (tex.image) {
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, !!tex.flipY);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.image);
+                const wrap = tex.repeat ? gl.REPEAT : gl.CLAMP_TO_EDGE;
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
+              }
+              tex.needsUpdate = false;
+            }
+          }
+
+          _collectMeshes(node, list) {
+            if (!node.visible) return;
+            if (node.isMesh && node.geometry && node.material) list.push(node);
+            for (let i = 0; i < node.children.length; i++) {
+              this._collectMeshes(node.children[i], list);
+            }
+          }
+
+          render(root, camera, target, opts = {}) {
+            const gl = this.gl;
+            if (target) {
+              gl.bindFramebuffer(gl.FRAMEBUFFER, target._fbo);
+              gl.viewport(0, 0, target.width, target.height);
+            } else {
+              gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+              gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            const clearColor = opts.clearColor !== false;
+            const clearDepth = opts.clearDepth !== false;
+            let clearMask = 0;
+            if (clearColor) {
+              const cc = opts.bgColor || [0.04, 0.14, 0.16, 1.0];
+              gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+              clearMask |= gl.COLOR_BUFFER_BIT;
+            }
+            if (clearDepth) {
+              gl.depthMask(true);
+              clearMask |= gl.DEPTH_BUFFER_BIT;
+            }
+            if (clearMask) gl.clear(clearMask);
+
+            root.updateMatrixWorld(null);
+
+            const list = this._drawList;
+            list.length = 0;
+            this._collectMeshes(root, list);
+
+            // 排序：不透明先畫，再依 renderOrder 畫透明物件
+            list.sort((a, b) => {
+              const ta = a.material.transparent ? 1 : 0;
+              const tb = b.material.transparent ? 1 : 0;
+              if (ta !== tb) return ta - tb;
+              return a.renderOrder - b.renderOrder;
+            });
+
+            for (let i = 0; i < list.length; i++) {
+              const mesh = list[i];
+              const mat = mesh.material;
+              const geo = mesh.geometry;
+              const prog = this._getProgram(mat.vertexShader, mat.fragmentShader);
+              if (!prog) continue;
+
+              this._uploadGeometry(geo);
+              gl.useProgram(prog.program);
+
+              if (mat.depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
+              gl.depthMask(!!mat.depthWrite);
+
+              if (mat.transparent) gl.enable(gl.BLEND); else gl.disable(gl.BLEND);
+              if (mat.side === THREE.DoubleSide) gl.disable(gl.CULL_FACE);
+              else { gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK); }
+
+              // 內建矩陣 Uniforms
+              const u = prog.uniforms;
+              if (u.uModelMatrix) gl.uniformMatrix4fv(u.uModelMatrix.loc, false, mesh._worldMat);
+              if (u.uViewMatrix && camera) gl.uniformMatrix4fv(u.uViewMatrix.loc, false, camera.viewMatrix);
+              if (u.uProjectionMatrix && camera) gl.uniformMatrix4fv(u.uProjectionMatrix.loc, false, camera.projectionMatrix);
+              if (u.uNormalMatrix) gl.uniformMatrix3fv(u.uNormalMatrix.loc, false, mesh._normalMat);
+
+              // 材質自訂 Uniforms
+              let texUnit = 0;
+              for (const name in mat.uniforms) {
+                const uInfo = u[name];
+                if (!uInfo) continue;
+                const val = mat.uniforms[name].value;
+                if (val === null || val === undefined) continue;
+                if (val.isTexture) {
+                  this._bindTexture(val, texUnit);
+                  gl.uniform1i(uInfo.loc, texUnit++);
+                } else if (typeof val === 'number') {
+                  gl.uniform1f(uInfo.loc, val);
+                } else if (val.length === 2) {
+                  gl.uniform2f(uInfo.loc, val[0], val[1]);
+                } else if (val.length === 3) {
+                  gl.uniform3f(uInfo.loc, val[0], val[1], val[2]);
+                } else if (val.length === 4) {
+                  gl.uniform4f(uInfo.loc, val[0], val[1], val[2], val[3]);
+                }
+              }
+
+              // 綁定頂點屬性
+              for (const attName in prog.attribs) {
+                const loc = prog.attribs[attName];
+                if (loc < 0) continue;
+                const gBuf = geo._glBuffers[attName];
+                if (!gBuf) continue;
+                gl.bindBuffer(gl.ARRAY_BUFFER, gBuf.buf);
+                gl.enableVertexAttribArray(loc);
+                gl.vertexAttribPointer(loc, gBuf.itemSize, gl.FLOAT, false, 0, 0);
+              }
+
+              if (geo._glIndex) {
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, geo._glIndex);
+                gl.drawElements(gl.TRIANGLES, geo._count, gl.UNSIGNED_SHORT, 0);
+              } else {
+                gl.drawArrays(gl.TRIANGLES, 0, geo._count);
+              }
+            }
+            gl.depthMask(true);
+          }
+        }
+      };
+
+      /* =========================================================================
+       * 2. Web Audio API 純程式合成水聲與咬食音效（零外部音檔）
+       * ========================================================================= */
+      class PondAudio {
+        constructor() {
+          this.enabled = true;
+          this.ctx = null;
+          this._lastSwipe = 0;
+        }
+        _ensure() {
+          if (!this.enabled) return null;
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            this.ctx = new AC();
+          }
+          if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+          return this.ctx;
+        }
+        playPlop(pitch = 1.0, vol = 0.14) {
+          const ctx = this._ensure();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320 * pitch, now);
+          osc.frequency.exponentialRampToValueAtTime(760 * pitch, now + 0.09);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(vol, now + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.17);
+        }
+        playSwipe() {
+          const t = performance.now();
+          if (t - this._lastSwipe < 140) return;
+          this._lastSwipe = t;
+          this.playPlop(0.85 + Math.random() * 0.45, 0.055);
+        }
+        playGulp() {
+          const ctx = this._ensure();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(480, now);
+          osc.frequency.exponentialRampToValueAtTime(210, now + 0.07);
+          osc.frequency.exponentialRampToValueAtTime(620, now + 0.14);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.11, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.17);
+        }
+        playChomp() {
+          const ctx = this._ensure();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          // 低沉俏皮咬合 + 水花氣泡
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(88, now + 0.13);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.22, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.24);
+
+          setTimeout(() => this.playPlop(1.35, 0.11), 65);
+          setTimeout(() => this.playPlop(1.75, 0.08), 130);
+        }
       }
-    };
-// ... existing code ...
-        for (let i = 0; i < normals.length; i += 3) {
-          const l = Math.hypot(nAcc[i], nAcc[i + 1], nAcc[i + 2]);
-          if (l > 1e-6) {
-            normals[i] = nAcc[i] / l;
-            normals[i + 1] = nAcc[i + 1] / l;
-            normals[i + 2] = nAcc[i + 2] / l;
+
+      /* =========================================================================
+       * 3. 2D 波動方程水波模擬器（支援苔石障礙反射與即時高度採樣）
+       * ========================================================================= */
+      class WaterRippleSim {
+        constructor(w, h) {
+          this.w = w;
+          this.h = h;
+          const n = w * h;
+          this.curr = new Float32Array(n);
+          this.prev = new Float32Array(n);
+          this.next = new Float32Array(n);
+          this.obstacle = new Uint8Array(n);
+          this.texData = new Uint8Array(n * 4);
+          this.texture = new THREE.DataTexture(this.texData, w, h);
+          this.damping = 0.974;
+        }
+
+        clearObstacles() {
+          this.obstacle.fill(0);
+        }
+
+        addObstacleCircle(u, v, radU, radV) {
+          const cx = u * this.w;
+          const cy = v * this.h;
+          const rx = Math.max(1, radU * this.w);
+          const ry = Math.max(1, radV * this.h);
+          const x0 = Math.max(1, Math.floor(cx - rx - 1));
+          const x1 = Math.min(this.w - 2, Math.ceil(cx + rx + 1));
+          const y0 = Math.max(1, Math.floor(cy - ry - 1));
+          const y1 = Math.min(this.h - 2, Math.ceil(cy + ry + 1));
+          for (let y = y0; y <= y1; y++) {
+            for (let x = x0; x <= x1; x++) {
+              const dx = (x - cx) / rx;
+              const dy = (y - cy) / ry;
+              if (dx * dx + dy * dy <= 1.0) {
+                const idx = y * this.w + x;
+                this.obstacle[idx] = 1;
+                this.curr[idx] = 0;
+                this.prev[idx] = 0;
+              }
+            }
+          }
+        }
+
+        drop(u, v, radiusCells, strength) {
+          const cx = u * this.w;
+          const cy = v * this.h;
+          const r = Math.max(1.5, radiusCells);
+          const x0 = Math.max(2, Math.floor(cx - r));
+          const x1 = Math.min(this.w - 3, Math.ceil(cx + r));
+          const y0 = Math.max(2, Math.floor(cy - r));
+          const y1 = Math.min(this.h - 3, Math.ceil(cy + r));
+          for (let y = y0; y <= y1; y++) {
+            for (let x = x0; x <= x1; x++) {
+              const idx = y * this.w + x;
+              if (this.obstacle[idx]) continue;
+              const d = Math.hypot(x - cx, y - cy) / r;
+              if (d < 1.0) {
+                const falloff = Math.cos(d * Math.PI * 0.5);
+                this.curr[idx] = Math.max(-2.0, Math.min(2.0, this.curr[idx] + strength * falloff * falloff));
+              }
+            }
+          }
+        }
+
+        step() {
+          const w = this.w, h = this.h;
+          const curr = this.curr, prev = this.prev, next = this.next, obs = this.obstacle;
+          const damp = this.damping;
+
+          for (let y = 1; y < h - 1; y++) {
+            const row = y * w;
+            for (let x = 1; x < w - 1; x++) {
+              const i = row + x;
+              if (obs[i]) {
+                next[i] = 0;
+                continue;
+              }
+              const l = obs[i - 1] ? curr[i] : curr[i - 1];
+              const r = obs[i + 1] ? curr[i] : curr[i + 1];
+              const u = obs[i - w] ? curr[i] : curr[i - w];
+              const d = obs[i + w] ? curr[i] : curr[i + w];
+              let val = ((l + r + u + d) * 0.5 - prev[i]) * damp;
+              if (val > 2.2) val = 2.2;
+              else if (val < -2.2) val = -2.2;
+              next[i] = val;
+            }
+          }
+
+          // 柔和吸收邊界
+          for (let x = 0; x < w; x++) {
+            next[x] = next[w + x] * 0.6;
+            next[(h - 1) * w + x] = next[(h - 2) * w + x] * 0.6;
+          }
+          for (let y = 0; y < h; y++) {
+            next[y * w] = next[y * w + 1] * 0.6;
+            next[y * w + w - 1] = next[y * w + w - 2] * 0.6;
+          }
+
+          this.prev = curr;
+          this.curr = next;
+          this.next = prev;
+        }
+
+        sample(u, v) {
+          const x = Math.max(1, Math.min(this.w - 2, Math.floor(u * this.w)));
+          const y = Math.max(1, Math.min(this.h - 2, Math.floor(v * this.h)));
+          const i = y * this.w + x;
+          return {
+            h: this.curr[i],
+            dx: this.curr[i + 1] - this.curr[i - 1],
+            dy: this.curr[i + this.w] - this.curr[i - this.w]
+          };
+        }
+
+        updateTexture() {
+          const w = this.w, h = this.h;
+          const curr = this.curr, data = this.texData;
+          for (let y = 0; y < h; y++) {
+            const ym = y > 0 ? y - 1 : 0;
+            const yp = y < h - 1 ? y + 1 : h - 1;
+            for (let x = 0; x < w; x++) {
+              const xm = x > 0 ? x - 1 : 0;
+              const xp = x < w - 1 ? x + 1 : w - 1;
+              const i = y * w + x;
+              const hVal = curr[i];
+              const dx = curr[y * w + xp] - curr[y * w + xm];
+              const dy = curr[yp * w + x] - curr[ym * w + x];
+              const p = i * 4;
+              data[p]     = Math.max(0, Math.min(255, Math.round(128 + hVal * 90)));
+              data[p + 1] = Math.max(0, Math.min(255, Math.round(128 + dx * 180)));
+              data[p + 2] = Math.max(0, Math.min(255, Math.round(128 + dy * 180)));
+              data[p + 3] = 255;
+            }
+          }
+          this.texture.needsUpdate = true;
+        }
+      }
+
+      /* =========================================================================
+       * 4. 純程式化紋理工廠（池底、三種錦鯉、參考附圖 3D Pixar 胖鯊魚、造景）
+       * ========================================================================= */
+      const TextureFactory = {
+        // 池底自然溪床（柔和深青灰細沙與圓潤暗色溪石）
+        createPondBedTexture() {
+          const c = document.createElement('canvas');
+          c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+
+          const bg = ctx.createRadialGradient(256, 256, 40, 256, 256, 360);
+          bg.addColorStop(0.0, '#184047');
+          bg.addColorStop(0.55, '#123239');
+          bg.addColorStop(1.0, '#0a1f24');
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, 512, 512);
+
+          // 細沙微粒
+          for (let i = 0; i < 3200; i++) {
+            const x = Math.random() * 512;
+            const y = Math.random() * 512;
+            const r = 0.7 + Math.random() * 1.9;
+            const l = 28 + Math.random() * 34;
+            ctx.fillStyle = `rgba(${l + 8}, ${l + 32}, ${l + 34}, ${0.08 + Math.random() * 0.14})`;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // 池底平滑小卵石
+          for (let i = 0; i < 150; i++) {
+            const x = Math.random() * 512;
+            const y = Math.random() * 512;
+            const rx = 5 + Math.random() * 14;
+            const ry = rx * (0.62 + Math.random() * 0.32);
+            const rot = Math.random() * Math.PI;
+            const tone = Math.random();
+            let col;
+            if (tone < 0.45) col = `rgba(38, 72, 74, ${0.35 + Math.random() * 0.25})`;
+            else if (tone < 0.75) col = `rgba(60, 84, 78, ${0.3 + Math.random() * 0.25})`;
+            else col = `rgba(82, 86, 74, ${0.24 + Math.random() * 0.22})`;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rot);
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(180, 225, 220, 0.08)';
+            ctx.beginPath();
+            ctx.ellipse(-rx * 0.22, -ry * 0.22, rx * 0.45, ry * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+          return new THREE.CanvasTexture(c, { repeat: true, flipY: false });
+        },
+
+        // 三種錦鯉紋理（u: 0=尾 -> 1=頭，v: 0.5=背脊正中）
+        createKoiTexture(variant) {
+          const c = document.createElement('canvas');
+          c.width = 512; c.height = 256;
+          const ctx = c.getContext('2d');
+
+          if (variant === 'yamabuki') {
+            const g = ctx.createLinearGradient(0, 0, 0, 256);
+            g.addColorStop(0.0, '#f0b624');
+            g.addColorStop(0.25, '#ffd95e');
+            g.addColorStop(0.5, '#ffe784');
+            g.addColorStop(0.75, '#ffd95e');
+            g.addColorStop(1.0, '#f0b624');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 512, 256);
+
+            // 金屬鱗片網格光澤
+            ctx.strokeStyle = 'rgba(218, 146, 16, 0.34)';
+            ctx.lineWidth = 1.4;
+            for (let x = 55; x < 410; x += 18) {
+              for (let y = 26; y < 230; y += 16) {
+                const ox = ((y / 16) % 2) * 9;
+                ctx.beginPath();
+                ctx.arc(x + ox, y, 8.5, -Math.PI * 0.55, Math.PI * 0.55);
+                ctx.stroke();
+              }
+            }
           } else {
-            normals[i] = 0;
-            normals[i + 1] = 1;
-            normals[i + 2] = 0;
-          }
-        }
+            // 純白瓷感底色
+            const g = ctx.createLinearGradient(0, 0, 0, 256);
+            g.addColorStop(0.0, '#dbe5e9');
+            g.addColorStop(0.22, '#f8fbfc');
+            g.addColorStop(0.5, '#ffffff');
+            g.addColorStop(0.78, '#f8fbfc');
+            g.addColorStop(1.0, '#dbe5e9');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 512, 256);
 
-        return new THREE.BufferGeometry()
-// ... existing code ...
-        for (let i = 0; i < normals.length; i += 3) {
-          const l = Math.hypot(nAcc[i], nAcc[i + 1], nAcc[i + 2]);
-          if (l > 1e-6) {
-            normals[i] = nAcc[i] / l;
-            normals[i + 1] = nAcc[i + 1] / l;
-            normals[i + 2] = nAcc[i + 2] / l;
+            // 緋紅大斑（紅白 / 大正三色）
+            const drawBlob = (cx, cy, rx, ry, col) => {
+              ctx.fillStyle = col;
+              ctx.beginPath();
+              ctx.ellipse(cx, cy, rx, ry, (Math.random() - 0.5) * 0.4, 0, Math.PI * 2);
+              ctx.fill();
+            };
+
+            const hi = '#e9381d';
+            const hiDeep = '#d22712';
+            // 頭部丹頂／面紋
+            drawBlob(430, 128, 42, 46, hi);
+            // 中背大紅斑
+            drawBlob(285, 118, 72, 64, hi);
+            drawBlob(305, 146, 56, 48, hiDeep);
+            // 後段紅斑
+            drawBlob(148, 132, 48, 46, hi);
+
+            if (variant === 'sanke') {
+              // 大正三色：墨斑（Sumi）點綴
+              const sumi = '#191d22';
+              drawBlob(346, 98, 22, 16, sumi);
+              drawBlob(240, 158, 26, 18, sumi);
+              drawBlob(188, 108, 19, 15, sumi);
+              drawBlob(112, 145, 16, 13, sumi);
+            }
+
+            // 柔和細緻鱗紋
+            ctx.strokeStyle = 'rgba(130, 148, 158, 0.14)';
+            ctx.lineWidth = 1.1;
+            for (let x = 60; x < 395; x += 20) {
+              for (let y = 30; y < 226; y += 18) {
+                const ox = ((y / 18) % 2) * 10;
+                ctx.beginPath();
+                ctx.arc(x + ox, y, 9, -Math.PI * 0.5, Math.PI * 0.5);
+                ctx.stroke();
+              }
+            }
+          }
+
+          // 錦鯉雙眼（位於頭部兩側偏上，俯視清晰可見）
+          const drawEye = (ey) => {
+            ctx.fillStyle = '#0e1216';
+            ctx.beginPath();
+            ctx.arc(448, ey, 8.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(451, ey - 2.5, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+          };
+          drawEye(84);
+          drawEye(172);
+
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 錦鯉半透明飄逸魚鰭紋理
+        createKoiFinTexture(variant) {
+          const c = document.createElement('canvas');
+          c.width = 128; c.height = 128;
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, 128, 128);
+
+          const g = ctx.createLinearGradient(0, 0, 128, 0);
+          if (variant === 'yamabuki') {
+            g.addColorStop(0.0, 'rgba(255, 224, 118, 0.92)');
+            g.addColorStop(0.65, 'rgba(255, 238, 168, 0.55)');
+            g.addColorStop(1.0, 'rgba(255, 250, 220, 0.08)');
           } else {
-            normals[i] = 0;
-            normals[i + 1] = 1;
-            normals[i + 2] = 0;
+            g.addColorStop(0.0, 'rgba(255, 252, 248, 0.90)');
+            g.addColorStop(0.65, 'rgba(250, 248, 246, 0.50)');
+            g.addColorStop(1.0, 'rgba(255, 255, 255, 0.06)');
+          }
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 128, 128);
+
+          // 細緻放射鰭條
+          ctx.strokeStyle = variant === 'yamabuki' ? 'rgba(235, 175, 40, 0.35)' : 'rgba(215, 225, 232, 0.42)';
+          ctx.lineWidth = 1.5;
+          for (let i = 1; i < 11; i++) {
+            const y = (i / 11) * 128;
+            ctx.beginPath();
+            ctx.moveTo(0, 64 + (y - 64) * 0.35);
+            ctx.lineTo(122, y);
+            ctx.stroke();
+          }
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 參考附圖：3D Pixar 可愛胖鯊魚軀幹紋理（清新天空藍背 + 柔順弧線純白肚皮 + 三道鰓裂陰影）
+        createSharkBodyTexture() {
+          const c = document.createElement('canvas');
+          c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+
+          // u (x): 0 = 尾柄, 1 = 吻端
+          // v (y): 0 = 肚底(-Y), 0.25 = 右側(+X), 0.5 = 背脊(+Y), 0.75 = 左側(-X), 1 = 肚底(-Y)
+          const bg = ctx.createLinearGradient(0, 0, 0, 512);
+          bg.addColorStop(0.0, '#6bb8e2');
+          bg.addColorStop(0.24, '#66b5e0');
+          bg.addColorStop(0.5, '#7cc6ec');
+          bg.addColorStop(0.76, '#66b5e0');
+          bg.addColorStop(1.0, '#6bb8e2');
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, 512, 512);
+
+          // 繪製純白光滑肚皮與微笑下巴（依附圖弧線上揚至眼睛下方）
+          const whiteHeightAt = (u) => {
+            // u=0 尾柄極窄白肚，u=0.55 中腹寬圓，u=0.82 微笑嘴角上揚，u=1.0 吻尖收合
+            if (u < 0.08) return 0.08 + u * 0.9;
+            const belly = 0.165 + 0.045 * Math.sin(Math.min(1, u) * Math.PI);
+            const cheekRise = u > 0.55 ? 0.068 * Math.pow((u - 0.55) / 0.45, 1.35) * (1.0 - Math.pow(Math.max(0, (u - 0.88) / 0.12), 2.0)) : 0;
+            return Math.min(0.265, belly + cheekRise);
+          };
+
+          // 下半部 v ∈ [0, whiteH] 與上半部 v ∈ [1 - whiteH, 1] 均為純白肚皮
+          const drawBellyBand = (isTopWrap) => {
+            ctx.beginPath();
+            if (!isTopWrap) {
+              ctx.moveTo(0, 0);
+              for (let x = 0; x <= 512; x += 4) {
+                const u = x / 512;
+                ctx.lineTo(x, whiteHeightAt(u) * 512);
+              }
+              ctx.lineTo(512, 0);
+            } else {
+              ctx.moveTo(0, 512);
+              for (let x = 0; x <= 512; x += 4) {
+                const u = x / 512;
+                ctx.lineTo(x, (1.0 - whiteHeightAt(u)) * 512);
+              }
+              ctx.lineTo(512, 512);
+            }
+            ctx.closePath();
+            ctx.fillStyle = '#fafdff';
+            ctx.fill();
+
+            // 藍白交界微柔邊緣
+            ctx.strokeStyle = 'rgba(182, 224, 244, 0.65)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+          };
+          drawBellyBand(false);
+          drawBellyBand(true);
+
+          // 兩側三道柔和凹刻鰓裂陰影（對應 3D 網格凹槽位置 u ≈ 0.53..0.63）
+          const drawGills = (cy) => {
+            for (let g = 0; g < 3; g++) {
+              const gx = (0.525 + g * 0.036) * 512;
+              ctx.strokeStyle = 'rgba(42, 108, 150, 0.55)';
+              ctx.lineWidth = 4.2;
+              ctx.lineCap = 'round';
+              ctx.beginPath();
+              ctx.moveTo(gx, cy - 22);
+              ctx.quadraticCurveTo(gx - 7, cy, gx + 1, cy + 22);
+              ctx.stroke();
+
+              // 鰓裂旁高光小邊
+              ctx.strokeStyle = 'rgba(190, 232, 252, 0.45)';
+              ctx.lineWidth = 2.0;
+              ctx.beginPath();
+              ctx.moveTo(gx + 3.5, cy - 20);
+              ctx.quadraticCurveTo(gx - 3.5, cy, gx + 4.5, cy + 20);
+              ctx.stroke();
+            }
+          };
+          drawGills(0.265 * 512);
+          drawGills(0.735 * 512);
+
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 胖鯊魚圓厚四鰭紋理（同款清亮天空藍漸層）
+        createSharkFinTexture() {
+          const c = document.createElement('canvas');
+          c.width = 128; c.height = 128;
+          const ctx = c.getContext('2d');
+          const g = ctx.createLinearGradient(0, 0, 128, 128);
+          g.addColorStop(0.0, '#78c3ea');
+          g.addColorStop(0.55, '#64b3df');
+          g.addColorStop(1.0, '#4f9fcd');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 128, 128);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 附圖同款亮黑圓珠大眼（帶純白攝影棚柔光箱反光）
+        createSharkEyeTexture() {
+          const c = document.createElement('canvas');
+          c.width = 256; c.height = 256;
+          const ctx = c.getContext('2d');
+          const g = ctx.createRadialGradient(112, 104, 10, 128, 128, 130);
+          g.addColorStop(0.0, '#1d242b');
+          g.addColorStop(0.45, '#090c10');
+          g.addColorStop(1.0, '#040608');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // 上方主弧形攝影棚柔光反光
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+          ctx.beginPath();
+          ctx.ellipse(116, 94, 42, 22, -0.22, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 右下點綴小亮點
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+          ctx.beginPath();
+          ctx.arc(164, 152, 10, 0, Math.PI * 2);
+          ctx.fill();
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 3D 深紅微笑口腔內壁紋理
+        createSharkMouthTexture() {
+          const c = document.createElement('canvas');
+          c.width = 64; c.height = 64;
+          const ctx = c.getContext('2d');
+          const g = ctx.createRadialGradient(32, 32, 4, 32, 32, 36);
+          g.addColorStop(0.0, '#7c0a14');
+          g.addColorStop(0.65, '#b21422');
+          g.addColorStop(1.0, '#cb1e2e');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 64, 64);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 3D 純白小尖牙紋理
+        createSharkTeethTexture() {
+          const c = document.createElement('canvas');
+          c.width = 32; c.height = 32;
+          const ctx = c.getContext('2d');
+          const g = ctx.createLinearGradient(0, 0, 0, 32);
+          g.addColorStop(0.0, '#f2f6fa');
+          g.addColorStop(1.0, '#ffffff');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 32, 32);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 鼻孔紋理
+        createSharkNostrilTexture() {
+          const c = document.createElement('canvas');
+          c.width = 32; c.height = 32;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#2d688d';
+          ctx.fillRect(0, 0, 32, 32);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 翠綠放射葉脈荷葉紋理
+        createLilyPadTexture() {
+          const c = document.createElement('canvas');
+          c.width = 256; c.height = 256;
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, 256, 256);
+
+          const cx = 128, cy = 128, R = 118;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, R, 0.24, Math.PI * 2 - 0.24);
+          ctx.closePath();
+
+          const g = ctx.createRadialGradient(cx, cy, 8, cx, cy, R);
+          g.addColorStop(0.0, '#5ea84f');
+          g.addColorStop(0.55, '#3b823c');
+          g.addColorStop(0.92, '#2a6430');
+          g.addColorStop(1.0, '#225229');
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          // 葉脈
+          ctx.clip();
+          ctx.strokeStyle = 'rgba(155, 224, 128, 0.38)';
+          ctx.lineWidth = 2.0;
+          for (let i = 0; i < 16; i++) {
+            const a = 0.35 + (i / 15) * (Math.PI * 2 - 0.7);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+            ctx.stroke();
+          }
+          // 水珠亮點
+          for (let i = 0; i < 6; i++) {
+            const a = 0.6 + i * 0.95;
+            const d = 34 + (i % 3) * 26;
+            ctx.fillStyle = 'rgba(220, 255, 240, 0.58)';
+            ctx.beginPath();
+            ctx.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 3.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 粉白漸層睡蓮花瓣紋理
+        createLotusPetalTexture() {
+          const c = document.createElement('canvas');
+          c.width = 64; c.height = 128;
+          const ctx = c.getContext('2d');
+          const g = ctx.createLinearGradient(0, 128, 0, 0);
+          g.addColorStop(0.0, '#fff7f0');
+          g.addColorStop(0.45, '#ffd7e5');
+          g.addColorStop(0.85, '#f588b0');
+          g.addColorStop(1.0, '#e25c8f');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 64, 128);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 苔石紋理（濕潤深岩配青翠苔蘚）
+        createMossRockTexture() {
+          const c = document.createElement('canvas');
+          c.width = 256; c.height = 256;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#475252';
+          ctx.fillRect(0, 0, 256, 256);
+
+          for (let i = 0; i < 700; i++) {
+            const x = Math.random() * 256;
+            const y = Math.random() * 256;
+            const r = 2 + Math.random() * 7;
+            const v = 50 + Math.random() * 45;
+            ctx.fillStyle = `rgba(${v}, ${v + 6}, ${v + 4}, 0.35)`;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          // 頂部苔蘚（uv.y 高處）
+          for (let i = 0; i < 240; i++) {
+            const x = Math.random() * 256;
+            const y = Math.random() * 140;
+            const r = 3 + Math.random() * 11;
+            ctx.fillStyle = `rgba(${56 + Math.random() * 34}, ${112 + Math.random() * 48}, ${48 + Math.random() * 25}, 0.52)`;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 卵石紋理
+        createPebbleTexture() {
+          const c = document.createElement('canvas');
+          c.width = 128; c.height = 128;
+          const ctx = c.getContext('2d');
+          const g = ctx.createRadialGradient(54, 48, 8, 64, 64, 72);
+          g.addColorStop(0.0, '#9aa5a0');
+          g.addColorStop(0.6, '#6e7b78');
+          g.addColorStop(1.0, '#465454');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 128, 128);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 柔和圓形陰影貼圖
+        createSoftShadowTexture() {
+          const c = document.createElement('canvas');
+          c.width = 128; c.height = 128;
+          const ctx = c.getContext('2d');
+          const g = ctx.createRadialGradient(64, 64, 8, 64, 64, 62);
+          g.addColorStop(0.0, 'rgba(3, 12, 15, 0.56)');
+          g.addColorStop(0.55, 'rgba(3, 12, 15, 0.28)');
+          g.addColorStop(1.0, 'rgba(3, 12, 15, 0.0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 128, 128);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 魚形陰影貼圖
+        createFishShadowTexture() {
+          const c = document.createElement('canvas');
+          c.width = 128; c.height = 256;
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, 128, 256);
+          const g = ctx.createRadialGradient(64, 108, 6, 64, 120, 74);
+          g.addColorStop(0.0, 'rgba(2, 11, 14, 0.55)');
+          g.addColorStop(0.6, 'rgba(2, 11, 14, 0.24)');
+          g.addColorStop(1.0, 'rgba(2, 11, 14, 0.0)');
+          ctx.fillStyle = g;
+          ctx.save();
+          ctx.translate(64, 118);
+          ctx.scale(0.52, 1.48);
+          ctx.beginPath();
+          ctx.arc(0, 0, 62, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          return new THREE.CanvasTexture(c, { flipY: false });
+        },
+
+        // 飼料顆粒紋理
+        createPelletTexture() {
+          const c = document.createElement('canvas');
+          c.width = 64; c.height = 64;
+          const ctx = c.getContext('2d');
+          const g = ctx.createRadialGradient(24, 22, 4, 32, 32, 32);
+          g.addColorStop(0.0, '#f3c178');
+          g.addColorStop(0.65, '#c7853b');
+          g.addColorStop(1.0, '#8b541c');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, 64, 64);
+          return new THREE.CanvasTexture(c, { flipY: false });
+        }
+      };
+
+      /* =========================================================================
+       * 5. 純程式碼 3D 幾何建模工廠（含錦鯉、參考附圖 3D Pixar 胖鯊魚、造景）
+       * ========================================================================= */
+      const GeometryFactory = {
+        _computeSmoothNormals(positions, indices) {
+          const nAcc = new Float32Array(positions.length);
+          for (let i = 0; i < indices.length; i += 3) {
+            const ia = indices[i] * 3, ib = indices[i + 1] * 3, ic = indices[i + 2] * 3;
+            const ax = positions[ia], ay = positions[ia + 1], az = positions[ia + 2];
+            const bx = positions[ib], by = positions[ib + 1], bz = positions[ib + 2];
+            const cx = positions[ic], cy = positions[ic + 1], cz = positions[ic + 2];
+            const abx = bx - ax, aby = by - ay, abz = bz - az;
+            const acx = cx - ax, acy = cy - ay, acz = cz - az;
+            const nx = aby * acz - abz * acy;
+            const ny = abz * acx - abx * acz;
+            const nz = abx * acy - aby * acx;
+            nAcc[ia] += nx; nAcc[ia + 1] += ny; nAcc[ia + 2] += nz;
+            nAcc[ib] += nx; nAcc[ib + 1] += ny; nAcc[ib + 2] += nz;
+            nAcc[ic] += nx; nAcc[ic + 1] += ny; nAcc[ic + 2] += nz;
+          }
+          const normals = new Float32Array(positions.length);
+          for (let i = 0; i < normals.length; i += 3) {
+            const l = Math.hypot(nAcc[i], nAcc[i + 1], nAcc[i + 2]);
+            if (l > 1e-6) {
+              normals[i] = nAcc[i] / l;
+              normals[i + 1] = nAcc[i + 1] / l;
+              normals[i + 2] = nAcc[i + 2] / l;
+            } else {
+              normals[i] = 0; normals[i + 1] = 1; normals[i + 2] = 0;
+            }
+          }
+          return normals;
+        },
+
+        createPlane(w, h, segX = 1, segY = 1, horizontal = true) {
+          const pos = [], norm = [], uvs = [], idx = [];
+          for (let iy = 0; iy <= segY; iy++) {
+            const v = iy / segY;
+            for (let ix = 0; ix <= segX; ix++) {
+              const u = ix / segX;
+              const x = (u - 0.5) * w;
+              const y = (v - 0.5) * h;
+              if (horizontal) {
+                pos.push(x, 0, y);
+                norm.push(0, 1, 0);
+              } else {
+                pos.push(x, y, 0);
+                norm.push(0, 0, 1);
+              }
+              uvs.push(u, v);
+            }
+          }
+          const stride = segX + 1;
+          for (let iy = 0; iy < segY; iy++) {
+            for (let ix = 0; ix < segX; ix++) {
+              const a = iy * stride + ix;
+              const b = a + 1;
+              const c = a + stride;
+              const d = c + 1;
+              if (horizontal) {
+                idx.push(a, c, b, b, c, d);
+              } else {
+                idx.push(a, b, c, b, d, c);
+              }
+            }
+          }
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', norm, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        createSphere(radius, segW = 14, segH = 10, scaleX = 1, scaleY = 1, scaleZ = 1, deformFn = null) {
+          const pos = [], uvs = [], idx = [];
+          for (let iy = 0; iy <= segH; iy++) {
+            const v = iy / segH;
+            const phi = v * Math.PI;
+            const sp = Math.sin(phi), cp = Math.cos(phi);
+            for (let ix = 0; ix <= segW; ix++) {
+              const u = ix / segW;
+              const theta = u * Math.PI * 2;
+              let x = -Math.cos(theta) * sp * radius * scaleX;
+              let y = cp * radius * scaleY;
+              let z = Math.sin(theta) * sp * radius * scaleZ;
+              if (deformFn) {
+                const p = deformFn(x, y, z, u, v);
+                x = p[0]; y = p[1]; z = p[2];
+              }
+              pos.push(x, y, z);
+              uvs.push(u, v);
+            }
+          }
+          const stride = segW + 1;
+          for (let iy = 0; iy < segH; iy++) {
+            for (let ix = 0; ix < segW; ix++) {
+              const a = iy * stride + ix;
+              const b = a + 1;
+              const c = a + stride;
+              const d = c + 1;
+              idx.push(a, c, b, b, c, d);
+            }
+          }
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 立體錦鯉軀幹（z ∈ [-0.88 尾柄, +0.92 吻端]）
+        createKoiBodyGeometry() {
+          const segZ = 28, segR = 18;
+          const pos = [], uvs = [], idx = [];
+
+          for (let iz = 0; iz <= segZ; iz++) {
+            const t = iz / segZ; // 0 = 尾柄, 1 = 吻端
+            const z = -0.88 + t * 1.80;
+
+            // 飽滿流線錦鯉橫截面（肩部最寬）
+            let rx, ry;
+            if (t < 0.72) {
+              const s = t / 0.72;
+              rx = 0.025 + 0.215 * Math.pow(Math.sin(s * Math.PI * 0.52), 1.35);
+              ry = 0.045 + 0.195 * Math.pow(Math.sin(s * Math.PI * 0.55), 1.2);
+            } else {
+              const s = (t - 0.72) / 0.28;
+              const c = Math.cos(s * Math.PI * 0.5);
+              rx = 0.24 * Math.pow(c, 0.72);
+              ry = 0.24 * Math.pow(c, 0.78);
+            }
+
+            for (let ir = 0; ir <= segR; ir++) {
+              const v = ir / segR; // 0 = 肚底, 0.5 = 背脊, 1 = 肚底
+              const a = v * Math.PI * 2;
+              // a=0 -> (0, -ry), a=PI/2 -> (+rx, 0), a=PI -> (0, +ry), a=3PI/2 -> (-rx, 0)
+              const x = Math.sin(a) * rx;
+              const y = -Math.cos(a) * ry;
+              pos.push(x, y, z);
+              uvs.push(t, v);
+            }
+          }
+
+          const stride = segR + 1;
+          for (let iz = 0; iz < segZ; iz++) {
+            for (let ir = 0; ir < segR; ir++) {
+              const a = iz * stride + ir;
+              const b = a + 1;
+              const c = a + stride;
+              const d = c + 1;
+              // 確認朝外逆時針繞序
+              idx.push(a, c, b, b, c, d);
+            }
+          }
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 錦鯉飄逸魚鰭（胸鰭、腹鰭、背鰭、優雅扇形尾鰭）
+        createKoiFinsGeometry() {
+          const pos = [], norm = [], uvs = [], idx = [];
+          let base = 0;
+
+          const addRibbonFin = (ptsRoot, ptsTip) => {
+            const n = ptsRoot.length;
+            for (let i = 0; i < n; i++) {
+              const u = i / (n - 1);
+              const r = ptsRoot[i], t = ptsTip[i];
+              pos.push(r[0], r[1], r[2]);
+              norm.push(0, 1, 0);
+              uvs.push(0.0, u);
+              pos.push(t[0], t[1], t[2]);
+              norm.push(0, 1, 0);
+              uvs.push(1.0, u);
+            }
+            for (let i = 0; i < n - 1; i++) {
+              const a = base + i * 2;
+              const b = a + 1;
+              const c = a + 2;
+              const d = a + 3;
+              idx.push(a, b, c, b, d, c);
+            }
+            base += n * 2;
+          };
+
+          // 左右寬大圓潤胸鰭
+          for (const side of [-1, 1]) {
+            addRibbonFin(
+              [[side * 0.17, -0.04, 0.44], [side * 0.21, -0.05, 0.28], [side * 0.19, -0.05, 0.12]],
+              [[side * 0.50, -0.07, 0.28], [side * 0.56, -0.08, 0.04], [side * 0.36, -0.07, -0.14]]
+            );
+            // 腹鰭
+            addRibbonFin(
+              [[side * 0.13, -0.08, -0.04], [side * 0.11, -0.08, -0.22]],
+              [[side * 0.31, -0.10, -0.20], [side * 0.24, -0.10, -0.36]]
+            );
+          }
+
+          // 背鰭
+          addRibbonFin(
+            [[0, 0.18, 0.22], [0, 0.16, -0.05], [0, 0.11, -0.35]],
+            [[0, 0.33, 0.08], [0, 0.30, -0.20], [0, 0.21, -0.48]]
+          );
+
+          // 優雅飄逸尾鰭（略微展開 V 字雙葉）
+          addRibbonFin(
+            [[0, 0.04, -0.84], [0, 0.0, -0.86], [0, -0.04, -0.84]],
+            [[-0.08, 0.20, -1.36], [0.0, 0.0, -1.20], [0.08, -0.20, -1.36]]
+          );
+          addRibbonFin(
+            [[0, 0.04, -0.84], [0, 0.0, -0.86], [0, -0.04, -0.84]],
+            [[0.12, 0.18, -1.34], [0.0, 0.0, -1.18], [-0.12, -0.18, -1.34]]
+          );
+
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', norm, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // === 參考附圖：3D Pixar 可愛胖鯊魚軀幹（胖蛋水滴身 + 3道凹刻鰓裂 + 微笑口腔凹槽） ===
+        createSharkBodyGeometry() {
+          const segZ = 40, segR = 28;
+          const pos = [], uvs = [], idx = [];
+
+          for (let iz = 0; iz <= segZ; iz++) {
+            const t = iz / segZ; // 0 = 尾柄(-0.68), 1 = 圓吻尖(+0.96)
+            const z = -0.68 + t * 1.64;
+
+            // 胖嘟嘟 Pixar 玩具鯊魚輪廓（附圖寬圓飽滿身型）
+            let rx, ry, yOffset;
+            if (t < 0.62) {
+              const s = t / 0.62;
+              const curve = Math.pow(Math.sin(s * Math.PI * 0.5), 0.78);
+              rx = 0.065 + 0.395 * curve;
+              ry = 0.085 + 0.355 * curve;
+              yOffset = 0.02 * Math.sin(s * Math.PI);
+            } else {
+              const s = (t - 0.62) / 0.38;
+              const c = Math.cos(s * Math.PI * 0.5);
+              // 圓潤寬吻，不尖銳
+              rx = 0.46 * Math.pow(Math.max(0, c), 0.62);
+              ry = 0.44 * Math.pow(Math.max(0, c), 0.68);
+              yOffset = 0.03 * s; // 吻端微上揚顯得俏皮
+            }
+
+            for (let ir = 0; ir <= segR; ir++) {
+              const v = ir / segR; // 0 = 肚底(-Y), 0.25 = +X, 0.5 = 背脊(+Y), 0.75 = -X, 1 = 肚底
+              const a = v * Math.PI * 2;
+              let x = Math.sin(a) * rx;
+              let y = -Math.cos(a) * ry + yOffset;
+              let pz = z;
+
+              // 1) 兩側三道凹刻鰓裂（t ∈ [0.50, 0.64], 側面高度）
+              if (t > 0.49 && t < 0.65 && Math.abs(Math.sin(a)) > 0.76 && y > -0.14 && y < 0.16) {
+                const gillPhase = (t - 0.505) / 0.042;
+                const nearest = Math.round(gillPhase);
+                if (nearest >= 0 && nearest <= 2) {
+                  const dist = Math.abs(gillPhase - nearest);
+                  if (dist < 0.36) {
+                    const dent = Math.cos((dist / 0.36) * Math.PI * 0.5) * 0.022;
+                    const vFade = Math.max(0, 1.0 - Math.abs((y - 0.01) / 0.15));
+                    x -= Math.sign(x) * dent * vFade;
+                  }
+                }
+              }
+
+              // 2) 下吻微笑口腔凹槽（讓紅色內腔與白色尖牙清楚嵌入）
+              if (t > 0.74 && t < 0.96 && y < 0.01 && y > -0.24) {
+                const mouthU = (t - 0.74) / 0.22;
+                const smileArcY = -0.115 + 0.045 * Math.pow(1.0 - mouthU, 1.5);
+                const dy = Math.abs(y - smileArcY);
+                const mouthHalfOpen = 0.082 * Math.sin(mouthU * Math.PI);
+                if (dy < mouthHalfOpen && Math.abs(x) < 0.32) {
+                  const dFactor = Math.cos((dy / mouthHalfOpen) * Math.PI * 0.5);
+                  const pushIn = 0.14 * dFactor * Math.sin(mouthU * Math.PI);
+                  pz -= pushIn * 0.75;
+                  x *= (1.0 - pushIn * 0.55);
+                }
+              }
+
+              pos.push(x, y, pz);
+              uvs.push(t, v);
+            }
+          }
+
+          const stride = segR + 1;
+          for (let iz = 0; iz < segZ; iz++) {
+            for (let ir = 0; ir < segR; ir++) {
+              const a = iz * stride + ir;
+              const b = a + 1;
+              const c = a + stride;
+              const d = c + 1;
+              // 朝外逆時針繞序
+              idx.push(a, c, b, b, c, d);
+            }
+          }
+
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // === 參考附圖：3D Pixar 胖鯊魚四片圓厚立體魚鰭（背鰭 + 左右圓槳胸鰭 + 飽滿新月尾鰭） ===
+        createSharkFinsGeometry() {
+          const pos = [], uvs = [], idx = [];
+          let base = 0;
+
+          // 生成具有飽滿圓角厚度的 3D 鰭片（雙面鼓起像軟膠公仔）
+          const addPlumpFin = (gridFn, segU, segV, thicknessFn, normalDir) => {
+            const start = base;
+            const ringVerts = (segU + 1) * (segV + 1);
+
+            for (const side of [1, -1]) {
+              for (let iv = 0; iv <= segV; iv++) {
+                const v = iv / segV;
+                for (let iu = 0; iu <= segU; iu++) {
+                  const u = iu / segU;
+                  const p = gridFn(u, v);
+                  // 邊緣收斂成光滑圓角，中央飽滿鼓起
+                  const edgeU = Math.sin(u * Math.PI);
+                  const edgeV = Math.sin(v * Math.PI);
+                  const bulge = Math.sqrt(Math.max(0, edgeU * edgeV)) * thicknessFn(u, v) * side;
+                  pos.push(
+                    p[0] + normalDir[0] * bulge,
+                    p[1] + normalDir[1] * bulge,
+                    p[2] + normalDir[2] * bulge
+                  );
+                  uvs.push(u, v);
+                  base++;
+                }
+              }
+            }
+
+            const stride = segU + 1;
+            // 正反兩面依實際法線方向決定繞序
+            for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
+              const offset = start + sideIdx * ringVerts;
+              for (let iv = 0; iv < segV; iv++) {
+                for (let iu = 0; iu < segU; iu++) {
+                  const a = offset + iv * stride + iu;
+                  const b = a + 1;
+                  const c = a + stride;
+                  const d = c + 1;
+                  if (sideIdx === 0) idx.push(a, b, c, b, d, c);
+                  else idx.push(a, c, b, b, c, d);
+                }
+              }
+            }
+          };
+
+          // 1) 高挺圓潤背鰭（附圖招牌圓角厚背鰭）
+          addPlumpFin(
+            (u, v) => {
+              // v: 0=根部 -> 1=鰭尖, u: 0=後緣 -> 1=前緣
+              const rootZ = -0.18 + u * 0.48;
+              const tipZ = -0.24 + u * 0.14;
+              const z = rootZ * (1 - v) + tipZ * v - 0.12 * Math.sin(v * Math.PI * 0.7);
+              const widthFactor = Math.pow(1.0 - v * 0.82, 0.75);
+              const zCentered = -0.02 - 0.24 * v + (u - 0.5) * 0.50 * widthFactor;
+              const y = 0.34 + v * 0.46 * Math.sin(0.2 + u * 0.65 * Math.PI);
+              return [0, y, zCentered];
+            },
+            10, 10,
+            (u, v) => 0.068 * (1.0 - v * 0.65),
+            [1, 0, 0]
+          );
+
+          // 2) 左右圓頭槳狀胸鰭（附圖微微向後下方伸展）
+          for (const side of [-1, 1]) {
+            addPlumpFin(
+              (u, v) => {
+                // v: 0=貼身根部 -> 1=鰭尖, u: 0=後緣 -> 1=前緣
+                const span = v * 0.56;
+                const chord = 0.36 * Math.sin(Math.min(1, 0.22 + (1 - v) * 0.78) * Math.PI * 0.5);
+                const sweepZ = 0.22 - v * 0.42 + (u - 0.5) * chord;
+                const x = side * (0.35 + span * Math.sin(0.18 + u * 0.68 * Math.PI));
+                const y = -0.14 - v * 0.16;
+                return [x, y, sweepZ];
+              },
+              10, 10,
+              (u, v) => 0.052 * (1.0 - v * 0.62),
+              [0, 1, 0]
+            );
+          }
+
+          // 3) 飽滿圓角新月尾鰭（上下雙葉，上葉略高）
+          for (const lobe of [1, -1]) {
+            addPlumpFin(
+              (u, v) => {
+                // v: 0=尾柄根 -> 1=尾葉尖端
+                const len = lobe > 0 ? 0.54 : 0.44;
+                const chord = 0.22 * Math.pow(1.0 - v * 0.75, 0.6);
+                const z = -0.62 - v * len + (u - 0.5) * chord - 0.08 * Math.sin(v * Math.PI);
+                const y = lobe * (0.02 + v * (lobe > 0 ? 0.44 : 0.34) * Math.sin(0.25 + u * 0.6 * Math.PI));
+                return [0, y, z];
+              },
+              8, 10,
+              (u, v) => 0.048 * (1.0 - v * 0.65),
+              [1, 0, 0]
+            );
+          }
+
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 附圖同款大顆亮黑圓珠雙眼（置於頭部兩側略偏上，俯視極清楚可愛）
+        createSharkEyesGeometry() {
+          const pos = [], uvs = [], idx = [];
+          let base = 0;
+          const addEyeSphere = (cx, cy, cz, r) => {
+            const segW = 14, segH = 10;
+            const start = base;
+            for (let iy = 0; iy <= segH; iy++) {
+              const v = iy / segH;
+              const phi = v * Math.PI;
+              for (let ix = 0; ix <= segW; ix++) {
+                const u = ix / segW;
+                const theta = u * Math.PI * 2;
+                const sx = -Math.cos(theta) * Math.sin(phi);
+                const sy = Math.cos(phi);
+                const sz = Math.sin(theta) * Math.sin(phi);
+                pos.push(cx + sx * r, cy + sy * r, cz + sz * r);
+                // 映射讓白色反光朝上朝前
+                uvs.push(0.5 + sx * 0.42, 0.5 - sy * 0.42);
+                base++;
+              }
+            }
+            const stride = segW + 1;
+            for (let iy = 0; iy < segH; iy++) {
+              for (let ix = 0; ix < segW; ix++) {
+                const a = start + iy * stride + ix;
+                const b = a + 1;
+                const c = a + stride;
+                const d = c + 1;
+                idx.push(a, c, b, b, c, d);
+              }
+            }
+          };
+
+          addEyeSphere(0.325, 0.145, 0.565, 0.095);
+          addEyeSphere(-0.325, 0.145, 0.565, 0.095);
+
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 3D 深紅微笑口腔內壁
+        createSharkMouthGeometry() {
+          const segU = 14, segV = 8;
+          const pos = [], uvs = [], idx = [];
+          for (let iv = 0; iv <= segV; iv++) {
+            const v = iv / segV; // 0=下唇 -> 1=上唇
+            for (let iu = 0; iu <= segU; iu++) {
+              const u = iu / segU; // 0=左嘴角 -> 1=右嘴角
+              const ang = (u - 0.5) * Math.PI * 0.82;
+              const r = 0.255;
+              const x = Math.sin(ang) * r;
+              const zFront = 0.57 + Math.cos(ang) * 0.245;
+              const depth = Math.sin(v * Math.PI) * 0.085;
+              const openH = 0.072 * Math.cos(ang * 0.75);
+              const smileY = -0.105 + 0.032 * Math.pow(Math.abs(u - 0.5) * 2, 1.8);
+              const y = smileY + (v - 0.5) * 2.0 * openH;
+              pos.push(x * (1.0 - depth * 0.9), y, zFront - depth);
+              uvs.push(u, v);
+            }
+          }
+          const stride = segU + 1;
+          for (let iv = 0; iv < segV; iv++) {
+            for (let iu = 0; iu < segU; iu++) {
+              const a = iv * stride + iu;
+              const b = a + 1;
+              const c = a + stride;
+              const d = c + 1;
+              idx.push(a, b, c, b, d, c);
+            }
+          }
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 3D 上下交錯純白小尖牙（13 顆）
+        createSharkTeethGeometry() {
+          const pos = [], norm = [], uvs = [], idx = [];
+          let base = 0;
+
+          const addTooth = (bx, by, bz, dirY, rad, h, leanZ) => {
+            const segs = 6;
+            const tipIdx = base++;
+            const tl = Math.hypot(0, dirY, 0.5) || 1;
+            pos.push(bx, by + dirY * h, bz + leanZ);
+            norm.push(0, dirY / tl, 0.5 / tl);
+            uvs.push(0.5, 1.0);
+
+            const ringStart = base;
+            const rl = Math.hypot(1, dirY * 0.25) || 1;
+            for (let s = 0; s <= segs; s++) {
+              const a = (s / segs) * Math.PI * 2;
+              const ca = Math.cos(a), sa = Math.sin(a);
+              pos.push(bx + ca * rad, by, bz + sa * rad);
+              norm.push(ca / rl, (dirY * 0.25) / rl, sa / rl);
+              uvs.push(s / segs, 0.0);
+              base++;
+            }
+            for (let s = 0; s < segs; s++) {
+              if (dirY < 0) idx.push(tipIdx, ringStart + s, ringStart + s + 1);
+              else idx.push(tipIdx, ringStart + s + 1, ringStart + s);
+            }
+          };
+
+          // 上排 7 顆尖牙（向下）
+          for (let i = 0; i < 7; i++) {
+            const u = (i + 0.5) / 7;
+            const ang = (u - 0.5) * Math.PI * 0.72;
+            const x = Math.sin(ang) * 0.255;
+            const z = 0.595 + Math.cos(ang) * 0.245;
+            const y = -0.055 + 0.025 * Math.pow(Math.abs(u - 0.5) * 2, 1.6);
+            addTooth(x, y, z, -1, 0.025, 0.068, 0.014);
+          }
+          // 下排 6 顆交錯尖牙（向上）
+          for (let i = 0; i < 6; i++) {
+            const u = (i + 0.5) / 6;
+            const ang = (u - 0.5) * Math.PI * 0.62;
+            const x = Math.sin(ang) * 0.238;
+            const z = 0.585 + Math.cos(ang) * 0.232;
+            const y = -0.155 + 0.026 * Math.pow(Math.abs(u - 0.5) * 2, 1.6);
+            addTooth(x, y, z, 1, 0.022, 0.060, 0.012);
+          }
+
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', norm, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 鼻尖兩側小鼻孔
+        createSharkNostrilsGeometry() {
+          const pos = [], uvs = [], idx = [];
+          let base = 0;
+          for (const side of [-1, 1]) {
+            const cx = side * 0.105, cy = 0.072, cz = 0.875;
+            const rx = 0.017, ry = 0.011, rz = 0.014;
+            const start = base;
+            const segW = 8, segH = 6;
+            for (let iy = 0; iy <= segH; iy++) {
+              const v = iy / segH, phi = v * Math.PI;
+              for (let ix = 0; ix <= segW; ix++) {
+                const u = ix / segW, th = u * Math.PI * 2;
+                pos.push(
+                  cx - Math.cos(th) * Math.sin(phi) * rx,
+                  cy + Math.cos(phi) * ry,
+                  cz + Math.sin(th) * Math.sin(phi) * rz
+                );
+                uvs.push(u, v);
+                base++;
+              }
+            }
+            const stride = segW + 1;
+            for (let iy = 0; iy < segH; iy++) {
+              for (let ix = 0; ix < segW; ix++) {
+                const a = start + iy * stride + ix;
+                const b = a + 1, c = a + stride, d = c + 1;
+                idx.push(a, c, b, b, c, d);
+              }
+            }
+          }
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 3D 多層盛開睡蓮花
+        createLotusFlowerGeometry() {
+          const pos = [], uvs = [], idx = [];
+          let base = 0;
+          const addPetal = (angle, tilt, len, width, yOff) => {
+            const segL = 5, segW = 3;
+            const start = base;
+            const ca = Math.cos(angle), sa = Math.sin(angle);
+            for (let il = 0; il <= segL; il++) {
+              const v = il / segL;
+              const r = v * len;
+              const w = Math.sin(v * Math.PI) * width;
+              const h = yOff + Math.sin(v * Math.PI * 0.72) * len * tilt + v * v * 0.06;
+              for (let iw = 0; iw <= segW; iw++) {
+                const u = iw / segW;
+                const lat = (u - 0.5) * 2.0 * w;
+                const cup = (1.0 - Math.pow((u - 0.5) * 2.0, 2)) * -0.025 * Math.sin(v * Math.PI);
+                const px = ca * r - sa * lat;
+                const pz = sa * r + ca * lat;
+                pos.push(px, h + cup, pz);
+                uvs.push(u, v);
+                base++;
+              }
+            }
+            const stride = segW + 1;
+            for (let il = 0; il < segL; il++) {
+              for (let iw = 0; iw < segW; iw++) {
+                const a = start + il * stride + iw;
+                const b = a + 1, c = a + stride, d = c + 1;
+                idx.push(a, c, b, b, c, d);
+              }
+            }
+          };
+
+          // 外圈 8 瓣
+          for (let i = 0; i < 8; i++) addPetal((i / 8) * Math.PI * 2, 0.30, 0.36, 0.115, 0.02);
+          // 中圈 8 瓣
+          for (let i = 0; i < 8; i++) addPetal(((i + 0.5) / 8) * Math.PI * 2, 0.56, 0.29, 0.092, 0.04);
+          // 內圈 6 瓣
+          for (let i = 0; i < 6; i++) addPetal((i / 6) * Math.PI * 2 + 0.2, 0.82, 0.20, 0.068, 0.06);
+
+          const normals = this._computeSmoothNormals(pos, idx);
+          return new THREE.BufferGeometry()
+            .setAttribute('position', pos, 3)
+            .setAttribute('normal', normals, 3)
+            .setAttribute('uv', uvs, 2)
+            .setIndex(idx);
+        },
+
+        // 不規則自然立體苔石
+        createMossRockGeometry() {
+          return this.createSphere(0.55, 16, 12, 1.15, 0.72, 1.0, (x, y, z) => {
+            const n = Math.sin(x * 5.2 + z * 3.7) * 0.075 + Math.cos(z * 6.1 - y * 4.2) * 0.06;
+            const flatTop = y > 0.22 ? 0.22 + (y - 0.22) * 0.45 : y;
+            return [x * (1 + n), flatTop * (1 + n * 0.5), z * (1 - n * 0.7)];
+          });
+        }
+      };
+
+      /* =========================================================================
+       * 6. GLSL 著色器集合（WebGL1/2 跨行動裝置安全精準度與防 NaN）
+       * ========================================================================= */
+      const PREC = `
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+          precision highp float;
+        #else
+          precision mediump float;
+        #endif
+      `;
+
+      const Shaders = {
+        // 1) 池底著色器（含動態陽光水下焦散）
+        pondBedVert: `
+          attribute vec3 position;
+          attribute vec2 uv;
+          uniform mat4 uModelMatrix;
+          uniform mat4 uViewMatrix;
+          uniform mat4 uProjectionMatrix;
+          varying vec2 vUv;
+          varying vec3 vWorldPos;
+          void main() {
+            vec4 wp = uModelMatrix * vec4(position, 1.0);
+            vWorldPos = wp.xyz;
+            vUv = uv;
+            gl_Position = uProjectionMatrix * uViewMatrix * wp;
+          }
+        `,
+        pondBedFrag: PREC + `
+          uniform sampler2D uMap;
+          uniform float uTime;
+          varying vec2 vUv;
+          varying vec3 vWorldPos;
+
+          float causticPattern(vec2 p, float t) {
+            float c1 = sin(p.x * 2.1 + t * 1.1 + sin(p.y * 1.8 - t * 0.8));
+            float c2 = cos(p.y * 2.4 - t * 0.95 + cos(p.x * 1.9 + t * 0.7));
+            float c3 = sin((p.x + p.y) * 1.6 - t * 1.25);
+            float v = abs(c1 + c2 + c3 * 0.5) / 2.5;
+            return pow(clamp(1.0 - v, 0.0001, 1.0), 3.2);
+          }
+
+          void main() {
+            vec3 base = texture2D(uMap, vUv * 2.6).rgb;
+            float caust = causticPattern(vWorldPos.xz * 0.92, uTime);
+            vec3 col = base + vec3(0.18, 0.42, 0.40) * caust * 0.55;
+            // 周圍柔和暗角營造深池層次
+            float dist = length(vWorldPos.xz) * 0.11;
+            col *= (1.0 - clamp(dist * dist, 0.0, 0.42));
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `,
+
+        // 2) 錦鯉與鯊魚共用游動變形頂點著色器（S 形擺尾 + 轉向彎曲 + 鯊魚撲咬擠壓拉伸）
+        fishVert: `
+          attribute vec3 position;
+          attribute vec3 normal;
+          attribute vec2 uv;
+          uniform mat4 uModelMatrix;
+          uniform mat4 uViewMatrix;
+          uniform mat4 uProjectionMatrix;
+          uniform mat3 uNormalMatrix;
+          uniform float uSwimPhase;
+          uniform float uSwimAmp;
+          uniform float uTurnBend;
+          uniform float uIsFin;
+          uniform float uChomp;
+
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+
+          void main() {
+            vec3 p = position;
+            vec3 n = normal;
+
+            // 撲咬瞬間 Pixar Squash & Stretch 彈性動畫
+            if (uChomp > 0.001) {
+              float s = sin(uChomp * 3.14159);
+              p.z *= (1.0 + s * 0.14);
+              p.x *= (1.0 - s * 0.06);
+              p.y *= (1.0 + s * 0.08);
+            }
+
+            // 沿魚身（+Z 頭 -> -Z 尾）自然 S 型擺尾
+            float tailWeight = clamp((0.65 - p.z) / 1.75, 0.0, 1.35);
+            float w2 = tailWeight * tailWeight;
+            float wave = sin(uSwimPhase - p.z * 3.4) * uSwimAmp * w2;
+            float finFlutter = uIsFin * sin(uSwimPhase * 1.35 - p.z * 4.0) * 0.045 * clamp(abs(p.x) + tailWeight * 0.4, 0.0, 1.2);
+            float bend = uTurnBend * w2 * 0.55;
+
+            p.x += wave + bend;
+            p.y += finFlutter;
+
+            // 輕微調整法線隨擺尾方向偏轉
+            float dWave = -cos(uSwimPhase - p.z * 3.4) * 3.4 * uSwimAmp * w2 * 0.25;
+            n = normalize(vec3(n.x, n.y, n.z - dWave * n.x));
+
+            vec4 wp = uModelMatrix * vec4(p, 1.0);
+            vWorldPos = wp.xyz;
+            vNormal = normalize(uNormalMatrix * n);
+            vUv = uv;
+            gl_Position = uProjectionMatrix * uViewMatrix * wp;
+          }
+        `,
+
+        // 3) 錦鯉溫潤光澤著色器
+        koiFrag: PREC + `
+          uniform sampler2D uMap;
+          uniform float uTime;
+          uniform float uAlpha;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+
+          void main() {
+            vec4 tex = texture2D(uMap, vUv);
+            float a = tex.a * uAlpha;
+            if (a < 0.02) discard;
+
+            vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
+            vec3 L = normalize(vec3(0.30, 0.92, -0.25));
+            vec3 V = normalize(vec3(0.0, 1.0, 0.14));
+            vec3 H = normalize(L + V);
+
+            float diff = clamp((dot(N, L) + 0.45) / 1.45, 0.0, 1.0);
+            float spec = pow(clamp(dot(N, H), 0.0001, 1.0), 36.0) * 0.42;
+            float caust = max(0.0, sin(vWorldPos.x * 3.1 + uTime * 2.1) * cos(vWorldPos.z * 2.9 - uTime * 1.7)) * 0.10;
+
+            vec3 col = tex.rgb * (0.46 + 0.62 * diff) + vec3(0.95, 1.0, 1.0) * spec + vec3(0.42, 0.78, 0.78) * caust;
+            float depth = clamp(-vWorldPos.y / 2.6, 0.0, 1.0);
+            col = mix(col, vec3(0.07, 0.22, 0.24), depth * 0.22);
+            gl_FragColor = vec4(col, a);
+          }
+        `,
+
+        // 4) 參考附圖：3D Pixar 光澤公仔胖鯊魚著色器（柔化三點攝影棚光 + 清漆高光 + 冰藍輪廓光）
+        sharkFrag: PREC + `
+          uniform sampler2D uMap;
+          uniform float uTime;
+          uniform float uGloss;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+
+          void main() {
+            vec4 tex = texture2D(uMap, vUv);
+
+            vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
+            vec3 L = normalize(vec3(0.32, 0.90, -0.28));
+            vec3 L2 = normalize(vec3(-0.55, 0.58, 0.48));
+            vec3 V = normalize(vec3(0.0, 1.0, 0.15));
+            vec3 H = normalize(L + V);
+
+            float wrapDiff = clamp((dot(N, L) + 0.54) / 1.54, 0.0, 1.0);
+            float fillDiff = max(dot(N, L2), 0.0) * 0.22;
+
+            float ndh = clamp(dot(N, H), 0.0001, 1.0);
+            float clearcoat = pow(ndh, mix(26.0, 92.0, uGloss)) * mix(0.38, 0.92, uGloss);
+            float softSheen = pow(ndh, 8.0) * mix(0.16, 0.08, uGloss);
+
+            float rimBase = clamp(1.0 - max(dot(N, V), 0.0), 0.0001, 1.0);
+            float rim = pow(rimBase, 2.4);
+            vec3 rimCol = vec3(0.78, 0.95, 1.0) * rim * mix(0.36, 0.20, uGloss);
+
+            float caust = max(0.0, sin(vWorldPos.x * 2.8 + uTime * 2.0) * cos(vWorldPos.z * 2.6 - uTime * 1.6)) * 0.06 * max(N.y, 0.0);
+
+            vec3 col = tex.rgb * (0.52 + 0.56 * wrapDiff + fillDiff)
+                     + vec3(1.0, 1.0, 1.0) * (clearcoat + softSheen)
+                     + rimCol
+                     + vec3(0.68, 0.92, 0.98) * caust;
+
+            float depth = clamp(-vWorldPos.y / 2.6, 0.0, 1.0);
+            col = mix(col, vec3(0.08, 0.25, 0.27), depth * 0.14);
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `,
+
+        // 5) 通用 3D 立體物件著色器（睡蓮、荷葉、苔石、卵石、飼料）
+        litVert: `
+          attribute vec3 position;
+          attribute vec3 normal;
+          attribute vec2 uv;
+          uniform mat4 uModelMatrix;
+          uniform mat4 uViewMatrix;
+          uniform mat4 uProjectionMatrix;
+          uniform mat3 uNormalMatrix;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            vec4 wp = uModelMatrix * vec4(position, 1.0);
+            vWorldPos = wp.xyz;
+            vNormal = normalize(uNormalMatrix * normal);
+            vUv = uv;
+            gl_Position = uProjectionMatrix * uViewMatrix * wp;
+          }
+        `,
+        litFrag: PREC + `
+          uniform sampler2D uMap;
+          uniform float uAlpha;
+          uniform float uUnderwater;
+          uniform float uSpec;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            vec4 tex = texture2D(uMap, vUv);
+            float a = tex.a * uAlpha;
+            if (a < 0.08) discard;
+
+            vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
+            vec3 L = normalize(vec3(0.32, 0.90, -0.30));
+            vec3 V = normalize(vec3(0.0, 1.0, 0.16));
+            vec3 H = normalize(L + V);
+
+            float diff = clamp((dot(N, L) + 0.42) / 1.42, 0.0, 1.0);
+            float spec = pow(clamp(dot(N, H), 0.0001, 1.0), 28.0) * uSpec;
+            vec3 col = tex.rgb * (0.44 + 0.64 * diff) + vec3(1.0, 0.99, 0.96) * spec;
+
+            if (uUnderwater > 0.5) {
+              float d = clamp(-vWorldPos.y / 2.4, 0.0, 1.0);
+              col = mix(col, vec3(0.06, 0.20, 0.22), d * 0.36);
+            }
+            gl_FragColor = vec4(col, a);
+          }
+        `,
+
+        // 6) 晶瑩 3D 氣泡著色器（鯊魚咬食瞬間冒出）
+        bubbleFrag: PREC + `
+          uniform float uAlpha;
+          varying vec3 vNormal;
+          void main() {
+            vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
+            vec3 V = normalize(vec3(0.0, 1.0, 0.15));
+            vec3 L = normalize(vec3(0.35, 0.90, -0.25));
+            vec3 H = normalize(L + V);
+            float fresnel = pow(clamp(1.0 - max(dot(N, V), 0.0), 0.0001, 1.0), 2.1);
+            float spec = pow(clamp(dot(N, H), 0.0001, 1.0), 42.0);
+            vec3 col = mix(vec3(0.70, 0.94, 1.0), vec3(1.0, 1.0, 1.0), clamp(fresnel + spec, 0.0, 1.0));
+            float a = clamp(0.18 + fresnel * 0.68 + spec * 0.85, 0.0, 0.92) * uAlpha;
+            gl_FragColor = vec4(col, a);
+          }
+        `,
+
+        // 7) 池底投影著色器
+        shadowVert: `
+          attribute vec3 position;
+          attribute vec2 uv;
+          uniform mat4 uModelMatrix;
+          uniform mat4 uViewMatrix;
+          uniform mat4 uProjectionMatrix;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(position, 1.0);
+          }
+        `,
+        shadowFrag: PREC + `
+          uniform sampler2D uMap;
+          uniform float uOpacity;
+          varying vec2 vUv;
+          void main() {
+            vec4 tex = texture2D(uMap, vUv);
+            gl_FragColor = vec4(tex.rgb, tex.a * uOpacity);
+          }
+        `,
+
+        // 8) 全螢幕水面折射與波紋高光合成著色器（將水下 FBO 即時扭曲折射）
+        waterVert: `
+          attribute vec3 position;
+          attribute vec2 uv;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
+          }
+        `,
+        waterFrag: PREC + `
+          uniform sampler2D uUnderwater;
+          uniform sampler2D uRipples;
+          uniform float uTime;
+          varying vec2 vUv;
+
+          void main() {
+            // uRipples: R=高度, G=dx, B=dy（以 0.5 為 0）
+            vec2 ripUv = vec2(vUv.x, 1.0 - vUv.y);
+            vec3 rip = texture2D(uRipples, ripUv).rgb;
+            vec2 grad = (rip.gb - 0.5) * 2.0;
+
+            // 微弱自然微風細波
+            float breezeX = sin(vUv.x * 22.0 + uTime * 1.4) * cos(vUv.y * 19.0 - uTime * 1.1) * 0.0014;
+            float breezeY = cos(vUv.x * 18.0 - uTime * 1.2) * sin(vUv.y * 24.0 + uTime * 1.5) * 0.0014;
+
+            vec2 offset = grad * 0.032 + vec2(breezeX, breezeY);
+            vec2 refractUv = clamp(vUv + offset, 0.002, 0.998);
+
+            // 輕微色散增加清澈泉水質感
+            float r = texture2D(uUnderwater, clamp(refractUv + offset * 0.14, 0.002, 0.998)).r;
+            float g = texture2D(uUnderwater, refractUv).g;
+            float b = texture2D(uUnderwater, clamp(refractUv - offset * 0.14, 0.002, 0.998)).b;
+            vec3 waterCol = vec3(r, g, b);
+
+            // 水面法線與清亮陽光波紋反光
+            vec3 N = normalize(vec3(-grad.x * 2.6 - breezeX * 18.0, 1.0, -grad.y * 2.6 - breezeY * 18.0));
+            vec3 L = normalize(vec3(0.32, 0.90, -0.35));
+            vec3 V = vec3(0.0, 1.0, 0.0);
+            vec3 H = normalize(L + V);
+
+            float spec = pow(clamp(dot(N, H), 0.0001, 1.0), 46.0) * 0.72;
+            float glint = smoothstep(0.18, 0.75, length(grad)) * 0.16;
+
+            // 極清透天光微反射，絕不遮擋下方錦鯉與胖鯊魚
+            vec3 skyTint = vec3(0.45, 0.78, 0.86);
+            waterCol = mix(waterCol, skyTint, 0.045 + glint * 0.35);
+            waterCol += vec3(0.88, 0.98, 1.0) * (spec + glint * 0.45);
+
+            gl_FragColor = vec4(waterCol, 1.0);
+          }
+        `
+      };
+
+      /* =========================================================================
+       * 7. 錦鯉池主應用程式（物理邊界、三種錦鯉追逐 AI、3D Pixar 胖鯊魚掠食 AI、造景互動）
+       * ========================================================================= */
+      class KoiPondApp {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.renderer = new THREE.WebGLRenderer(canvas);
+          this.audio = new PondAudio();
+          this.camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.5, 40);
+          this.camera.eye = [0, 13.8, 1.45];
+          this.camera.target = [0, -0.25, 0];
+          this.camera.up = [0, 0, -1];
+          this.camera.updateMatrices();
+
+          this.underwaterScene = new THREE.Object3D();
+          this.waterPassScene = new THREE.Object3D();
+          this.aboveWaterScene = new THREE.Object3D();
+
+          this.underwaterRT = new THREE.RenderTarget(512, 512);
+          this.rippleSim = new WaterRippleSim(140, 210);
+
+          this.bounds = { minX: -4, maxX: 4, minZ: -6, maxZ: 6 };
+          this.time = 0;
+          this.mode = 'ripple';
+          this.selectedFish = 'kohaku';
+          this.selectedDecor = 'lotus';
+
+          this.kois = [];
+          this.sharks = [];
+          this.pellets = [];
+          this.decors = [];
+          this.bubbles = [];
+
+          this._pointerDown = false;
+          this._lastWaterPos = null;
+          this._toastTimer = null;
+
+          this._initAssets();
+          this._initScenes();
+          this._handleResize();
+          this._initUI();
+          this._initInput();
+          this.resetPond();
+        }
+
+        _initAssets() {
+          this.assets = {
+            texBed: TextureFactory.createPondBedTexture(),
+            texKoi: {
+              kohaku: TextureFactory.createKoiTexture('kohaku'),
+              sanke: TextureFactory.createKoiTexture('sanke'),
+              yamabuki: TextureFactory.createKoiTexture('yamabuki')
+            },
+            texKoiFin: {
+              kohaku: TextureFactory.createKoiFinTexture('kohaku'),
+              sanke: TextureFactory.createKoiFinTexture('sanke'),
+              yamabuki: TextureFactory.createKoiFinTexture('yamabuki')
+            },
+            texSharkBody: TextureFactory.createSharkBodyTexture(),
+            texSharkFin: TextureFactory.createSharkFinTexture(),
+            texSharkEye: TextureFactory.createSharkEyeTexture(),
+            texSharkMouth: TextureFactory.createSharkMouthTexture(),
+            texSharkTeeth: TextureFactory.createSharkTeethTexture(),
+            texSharkNostril: TextureFactory.createSharkNostrilTexture(),
+            texLilyPad: TextureFactory.createLilyPadTexture(),
+            texLotusPetal: TextureFactory.createLotusPetalTexture(),
+            texMossRock: TextureFactory.createMossRockTexture(),
+            texPebble: TextureFactory.createPebbleTexture(),
+            texSoftShadow: TextureFactory.createSoftShadowTexture(),
+            texFishShadow: TextureFactory.createFishShadowTexture(),
+            texPellet: TextureFactory.createPelletTexture(),
+
+            geoQuad: GeometryFactory.createPlane(2, 2, 1, 1, false),
+            geoPlane: GeometryFactory.createPlane(1, 1, 1, 1, true),
+            geoKoiBody: GeometryFactory.createKoiBodyGeometry(),
+            geoKoiFins: GeometryFactory.createKoiFinsGeometry(),
+            geoSharkBody: GeometryFactory.createSharkBodyGeometry(),
+            geoSharkFins: GeometryFactory.createSharkFinsGeometry(),
+            geoSharkEyes: GeometryFactory.createSharkEyesGeometry(),
+            geoSharkMouth: GeometryFactory.createSharkMouthGeometry(),
+            geoSharkTeeth: GeometryFactory.createSharkTeethGeometry(),
+            geoSharkNostrils: GeometryFactory.createSharkNostrilsGeometry(),
+            geoLotusFlower: GeometryFactory.createLotusFlowerGeometry(),
+            geoMossRock: GeometryFactory.createMossRockGeometry(),
+            geoPebble: GeometryFactory.createSphere(0.18, 10, 8, 1.25, 0.55, 0.95),
+            geoPellet: GeometryFactory.createSphere(0.055, 8, 6, 1.0, 0.72, 1.0),
+            geoBubble: GeometryFactory.createSphere(0.065, 10, 8, 1, 1, 1)
+          };
+        }
+
+        _initScenes() {
+          // 池底平面
+          this.bedUniforms = {
+            uMap: { value: this.assets.texBed },
+            uTime: { value: 0 }
+          };
+          const bedMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.pondBedVert,
+            fragmentShader: Shaders.pondBedFrag,
+            uniforms: this.bedUniforms
+          });
+          const bedMesh = new THREE.Mesh(GeometryFactory.createPlane(28, 36, 1, 1, true), bedMat);
+          bedMesh.position.y = -2.0;
+          this.underwaterScene.add(bedMesh);
+
+          // 全螢幕水面合成層
+          this.waterUniforms = {
+            uUnderwater: { value: this.underwaterRT.texture },
+            uRipples: { value: this.rippleSim.texture },
+            uTime: { value: 0 }
+          };
+          const waterMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.waterVert,
+            fragmentShader: Shaders.waterFrag,
+            uniforms: this.waterUniforms,
+            depthTest: false,
+            depthWrite: false,
+            side: THREE.DoubleSide
+          });
+          this.waterPassScene.add(new THREE.Mesh(this.assets.geoQuad, waterMat));
+        }
+
+        _handleResize() {
+          const cssW = window.innerWidth;
+          const cssH = window.innerHeight;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+          this.renderer.setSize(cssW, cssH, dpr);
+          this.underwaterRT.resize(this.renderer.gl, cssW * dpr, cssH * dpr);
+
+          this.camera.aspect = cssW / Math.max(1, cssH);
+          this.camera.updateMatrices();
+
+          // 精確計算水面 (y=0) 可視邊界，確保所有魚永遠在畫面內活動
+          const topLeft = this.camera.screenToWaterPlane(-1, 1);
+          const botRight = this.camera.screenToWaterPlane(1, -1);
+          const minX = Math.min(topLeft.x, botRight.x);
+          const maxX = Math.max(topLeft.x, botRight.x);
+          const minZ = Math.min(topLeft.z, botRight.z);
+          const maxZ = Math.max(topLeft.z, botRight.z);
+          this.bounds = { minX, maxX, minZ, maxZ, w: maxX - minX, h: maxZ - minZ };
+
+          this._rebuildRippleObstacles();
+        }
+
+        worldToRippleUV(x, z) {
+          const u = (x - this.bounds.minX) / (this.bounds.w || 1);
+          const v = (z - this.bounds.minZ) / (this.bounds.h || 1);
+          return { u, v };
+        }
+
+        _rebuildRippleObstacles() {
+          this.rippleSim.clearObstacles();
+          for (const d of this.decors) {
+            if (d.type === 'rock') {
+              const uv = this.worldToRippleUV(d.x, d.z);
+              const ru = (d.radius * 0.92) / (this.bounds.w || 1);
+              const rv = (d.radius * 0.92) / (this.bounds.h || 1);
+              this.rippleSim.addObstacleCircle(uv.u, uv.v, ru, rv);
+            }
           }
         }
 
-        return new THREE.BufferGeometry()
-// ... existing code ...
-        const addToothCone = (bx, by, bz, dirY, rad, height, leanZ) => {
-          const segs = 7;
-          const tipIdx = baseIdx++;
-          const tipLen = Math.hypot(0, dirY, 0.6) || 1;
-          positions.push(bx, by + dirY * height, bz + leanZ);
-          normals.push(0, dirY / tipLen, 0.6 / tipLen);
-          uvs.push(0.5, 1.0);
-
-          const ringStart = baseIdx;
-          const ringLen = Math.hypot(1, dirY * 0.25) || 1;
-          for (let s = 0; s <= segs; s++) {
-            const a = (s / segs) * Math.PI * 2;
-            const ca = Math.cos(a), sa = Math.sin(a);
-            positions.push(bx + ca * rad, by, bz + sa * rad);
-            normals.push(ca / ringLen, (dirY * 0.25) / ringLen, sa / ringLen);
-            uvs.push(s / segs, 0.0);
-            baseIdx++;
-          }
-          for (let s = 0; s < segs; s++) {
-            if (dirY < 0) indices.push(tipIdx, ringStart + s, ringStart + s + 1);
-            else indices.push(tipIdx, ringStart + s + 1, ringStart + s);
-          }
-        };
-// ... existing code ...
-      // 3B. 3D Pixar 光澤公仔鯊魚專屬著色器（柔化三點攝影棚光 + 亮白清漆高光 + 清新粉藍輪廓邊緣光）
-      sharkFrag: PREC + `
-        uniform sampler2D uMap;
-        uniform float uTime;
-        uniform float uGloss;
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vWorldPos;
-
-        void main() {
-          vec4 tex = texture2D(uMap, vUv);
-
-          vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
-          vec3 L = normalize(vec3(0.32, 0.90, -0.28));
-          vec3 L2 = normalize(vec3(-0.55, 0.55, 0.50)); // 柔和補光避免暗部發黑
-          vec3 V = normalize(vec3(0.0, 1.0, 0.15));
-          vec3 H = normalize(L + V);
-
-          // Pixar 柔和包裹漫射 + 環境補光（維持粉藍與純白的高級公仔潔淨感）
-          float wrapDiff = clamp((dot(N, L) + 0.52) / 1.52, 0.0, 1.0);
-          float fillDiff = max(dot(N, L2), 0.0) * 0.22;
-
-          // 附圖同款光滑亮面塑膠／黏土清漆高光（底數嚴格大於 0，避免行動端／Safari WebGL pow(<=0) 產生 NaN 黑塊）
-          float ndh = clamp(dot(N, H), 0.0001, 1.0);
-          float clearcoat = pow(ndh, mix(26.0, 96.0, uGloss)) * mix(0.42, 0.95, uGloss);
-          float softSheen = pow(ndh, 8.0) * mix(0.16, 0.08, uGloss);
-
-          // 清透冰藍輪廓邊緣光（Rim Light），讓胖嘟嘟圓潤體積躍然水上
-          float rimBase = clamp(1.0 - max(dot(N, V), 0.0), 0.0001, 1.0);
-          float rim = pow(rimBase, 2.4);
-          vec3 rimCol = vec3(0.76, 0.94, 1.0) * rim * mix(0.38, 0.22, uGloss);
-
-          // 輕微水下陽光焦散
-          float caust = sin(vWorldPos.x * 2.8 + uTime * 2.0) * cos(vWorldPos.z * 2.6 - uTime * 1.6);
-          caust = max(0.0, caust) * 0.06 * max(N.y, 0.0);
-
-          vec3 col = tex.rgb * (0.50 + 0.56 * wrapDiff + fillDiff)
-                   + vec3(1.0, 1.0, 1.0) * (clearcoat + softSheen)
-                   + rimCol
-                   + vec3(0.68, 0.92, 0.98) * caust;
-
-          // 極輕柔水深霧化，保持天空藍與純白鮮明透亮
-          float depth = clamp(-vWorldPos.y / 2.6, 0.0, 1.0);
-          vec3 waterFog = vec3(0.08, 0.24, 0.25);
-          col = mix(col, waterFog, depth * 0.18);
-
-          gl_FragColor = vec4(col, 1.0);
+        showToast(msg) {
+          const el = document.getElementById('toast');
+          el.textContent = msg;
+          el.classList.add('show');
+          clearTimeout(this._toastTimer);
+          this._toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
         }
-      `,
 
-      // 3C. 3D 透明氣泡粒子著色器（鯊魚咬食瞬間冒出晶瑩 Pixar 氣泡）
-// ... existing code ...
-          texSharkMouth: TextureFactory.createSharkMouthTexture(),
-          texSharkTeeth: TextureFactory.createSharkTeethTexture(),
-          texSharkNostril: TextureFactory.createSharkNostrilTexture(),
-          geoSharkBody: GeometryFactory.createSharkBodyGeometry(),
-          geoSharkFins: GeometryFactory.createSharkFinsGeometry(),
-          geoSharkEyes: GeometryFactory.createSharkEyesGeometry(),
-          geoSharkMouth: GeometryFactory.createSharkMouthGeometry(),
-          geoSharkTeeth: GeometryFactory.createSharkTeethGeometry(),
-          geoSharkNostrils: GeometryFactory.createSharkNostrilsGeometry(),
-          geoSharkShadow: GeometryFactory.createSharkShadowGeometry(),
-          geoDiscShadow: GeometryFactory.createPlane(1, 1, 1, 1, true),
-// ... existing code ...
-        if (isShark) {
-          // 組裝參考附圖的 3D Pixar 胖鯊魚（胖水滴軀幹 + 圓厚四鰭 + 亮黑圓珠大眼 + 紅口腔 + 3D 白尖牙 + 迷你鼻孔）
-          const bodyMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
+        _updateStats() {
+          const el = document.getElementById('stats-label');
+          el.textContent = `${this.kois.length} 鯉 · ${this.sharks.length} 鯊`;
+        }
+
+        /* -------------------------------------------------------------------
+         * 生成魚類：三種錦鯉 + 3D Pixar 可愛胖鯊魚
+         * ------------------------------------------------------------------- */
+        spawnFish(variant, x, z, silent = false) {
+          const isShark = variant === 'shark';
+          if (isShark && this.sharks.length >= 4) {
+            this.showToast('水池最多放 4 隻胖鯊魚喔！');
+            return;
+          }
+          if (!isShark && this.kois.length >= 20) {
+            this.showToast('錦鯉已經很熱鬧囉（上限 20 尾）');
+            return;
+          }
+
+          const root = new THREE.Object3D();
+          const uniforms = {
+            uSwimPhase: { value: Math.random() * Math.PI * 2 },
+            uSwimAmp: { value: isShark ? 0.14 : 0.17 },
+            uTurnBend: { value: 0.0 },
+            uChomp: { value: 0.0 },
+            uTime: { value: this.time }
+          };
+
+          if (isShark) {
+            // 參考附圖：圓潤天空藍白肚胖鯊魚（軀幹 + 四鰭 + 亮黑大眼 + 紅口腔 + 13 顆白尖牙 + 小鼻孔）
+            const makeSharkMat = (tex, gloss, isFin = 0, doubleSide = false) => new THREE.ShaderMaterial({
+              vertexShader: Shaders.fishVert,
+              fragmentShader: Shaders.sharkFrag,
+              side: doubleSide ? THREE.DoubleSide : THREE.FrontSide,
+              uniforms: {
+                uMap: { value: tex },
+                uSwimPhase: uniforms.uSwimPhase,
+                uSwimAmp: uniforms.uSwimAmp,
+                uTurnBend: uniforms.uTurnBend,
+                uIsFin: { value: isFin },
+                uChomp: uniforms.uChomp,
+                uTime: uniforms.uTime,
+                uGloss: { value: gloss }
+              }
+            });
+
+            root.add(new THREE.Mesh(this.assets.geoSharkBody, makeSharkMat(this.assets.texSharkBody, 0.62, 0, true)));
+            root.add(new THREE.Mesh(this.assets.geoSharkFins, makeSharkMat(this.assets.texSharkFin, 0.56, 1, true)));
+            root.add(new THREE.Mesh(this.assets.geoSharkEyes, makeSharkMat(this.assets.texSharkEye, 0.98, 0, false)));
+            root.add(new THREE.Mesh(this.assets.geoSharkMouth, makeSharkMat(this.assets.texSharkMouth, 0.25, 0, true)));
+            root.add(new THREE.Mesh(this.assets.geoSharkTeeth, makeSharkMat(this.assets.texSharkTeeth, 0.72, 0, true)));
+            root.add(new THREE.Mesh(this.assets.geoSharkNostrils, makeSharkMat(this.assets.texSharkNostril, 0.20, 0, false)));
+          } else {
+            const bodyMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.fishVert,
+              fragmentShader: Shaders.koiFrag,
+              side: THREE.DoubleSide,
+              uniforms: {
+                uMap: { value: this.assets.texKoi[variant] || this.assets.texKoi.kohaku },
+                uSwimPhase: uniforms.uSwimPhase,
+                uSwimAmp: uniforms.uSwimAmp,
+                uTurnBend: uniforms.uTurnBend,
+                uIsFin: { value: 0.0 },
+                uChomp: uniforms.uChomp,
+                uTime: uniforms.uTime,
+                uAlpha: { value: 1.0 }
+              }
+            });
+            const finMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.fishVert,
+              fragmentShader: Shaders.koiFrag,
+              transparent: true,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+              uniforms: {
+                uMap: { value: this.assets.texKoiFin[variant] || this.assets.texKoiFin.kohaku },
+                uSwimPhase: uniforms.uSwimPhase,
+                uSwimAmp: uniforms.uSwimAmp,
+                uTurnBend: uniforms.uTurnBend,
+                uIsFin: { value: 1.0 },
+                uChomp: uniforms.uChomp,
+                uTime: uniforms.uTime,
+                uAlpha: { value: 0.92 }
+              }
+            });
+            const finMesh = new THREE.Mesh(this.assets.geoKoiFins, finMat);
+            finMesh.renderOrder = 3;
+            root.add(new THREE.Mesh(this.assets.geoKoiBody, bodyMat));
+            root.add(finMesh);
+          }
+
+          // 池底投影
+          const shadowMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.shadowVert,
+            fragmentShader: Shaders.shadowFrag,
+            transparent: true,
+            depthWrite: false,
             uniforms: {
-              uMap: { value: this.assets.texSharkBody },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 0.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.62 }
+              uMap: { value: this.assets.texFishShadow },
+              uOpacity: { value: isShark ? 0.75 : 0.62 }
             }
           });
+          const shadowMesh = new THREE.Mesh(this.assets.geoPlane, shadowMat);
+          shadowMesh.renderOrder = 1;
+          this.underwaterScene.add(shadowMesh);
+          this.underwaterScene.add(root);
 
-          const finMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
-            side: THREE.DoubleSide,
-            uniforms: {
-              uMap: { value: this.assets.texSharkFin },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 1.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.56 }
+          const scale = isShark ? (1.18 + Math.random() * 0.16) : (0.72 + Math.random() * 0.24);
+          const angle = Math.random() * Math.PI * 2;
+          const baseDepth = isShark ? -0.46 : (-0.52 - Math.random() * 0.55);
+
+          root.position.x = x;
+          root.position.y = baseDepth;
+          root.position.z = z;
+          root.rotation.y = angle;
+          root.scale.x = root.scale.y = root.scale.z = scale;
+
+          const entity = {
+            id: Math.random().toString(36).slice(2),
+            variant,
+            isShark,
+            mesh: root,
+            shadow: shadowMesh,
+            uniforms,
+            x,
+            y: baseDepth,
+            z,
+            baseDepth,
+            angle,
+            speed: isShark ? 1.55 : (1.15 + Math.random() * 0.35),
+            baseSpeed: isShark ? 1.55 : (1.15 + Math.random() * 0.35),
+            scale,
+            turnRate: 0,
+            wanderAngle: angle,
+            wanderTimer: 1 + Math.random() * 2,
+            // 錦鯉追逐用
+            chaseTarget: null,
+            chaseTimer: 2 + Math.random() * 4,
+            // 鯊魚掠食用
+            state: 'cruise',
+            prey: null,
+            huntCooldown: 4.0 + Math.random() * 3.5,
+            chompTimer: 0,
+            roll: 0,
+            pitch: 0
+          };
+
+          if (isShark) this.sharks.push(entity);
+          else this.kois.push(entity);
+
+          if (!silent) {
+            const uv = this.worldToRippleUV(x, z);
+            this.rippleSim.drop(uv.u, uv.v, isShark ? 7 : 4.5, isShark ? 1.15 : 0.75);
+            this.audio.playPlop(isShark ? 0.68 : 1.05, isShark ? 0.16 : 0.12);
+          }
+          this._updateStats();
+          return entity;
+        }
+
+        _removeFish(fish) {
+          this.underwaterScene.remove(fish.mesh);
+          this.underwaterScene.remove(fish.shadow);
+          if (fish.isShark) {
+            const idx = this.sharks.indexOf(fish);
+            if (idx >= 0) this.sharks.splice(idx, 1);
+          } else {
+            const idx = this.kois.indexOf(fish);
+            if (idx >= 0) this.kois.splice(idx, 1);
+            // 清除任何正在追這條魚的參考
+            for (const k of this.kois) if (k.chaseTarget === fish) k.chaseTarget = null;
+            for (const s of this.sharks) if (s.prey === fish) { s.prey = null; s.state = 'cruise'; }
+          }
+          this._updateStats();
+        }
+
+        /* -------------------------------------------------------------------
+         * 投餵飼料與氣泡粒子
+         * ------------------------------------------------------------------- */
+        dropFoodCluster(x, z) {
+          if (this.pellets.length > 35) return;
+          const count = 3 + Math.floor(Math.random() * 3);
+          for (let i = 0; i < count; i++) {
+            const px = x + (Math.random() - 0.5) * 0.65;
+            const pz = z + (Math.random() - 0.5) * 0.65;
+            const mat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.litVert,
+              fragmentShader: Shaders.litFrag,
+              uniforms: {
+                uMap: { value: this.assets.texPellet },
+                uAlpha: { value: 1.0 },
+                uUnderwater: { value: 0.0 },
+                uSpec: { value: 0.2 }
+              }
+            });
+            const mesh = new THREE.Mesh(this.assets.geoPellet, mat);
+            mesh.position.x = px;
+            mesh.position.y = 0.03;
+            mesh.position.z = pz;
+            this.aboveWaterScene.add(mesh);
+
+            this.pellets.push({
+              mesh,
+              x: px,
+              z: pz,
+              vx: (Math.random() - 0.5) * 0.18,
+              vz: (Math.random() - 0.5) * 0.18,
+              life: 24
+            });
+          }
+          const uv = this.worldToRippleUV(x, z);
+          this.rippleSim.drop(uv.u, uv.v, 3.8, 0.58);
+          this.audio.playPlop(1.42 + Math.random() * 0.25, 0.10);
+        }
+
+        _removePellet(pellet) {
+          this.aboveWaterScene.remove(pellet.mesh);
+          const idx = this.pellets.indexOf(pellet);
+          if (idx >= 0) this.pellets.splice(idx, 1);
+        }
+
+        _spawnBubbles(x, y, z, count = 12) {
+          for (let i = 0; i < count; i++) {
+            const uAlpha = { value: 0.95 };
+            const mat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.litVert,
+              fragmentShader: Shaders.bubbleFrag,
+              transparent: true,
+              depthWrite: false,
+              uniforms: { uAlpha }
+            });
+            const mesh = new THREE.Mesh(this.assets.geoBubble, mat);
+            const sc = 0.55 + Math.random() * 1.15;
+            mesh.scale.x = mesh.scale.y = mesh.scale.z = sc;
+            mesh.renderOrder = 6;
+            const bx = x + (Math.random() - 0.5) * 0.65;
+            const by = y + (Math.random() - 0.5) * 0.2;
+            const bz = z + (Math.random() - 0.5) * 0.65;
+            mesh.position.x = bx;
+            mesh.position.y = by;
+            mesh.position.z = bz;
+            this.underwaterScene.add(mesh);
+
+            this.bubbles.push({
+              mesh,
+              uAlpha,
+              x: bx,
+              y: by,
+              z: bz,
+              vx: (Math.random() - 0.5) * 0.55,
+              vy: 0.65 + Math.random() * 0.75,
+              vz: (Math.random() - 0.5) * 0.55,
+              life: 0.85 + Math.random() * 0.65,
+              maxLife: 1.4
+            });
+          }
+        }
+
+        /* -------------------------------------------------------------------
+         * 池塘造景：睡蓮、荷葉、苔石、卵石
+         * ------------------------------------------------------------------- */
+        placeDecor(type, x, z, silent = false) {
+          if (this.decors.length >= 28) {
+            this.showToast('造景數量已達上限，可先切換「移除」整理');
+            return;
+          }
+
+          let group = new THREE.Object3D();
+          let shadow = null;
+          let radius = 0.65;
+          let floating = false;
+
+          if (type === 'pad' || type === 'lotus') {
+            floating = true;
+            const padSize = type === 'lotus' ? (1.15 + Math.random() * 0.25) : (0.95 + Math.random() * 0.45);
+            radius = padSize * 0.52;
+
+            const padMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.litVert,
+              fragmentShader: Shaders.litFrag,
+              transparent: true,
+              depthWrite: true,
+              side: THREE.DoubleSide,
+              uniforms: {
+                uMap: { value: this.assets.texLilyPad },
+                uAlpha: { value: 1.0 },
+                uUnderwater: { value: 0.0 },
+                uSpec: { value: 0.26 }
+              }
+            });
+            const padMesh = new THREE.Mesh(this.assets.geoPlane, padMat);
+            padMesh.scale.x = padMesh.scale.z = padSize;
+            padMesh.rotation.y = Math.random() * Math.PI * 2;
+            group.add(padMesh);
+
+            if (type === 'lotus') {
+              const petalMat = new THREE.ShaderMaterial({
+                vertexShader: Shaders.litVert,
+                fragmentShader: Shaders.litFrag,
+                side: THREE.DoubleSide,
+                uniforms: {
+                  uMap: { value: this.assets.texLotusPetal },
+                  uAlpha: { value: 1.0 },
+                  uUnderwater: { value: 0.0 },
+                  uSpec: { value: 0.18 }
+                }
+              });
+              const flower = new THREE.Mesh(this.assets.geoLotusFlower, petalMat);
+              flower.position.y = 0.03;
+              flower.scale.x = flower.scale.y = flower.scale.z = 1.05;
+              flower.rotation.y = Math.random() * Math.PI * 2;
+              group.add(flower);
+
+              // 金黃花蕊
+              const centerMat = new THREE.ShaderMaterial({
+                vertexShader: Shaders.litVert,
+                fragmentShader: Shaders.litFrag,
+                uniforms: {
+                  uMap: { value: this.assets.texPellet },
+                  uAlpha: { value: 1.0 },
+                  uUnderwater: { value: 0.0 },
+                  uSpec: { value: 0.25 }
+                }
+              });
+              const stamen = new THREE.Mesh(this.assets.geoPellet, centerMat);
+              stamen.position.y = 0.13;
+              stamen.scale.x = stamen.scale.y = stamen.scale.z = 1.65;
+              group.add(stamen);
             }
+
+            group.position.x = x;
+            group.position.y = 0.04;
+            group.position.z = z;
+            this.aboveWaterScene.add(group);
+
+            // 荷葉在池底的陰影
+            const shMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.shadowVert,
+              fragmentShader: Shaders.shadowFrag,
+              transparent: true,
+              depthWrite: false,
+              uniforms: { uMap: { value: this.assets.texSoftShadow }, uOpacity: { value: 0.52 } }
+            });
+            shadow = new THREE.Mesh(this.assets.geoPlane, shMat);
+            shadow.position.x = x + 0.22;
+            shadow.position.y = -1.92;
+            shadow.position.z = z + 0.18;
+            shadow.scale.x = shadow.scale.z = padSize * 1.08;
+            shadow.renderOrder = 1;
+            this.underwaterScene.add(shadow);
+          } else if (type === 'rock') {
+            const sc = 0.88 + Math.random() * 0.42;
+            radius = 0.65 * sc;
+            const rockMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.litVert,
+              fragmentShader: Shaders.litFrag,
+              uniforms: {
+                uMap: { value: this.assets.texMossRock },
+                uAlpha: { value: 1.0 },
+                uUnderwater: { value: 0.0 },
+                uSpec: { value: 0.28 }
+              }
+            });
+            const rockMesh = new THREE.Mesh(this.assets.geoMossRock, rockMat);
+            rockMesh.scale.x = sc;
+            rockMesh.scale.y = sc * 1.15;
+            rockMesh.scale.z = sc * (0.85 + Math.random() * 0.3);
+            rockMesh.rotation.y = Math.random() * Math.PI * 2;
+            group.add(rockMesh);
+            group.position.x = x;
+            group.position.y = 0.06;
+            group.position.z = z;
+            this.aboveWaterScene.add(group);
+
+            // 岩石池底陰影
+            const shMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.shadowVert,
+              fragmentShader: Shaders.shadowFrag,
+              transparent: true,
+              depthWrite: false,
+              uniforms: { uMap: { value: this.assets.texSoftShadow }, uOpacity: { value: 0.72 } }
+            });
+            shadow = new THREE.Mesh(this.assets.geoPlane, shMat);
+            shadow.position.x = x + 0.18;
+            shadow.position.y = -1.92;
+            shadow.position.z = z + 0.16;
+            shadow.scale.x = shadow.scale.z = radius * 2.5;
+            shadow.renderOrder = 1;
+            this.underwaterScene.add(shadow);
+          } else if (type === 'pebble') {
+            radius = 0.55;
+            const count = 3 + Math.floor(Math.random() * 3);
+            const pebMat = new THREE.ShaderMaterial({
+              vertexShader: Shaders.litVert,
+              fragmentShader: Shaders.litFrag,
+              uniforms: {
+                uMap: { value: this.assets.texPebble },
+                uAlpha: { value: 1.0 },
+                uUnderwater: { value: 1.0 },
+                uSpec: { value: 0.22 }
+              }
+            });
+            for (let i = 0; i < count; i++) {
+              const m = new THREE.Mesh(this.assets.geoPebble, pebMat);
+              const s = 0.7 + Math.random() * 0.85;
+              m.position.x = (Math.random() - 0.5) * 0.62;
+              m.position.y = 0.05 * s;
+              m.position.z = (Math.random() - 0.5) * 0.62;
+              m.rotation.y = Math.random() * Math.PI * 2;
+              m.scale.x = s;
+              m.scale.y = s * 0.85;
+              m.scale.z = s * (0.8 + Math.random() * 0.35);
+              group.add(m);
+            }
+            group.position.x = x;
+            group.position.y = -1.95;
+            group.position.z = z;
+            this.underwaterScene.add(group);
+          }
+
+          this.decors.push({
+            type,
+            x,
+            z,
+            radius,
+            floating,
+            group,
+            shadow,
+            inUnderwater: type === 'pebble',
+            phase: Math.random() * Math.PI * 2
           });
 
-          const eyeMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
-            uniforms: {
-              uMap: { value: this.assets.texSharkEye },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 0.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.98 }
+          if (type === 'rock') this._rebuildRippleObstacles();
+          if (!silent) {
+            const uv = this.worldToRippleUV(x, z);
+            this.rippleSim.drop(uv.u, uv.v, type === 'rock' ? 7 : 5, type === 'rock' ? 1.0 : 0.62);
+            this.audio.playPlop(type === 'rock' ? 0.62 : 1.12, 0.13);
+          }
+        }
+
+        _removeDecor(d) {
+          if (d.inUnderwater) this.underwaterScene.remove(d.group);
+          else this.aboveWaterScene.remove(d.group);
+          if (d.shadow) this.underwaterScene.remove(d.shadow);
+          const idx = this.decors.indexOf(d);
+          if (idx >= 0) this.decors.splice(idx, 1);
+          if (d.type === 'rock') this._rebuildRippleObstacles();
+        }
+
+        removeNearestAt(x, z) {
+          let best = null, bestDist = 1.25, kind = null;
+          for (const d of this.decors) {
+            const dist = Math.hypot(d.x - x, d.z - z);
+            if (dist < Math.max(d.radius + 0.35, bestDist) && dist < bestDist) {
+              best = d; bestDist = dist; kind = 'decor';
             }
+          }
+          for (const f of [...this.sharks, ...this.kois]) {
+            const dist = Math.hypot(f.x - x, f.z - z);
+            if (dist < bestDist) {
+              best = f; bestDist = dist; kind = 'fish';
+            }
+          }
+          if (!best) return;
+          if (kind === 'decor') this._removeDecor(best);
+          else this._removeFish(best);
+
+          const uv = this.worldToRippleUV(best.x, best.z);
+          this.rippleSim.drop(uv.u, uv.v, 4.5, 0.65);
+          this.audio.playPlop(1.3, 0.1);
+        }
+
+        /* -------------------------------------------------------------------
+         * 重置水池（預設 9 尾三色錦鯉 + 1 隻 3D Pixar 胖鯊魚 + 禪意造景）
+         * ------------------------------------------------------------------- */
+        resetPond() {
+          for (const f of [...this.kois]) this._removeFish(f);
+          for (const s of [...this.sharks]) this._removeFish(s);
+          for (const p of [...this.pellets]) this._removePellet(p);
+          for (const d of [...this.decors]) this._removeDecor(d);
+          for (const b of this.bubbles) this.underwaterScene.remove(b.mesh);
+          this.bubbles.length = 0;
+
+          const rx = this.bounds.w * 0.34;
+          const rz = this.bounds.h * 0.33;
+
+          // 禪意造景
+          this.placeDecor('rock', -rx * 0.92, -rz * 0.72, true);
+          this.placeDecor('rock', rx * 0.96, rz * 0.66, true);
+          this.placeDecor('lotus', -rx * 0.62, rz * 0.56, true);
+          this.placeDecor('pad', -rx * 0.32, rz * 0.72, true);
+          this.placeDecor('lotus', rx * 0.64, -rz * 0.60, true);
+          this.placeDecor('pad', rx * 0.34, -rz * 0.76, true);
+          this.placeDecor('pad', rx * 0.78, -rz * 0.25, true);
+
+          for (let i = 0; i < 6; i++) {
+            this.placeDecor('pebble', (Math.random() - 0.5) * rx * 2.1, (Math.random() - 0.5) * rz * 2.1, true);
+          }
+
+          // 三種錦鯉各 3 尾（共 9 尾）
+          const variants = ['kohaku', 'sanke', 'yamabuki'];
+          for (let i = 0; i < 9; i++) {
+            const x = (Math.random() - 0.5) * rx * 1.5;
+            const z = (Math.random() - 0.5) * rz * 1.5;
+            this.spawnFish(variants[i % 3], x, z, true);
+          }
+
+          // 1 隻參考附圖的 3D Pixar 可愛胖鯊魚
+          this.spawnFish('shark', 0, -rz * 0.18, true);
+
+          this._updateStats();
+          this.showToast('歡迎來到錦鯉池 · 划水面泛起漣漪');
+        }
+
+        /* -------------------------------------------------------------------
+         * UI 與觸控／滑鼠互動綁定
+         * ------------------------------------------------------------------- */
+        _initUI() {
+          const dockBtns = document.querySelectorAll('.dock-btn');
+          const subFish = document.getElementById('sub-fish');
+          const subDecor = document.getElementById('sub-decor');
+
+          const setMode = (m) => {
+            this.mode = m;
+            dockBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+            subFish.classList.toggle('open', m === 'fish');
+            subDecor.classList.toggle('open', m === 'decor');
+
+            const tips = {
+              ripple: '滑動水面泛起漣漪與魚互動',
+              feed: '點擊水面撒下飼料，錦鯉會游來吃',
+              fish: '選擇品種後點擊水面放魚',
+              decor: '選擇造景後點擊水面擺放',
+              remove: '點擊造景或魚即可移除'
+            };
+            this.showToast(tips[m]);
+          };
+
+          dockBtns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+          document.querySelectorAll('#sub-fish .sub-btn').forEach(b => {
+            b.addEventListener('click', () => {
+              this.selectedFish = b.dataset.fish;
+              document.querySelectorAll('#sub-fish .sub-btn').forEach(x => x.classList.toggle('active', x === b));
+            });
           });
 
-          const mouthMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
-            side: THREE.DoubleSide,
-            uniforms: {
-              uMap: { value: this.assets.texSharkMouth },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 0.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.25 }
-            }
+          document.querySelectorAll('#sub-decor .sub-btn').forEach(b => {
+            b.addEventListener('click', () => {
+              this.selectedDecor = b.dataset.decor;
+              document.querySelectorAll('#sub-decor .sub-btn').forEach(x => x.classList.toggle('active', x === b));
+            });
           });
 
-          const teethMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
-            side: THREE.DoubleSide,
-            uniforms: {
-              uMap: { value: this.assets.texSharkTeeth },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 0.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.72 }
-            }
+          const soundBtn = document.getElementById('btn-sound');
+          soundBtn.addEventListener('click', () => {
+            this.audio.enabled = !this.audio.enabled;
+            soundBtn.textContent = this.audio.enabled ? '🔊' : '🔇';
+            this.showToast(this.audio.enabled ? '已開啟水聲效果' : '已靜音');
           });
 
-          const nostrilMat = new THREE.ShaderMaterial({
-            vertexShader: Shaders.koiVert,
-            fragmentShader: Shaders.sharkFrag,
-            uniforms: {
-              uMap: { value: this.assets.texSharkNostril },
-              uSwimPhase: uniformsCommon.uSwimPhase,
-              uSwimAmp: uniformsCommon.uSwimAmp,
-              uTurnBend: uniformsCommon.uTurnBend,
-              uIsFin: { value: 0.0 },
-              uChomp: uniformsCommon.uChomp,
-              uTime: uniformsCommon.uTime,
-              uGloss: { value: 0.2 }
-            }
+          document.getElementById('btn-reset').addEventListener('click', () => {
+            this.resetPond();
+            this.audio.playPlop(0.9, 0.12);
           });
 
-          const bodyMesh = new THREE.Mesh(this.assets.geoSharkBody, bodyMat);
-// ... existing code ...
+          window.addEventListener('resize', () => this._handleResize());
+        }
+
+        _initInput() {
+          const toWorld = (clientX, clientY) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+            const ndcY = 1 - ((clientY - rect.top) / rect.height) * 2;
+            return this.camera.screenToWaterPlane(ndcX, ndcY);
+          };
+
+          const handleStart = (clientX, clientY) => {
+            this._pointerDown = true;
+            const pt = toWorld(clientX, clientY);
+            this._lastWaterPos = pt;
+
+            if (this.mode === 'ripple') {
+              const uv = this.worldToRippleUV(pt.x, pt.z);
+              this.rippleSim.drop(uv.u, uv.v, 5.2, 0.95);
+              this.audio.playPlop(0.95 + Math.random() * 0.35, 0.11);
+              this._pokeFishNear(pt.x, pt.z);
+            } else if (this.mode === 'feed') {
+              this.dropFoodCluster(pt.x, pt.z);
+            } else if (this.mode === 'fish') {
+              this.spawnFish(this.selectedFish, pt.x, pt.z);
+            } else if (this.mode === 'decor') {
+              this.placeDecor(this.selectedDecor, pt.x, pt.z);
+            } else if (this.mode === 'remove') {
+              this.removeNearestAt(pt.x, pt.z);
+            }
+          };
+
+          const handleMove = (clientX, clientY) => {
+            if (!this._pointerDown) return;
+            const pt = toWorld(clientX, clientY);
+            if (this.mode === 'ripple' && this._lastWaterPos) {
+              const dist = Math.hypot(pt.x - this._lastWaterPos.x, pt.z - this._lastWaterPos.z);
+              const steps = Math.max(1, Math.min(8, Math.ceil(dist / 0.18)));
+              for (let i = 1; i <= steps; i++) {
+                const t = i / steps;
+                const ix = this._lastWaterPos.x + (pt.x - this._lastWaterPos.x) * t;
+                const iz = this._lastWaterPos.z + (pt.z - this._lastWaterPos.z) * t;
+                const uv = this.worldToRippleUV(ix, iz);
+                this.rippleSim.drop(uv.u, uv.v, 3.8, 0.56);
+              }
+              if (dist > 0.12) {
+                this.audio.playSwipe();
+                this._pokeFishNear(pt.x, pt.z);
+                this._lastWaterPos = pt;
+              }
+            }
+          };
+
+          const handleEnd = () => {
+            this._pointerDown = false;
+            this._lastWaterPos = null;
+          };
+
+          this.canvas.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            handleStart(e.clientX, e.clientY);
+          });
+          window.addEventListener('pointermove', (e) => handleMove(e.clientX, e.clientY));
+          window.addEventListener('pointerup', handleEnd);
+          window.addEventListener('pointercancel', handleEnd);
+        }
+
+        _pokeFishNear(x, z) {
+          for (const k of this.kois) {
+            const dx = k.x - x, dz = k.z - z;
+            const d = Math.hypot(dx, dz);
+            if (d < 1.8 && d > 0.01) {
+              k.wanderAngle = Math.atan2(dx, dz);
+              k.speed = Math.max(k.speed, 2.75);
+            }
+          }
+        }
+
+        /* -------------------------------------------------------------------
+         * AI 更新：錦鯉（漫游 + 互相追來追去 + 搶食飼料 + 躲鯊魚）與 胖鯊魚（隨機追捕吃魚）
+         * ------------------------------------------------------------------- */
+        _steerAngle(cur, target, maxTurn) {
+          let diff = target - cur;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          const clamped = Math.max(-maxTurn, Math.min(maxTurn, diff));
+          return { angle: cur + clamped, delta: clamped };
+        }
+
+        _avoidRocksAndBounds(f, desiredX, desiredZ) {
+          let ax = desiredX, az = desiredZ;
+          const padX = this.bounds.w * 0.10;
+          const padZ = this.bounds.h * 0.11;
+          const minX = this.bounds.minX + padX, maxX = this.bounds.maxX - padX;
+          const minZ = this.bounds.minZ + padZ, maxZ = this.bounds.maxZ - padZ;
+
+          if (f.x < minX) ax += (minX - f.x) * 2.8;
+          if (f.x > maxX) ax -= (f.x - maxX) * 2.8;
+          if (f.z < minZ) az += (minZ - f.z) * 2.8;
+          if (f.z > maxZ) az -= (f.z - maxZ) * 2.8;
+
+          // 閃避苔石
+          for (const d of this.decors) {
+            if (d.type !== 'rock') continue;
+            const dx = f.x - d.x, dz = f.z - d.z;
+            const dist = Math.hypot(dx, dz);
+            const safeR = d.radius + (f.isShark ? 0.95 : 0.65);
+            if (dist < safeR && dist > 0.001) {
+              const push = ((safeR - dist) / safeR) * 4.5;
+              ax += (dx / dist) * push;
+              az += (dz / dist) * push;
+            }
+          }
+          return { x: ax, z: az };
+        }
+
+        _updateKois(dt) {
+          for (let i = 0; i < this.kois.length; i++) {
+            const k = this.kois[i];
+            let targetSpeed = k.baseSpeed;
+            let targetDepth = k.baseDepth;
+
+            // 1) 檢查是否正被鯊魚追捕或靠近 -> 驚慌蛇行逃竄
+            let fleeing = false;
+            let sx = Math.sin(k.wanderAngle), sz = Math.cos(k.wanderAngle);
+
+            for (const s of this.sharks) {
+              const dx = k.x - s.x, dz = k.z - s.z;
+              const dist = Math.hypot(dx, dz);
+              const dangerR = s.prey === k ? 3.8 : 2.1;
+              if (dist < dangerR && dist > 0.01) {
+                fleeing = true;
+                const zig = Math.sin(this.time * 9.0 + i * 2.1) * 0.55;
+                const away = Math.atan2(dx, dz) + zig;
+                sx = Math.sin(away) * 2.4;
+                sz = Math.cos(away) * 2.4;
+                targetSpeed = 2.85;
+                targetDepth = -0.78;
+                break;
+              }
+            }
+
+            // 2) 若安全且水面有飼料 -> 游上水面張口搶食
+            let nearestPellet = null;
+            if (!fleeing && this.pellets.length > 0) {
+              let bestD = 5.2;
+              for (const p of this.pellets) {
+                const d = Math.hypot(p.x - k.x, p.z - k.z);
+                if (d < bestD) { bestD = d; nearestPellet = p; }
+              }
+              if (nearestPellet) {
+                const dx = nearestPellet.x - k.x, dz = nearestPellet.z - k.z;
+                const d = Math.hypot(dx, dz) || 1;
+                sx = (dx / d) * 1.9;
+                sz = (dz / d) * 1.9;
+                targetSpeed = 2.15;
+                targetDepth = -0.18;
+
+                if (d < 0.42) {
+                  const uv = this.worldToRippleUV(nearestPellet.x, nearestPellet.z);
+                  this.rippleSim.drop(uv.u, uv.v, 4.2, 0.72);
+                  this.audio.playGulp();
+                  this._removePellet(nearestPellet);
+                }
+              }
+            }
+
+            // 3) 錦鯉之間隨機「追來追去」與自然漫游
+            if (!fleeing && !nearestPellet) {
+              k.chaseTimer -= dt;
+              if (k.chaseTimer <= 0) {
+                if (k.chaseTarget || this.kois.length < 2 || Math.random() < 0.45) {
+                  k.chaseTarget = null;
+                  k.chaseTimer = 2.5 + Math.random() * 4.0;
+                } else {
+                  const cand = this.kois[Math.floor(Math.random() * this.kois.length)];
+                  if (cand !== k) {
+                    k.chaseTarget = cand;
+                    k.chaseTimer = 3.5 + Math.random() * 4.5;
+                  }
+                }
+              }
+
+              if (k.chaseTarget) {
+                const dx = k.chaseTarget.x - k.x, dz = k.chaseTarget.z - k.z;
+                const d = Math.hypot(dx, dz);
+                if (d > 0.55) {
+                  sx = (dx / d) * 1.6;
+                  sz = (dz / d) * 1.6;
+                  targetSpeed = 2.05;
+                } else {
+                  // 追上後角色互換或 playfully 轉彎
+                  k.chaseTarget.chaseTarget = k;
+                  k.chaseTarget.chaseTimer = 3.5;
+                  k.chaseTarget = null;
+                  k.wanderAngle += (Math.random() > 0.5 ? 1 : -1) * 1.3;
+                }
+              } else {
+                k.wanderTimer -= dt;
+                if (k.wanderTimer <= 0) {
+                  k.wanderAngle += (Math.random() - 0.5) * 1.55;
+                  k.wanderTimer = 1.2 + Math.random() * 2.4;
+                }
+                sx = Math.sin(k.wanderAngle);
+                sz = Math.cos(k.wanderAngle);
+              }
+
+              // 同伴輕微防重疊
+              for (let j = 0; j < this.kois.length; j++) {
+                if (i === j) continue;
+                const o = this.kois[j];
+                const dx = k.x - o.x, dz = k.z - o.z;
+                const d = Math.hypot(dx, dz);
+                if (d < 0.72 && d > 0.001) {
+                  sx += (dx / d) * (0.72 - d) * 2.0;
+                  sz += (dz / d) * (0.72 - d) * 2.0;
+                }
+              }
+            }
+
+            const steered = this._avoidRocksAndBounds(k, sx, sz);
+            const desiredAngle = Math.atan2(steered.x, steered.z);
+            const turn = this._steerAngle(k.angle, desiredAngle, (fleeing ? 4.8 : 2.9) * dt);
+            k.angle = turn.angle;
+            k.turnRate += (turn.delta / Math.max(dt, 0.008) - k.turnRate) * Math.min(1, dt * 8);
+            k.speed += (targetSpeed - k.speed) * Math.min(1, dt * 3.5);
+
+            k.x += Math.sin(k.angle) * k.speed * dt;
+            k.z += Math.cos(k.angle) * k.speed * dt;
+            k.y += (targetDepth - k.y) * Math.min(1, dt * 2.4);
+
+            // 硬邊界保險
+            k.x = Math.max(this.bounds.minX + 0.35, Math.min(this.bounds.maxX - 0.35, k.x));
+            k.z = Math.max(this.bounds.minZ + 0.35, Math.min(this.bounds.maxZ - 0.35, k.z));
+
+            // 游動尾波偶爾輕擾水面
+            if (k.y > -0.45 && Math.random() < dt * 2.4) {
+              const uv = this.worldToRippleUV(k.x, k.z);
+              this.rippleSim.drop(uv.u, uv.v, 2.2, 0.16);
+            }
+
+            // 更新網格與池底投影
+            k.uniforms.uSwimPhase.value += dt * (4.8 + k.speed * 3.6);
+            k.uniforms.uSwimAmp.value = 0.12 + k.speed * 0.036;
+            k.uniforms.uTurnBend.value = Math.max(-0.85, Math.min(0.85, -k.turnRate * 0.25));
+            k.uniforms.uTime.value = this.time;
+
+            k.mesh.position.x = k.x;
+            k.mesh.position.y = k.y;
+            k.mesh.position.z = k.z;
+            k.mesh.rotation.y = k.angle;
+
+            k.shadow.position.x = k.x + 0.26 * (2.0 + k.y) * 0.45;
+            k.shadow.position.y = -1.94;
+            k.shadow.position.z = k.z + 0.22 * (2.0 + k.y) * 0.45;
+            k.shadow.rotation.y = k.angle;
+            k.shadow.scale.x = k.scale * 1.15;
+            k.shadow.scale.z = k.scale * 2.15;
+          }
+        }
+
+        _updateSharks(dt) {
+          for (const s of this.sharks) {
+            if (s.chompTimer > 0) {
+              s.chompTimer = Math.max(0, s.chompTimer - dt * 2.8);
+              s.uniforms.uChomp.value = s.chompTimer;
+            } else {
+              s.uniforms.uChomp.value = 0;
+            }
+
+            let targetSpeed = s.baseSpeed;
+            let targetPitch = -0.10; // 微微抬吻讓可愛大眼與微笑尖牙在俯視角若隱若現
+            let sx = Math.sin(s.wanderAngle), sz = Math.cos(s.wanderAngle);
+
+            if (s.state === 'cruise') {
+              s.huntCooldown -= dt;
+              s.wanderTimer -= dt;
+              if (s.wanderTimer <= 0) {
+                s.wanderAngle += (Math.random() - 0.5) * 1.4;
+                s.wanderTimer = 1.6 + Math.random() * 2.2;
+              }
+              sx = Math.sin(s.wanderAngle);
+              sz = Math.cos(s.wanderAngle);
+
+              // 冷卻結束，隨機鎖定池中一尾錦鯉展開追捕！
+              if (s.huntCooldown <= 0 && this.kois.length > 0) {
+                s.prey = this.kois[Math.floor(Math.random() * this.kois.length)];
+                s.state = 'hunt';
+              }
+            } else if (s.state === 'hunt') {
+              if (!s.prey || this.kois.indexOf(s.prey) < 0) {
+                s.prey = null;
+                s.state = 'cruise';
+                s.huntCooldown = 4.0 + Math.random() * 3.0;
+              } else {
+                // 預測前置攔截目標錦鯉
+                const leadX = s.prey.x + Math.sin(s.prey.angle) * s.prey.speed * 0.28;
+                const leadZ = s.prey.z + Math.cos(s.prey.angle) * s.prey.speed * 0.28;
+                const dx = leadX - s.x, dz = leadZ - s.z;
+                const dist = Math.hypot(s.prey.x - s.x, s.prey.z - s.z);
+                const dLead = Math.hypot(dx, dz) || 1;
+
+                sx = (dx / dLead) * 2.4;
+                sz = (dz / dLead) * 2.4;
+                targetSpeed = 3.15;
+                targetPitch = -0.22; // 追擊時微抬吻露出微笑尖牙
+
+                // 追上並一口吃掉！
+                if (dist < 0.78) {
+                  const eaten = s.prey;
+                  const ex = eaten.x, ey = eaten.y, ez = eaten.z;
+                  this._removeFish(eaten);
+
+                  s.chompTimer = 1.0;
+                  s.prey = null;
+                  s.state = 'cruise';
+                  s.huntCooldown = 7.5 + Math.random() * 4.5;
+                  s.wanderAngle = s.angle + (Math.random() > 0.5 ? 0.6 : -0.6);
+
+                  const uv = this.worldToRippleUV(ex, ez);
+                  this.rippleSim.drop(uv.u, uv.v, 8.5, 1.45);
+                  this._spawnBubbles(ex, ey, ez, 14);
+                  this.audio.playChomp();
+
+                  if (this.kois.length === 0) {
+                    this.showToast('胖鯊魚把錦鯉吃光囉！點「放魚」補充');
+                  } else {
+                    this.showToast('胖鯊魚一口吃掉了一尾錦鯉！');
+                  }
+                }
+              }
+            }
+
+            const steered = this._avoidRocksAndBounds(s, sx, sz);
+            const desiredAngle = Math.atan2(steered.x, steered.z);
+            const maxTurn = (s.state === 'hunt' ? 4.2 : 2.3) * dt;
+            const turn = this._steerAngle(s.angle, desiredAngle, maxTurn);
+            s.angle = turn.angle;
+            s.turnRate += (turn.delta / Math.max(dt, 0.008) - s.turnRate) * Math.min(1, dt * 7);
+            s.speed += (targetSpeed - s.speed) * Math.min(1, dt * 3.8);
+
+            s.x += Math.sin(s.angle) * s.speed * dt;
+            s.z += Math.cos(s.angle) * s.speed * dt;
+            s.x = Math.max(this.bounds.minX + 0.5, Math.min(this.bounds.maxX - 0.5, s.x));
+            s.z = Math.max(this.bounds.minZ + 0.5, Math.min(this.bounds.maxZ - 0.5, s.z));
+
+            // 可愛 Pixar 俏皮側搖（俯視時能交替清楚看見側臉黑豆大眼、白肚與鰓裂）
+            const targetRoll = Math.sin(this.time * 2.2 + s.scale * 5.0) * 0.24 - s.turnRate * 0.14;
+            s.roll += (targetRoll - s.roll) * Math.min(1, dt * 5);
+            s.pitch += (targetPitch - s.pitch) * Math.min(1, dt * 4);
+
+            // 鯊魚背鰭劃過水面產生細膩尾波
+            if (Math.random() < dt * (s.state === 'hunt' ? 8.0 : 3.5)) {
+              const uv = this.worldToRippleUV(s.x - Math.sin(s.angle) * 0.35, s.z - Math.cos(s.angle) * 0.35);
+              this.rippleSim.drop(uv.u, uv.v, 2.8, s.state === 'hunt' ? 0.36 : 0.20);
+            }
+
+            s.uniforms.uSwimPhase.value += dt * (3.6 + s.speed * 2.6);
+            s.uniforms.uSwimAmp.value = 0.10 + s.speed * 0.028;
+            s.uniforms.uTurnBend.value = Math.max(-0.65, Math.min(0.65, -s.turnRate * 0.22));
+            s.uniforms.uTime.value = this.time;
+
+            s.mesh.position.x = s.x;
+            s.mesh.position.y = s.baseDepth + Math.sin(this.time * 2.0) * 0.04;
+            s.mesh.position.z = s.z;
+            s.mesh.rotation.y = s.angle;
+            s.mesh.rotation.x = s.pitch;
+            s.mesh.rotation.z = s.roll;
+
+            s.shadow.position.x = s.x + 0.32;
+            s.shadow.position.y = -1.94;
+            s.shadow.position.z = s.z + 0.28;
+            s.shadow.rotation.y = s.angle;
+            s.shadow.scale.x = s.scale * 1.55;
+            s.shadow.scale.z = s.scale * 2.35;
+          }
+        }
+
+        _updateWorldObjects(dt) {
+          // 漂浮飼料隨水波晃動
+          for (let i = this.pellets.length - 1; i >= 0; i--) {
+            const p = this.pellets[i];
+            p.life -= dt;
+            if (p.life <= 0) { this._removePellet(p); continue; }
+            const uv = this.worldToRippleUV(p.x, p.z);
+            const r = this.rippleSim.sample(uv.u, uv.v);
+            p.vx = (p.vx - r.dx * 0.8 * dt) * 0.96;
+            p.vz = (p.vz - r.dy * 0.8 * dt) * 0.96;
+            p.x += p.vx * dt;
+            p.z += p.vz * dt;
+            p.mesh.position.x = p.x;
+            p.mesh.position.y = 0.03 + r.h * 0.14;
+            p.mesh.position.z = p.z;
+          }
+
+          // 睡蓮與荷葉隨水波起伏搖擺
+          for (const d of this.decors) {
+            if (!d.floating) continue;
+            const uv = this.worldToRippleUV(d.x, d.z);
+            const r = this.rippleSim.sample(uv.u, uv.v);
+            d.group.position.y = 0.04 + r.h * 0.16 + Math.sin(this.time * 1.4 + d.phase) * 0.012;
+            d.group.rotation.x = Math.max(-0.22, Math.min(0.22, r.dy * 0.45));
+            d.group.rotation.z = Math.max(-0.22, Math.min(0.22, -r.dx * 0.45));
+          }
+
+          // 上浮氣泡粒子
+          for (let i = this.bubbles.length - 1; i >= 0; i--) {
+            const b = this.bubbles[i];
+            b.life -= dt;
+            if (b.life <= 0 || b.y > -0.02) {
+              this.underwaterScene.remove(b.mesh);
+              this.bubbles.splice(i, 1);
+              continue;
+            }
+            b.x += b.vx * dt + Math.sin(this.time * 8 + i) * 0.008;
+            b.y += b.vy * dt;
+            b.z += b.vz * dt;
+            b.mesh.position.x = b.x;
+            b.mesh.position.y = b.y;
+            b.mesh.position.z = b.z;
+            b.uAlpha.value = Math.max(0, b.life / b.maxLife);
+          }
+        }
+
+        step(dt) {
+          this.time += dt;
+          this.bedUniforms.uTime.value = this.time;
+          this.waterUniforms.uTime.value = this.time;
+
+          // 偶爾自然微風落水點，讓池面永保生機
+          if (Math.random() < dt * 0.45) {
+            this.rippleSim.drop(0.15 + Math.random() * 0.7, 0.15 + Math.random() * 0.7, 3.0, 0.24);
+          }
+
+          this.rippleSim.step();
+          this.rippleSim.updateTexture();
+
+          this._updateKois(dt);
+          this._updateSharks(dt);
+          this._updateWorldObjects(dt);
+
+          // Pass 1：渲染水下世界（池底、卵石、陰影、錦鯉、3D Pixar 胖鯊魚、氣泡）到 FBO
+          this.renderer.render(this.underwaterScene, this.camera, this.underwaterRT, {
+            clearColor: true,
+            clearDepth: true,
+            bgColor: [0.04, 0.15, 0.17, 1.0]
+          });
+
+          // Pass 2：全螢幕水波折射合成（將 FBO 依即時水波扭曲加上陽光反光）
+          this.renderer.render(this.waterPassScene, null, null, {
+            clearColor: true,
+            clearDepth: true
+          });
+
+          // Pass 3：於水面上方疊加 3D 浮水物件（睡蓮、荷葉、苔石、飼料）
+          this.renderer.render(this.aboveWaterScene, this.camera, null, {
+            clearColor: false,
+            clearDepth: true
+          });
+        }
+
+        start() {
+          let last = performance.now();
+          const loop = (now) => {
+            const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+            last = now;
+            this.step(dt);
+            requestAnimationFrame(loop);
+          };
+          requestAnimationFrame(loop);
+        }
+      }
+
+      window.onload = function () {
+        const canvas = document.getElementById('pond-canvas');
+        try {
+          const app = new KoiPondApp(canvas);
+          app.start();
+        } catch (err) {
+          console.error('KoiPond init error:', err);
+          document.getElementById('fallback-msg').style.display = 'flex';
+        }
+      };
+    })();
   </script>
 </body>
-</html><!-- Koi Pond 3D -->
+</html>
