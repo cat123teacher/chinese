@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" dir="ltr">
+<head>
+<!-- ... existing code ... -->
+        // 右下點綴小亮點
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+        ctx.beginPath();
+        ctx.arc(166, 154, 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        return new THREE.CanvasTexture(c, { flipY: false });
+      },
+
+      // 繪製 3D 微笑深紅口腔內壁紋理（取代 vec3 陣列 uniform，確保完全相容內嵌渲染器）
+      createSharkMouthTexture() {
+        const c = document.createElement('canvas');
+        c.width = 64; c.height = 64;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(32, 32, 4, 32, 32, 34);
+        g.addColorStop(0.0, '#7a0a14');
+        g.addColorStop(0.65, '#a8121f');
+        g.addColorStop(1.0, '#c41c2a');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(c, { flipY: false });
+      },
+
+      // 繪製 3D 純白珍珠光澤小尖牙紋理
+      createSharkTeethTexture() {
+        const c = document.createElement('canvas');
+        c.width = 32; c.height = 32;
+        const ctx = c.getContext('2d');
+        const g = ctx.createLinearGradient(0, 0, 0, 32);
+        g.addColorStop(0.0, '#f4f7fa');
+        g.addColorStop(1.0, '#ffffff');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 32, 32);
+        return new THREE.CanvasTexture(c, { flipY: false });
+      },
+
+      // 繪製鼻尖兩側迷你小鼻孔紋理
+      createSharkNostrilTexture() {
+        const c = document.createElement('canvas');
+        c.width = 32; c.height = 32;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#295b7e';
+        ctx.fillRect(0, 0, 32, 32);
+        return new THREE.CanvasTexture(c, { flipY: false });
+      }
+    };
+// ... existing code ...
+        for (let i = 0; i < normals.length; i += 3) {
+          const l = Math.hypot(nAcc[i], nAcc[i + 1], nAcc[i + 2]);
+          if (l > 1e-6) {
+            normals[i] = nAcc[i] / l;
+            normals[i + 1] = nAcc[i + 1] / l;
+            normals[i + 2] = nAcc[i + 2] / l;
+          } else {
+            normals[i] = 0;
+            normals[i + 1] = 1;
+            normals[i + 2] = 0;
+          }
+        }
+
+        return new THREE.BufferGeometry()
+// ... existing code ...
+        for (let i = 0; i < normals.length; i += 3) {
+          const l = Math.hypot(nAcc[i], nAcc[i + 1], nAcc[i + 2]);
+          if (l > 1e-6) {
+            normals[i] = nAcc[i] / l;
+            normals[i + 1] = nAcc[i + 1] / l;
+            normals[i + 2] = nAcc[i + 2] / l;
+          } else {
+            normals[i] = 0;
+            normals[i + 1] = 1;
+            normals[i + 2] = 0;
+          }
+        }
+
+        return new THREE.BufferGeometry()
+// ... existing code ...
+        const addToothCone = (bx, by, bz, dirY, rad, height, leanZ) => {
+          const segs = 7;
+          const tipIdx = baseIdx++;
+          const tipLen = Math.hypot(0, dirY, 0.6) || 1;
+          positions.push(bx, by + dirY * height, bz + leanZ);
+          normals.push(0, dirY / tipLen, 0.6 / tipLen);
+          uvs.push(0.5, 1.0);
+
+          const ringStart = baseIdx;
+          const ringLen = Math.hypot(1, dirY * 0.25) || 1;
+          for (let s = 0; s <= segs; s++) {
+            const a = (s / segs) * Math.PI * 2;
+            const ca = Math.cos(a), sa = Math.sin(a);
+            positions.push(bx + ca * rad, by, bz + sa * rad);
+            normals.push(ca / ringLen, (dirY * 0.25) / ringLen, sa / ringLen);
+            uvs.push(s / segs, 0.0);
+            baseIdx++;
+          }
+          for (let s = 0; s < segs; s++) {
+            if (dirY < 0) indices.push(tipIdx, ringStart + s, ringStart + s + 1);
+            else indices.push(tipIdx, ringStart + s + 1, ringStart + s);
+          }
+        };
+// ... existing code ...
+      // 3B. 3D Pixar 光澤公仔鯊魚專屬著色器（柔化三點攝影棚光 + 亮白清漆高光 + 清新粉藍輪廓邊緣光）
+      sharkFrag: PREC + `
+        uniform sampler2D uMap;
+        uniform float uTime;
+        uniform float uGloss;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vWorldPos;
+
+        void main() {
+          vec4 tex = texture2D(uMap, vUv);
+
+          vec3 N = length(vNormal) > 0.0001 ? normalize(vNormal) : vec3(0.0, 1.0, 0.0);
+          vec3 L = normalize(vec3(0.32, 0.90, -0.28));
+          vec3 L2 = normalize(vec3(-0.55, 0.55, 0.50)); // 柔和補光避免暗部發黑
+          vec3 V = normalize(vec3(0.0, 1.0, 0.15));
+          vec3 H = normalize(L + V);
+
+          // Pixar 柔和包裹漫射 + 環境補光（維持粉藍與純白的高級公仔潔淨感）
+          float wrapDiff = clamp((dot(N, L) + 0.52) / 1.52, 0.0, 1.0);
+          float fillDiff = max(dot(N, L2), 0.0) * 0.22;
+
+          // 附圖同款光滑亮面塑膠／黏土清漆高光（底數嚴格大於 0，避免行動端／Safari WebGL pow(<=0) 產生 NaN 黑塊）
+          float ndh = clamp(dot(N, H), 0.0001, 1.0);
+          float clearcoat = pow(ndh, mix(26.0, 96.0, uGloss)) * mix(0.42, 0.95, uGloss);
+          float softSheen = pow(ndh, 8.0) * mix(0.16, 0.08, uGloss);
+
+          // 清透冰藍輪廓邊緣光（Rim Light），讓胖嘟嘟圓潤體積躍然水上
+          float rimBase = clamp(1.0 - max(dot(N, V), 0.0), 0.0001, 1.0);
+          float rim = pow(rimBase, 2.4);
+          vec3 rimCol = vec3(0.76, 0.94, 1.0) * rim * mix(0.38, 0.22, uGloss);
+
+          // 輕微水下陽光焦散
+          float caust = sin(vWorldPos.x * 2.8 + uTime * 2.0) * cos(vWorldPos.z * 2.6 - uTime * 1.6);
+          caust = max(0.0, caust) * 0.06 * max(N.y, 0.0);
+
+          vec3 col = tex.rgb * (0.50 + 0.56 * wrapDiff + fillDiff)
+                   + vec3(1.0, 1.0, 1.0) * (clearcoat + softSheen)
+                   + rimCol
+                   + vec3(0.68, 0.92, 0.98) * caust;
+
+          // 極輕柔水深霧化，保持天空藍與純白鮮明透亮
+          float depth = clamp(-vWorldPos.y / 2.6, 0.0, 1.0);
+          vec3 waterFog = vec3(0.08, 0.24, 0.25);
+          col = mix(col, waterFog, depth * 0.18);
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `,
+
+      // 3C. 3D 透明氣泡粒子著色器（鯊魚咬食瞬間冒出晶瑩 Pixar 氣泡）
+// ... existing code ...
+          texSharkMouth: TextureFactory.createSharkMouthTexture(),
+          texSharkTeeth: TextureFactory.createSharkTeethTexture(),
+          texSharkNostril: TextureFactory.createSharkNostrilTexture(),
+          geoSharkBody: GeometryFactory.createSharkBodyGeometry(),
+          geoSharkFins: GeometryFactory.createSharkFinsGeometry(),
+          geoSharkEyes: GeometryFactory.createSharkEyesGeometry(),
+          geoSharkMouth: GeometryFactory.createSharkMouthGeometry(),
+          geoSharkTeeth: GeometryFactory.createSharkTeethGeometry(),
+          geoSharkNostrils: GeometryFactory.createSharkNostrilsGeometry(),
+          geoSharkShadow: GeometryFactory.createSharkShadowGeometry(),
+          geoDiscShadow: GeometryFactory.createPlane(1, 1, 1, 1, true),
+// ... existing code ...
+        if (isShark) {
+          // 組裝參考附圖的 3D Pixar 胖鯊魚（胖水滴軀幹 + 圓厚四鰭 + 亮黑圓珠大眼 + 紅口腔 + 3D 白尖牙 + 迷你鼻孔）
+          const bodyMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            uniforms: {
+              uMap: { value: this.assets.texSharkBody },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 0.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.62 }
+            }
+          });
+
+          const finMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            side: THREE.DoubleSide,
+            uniforms: {
+              uMap: { value: this.assets.texSharkFin },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 1.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.56 }
+            }
+          });
+
+          const eyeMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            uniforms: {
+              uMap: { value: this.assets.texSharkEye },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 0.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.98 }
+            }
+          });
+
+          const mouthMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            side: THREE.DoubleSide,
+            uniforms: {
+              uMap: { value: this.assets.texSharkMouth },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 0.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.25 }
+            }
+          });
+
+          const teethMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            side: THREE.DoubleSide,
+            uniforms: {
+              uMap: { value: this.assets.texSharkTeeth },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 0.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.72 }
+            }
+          });
+
+          const nostrilMat = new THREE.ShaderMaterial({
+            vertexShader: Shaders.koiVert,
+            fragmentShader: Shaders.sharkFrag,
+            uniforms: {
+              uMap: { value: this.assets.texSharkNostril },
+              uSwimPhase: uniformsCommon.uSwimPhase,
+              uSwimAmp: uniformsCommon.uSwimAmp,
+              uTurnBend: uniformsCommon.uTurnBend,
+              uIsFin: { value: 0.0 },
+              uChomp: uniformsCommon.uChomp,
+              uTime: uniformsCommon.uTime,
+              uGloss: { value: 0.2 }
+            }
+          });
+
+          const bodyMesh = new THREE.Mesh(this.assets.geoSharkBody, bodyMat);
+// ... existing code ...
+  </script>
+</body>
+</html><!-- Koi Pond 3D -->
