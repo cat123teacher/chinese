@@ -24,6 +24,7 @@
       --red: #dc2626;
       --red-bg: #fee2e2;
       --purple: #7c3aed;
+      --teal: #14b8a6;
       --radius-lg: 24px;
       --radius-md: 16px;
       --shadow-card: 0 8px 0 rgba(15, 23, 42, 0.14), 0 14px 28px rgba(15, 23, 42, 0.08);
@@ -533,7 +534,7 @@
       flex-wrap: wrap;
     }
 
-    /* Visual Widget Styles */
+    /* Visual Widget Styles (Screen) */
     .dual-clock-row {
       display: flex;
       align-items: center;
@@ -726,7 +727,7 @@
       border: 4px solid #0f172a;
       border-radius: 24px;
       width: 100%;
-      max-width: 820px;
+      max-width: 860px;
       max-height: 92vh;
       display: flex;
       flex-direction: column;
@@ -770,19 +771,20 @@
     }
     .count-pill.active { background: #2563eb; color: #ffffff; }
     .modal-preview-scroll {
-      padding: 14px;
+      padding: 16px;
       overflow-y: auto;
-      background: #e2e8f0;
+      background: #cbd5e1;
       flex: 1;
     }
     .preview-paper {
       background: #ffffff;
-      border: 1px solid #94a3b8;
-      padding: 18px;
+      border: 1.5px solid #94a3b8;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+      padding: 22px 24px;
       margin: 0 auto;
       max-width: 740px;
       color: #000000;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Nunito", Arial, sans-serif;
     }
 
     #confetti-canvas {
@@ -804,125 +806,513 @@
     }
 
     /* ============================================================
-       2. LOW-INK A4 PRINTABLE WORKSHEET STYLES
+       2. COLORFUL ECO-INK (LOW-TONER) CARTOON A4 PORTRAIT WORKSHEET
+          90%+ Pure #ffffff white interior + vibrant colored outlines
+          (Applies identically to Live Preview & @media print)
        ============================================================ */
     #print-area { display: none; }
-    .ws-header {
-      border-bottom: 2px solid #000000;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
+
+    .ws-sheet {
+      --ws-theme: #2563eb;
+      --ws-accent: #f59e0b;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Nunito", Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+    }
+    .ws-sheet.ws-lvl-1 { --ws-theme: #2563eb; --ws-accent: #f59e0b; }
+    .ws-sheet.ws-lvl-2 { --ws-theme: #059669; --ws-accent: #f59e0b; }
+    .ws-sheet.ws-lvl-3 { --ws-theme: #ea580c; --ws-accent: #2563eb; }
+    .ws-sheet.ws-lvl-4 { --ws-theme: #db2777; --ws-accent: #0d9488; }
+    .ws-sheet.ws-lvl-5 { --ws-theme: #7c3aed; --ws-accent: #f59e0b; }
+
+    /* Playful Colorful Outline Cartoon Header Banner */
+    .ws-banner {
+      position: relative;
+      border: 3px solid var(--ws-theme);
+      border-radius: 20px;
+      padding: 11px 15px;
+      margin-bottom: 10px;
+      background: #ffffff;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .ws-title { margin: 0; font-size: 17.5px; font-weight: 900; color: #000000; }
-    .ws-sub { margin: 2px 0 0; font-size: 12px; color: #000000; }
-    .ws-meta { font-size: 12px; text-align: right; line-height: 1.65; color: #000000; }
-    .ws-instruction {
-      border: 1px solid #000000;
-      border-radius: 6px;
-      padding: 5px 9px;
-      margin-bottom: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #000000;
-    }
-    .ws-q {
-      border: 1.5px solid #000000;
-      border-radius: 8px;
-      padding: 9px 11px;
-      margin-bottom: 10px;
+      align-items: center;
+      gap: 13px;
       page-break-inside: avoid;
       break-inside: avoid;
-      background: #ffffff;
     }
-    .ws-q-title { font-size: 13.5px; font-weight: 700; margin: 0 0 6px; color: #000000; }
-    .ws-visual { margin: 6px 0 8px; display: flex; justify-content: center; }
-    .ws-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px 12px;
-      font-size: 13px;
-      color: #000000;
+    .ws-corner-deco {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      pointer-events: none;
     }
-    .ws-opt { display: flex; align-items: center; gap: 6px; }
-    .ws-opt.visual-ws-opt {
+    .ws-corner-deco.top-right { top: 7px; right: 11px; }
+    .ws-corner-deco.bottom-right { bottom: 6px; right: 11px; }
+
+    .ws-mascot-col {
+      flex: 0 0 auto;
+      display: flex;
       flex-direction: column;
-      border: 1px solid #444444;
-      border-radius: 6px;
-      padding: 5px;
+      align-items: center;
+      gap: 2px;
     }
-    .ws-bubble {
+    .ws-banner-body {
+      flex: 1;
+      min-width: 0;
+      padding-right: 26px;
+    }
+    .ws-speech {
       display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 1.6px solid #000000;
-      border-radius: 50%;
-      flex: 0 0 14px;
+      border: 1.8px solid var(--ws-theme);
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 11.2px;
+      font-weight: 800;
+      color: var(--ws-theme);
       background: #ffffff;
+      margin-bottom: 5px;
     }
-    .ws-answer-key {
-      page-break-before: always;
-      break-before: page;
+    .ws-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
-    .ws-ans-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px 14px;
+    .ws-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1.2;
+      color: var(--ws-theme);
+    }
+    .ws-sub {
+      margin: 3px 0 0;
       font-size: 12px;
-      color: #000000;
+      font-weight: 700;
+      color: #334155;
     }
-    .ws-ans-row {
-      border-bottom: 1px solid #999999;
-      padding: 4px 0;
+
+    /* Rounded Dashed Student Info & My Stars Strip */
+    .ws-student-strip {
+      border: 2px dashed var(--ws-theme);
+      border-radius: 15px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .ws-student-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 14px;
+      flex: 1;
+      line-height: 1.7;
+    }
+    .ws-field-lbl {
+      color: var(--ws-theme);
+      font-weight: 900;
+    }
+    .ws-stars-box {
+      border: 2px solid #f59e0b;
+      border-radius: 13px;
+      padding: 4px 10px;
+      text-align: center;
+      background: #ffffff;
+      flex: 0 0 auto;
+    }
+    .ws-stars-label {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: #d97706;
+    }
+    .ws-stars-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .ws-instruction {
+      border: 1.8px solid #0d9488;
+      border-radius: 13px;
+      padding: 5px 11px;
+      margin-bottom: 11px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 7px;
       page-break-inside: avoid;
       break-inside: avoid;
     }
 
+    /* Colorful Comic-Panel Question Cards (Pure White Interior) */
+    .ws-q {
+      --q-color: #3b82f6;
+      border: 2px solid var(--q-color);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      background: #ffffff;
+    }
+    .ws-q.ws-q-c0 { --q-color: #3b82f6; }
+    .ws-q.ws-q-c1 { --q-color: #10b981; }
+    .ws-q.ws-q-c2 { --q-color: #f59e0b; }
+    .ws-q.ws-q-c3 { --q-color: #ec4899; }
+    .ws-q.ws-q-c4 { --q-color: #8b5cf6; }
+
+    .ws-q-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-bottom: 7px;
+    }
+    .ws-q-badge {
+      flex: 0 0 auto;
+      min-width: 34px;
+      height: 30px;
+      padding: 0 6px;
+      border: 2.2px solid var(--q-color);
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--q-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      font-weight: 900;
+      margin-top: 1px;
+    }
+    .ws-q-title-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+    .ws-ch-pill {
+      display: inline-block;
+      border: 1.6px solid #2563eb;
+      color: #2563eb;
+      border-radius: 999px;
+      padding: 0 7px;
+      font-size: 10.5px;
+      font-weight: 900;
+      margin-right: 6px;
+      background: #ffffff;
+      vertical-align: middle;
+    }
+    .ws-ch-pill.ws-ch-1 { border-color: #2563eb; color: #2563eb; }
+    .ws-ch-pill.ws-ch-2 { border-color: #059669; color: #059669; }
+    .ws-ch-pill.ws-ch-3 { border-color: #ea580c; color: #ea580c; }
+    .ws-ch-pill.ws-ch-4 { border-color: #db2777; color: #db2777; }
+
+    .ws-q-title {
+      font-size: 13.8px;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.38;
+      color: #0f172a;
+    }
+    .ws-visual {
+      margin: 6px 0 9px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Large Hollow Colored-Outline Answer Bubbles */
+    .ws-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px 14px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      padding-left: 4px;
+    }
+    .ws-opt {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 2px 0;
+    }
+    .ws-opt.visual-ws-opt {
+      flex-direction: column;
+      border: 1.6px dashed #60a5fa;
+      border-radius: 12px;
+      padding: 6px 4px;
+      background: #ffffff;
+    }
+    .ws-bubble {
+      display: inline-block;
+      width: 17px;
+      height: 17px;
+      border: 2px solid #2563eb;
+      border-radius: 50%;
+      flex: 0 0 17px;
+      background: #ffffff;
+    }
+    .ws-opt-letter {
+      color: #1d4ed8;
+      font-weight: 900;
+    }
+
+    /* Colorful Eco-Ink Print Widget Overrides (Preview + Print) */
+    .ws-sheet .dual-clock-row { gap: 10px; }
+    .ws-sheet .clock-card {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .ws-sheet .arrow-badge {
+      background: #ffffff !important;
+      color: #ea580c !important;
+      border: 2px solid #ea580c !important;
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 11.5px;
+      font-weight: 900;
+    }
+    .ws-sheet .mini-table {
+      border: 2px solid #0d9488;
+      border-radius: 8px;
+      background: #ffffff;
+      font-size: 12px;
+    }
+    .ws-sheet .mini-table th,
+    .ws-sheet .mini-table td {
+      border: 1.4px solid #0d9488;
+      background: #ffffff !important;
+      color: #0f172a !important;
+      padding: 4px 8px;
+    }
+    .ws-sheet .mini-table th {
+      border-bottom: 2.2px solid #0d9488;
+      color: #0f766e !important;
+      font-weight: 900;
+    }
+    .ws-sheet .week-strip {
+      max-width: 520px;
+      gap: 5px;
+    }
+    .ws-sheet .week-cell {
+      background: #ffffff !important;
+      border: 1.8px solid #ea580c !important;
+      border-radius: 10px;
+      padding: 4px 2px;
+    }
+    .ws-sheet .week-cell.is-closed {
+      border: 1.8px dashed #dc2626 !important;
+    }
+    .ws-sheet .week-cell.is-closed .week-label {
+      color: #dc2626 !important;
+    }
+    .ws-sheet .week-day {
+      background: #ffffff !important;
+      color: #c2410c !important;
+      border-bottom: 1.4px dashed #fb923c;
+      border-radius: 0;
+      padding: 1px 0 3px;
+      margin-bottom: 4px;
+      font-size: 10.5px;
+      font-weight: 900;
+    }
+    .ws-sheet .week-label {
+      color: #0f172a !important;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .ws-sheet .cal-box {
+      background: #ffffff !important;
+      border: 2px solid #2563eb !important;
+      border-radius: 12px;
+      max-width: 265px;
+      min-width: 205px;
+    }
+    .ws-sheet .cal-title {
+      background: #ffffff !important;
+      color: #1d4ed8 !important;
+      border-bottom: 2.5px solid #2563eb !important;
+      font-size: 12.5px;
+      font-weight: 900;
+      padding: 4px 9px;
+    }
+    .ws-sheet .cal-grid { font-size: 11px; }
+    .ws-sheet .cal-grid th,
+    .ws-sheet .cal-grid td {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border: 1px dotted #94a3b8 !important;
+      padding: 3px 2px;
+    }
+    .ws-sheet .cal-grid th {
+      border-bottom: 1.6px solid #2563eb !important;
+      color: #1e40af !important;
+      font-weight: 900;
+    }
+    .ws-sheet .cal-grid th:first-child,
+    .ws-sheet .cal-grid td:first-child {
+      color: #dc2626 !important;
+    }
+    .ws-sheet .cal-mark {
+      background: #ffffff !important;
+      color: #c2410c !important;
+      border: 2px dashed #ea580c !important;
+      border-radius: 6px;
+      font-weight: 900;
+    }
+    .ws-sheet .bill-slip {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border: 2.2px dashed #7c3aed !important;
+      border-radius: 14px;
+      box-shadow: none !important;
+      padding: 9px 13px;
+      max-width: 292px;
+    }
+    .ws-sheet .bill-title {
+      color: #6d28d9 !important;
+      border-bottom: 1.6px dashed #a78bfa;
+      font-size: 13px;
+    }
+    .ws-sheet .bill-due {
+      background: #ffffff !important;
+      color: #dc2626 !important;
+      border: 2.2px solid #dc2626 !important;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 4px 8px;
+    }
+    .ws-story-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1.8px dashed var(--ws-theme);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    /* Rainbow-Accent Cartoon Reward Colouring Footer */
+    .ws-footer-wrap {
+      margin-top: 12px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .ws-rainbow-divider {
+      width: 100%;
+      line-height: 0;
+      margin-bottom: 8px;
+    }
+    .ws-footer-reward {
+      border: 2px dashed var(--ws-theme);
+      border-radius: 16px;
+      padding: 9px 14px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ws-footer-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ws-theme);
+    }
+    .ws-footer-stars {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Separate-Page Colorful Low-Toner Answer Key */
+    .ws-answer-key {
+      page-break-before: always;
+      break-before: page;
+      padding-top: 2px;
+    }
+    .ws-ans-header {
+      border: 2.5px solid var(--ws-theme);
+      border-radius: 16px;
+      padding: 9px 14px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+    .ws-ans-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px 14px;
+      font-size: 11.8px;
+      color: #0f172a;
+    }
+    .ws-ans-row {
+      border-bottom: 1.4px dotted #94a3b8;
+      padding: 4px 0 6px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      background: #ffffff;
+    }
+    .ws-ans-correct {
+      color: #15803d;
+      font-weight: 900;
+    }
+    .ws-ans-exp {
+      font-size: 11px;
+      margin-top: 2px;
+      color: #334155;
+    }
+
+    /* STRICT A4 PORTRAIT COLORFUL ECO-INK PRINT RULES */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 11mm;
+        margin: 10mm;
+      }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       html, body {
         background: #ffffff !important;
-        color: #000000 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        color: #0f172a !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
       .cloud-layer, .app-shell, .modal-backdrop, #confetti-canvas {
         display: none !important;
       }
       #print-area {
         display: block !important;
-        font-family: Arial, Helvetica, sans-serif;
-        color: #000000 !important;
         background: #ffffff !important;
+        color: #0f172a !important;
       }
       #print-area * {
         box-shadow: none !important;
         background-image: none !important;
-      }
-      #print-area .cal-title,
-      #print-area .cal-grid th,
-      #print-area .cal-grid td,
-      #print-area .mini-table th,
-      #print-area .mini-table td,
-      #print-area .week-day,
-      #print-area .week-cell,
-      #print-area .arrow-badge,
-      #print-area .bill-due,
-      #print-area .bill-slip,
-      #print-area .cal-mark {
-        background: #ffffff !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
-      }
-      #print-area .cal-mark {
-        outline: 2px solid #000000;
-        outline-offset: -2px;
       }
     }
   </style>
@@ -955,7 +1345,7 @@
       <div class="levels-grid" id="levels-grid"></div>
 
       <footer class="home-footer">
-        <span class="tip-pill">🖨️ Tap <strong>Print</strong> on any level to create a low-ink A4 practice paper!</span>
+        <span class="tip-pill">🖨️ Tap <strong>Print</strong> on any level for a colorful, eco-ink cartoon A4 worksheet!</span>
         <button class="btn btn-white btn-sm" id="btn-reset-stars" type="button">🔄 Reset Stars</button>
       </footer>
     </section>
@@ -1029,7 +1419,7 @@
   <div class="modal-backdrop" id="print-modal" role="dialog" aria-modal="true" aria-labelledby="print-modal-title">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="print-modal-title" style="margin:0; font-size:1.15rem;">🖨️ Printable A4 Worksheet</h3>
+        <h3 id="print-modal-title" style="margin:0; font-size:1.12rem;">🖨️ Colorful Eco-Ink A4 Worksheet</h3>
         <button class="btn btn-white btn-sm" id="btn-close-print" type="button">✖ Close</button>
       </div>
       <div class="modal-controls">
@@ -1038,10 +1428,10 @@
           <span class="count-pills" id="print-count-pills"></span>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <label style="font-size:0.88rem; font-weight:800; cursor:pointer;">
-            <input type="checkbox" id="chk-answer-key" checked /> Include Answer Key
+          <label style="font-size:0.86rem; font-weight:800; cursor:pointer;">
+            <input type="checkbox" id="chk-answer-key" checked /> Include Answer Key (Page 2)
           </label>
-          <button class="btn btn-accent btn-sm" id="btn-shuffle-print" type="button">🔀 Shuffle</button>
+          <button class="btn btn-accent btn-sm" id="btn-shuffle-print" type="button">🔀 Shuffle New Set</button>
           <button class="btn btn-green btn-sm" id="btn-do-print" type="button">🖨️ Print A4</button>
         </div>
       </div>
@@ -1066,7 +1456,7 @@
     </div>
   </div>
 
-  <!-- LOW-INK A4 PRINT CONTAINER -->
+  <!-- LOW-TONER A4 PORTRAIT PRINT CONTAINER -->
   <div id="print-area"></div>
 
   <script>
@@ -1074,11 +1464,11 @@
        1. CONSTANTS, MATH & CALENDAR UTILITIES
        ============================================================ */
     const LEVEL_META = [
-      { id: 1, chapter: "Ch. 1", title: "Telling Time", icon: "⏰", bankSize: 70, drawCount: 5, isExam: false, desc: "Clock face, o'clock, half past & tricky clocks", printOptions: [5, 10, 15, 35, 70] },
-      { id: 2, chapter: "Ch. 2", title: "Hour & Time Intervals", icon: "⏳", bankSize: 70, drawCount: 5, isExam: false, desc: "Longer/shorter than 1 hour, elapsed hours & schedules", printOptions: [5, 10, 15, 35, 70] },
-      { id: 3, chapter: "Ch. 3", title: "Week", icon: "📅", bankSize: 70, drawCount: 5, isExam: false, desc: "Days of the week, yesterday/tomorrow & weekly charts", printOptions: [5, 10, 15, 35, 70] },
-      { id: 4, chapter: "Ch. 4", title: "Month", icon: "🗓️", bankSize: 70, drawCount: 5, isExam: false, desc: "Months, ordinal dates, calendars & bill due dates", printOptions: [5, 10, 15, 35, 70] },
-      { id: 5, chapter: "Ch. 1–4", title: "Mock Assessment Exam", icon: "🏆", bankSize: 70, drawCount: 10, isExam: true, desc: "Balanced Ch. 1–4 mock test with timer & score report", printOptions: [10, 20, 35, 70] }
+      { id: 1, chapter: "Ch. 1", title: "Telling Time", icon: "⏰", themeColor: "#2563eb", bankSize: 70, drawCount: 5, isExam: false, desc: "Clock face, o'clock, half past & tricky clocks", printOptions: [5, 10, 15, 35, 70] },
+      { id: 2, chapter: "Ch. 2", title: "Hour & Time Intervals", icon: "⏳", themeColor: "#059669", bankSize: 70, drawCount: 5, isExam: false, desc: "Longer/shorter than 1 hour, elapsed hours & schedules", printOptions: [5, 10, 15, 35, 70] },
+      { id: 3, chapter: "Ch. 3", title: "Week", icon: "📅", themeColor: "#ea580c", bankSize: 70, drawCount: 5, isExam: false, desc: "Days of the week, yesterday/tomorrow & weekly charts", printOptions: [5, 10, 15, 35, 70] },
+      { id: 4, chapter: "Ch. 4", title: "Month", icon: "🗓️", themeColor: "#db2777", bankSize: 70, drawCount: 5, isExam: false, desc: "Months, ordinal dates, calendars & bill due dates", printOptions: [5, 10, 15, 35, 70] },
+      { id: 5, chapter: "Ch. 1–4", title: "Mock Assessment Exam", icon: "🏆", themeColor: "#7c3aed", bankSize: 70, drawCount: 10, isExam: true, desc: "Balanced Ch. 1–4 mock test with timer & score report", printOptions: [10, 20, 35, 70] }
     ];
 
     const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -1086,7 +1476,6 @@
     const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const LETTERS = ["A", "B", "C", "D"];
 
-    /** Fisher-Yates shuffle returning a new array */
     function shuffle(arr) {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
@@ -1126,7 +1515,6 @@
       return `${n} ${n === 1 ? "hour" : "hours"}`;
     }
 
-    /** Real calendar utilities verified by JS Date */
     function daysInMonth(year, monthIndex) {
       return new Date(year, monthIndex + 1, 0).getDate();
     }
@@ -1263,7 +1651,7 @@
     }
 
     /* ============================================================
-       3. CARTOON MASCOT ("Pip the Time Owl") & CONFETTI
+       3. CARTOON MASCOT SVGS (COLOR SCREEN + ECO-INK PRINT)
        ============================================================ */
     function renderOwlSVG(mood = "happy", size = 64) {
       const cheekColor = mood === "cheer" ? "#fb7185" : "#fda4af";
@@ -1293,6 +1681,79 @@
           <path d="M32 68 L32 73 M36 68 L36 73 M44 68 L44 73 M48 68 L48 73" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
         </svg>
       `;
+    }
+
+    /** Colorful Eco-Ink Line-Art Pip the Time Owl (White body for colouring + vibrant outlines) */
+    function renderPrintOwlOutlineSVG(size = 78, pose = "clock", accentColor = "#2563eb") {
+      const rightProp = pose === "cheer"
+        ? `
+          <path d="M64 46 Q78 32 71 20" fill="none" stroke="${accentColor}" stroke-width="2.6" stroke-linecap="round"/>
+          <polygon points="73,9 75.7,15 82,15.6 77.3,19.9 78.7,26.2 73,23 67.3,26.2 68.7,19.9 64,15.6 70.3,15" fill="#ffffff" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/>
+        `
+        : `
+          <path d="M63 48 Q75 44 74 34" fill="none" stroke="${accentColor}" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="77" cy="27" r="10.8" fill="#ffffff" stroke="#2563eb" stroke-width="2.1"/>
+          <line x1="77" y1="27" x2="77" y2="20" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="77" y1="27" x2="82.5" y2="29" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="77" cy="27" r="1.6" fill="#f59e0b"/>
+        `;
+      return `
+        <svg width="${size}" height="${Math.round(size * 0.92)}" viewBox="0 0 92 84" aria-hidden="true">
+          <path d="M18 24 L26 11 L34 21 Z M60 21 L52 11 L44 21 Z" fill="#ffffff" stroke="${accentColor}" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="39" cy="45" r="26" fill="#ffffff" stroke="#1e293b" stroke-width="2.5"/>
+          <ellipse cx="39" cy="54" rx="15" ry="13" fill="#ffffff" stroke="${accentColor}" stroke-width="1.9"/>
+          <path d="M31 52 Q34 55.5 37 52 M41 52 Q44 55.5 47 52 M35 58.5 Q39 61.5 43 58.5" fill="none" stroke="${accentColor}" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15 44 Q5 52 16 61" fill="#ffffff" stroke="${accentColor}" stroke-width="2.6" stroke-linecap="round"/>
+          ${rightProp}
+          <circle cx="29" cy="37" r="8.2" fill="#ffffff" stroke="#1e293b" stroke-width="2.2"/>
+          <circle cx="49" cy="37" r="8.2" fill="#ffffff" stroke="#1e293b" stroke-width="2.2"/>
+          <circle cx="30" cy="37" r="2.8" fill="#1e293b"/>
+          <circle cx="50" cy="37" r="2.8" fill="#1e293b"/>
+          <circle cx="31.2" cy="35.8" r="1" fill="#ffffff"/>
+          <circle cx="51.2" cy="35.8" r="1" fill="#ffffff"/>
+          <path d="M23 27 Q29 23 35 27 M43 27 Q49 23 55 27" fill="none" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round"/>
+          <polygon points="39,40 34.5,46 43.5,46" fill="#ffffff" stroke="#f59e0b" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="21" cy="45" r="3.2" fill="#ffffff" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="2.2 1.4"/>
+          <circle cx="57" cy="45" r="3.2" fill="#ffffff" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="2.2 1.4"/>
+          <path d="M30 71 L29 77 M34 71 L34 77 M44 71 L44 77 M48 71 L49 77" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    /** Crisp Hollow Colored-Outline Star SVG (Pure white inside for kids to colour!) */
+    function renderHollowStarSVG(size = 20, strokeColor = "#f59e0b") {
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 28 28" aria-hidden="true" style="display:inline-block; vertical-align:middle;">
+          <polygon points="14,2.5 17.5,9.8 25.5,10.8 19.6,16.4 21.1,24.4 14,20.5 6.9,24.4 8.4,16.4 2.5,10.8 10.5,9.8"
+            fill="#ffffff" stroke="${strokeColor}" stroke-width="2.1" stroke-linejoin="round"/>
+        </svg>
+      `;
+    }
+
+    /** Colorful Eco-Ink Outline Pencil SVG for Worksheet Instruction Bar */
+    function renderOutlinePencilSVG(size = 19) {
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" style="flex:0 0 ${size}px;">
+          <path d="M4 20 L6 14 L14.8 5.2 L18.8 9.2 L10 18 Z" fill="#ffffff" stroke="#f59e0b" stroke-width="1.9" stroke-linejoin="round"/>
+          <path d="M14.8 5.2 L16.8 3.2 L20.8 7.2 L18.8 9.2 Z" fill="#ffffff" stroke="#ec4899" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M4 20 L6 14 L10 18 Z" fill="#ffffff" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      `;
+    }
+
+    /** Ultra-Low-Toner Dashed Rainbow Divider SVG for Reward Footer */
+    function renderRainbowDividerSVG() {
+      const segs = ["#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
+      let lines = "";
+      for (let i = 0; i < 15; i++) {
+        const x = i * 40 + 4;
+        const col = segs[i % segs.length];
+        lines += `<line x1="${x}" y1="6" x2="${x + 26}" y2="6" stroke="${col}" stroke-width="2.4" stroke-linecap="round"/>`;
+        if (i < 14) {
+          lines += `<circle cx="${x + 33}" cy="6" r="2.2" fill="#ffffff" stroke="${segs[(i + 2) % segs.length]}" stroke-width="1.5"/>`;
+        }
+      }
+      return `<svg width="100%" height="12" viewBox="0 0 604 12" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>`;
     }
 
     let confettiAnimId = null;
@@ -1353,21 +1814,22 @@
     }
 
     /* ============================================================
-       4. SVG CLOCK, SCHEDULE, CALENDAR & BILL WIDGET RENDERERS
+       4. SVG CLOCK (CARTOON ALARM FRAME IN PRINT), SCHEDULE,
+          CALENDAR & BILL WIDGET RENDERERS
        ============================================================ */
     function renderClockSVG(cfg, printMode = false) {
-      const size = cfg.size || (printMode ? 114 : 156);
+      const size = cfg.size || (printMode ? 120 : 156);
       const hour = wrapHour(cfg.hour || 12);
       const minute = cfg.minute || 0;
       const missingSet = new Set(cfg.missingNumbers || []);
       const trick = cfg.trickMode || "normal";
       const showHands = cfg.showHands !== false;
 
-      const rimColor = printMode ? "#000000" : "#3b82f6";
+      const rimColor = printMode ? "#2563eb" : "#3b82f6";
       const ringFill = printMode ? "#ffffff" : "#dbeafe";
-      const hourHandColor = printMode ? "#000000" : "#0f172a";
-      const minHandColor = printMode ? "#000000" : "#2563eb";
-      const missingColor = printMode ? "#000000" : "#dc2626";
+      const hourHandColor = "#0f172a";
+      const minHandColor = "#2563eb";
+      const missingColor = "#dc2626";
 
       let ticksSVG = "";
       let numsSVG = "";
@@ -1377,13 +1839,13 @@
         const y1 = 100 + Math.sin(rad) * 78;
         const x2 = 100 + Math.cos(rad) * 86;
         const y2 = 100 + Math.sin(rad) * 86;
-        ticksSVG += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#0f172a" stroke-width="${i % 3 === 0 ? 3.2 : 2}" stroke-linecap="round"/>`;
+        ticksSVG += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${i % 3 === 0 ? "#1d4ed8" : "#0f172a"}" stroke-width="${i % 3 === 0 ? 3.2 : 1.9}" stroke-linecap="round"/>`;
 
         const nx = 100 + Math.cos(rad) * 64;
         const ny = 100 + Math.sin(rad) * 64;
         if (missingSet.has(i)) {
           numsSVG += `
-            <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="${printMode ? "#ffffff" : "#fee2e2"}" stroke="${missingColor}" stroke-width="2" stroke-dasharray="3 2"/>
+            <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="${printMode ? "#ffffff" : "#fee2e2"}" stroke="${missingColor}" stroke-width="2.2" stroke-dasharray="3.2 2"/>
             <text x="${nx.toFixed(1)}" y="${(ny + 5).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="900" fill="${missingColor}" font-family="Arial, sans-serif">?</text>
           `;
         } else {
@@ -1420,15 +1882,40 @@
 
       const handsSVG = showHands
         ? `
-          <line x1="100" y1="100" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="${minHandColor}" stroke-width="4.2" stroke-linecap="round"/>
-          <line x1="100" y1="100" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="${hourHandColor}" stroke-width="6.8" stroke-linecap="round"/>
-          <circle cx="100" cy="100" r="6" fill="${printMode ? "#000000" : "#f59e0b"}" stroke="#0f172a" stroke-width="2.2"/>
+          <line x1="100" y1="100" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="${minHandColor}" stroke-width="${printMode ? "4" : "4.2"}" stroke-linecap="round"/>
+          <line x1="100" y1="100" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="${hourHandColor}" stroke-width="${printMode ? "6.6" : "6.8"}" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="6" fill="#f59e0b" stroke="#0f172a" stroke-width="2.2"/>
         `
-        : `<circle cx="100" cy="100" r="5" fill="#0f172a"/>`;
+        : `<circle cx="100" cy="100" r="5" fill="#ffffff" stroke="#0f172a" stroke-width="2.2"/>`;
 
       const unknownOverlay = cfg.mysteryClock
-        ? `<text x="100" y="114" text-anchor="middle" font-size="42" font-weight="900" fill="${printMode ? "#000000" : "#2563eb"}" font-family="Arial, sans-serif">?</text>`
+        ? `<text x="100" y="114" text-anchor="middle" font-size="42" font-weight="900" fill="#2563eb" font-family="Arial, sans-serif">?</text>`
         : "";
+
+      if (printMode) {
+        const alarmDecor = `
+          <path d="M22 36 A26 26 0 0 1 64 12 L22 36 Z" fill="#ffffff" stroke="#f59e0b" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M32 25 A15 15 0 0 1 51 16" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M178 36 A26 26 0 0 0 136 12 L178 36 Z" fill="#ffffff" stroke="#f59e0b" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M168 25 A15 15 0 0 0 149 16" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="46" y1="24" x2="52" y2="33" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="154" y1="24" x2="148" y2="33" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round"/>
+          <line x1="100" y1="6" x2="100" y2="-5" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="100" cy="-9" r="5.5" fill="#ffffff" stroke="#f59e0b" stroke-width="3.2"/>
+          <path d="M44 176 L31 198 Q38 205 49 199 L58 183" fill="#ffffff" stroke="#ef4444" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M156 176 L169 198 Q162 205 151 199 L142 183" fill="#ffffff" stroke="#ef4444" stroke-width="4" stroke-linejoin="round"/>
+        `;
+        return `
+          <svg width="${size}" height="${Math.round(size * 1.08)}" viewBox="0 -18 200 228" role="img" aria-label="Colorful cartoon alarm clock">
+            ${alarmDecor}
+            <circle cx="100" cy="100" r="95" fill="#ffffff" stroke="${rimColor}" stroke-width="5"/>
+            <circle cx="100" cy="100" r="88" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+            ${ticksSVG}
+            ${numsSVG}
+            ${cfg.mysteryClock ? unknownOverlay : handsSVG}
+          </svg>
+        `;
+      }
 
       return `
         <svg width="${size}" height="${size}" viewBox="0 0 200 200" role="img" aria-label="Analog clock">
@@ -1441,7 +1928,7 @@
       `;
     }
 
-    function renderSingleCalendar(calCfg) {
+    function renderSingleCalendar(calCfg, printMode = false) {
       const { year, monthIndex, marks = {} } = calCfg;
       const firstDay = getDayOfWeek(year, monthIndex, 1);
       const totalDays = daysInMonth(year, monthIndex);
@@ -1471,6 +1958,8 @@
         .filter(([, m]) => m && m.legend)
         .map(([, m]) => `<span>${m.icon || "★"} ${m.legend}</span>`);
 
+      const legendBorder = printMode ? "1.4px dashed #93c5fd" : "1px solid #cbd5e1";
+
       return `
         <div class="cal-box">
           <div class="cal-title"><span>${year}</span><span>${MONTHS[monthIndex]}</span></div>
@@ -1478,7 +1967,7 @@
             <thead><tr>${SHORT_DAYS.map(s => `<th>${s}</th>`).join("")}</tr></thead>
             <tbody>${rows}</tbody>
           </table>
-          ${legendItems.length ? `<div style="padding:4px 8px; font-size:0.75rem; font-weight:800; border-top:1px solid #cbd5e1; text-align:right;">${legendItems.join(" • ")}</div>` : ""}
+          ${legendItems.length ? `<div style="padding:4px 8px; font-size:0.75rem; font-weight:800; color:${printMode ? "#c2410c" : "inherit"}; border-top:${legendBorder}; text-align:right;">${legendItems.join(" • ")}</div>` : ""}
         </div>
       `;
     }
@@ -1486,15 +1975,18 @@
     function renderVisual(visual, printMode = false) {
       if (!visual) return "";
       if (visual.type === "clock") {
-        const svg = renderClockSVG({ ...visual, size: printMode ? 114 : (visual.size || 166) }, printMode);
+        const svg = renderClockSVG({ ...visual, size: printMode ? 118 : (visual.size || 166) }, printMode);
         return `<div class="clock-card">${svg}${visual.caption ? `<div>${visual.caption}</div>` : ""}</div>`;
       }
       if (visual.type === "dual_clock") {
-        const sz = printMode ? 102 : 134;
+        const sz = printMode ? 106 : 134;
+        const arrowLabel = printMode
+          ? (visual.arrowText || "➔").replace("➡️", "➔")
+          : (visual.arrowText || "➡️");
         return `
           <div class="dual-clock-row">
             <div class="clock-card">${renderClockSVG({ ...visual.left, size: sz }, printMode)}${visual.leftLabel ? `<div>${visual.leftLabel}</div>` : ""}</div>
-            <div class="arrow-badge">${visual.arrowText || "➡️"}</div>
+            <div class="arrow-badge">${arrowLabel}</div>
             <div class="clock-card">${renderClockSVG({ ...visual.right, size: sz }, printMode)}${visual.rightLabel ? `<div>${visual.rightLabel}</div>` : ""}</div>
           </div>
         `;
@@ -1503,43 +1995,46 @@
         const head = visual.headers.map(h => `<th>${h}</th>`).join("");
         const body = visual.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("");
         return `
-          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px;">
-            ${visual.title ? `<div style="font-weight:900; font-size:0.95rem;">${visual.title}</div>` : ""}
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:5px;">
+            ${visual.title ? `<div style="font-weight:900; font-size:${printMode ? "12.5px" : "0.95rem"};">${visual.title}</div>` : ""}
             <table class="mini-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
           </div>
         `;
       }
       if (visual.type === "week_strip") {
         const cells = visual.items.map((item, idx) => `
-          <div class="week-cell">
+          <div class="week-cell${item.closed ? " is-closed" : ""}">
             <div class="week-day">${SHORT_DAYS[idx]}</div>
             <div class="week-icon">${item.closed ? "🚫" : item.icon}</div>
             <div class="week-label">${item.closed ? "Closed" : item.label}</div>
           </div>
         `).join("");
         return `
-          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px;">
-            ${visual.title ? `<div style="font-weight:900; font-size:0.94rem;">${visual.title}</div>` : ""}
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:5px;">
+            ${visual.title ? `<div style="font-weight:900; font-size:${printMode ? "12.5px" : "0.94rem"}; color:${printMode ? "#c2410c" : "inherit"};">${visual.title}</div>` : ""}
             <div class="week-strip">${cells}</div>
           </div>
         `;
       }
       if (visual.type === "calendar") {
-        return `<div class="cal-wrap">${(visual.calendars || [visual]).map(c => renderSingleCalendar(c)).join("")}</div>`;
+        return `<div class="cal-wrap">${(visual.calendars || [visual]).map(c => renderSingleCalendar(c, printMode)).join("")}</div>`;
       }
       if (visual.type === "bill") {
         return `
           <div class="bill-slip">
             <div class="bill-title"><span>${visual.icon || "🧾"} ${visual.title}</span><span>#${visual.ref || "104"}</span></div>
             <div style="font-size:0.86rem; font-weight:700;">Holder: ${visual.holder}</div>
-            <div style="font-size:0.84rem; color:#475569; font-weight:700;">${visual.note || "Please pay on or before the due date."}</div>
+            <div style="font-size:0.84rem; color:${printMode ? "#000000" : "#475569"}; font-weight:700;">${visual.note || "Please pay on or before the due date."}</div>
             <div class="bill-due">Due Date: ${visual.dueDate}</div>
           </div>
         `;
       }
       if (visual.type === "story_badge") {
+        if (printMode) {
+          return `<div class="ws-story-pill"><span>${visual.icon || "☆"}</span><span>${visual.label || ""}</span></div>`;
+        }
         return `
-          <div style="background:${printMode ? "#ffffff" : "#eff6ff"}; border:2.5px solid #0f172a; border-radius:18px; padding:12px 16px; max-width:340px;">
+          <div style="background:#eff6ff; border:2.5px solid #0f172a; border-radius:18px; padding:12px 16px; max-width:340px;">
             <div style="font-size:2.3rem; line-height:1.2;">${visual.icon || "📘"}</div>
             <div style="font-weight:900; font-size:0.96rem; margin-top:4px;">${visual.label || ""}</div>
           </div>
@@ -1550,13 +2045,13 @@
 
     function renderOptionContent(opt, printMode = false) {
       if (typeof opt === "object" && opt !== null && opt.type === "clock") {
-        return renderClockSVG({ ...opt, size: printMode ? 86 : 112 }, printMode);
+        return renderClockSVG({ ...opt, size: printMode ? 90 : 112 }, printMode);
       }
       return `<span>${opt}</span>`;
     }
 
     /* ============================================================
-       5. 350-QUESTION VERIFIED BANK ENGINE (EXACTLY 70 PER LEVEL)
+       5. 350-QUESTION VERIFIED BANK ENGINE (70 PER LEVEL)
        ============================================================ */
     function makeTextQ(id, chapter, text, correct, distractors, explanation, visual = null) {
       const { options, answerIndex } = buildUniqueOptions(correct, distractors);
@@ -1585,7 +2080,7 @@
       let n = 1;
       const nid = () => `L1-${String(n++).padStart(2, "0")}`;
 
-      // 2 clock face concept questions
+      // 2 clock face structure questions
       qs.push(
         makeTextQ(nid(), "Ch. 1", "Look at the clock face. How many numbers are there on a clock face?", "12 numbers", ["10 numbers", "8 numbers", "6 numbers", "24 numbers"], "A clock face always has 12 numbers, from 1 to 12.", { type: "clock", hour: 3, minute: 0 }),
         makeTextQ(nid(), "Ch. 1", "Look at this clock face. How many hands are there on the clock face?", "2 hands", ["1 hand", "4 hands", "12 hands", "6 hands"], "This clock face has 2 hands: the shorter hour hand and the longer minute hand.", { type: "clock", hour: 9, minute: 0 })
@@ -1605,7 +2100,7 @@
         );
       }
 
-      // 12 read o'clock times (1..12)
+      // 12 o'clock reading (1..12)
       for (let h = 1; h <= 12; h++) {
         const correct = `${h} o'clock`;
         qs.push(
@@ -1620,7 +2115,7 @@
         );
       }
 
-      // 12 read half-past times (1..12)
+      // 12 half-past reading (1..12)
       for (let h = 1; h <= 12; h++) {
         const nextH = wrapHour(h + 1);
         const correct = `half past ${h}`;
@@ -1636,7 +2131,7 @@
         );
       }
 
-      // 12 hand-position word reasoning (6 o'clock + 6 half-past)
+      // 12 hand-position reasoning (6 o'clock + 6 half past)
       [2, 4, 5, 7, 10, 11].forEach(h => {
         qs.push(
           makeTextQ(
@@ -1664,7 +2159,7 @@
         );
       });
 
-      // 12 visual 4-clock choices (6 o'clock + 6 half-past)
+      // 12 visual 4-clock selection (6 o'clock + 6 half past)
       [1, 3, 6, 8, 9, 12].forEach(h => {
         qs.push(
           makeVisualClockQ(
@@ -1698,7 +2193,7 @@
         );
       });
 
-      // 8 spot-the-correctly-drawn clock vs trick clocks
+      // 8 trick-clock comparison questions
       [
         { h: 2, m: 30 }, { h: 4, m: 0 }, { h: 5, m: 30 }, { h: 7, m: 0 },
         { h: 8, m: 30 }, { h: 9, m: 30 }, { h: 10, m: 0 }, { h: 11, m: 30 }
@@ -1993,7 +2488,7 @@
             qs.push(makeTextQ(nid(), "Ch. 3", `On which day did the shop give out the ${target.icon} ${target.label}?`, ans, DAYS.filter(d => d !== ans), `Find ${target.icon} ${target.label} on the chart — it is on ${ans}.`, visual));
           } else if (spec.type === "closedDay") {
             const ans = DAYS[chart.closedIdx];
-            qs.push(makeTextQ(nid(), "Ch. 3", `The shop did not give out gifts on one day due to ${spec.reason}. Which day was it?`, ans, DAYS.filter(d => d !== ans), `The 🚫 symbol is on ${ans}, so no gifts were given on ${ans}.`, visual));
+            qs.push(makeTextQ(nid(), "Ch. 3", `The shop did not give out gifts on one day due to ${spec.reason}. Which day was it?`, ans, DAYS.filter(d => d !== ans), `The Closed symbol is on ${ans}, so no gifts were given on ${ans}.`, visual));
           } else if (spec.type === "pairDays") {
             const i1 = chart.items[spec.d1], i2 = chart.items[spec.d2];
             const ans = `${DAYS[spec.d1]} and ${DAYS[spec.d2]}`;
@@ -2285,7 +2780,7 @@
       [
         { t: "Lily went to the Pet Shop on Friday. Which gift did she get?", a: "🔔 Bell", d: ["🧶 Yarn", "⚽ Ball", "🥕 Carrot"], w: "Under Fri, the gift is 🔔 Bell." },
         { t: "On which day did the Pet Shop give out a 🥕 Carrot?", a: "Wednesday", d: ["Monday", "Thursday", "Saturday"], w: "🥕 Carrot is under Wed (Wednesday)." },
-        { t: "The Pet Shop was closed on one day. Which day was it?", a: "Tuesday", d: ["Monday", "Wednesday", "Sunday"], w: "The 🚫 symbol is on Tuesday." },
+        { t: "The Pet Shop was closed on one day. Which day was it?", a: "Tuesday", d: ["Monday", "Wednesday", "Sunday"], w: "The Closed symbol is on Tuesday." },
         { t: "Tom got a 🦴 Bone and a ⚽ Ball. Which two days did he visit?", a: "Sunday and Saturday", d: ["Monday and Friday", "Sunday and Friday", "Thursday and Saturday"], w: "Bone is on Sunday and Ball is on Saturday." },
         { t: "Sam went to the shop the day right after it was closed. What gift did he get?", a: "🥕 Carrot", d: ["🐟 Fish", "🧶 Yarn", "🦴 Bone"], w: "The shop was closed on Tuesday; the next day is Wednesday (🥕 Carrot)." }
       ].forEach(q => qs.push(makeTextQ(nid(), "Ch. 3", q.t, q.a, q.d, q.w, petVisual)));
@@ -2387,7 +2882,7 @@
     }
 
     /* ============================================================
-       6. GAME CONTROLLER, EXAM ENGINE, STORAGE & A4 PRINT
+       6. GAME CONTROLLER, EXAM ENGINE, STORAGE & RESULTS
        ============================================================ */
     const STORAGE_KEY = "mt4_practice_1b_stars_v350";
 
@@ -2479,7 +2974,7 @@
             <div style="font-size:0.84rem; font-weight:800; color:#334155;">📚 ${modeText}</div>
             <div class="level-actions">
               <button class="btn ${playBtnCls}" type="button" data-play-level="${meta.id}">${playLabel}</button>
-              <button class="btn btn-teal" type="button" data-print-level="${meta.id}" title="Print A4 Worksheet">🖨️ Print</button>
+              <button class="btn btn-teal" type="button" data-print-level="${meta.id}" title="Print Colorful Eco-Ink A4 Worksheet">🖨️ Print</button>
             </div>
           </article>
         `;
@@ -2763,7 +3258,7 @@
         mistakesEl.innerHTML = `<h3 style="margin:6px 0 2px; font-size:1.15rem;">📝 Review Mistakes (${mistakes.length})</h3>` + mistakes.map(m => {
           const yourLabel = m.chosen === null ? "No answer" : m.q.visualOptions ? `Clock ${LETTERS[m.chosen]}` : escapeHTML(m.q.options[m.chosen]);
           const rightLabel = m.q.visualOptions ? `Clock ${LETTERS[m.q.answerIndex]}` : escapeHTML(m.q.options[m.q.answerIndex]);
-          const visualPreview = m.q.visualOptions ? `<div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Correct Clock (${LETTERS[m.q.answerIndex]}):</strong> ${renderOptionContent(m.q.options[m.q.answerIndex], true)}</div>` : "";
+          const visualPreview = m.q.visualOptions ? `<div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Correct Clock (${LETTERS[m.q.answerIndex]}):</strong> ${renderOptionContent(m.q.options[m.q.answerIndex], false)}</div>` : "";
           return `
             <div class="mistake-item">
               <div style="font-weight:900; margin-bottom:4px;">Q${m.num} (${m.q.chapter}): ${escapeHTML(m.q.text)}</div>
@@ -2780,57 +3275,137 @@
     }
 
     /* ============================================================
-       7. A4 LOW-INK PRINTABLE WORKSHEET BUILDER
+       7. COLORFUL ECO-INK (LOW-TONER) CARTOON A4 PORTRAIT WORKSHEET
        ============================================================ */
+    function getChapterClass(ch) {
+      if (ch === "Ch. 1") return "ws-ch-1";
+      if (ch === "Ch. 2") return "ws-ch-2";
+      if (ch === "Ch. 3") return "ws-ch-3";
+      return "ws-ch-4";
+    }
+
     function buildWorksheetHTML(levelId, questions, includeAnswerKey) {
       const meta = LEVEL_META.find(m => m.id === levelId) || LEVEL_META[0];
+      const themeCol = meta.themeColor || "#2563eb";
+      const threeHollowStars =
+        renderHollowStarSVG(19, "#f59e0b") +
+        renderHollowStarSVG(19, "#f59e0b") +
+        renderHollowStarSVG(19, "#f59e0b");
+      const fiveRainbowStars =
+        renderHollowStarSVG(23, "#f59e0b") +
+        renderHollowStarSVG(23, "#ec4899") +
+        renderHollowStarSVG(23, "#3b82f6") +
+        renderHollowStarSVG(23, "#10b981") +
+        renderHollowStarSVG(23, "#8b5cf6");
+
       const headerHTML = `
-        <div class="ws-header">
-          <div>
-            <h1 class="ws-title">1B MT 4練習 — Level ${meta.id}: ${meta.title}</h1>
-            <p class="ws-sub">Modern Primary Mathematics 1C (${meta.chapter}) • Practice Worksheet (${questions.length} of 70 Bank Questions)</p>
+        <div class="ws-banner">
+          <div class="ws-corner-deco top-right" aria-hidden="true">
+            ${renderHollowStarSVG(14, "#f59e0b")}
+            ${renderHollowStarSVG(11, themeCol)}
           </div>
-          <div class="ws-meta">
-            <div>Name: _____________________</div>
-            <div>Class: ________ &nbsp; Date: ____________ &nbsp; Score: _____ / ${questions.length}</div>
+          <div class="ws-corner-deco bottom-right" aria-hidden="true">
+            ${renderHollowStarSVG(11, "#ec4899")}
+          </div>
+          <div class="ws-mascot-col">
+            ${renderPrintOwlOutlineSVG(80, "clock", themeCol)}
+          </div>
+          <div class="ws-banner-body">
+            <div class="ws-speech">Hi! I'm Pip! Do your best &amp; colour the stars!</div>
+            <div class="ws-title-row">
+              ${renderHollowStarSVG(17, "#f59e0b")}
+              <h1 class="ws-title">1B MT 4練習 — Level ${meta.id}: ${meta.title}</h1>
+              ${renderHollowStarSVG(17, "#f59e0b")}
+            </div>
+            <p class="ws-sub">Modern Primary Mathematics 1C (${meta.chapter}) • Practice Worksheet (${questions.length} Questions)</p>
           </div>
         </div>
-        <div class="ws-instruction">Instructions: Read each question carefully and blacken the circle ( ○ ) next to the correct answer.</div>
+
+        <div class="ws-student-strip">
+          <div class="ws-student-fields">
+            <span>✏️ <span class="ws-field-lbl">Name:</span> ___________________</span>
+            <span>🏫 <span class="ws-field-lbl">Class:</span> ________</span>
+            <span>📅 <span class="ws-field-lbl">Date:</span> _____________</span>
+            <span>🏅 <span class="ws-field-lbl">Score:</span> _____ / ${questions.length}</span>
+          </div>
+          <div class="ws-stars-box">
+            <div class="ws-stars-label">My Stars</div>
+            <div class="ws-stars-row">${threeHollowStars}</div>
+          </div>
+        </div>
+
+        <div class="ws-instruction">
+          ${renderOutlinePencilSVG(19)}
+          <span>Instructions: Read each question carefully and blacken or circle the ( ○ ) next to the correct answer.</span>
+        </div>
       `;
 
       const questionsHTML = questions.map((q, idx) => {
+        const cardCycle = `ws-q-c${idx % 5}`;
+        const chCls = getChapterClass(q.chapter);
         const visualHTML = q.visual ? `<div class="ws-visual">${renderVisual(q.visual, true)}</div>` : "";
         const optsHTML = q.options.map((opt, oi) => `
           <div class="ws-opt${q.visualOptions ? " visual-ws-opt" : ""}">
-            <div style="display:flex; align-items:center; gap:5px;">
+            <div style="display:flex; align-items:center; gap:6px;">
               <span class="ws-bubble"></span>
-              <strong>${LETTERS[oi]}.</strong>
+              <strong class="ws-opt-letter">${LETTERS[oi]}.</strong>
               ${q.visualOptions ? "" : renderOptionContent(opt, true)}
             </div>
             ${q.visualOptions ? renderOptionContent(opt, true) : ""}
           </div>
         `).join("");
-        return `<div class="ws-q"><p class="ws-q-title">${idx + 1}. [${q.chapter}] ${escapeHTML(q.text)}</p>${visualHTML}<div class="ws-options">${optsHTML}</div></div>`;
+
+        return `
+          <div class="ws-q ${cardCycle}">
+            <div class="ws-q-head">
+              <div class="ws-q-badge">Q${idx + 1}</div>
+              <div class="ws-q-title-wrap">
+                <p class="ws-q-title"><span class="ws-ch-pill ${chCls}">${q.chapter}</span>${escapeHTML(q.text)}</p>
+              </div>
+            </div>
+            ${visualHTML}
+            <div class="ws-options">${optsHTML}</div>
+          </div>
+        `;
       }).join("");
+
+      const rewardFooterHTML = `
+        <div class="ws-footer-wrap">
+          <div class="ws-rainbow-divider">${renderRainbowDividerSVG()}</div>
+          <div class="ws-footer-reward">
+            <div class="ws-footer-text">
+              ${renderPrintOwlOutlineSVG(46, "cheer", themeCol)}
+              <span>Awesome effort! Colour your stars!</span>
+            </div>
+            <div class="ws-footer-stars">${fiveRainbowStars}</div>
+          </div>
+        </div>
+      `;
 
       const answerKeyHTML = includeAnswerKey ? `
         <div class="ws-answer-key">
-          <div class="ws-header">
+          <div class="ws-ans-header">
+            ${renderPrintOwlOutlineSVG(52, "cheer", themeCol)}
             <div>
-              <h2 class="ws-title">1B MT 4練習 — Answer Key (Level ${meta.id}: ${meta.title})</h2>
-              <p class="ws-sub">For Parents & Teachers (${questions.length} Questions)</p>
+              <h2 class="ws-title" style="font-size:17px;">1B MT 4練習 — Answer Key (Level ${meta.id}: ${meta.title})</h2>
+              <p class="ws-sub">For Parents &amp; Teachers • ${questions.length} Questions (${meta.chapter})</p>
             </div>
           </div>
           <div class="ws-ans-grid">
             ${questions.map((q, idx) => {
               const ansText = q.visualOptions ? `Option ${LETTERS[q.answerIndex]}` : `${LETTERS[q.answerIndex]}. ${escapeHTML(q.options[q.answerIndex])}`;
-              return `<div class="ws-ans-row"><strong>Q${idx + 1} (${q.chapter}): ${ansText}</strong><div style="font-size:11px; color:#222;">${escapeHTML(q.explanation)}</div></div>`;
+              return `
+                <div class="ws-ans-row">
+                  <div><strong>Q${idx + 1} (${q.chapter}):</strong> <span class="ws-ans-correct">${ansText}</span></div>
+                  <div class="ws-ans-exp">${escapeHTML(q.explanation)}</div>
+                </div>
+              `;
             }).join("")}
           </div>
         </div>
       ` : "";
 
-      return headerHTML + questionsHTML + answerKeyHTML;
+      return `<div class="ws-sheet ws-lvl-${meta.id}">${headerHTML}${questionsHTML}${rewardFooterHTML}${answerKeyHTML}</div>`;
     }
 
     function renderPrintPreview() {
@@ -2846,7 +3421,7 @@
       state.printQuestions = drawQuestionsForLevel(meta.id, state.printCount);
       if (state.examTimerId) state.examPaused = true;
 
-      $("print-modal-title").textContent = `🖨️ Print A4 Worksheet — Level ${meta.id}: ${meta.title}`;
+      $("print-modal-title").textContent = `🖨️ Colorful Eco-Ink A4 Worksheet — Level ${meta.id}: ${meta.title}`;
       const pillsEl = $("print-count-pills");
       pillsEl.innerHTML = meta.printOptions.map(cnt => `<button type="button" class="count-pill${cnt === state.printCount ? " active" : ""}" data-pcnt="${cnt}">${cnt} Qs</button>`).join("");
 
