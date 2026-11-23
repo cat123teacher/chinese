@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>1B MT 4練習</title>
+  <style>
+    /* ============================================================
+       1. CARTOON ISLAND THEME, TYPOGRAPHY & RESPONSIVE LAYOUT
+       ============================================================ */
+    :root {
+      --sky-top: #60c6fb;
+      --sky-mid: #bae6fd;
+      --sky-bottom: #bbf7d0;
+      --card-bg: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #fbbf24;
+      --accent-hover: #f59e0b;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --purple: #7c3aed;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --shadow-card: 0 8px 0 rgba(15, 23, 42, 0.14), 0 14px 28px rgba(15, 23, 42, 0.08);
+      --shadow-btn: 0 5px 0 rgba(15, 23, 42, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Nunito", "Quicksand", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 50%, var(--sky-bottom) 100%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Animated Cartoon Sky & Drifting Clouds */
+    .cloud-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .sun-orb {
+      position: absolute;
+      top: -28px;
+      right: -24px;
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fef08a 38%, #facc15 70%, rgba(250, 204, 21, 0) 76%);
+      animation: sunPulse 4.8s ease-in-out infinite;
+    }
+    @keyframes sunPulse {
+      0%, 100% { transform: scale(1); opacity: 0.94; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 999px;
+      filter: drop-shadow(0 6px 10px rgba(37, 99, 235, 0.1));
+      animation: drift linear infinite;
+    }
+    .cloud::before, .cloud::after {
+      content: "";
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .cloud.c1 { width: 124px; height: 40px; top: 6%; left: -150px; animation-duration: 38s; }
+    .cloud.c1::before { width: 54px; height: 54px; top: -24px; left: 18px; }
+    .cloud.c1::after { width: 44px; height: 44px; top: -18px; right: 20px; }
+
+    .cloud.c2 { width: 154px; height: 46px; top: 19%; left: -190px; animation-duration: 54s; animation-delay: -18s; }
+    .cloud.c2::before { width: 66px; height: 66px; top: -28px; left: 26px; }
+    .cloud.c2::after { width: 50px; height: 50px; top: -20px; right: 24px; }
+
+    .cloud.c3 { width: 104px; height: 34px; top: 34%; left: -130px; animation-duration: 46s; animation-delay: -30s; }
+    .cloud.c3::before { width: 46px; height: 46px; top: -20px; left: 16px; }
+    .cloud.c3::after { width: 36px; height: 36px; top: -14px; right: 16px; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100vw + 270px)); }
+    }
+    @keyframes floatBob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.94); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 12px 14px 28px;
+      min-height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      animation: popIn 0.24s ease-out;
+    }
+    .screen.active { display: block; }
+
+    /* Chunky Tactile Cartoon Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 3px solid #0f172a;
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+      box-shadow: var(--shadow-btn);
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.22);
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-primary { background: #3b82f6; color: #ffffff; }
+    .btn-primary:hover:not(:disabled) { background: #2563eb; }
+    .btn-accent { background: #fbbf24; color: #0f172a; }
+    .btn-accent:hover:not(:disabled) { background: #f59e0b; }
+    .btn-green { background: #22c55e; color: #ffffff; }
+    .btn-green:hover:not(:disabled) { background: #16a34a; }
+    .btn-white { background: #ffffff; color: #0f172a; }
+    .btn-white:hover:not(:disabled) { background: #f8fafc; }
+    .btn-purple { background: #8b5cf6; color: #ffffff; }
+    .btn-purple:hover:not(:disabled) { background: #7c3aed; }
+    .btn-teal { background: #14b8a6; color: #ffffff; }
+    .btn-teal:hover:not(:disabled) { background: #0d9488; }
+    .btn-sm { padding: 7px 12px; font-size: 0.9rem; border-radius: 13px; border-width: 2.5px; }
+
+    /* Home Hero Header */
+    .hero-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #fef9c3 100%);
+      border: 4px solid #0f172a;
+      border-radius: 26px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .mascot-badge {
+      width: 78px;
+      height: 78px;
+      flex: 0 0 78px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      border: 3.5px solid #0f172a;
+      display: grid;
+      place-items: center;
+      animation: floatBob 2.8s ease-in-out infinite;
+    }
+    .hero-text { flex: 1; min-width: 210px; }
+    .hero-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 3.4vw, 2.15rem);
+      color: #1d4ed8;
+      letter-spacing: 0.4px;
+      line-height: 1.15;
+    }
+    .hero-sub {
+      margin: 4px 0 0;
+      font-size: 0.96rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .hero-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .star-pill {
+      background: #fef3c7;
+      border: 3px solid #0f172a;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #92400e;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Island Level Cards */
+    .levels-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .level-card {
+      background: var(--card-bg);
+      border: 4px solid #0f172a;
+      border-radius: var(--radius-lg);
+      padding: 15px 16px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.14s ease;
+    }
+    .level-card:hover { transform: translateY(-2px); }
+    .level-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 10px;
+      background: var(--lvl-color, #3b82f6);
+    }
+    .level-card.lvl-1 { --lvl-color: #3b82f6; }
+    .level-card.lvl-2 { --lvl-color: #10b981; }
+    .level-card.lvl-3 { --lvl-color: #f59e0b; }
+    .level-card.lvl-4 { --lvl-color: #ec4899; }
+    .level-card.lvl-5 {
+      --lvl-color: #7c3aed;
+      background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+    }
+
+    .level-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .level-icon {
+      width: 56px;
+      height: 56px;
+      flex: 0 0 56px;
+      border-radius: 16px;
+      border: 3px solid #0f172a;
+      background: #f8fafc;
+      display: grid;
+      place-items: center;
+      font-size: 1.85rem;
+    }
+    .level-info { flex: 1; min-width: 0; }
+    .level-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+    .level-name { margin: 0; font-size: 1.18rem; line-height: 1.2; }
+    .level-meta { margin: 3px 0 0; font-size: 0.87rem; color: var(--muted); font-weight: 700; }
+    .level-stars { font-size: 1.18rem; letter-spacing: 2px; color: #f59e0b; font-weight: 900; }
+    .level-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .home-footer {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .tip-pill {
+      background: rgba(255, 255, 255, 0.86);
+      border: 2.5px solid #0f172a;
+      border-radius: 999px;
+      padding: 6px 14px;
+    }
+
+    /* Gameplay Top Bar */
+    .game-topbar {
+      background: #ffffff;
+      border: 3.5px solid #0f172a;
+      border-radius: 20px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .topbar-left, .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill-badge {
+      background: #eff6ff;
+      border: 2.5px solid #0f172a;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-weight: 900;
+      font-size: 0.92rem;
+      color: #1e3a8a;
+    }
+    .timer-badge { background: #fef3c7; color: #92400e; display: none; }
+    .timer-badge.show { display: inline-flex; }
+
+    .progress-wrap {
+      width: 100%;
+      height: 14px;
+      background: #e2e8f0;
+      border: 2.5px solid #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      transition: width 0.3s ease;
+    }
+
+    /* Exam Navigator (Level 5) */
+    .exam-nav {
+      display: none;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .exam-nav.show { display: flex; }
+    .exam-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      border: 2.5px solid #0f172a;
+      background: #ffffff;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+    .exam-dot.current { background: #3b82f6; color: #ffffff; transform: scale(1.08); }
+    .exam-dot.answered { background: #fde68a; color: #0f172a; }
+
+    /* Main Question Stage (Stacked Phone Portrait -> 2-Col iPad Landscape) */
+    .question-stage {
+      background: #ffffff;
+      border: 4px solid #0f172a;
+      border-radius: 26px;
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .visual-pane {
+      background: #f8fafc;
+      border: 3px dashed #94a3b8;
+      border-radius: 20px;
+      padding: 14px;
+      min-height: 156px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+    }
+    .visual-pane.hidden { display: none; }
+
+    .qa-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .q-mascot-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eff6ff;
+      border: 2.5px solid #0f172a;
+      border-radius: 18px;
+      padding: 8px 12px;
+    }
+    .q-chapter-chip {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 900;
+      background: #fef08a;
+      color: #0f172a;
+      border: 2px solid #0f172a;
+      border-radius: 999px;
+      padding: 2px 10px;
+      margin-bottom: 4px;
+    }
+    .q-text {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.3vw, 1.36rem);
+      line-height: 1.38;
+      color: #0f172a;
+      font-weight: 800;
+    }
+
+    /* Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .options-grid.two-col { grid-template-columns: repeat(2, 1fr); }
+    .option-btn {
+      width: 100%;
+      min-height: 54px;
+      text-align: left;
+      background: #ffffff;
+      border: 3.5px solid #0f172a;
+      border-radius: 18px;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 1.04rem;
+      font-weight: 800;
+      color: #0f172a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 0 rgba(15, 23, 42, 0.16);
+      transition: transform 0.1s ease, background 0.15s ease;
+      touch-action: manipulation;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      transform: translateY(-2px);
+    }
+    .option-btn.selected { background: #dbeafe; border-color: #2563eb; }
+    .option-btn.correct { background: var(--green-bg); border-color: var(--green); color: #14532d; }
+    .option-btn.wrong {
+      background: var(--red-bg);
+      border-color: var(--red);
+      color: #7f1d1d;
+      animation: shake 0.35s ease;
+    }
+    .option-btn.visual-opt {
+      flex-direction: column;
+      text-align: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    .opt-letter {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      border-radius: 50%;
+      border: 2.5px solid #0f172a;
+      background: #fef08a;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+    }
+
+    /* Feedback Box */
+    .feedback-box {
+      display: none;
+      border: 3px solid #0f172a;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-weight: 800;
+      line-height: 1.4;
+      gap: 10px;
+      align-items: center;
+    }
+    .feedback-box.show { display: flex; }
+    .feedback-box.good { background: #dcfce7; color: #14532d; }
+    .feedback-box.bad { background: #fee2e2; color: #7f1d1d; }
+
+    .stage-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    /* Visual Widget Styles */
+    .dual-clock-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .clock-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+    .arrow-badge {
+      background: #fef3c7;
+      border: 2.5px solid #0f172a;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 900;
+      font-size: 0.92rem;
+    }
+    .mini-table {
+      width: 100%;
+      max-width: 440px;
+      border-collapse: collapse;
+      background: #ffffff;
+      border: 2.5px solid #0f172a;
+      font-size: 0.9rem;
+    }
+    .mini-table th, .mini-table td {
+      border: 2px solid #0f172a;
+      padding: 6px 8px;
+      text-align: center;
+      font-weight: 800;
+    }
+    .mini-table th { background: #bfdbfe; }
+    .week-strip {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(38px, 1fr));
+      gap: 4px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .week-cell {
+      background: #ffffff;
+      border: 2px solid #0f172a;
+      border-radius: 10px;
+      padding: 4px 2px;
+      text-align: center;
+    }
+    .week-day {
+      font-size: 0.72rem;
+      font-weight: 900;
+      background: #e0f2fe;
+      border-radius: 6px;
+      padding: 2px;
+      margin-bottom: 4px;
+    }
+    .week-icon { font-size: 1.45rem; line-height: 1.2; }
+    .week-label { font-size: 0.65rem; font-weight: 800; color: #475569; }
+
+    .cal-wrap {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .cal-box {
+      background: #ffffff;
+      border: 2.5px solid #0f172a;
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 215px;
+      flex: 1;
+      max-width: 280px;
+    }
+    .cal-title {
+      background: #3b82f6;
+      color: #ffffff;
+      font-weight: 900;
+      padding: 5px 8px;
+      font-size: 0.92rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .cal-grid { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .cal-grid th, .cal-grid td {
+      border: 1px solid #cbd5e1;
+      padding: 3px 2px;
+      text-align: center;
+      font-weight: 800;
+    }
+    .cal-grid th { background: #f1f5f9; }
+    .cal-grid th:first-child, .cal-grid td:first-child { color: #dc2626; }
+    .cal-mark {
+      background: #fef08a;
+      border-radius: 6px;
+      font-weight: 900;
+      color: #0f172a !important;
+    }
+
+    .bill-slip {
+      background: #fffbeb;
+      border: 3px solid #0f172a;
+      border-radius: 16px;
+      padding: 12px 16px;
+      max-width: 300px;
+      width: 100%;
+      text-align: left;
+      box-shadow: 0 4px 0 rgba(15, 23, 42, 0.12);
+    }
+    .bill-title {
+      font-size: 1rem;
+      font-weight: 900;
+      border-bottom: 2px dashed #94a3b8;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .bill-due {
+      background: #fee2e2;
+      border: 2px solid #dc2626;
+      border-radius: 10px;
+      padding: 6px 10px;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.08rem;
+      color: #991b1b;
+      margin-top: 8px;
+    }
+
+    /* Results Screen */
+    .result-card {
+      background: #ffffff;
+      border: 4px solid #0f172a;
+      border-radius: 26px;
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+    .result-stars { font-size: 2.8rem; letter-spacing: 6px; margin: 6px 0; }
+    .score-big { font-size: 2.3rem; font-weight: 900; color: #1d4ed8; margin: 4px 0; }
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+      text-align: left;
+    }
+    .breakdown-item {
+      background: #f8fafc;
+      border: 2.5px solid #0f172a;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 800;
+    }
+    .mistakes-list {
+      text-align: left;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mistake-item {
+      background: #fff7ed;
+      border: 2.5px solid #ea580c;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 0.94rem;
+    }
+
+    /* Modals (Print Preview & Reset Confirmation) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      z-index: 999;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #ffffff;
+      border: 4px solid #0f172a;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+    .modal-box.small-modal {
+      max-width: 390px;
+      padding: 22px;
+      text-align: center;
+      gap: 12px;
+    }
+    .modal-header {
+      padding: 12px 16px;
+      background: #eff6ff;
+      border-bottom: 3px solid #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .modal-controls {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 2px solid #cbd5e1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .count-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .count-pill {
+      border: 2px solid #0f172a;
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .count-pill.active { background: #2563eb; color: #ffffff; }
+    .modal-preview-scroll {
+      padding: 14px;
+      overflow-y: auto;
+      background: #e2e8f0;
+      flex: 1;
+    }
+    .preview-paper {
+      background: #ffffff;
+      border: 1px solid #94a3b8;
+      padding: 18px;
+      margin: 0 auto;
+      max-width: 740px;
+      color: #000000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 950;
+    }
+
+    /* Responsive Breakpoint: iPad Landscape & Wide Screens */
+    @media (min-width: 760px) {
+      .levels-grid { grid-template-columns: repeat(2, 1fr); }
+      .level-card.lvl-5 { grid-column: 1 / -1; }
+      .question-stage.has-visual {
+        grid-template-columns: minmax(280px, 44%) 1fr;
+        align-items: center;
+      }
+      .options-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ============================================================
+       2. LOW-INK A4 PRINTABLE WORKSHEET STYLES
+       ============================================================ */
+    #print-area { display: none; }
+    .ws-header {
+      border-bottom: 2px solid #000000;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .ws-title { margin: 0; font-size: 17.5px; font-weight: 900; color: #000000; }
+    .ws-sub { margin: 2px 0 0; font-size: 12px; color: #000000; }
+    .ws-meta { font-size: 12px; text-align: right; line-height: 1.65; color: #000000; }
+    .ws-instruction {
+      border: 1px solid #000000;
+      border-radius: 6px;
+      padding: 5px 9px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #000000;
+    }
+    .ws-q {
+      border: 1.5px solid #000000;
+      border-radius: 8px;
+      padding: 9px 11px;
+      margin-bottom: 10px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      background: #ffffff;
+    }
+    .ws-q-title { font-size: 13.5px; font-weight: 700; margin: 0 0 6px; color: #000000; }
+    .ws-visual { margin: 6px 0 8px; display: flex; justify-content: center; }
+    .ws-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 12px;
+      font-size: 13px;
+      color: #000000;
+    }
+    .ws-opt { display: flex; align-items: center; gap: 6px; }
+    .ws-opt.visual-ws-opt {
+      flex-direction: column;
+      border: 1px solid #444444;
+      border-radius: 6px;
+      padding: 5px;
+    }
+    .ws-bubble {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 1.6px solid #000000;
+      border-radius: 50%;
+      flex: 0 0 14px;
+      background: #ffffff;
+    }
+    .ws-answer-key {
+      page-break-before: always;
+      break-before: page;
+    }
+    .ws-ans-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 14px;
+      font-size: 12px;
+      color: #000000;
+    }
+    .ws-ans-row {
+      border-bottom: 1px solid #999999;
+      padding: 4px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 11mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .cloud-layer, .app-shell, .modal-backdrop, #confetti-canvas {
+        display: none !important;
+      }
+      #print-area {
+        display: block !important;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #000000 !important;
+        background: #ffffff !important;
+      }
+      #print-area * {
+        box-shadow: none !important;
+        background-image: none !important;
+      }
+      #print-area .cal-title,
+      #print-area .cal-grid th,
+      #print-area .cal-grid td,
+      #print-area .mini-table th,
+      #print-area .mini-table td,
+      #print-area .week-day,
+      #print-area .week-cell,
+      #print-area .arrow-badge,
+      #print-area .bill-due,
+      #print-area .bill-slip,
+      #print-area .cal-mark {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+      }
+      #print-area .cal-mark {
+        outline: 2px solid #000000;
+        outline-offset: -2px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Cartoon Sky Background -->
+  <div class="cloud-layer" aria-hidden="true">
+    <div class="sun-orb"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+  </div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <main class="app-shell">
+    <!-- ==================== 1. HOME SCREEN ==================== -->
+    <section id="screen-home" class="screen active">
+      <header class="hero-banner">
+        <div class="mascot-badge" id="home-mascot" aria-hidden="true"></div>
+        <div class="hero-text">
+          <h1 class="hero-title">1B MT 4練習</h1>
+          <p class="hero-sub">Primary 1 Math 1C (Chapters 1–4) • 350-Question Bank • Printable A4 Worksheets</p>
+        </div>
+        <div class="hero-tools">
+          <div class="star-pill" title="Total Stars Earned">⭐ <span id="total-stars">0</span> / 15</div>
+          <button class="btn btn-white btn-sm" id="btn-sound-toggle" type="button">🔊 Sound: ON</button>
+        </div>
+      </header>
+
+      <div class="levels-grid" id="levels-grid"></div>
+
+      <footer class="home-footer">
+        <span class="tip-pill">🖨️ Tap <strong>Print</strong> on any level to create a low-ink A4 practice paper!</span>
+        <button class="btn btn-white btn-sm" id="btn-reset-stars" type="button">🔄 Reset Stars</button>
+      </footer>
+    </section>
+
+    <!-- ==================== 2. GAMEPLAY SCREEN ==================== -->
+    <section id="screen-game" class="screen">
+      <div class="game-topbar">
+        <div class="topbar-left">
+          <button class="btn btn-white btn-sm" id="btn-back-home" type="button">🏠 Islands</button>
+          <span class="pill-badge" id="game-level-badge">Level 1</span>
+          <span class="pill-badge" id="game-q-counter">Q 1 / 5</span>
+        </div>
+        <div class="topbar-right">
+          <span class="pill-badge timer-badge" id="game-timer">⏱ 00:00</span>
+          <button class="btn btn-accent btn-sm" id="btn-read-aloud" type="button">🗣️ Read Aloud</button>
+          <button class="btn btn-teal btn-sm" id="btn-game-print" type="button">🖨️ Print</button>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-fill" id="game-progress"></div>
+      </div>
+
+      <div class="exam-nav" id="exam-nav"></div>
+
+      <div class="question-stage" id="question-stage">
+        <div class="visual-pane" id="visual-pane"></div>
+        <div class="qa-pane">
+          <div class="q-mascot-bar">
+            <div id="game-mascot" style="flex:0 0 54px;"></div>
+            <div style="flex:1; min-width:0;">
+              <span class="q-chapter-chip" id="q-chapter-chip">Ch. 1</span>
+              <p class="q-text" id="q-text">Loading question...</p>
+            </div>
+          </div>
+          <div class="options-grid" id="options-grid"></div>
+          <div class="feedback-box" id="feedback-box"></div>
+          <div class="stage-footer">
+            <button class="btn btn-white btn-sm" id="btn-prev-q" type="button" style="display:none;">⬅️ Previous</button>
+            <div style="flex:1"></div>
+            <button class="btn btn-green" id="btn-next-q" type="button" style="display:none;">Next Question ➡️</button>
+            <button class="btn btn-purple" id="btn-submit-exam" type="button" style="display:none;">✅ Submit Exam</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. RESULTS SCREEN ==================== -->
+    <section id="screen-results" class="screen">
+      <div class="result-card">
+        <div id="result-mascot" style="display:inline-block;"></div>
+        <h2 id="result-title" style="margin:6px 0 0; font-size:1.75rem;">Awesome Work!</h2>
+        <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+        <div class="score-big" id="result-score">5 / 5</div>
+        <p id="result-sub" style="margin:0 0 14px; font-weight:800; color:#475569;"></p>
+
+        <div class="breakdown-grid" id="result-breakdown"></div>
+
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;">
+          <button class="btn btn-primary" id="btn-play-again" type="button">🔄 Play New Set</button>
+          <button class="btn btn-teal" id="btn-result-print" type="button">🖨️ Print Worksheet</button>
+          <button class="btn btn-white" id="btn-result-home" type="button">🏠 Back to Islands</button>
+        </div>
+
+        <div class="mistakes-list" id="mistakes-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== PRINT PREVIEW MODAL ==================== -->
+  <div class="modal-backdrop" id="print-modal" role="dialog" aria-modal="true" aria-labelledby="print-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="print-modal-title" style="margin:0; font-size:1.15rem;">🖨️ Printable A4 Worksheet</h3>
+        <button class="btn btn-white btn-sm" id="btn-close-print" type="button">✖ Close</button>
+      </div>
+      <div class="modal-controls">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <strong style="font-size:0.9rem;">Questions:</strong>
+          <span class="count-pills" id="print-count-pills"></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <label style="font-size:0.88rem; font-weight:800; cursor:pointer;">
+            <input type="checkbox" id="chk-answer-key" checked /> Include Answer Key
+          </label>
+          <button class="btn btn-accent btn-sm" id="btn-shuffle-print" type="button">🔀 Shuffle</button>
+          <button class="btn btn-green btn-sm" id="btn-do-print" type="button">🖨️ Print A4</button>
+        </div>
+      </div>
+      <div class="modal-preview-scroll">
+        <div class="preview-paper" id="print-preview-paper"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== RESET STARS MODAL ==================== -->
+  <div class="modal-backdrop" id="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="modal-box small-modal">
+      <div style="font-size:2.4rem;">🌟</div>
+      <h3 id="reset-modal-title" style="margin:0; font-size:1.35rem;">Reset All Stars?</h3>
+      <p style="margin:0; font-size:0.95rem; font-weight:700; color:#475569;">
+        This clears saved stars for all 5 levels so you can start a fresh island adventure.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:6px;">
+        <button class="btn btn-white btn-sm" id="btn-cancel-reset" type="button">Cancel</button>
+        <button class="btn btn-accent btn-sm" id="btn-confirm-reset" type="button">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOW-INK A4 PRINT CONTAINER -->
+  <div id="print-area"></div>
+
+  <script>
+    /* ============================================================
+       1. CONSTANTS, MATH & CALENDAR UTILITIES
+       ============================================================ */
+    const LEVEL_META = [
+      { id: 1, chapter: "Ch. 1", title: "Telling Time", icon: "⏰", bankSize: 70, drawCount: 5, isExam: false, desc: "Clock face, o'clock, half past & tricky clocks", printOptions: [5, 10, 15, 35, 70] },
+      { id: 2, chapter: "Ch. 2", title: "Hour & Time Intervals", icon: "⏳", bankSize: 70, drawCount: 5, isExam: false, desc: "Longer/shorter than 1 hour, elapsed hours & schedules", printOptions: [5, 10, 15, 35, 70] },
+      { id: 3, chapter: "Ch. 3", title: "Week", icon: "📅", bankSize: 70, drawCount: 5, isExam: false, desc: "Days of the week, yesterday/tomorrow & weekly charts", printOptions: [5, 10, 15, 35, 70] },
+      { id: 4, chapter: "Ch. 4", title: "Month", icon: "🗓️", bankSize: 70, drawCount: 5, isExam: false, desc: "Months, ordinal dates, calendars & bill due dates", printOptions: [5, 10, 15, 35, 70] },
+      { id: 5, chapter: "Ch. 1–4", title: "Mock Assessment Exam", icon: "🏆", bankSize: 70, drawCount: 10, isExam: true, desc: "Balanced Ch. 1–4 mock test with timer & score report", printOptions: [10, 20, 35, 70] }
+    ];
+
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const SHORT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const LETTERS = ["A", "B", "C", "D"];
+
+    /** Fisher-Yates shuffle returning a new array */
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pickUnique(arr, count) {
+      return shuffle(arr).slice(0, Math.min(count, arr.length));
+    }
+
+    /** Formats day number as English ordinal: 1st, 2nd, 3rd, 4th... */
+    function ordinal(n) {
+      const v = n % 100;
+      if (v >= 11 && v <= 13) return n + "th";
+      const last = n % 10;
+      if (last === 1) return n + "st";
+      if (last === 2) return n + "nd";
+      if (last === 3) return n + "rd";
+      return n + "th";
+    }
+
+    /** Wraps any integer into standard 1..12 clock hour */
+    function wrapHour(h) {
+      return ((h - 1) % 12 + 12) % 12 + 1;
+    }
+
+    function formatClockTime(hour, isHalf) {
+      const h = wrapHour(hour);
+      return isHalf ? `half past ${h}` : `${h} o'clock`;
+    }
+
+    /** Singular/plural safe hour formatter */
+    function formatHours(n) {
+      return `${n} ${n === 1 ? "hour" : "hours"}`;
+    }
+
+    /** Real calendar utilities verified by JS Date */
+    function daysInMonth(year, monthIndex) {
+      return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    function getDayOfWeek(year, monthIndex, day) {
+      return new Date(year, monthIndex, day).getDay();
+    }
+
+    function countWeekdayInMonth(year, monthIndex, weekdayIdx) {
+      const total = daysInMonth(year, monthIndex);
+      let count = 0;
+      for (let d = 1; d <= total; d++) {
+        if (getDayOfWeek(year, monthIndex, d) === weekdayIdx) count++;
+      }
+      return count;
+    }
+
+    function getNthWeekdayDate(year, monthIndex, weekdayIdx, nth) {
+      const total = daysInMonth(year, monthIndex);
+      let found = 0;
+      for (let d = 1; d <= total; d++) {
+        if (getDayOfWeek(year, monthIndex, d) === weekdayIdx) {
+          found++;
+          if (found === nth) return d;
+        }
+      }
+      return null;
+    }
+
+    function getLastWeekdayDate(year, monthIndex, weekdayIdx) {
+      const total = daysInMonth(year, monthIndex);
+      for (let d = total; d >= 1; d--) {
+        if (getDayOfWeek(year, monthIndex, d) === weekdayIdx) return d;
+      }
+      return null;
+    }
+
+    /** Builds up to 4 strictly deduplicated choices and returns shuffled options + answer index */
+    function buildUniqueOptions(correctText, distractorPool) {
+      const set = new Set([correctText]);
+      const cleaned = [];
+      for (const item of distractorPool) {
+        if (item !== undefined && item !== null && !set.has(item)) {
+          set.add(item);
+          cleaned.push(item);
+        }
+        if (cleaned.length === 3) break;
+      }
+      const options = shuffle([correctText, ...cleaned]);
+      return { options, answerIndex: options.indexOf(correctText) };
+    }
+
+    /* ============================================================
+       2. SOUND ENGINE (Web Audio API) & READ ALOUD (SpeechSynthesis)
+       ============================================================ */
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!soundEnabled) return null;
+      try {
+        if (!audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (Ctx) audioCtx = new Ctx();
+        }
+        if (audioCtx && audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+      } catch (e) {
+        return null;
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, duration, type = "sine", startOffset = 0, vol = 0.14) {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime + startOffset;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      } catch (e) {}
+    }
+
+    const SFX = {
+      click() { playTone(540, 0.07, "triangle", 0, 0.1); },
+      correct() {
+        playTone(523.25, 0.12, "triangle", 0, 0.16);
+        playTone(659.25, 0.12, "triangle", 0.09, 0.16);
+        playTone(783.99, 0.22, "triangle", 0.18, 0.18);
+      },
+      wrong() {
+        playTone(280, 0.16, "sawtooth", 0, 0.1);
+        playTone(220, 0.22, "sawtooth", 0.14, 0.1);
+      },
+      win() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => playTone(n, 0.2, "triangle", i * 0.11, 0.17));
+      }
+    };
+
+    function stopSpeech() {
+      try {
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
+
+    function speakEnglish(text) {
+      if (!("speechSynthesis" in window) || !text) return;
+      try {
+        stopSpeech();
+        const cleanText = text.replace(/___+/g, "blank").replace(/\s+/g, " ").trim();
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.lang = "en-GB";
+        utter.rate = 0.9;
+        utter.pitch = 1.05;
+        const voices = window.speechSynthesis.getVoices();
+        const preferred =
+          voices.find(v => /en-GB/i.test(v.lang) && /Google|Daniel|Serena|Samantha|Female/i.test(v.name)) ||
+          voices.find(v => /en-GB/i.test(v.lang)) ||
+          voices.find(v => /en-US/i.test(v.lang)) ||
+          voices.find(v => /^en/i.test(v.lang));
+        if (preferred) utter.voice = preferred;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {}
+    }
+
+    /* ============================================================
+       3. CARTOON MASCOT ("Pip the Time Owl") & CONFETTI
+       ============================================================ */
+    function renderOwlSVG(mood = "happy", size = 64) {
+      const cheekColor = mood === "cheer" ? "#fb7185" : "#fda4af";
+      const brow = mood === "think"
+        ? `<path d="M23 26 L35 28 M45 28 L57 26" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round"/>`
+        : `<path d="M24 27 Q30 22 36 27 M44 27 Q50 22 56 27" fill="none" stroke="#1e293b" stroke-width="2.4" stroke-linecap="round"/>`;
+      const wingLeft = mood === "cheer" ? "M14 48 Q4 30 18 24" : "M16 44 Q8 54 19 60";
+      const wingRight = mood === "cheer" ? "M66 48 Q76 30 62 24" : "M64 44 Q72 54 61 60";
+      const eyes = mood === "cheer"
+        ? `<path d="M25 36 Q30 30 35 36 M45 36 Q50 30 55 36" fill="none" stroke="#0f172a" stroke-width="2.8" stroke-linecap="round"/>`
+        : `<circle cx="31" cy="36" r="3.6" fill="#0f172a"/><circle cx="51" cy="36" r="3.6" fill="#0f172a"/><circle cx="32.5" cy="34.5" r="1.3" fill="#ffffff"/><circle cx="52.5" cy="34.5" r="1.3" fill="#ffffff"/>`;
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 80 80" aria-hidden="true">
+          <circle cx="40" cy="43" r="27" fill="#60a5fa" stroke="#0f172a" stroke-width="3.2"/>
+          <path d="M20 22 L28 12 L34 22 Z M60 22 L52 12 L46 22 Z" fill="#3b82f6" stroke="#0f172a" stroke-width="2.8" stroke-linejoin="round"/>
+          <ellipse cx="40" cy="52" rx="16" ry="14" fill="#fef3c7" stroke="#0f172a" stroke-width="2.2"/>
+          <path d="${wingLeft}" fill="none" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
+          <path d="${wingRight}" fill="none" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="30" cy="36" r="8.5" fill="#ffffff" stroke="#0f172a" stroke-width="2.6"/>
+          <circle cx="50" cy="36" r="8.5" fill="#ffffff" stroke="#0f172a" stroke-width="2.6"/>
+          ${eyes}
+          ${brow}
+          <polygon points="40,39 35,45 45,45" fill="#f59e0b" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="22" cy="44" r="3.5" fill="${cheekColor}" opacity="0.8"/>
+          <circle cx="58" cy="44" r="3.5" fill="${cheekColor}" opacity="0.8"/>
+          <path d="M32 68 L32 73 M36 68 L36 73 M44 68 L44 73 M48 68 L48 73" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    let confettiAnimId = null;
+
+    function resizeConfettiCanvas() {
+      const canvas = document.getElementById("confetti-canvas");
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function stopConfetti() {
+      if (confettiAnimId) {
+        cancelAnimationFrame(confettiAnimId);
+        confettiAnimId = null;
+      }
+      const canvas = document.getElementById("confetti-canvas");
+      if (canvas) canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      if (!canvas) return;
+      resizeConfettiCanvas();
+      stopConfetti();
+      const ctx = canvas.getContext("2d");
+      const colors = ["#3b82f6", "#f59e0b", "#22c55e", "#ec4899", "#8b5cf6", "#ef4444"];
+      const pieces = Array.from({ length: 90 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 140,
+        r: 5 + Math.random() * 6,
+        vx: (Math.random() - 0.5) * 4,
+        vy: 3 + Math.random() * 4.5,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.25,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+
+      let frames = 0;
+      function step() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vrot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.65);
+          ctx.restore();
+        });
+        frames++;
+        if (frames < 130) confettiAnimId = requestAnimationFrame(step);
+        else stopConfetti();
+      }
+      confettiAnimId = requestAnimationFrame(step);
+    }
+
+    /* ============================================================
+       4. SVG CLOCK, SCHEDULE, CALENDAR & BILL WIDGET RENDERERS
+       ============================================================ */
+    function renderClockSVG(cfg, printMode = false) {
+      const size = cfg.size || (printMode ? 114 : 156);
+      const hour = wrapHour(cfg.hour || 12);
+      const minute = cfg.minute || 0;
+      const missingSet = new Set(cfg.missingNumbers || []);
+      const trick = cfg.trickMode || "normal";
+      const showHands = cfg.showHands !== false;
+
+      const rimColor = printMode ? "#000000" : "#3b82f6";
+      const ringFill = printMode ? "#ffffff" : "#dbeafe";
+      const hourHandColor = printMode ? "#000000" : "#0f172a";
+      const minHandColor = printMode ? "#000000" : "#2563eb";
+      const missingColor = printMode ? "#000000" : "#dc2626";
+
+      let ticksSVG = "";
+      let numsSVG = "";
+      for (let i = 1; i <= 12; i++) {
+        const rad = ((i * 30 - 90) * Math.PI) / 180;
+        const x1 = 100 + Math.cos(rad) * 78;
+        const y1 = 100 + Math.sin(rad) * 78;
+        const x2 = 100 + Math.cos(rad) * 86;
+        const y2 = 100 + Math.sin(rad) * 86;
+        ticksSVG += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#0f172a" stroke-width="${i % 3 === 0 ? 3.2 : 2}" stroke-linecap="round"/>`;
+
+        const nx = 100 + Math.cos(rad) * 64;
+        const ny = 100 + Math.sin(rad) * 64;
+        if (missingSet.has(i)) {
+          numsSVG += `
+            <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="11" fill="${printMode ? "#ffffff" : "#fee2e2"}" stroke="${missingColor}" stroke-width="2" stroke-dasharray="3 2"/>
+            <text x="${nx.toFixed(1)}" y="${(ny + 5).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="900" fill="${missingColor}" font-family="Arial, sans-serif">?</text>
+          `;
+        } else {
+          numsSVG += `<text x="${nx.toFixed(1)}" y="${(ny + 5.5).toFixed(1)}" text-anchor="middle" font-size="15.5" font-weight="800" fill="#0f172a" font-family="Arial, sans-serif">${i}</text>`;
+        }
+      }
+
+      // Mathematically accurate hand angles (hour hand progresses smoothly with minutes)
+      let hourAngle = (hour % 12) * 30 + (minute / 60) * 30;
+      let minAngle = minute * 6;
+      let hourLen = 40;
+      let minLen = 63;
+
+      if (trick === "wrong_half_hour") {
+        minAngle = 180;
+        hourAngle = (hour % 12) * 30;
+      } else if (trick === "wrong_half_after") {
+        minAngle = 180;
+        hourAngle = ((hour + 1) % 12) * 30;
+      } else if (trick === "wrong_oclock_half") {
+        minAngle = 0;
+        hourAngle = (hour % 12) * 30 + 15;
+      } else if (trick === "swapped_hands") {
+        hourLen = 64;
+        minLen = 36;
+      }
+
+      const hRad = ((hourAngle - 90) * Math.PI) / 180;
+      const mRad = ((minAngle - 90) * Math.PI) / 180;
+      const hx = 100 + Math.cos(hRad) * hourLen;
+      const hy = 100 + Math.sin(hRad) * hourLen;
+      const mx = 100 + Math.cos(mRad) * minLen;
+      const my = 100 + Math.sin(mRad) * minLen;
+
+      const handsSVG = showHands
+        ? `
+          <line x1="100" y1="100" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="${minHandColor}" stroke-width="4.2" stroke-linecap="round"/>
+          <line x1="100" y1="100" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="${hourHandColor}" stroke-width="6.8" stroke-linecap="round"/>
+          <circle cx="100" cy="100" r="6" fill="${printMode ? "#000000" : "#f59e0b"}" stroke="#0f172a" stroke-width="2.2"/>
+        `
+        : `<circle cx="100" cy="100" r="5" fill="#0f172a"/>`;
+
+      const unknownOverlay = cfg.mysteryClock
+        ? `<text x="100" y="114" text-anchor="middle" font-size="42" font-weight="900" fill="${printMode ? "#000000" : "#2563eb"}" font-family="Arial, sans-serif">?</text>`
+        : "";
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 200 200" role="img" aria-label="Analog clock">
+          <circle cx="100" cy="100" r="95" fill="${ringFill}" stroke="${rimColor}" stroke-width="7"/>
+          <circle cx="100" cy="100" r="88" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+          ${ticksSVG}
+          ${numsSVG}
+          ${cfg.mysteryClock ? unknownOverlay : handsSVG}
+        </svg>
+      `;
+    }
+
+    function renderSingleCalendar(calCfg) {
+      const { year, monthIndex, marks = {} } = calCfg;
+      const firstDay = getDayOfWeek(year, monthIndex, 1);
+      const totalDays = daysInMonth(year, monthIndex);
+
+      let rows = "<tr>";
+      for (let i = 0; i < firstDay; i++) rows += "<td></td>";
+
+      let col = firstDay;
+      for (let d = 1; d <= totalDays; d++) {
+        const mark = marks[d];
+        const cls = mark ? ' class="cal-mark"' : "";
+        const label = mark ? `${d}${mark.icon ? " " + mark.icon : ""}` : `${d}`;
+        rows += `<td${cls}>${label}</td>`;
+        col++;
+        if (col === 7 && d < totalDays) {
+          rows += "</tr><tr>";
+          col = 0;
+        }
+      }
+      while (col > 0 && col < 7) {
+        rows += "<td></td>";
+        col++;
+      }
+      rows += "</tr>";
+
+      const legendItems = Object.entries(marks)
+        .filter(([, m]) => m && m.legend)
+        .map(([, m]) => `<span>${m.icon || "★"} ${m.legend}</span>`);
+
+      return `
+        <div class="cal-box">
+          <div class="cal-title"><span>${year}</span><span>${MONTHS[monthIndex]}</span></div>
+          <table class="cal-grid">
+            <thead><tr>${SHORT_DAYS.map(s => `<th>${s}</th>`).join("")}</tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          ${legendItems.length ? `<div style="padding:4px 8px; font-size:0.75rem; font-weight:800; border-top:1px solid #cbd5e1; text-align:right;">${legendItems.join(" • ")}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderVisual(visual, printMode = false) {
+      if (!visual) return "";
+      if (visual.type === "clock") {
+        const svg = renderClockSVG({ ...visual, size: printMode ? 114 : (visual.size || 166) }, printMode);
+        return `<div class="clock-card">${svg}${visual.caption ? `<div>${visual.caption}</div>` : ""}</div>`;
+      }
+      if (visual.type === "dual_clock") {
+        const sz = printMode ? 102 : 134;
+        return `
+          <div class="dual-clock-row">
+            <div class="clock-card">${renderClockSVG({ ...visual.left, size: sz }, printMode)}${visual.leftLabel ? `<div>${visual.leftLabel}</div>` : ""}</div>
+            <div class="arrow-badge">${visual.arrowText || "➡️"}</div>
+            <div class="clock-card">${renderClockSVG({ ...visual.right, size: sz }, printMode)}${visual.rightLabel ? `<div>${visual.rightLabel}</div>` : ""}</div>
+          </div>
+        `;
+      }
+      if (visual.type === "schedule") {
+        const head = visual.headers.map(h => `<th>${h}</th>`).join("");
+        const body = visual.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("");
+        return `
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px;">
+            ${visual.title ? `<div style="font-weight:900; font-size:0.95rem;">${visual.title}</div>` : ""}
+            <table class="mini-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
+          </div>
+        `;
+      }
+      if (visual.type === "week_strip") {
+        const cells = visual.items.map((item, idx) => `
+          <div class="week-cell">
+            <div class="week-day">${SHORT_DAYS[idx]}</div>
+            <div class="week-icon">${item.closed ? "🚫" : item.icon}</div>
+            <div class="week-label">${item.closed ? "Closed" : item.label}</div>
+          </div>
+        `).join("");
+        return `
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:6px;">
+            ${visual.title ? `<div style="font-weight:900; font-size:0.94rem;">${visual.title}</div>` : ""}
+            <div class="week-strip">${cells}</div>
+          </div>
+        `;
+      }
+      if (visual.type === "calendar") {
+        return `<div class="cal-wrap">${(visual.calendars || [visual]).map(c => renderSingleCalendar(c)).join("")}</div>`;
+      }
+      if (visual.type === "bill") {
+        return `
+          <div class="bill-slip">
+            <div class="bill-title"><span>${visual.icon || "🧾"} ${visual.title}</span><span>#${visual.ref || "104"}</span></div>
+            <div style="font-size:0.86rem; font-weight:700;">Holder: ${visual.holder}</div>
+            <div style="font-size:0.84rem; color:#475569; font-weight:700;">${visual.note || "Please pay on or before the due date."}</div>
+            <div class="bill-due">Due Date: ${visual.dueDate}</div>
+          </div>
+        `;
+      }
+      if (visual.type === "story_badge") {
+        return `
+          <div style="background:${printMode ? "#ffffff" : "#eff6ff"}; border:2.5px solid #0f172a; border-radius:18px; padding:12px 16px; max-width:340px;">
+            <div style="font-size:2.3rem; line-height:1.2;">${visual.icon || "📘"}</div>
+            <div style="font-weight:900; font-size:0.96rem; margin-top:4px;">${visual.label || ""}</div>
+          </div>
+        `;
+      }
+      return "";
+    }
+
+    function renderOptionContent(opt, printMode = false) {
+      if (typeof opt === "object" && opt !== null && opt.type === "clock") {
+        return renderClockSVG({ ...opt, size: printMode ? 86 : 112 }, printMode);
+      }
+      return `<span>${opt}</span>`;
+    }
+
+    /* ============================================================
+       5. 350-QUESTION VERIFIED BANK ENGINE (EXACTLY 70 PER LEVEL)
+       ============================================================ */
+    function makeTextQ(id, chapter, text, correct, distractors, explanation, visual = null) {
+      const { options, answerIndex } = buildUniqueOptions(correct, distractors);
+      return { id, chapter, text, visual, options, visualOptions: false, answerIndex, explanation };
+    }
+
+    function makeChoiceListQ(id, chapter, text, fixedOptions, correctText, explanation, visual = null) {
+      return { id, chapter, text, visual, options: fixedOptions, visualOptions: false, answerIndex: fixedOptions.indexOf(correctText), explanation };
+    }
+
+    function makeVisualClockQ(id, chapter, text, correctClock, wrongClocks, explanation, visual = null) {
+      const tagged = [{ ...correctClock, _isCorrect: true }, ...wrongClocks.slice(0, 3).map(c => ({ ...c, _isCorrect: false }))];
+      const mixed = shuffle(tagged);
+      return {
+        id, chapter, text, visual,
+        options: mixed.map(({ _isCorrect, ...rest }) => rest),
+        visualOptions: true,
+        answerIndex: mixed.findIndex(c => c._isCorrect),
+        explanation
+      };
+    }
+
+    /* ---------------- LEVEL 1: Ch. 1 Telling Time (70 Qs) ---------------- */
+    function buildLevel1Bank() {
+      const qs = [];
+      let n = 1;
+      const nid = () => `L1-${String(n++).padStart(2, "0")}`;
+
+      // 2 clock face concept questions
+      qs.push(
+        makeTextQ(nid(), "Ch. 1", "Look at the clock face. How many numbers are there on a clock face?", "12 numbers", ["10 numbers", "8 numbers", "6 numbers", "24 numbers"], "A clock face always has 12 numbers, from 1 to 12.", { type: "clock", hour: 3, minute: 0 }),
+        makeTextQ(nid(), "Ch. 1", "Look at this clock face. How many hands are there on the clock face?", "2 hands", ["1 hand", "4 hands", "12 hands", "6 hands"], "This clock face has 2 hands: the shorter hour hand and the longer minute hand.", { type: "clock", hour: 9, minute: 0 })
+      );
+
+      // 12 missing-number clocks (1..12)
+      for (let num = 1; num <= 12; num++) {
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 1",
+            "One number is missing on the clock face. Which number should be in the '?' circle?",
+            String(num),
+            [wrapHour(num - 1), wrapHour(num + 1), wrapHour(num + 2), wrapHour(num - 2)].map(String),
+            `The numbers go around the clock in order from 1 to 12. The missing number is ${num}.`,
+            { type: "clock", hour: wrapHour(num + 3), minute: 0, missingNumbers: [num] }
+          )
+        );
+      }
+
+      // 12 read o'clock times (1..12)
+      for (let h = 1; h <= 12; h++) {
+        const correct = `${h} o'clock`;
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 1",
+            "Look at the clock face. What time does it show?",
+            correct,
+            [`${wrapHour(h + 1)} o'clock`, `${wrapHour(h - 1)} o'clock`, `half past ${h}`, `${wrapHour(h + 6)} o'clock`],
+            `The hour hand points to ${h} and the minute hand points to 12, so it is ${correct}.`,
+            { type: "clock", hour: h, minute: 0 }
+          )
+        );
+      }
+
+      // 12 read half-past times (1..12)
+      for (let h = 1; h <= 12; h++) {
+        const nextH = wrapHour(h + 1);
+        const correct = `half past ${h}`;
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 1",
+            "Look at the clock face. What time does it show?",
+            correct,
+            [`half past ${nextH}`, `half past ${wrapHour(h - 1)}`, `${h} o'clock`, `${nextH} o'clock`],
+            `The hour hand is halfway between ${h} and ${nextH}, and the minute hand points to 6, so it is ${correct}.`,
+            { type: "clock", hour: h, minute: 30 }
+          )
+        );
+      }
+
+      // 12 hand-position word reasoning (6 o'clock + 6 half-past)
+      [2, 4, 5, 7, 10, 11].forEach(h => {
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 1",
+            `The hour hand points to ${h}, and the minute hand points to 12. What is the time?`,
+            `${h} o'clock`,
+            [`half past ${h}`, `${wrapHour(h + 1)} o'clock`, `12 o'clock`, `${wrapHour(h - 1)} o'clock`],
+            `When the minute hand points to 12 and the hour hand points to ${h}, the time is ${h} o'clock.`,
+            { type: "story_badge", icon: "🕒", label: "Listen to the clock hands!" }
+          )
+        );
+      });
+
+      [1, 3, 6, 8, 9, 12].forEach(h => {
+        const nextH = wrapHour(h + 1);
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 1",
+            `The hour hand points halfway between ${h} and ${nextH}, and the minute hand points to 6. What is the time?`,
+            `half past ${h}`,
+            [`half past ${nextH}`, `${h} o'clock`, `half past ${wrapHour(h - 1)}`, `${nextH} o'clock`],
+            `Halfway between ${h} and ${nextH} with the minute hand at 6 means half past ${h}.`,
+            { type: "story_badge", icon: "🕧", label: "Check both hands carefully!" }
+          )
+        );
+      });
+
+      // 12 visual 4-clock choices (6 o'clock + 6 half-past)
+      [1, 3, 6, 8, 9, 12].forEach(h => {
+        qs.push(
+          makeVisualClockQ(
+            nid(), "Ch. 1",
+            `Which clock face below shows ${h} o'clock?`,
+            { type: "clock", hour: h, minute: 0 },
+            [
+              { type: "clock", hour: h, minute: 30 },
+              { type: "clock", hour: wrapHour(h + 1), minute: 0 },
+              { type: "clock", hour: wrapHour(h + 3), minute: 0 }
+            ],
+            `For ${h} o'clock, the shorter hour hand points to ${h} and the longer minute hand points to 12.`
+          )
+        );
+      });
+
+      [2, 4, 5, 7, 10, 12].forEach(h => {
+        const nextH = wrapHour(h + 1);
+        qs.push(
+          makeVisualClockQ(
+            nid(), "Ch. 1",
+            `Which clock face below shows half past ${h}?`,
+            { type: "clock", hour: h, minute: 30 },
+            [
+              { type: "clock", hour: h, minute: 0 },
+              { type: "clock", hour: nextH, minute: 30 },
+              { type: "clock", hour: h, minute: 30, trickMode: "wrong_half_hour" }
+            ],
+            `For half past ${h}, the minute hand points to 6 and the hour hand is halfway between ${h} and ${nextH}.`
+          )
+        );
+      });
+
+      // 8 spot-the-correctly-drawn clock vs trick clocks
+      [
+        { h: 2, m: 30 }, { h: 4, m: 0 }, { h: 5, m: 30 }, { h: 7, m: 0 },
+        { h: 8, m: 30 }, { h: 9, m: 30 }, { h: 10, m: 0 }, { h: 11, m: 30 }
+      ].forEach(item => {
+        const timeStr = formatClockTime(item.h, item.m === 30);
+        qs.push(
+          makeVisualClockQ(
+            nid(), "Ch. 1",
+            "Which clock face below shows the time correctly?",
+            { type: "clock", hour: item.h, minute: item.m, trickMode: "normal" },
+            [
+              { type: "clock", hour: wrapHour(item.h + 1), minute: 30, trickMode: "wrong_half_hour" },
+              { type: "clock", hour: wrapHour(item.h + 3), minute: 0, trickMode: "wrong_oclock_half" },
+              { type: "clock", hour: wrapHour(item.h + 5), minute: 30, trickMode: "wrong_half_after" }
+            ],
+            `Only the correct clock has both hands in the right place (${timeStr}). Remember: at half past, the hour hand is halfway between two numbers; at o'clock, it points straight at a number.`
+          )
+        );
+      });
+
+      return qs;
+    }
+
+    /* ---------------- LEVEL 2: Ch. 2 Hour & Time Intervals (70 Qs) ---------------- */
+    function buildLevel2Bank() {
+      const qs = [];
+      let n = 1;
+      const nid = () => `L2-${String(n++).padStart(2, "0")}`;
+
+      // 12 shorter/longer than 1 hour
+      const durationLife = [
+        { act: "A ride on the MTR from one station to the next station", ans: "Shorter than 1 hour", icon: "🚇", why: "Going one MTR stop takes only about 2–3 minutes, which is shorter than 1 hour." },
+        { act: "Brushing your teeth in the morning", ans: "Shorter than 1 hour", icon: "🪥", why: "Brushing teeth takes only a few minutes, much shorter than 1 hour." },
+        { act: "Eating a bowl of noodles for lunch", ans: "Shorter than 1 hour", icon: "🍜", why: "Eating a bowl of noodles usually takes about 15–20 minutes, shorter than 1 hour." },
+        { act: "Walking from the school gate to your classroom", ans: "Shorter than 1 hour", icon: "🏫", why: "Walking to your classroom takes only a few minutes, shorter than 1 hour." },
+        { act: "Singing 'Happy Birthday' once", ans: "Shorter than 1 hour", icon: "🎂", why: "Singing 'Happy Birthday' takes less than 1 minute, shorter than 1 hour." },
+        { act: "Putting on your school shoes", ans: "Shorter than 1 hour", icon: "👟", why: "Putting on shoes takes only a minute, shorter than 1 hour." },
+        { act: "Sleeping at night", ans: "Longer than 1 hour", icon: "🛏️", why: "Children sleep about 9–10 hours at night, which is longer than 1 hour." },
+        { act: "A full school day from morning to afternoon", ans: "Longer than 1 hour", icon: "🎒", why: "A school day lasts about 6–7 hours, which is longer than 1 hour." },
+        { act: "Watching a full cartoon movie at the cinema", ans: "Longer than 1 hour", icon: "🎬", why: "A cinema movie usually lasts about 1.5 to 2 hours, longer than 1 hour." },
+        { act: "A family trip to a theme park", ans: "Longer than 1 hour", icon: "🎡", why: "Visiting a theme park takes several hours, longer than 1 hour." },
+        { act: "Flying on an aeroplane from Hong Kong to Japan", ans: "Longer than 1 hour", icon: "✈️", why: "Flying to Japan takes about 4 hours, which is longer than 1 hour." },
+        { act: "A half-day hiking picnic in the country park", ans: "Longer than 1 hour", icon: "⛰️", why: "A half-day picnic takes several hours, longer than 1 hour." }
+      ];
+      durationLife.forEach(item => {
+        qs.push(makeChoiceListQ(nid(), "Ch. 2", `${item.act} takes ___ .`, ["Shorter than 1 hour", "Longer than 1 hour"], item.ans, item.why, { type: "story_badge", icon: item.icon, label: "Compare with 1 hour" }));
+      });
+
+      // 7 comparing kids' time spent
+      const cmpCases = [
+        { a: "Paul", ha: 2, b: "Amy", hb: 1, act: "watching TV" },
+        { a: "Leo", ha: 1, b: "Mia", hb: 3, act: "reading storybooks" },
+        { a: "Ben", ha: 4, b: "Eva", hb: 2, act: "playing Lego" },
+        { a: "Chloe", ha: 2, b: "Sam", hb: 5, act: "practising piano" },
+        { a: "Noah", ha: 3, b: "Lily", hb: 1, act: "cycling in the park" },
+        { a: "Zoe", ha: 2, b: "Max", hb: 4, act: "painting pictures" },
+        { a: "Ken", ha: 3, b: "Joy", hb: 3, act: "doing homework" }
+      ];
+      cmpCases.forEach(c => {
+        const correct = c.ha > c.hb ? "more time" : c.ha < c.hb ? "less time" : "the same time";
+        qs.push(makeChoiceListQ(nid(), "Ch. 2", `${c.a} spends ${formatHours(c.ha)} ${c.act}. ${c.b} spends ${formatHours(c.hb)} ${c.act}. ${c.a} spends ___ ${c.act} than ${c.b}.`, ["more time", "less time", "the same time"], correct, `${c.a} spends ${formatHours(c.ha)} and ${c.b} spends ${formatHours(c.hb)}, so ${c.a} spends ${correct}.`, { type: "story_badge", icon: "⚖️", label: `${c.a}: ${formatHours(c.ha)} | ${c.b}: ${formatHours(c.hb)}` }));
+      });
+
+      // 7 logical duration deduction
+      const dedCases = [
+        { a: "Mimi", ha: 2, b: "John", dir: "more", ans: 3, opts: [1, 2, 3], act: "swimming" },
+        { a: "Tom", ha: 3, b: "Ada", dir: "less", ans: 2, opts: [2, 3, 4], act: "drawing" },
+        { a: "Ray", ha: 4, b: "May", dir: "more", ans: 5, opts: [2, 4, 5], act: "hiking" },
+        { a: "Ella", ha: 2, b: "Dan", dir: "less", ans: 1, opts: [1, 2, 3], act: "baking" },
+        { a: "Owen", ha: 5, b: "Ivy", dir: "more", ans: 6, opts: [3, 5, 6], act: "camping" },
+        { a: "Tina", ha: 4, b: "Jay", dir: "less", ans: 3, opts: [3, 4, 5], act: "skating" },
+        { a: "Ryan", ha: 3, b: "Nora", dir: "more", ans: 4, opts: [2, 3, 4], act: "reading" }
+      ];
+      dedCases.forEach(d => {
+        const fixedOpts = d.opts.map(v => formatHours(v));
+        const ansStr = formatHours(d.ans);
+        qs.push(makeChoiceListQ(nid(), "Ch. 2", `${d.a} spends ${formatHours(d.ha)} ${d.act}. ${d.b} spends ${d.dir} time ${d.act} than ${d.a}. ${d.b} may spend ___ ${d.act}.`, fixedOpts, ansStr, `Since ${d.b} spends ${d.dir} time than ${formatHours(d.ha)}, only ${ansStr} is possible among the choices.`, { type: "story_badge", icon: "🤔", label: `Compare with ${formatHours(d.ha)}` }));
+      });
+
+      // 16 dual-clock end times (crossing 12 o'clock)
+      const endCases = [
+        { name: "The Magic Show", startH: 12, half: false, dur: 1 },
+        { name: "The Puppet Show", startH: 10, half: false, dur: 2 },
+        { name: "The Football Match", startH: 11, half: false, dur: 3 },
+        { name: "The Art Lesson", startH: 9, half: false, dur: 2 },
+        { name: "The Music Concert", startH: 2, half: false, dur: 3 },
+        { name: "The Dance Class", startH: 4, half: false, dur: 2 },
+        { name: "The Zoo Tour", startH: 10, half: false, dur: 4 },
+        { name: "The Coding Club", startH: 11, half: false, dur: 2 },
+        { name: "Cindy's Space Museum visit", startH: 9, half: true, dur: 3 },
+        { name: "The Science Workshop", startH: 10, half: true, dur: 2 },
+        { name: "The Swimming Lesson", startH: 11, half: true, dur: 2 },
+        { name: "The Baking Class", startH: 1, half: true, dur: 3 },
+        { name: "The Lego Party", startH: 3, half: true, dur: 2 },
+        { name: "The Story Time", startH: 12, half: true, dur: 1 },
+        { name: "The Bike Ride", startH: 8, half: true, dur: 4 },
+        { name: "The Circus Show", startH: 10, half: true, dur: 3 }
+      ];
+      endCases.forEach(ec => {
+        const endH = wrapHour(ec.startH + ec.dur);
+        const startStr = formatClockTime(ec.startH, ec.half);
+        const endStr = formatClockTime(endH, ec.half);
+        const durStr = formatHours(ec.dur);
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 2",
+            `${ec.name} starts at ${startStr} and ends after ${durStr}. What time does it end?`,
+            endStr,
+            [formatClockTime(wrapHour(endH + 1), ec.half), formatClockTime(wrapHour(endH - 1), ec.half), formatClockTime(endH, !ec.half)],
+            `Count forward ${durStr} from ${startStr}: it ends at ${endStr}.`,
+            {
+              type: "dual_clock",
+              left: { hour: ec.startH, minute: ec.half ? 30 : 0 },
+              right: { hour: endH, minute: ec.half ? 30 : 0, mysteryClock: true },
+              leftLabel: "Start",
+              rightLabel: "End (?)",
+              arrowText: `After ${durStr} ➡️`
+            }
+          )
+        );
+      });
+
+      // 16 dual-clock elapsed hours
+      const elapsedCases = [
+        { title: "Eco Handmade Workshop", s: 9, half: false, dur: 2 },
+        { title: "Blood Pressure Test", s: 10, half: true, dur: 4 },
+        { title: "Paper Craft Class", s: 11, half: false, dur: 3 },
+        { title: "Reading Fair", s: 1, half: false, dur: 4 },
+        { title: "School Picnic", s: 9, half: false, dur: 5 },
+        { title: "Chess Contest", s: 2, half: false, dur: 2 },
+        { title: "Singing Rehearsal", s: 12, half: false, dur: 3 },
+        { title: "Drama Practice", s: 8, half: false, dur: 4 },
+        { title: "Garden Planting", s: 8, half: true, dur: 2 },
+        { title: "Aquarium Visit", s: 9, half: true, dur: 4 },
+        { title: "Robot Workshop", s: 11, half: true, dur: 3 },
+        { title: "Music Festival", s: 1, half: true, dur: 3 },
+        { title: "Balloon Show", s: 12, half: true, dur: 2 },
+        { title: "Clay Modelling", s: 2, half: true, dur: 4 },
+        { title: "Book Swap", s: 10, half: true, dur: 3 },
+        { title: "Sports Fun Day", s: 8, half: true, dur: 5 }
+      ];
+      elapsedCases.forEach(el => {
+        const endH = wrapHour(el.s + el.dur);
+        const ansStr = formatHours(el.dur);
+        const distractors = [el.dur - 1, el.dur + 1, el.dur + 2, el.dur - 2].filter(v => v >= 1 && v <= 9 && v !== el.dur).map(formatHours);
+        qs.push(
+          makeTextQ(
+            nid(), "Ch. 2",
+            `Look at the start and end clocks for the ${el.title}. How many hours does it last?`,
+            ansStr,
+            distractors,
+            `From ${formatClockTime(el.s, el.half)} to ${formatClockTime(endH, el.half)}, ${ansStr} have passed.`,
+            {
+              type: "dual_clock",
+              left: { hour: el.s, minute: el.half ? 30 : 0 },
+              right: { hour: endH, minute: el.half ? 30 : 0 },
+              leftLabel: "Start",
+              rightLabel: "End",
+              arrowText: "? hours ➡️"
+            }
+          )
+        );
+      });
+
+      // 12 multi-row schedule table questions (6 tables x 2 Qs)
+      const schedules = [
+        {
+          title: "Recycling Activity Schedule", headers: ["Recycling Item", "Period"],
+          rows: [["Paper", "Half past 9 to half past 11"], ["Plastic", "Half past 11 to half past 1"], ["Can", "Half past 1 to half past 2"]],
+          q1: { text: "How many hours does the whole Recycling Activity last?", ans: 5, why: "From half past 9 to half past 2 is 2 + 2 + 1 = 5 hours." },
+          q2: { text: "How long is the Plastic recycling period?", ans: 2, why: "From half past 11 to half past 1 is 2 hours." }
+        },
+        {
+          title: "School Sports Day", headers: ["Event", "Period"],
+          rows: [["Running", "9 o'clock to 10 o'clock"], ["Jumping", "10 o'clock to 12 o'clock"], ["Relay", "12 o'clock to 1 o'clock"]],
+          q1: { text: "How many hours does the whole School Sports Day last?", ans: 4, why: "From 9 o'clock to 1 o'clock is 1 + 2 + 1 = 4 hours." },
+          q2: { text: "How long does the Jumping event last?", ans: 2, why: "From 10 o'clock to 12 o'clock is 2 hours." }
+        },
+        {
+          title: "Saturday Art Camp", headers: ["Activity", "Period"],
+          rows: [["Drawing", "Half past 8 to half past 10"], ["Clay Fun", "Half past 10 to half past 11"], ["Painting", "Half past 11 to half past 2"]],
+          q1: { text: "How many hours does the whole Saturday Art Camp last?", ans: 6, why: "From half past 8 to half past 2 is 2 + 1 + 3 = 6 hours." },
+          q2: { text: "How long is the Painting session?", ans: 3, why: "From half past 11 to half past 2 is 3 hours." }
+        },
+        {
+          title: "Library Reading Day", headers: ["Session", "Period"],
+          rows: [["Story Time", "10 o'clock to 11 o'clock"], ["Book Quiz", "11 o'clock to 1 o'clock"], ["Craft Corner", "1 o'clock to 3 o'clock"]],
+          q1: { text: "How many hours does Library Reading Day last in total?", ans: 5, why: "From 10 o'clock to 3 o'clock is 1 + 2 + 2 = 5 hours." },
+          q2: { text: "How long does the Craft Corner last?", ans: 2, why: "From 1 o'clock to 3 o'clock is 2 hours." }
+        },
+        {
+          title: "Music Park Timetable", headers: ["Show", "Period"],
+          rows: [["Piano", "1 o'clock to 2 o'clock"], ["Violin", "2 o'clock to 4 o'clock"], ["Choir", "4 o'clock to 5 o'clock"]],
+          q1: { text: "How many hours do all the shows in the Music Park last?", ans: 4, why: "From 1 o'clock to 5 o'clock is 1 + 2 + 1 = 4 hours." },
+          q2: { text: "How long is the Violin show?", ans: 2, why: "From 2 o'clock to 4 o'clock is 2 hours." }
+        },
+        {
+          title: "Science Museum Tour", headers: ["Zone", "Period"],
+          rows: [["Space", "Half past 10 to half past 11"], ["Robots", "Half past 11 to half past 1"], ["Dinosaurs", "Half past 1 to half past 4"]],
+          q1: { text: "How many hours does the whole Science Museum Tour last?", ans: 6, why: "From half past 10 to half past 4 is 1 + 2 + 3 = 6 hours." },
+          q2: { text: "How long is the Dinosaurs zone tour?", ans: 3, why: "From half past 1 to half past 4 is 3 hours." }
+        }
+      ];
+      schedules.forEach(sc => {
+        [sc.q1, sc.q2].forEach(q => {
+          const dPool = [q.ans - 1, q.ans + 1, q.ans + 2, q.ans - 2, q.ans + 3].filter(v => v >= 1 && v !== q.ans).map(formatHours);
+          qs.push(makeTextQ(nid(), "Ch. 2", q.text, formatHours(q.ans), dPool, q.why, { type: "schedule", title: sc.title, headers: sc.headers, rows: sc.rows }));
+        });
+      });
+
+      return qs;
+    }
+
+    /* ---------------- LEVEL 3: Ch. 3 Week (70 Qs) ---------------- */
+    function buildLevel3Bank() {
+      const qs = [];
+      let n = 1;
+      const nid = () => `L3-${String(n++).padStart(2, "0")}`;
+
+      // 12 week basics & ordering
+      const weekBasics = [
+        { t: "How many days are there in 1 week?", a: "7 days", d: ["5 days", "6 days", "12 days"], w: "There are 7 days in a week: Sunday to Saturday." },
+        { t: "Which is the first day of a week on our calendar?", a: "Sunday", d: ["Monday", "Friday", "Saturday"], w: "On a standard school calendar, Sunday is the first day of the week." },
+        { t: "Which day comes right after Wednesday?", a: "Thursday", d: ["Tuesday", "Friday", "Monday"], w: "Thursday comes right after Wednesday." },
+        { t: "Which day comes right before Sunday?", a: "Saturday", d: ["Monday", "Friday", "Thursday"], w: "Saturday is the day right before Sunday." },
+        { t: "Which day comes right after Saturday?", a: "Sunday", d: ["Friday", "Monday", "Tuesday"], w: "After Saturday, a new week starts with Sunday." },
+        { t: "Which day comes right before Tuesday?", a: "Monday", d: ["Sunday", "Wednesday", "Thursday"], w: "Monday comes right before Tuesday." },
+        { t: "Which day is between Tuesday and Thursday?", a: "Wednesday", d: ["Monday", "Friday", "Sunday"], w: "Tuesday, Wednesday, Thursday — Wednesday is in the middle." },
+        { t: "Which day is between Friday and Sunday?", a: "Saturday", d: ["Thursday", "Monday", "Wednesday"], w: "Friday, Saturday, Sunday — Saturday is in the middle." },
+        { t: "How many days are there in 2 weeks?", a: "14 days", d: ["7 days", "10 days", "12 days"], w: "1 week has 7 days, so 2 weeks have 7 + 7 = 14 days." },
+        { t: "Which day is 2 days after Monday?", a: "Wednesday", d: ["Tuesday", "Thursday", "Friday"], w: "Monday → Tuesday (1 day) → Wednesday (2 days)." },
+        { t: "Which day is 2 days before Friday?", a: "Wednesday", d: ["Thursday", "Tuesday", "Saturday"], w: "Friday → Thursday (1 day before) → Wednesday (2 days before)." },
+        { t: "School runs from Monday to Friday. How many school days are in one week?", a: "5 days", d: ["4 days", "6 days", "7 days"], w: "Monday, Tuesday, Wednesday, Thursday, and Friday make 5 school days." }
+      ];
+      weekBasics.forEach(wb => qs.push(makeTextQ(nid(), "Ch. 3", wb.t, wb.a, wb.d, wb.w, { type: "story_badge", icon: "📅", label: "Days of the Week" })));
+
+      // 20 yesterday/today/tomorrow puzzles
+      DAYS.forEach((day, idx) => {
+        const tom = DAYS[(idx + 1) % 7];
+        qs.push(makeTextQ(nid(), "Ch. 3", `Today is ${day}. Tomorrow is ___.`, tom, [DAYS[(idx + 6) % 7], DAYS[(idx + 2) % 7], day], `The day after ${day} is ${tom}.`));
+      });
+      DAYS.forEach((day, idx) => {
+        const yes = DAYS[(idx + 6) % 7];
+        qs.push(makeTextQ(nid(), "Ch. 3", `If today is ${day}, then yesterday was ___.`, yes, [DAYS[(idx + 1) % 7], DAYS[(idx + 5) % 7], day], `The day before ${day} was ${yes}.`));
+      });
+      [5, 0, 2].forEach(yIdx => {
+        const yDay = DAYS[yIdx], today = DAYS[(yIdx + 1) % 7], tom = DAYS[(yIdx + 2) % 7];
+        qs.push(makeTextQ(nid(), "Ch. 3", `If yesterday was ${yDay}, then tomorrow will be ___.`, tom, [today, yDay, DAYS[(yIdx + 3) % 7]], `Yesterday was ${yDay}, so today is ${today}, and tomorrow will be ${tom}.`));
+      });
+      [1, 4, 6].forEach(tIdx => {
+        const tomDay = DAYS[tIdx], today = DAYS[(tIdx + 6) % 7], yes = DAYS[(tIdx + 5) % 7];
+        qs.push(makeTextQ(nid(), "Ch. 3", `If tomorrow will be ${tomDay}, then yesterday was ___.`, yes, [today, tomDay, DAYS[(tIdx + 4) % 7]], `Tomorrow is ${tomDay}, so today is ${today}, and yesterday was ${yes}.`));
+      });
+
+      // 19 shop/giveaway strip chart questions (4 distinct charts)
+      const giveawayCharts = [
+        {
+          title: "Department Store Key Ring Giveaway", closedIdx: 5,
+          items: [{ icon: "🍎", label: "Apple" }, { icon: "🍊", label: "Orange" }, { icon: "🍓", label: "Strawberry" }, { icon: "🍇", label: "Grapes" }, { icon: "🍐", label: "Pear" }, { closed: true, label: "No gift" }, { icon: "🍍", label: "Pineapple" }],
+          qList: [{ type: "itemOnDay", day: 2, who: "Sally" }, { type: "dayOfItem", day: 4 }, { type: "pairDays", d1: 6, d2: 0, who: "Mary" }, { type: "closedDay", reason: "a power failure" }, { type: "dayOfItem", day: 3 }]
+        },
+        {
+          title: "Sunny Bakery Free Treat Week", closedIdx: 1,
+          items: [{ icon: "🍩", label: "Donut" }, { closed: true, label: "Closed" }, { icon: "🧁", label: "Cupcake" }, { icon: "🍪", label: "Cookie" }, { icon: "🥐", label: "Croissant" }, { icon: "🍰", label: "Cake" }, { icon: "🥨", label: "Pretzel" }],
+          qList: [{ type: "itemOnDay", day: 4, who: "Ben" }, { type: "dayOfItem", day: 5 }, { type: "pairDays", d1: 2, d2: 3, who: "Eva" }, { type: "closedDay", reason: "cleaning day" }, { type: "itemOnDay", day: 6, who: "Leo" }]
+        },
+        {
+          title: "Star Stationery Sticker Week", closedIdx: 3,
+          items: [{ icon: "⭐", label: "Star" }, { icon: "🌈", label: "Rainbow" }, { icon: "🚀", label: "Rocket" }, { closed: true, label: "No gift" }, { icon: "🦋", label: "Butterfly" }, { icon: "🌸", label: "Flower" }, { icon: "🎈", label: "Balloon" }],
+          qList: [{ type: "itemOnDay", day: 1, who: "Mia" }, { type: "dayOfItem", day: 4 }, { type: "pairDays", d1: 0, d2: 5, who: "Sam" }, { type: "closedDay", reason: "a typhoon" }, { type: "dayOfItem", day: 2 }]
+        },
+        {
+          title: "Toy Shop Animal Badge Week", closedIdx: 4,
+          items: [{ icon: "🐶", label: "Puppy" }, { icon: "🐱", label: "Kitten" }, { icon: "🐰", label: "Bunny" }, { icon: "🐻", label: "Bear" }, { closed: true, label: "Closed" }, { icon: "🦊", label: "Fox" }, { icon: "🐼", label: "Panda" }],
+          qList: [{ type: "itemOnDay", day: 6, who: "Chloe" }, { type: "dayOfItem", day: 2 }, { type: "closedDay", reason: "a holiday" }, { type: "itemOnDay", day: 5, who: "Noah" }]
+        }
+      ];
+
+      giveawayCharts.forEach(chart => {
+        const visual = { type: "week_strip", title: chart.title, items: chart.items };
+        const validItems = chart.items.filter(i => !i.closed);
+
+        chart.qList.forEach(spec => {
+          if (spec.type === "itemOnDay") {
+            const target = chart.items[spec.day];
+            const ans = `${target.icon} ${target.label}`;
+            const dPool = validItems.filter(i => i.label !== target.label).map(i => `${i.icon} ${i.label}`);
+            qs.push(makeTextQ(nid(), "Ch. 3", `${spec.who} visited the shop on ${DAYS[spec.day]}. Which gift did ${spec.who} get?`, ans, dPool, `Look under ${SHORT_DAYS[spec.day]}: the gift on ${DAYS[spec.day]} is ${ans}.`, visual));
+          } else if (spec.type === "dayOfItem") {
+            const target = chart.items[spec.day];
+            const ans = DAYS[spec.day];
+            qs.push(makeTextQ(nid(), "Ch. 3", `On which day did the shop give out the ${target.icon} ${target.label}?`, ans, DAYS.filter(d => d !== ans), `Find ${target.icon} ${target.label} on the chart — it is on ${ans}.`, visual));
+          } else if (spec.type === "closedDay") {
+            const ans = DAYS[chart.closedIdx];
+            qs.push(makeTextQ(nid(), "Ch. 3", `The shop did not give out gifts on one day due to ${spec.reason}. Which day was it?`, ans, DAYS.filter(d => d !== ans), `The 🚫 symbol is on ${ans}, so no gifts were given on ${ans}.`, visual));
+          } else if (spec.type === "pairDays") {
+            const i1 = chart.items[spec.d1], i2 = chart.items[spec.d2];
+            const ans = `${DAYS[spec.d1]} and ${DAYS[spec.d2]}`;
+            const candidatePairs = [
+              [(spec.d1 + 2) % 7, spec.d2],
+              [spec.d1, (spec.d2 + 2) % 7],
+              [(spec.d1 + 1) % 7, (spec.d2 + 1) % 7],
+              [(spec.d1 + 3) % 7, (spec.d2 + 2) % 7],
+              [(spec.d1 + 4) % 7, (spec.d2 + 1) % 7]
+            ]
+              .filter(([a, b]) => a !== b && !((a === spec.d1 && b === spec.d2) || (a === spec.d2 && b === spec.d1)))
+              .map(([a, b]) => `${DAYS[a]} and ${DAYS[b]}`);
+            qs.push(makeTextQ(nid(), "Ch. 3", `${spec.who} got a ${i1.icon} ${i1.label} and a ${i2.icon} ${i2.label}. Which two days did ${spec.who} visit?`, ans, candidatePairs, `${i1.icon} ${i1.label} is on ${DAYS[spec.d1]} and ${i2.icon} ${i2.label} is on ${DAYS[spec.d2]}.`, visual));
+          }
+        });
+      });
+
+      // 19 show/club strip chart questions (4 distinct charts)
+      const showSchedules = [
+        {
+          title: "Theme Park Weekly Shows",
+          items: [{ icon: "🎤", label: "Singer" }, { icon: "🎩", label: "Magician" }, { icon: "🤠", label: "Cowboy" }, { icon: "🤡", label: "Clown" }, { icon: "🤡", label: "Clown" }, { icon: "🎤", label: "Singer" }, { icon: "🎩", label: "Magician" }],
+          qs: [
+            { t: "Who performs on Sunday?", a: "🎤 Singer", d: ["🎩 Magician", "🤠 Cowboy", "🤡 Clown"], w: "Under Sun, the performer is the 🎤 Singer." },
+            { t: "On which day does the 🤠 Cowboy perform?", a: "Tuesday", d: ["Monday", "Wednesday", "Friday"], w: "The 🤠 Cowboy appears only under Tue (Tuesday)." },
+            { t: "How many days does the 🎩 Magician perform every week?", a: "2 days", d: ["1 day", "3 days", "4 days"], w: "The 🎩 Magician performs on Monday and Saturday — 2 days." },
+            { t: "Who performs for 2 consecutive days?", a: "🤡 Clown", d: ["🎤 Singer", "🎩 Magician", "🤠 Cowboy"], w: "The 🤡 Clown performs on Wednesday and Thursday, which are 2 days in a row." },
+            { t: "If the 🎩 Magician performed yesterday and the 🤡 Clown will perform tomorrow, what day is today?", a: "Tuesday", d: ["Monday", "Wednesday", "Friday"], w: "Magician is on Monday, Clown is on Wednesday, so today is Tuesday!" }
+          ]
+        },
+        {
+          title: "Ocean Zoo Weekly Shows",
+          items: [{ icon: "🐬", label: "Dolphin" }, { icon: "🐼", label: "Panda" }, { icon: "🐼", label: "Panda" }, { icon: "🦭", label: "Seal" }, { icon: "🦜", label: "Parrot" }, { icon: "🐬", label: "Dolphin" }, { icon: "🦭", label: "Seal" }],
+          qs: [
+            { t: "Which animal performs on Thursday?", a: "🦜 Parrot", d: ["🐬 Dolphin", "🐼 Panda", "🦭 Seal"], w: "Under Thu, the performer is the 🦜 Parrot." },
+            { t: "On which day does the 🦜 Parrot perform?", a: "Thursday", d: ["Wednesday", "Friday", "Monday"], w: "The 🦜 Parrot performs only on Thursday." },
+            { t: "How many days does the 🐬 Dolphin perform every week?", a: "2 days", d: ["1 day", "3 days", "4 days"], w: "The 🐬 Dolphin performs on Sunday and Friday — 2 days." },
+            { t: "Which animal performs for 2 consecutive days?", a: "🐼 Panda", d: ["🐬 Dolphin", "🦭 Seal", "🦜 Parrot"], w: "The 🐼 Panda performs on Monday and Tuesday (2 days in a row)." },
+            { t: "If the 🐼 Panda performed yesterday and the 🦜 Parrot will perform tomorrow, what day is today?", a: "Wednesday", d: ["Tuesday", "Thursday", "Monday"], w: "Panda is on Tuesday and Parrot is on Thursday, so today is Wednesday!" }
+          ]
+        },
+        {
+          title: "School Activity Club Week",
+          items: [{ icon: "🎨", label: "Art" }, { icon: "🎵", label: "Music" }, { icon: "♟️", label: "Chess" }, { icon: "♟️", label: "Chess" }, { icon: "💃", label: "Dance" }, { icon: "🎨", label: "Art" }, { icon: "🎵", label: "Music" }],
+          qs: [
+            { t: "Which club meets on Friday?", a: "🎨 Art", d: ["🎵 Music", "♟️ Chess", "💃 Dance"], w: "Under Fri, it is the 🎨 Art club." },
+            { t: "On which day does the 💃 Dance club meet?", a: "Thursday", d: ["Tuesday", "Wednesday", "Saturday"], w: "💃 Dance meets on Thursday." },
+            { t: "How many days does the 🎵 Music club meet every week?", a: "2 days", d: ["1 day", "3 days", "5 days"], w: "🎵 Music meets on Monday and Saturday — 2 days." },
+            { t: "Which club meets for 2 consecutive days?", a: "♟️ Chess", d: ["🎨 Art", "🎵 Music", "💃 Dance"], w: "♟️ Chess meets on Tuesday and Wednesday (2 days in a row)." },
+            { t: "If ♟️ Chess met yesterday and 🎨 Art will meet tomorrow, what day is today?", a: "Thursday", d: ["Wednesday", "Friday", "Tuesday"], w: "Chess is on Wednesday and Art is on Friday, so today is Thursday!" }
+          ]
+        },
+        {
+          title: "Sports Park Weekly Classes",
+          items: [{ icon: "🏊", label: "Swim" }, { icon: "🏃", label: "Run" }, { icon: "🏊", label: "Swim" }, { icon: "🤸", label: "Jump" }, { icon: "🏃", label: "Run" }, { icon: "🚴", label: "Cycle" }, { icon: "🚴", label: "Cycle" }],
+          qs: [
+            { t: "Which class is held on Wednesday?", a: "🤸 Jump", d: ["🏊 Swim", "🏃 Run", "🚴 Cycle"], w: "Under Wed, the class is 🤸 Jump." },
+            { t: "How many days is the 🏊 Swim class held each week?", a: "2 days", d: ["1 day", "3 days", "4 days"], w: "🏊 Swim is held on Sunday and Tuesday — 2 days." },
+            { t: "Which class is held for 2 consecutive days?", a: "🚴 Cycle", d: ["🏊 Swim", "🏃 Run", "🤸 Jump"], w: "🚴 Cycle is held on Friday and Saturday (2 days in a row)." },
+            { t: "If 🤸 Jump was yesterday and 🚴 Cycle will be tomorrow, what day is today?", a: "Thursday", d: ["Wednesday", "Friday", "Tuesday"], w: "Jump is on Wednesday and Cycle is on Friday, so today is Thursday!" }
+          ]
+        }
+      ];
+
+      showSchedules.forEach(ss => {
+        const visual = { type: "week_strip", title: ss.title, items: ss.items };
+        ss.qs.forEach(q => qs.push(makeTextQ(nid(), "Ch. 3", q.t, q.a, q.d, q.w, visual)));
+      });
+
+      return qs;
+    }
+
+    /* ---------------- LEVEL 4: Ch. 4 Month (70 Qs) ---------------- */
+    function buildLevel4Bank() {
+      const qs = [];
+      let n = 1;
+      const nid = () => `L4-${String(n++).padStart(2, "0")}`;
+
+      // 18 month order, days per month & HK ordinal special dates
+      const monthFacts = [
+        { t: "How many months are there in 1 year?", a: "12 months", d: ["7 months", "10 months", "24 months"], w: "There are 12 months in a year, from January to December." },
+        { t: "The first day of each year is the ___.", a: "1st of January", d: ["1st of December", "31st of January", "1st of February"], w: "New Year's Day is the 1st of January (remember to write '1st', not 'first')." },
+        { t: "Hong Kong Special Administrative Region Establishment Day is on the ___.", a: "1st of July", d: ["1st of June", "1st of October", "1st of May"], w: "HKSAR Establishment Day is on the 1st of July." },
+        { t: "Labour Day is on the ___.", a: "1st of May", d: ["1st of March", "1st of July", "1st of January"], w: "Labour Day is on the 1st of May." },
+        { t: "Father's Day is on the third ___ of June.", a: "Sunday", d: ["Saturday", "Monday", "Friday"], w: "Father's Day is always on the third Sunday of June." },
+        { t: "Father's Day is on the third Sunday of ___.", a: "June", d: ["May", "July", "April"], w: "Father's Day is in June (Mother's Day is in May)." },
+        { t: "Mother's Day is on the second Sunday of ___.", a: "May", d: ["June", "April", "March"], w: "Mother's Day is on the second Sunday of May." },
+        { t: "National Day is on the ___.", a: "1st of October", d: ["1st of July", "1st of November", "10th of October"], w: "National Day is on the 1st of October." },
+        { t: "Christmas Day is on the ___.", a: "25th of December", d: ["24th of December", "26th of December", "25th of November"], w: "Christmas Day is on the 25th of December." },
+        { t: "Which is the last month of the year?", a: "December", d: ["November", "January", "October"], w: "December is the 12th and last month of the year." },
+        { t: "Which month comes right after April?", a: "May", d: ["March", "June", "July"], w: "April is followed by May." },
+        { t: "Which month comes right before September?", a: "August", d: ["October", "July", "June"], w: "August comes right before September." },
+        { t: "Which month is the 3rd month of the year?", a: "March", d: ["February", "April", "May"], w: "1st January, 2nd February, 3rd March." },
+        { t: "Which month is the 8th month of the year?", a: "August", d: ["July", "September", "October"], w: "August is the 8th month of the year." },
+        { t: "Which month is between October and December?", a: "November", d: ["September", "January", "August"], w: "October, November, December — November is in the middle." },
+        { t: "How many days are there in December?", a: "31 days", d: ["30 days", "28 days", "29 days"], w: "December has 31 days." },
+        { t: "How many days are there in April?", a: "30 days", d: ["31 days", "28 days", "29 days"], w: "April has 30 days." },
+        { t: "Which month has the fewest days?", a: "February", d: ["January", "April", "June"], w: "February has only 28 days (or 29 days in a leap year)." }
+      ];
+      monthFacts.forEach(mf => qs.push(makeTextQ(nid(), "Ch. 4", mf.t, mf.a, mf.d, mf.w, { type: "story_badge", icon: "🗓️", label: "Months & Special Dates" })));
+
+      // 20 single-month JS-Date-verified calendars (5 calendars x 4 Qs)
+      const singleCals = [
+        { year: 2020, m: 11, markDay: 23, markIcon: "🎁", event: "Party", countWd: 2, checkDay: 25, nthWd: 0, nth: 2 },
+        { year: 2026, m: 2,  markDay: 18, markIcon: "🏅", event: "Sports Day", countWd: 0, checkDay: 10, nthWd: 5, nth: 3 },
+        { year: 2026, m: 3,  markDay: 14, markIcon: "🧺", event: "Picnic", countWd: 4, checkDay: 20, nthWd: 6, nth: 2 },
+        { year: 2026, m: 10, markDay: 27, markIcon: "✈️", event: "Trip", countWd: 1, checkDay: 15, nthWd: 3, nth: 4 },
+        { year: 2027, m: 0,  markDay: 16, markIcon: "🎪", event: "Fun Fair", countWd: 5, checkDay: 22, nthWd: 0, nth: 3 }
+      ];
+
+      singleCals.forEach(sc => {
+        const mName = MONTHS[sc.m];
+        const maxDay = daysInMonth(sc.year, sc.m);
+        const visual = { type: "calendar", calendars: [{ year: sc.year, monthIndex: sc.m, marks: { [sc.markDay]: { icon: sc.markIcon, legend: sc.event } } }] };
+
+        const wdCount = countWeekdayInMonth(sc.year, sc.m, sc.countWd);
+        qs.push(makeTextQ(nid(), "Ch. 4", `Look at the calendar. How many ${DAYS[sc.countWd]}s are there in ${mName} ${sc.year}?`, String(wdCount), [String(wdCount - 1), String(wdCount + 1), String(wdCount === 5 ? 3 : 6)], `Count the numbers in the ${SHORT_DAYS[sc.countWd]} column: there are ${wdCount} ${DAYS[sc.countWd]}s.`, visual));
+
+        const wdAns = DAYS[getDayOfWeek(sc.year, sc.m, sc.checkDay)];
+        qs.push(makeTextQ(nid(), "Ch. 4", `In ${sc.year}, the ${ordinal(sc.checkDay)} of ${mName} is a ___.`, wdAns, DAYS.filter(d => d !== wdAns), `Find ${sc.checkDay} on the ${mName} calendar and look up to the column heading: it is ${wdAns}.`, visual));
+
+        const dateAns = `${sc.markDay}-${sc.m + 1}-${sc.year}`;
+        qs.push(makeTextQ(nid(), "Ch. 4", `Look at the ${sc.markIcon} mark. What is the date of the ${sc.event}?`, dateAns, [`${sc.markDay - 1}-${sc.m + 1}-${sc.year}`, `${sc.markDay + 1}-${sc.m + 1}-${sc.year}`, `${sc.m + 1}-${sc.markDay}-${sc.year}`], `The ${sc.markIcon} ${sc.event} is on ${sc.markDay} ${mName} ${sc.year}, written as ${dateAns}.`, visual));
+
+        const nthDate = getNthWeekdayDate(sc.year, sc.m, sc.nthWd, sc.nth);
+        const nthWords = ["", "first", "second", "third", "fourth"];
+        const nthAns = `${ordinal(nthDate)} of ${mName}`;
+        const nthDistractors = [nthDate - 7, nthDate + 7, nthDate + 1, nthDate - 1, nthDate + 2, nthDate - 2]
+          .filter(d => d >= 1 && d <= maxDay && d !== nthDate)
+          .map(d => `${ordinal(d)} of ${mName}`);
+        qs.push(makeTextQ(nid(), "Ch. 4", `What is the date of the ${nthWords[sc.nth]} ${DAYS[sc.nthWd]} of ${mName} ${sc.year}?`, nthAns, nthDistractors, `Go down the ${SHORT_DAYS[sc.nthWd]} column to the ${nthWords[sc.nth]} date: it is the ${nthAns}.`, visual));
+      });
+
+      // 20 side-by-side two-month JS-Date-verified calendars (4 pairs x 5 Qs)
+      const dualCals = [
+        { year: 2020, m1: 6, m2: 7, kid1: "Sue", kid2: "Ann", kid3: "Bob", lastWd: 4, firstWd: 3, lessonWd: 0, bday: 21, nextMonth: "September", nextMIdx: 8 },
+        { year: 2026, m1: 4, m2: 5, kid1: "Mia", kid2: "Leo", kid3: "Ken", lastWd: 5, firstWd: 1, lessonWd: 6, bday: 14, nextMonth: "July", nextMIdx: 6 },
+        { year: 2026, m1: 8, m2: 9, kid1: "Eva", kid2: "Sam", kid3: "Max", lastWd: 2, firstWd: 4, lessonWd: 0, bday: 19, nextMonth: "November", nextMIdx: 10 },
+        { year: 2026, m1: 10, m2: 11, kid1: "Zoe", kid2: "Ben", kid3: "Ray", lastWd: 0, firstWd: 2, lessonWd: 5, bday: 12, nextMonth: "January", nextMIdx: 0, nextYear: 2027 }
+      ];
+
+      dualCals.forEach(dc => {
+        const m1Name = MONTHS[dc.m1], m2Name = MONTHS[dc.m2];
+        const visual = { type: "calendar", calendars: [{ year: dc.year, monthIndex: dc.m1 }, { year: dc.year, monthIndex: dc.m2 }] };
+
+        const lastD = getLastWeekdayDate(dc.year, dc.m1, dc.lastWd);
+        const ans1 = `${ordinal(lastD)} of ${m1Name}`;
+        qs.push(makeTextQ(nid(), "Ch. 4", `${dc.kid1} went on a trip on the last ${DAYS[dc.lastWd]} of ${m1Name}. What was the date?`, ans1, [`${ordinal(lastD - 7)} of ${m1Name}`, `${ordinal(daysInMonth(dc.year, dc.m1))} of ${m1Name}`, `${ordinal(lastD)} of ${m2Name}`, `${ordinal(lastD - 1)} of ${m1Name}`], `Look at the bottom of the ${SHORT_DAYS[dc.lastWd]} column in ${m1Name}: the last ${DAYS[dc.lastWd]} is the ${ans1}.`, visual));
+
+        const firstD = getNthWeekdayDate(dc.year, dc.m2, dc.firstWd, 1);
+        const ans2 = `${firstD}-${dc.m2 + 1}-${dc.year}`;
+        qs.push(makeTextQ(nid(), "Ch. 4", `${dc.kid1} returned home on the first ${DAYS[dc.firstWd]} of ${m2Name}. What was the date?`, ans2, [`${firstD + 7}-${dc.m2 + 1}-${dc.year}`, `${firstD}-${dc.m1 + 1}-${dc.year}`, `1-${dc.m2 + 1}-${dc.year}`, `${firstD + 1}-${dc.m2 + 1}-${dc.year}`, `${firstD + 2}-${dc.m2 + 1}-${dc.year}`], `The first ${DAYS[dc.firstWd]} of ${m2Name} ${dc.year} is ${firstD}, written as ${ans2}.`, visual));
+
+        const lessons = countWeekdayInMonth(dc.year, dc.m2, dc.lessonWd);
+        qs.push(makeTextQ(nid(), "Ch. 4", `${dc.kid2} joined a swimming class in ${m2Name} with a lesson every ${DAYS[dc.lessonWd]}. How many lessons did ${dc.kid2} have altogether?`, `${lessons} lessons`, [`${lessons - 1} lessons`, `${lessons + 1} lessons`, `${lessons === 5 ? 3 : 6} lessons`], `There are ${lessons} ${DAYS[dc.lessonWd]}s in ${m2Name}, so ${dc.kid2} had ${lessons} lessons.`, visual));
+
+        const bWd = DAYS[getDayOfWeek(dc.year, dc.m2, dc.bday)];
+        qs.push(makeTextQ(nid(), "Ch. 4", `${dc.kid3}'s birthday is on the ${ordinal(dc.bday)} of ${m2Name}. Which day of the week is it?`, bWd, DAYS.filter(d => d !== bWd), `Find ${dc.bday} in the ${m2Name} calendar: it falls on a ${bWd}.`, visual));
+
+        const nextYr = dc.nextYear || dc.year;
+        const nextWdIdx = getDayOfWeek(nextYr, dc.nextMIdx, 1);
+        const nextWd = DAYS[nextWdIdx];
+        const m2LastDay = daysInMonth(dc.year, dc.m2);
+        const ans5 = `1st of ${dc.nextMonth} (${nextWd})`;
+        qs.push(makeTextQ(nid(), "Ch. 4", `The holiday ended on the last day of ${m2Name}. The new term started the next day. What date and day of the week was it?`, ans5, [`1st of ${dc.nextMonth} (${DAYS[(nextWdIdx + 1) % 7]})`, `1st of ${dc.nextMonth} (${DAYS[(nextWdIdx + 6) % 7]})`, `${ordinal(m2LastDay)} of ${m2Name} (${nextWd})`], `The day after the last day of ${m2Name} is the 1st of ${dc.nextMonth}, which is a ${nextWd}.`, visual));
+      });
+
+      // 12 bill/pass due-date cards
+      const bills = [
+        { title: "Electricity Bill", icon: "⚡", holder: "Mr Chan", d: 30, m: 4, y: 2020, ask: "full" },
+        { title: "Water Bill", icon: "💧", holder: "Mrs Lee", d: 15, m: 6, y: 2026, ask: "month" },
+        { title: "Library Book Slip", icon: "📚", holder: "Chloe Lam", d: 3, m: 11, y: 2026, ask: "day" },
+        { title: "Gas Bill", icon: "🔥", holder: "Mr Wong", d: 21, m: 8, y: 2025, ask: "full" },
+        { title: "School Bus Pass", icon: "🚌", holder: "Leo Ho", d: 1, m: 9, y: 2026, ask: "day" },
+        { title: "Swimming Pass", icon: "🏊", holder: "Amy Ng", d: 22, m: 7, y: 2026, ask: "month" },
+        { title: "Piano Fee Slip", icon: "🎹", holder: "Ben Ma", d: 2, m: 3, y: 2026, ask: "full" },
+        { title: "Milk Order Form", icon: "🥛", holder: "Mia Lau", d: 18, m: 5, y: 2026, ask: "year" },
+        { title: "Lunch Box Slip", icon: "🍱", holder: "Sam Tse", d: 28, m: 2, y: 2026, ask: "month" },
+        { title: "Art Club Fee", icon: "🎨", holder: "Eva Cheung", d: 12, m: 10, y: 2026, ask: "full" },
+        { title: "Museum Pass", icon: "🦕", holder: "Noah Yip", d: 23, m: 12, y: 2026, ask: "day" },
+        { title: "Book Club Bill", icon: "📖", holder: "Lily Kwok", d: 19, m: 1, y: 2027, ask: "year" }
+      ];
+
+      bills.forEach((b, idx) => {
+        const dueStr = `${b.d}-${b.m}-${b.y}`;
+        const mName = MONTHS[b.m - 1];
+        const visual = { type: "bill", icon: b.icon, title: b.title, ref: String(201 + idx), holder: b.holder, dueDate: dueStr };
+        if (b.ask === "full") {
+          const ans = `${ordinal(b.d)} of ${mName}, ${b.y}`;
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the ${b.title}. ${b.holder} must pay on or before which date?`, ans, [`${ordinal(b.d)} of ${MONTHS[b.m % 12]}, ${b.y}`, `${ordinal(b.d)} of ${MONTHS[(b.m + 10) % 12]}, ${b.y}`, `${ordinal(b.m)} of ${mName}, ${b.y}`], `In ${dueStr}, ${b.d} is the day (${ordinal(b.d)}), ${b.m} is the month (${mName}), and ${b.y} is the year.`, visual));
+        } else if (b.ask === "month") {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the due date on the ${b.title}. Which month is it due?`, mName, [MONTHS[b.m % 12], MONTHS[(b.m + 10) % 12], MONTHS[(b.m + 1) % 12]], `The middle number in ${dueStr} is ${b.m}, which is ${mName}.`, visual));
+        } else if (b.ask === "day") {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the due date on the ${b.title}. Which day of the month is it?`, ordinal(b.d), [ordinal(b.d + 1), ordinal(b.m), ordinal(b.d + 2)], `The first number in ${dueStr} is ${b.d}, written as ${ordinal(b.d)}.`, visual));
+        } else {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the due date on the ${b.title}. Which year is it?`, String(b.y), [String(b.y - 1), String(b.y + 1), String(b.y - 2)], `The last number in ${dueStr} is the year ${b.y}.`, visual));
+        }
+      });
+
+      return qs;
+    }
+
+    /* ---------------- LEVEL 5: Mock Assessment Exam (70 Fresh Qs) ---------------- */
+    function buildLevel5Bank() {
+      const qs = [];
+      let n = 1;
+      const nid = () => `L5-${String(n++).padStart(2, "0")}`;
+
+      // 18 fresh Ch. 1 questions
+      [3, 7, 11].forEach(num => {
+        qs.push(makeTextQ(nid(), "Ch. 1", "Exam Check: What number is missing at the '?' on this clock face?", String(num), [String(wrapHour(num - 1)), String(wrapHour(num + 1)), String(wrapHour(num + 2))], `Counting around the clock in order, the missing number is ${num}.`, { type: "clock", hour: wrapHour(num + 4), minute: 30, missingNumbers: [num] }));
+      });
+      [{ h: 2, m: 0 }, { h: 8, m: 0 }, { h: 5, m: 30 }, { h: 11, m: 30 }].forEach(c => {
+        const ans = formatClockTime(c.h, c.m === 30);
+        qs.push(makeTextQ(nid(), "Ch. 1", "Look carefully at the clock face on the assessment paper. What time does it show?", ans, [formatClockTime(wrapHour(c.h + 1), c.m === 30), formatClockTime(c.h, c.m === 0), formatClockTime(wrapHour(c.h - 1), c.m === 30)], `The hands show ${ans}.`, { type: "clock", hour: c.h, minute: c.m }));
+      });
+      [{ h: 6, half: false }, { h: 9, half: false }, { h: 4, half: true }, { h: 10, half: true }].forEach(c => {
+        const nextH = wrapHour(c.h + 1);
+        const prompt = c.half
+          ? `The hour hand is halfway between ${c.h} and ${nextH}, and the minute hand points to 6. What is the time?`
+          : `The hour hand points straight at ${c.h}, and the minute hand points to 12. What is the time?`;
+        const ans = formatClockTime(c.h, c.half);
+        qs.push(makeTextQ(nid(), "Ch. 1", prompt, ans, [formatClockTime(nextH, c.half), formatClockTime(c.h, !c.half), formatClockTime(wrapHour(c.h - 1), c.half)], `That hand position shows ${ans}.`));
+      });
+      [{ h: 5, m: 0 }, { h: 11, m: 0 }, { h: 3, m: 30 }, { h: 9, m: 30 }].forEach(c => {
+        const targetStr = formatClockTime(c.h, c.m === 30);
+        qs.push(makeVisualClockQ(nid(), "Ch. 1", `Which clock face below shows ${targetStr}?`, { type: "clock", hour: c.h, minute: c.m }, [{ type: "clock", hour: c.h, minute: c.m === 0 ? 30 : 0 }, { type: "clock", hour: wrapHour(c.h + 1), minute: c.m }, { type: "clock", hour: c.h, minute: 30, trickMode: "wrong_half_hour" }], `Look at both hands carefully: only the correct clock shows ${targetStr}.`));
+      });
+      [{ h: 1, m: 30 }, { h: 6, m: 30 }, { h: 12, m: 30 }].forEach(c => {
+        qs.push(makeVisualClockQ(nid(), "Ch. 1", "Only ONE clock face below shows the time correctly. Which one is it?", { type: "clock", hour: c.h, minute: c.m, trickMode: "normal" }, [{ type: "clock", hour: wrapHour(c.h + 2), minute: 30, trickMode: "wrong_half_hour" }, { type: "clock", hour: wrapHour(c.h + 4), minute: 0, trickMode: "wrong_oclock_half" }, { type: "clock", hour: wrapHour(c.h + 6), minute: 30, trickMode: "wrong_half_after" }], `At ${formatClockTime(c.h, true)}, the minute hand is at 6 and the hour hand is halfway between ${c.h} and ${wrapHour(c.h + 1)}.`));
+      });
+
+      // 18 fresh Ch. 2 questions
+      [
+        { t: "Washing your hands with soap", a: "Shorter than 1 hour", icon: "🧼" },
+        { t: "A ferry ride across Victoria Harbour (Star Ferry)", a: "Shorter than 1 hour", icon: "⛴️" },
+        { t: "Spending a full morning at Ocean Park", a: "Longer than 1 hour", icon: "🎢" },
+        { t: "A full night's sleep", a: "Longer than 1 hour", icon: "🌙" }
+      ].forEach(s => qs.push(makeChoiceListQ(nid(), "Ch. 2", `${s.t} takes ___ .`, ["Shorter than 1 hour", "Longer than 1 hour"], s.a, `${s.t} is ${s.a.toLowerCase()}.`, { type: "story_badge", icon: s.icon, label: "1 Hour Check" })));
+
+      qs.push(
+        makeChoiceListQ(nid(), "Ch. 2", "Grace spends 3 hours baking. Tim spends 2 hours baking. Grace spends ___ baking than Tim.", ["more time", "less time", "the same time"], "more time", "3 hours is more than 2 hours."),
+        makeChoiceListQ(nid(), "Ch. 2", "Peter spends 1 hour cycling. Jane spends 3 hours cycling. Peter spends ___ cycling than Jane.", ["more time", "less time", "the same time"], "less time", "1 hour is less than 3 hours."),
+        makeChoiceListQ(nid(), "Ch. 2", "Ruby spends 3 hours at the beach. Jack spends more time at the beach than Ruby. Jack may spend ___ at the beach.", ["2 hours", "3 hours", "4 hours"], "4 hours", "More than 3 hours means 4 hours is the only possible choice."),
+        makeChoiceListQ(nid(), "Ch. 2", "Alan spends 4 hours painting. Kate spends less time painting than Alan. Kate may spend ___ painting.", ["3 hours", "4 hours", "5 hours"], "3 hours", "Less than 4 hours means 3 hours is the only possible choice.")
+      );
+
+      [
+        { name: "The Dolphin Show", s: 11, half: false, dur: 2 },
+        { name: "The Toy Fair", s: 10, half: true, dur: 3 },
+        { name: "The Piano Recital", s: 12, half: true, dur: 2 },
+        { name: "The Story Workshop", s: 9, half: false, dur: 4 }
+      ].forEach(ec => {
+        const endH = wrapHour(ec.s + ec.dur);
+        const ans = formatClockTime(endH, ec.half);
+        qs.push(makeTextQ(nid(), "Ch. 2", `${ec.name} starts at ${formatClockTime(ec.s, ec.half)} and lasts for ${formatHours(ec.dur)}. What time does it end?`, ans, [formatClockTime(wrapHour(endH + 1), ec.half), formatClockTime(wrapHour(endH - 1), ec.half), formatClockTime(endH, !ec.half)], `Counting ${formatHours(ec.dur)} forward from ${formatClockTime(ec.s, ec.half)} gives ${ans}.`, { type: "dual_clock", left: { hour: ec.s, minute: ec.half ? 30 : 0 }, right: { hour: endH, minute: ec.half ? 30 : 0, mysteryClock: true }, leftLabel: "Start", rightLabel: "End (?)", arrowText: `After ${formatHours(ec.dur)} ➡️` }));
+      });
+
+      [
+        { name: "Charity Walk", s: 9, half: true, dur: 3 },
+        { name: "Health Check", s: 11, half: false, dur: 4 },
+        { name: "Lego Building", s: 1, half: true, dur: 2 },
+        { name: "Book Fair", s: 10, half: false, dur: 5 }
+      ].forEach(el => {
+        const endH = wrapHour(el.s + el.dur);
+        const ans = formatHours(el.dur);
+        const dPool = [el.dur - 1, el.dur + 1, el.dur + 2, el.dur - 2].filter(v => v >= 1 && v !== el.dur).map(formatHours);
+        qs.push(makeTextQ(nid(), "Ch. 2", `Look at the two clocks for the ${el.name}. How many hours have passed?`, ans, dPool, `From ${formatClockTime(el.s, el.half)} to ${formatClockTime(endH, el.half)} is ${ans}.`, { type: "dual_clock", left: { hour: el.s, minute: el.half ? 30 : 0 }, right: { hour: endH, minute: el.half ? 30 : 0 }, leftLabel: "Start", rightLabel: "End", arrowText: "? hours ➡️" }));
+      });
+
+      const examSched = { type: "schedule", title: "Green Day Activity", headers: ["Activity", "Period"], rows: [["Planting", "Half past 8 to half past 10"], ["Watering", "Half past 10 to half past 11"], ["Clean-up", "Half past 11 to half past 1"]] };
+      qs.push(
+        makeTextQ(nid(), "Ch. 2", "Look at the Green Day Activity table. How many hours does the whole activity last?", "5 hours", ["3 hours", "4 hours", "6 hours"], "From half past 8 to half past 1 is 2 + 1 + 2 = 5 hours.", examSched),
+        makeTextQ(nid(), "Ch. 2", "Look at the Green Day Activity table. How long does the Clean-up period last?", "2 hours", ["1 hour", "3 hours", "4 hours"], "From half past 11 to half past 1 is 2 hours.", examSched)
+      );
+
+      // 17 fresh Ch. 3 questions
+      [
+        { t: "Today is Thursday. Tomorrow is ___.", a: "Friday", d: ["Wednesday", "Saturday", "Tuesday"], w: "Friday comes right after Thursday." },
+        { t: "If today is Monday, then yesterday was ___.", a: "Sunday", d: ["Tuesday", "Saturday", "Friday"], w: "Sunday comes right before Monday." },
+        { t: "If yesterday was Tuesday, then tomorrow will be ___.", a: "Thursday", d: ["Wednesday", "Friday", "Monday"], w: "Yesterday Tuesday → Today Wednesday → Tomorrow Thursday." },
+        { t: "If yesterday was Saturday, then tomorrow will be ___.", a: "Monday", d: ["Sunday", "Tuesday", "Friday"], w: "Yesterday Saturday → Today Sunday → Tomorrow Monday." },
+        { t: "If tomorrow will be Wednesday, then yesterday was ___.", a: "Monday", d: ["Tuesday", "Sunday", "Thursday"], w: "Tomorrow Wednesday → Today Tuesday → Yesterday Monday." },
+        { t: "Which day is between Sunday and Tuesday?", a: "Monday", d: ["Saturday", "Wednesday", "Friday"], w: "Sunday, Monday, Tuesday." },
+        { t: "How many days are there in a week?", a: "7 days", d: ["5 days", "6 days", "8 days"], w: "Every week has 7 days." }
+      ].forEach(p => qs.push(makeTextQ(nid(), "Ch. 3", p.t, p.a, p.d, p.w)));
+
+      const petVisual = { type: "week_strip", title: "Happy Pet Shop Gift Week", items: [{ icon: "🦴", label: "Bone" }, { icon: "🐟", label: "Fish" }, { closed: true, label: "Closed" }, { icon: "🥕", label: "Carrot" }, { icon: "🧶", label: "Yarn" }, { icon: "🔔", label: "Bell" }, { icon: "⚽", label: "Ball" }] };
+      [
+        { t: "Lily went to the Pet Shop on Friday. Which gift did she get?", a: "🔔 Bell", d: ["🧶 Yarn", "⚽ Ball", "🥕 Carrot"], w: "Under Fri, the gift is 🔔 Bell." },
+        { t: "On which day did the Pet Shop give out a 🥕 Carrot?", a: "Wednesday", d: ["Monday", "Thursday", "Saturday"], w: "🥕 Carrot is under Wed (Wednesday)." },
+        { t: "The Pet Shop was closed on one day. Which day was it?", a: "Tuesday", d: ["Monday", "Wednesday", "Sunday"], w: "The 🚫 symbol is on Tuesday." },
+        { t: "Tom got a 🦴 Bone and a ⚽ Ball. Which two days did he visit?", a: "Sunday and Saturday", d: ["Monday and Friday", "Sunday and Friday", "Thursday and Saturday"], w: "Bone is on Sunday and Ball is on Saturday." },
+        { t: "Sam went to the shop the day right after it was closed. What gift did he get?", a: "🥕 Carrot", d: ["🐟 Fish", "🧶 Yarn", "🦴 Bone"], w: "The shop was closed on Tuesday; the next day is Wednesday (🥕 Carrot)." }
+      ].forEach(q => qs.push(makeTextQ(nid(), "Ch. 3", q.t, q.a, q.d, q.w, petVisual)));
+
+      const carnVisual = { type: "week_strip", title: "Fun Carnival Show Week", items: [{ icon: "🦁", label: "Lion" }, { icon: "🤖", label: "Robot" }, { icon: "🧙", label: "Wizard" }, { icon: "🦁", label: "Lion" }, { icon: "🥁", label: "Drums" }, { icon: "🥁", label: "Drums" }, { icon: "🤖", label: "Robot" }] };
+      [
+        { t: "Which show is on Monday at the Fun Carnival?", a: "🤖 Robot", d: ["🦁 Lion", "🧙 Wizard", "🥁 Drums"], w: "Under Mon, the show is 🤖 Robot." },
+        { t: "On which day is the 🧙 Wizard show?", a: "Tuesday", d: ["Monday", "Wednesday", "Thursday"], w: "🧙 Wizard performs only on Tuesday." },
+        { t: "How many days does the 🦁 Lion show perform every week?", a: "2 days", d: ["1 day", "3 days", "4 days"], w: "🦁 Lion performs on Sunday and Wednesday — 2 days." },
+        { t: "Which show performs for 2 consecutive days?", a: "🥁 Drums", d: ["🦁 Lion", "🤖 Robot", "🧙 Wizard"], w: "🥁 Drums performs on Thursday and Friday (2 days in a row)." },
+        { t: "If 🤖 Robot performed yesterday and 🦁 Lion will perform tomorrow, what day is today?", a: "Tuesday", d: ["Monday", "Wednesday", "Saturday"], w: "Robot is on Monday and Lion is on Wednesday, so today is Tuesday!" }
+      ].forEach(q => qs.push(makeTextQ(nid(), "Ch. 3", q.t, q.a, q.d, q.w, carnVisual)));
+
+      // 17 fresh Ch. 4 questions
+      [
+        { t: "Hong Kong Special Administrative Region Establishment Day is on the ___.", a: "1st of July", d: ["1st of May", "1st of October", "1st of January"], w: "HKSAR Establishment Day is on the 1st of July." },
+        { t: "Labour Day is on the ___.", a: "1st of May", d: ["1st of July", "1st of June", "2nd of May"], w: "Labour Day is on the 1st of May." },
+        { t: "Which month comes right after November?", a: "December", d: ["October", "January", "September"], w: "December follows November." },
+        { t: "Father's Day is on the third Sunday of ___.", a: "June", d: ["May", "July", "August"], w: "Father's Day is in June." },
+        { t: "The first day of every year is the ___.", a: "1st of January", d: ["1st of February", "31st of December", "2nd of January"], w: "Every year starts on the 1st of January." }
+      ].forEach(h => qs.push(makeTextQ(nid(), "Ch. 4", h.t, h.a, h.d, h.w)));
+
+      const oct26 = { type: "calendar", calendars: [{ year: 2026, monthIndex: 9, marks: { 16: { icon: "🎒", legend: "School Picnic" } } }] };
+      const octSats = countWeekdayInMonth(2026, 9, 6);
+      const oct25Wd = DAYS[getDayOfWeek(2026, 9, 25)];
+      const oct3rdThu = getNthWeekdayDate(2026, 9, 4, 3);
+      qs.push(
+        makeTextQ(nid(), "Ch. 4", "How many Saturdays are there in October 2026?", String(octSats), [String(octSats - 1), String(octSats + 1), "3"], `Count the Sat column: there are ${octSats} Saturdays.`, oct26),
+        makeTextQ(nid(), "Ch. 4", "In October 2026, the 25th of October is a ___.", oct25Wd, DAYS.filter(d => d !== oct25Wd), `Find 25 on the calendar: it is a ${oct25Wd}.`, oct26),
+        makeTextQ(nid(), "Ch. 4", "Look at the 🎒 mark. What is the date of the School Picnic?", "16-10-2026", ["15-10-2026", "17-10-2026", "10-16-2026"], "The School Picnic is on 16 October 2026, written as 16-10-2026.", oct26),
+        makeTextQ(nid(), "Ch. 4", "What is the date of the third Thursday of October 2026?", `${ordinal(oct3rdThu)} of October`, [`${ordinal(oct3rdThu - 7)} of October`, `${ordinal(oct3rdThu + 7)} of October`, `${ordinal(oct3rdThu + 1)} of October`], `The third date in the Thu column is the ${ordinal(oct3rdThu)} of October.`, oct26)
+      );
+
+      const julAug26 = { type: "calendar", calendars: [{ year: 2026, monthIndex: 6 }, { year: 2026, monthIndex: 7 }] };
+      const lastWedJul = getLastWeekdayDate(2026, 6, 3);
+      const firstMonAug = getNthWeekdayDate(2026, 7, 1, 1);
+      const augSuns = countWeekdayInMonth(2026, 7, 0);
+      const aug18Wd = DAYS[getDayOfWeek(2026, 7, 18)];
+      const sep1Wd = DAYS[getDayOfWeek(2026, 8, 1)];
+      qs.push(
+        makeTextQ(nid(), "Ch. 4", "Amy flew to Japan on the last Wednesday of July 2026. What was the date?", `${ordinal(lastWedJul)} of July`, [`${ordinal(lastWedJul - 7)} of July`, "31st of July", `${ordinal(lastWedJul)} of August`], `The last date in July's Wed column is the ${ordinal(lastWedJul)} of July.`, julAug26),
+        makeTextQ(nid(), "Ch. 4", "Amy returned on the first Monday of August 2026. What was the date?", `${firstMonAug}-8-2026`, [`${firstMonAug + 7}-8-2026`, `1-8-2026`, `${firstMonAug}-7-2026`], `The first Monday of August 2026 is ${firstMonAug}-8-2026.`, julAug26),
+        makeTextQ(nid(), "Ch. 4", "Ben had a violin lesson every Sunday in August 2026. How many lessons did he have?", `${augSuns} lessons`, [`${augSuns - 1} lessons`, `${augSuns + 1} lessons`, "3 lessons"], `There are ${augSuns} Sundays in August 2026.`, julAug26),
+        makeTextQ(nid(), "Ch. 4", "Chloe's art show is on the 18th of August 2026. Which day of the week is it?", aug18Wd, DAYS.filter(d => d !== aug18Wd), `Find 18 in August 2026: it falls on a ${aug18Wd}.`, julAug26),
+        makeTextQ(nid(), "Ch. 4", "Summer holidays end on the 31st of August 2026. The new school term starts on the 1st of September. Which day of the week is it?", sep1Wd, DAYS.filter(d => d !== sep1Wd), `31st August 2026 is a ${DAYS[getDayOfWeek(2026, 7, 31)]}, so 1st September 2026 is a ${sep1Wd}.`, julAug26)
+      );
+
+      [
+        { title: "Phone Bill", icon: "📱", holder: "Mr Lam", d: 24, m: 11, y: 2026, ask: "full" },
+        { title: "Library Notice", icon: "📖", holder: "Tim Wu", d: 2, m: 5, y: 2026, ask: "day" },
+        { title: "Dance Fee Slip", icon: "🩰", holder: "Joy Ho", d: 17, m: 9, y: 2026, ask: "month" }
+      ].forEach((b, idx) => {
+        const dueStr = `${b.d}-${b.m}-${b.y}`;
+        const mName = MONTHS[b.m - 1];
+        const v = { type: "bill", icon: b.icon, title: b.title, ref: String(501 + idx), holder: b.holder, dueDate: dueStr };
+        if (b.ask === "full") {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the ${b.title}. When must ${b.holder} pay on or before?`, `${ordinal(b.d)} of ${mName}, ${b.y}`, [`${ordinal(b.d)} of ${MONTHS[b.m % 12]}, ${b.y}`, `${ordinal(b.m)} of ${mName}, ${b.y}`, `${ordinal(b.d - 1)} of ${mName}, ${b.y}`], `${dueStr} means the ${ordinal(b.d)} of ${mName}, ${b.y}.`, v));
+        } else if (b.ask === "day") {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the ${b.title}. Which day of the month is it due?`, ordinal(b.d), [ordinal(b.m), ordinal(b.d + 1), ordinal(b.d + 2)], `The first number is ${b.d}, written as ${ordinal(b.d)}.`, v));
+        } else {
+          qs.push(makeTextQ(nid(), "Ch. 4", `Look at the ${b.title}. Which month is it due?`, mName, [MONTHS[b.m % 12], MONTHS[(b.m + 10) % 12], MONTHS[(b.m + 1) % 12]], `The middle number is ${b.m}, which is ${mName}.`, v));
+        }
+      });
+
+      return qs;
+    }
+
+    const QUESTION_BANKS = {
+      1: buildLevel1Bank(),
+      2: buildLevel2Bank(),
+      3: buildLevel3Bank(),
+      4: buildLevel4Bank(),
+      5: buildLevel5Bank()
+    };
+
+    /** Draws random questions (balanced across Ch. 1–4 for Level 5) */
+    function drawQuestionsForLevel(levelId, count) {
+      const bank = QUESTION_BANKS[levelId] || [];
+      if (levelId !== 5 || count >= bank.length) return pickUnique(bank, count);
+      const byCh = {
+        "Ch. 1": shuffle(bank.filter(q => q.chapter === "Ch. 1")),
+        "Ch. 2": shuffle(bank.filter(q => q.chapter === "Ch. 2")),
+        "Ch. 3": shuffle(bank.filter(q => q.chapter === "Ch. 3")),
+        "Ch. 4": shuffle(bank.filter(q => q.chapter === "Ch. 4"))
+      };
+      const chKeys = ["Ch. 1", "Ch. 2", "Ch. 3", "Ch. 4"];
+      const picked = [];
+      let cursor = 0;
+      while (picked.length < count) {
+        const key = chKeys[cursor % 4];
+        if (byCh[key].length > 0) {
+          picked.push(byCh[key].pop());
+        } else if (!chKeys.some(k => byCh[k].length > 0)) {
+          break;
+        }
+        cursor++;
+      }
+      return shuffle(picked);
+    }
+
+    /* ============================================================
+       6. GAME CONTROLLER, EXAM ENGINE, STORAGE & A4 PRINT
+       ============================================================ */
+    const STORAGE_KEY = "mt4_practice_1b_stars_v350";
+
+    const state = {
+      stars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      levelId: 1,
+      questions: [],
+      currentIndex: 0,
+      answers: [],
+      locked: false,
+      confirmSubmitPending: false,
+      examTimerId: null,
+      examSeconds: 0,
+      examPaused: false,
+      printLevelId: 1,
+      printCount: 5,
+      printQuestions: []
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function showScreen(screenId) {
+      stopSpeech();
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      const target = $(screenId);
+      if (target) target.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function formatTimer(sec) {
+      return `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function loadStars() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          [1, 2, 3, 4, 5].forEach(id => {
+            if (typeof parsed[id] === "number") state.stars[id] = Math.max(0, Math.min(3, parsed[id]));
+          });
+        }
+      } catch (e) {}
+    }
+
+    function saveStars() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.stars)); } catch (e) {}
+    }
+
+    function getTotalStars() {
+      return [1, 2, 3, 4, 5].reduce((sum, id) => sum + (state.stars[id] || 0), 0);
+    }
+
+    function renderStarString(earned) {
+      return "⭐".repeat(earned) + "☆".repeat(3 - earned);
+    }
+
+    function renderHome() {
+      stopExamTimer();
+      stopConfetti();
+      $("home-mascot").innerHTML = renderOwlSVG("happy", 64);
+      $("total-stars").textContent = String(getTotalStars());
+
+      const grid = $("levels-grid");
+      grid.innerHTML = LEVEL_META.map(meta => {
+        const actualCount = (QUESTION_BANKS[meta.id] || []).length;
+        const earned = state.stars[meta.id] || 0;
+        const modeText = meta.isExam
+          ? `${meta.drawCount} balanced Qs / ${actualCount}-Q bank`
+          : `${meta.drawCount} random Qs / ${actualCount}-Q bank`;
+        const playBtnCls = meta.isExam ? "btn-purple" : "btn-primary";
+        const playLabel = meta.isExam ? "🚀 Start Mock Exam" : "▶ Play Level " + meta.id;
+
+        return `
+          <article class="level-card lvl-${meta.id}">
+            <div class="level-top">
+              <div class="level-icon" aria-hidden="true">${meta.icon}</div>
+              <div class="level-info">
+                <span class="level-tag">Level ${meta.id} • ${meta.chapter}</span>
+                <h2 class="level-name">${meta.title}</h2>
+                <p class="level-meta">${meta.desc}</p>
+              </div>
+              <div class="level-stars" aria-label="${earned} out of 3 stars">${renderStarString(earned)}</div>
+            </div>
+            <div style="font-size:0.84rem; font-weight:800; color:#334155;">📚 ${modeText}</div>
+            <div class="level-actions">
+              <button class="btn ${playBtnCls}" type="button" data-play-level="${meta.id}">${playLabel}</button>
+              <button class="btn btn-teal" type="button" data-print-level="${meta.id}" title="Print A4 Worksheet">🖨️ Print</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-play-level]").forEach(btn => {
+        btn.addEventListener("click", () => { SFX.click(); startLevel(Number(btn.dataset.playLevel)); });
+      });
+      grid.querySelectorAll("[data-print-level]").forEach(btn => {
+        btn.addEventListener("click", () => { SFX.click(); openPrintModal(Number(btn.dataset.printLevel)); });
+      });
+
+      showScreen("screen-home");
+    }
+
+    function startExamTimer() {
+      stopExamTimer();
+      state.examSeconds = 0;
+      state.examPaused = false;
+      const timerEl = $("game-timer");
+      timerEl.textContent = "⏱ 00:00";
+      timerEl.classList.add("show");
+      state.examTimerId = setInterval(() => {
+        if (!state.examPaused) {
+          state.examSeconds++;
+          timerEl.textContent = "⏱ " + formatTimer(state.examSeconds);
+        }
+      }, 1000);
+    }
+
+    function stopExamTimer() {
+      if (state.examTimerId) {
+        clearInterval(state.examTimerId);
+        state.examTimerId = null;
+      }
+      state.examPaused = false;
+      const timerEl = $("game-timer");
+      if (timerEl) timerEl.classList.remove("show");
+    }
+
+    function startLevel(levelId) {
+      const meta = LEVEL_META.find(m => m.id === levelId);
+      if (!meta) return;
+
+      state.levelId = levelId;
+      state.questions = drawQuestionsForLevel(levelId, meta.drawCount);
+      state.currentIndex = 0;
+      state.answers = new Array(state.questions.length).fill(null);
+      state.locked = false;
+      state.confirmSubmitPending = false;
+
+      $("game-level-badge").textContent = `Level ${meta.id}: ${meta.title}`;
+      if (meta.isExam) startExamTimer(); else stopExamTimer();
+
+      showScreen("screen-game");
+      renderCurrentQuestion();
+    }
+
+    function renderExamNav() {
+      const meta = LEVEL_META.find(m => m.id === state.levelId);
+      const nav = $("exam-nav");
+      if (!meta || !meta.isExam) {
+        nav.classList.remove("show");
+        nav.innerHTML = "";
+        return;
+      }
+
+      nav.classList.add("show");
+      nav.innerHTML = state.questions.map((_, idx) => {
+        const classes = ["exam-dot"];
+        if (idx === state.currentIndex) classes.push("current");
+        else if (state.answers[idx] !== null) classes.push("answered");
+        return `<button type="button" class="${classes.join(" ")}" data-jump="${idx}" aria-label="Question ${idx + 1}">${idx + 1}</button>`;
+      }).join("");
+
+      nav.querySelectorAll("[data-jump]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          SFX.click();
+          state.currentIndex = Number(btn.dataset.jump);
+          state.confirmSubmitPending = false;
+          renderCurrentQuestion();
+        });
+      });
+    }
+
+    function renderCurrentQuestion() {
+      stopSpeech();
+      const meta = LEVEL_META.find(m => m.id === state.levelId);
+      const q = state.questions[state.currentIndex];
+      if (!q || !meta) return;
+
+      const total = state.questions.length;
+      const idx = state.currentIndex;
+      const chosen = state.answers[idx];
+      state.locked = !meta.isExam && chosen !== null;
+
+      $("game-q-counter").textContent = `Q ${idx + 1} / ${total}`;
+      const progressPct = meta.isExam
+        ? (state.answers.filter(a => a !== null).length / total) * 100
+        : ((idx + (chosen !== null ? 1 : 0)) / total) * 100;
+      $("game-progress").style.width = `${progressPct}%`;
+
+      renderExamNav();
+
+      const stage = $("question-stage");
+      const visualPane = $("visual-pane");
+      if (q.visual) {
+        visualPane.innerHTML = renderVisual(q.visual, false);
+        visualPane.classList.remove("hidden");
+        stage.classList.add("has-visual");
+      } else {
+        visualPane.innerHTML = "";
+        visualPane.classList.add("hidden");
+        stage.classList.remove("has-visual");
+      }
+
+      const mascotMood = !meta.isExam && chosen !== null ? (chosen === q.answerIndex ? "cheer" : "think") : "happy";
+      $("game-mascot").innerHTML = renderOwlSVG(mascotMood, 52);
+      $("q-chapter-chip").textContent = `${q.chapter} • ${q.id}`;
+      $("q-text").textContent = q.text;
+
+      const optsGrid = $("options-grid");
+      optsGrid.className = "options-grid" + (q.visualOptions ? " two-col" : "");
+      optsGrid.innerHTML = q.options.map((opt, optIdx) => {
+        const cls = ["option-btn"];
+        if (q.visualOptions) cls.push("visual-opt");
+        if (meta.isExam) {
+          if (chosen === optIdx) cls.push("selected");
+        } else if (chosen !== null) {
+          if (optIdx === q.answerIndex) cls.push("correct");
+          else if (optIdx === chosen && chosen !== q.answerIndex) cls.push("wrong");
+        }
+        return `
+          <button type="button" class="${cls.join(" ")}" data-opt="${optIdx}" ${state.locked ? "disabled" : ""}>
+            <span class="opt-letter">${LETTERS[optIdx]}</span>
+            ${renderOptionContent(opt, false)}
+          </button>
+        `;
+      }).join("");
+
+      optsGrid.querySelectorAll("[data-opt]").forEach(btn => {
+        btn.addEventListener("click", () => handleSelectOption(Number(btn.dataset.opt)));
+      });
+
+      const fb = $("feedback-box");
+      const btnPrev = $("btn-prev-q");
+      const btnNext = $("btn-next-q");
+      const btnSubmit = $("btn-submit-exam");
+      fb.className = "feedback-box";
+      fb.innerHTML = "";
+
+      if (meta.isExam) {
+        btnPrev.style.display = idx > 0 ? "inline-flex" : "none";
+        btnNext.style.display = idx < total - 1 ? "inline-flex" : "none";
+        btnNext.textContent = "Next ➡️";
+        const answeredCount = state.answers.filter(a => a !== null).length;
+        btnSubmit.style.display = "inline-flex";
+        btnSubmit.textContent = answeredCount === total ? "✅ Submit Exam" : `✅ Submit Exam (${answeredCount}/${total})`;
+      } else {
+        btnPrev.style.display = "none";
+        btnSubmit.style.display = "none";
+        if (chosen !== null) {
+          const isRight = chosen === q.answerIndex;
+          fb.classList.add("show", isRight ? "good" : "bad");
+          fb.innerHTML = `
+            <div style="flex:0 0 46px;">${renderOwlSVG(isRight ? "cheer" : "think", 46)}</div>
+            <div>
+              <div style="font-size:1.05rem;">${isRight ? "🎉 Spot on! Great job!" : "💡 Nice try! Let's check:"}</div>
+              <div style="font-size:0.93rem; margin-top:2px;">${escapeHTML(q.explanation)}</div>
+            </div>
+          `;
+          btnNext.style.display = "inline-flex";
+          btnNext.textContent = idx === total - 1 ? "See My Stars 🏆" : "Next Question ➡️";
+        } else {
+          btnNext.style.display = "none";
+        }
+      }
+    }
+
+    function handleSelectOption(optIdx) {
+      const meta = LEVEL_META.find(m => m.id === state.levelId);
+      const q = state.questions[state.currentIndex];
+      if (!meta || !q) return;
+
+      if (meta.isExam) {
+        SFX.click();
+        state.answers[state.currentIndex] = optIdx;
+        state.confirmSubmitPending = false;
+        renderCurrentQuestion();
+        return;
+      }
+
+      if (state.locked) return;
+      state.answers[state.currentIndex] = optIdx;
+      state.locked = true;
+      if (optIdx === q.answerIndex) SFX.correct(); else SFX.wrong();
+      renderCurrentQuestion();
+    }
+
+    function handleSubmitExam() {
+      const unanswered = state.answers.map((a, i) => (a === null ? i + 1 : null)).filter(Boolean);
+      if (unanswered.length > 0 && !state.confirmSubmitPending) {
+        SFX.click();
+        state.confirmSubmitPending = true;
+        const fb = $("feedback-box");
+        fb.className = "feedback-box show bad";
+        fb.innerHTML = `
+          <div style="flex:0 0 44px;">${renderOwlSVG("think", 44)}</div>
+          <div>
+            <div>You still have ${unanswered.length} unanswered question(s): Q${unanswered.join(", Q")}.</div>
+            <div style="font-size:0.88rem; margin-top:2px;">Tap a number above to answer them, or tap <strong>Submit Exam</strong> again to finish now.</div>
+          </div>
+        `;
+        return;
+      }
+      SFX.click();
+      finishLevel();
+    }
+
+    function finishLevel() {
+      stopSpeech();
+      const meta = LEVEL_META.find(m => m.id === state.levelId);
+      const elapsedSec = state.examSeconds;
+      stopExamTimer();
+
+      const total = state.questions.length;
+      let correctCount = 0;
+      const chapterStats = {};
+      const mistakes = [];
+
+      state.questions.forEach((q, idx) => {
+        if (!chapterStats[q.chapter]) chapterStats[q.chapter] = { right: 0, total: 0 };
+        chapterStats[q.chapter].total++;
+        const chosen = state.answers[idx];
+        if (chosen === q.answerIndex) {
+          correctCount++;
+          chapterStats[q.chapter].right++;
+        } else {
+          mistakes.push({ num: idx + 1, q, chosen });
+        }
+      });
+
+      const pct = Math.round((correctCount / total) * 100);
+      const starsEarned = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0;
+
+      if (starsEarned > (state.stars[state.levelId] || 0)) {
+        state.stars[state.levelId] = starsEarned;
+        saveStars();
+      }
+
+      $("result-mascot").innerHTML = renderOwlSVG(starsEarned >= 2 ? "cheer" : "happy", 78);
+      $("result-title").textContent =
+        starsEarned === 3 ? "Superstar Time Master!" :
+        starsEarned === 2 ? "Awesome Job! Almost Perfect!" :
+        starsEarned === 1 ? "Good Effort! Keep Practising!" :
+        "Great Try! Let's Practise Together!";
+      $("result-stars").textContent = renderStarString(starsEarned);
+      $("result-score").textContent = `${correctCount} / ${total} (${pct}%)`;
+      $("result-sub").textContent = meta.isExam
+        ? `Mock Assessment Exam completed in ${formatTimer(elapsedSec)}`
+        : `Level ${meta.id}: ${meta.title}`;
+
+      const breakdownEl = $("result-breakdown");
+      if (meta.isExam || Object.keys(chapterStats).length > 1) {
+        breakdownEl.style.display = "grid";
+        breakdownEl.innerHTML = ["Ch. 1", "Ch. 2", "Ch. 3", "Ch. 4"].filter(ch => chapterStats[ch]).map(ch => {
+          const st = chapterStats[ch];
+          const chPct = Math.round((st.right / st.total) * 100);
+          const icon = chPct === 100 ? "🌟" : chPct >= 50 ? "👍" : "💪";
+          return `<div class="breakdown-item"><div style="font-size:0.86rem; color:#475569;">${ch}</div><div style="font-size:1.2rem; margin-top:2px;">${icon} ${st.right} / ${st.total}</div></div>`;
+        }).join("");
+      } else {
+        breakdownEl.style.display = "none";
+        breakdownEl.innerHTML = "";
+      }
+
+      const mistakesEl = $("mistakes-list");
+      if (mistakes.length === 0) {
+        mistakesEl.innerHTML = `<div style="background:#dcfce7; border:2.5px solid #16a34a; border-radius:16px; padding:14px; text-align:center; font-weight:800; color:#14532d;">🎉 Zero mistakes! You got every single question right!</div>`;
+      } else {
+        mistakesEl.innerHTML = `<h3 style="margin:6px 0 2px; font-size:1.15rem;">📝 Review Mistakes (${mistakes.length})</h3>` + mistakes.map(m => {
+          const yourLabel = m.chosen === null ? "No answer" : m.q.visualOptions ? `Clock ${LETTERS[m.chosen]}` : escapeHTML(m.q.options[m.chosen]);
+          const rightLabel = m.q.visualOptions ? `Clock ${LETTERS[m.q.answerIndex]}` : escapeHTML(m.q.options[m.q.answerIndex]);
+          const visualPreview = m.q.visualOptions ? `<div style="margin-top:6px; display:flex; align-items:center; gap:8px;"><strong>Correct Clock (${LETTERS[m.q.answerIndex]}):</strong> ${renderOptionContent(m.q.options[m.q.answerIndex], true)}</div>` : "";
+          return `
+            <div class="mistake-item">
+              <div style="font-weight:900; margin-bottom:4px;">Q${m.num} (${m.q.chapter}): ${escapeHTML(m.q.text)}</div>
+              <div>❌ Your answer: <strong>${yourLabel}</strong> &nbsp;|&nbsp; ✅ Correct answer: <strong style="color:#15803d;">${rightLabel}</strong></div>
+              ${visualPreview}
+              <div style="margin-top:4px; color:#334155;">💡 ${escapeHTML(m.q.explanation)}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      showScreen("screen-results");
+      if (pct >= 70) { SFX.win(); launchConfetti(); }
+    }
+
+    /* ============================================================
+       7. A4 LOW-INK PRINTABLE WORKSHEET BUILDER
+       ============================================================ */
+    function buildWorksheetHTML(levelId, questions, includeAnswerKey) {
+      const meta = LEVEL_META.find(m => m.id === levelId) || LEVEL_META[0];
+      const headerHTML = `
+        <div class="ws-header">
+          <div>
+            <h1 class="ws-title">1B MT 4練習 — Level ${meta.id}: ${meta.title}</h1>
+            <p class="ws-sub">Modern Primary Mathematics 1C (${meta.chapter}) • Practice Worksheet (${questions.length} of 70 Bank Questions)</p>
+          </div>
+          <div class="ws-meta">
+            <div>Name: _____________________</div>
+            <div>Class: ________ &nbsp; Date: ____________ &nbsp; Score: _____ / ${questions.length}</div>
+          </div>
+        </div>
+        <div class="ws-instruction">Instructions: Read each question carefully and blacken the circle ( ○ ) next to the correct answer.</div>
+      `;
+
+      const questionsHTML = questions.map((q, idx) => {
+        const visualHTML = q.visual ? `<div class="ws-visual">${renderVisual(q.visual, true)}</div>` : "";
+        const optsHTML = q.options.map((opt, oi) => `
+          <div class="ws-opt${q.visualOptions ? " visual-ws-opt" : ""}">
+            <div style="display:flex; align-items:center; gap:5px;">
+              <span class="ws-bubble"></span>
+              <strong>${LETTERS[oi]}.</strong>
+              ${q.visualOptions ? "" : renderOptionContent(opt, true)}
+            </div>
+            ${q.visualOptions ? renderOptionContent(opt, true) : ""}
+          </div>
+        `).join("");
+        return `<div class="ws-q"><p class="ws-q-title">${idx + 1}. [${q.chapter}] ${escapeHTML(q.text)}</p>${visualHTML}<div class="ws-options">${optsHTML}</div></div>`;
+      }).join("");
+
+      const answerKeyHTML = includeAnswerKey ? `
+        <div class="ws-answer-key">
+          <div class="ws-header">
+            <div>
+              <h2 class="ws-title">1B MT 4練習 — Answer Key (Level ${meta.id}: ${meta.title})</h2>
+              <p class="ws-sub">For Parents & Teachers (${questions.length} Questions)</p>
+            </div>
+          </div>
+          <div class="ws-ans-grid">
+            ${questions.map((q, idx) => {
+              const ansText = q.visualOptions ? `Option ${LETTERS[q.answerIndex]}` : `${LETTERS[q.answerIndex]}. ${escapeHTML(q.options[q.answerIndex])}`;
+              return `<div class="ws-ans-row"><strong>Q${idx + 1} (${q.chapter}): ${ansText}</strong><div style="font-size:11px; color:#222;">${escapeHTML(q.explanation)}</div></div>`;
+            }).join("")}
+          </div>
+        </div>
+      ` : "";
+
+      return headerHTML + questionsHTML + answerKeyHTML;
+    }
+
+    function renderPrintPreview() {
+      const html = buildWorksheetHTML(state.printLevelId, state.printQuestions, $("chk-answer-key").checked);
+      $("print-preview-paper").innerHTML = html;
+      $("print-area").innerHTML = html;
+    }
+
+    function openPrintModal(levelId) {
+      const meta = LEVEL_META.find(m => m.id === levelId) || LEVEL_META[0];
+      state.printLevelId = meta.id;
+      state.printCount = meta.drawCount;
+      state.printQuestions = drawQuestionsForLevel(meta.id, state.printCount);
+      if (state.examTimerId) state.examPaused = true;
+
+      $("print-modal-title").textContent = `🖨️ Print A4 Worksheet — Level ${meta.id}: ${meta.title}`;
+      const pillsEl = $("print-count-pills");
+      pillsEl.innerHTML = meta.printOptions.map(cnt => `<button type="button" class="count-pill${cnt === state.printCount ? " active" : ""}" data-pcnt="${cnt}">${cnt} Qs</button>`).join("");
+
+      pillsEl.querySelectorAll("[data-pcnt]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          SFX.click();
+          state.printCount = Number(btn.dataset.pcnt);
+          pillsEl.querySelectorAll(".count-pill").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.printQuestions = drawQuestionsForLevel(state.printLevelId, state.printCount);
+          renderPrintPreview();
+        });
+      });
+
+      renderPrintPreview();
+      $("print-modal").classList.add("open");
+    }
+
+    function closePrintModal() {
+      $("print-modal").classList.remove("open");
+      if (state.examTimerId) state.examPaused = false;
+    }
+
+    /* ============================================================
+       8. EVENT BINDING & INITIALIZATION
+       ============================================================ */
+    function bindEvents() {
+      $("btn-sound-toggle").addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        $("btn-sound-toggle").textContent = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+        if (soundEnabled) SFX.click();
+      });
+
+      $("btn-reset-stars").addEventListener("click", () => {
+        SFX.click();
+        $("reset-modal").classList.add("open");
+      });
+      $("btn-cancel-reset").addEventListener("click", () => {
+        SFX.click();
+        $("reset-modal").classList.remove("open");
+      });
+      $("btn-confirm-reset").addEventListener("click", () => {
+        SFX.click();
+        state.stars = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        saveStars();
+        $("reset-modal").classList.remove("open");
+        renderHome();
+      });
+      $("reset-modal").addEventListener("click", e => {
+        if (e.target === $("reset-modal")) $("reset-modal").classList.remove("open");
+      });
+
+      $("btn-back-home").addEventListener("click", () => { SFX.click(); renderHome(); });
+      $("btn-read-aloud").addEventListener("click", () => {
+        const q = state.questions[state.currentIndex];
+        if (!q) return;
+        let speech = q.text;
+        if (!q.visualOptions) speech += ". " + q.options.map((o, i) => `${LETTERS[i]}, ${o}`).join(". ");
+        speakEnglish(speech);
+      });
+      $("btn-game-print").addEventListener("click", () => { SFX.click(); openPrintModal(state.levelId); });
+      $("btn-prev-q").addEventListener("click", () => {
+        if (state.currentIndex > 0) { SFX.click(); state.currentIndex--; state.confirmSubmitPending = false; renderCurrentQuestion(); }
+      });
+      $("btn-next-q").addEventListener("click", () => {
+        SFX.click();
+        const meta = LEVEL_META.find(m => m.id === state.levelId);
+        if (state.currentIndex < state.questions.length - 1) { state.currentIndex++; state.confirmSubmitPending = false; renderCurrentQuestion(); }
+        else if (meta && !meta.isExam) finishLevel();
+      });
+      $("btn-submit-exam").addEventListener("click", handleSubmitExam);
+      $("btn-play-again").addEventListener("click", () => { SFX.click(); startLevel(state.levelId); });
+      $("btn-result-print").addEventListener("click", () => { SFX.click(); openPrintModal(state.levelId); });
+      $("btn-result-home").addEventListener("click", () => { SFX.click(); renderHome(); });
+      $("btn-close-print").addEventListener("click", () => { SFX.click(); closePrintModal(); });
+      $("print-modal").addEventListener("click", e => { if (e.target === $("print-modal")) closePrintModal(); });
+      $("chk-answer-key").addEventListener("change", renderPrintPreview);
+      $("btn-shuffle-print").addEventListener("click", () => { SFX.click(); state.printQuestions = drawQuestionsForLevel(state.printLevelId, state.printCount); renderPrintPreview(); });
+      $("btn-do-print").addEventListener("click", () => { renderPrintPreview(); window.print(); });
+    }
+
+    function initApp() {
+      resizeConfettiCanvas();
+      loadStars();
+      bindEvents();
+      renderHome();
+    }
+
+    window.addEventListener("resize", resizeConfettiCanvas);
+    if ("speechSynthesis" in window) window.speechSynthesis.onvoiceschanged = () => {};
+    window.onload = initApp;
+  </script>
+</body>
+</html>
